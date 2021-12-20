@@ -48,7 +48,7 @@ class AnnotatedMetricFunction:
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 
-    def invoke(self, df: pd.DataFrame, multi_d_columns: List[str]):
+    def invoke(self, df: pd.DataFrame):
         """Invoke the wrapped function on the supplied DataFrame.
 
         The function extracts its arguments from the supplied DataFrame :code:`df`.
@@ -69,17 +69,11 @@ class AnnotatedMetricFunction:
         """
         args = []
         for arg_name in self.postional_argument_names:
-            if arg_name in multi_d_columns:
-                args.append(list(df[arg_name]))
-            else:
-                args.append(list(df[arg_name]))
+            args.append(list(df[arg_name]))
 
         kwargs = dict()
         for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
-            if data_arg_name in multi_d_columns:
-                kwargs[func_arg_name] = list(df[data_arg_name])
-            else:
-                kwargs[func_arg_name] = list(df[data_arg_name])
+            kwargs[func_arg_name] = list(df[data_arg_name])
 
         result = self.func(*args, **kwargs)
 

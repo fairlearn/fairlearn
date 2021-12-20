@@ -43,8 +43,8 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells.
 
 def apply_to_dataframe(
         data: pd.DataFrame,
-        metric_functions: Dict[str, AnnotatedMetricFunction],
-        multi_d_columns: List[str]) -> pd.Series:
+        metric_functions: Dict[str, AnnotatedMetricFunction]
+) -> pd.Series:
     """Apply metric functions to a DataFrame.
 
     The incoming DataFrame may have been sliced via `groupby()`.
@@ -55,7 +55,7 @@ def apply_to_dataframe(
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
-        values[function_name] = metric_function.invoke(data, multi_d_columns)
+        values[function_name] = metric_function.invoke(data)
     result = pd.Series(data=values.values(), index=values.keys())
     return result
 
@@ -297,16 +297,16 @@ class MetricFrame:
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
 
-        self._all_data = pd.DataFrame(dtype='object')
-        self._multi_d_columns: List[str] = []
+        all_data = pd.DataFrame(dtype='object')
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        self._accrete_array(y_t, 'y_true')
-        self._accrete_array(y_p, 'y_pred')
+        
+        all_data['y_true'] = list(y_t)
+        all_data['y_pred'] = list(y_p)
 
-        annotated_funcs = self._process_functions(metrics, sample_params)
+        annotated_funcs = self._process_functions(metrics, sample_params, all_data)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
@@ -320,12 +320,12 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name_ for x in cf_list]
 
-        # Add sensitive and conditional features to _all_data
+        # Add sensitive and conditional features to all_data
         for sf in sf_list:
-            self._all_data[sf.name_] = list(sf.raw_feature_)
+            all_data[sf.name_] = list(sf.raw_feature_)
         if cf_list is not None:
             for cf in cf_list:
-                self._all_data[cf.name_] = list(cf.raw_feature_)
+                all_data[cf.name_] = list(cf.raw_feature_)
 
         # Check for duplicate feature names
         nameset = set()
@@ -339,14 +339,12 @@ class MetricFrame:
 
         if self._cf_names is None:
             self._overall = apply_to_dataframe(
-                self._all_data,
-                metric_functions=annotated_funcs,
-                multi_d_columns=self._multi_d_columns)
+                all_data,
+                metric_functions=annotated_funcs)
         else:
-            temp = self._all_data.groupby(by=self._cf_names).apply(
+            temp = all_data.groupby(by=self._cf_names).apply(
                 apply_to_dataframe,
-                metric_functions=annotated_funcs,
-                multi_d_columns=self._multi_d_columns
+                metric_functions=annotated_funcs
             )
             # If there are multiple control features, might have missing combinations
             if len(self._cf_names) > 1:
@@ -362,10 +360,9 @@ class MetricFrame:
             # Prepend the conditional features, so they are 'higher'
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
-        temp = self._all_data.groupby([x.name_ for x in grouping_features]).apply(
+        temp = all_data.groupby([x.name_ for x in grouping_features]).apply(
             apply_to_dataframe,
-            metric_functions=annotated_funcs,
-            multi_d_columns=self._multi_d_columns)
+            metric_functions=annotated_funcs)
         if len(grouping_features) > 1:
             all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
                                                      names=[x.name_ for x in grouping_features])
@@ -725,7 +722,7 @@ class MetricFrame:
 
         return result
 
-    def _process_functions(self, metric, sample_params) -> Dict[str, AnnotatedMetricFunction]:
+    def _process_functions(self, metric, sample_params, all_data: pd.DataFrame) -> Dict[str, AnnotatedMetricFunction]:
         """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""  # noqa: E501
         self._user_supplied_callable = True
         func_dict = dict()
@@ -753,11 +750,11 @@ class MetricFrame:
                 if name in s_p:
                     curr_s_p = s_p[name]
 
-                amf = self._process_one_function(func, name, curr_s_p)
+                amf = self._process_one_function(func, name, curr_s_p, all_data)
                 func_dict[amf.name] = amf
         else:
             # This is the case where the user has supplied a single metric function
-            amf = self._process_one_function(metric, None, sample_params)
+            amf = self._process_one_function(metric, None, sample_params, all_data)
             func_dict[amf.name] = amf
         return func_dict
 
@@ -765,7 +762,8 @@ class MetricFrame:
             self,
             func: Callable,
             name: str,
-            sample_parameters: Dict[str, Any]) -> AnnotatedMetricFunction:
+            sample_parameters: Dict[str, Any],
+            all_data: pd.DataFrame) -> AnnotatedMetricFunction:
         # Deal with the sample parameters
         _sample_param_arrays = dict()
         if sample_parameters is not None:
@@ -780,7 +778,7 @@ class MetricFrame:
         kwarg_dict = dict()
         for param_name, param_values in _sample_param_arrays.items():
             col_name = f'{name}_{param_name}'
-            self._accrete_array(param_values, col_name)
+            all_data[col_name] = param_values
             kwarg_dict[param_name] = col_name
 
         # Construct the return object
@@ -844,18 +842,3 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
-
-    def _accrete_array(
-            self,
-            source: np.ndarray,
-            base_name: str):
-        """Add an ndarray to _all_data DataFrame.
-
-        Multi-dimensional arrays have special handling,
-        which is recorded in _multi_d_columns
-        """
-        if len(source.shape) == 1:
-            self._all_data[base_name] = list(source)
-        else:
-            self._all_data[base_name] = list(source)
-            self._multi_d_columns.append(base_name)
