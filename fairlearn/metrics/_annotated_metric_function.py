@@ -48,7 +48,7 @@ class AnnotatedMetricFunction:
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 
-    def invoke(self, df: pd.DataFrame, split_columns: Dict[str, List[str]]):
+    def invoke(self, df: pd.DataFrame, multi_d_columns: List[str]):
         """Invoke the wrapped function on the supplied DataFrame.
 
         The function extracts its arguments from the supplied DataFrame :code:`df`.
@@ -64,26 +64,20 @@ class AnnotatedMetricFunction:
 
         The second issue is coping with when users have passed in a 2D array as
         a named argument (especially, `y_true` or `y_pred`).
-        These can't be packed into a single DataFrame column (pandas throws an error),
-        so we have to split them into individual columns (giving them unique names)
-        and then stitch them back together before packing then into the keyword
-        argument. The mapping is provided by the :code:`split_columns` argument.
-        This is a dictionary mapping the argument name to the list of corresponding
-        column names.
+        These are subject to some extra list-washing; columns requiring this
+        treatment are recorded in `multi_d_columns`.
         """
         args = []
         for arg_name in self.postional_argument_names:
-            if arg_name in split_columns:
-                sub_frame = df[split_columns[arg_name]]
-                args.append(sub_frame.to_numpy())
+            if arg_name in multi_d_columns:
+                args.append(list(df[arg_name]))
             else:
                 args.append(df[arg_name])
 
         kwargs = dict()
         for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
-            if data_arg_name in split_columns:
-                sub_frame = df[split_columns[data_arg_name]]
-                kwargs[func_arg_name] = sub_frame.to_numpy()
+            if data_arg_name in multi_d_columns:
+                kwargs[func_arg_name] = list(df[arg_name])
             else:
                 kwargs[func_arg_name] = df[data_arg_name]
 

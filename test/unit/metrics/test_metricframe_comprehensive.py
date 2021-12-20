@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import sklearn.metrics as skm
+import time
 
 import fairlearn.metrics as metrics
 
@@ -54,9 +55,13 @@ def test_3m_2sf_2cf():
     cf_array = np.stack([cf_1_arr, cf_2_arr], axis=1)
 
     # Create the target object
+    start = time.time()
     target = metrics.MetricFrame(metrics=metric_dict, y_true=y_true, y_pred=y_pred,
                                  sensitive_features=sf_frame,
                                  control_features=cf_array)
+    end = time.time()
+    elapsed = end - start
+    print(f"MetricFrame evaluation took {elapsed} secs")
 
     # Check on the indices properties
     assert isinstance(target.control_levels, list)

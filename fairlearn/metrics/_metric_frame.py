@@ -44,18 +44,18 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells.
 def apply_to_dataframe(
         data: pd.DataFrame,
         metric_functions: Dict[str, AnnotatedMetricFunction],
-        split_columns: Dict[str, List[str]]) -> pd.Series:
+        multi_d_columns: List[str]) -> pd.Series:
     """Apply metric functions to a DataFrame.
 
     The incoming DataFrame may have been sliced via `groupby()`.
     This function applies each annotated function in turn to the
     supplied DataFrame.
-    The `split_columns` argument provides information about arguments
-    which may have been split across multiple DataFrame columns.
+    The `multi_d_columns` argument provides information about arguments
+    which are multi-dimensional arrays
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
-        values[function_name] = metric_function.invoke(data, split_columns)
+        values[function_name] = metric_function.invoke(data, multi_d_columns)
     result = pd.Series(data=values.values(), index=values.keys())
     return result
 
@@ -298,7 +298,7 @@ class MetricFrame:
         check_consistent_length(y_true, y_pred)
 
         self._all_data = pd.DataFrame(dtype='object')
-        self._split_columns: Dict[str, List[str]] = dict()
+        self._multi_d_columns: List[str] = []
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
@@ -341,12 +341,12 @@ class MetricFrame:
             self._overall = apply_to_dataframe(
                 self._all_data,
                 metric_functions=annotated_funcs,
-                split_columns=self._split_columns)
+                multi_d_columns=self._multi_d_columns)
         else:
             temp = self._all_data.groupby(by=self._cf_names).apply(
                 apply_to_dataframe,
                 metric_functions=annotated_funcs,
-                split_columns=self._split_columns
+                multi_d_columns=self._multi_d_columns
             )
             # If there are multiple control features, might have missing combinations
             if len(self._cf_names) > 1:
@@ -365,7 +365,7 @@ class MetricFrame:
         temp = self._all_data.groupby([x.name_ for x in grouping_features]).apply(
             apply_to_dataframe,
             metric_functions=annotated_funcs,
-            split_columns=self._split_columns)
+            multi_d_columns=self._multi_d_columns)
         if len(grouping_features) > 1:
             all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
                                                      names=[x.name_ for x in grouping_features])
@@ -851,19 +851,11 @@ class MetricFrame:
             base_name: str):
         """Add an ndarray to _all_data DataFrame.
 
-        Splits into multiple columns if required, and updates
-        _split_columns accordingly.
+        Multi-dimensional arrays have special handling,
+        which is recorded in _multi_d_columns
         """
         if len(source.shape) == 1:
             self._all_data[base_name] = source
-            return
         else:
-            n_cols = source.shape[1]
-            unique_str = str(uuid.uuid4())
-            name_fmt = f"{base_name}_{unique_str}"+"{0}"
-            col_list = []
-            for i in range(n_cols):
-                col_name = name_fmt.format(i)
-                col_list.append(col_name)
-                self._all_data[col_name] = source[:, i]
-            self._split_columns[base_name] = col_list
+            self._all_data[base_name] = list(source)
+            self._multi_d_columns.append(base_name)
