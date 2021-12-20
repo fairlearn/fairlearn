@@ -246,7 +246,7 @@ def test_1m_1_sf_sample_weights():
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(p1)
         assert len(y_t) == len(p2)
-        assert np.array_equal(p2, y_t + y_p + p1)
+        assert np.array_equal(p2, np.asarray(y_t) + np.asarray(y_p) + np.asarray(p1))
         return sum(p2)
 
     # Generate some random input data
@@ -290,9 +290,10 @@ def test_2m_1sf_sample_weights():
         """
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(some_param_name)
-        assert all(some_param_name == y_t + y_p)
-        assert isinstance(some_param_name, pd.Series)
-        return some_param_name.sum()
+        assert np.array_equal(some_param_name,
+                              np.asarray(y_t) + np.asarray(y_p))
+        assert isinstance(some_param_name, list)
+        return sum(some_param_name)
 
     def multi_sp(y_t, y_p, some_param_name, some_other):
         """Metric accepting multiple sample parameters.
@@ -304,9 +305,10 @@ def test_2m_1sf_sample_weights():
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(some_param_name)
         assert len(y_t) == len(some_other)
-        assert np.array_equal(some_other, y_t + y_p * some_param_name)
-        assert isinstance(some_other, pd.Series)
-        return some_other.sum()
+        assert np.array_equal(some_other,
+                              np.asarray(y_t) + np.asarray(y_p) * np.asarray(some_param_name))
+        assert isinstance(some_other, list)
+        return sum(some_other)
 
     # Give the metrics some unusual names
     m1 = r"! # \ | $"

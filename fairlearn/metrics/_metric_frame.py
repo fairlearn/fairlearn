@@ -855,7 +855,7 @@ class MetricFrame:
         which is recorded in _multi_d_columns
         """
         if len(source.shape) == 1:
-            self._all_data[base_name] = source
+            self._all_data[base_name] = list(source)
         else:
             self._all_data[base_name] = list(source)
             self._multi_d_columns.append(base_name)

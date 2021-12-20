@@ -72,14 +72,14 @@ class AnnotatedMetricFunction:
             if arg_name in multi_d_columns:
                 args.append(list(df[arg_name]))
             else:
-                args.append(df[arg_name])
+                args.append(list(df[arg_name]))
 
         kwargs = dict()
         for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
             if data_arg_name in multi_d_columns:
                 kwargs[func_arg_name] = list(df[data_arg_name])
             else:
-                kwargs[func_arg_name] = df[data_arg_name]
+                kwargs[func_arg_name] = list(df[data_arg_name])
 
         result = self.func(*args, **kwargs)
 
