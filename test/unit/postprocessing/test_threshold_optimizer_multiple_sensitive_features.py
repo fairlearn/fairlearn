@@ -19,7 +19,7 @@ fairness_metrics = {
     "false_positive_rate": false_positive_rate,
     "positive_count": lambda true, pred: np.sum(true),
     "false_negative_rate": false_negative_rate,
-    "negative_count": lambda true, pred: np.sum(1-true),
+    "negative_count": lambda true, pred: np.sum(1-np.asarray(true)),
     "balanced_accuracy": balanced_accuracy_score
 }
 
