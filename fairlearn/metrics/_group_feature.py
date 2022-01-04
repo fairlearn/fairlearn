@@ -67,4 +67,3 @@ class GroupFeature:
                         feature_vector.name, type(feature_vector.name)
                     )
                     raise ValueError(msg)
-
