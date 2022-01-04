@@ -52,33 +52,19 @@ class GroupFeature:
         self, base_name: str, feature_vector, index: int, name: Optional[str]
     ):
         """Help with the metrics."""
-        self._classes = np.unique(feature_vector)
-        self._raw_feature_values = feature_vector
+        self.classes_ = np.unique(feature_vector)
+        self.raw_feature_ = feature_vector
 
-        self._name = "{0}{1}".format(base_name, index)
+        self.name_ = "{0}{1}".format(base_name, index)
         if name is not None:
-            self._name = name
+            self.name_ = name
         elif isinstance(feature_vector, pd.Series):
             if feature_vector.name is not None:
                 if isinstance(feature_vector.name, str):
-                    self._name = feature_vector.name
+                    self.name_ = feature_vector.name
                 else:
                     msg = _SERIES_NAME_NOT_STRING.format(
                         feature_vector.name, type(feature_vector.name)
                     )
                     raise ValueError(msg)
 
-    @property
-    def name_(self) -> str:
-        """Return the name of the feature."""
-        return self._name
-
-    @property
-    def classes_(self) -> List:
-        """Return list of unique classes."""
-        return list(self._classes)
-
-    @property
-    def raw_feature_(self):
-        """Return the feature values passed in constructor."""
-        return self._raw_feature_values
