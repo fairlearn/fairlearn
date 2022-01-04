@@ -70,11 +70,13 @@ class AnnotatedMetricFunction:
         """
         args = []
         for arg_name in self.postional_argument_names:
-            args.append(np.asarray(df[arg_name]))
+            # Need to convert to list first in case we have 2D arrays
+            args.append(np.asarray(list(df[arg_name])))
 
         kwargs = dict()
         for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
-            kwargs[func_arg_name] = np.asarray(df[data_arg_name])
+            # Need to convert to list first in case we have 2D arrays
+            kwargs[func_arg_name] = np.asarray(list(df[data_arg_name]))
 
         result = self.func(*args, **kwargs)
 
