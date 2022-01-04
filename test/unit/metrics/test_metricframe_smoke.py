@@ -290,9 +290,8 @@ def test_2m_1sf_sample_weights():
         """
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(some_param_name)
-        assert np.array_equal(some_param_name,
-                              np.asarray(y_t) + np.asarray(y_p))
-        assert isinstance(some_param_name, list)
+        assert np.array_equal(some_param_name, y_t+y_p)
+        assert isinstance(some_param_name, np.ndarray)
         return sum(some_param_name)
 
     def multi_sp(y_t, y_p, some_param_name, some_other):
@@ -306,8 +305,8 @@ def test_2m_1sf_sample_weights():
         assert len(y_t) == len(some_param_name)
         assert len(y_t) == len(some_other)
         assert np.array_equal(some_other,
-                              np.asarray(y_t) + np.asarray(y_p) * np.asarray(some_param_name))
-        assert isinstance(some_other, list)
+                              y_t+y_p * some_param_name)
+        assert isinstance(some_other, np.ndarray)
         return sum(some_other)
 
     # Give the metrics some unusual names

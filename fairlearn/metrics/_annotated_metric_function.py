@@ -4,6 +4,7 @@
 from typing import Callable, Dict, List, Optional
 
 import logging
+import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -69,11 +70,11 @@ class AnnotatedMetricFunction:
         """
         args = []
         for arg_name in self.postional_argument_names:
-            args.append(list(df[arg_name]))
+            args.append(np.asarray(df[arg_name]))
 
         kwargs = dict()
         for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
-            kwargs[func_arg_name] = list(df[data_arg_name])
+            kwargs[func_arg_name] = np.asarray(df[data_arg_name])
 
         result = self.func(*args, **kwargs)
 
