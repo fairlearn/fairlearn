@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import List, Optional
+from typing import Optional
 import numpy as np
 import pandas as pd
 
