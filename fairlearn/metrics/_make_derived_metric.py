@@ -132,7 +132,9 @@ def make_derived_metric(
         The metric function from which the new function should be derived
 
     transform : str
-        Selects the transformation aggregation the resultant function should use
+        Selects the transformation aggregation the resultant function should use.
+        The list of possible options is:
+        ['difference', 'group_min', 'group_max', 'ratio'].
 
     sample_param_names : List[str]
         A list of parameters names of the underlying :code:`metric` which should
@@ -146,7 +148,7 @@ def make_derived_metric(
     -------
     callable
         Function with the same signature as the :code:`metric` but with additional
-        :code:`sensitive_feature=` and :code:`method=` arguments, to enable the
+        :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
     dm = _DerivedMetric(metric=metric,

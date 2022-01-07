@@ -544,10 +544,10 @@ The other constraints acquire similar modifications.
 
 .. _constraints_multi_class_classification:
 
-Fairness constraints for multi-class classification
+Fairness constraints for multiclass classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Reductions approaches do not support multi-class classification yet at this
+Reductions approaches do not support multiclass classification yet at this
 point. If this is an important scenario for you please let us know!
 
 .. _constraints_regression:
