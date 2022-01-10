@@ -5,12 +5,12 @@ Retiring Adult: ACSIncome
 Introduction
 ^^^^^^^^^^^^^^^^^
 
-The ACSIncome dataset is one of five datasets created by Ding et al. [#1]_ 
+The ACSIncome dataset is one of five datasets created by Ding et al. [#0]_ 
 as an improved alternative to the popular UCI Adult dataset.
 The authors compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
 Note that this is a different source than the Annual Social and Economic Supplement (ASEC) 
 of the Current Population Survey (CPS) used to construct the original UCI Adult dataset.
-Ding et al. [#1]_ filtered the data such that ACSIncome only includes individuals above 16 years old 
+Ding et al. [#0]_ filtered the data such that ACSIncome only includes individuals above 16 years old 
 who worked at least 1 hour per week in the past year and had an income of at least $100.
 
 
@@ -160,6 +160,6 @@ An additonal column for the state code is also provided so users to easily filte
 
 .. topic:: References:
 
-  .. [#1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
+  .. [#0] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
       Advances in Neural Information Processing Systems 34, 2021.
 
