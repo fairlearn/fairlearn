@@ -10,7 +10,7 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 def fetch_acsincome(*, cache=True, data_home=None,
                     as_frame=False, return_X_y=False):
     """Load the ACS Income dataset.
-    
+
     Download it if necessary.
 
     ==============   ==============
@@ -52,7 +52,7 @@ def fetch_acsincome(*, cache=True, data_home=None,
         Dictionary-like object, with the following attributes.
 
         data : ndarray, shape (1664500, 12)
-            Each row corresponding to the 10 feature values in order as well as 
+            Each row corresponding to the 10 feature values in order as well as
             the state code (ST) and the target varaible (PINCP).
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (1664500,)
@@ -73,9 +73,9 @@ def fetch_acsincome(*, cache=True, data_home=None,
 
     References
     ----------
-    .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt 
-       "Retiring Adult: New Datasets for Fair Machine Learning"
-      Advances in Neural Information Processing Systems 34, 2021.
+    .. [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021).
+       "Retiring Adult: New Datasets for Fair Machine Learning."
+       Advances in Neural Information Processing Systems, 34.
 
     """
     if not data_home:
