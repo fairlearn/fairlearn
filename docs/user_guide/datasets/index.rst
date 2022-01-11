@@ -3,8 +3,7 @@
 Datasets
 ==========
 
-This section contains pages describing datasets that have been
-incorporated into the Fairlearn package.
+In this section we dive deeper into various datasets that have fairness-related concerns.
 
 .. toctree::
    :maxdepth: 2
