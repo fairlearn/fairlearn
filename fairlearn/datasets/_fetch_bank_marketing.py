@@ -39,7 +39,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None,
 
     data_home : str, default=None
         Specify another download and cache folder for the datasets.
-        By default, all data is stored in '~/.fairlearn-data'
+        By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
     as_frame : bool, default=False

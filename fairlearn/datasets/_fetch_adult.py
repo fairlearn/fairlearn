@@ -34,7 +34,7 @@ def fetch_adult(*, cache=True, data_home=None,
 
     data_home : str, default=None
         Specify another download and cache folder for the datasets.
-        By default, all scikit-learn data is stored in '~/.fairlearn-data'
+        By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
     as_frame : bool, default=False
