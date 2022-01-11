@@ -20,9 +20,10 @@ def fetch_acsincome(*, cache=True, data_home=None,
     Target                     real
     ==============   ==============
 
-    Source: Paper: Frances Ding (2021) [1]_
+    Source: Paper: Ding et al. (2021) [1]_
+            and corresponding repository https://github.com/zykls/folktables/
 
-    .. versionadded:: 0.8.0
+    .. versionadded:: 0.7.1
 
     Parameters
     ----------
@@ -53,7 +54,7 @@ def fetch_acsincome(*, cache=True, data_home=None,
 
         data : ndarray, shape (1664500, 12)
             Each row corresponding to the 10 feature values in order as well as
-            the state code (ST) and the target varaible (PINCP).
+            the state code (ST) and the target variable (PINCP).
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (1664500,)
             Integer denoting each person's income.
