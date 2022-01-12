@@ -101,7 +101,7 @@ def fetch_boston(*, cache=True, data_home=None,
         DESCR : string
             Description of the Boston housing dataset.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
+    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
         if ``return_X_y`` is True and ``as_frame`` is False
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
