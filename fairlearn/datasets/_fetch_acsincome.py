@@ -56,7 +56,6 @@ def fetch_acsincome(*, cache=True, data_home=None,
         If None, data from all 50 US states, including Puerto Rico, will be returned.
         The state abbreviations and codes can be found on page 1 of the data dictionary at ACS PUMS
         https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf
-        and are reproduced in the `_STATE_CODES` dictionary below.
 
     Returns
     -------
@@ -101,8 +100,24 @@ def fetch_acsincome(*, cache=True, data_home=None,
                     'SD': '46', 'TN': '47', 'TX': '48', 'UT': '49', 'VT': '50',
                     'VA': '51', 'WA': '53', 'WV': '54', 'WI': '55', 'WY': '56',
                     'PR': '72'}
-    if states is None:
+    # number of features
+    _NUM_FEATS = 10
+
+    # check that user-provided state abbreviations are valid
+    if states is not None:
+        states = [state.upper() for state in states]
+        for state in states:
+            try:
+                _STATE_CODES[state]
+            except KeyError:
+                raise KeyError(f'Error with state code: {state}\n'
+                               f'State code must be a two letter abbreviation'
+                               f'from the list {list(_STATE_CODES.keys())}\n'
+                               f'Note that PR is the abbreviation for Puerto Rico.'
+                               )
+    else:
         states = _STATE_CODES.keys()
+
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
@@ -127,13 +142,13 @@ def fetch_acsincome(*, cache=True, data_home=None,
     df.drop('ST', axis=1, inplace=True)
 
     if as_frame:
-        data_dict['data'] = df.iloc[:, :10]
+        data_dict['data'] = df.iloc[:, :_NUM_FEATS]
         data_dict['frame'] = df
-        data_dict['target'] = df.iloc[:, 10:]
+        data_dict['target'] = df.iloc[:, _NUM_FEATS]
     else:
-        data_dict['data'] = df.iloc[:, :10].values
+        data_dict['data'] = df.iloc[:, :_NUM_FEATS].values
         data_dict['frame'] = None
-        data_dict['target'] = df.iloc[:, 10:].values.flatten()
+        data_dict['target'] = df.iloc[:, _NUM_FEATS].values
 
     output = data_dict
 
