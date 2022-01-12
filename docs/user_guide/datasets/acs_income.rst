@@ -1,16 +1,23 @@
 .. _acsincome-data:
-Retiring Adult: ACSIncome
+ACSIncome
 -------------------------
 
 Introduction
 ^^^^^^^^^^^^^^^^^
 
 The ACSIncome dataset is one of five datasets created by Ding et al. [1]_ 
-as an improved alternative to the popular UCI Adult dataset.
-The authors compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
+as an improved alternative to the popular UCI Adult dataset [2]_.
+Briefly, the UCI Adult dataset is commonly used as a benchmark dataset when comparing
+different algorithmic fairness interventions. ACSIncome offers a few improvements,
+such as providing more datapoints (1,664,500 vs. 48,842) and more recent data (2018 vs. 1994).
+Further, the binary labels in the UCI Adult dataset indicate whether an indivdual earned 
+more than $50k US dollars in that year. Ding et al. show that the choice of threshold impacts
+the amount of fairness violation, so they allow users to define any threshold.
+
+Ding et al. compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
 Note that this is a different source than the Annual Social and Economic Supplement (ASEC) 
 of the Current Population Survey (CPS) used to construct the original UCI Adult dataset.
-Ding et al. [1]_ filtered the data such that ACSIncome only includes individuals above 16 years old 
+Ding et al. filtered the data such that ACSIncome only includes individuals above 16 years old 
 who worked at least 1 hour per week in the past year and had an income of at least $100.
 
 
@@ -18,7 +25,7 @@ who worked at least 1 hour per week in the past year and had an income of at lea
 
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
-The authors provide data from 2014-2018 for all 50 states and Puerto Rico.
+Ding et al. provide data from 2014-2018 for all 50 states and Puerto Rico.
 We uploaded the 2018 data to OpenML, which fairlearn can access.
 The dataset contains 1,664,500 rows. Each row describes a person and contains 10 features, which we describe below:
 
@@ -104,8 +111,8 @@ The dataset contains 1,664,500 rows. Each row describes a person and contains 10
          13. Unmarried partner
          14. Foster child
          15. Other nonrelative
-         16. Institutionalized group quarters population. Includes correctional facilities, nursing homes, and mental hopsitals. [2]_
-         17. Noninstitutionalized group quarters population. Includes college dormitories, military barracks, group homes, missions, and shelters. [2]_
+         16. Institutionalized group quarters population. Includes correctional facilities, nursing homes, and mental hopsitals. [3]_
+         17. Noninstitutionalized group quarters population. Includes college dormitories, military barracks, group homes, missions, and shelters. [3]_
 
    *  - WKHP
       - Usual hours worked per week in the past 12 months. Values are an integer from 1 to 99. Any hours above 99 are rounded down to 99
@@ -148,6 +155,8 @@ A threshold can be applied to PINCP to frame this as a binary classification tas
   .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
       Advances in Neural Information Processing Systems 34, 2021.
 
-  .. [2] `"Group Quarters and Residence Rules for Poverty", <https://www.census.gov/topics/income-poverty/poverty/guidance/group-quarters.html>`_,
+  .. [2] R. Kohavi and B. Becker. "UCI Adult Data Set." UCI Meachine Learning Repository, 5, 1996.
+
+  .. [3] `"Group Quarters and Residence Rules for Poverty", <https://www.census.gov/topics/income-poverty/poverty/guidance/group-quarters.html>`_,
       United States Census Bureau.
 
