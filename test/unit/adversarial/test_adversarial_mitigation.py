@@ -44,7 +44,9 @@ from .helper import (
         estimator_checks.check_estimators_dtypes,
         estimator_checks.check_fit_score_takes_y,
         estimator_checks.check_estimators_fit_returns_self,
-        estimator_checks.check_estimators_fit_returns_self,  # readonly_memmap=True
+        # The following does check seems equivalent to the previous, and it
+        # requires a parameter: readonly_memmap=True. So, we skip it.
+        # estimator_checks.check_estimators_fit_returns_self
         estimator_checks.check_complex_data,
         estimator_checks.check_dtype_object,
         estimator_checks.check_estimators_empty_data_messages,
