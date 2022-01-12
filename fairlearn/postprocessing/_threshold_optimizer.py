@@ -31,6 +31,8 @@ from sklearn.utils import Bunch
 from ..utils._common import _get_soft_predictions
 from ..utils._input_validation import (
     _validate_and_reformat_input,
+    _LABELS_NOT_BINARY_ERROR_MESSAGE,
+    _LABELS_MISSING_POS_LABEL,
     _KW_CONTROL_FEATURES,
 )
 from ._constants import (
@@ -281,22 +283,27 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         if kwargs.get(_KW_CONTROL_FEATURES) is not None:
             raise ValueError(NO_CONTROL_FEATURES)
 
-        _, _, sensitive_feature_vector, _ = _validate_and_reformat_input(
+        _, y, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X,
             y,
             sensitive_features=sensitive_features,
             enforce_binary_labels=True,
         )
 
-        self.classes_, y = np.unique(y, return_inverse=True)
-        # FIXME: Probably no longer need the code below to assert int
-
-        # postprocessing can't handle 0/1 as floating point numbers, so this
-        # converts it to int
-        if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
-            y = y.astype(int)
+        pos_label = kwargs.get('pos_label', None)
+        if pos_label:
+            labels = np.unique(y)
+            if not len(labels) == 2:
+                raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
+            if pos_label == labels[0]:
+                self.classes_ = [labels[1], labels[0]]
+            elif pos_label == labels[1]:
+                self.classes_ = [labels[0], labels[1]]
+            else:
+                raise ValueError(_LABELS_MISSING_POS_LABEL)
+            y = (y == pos_label).astype(int)
         else:
-            y = [int(y_val) for y_val in y]
+            self.classes_, y = np.unique(y, return_inverse=True)
 
         if not self.prefit:
             # Following is on two lines due to issue when estimator comes from
