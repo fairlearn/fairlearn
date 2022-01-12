@@ -288,6 +288,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             enforce_binary_labels=True,
         )
 
+        self.classes_, y = np.unique(y, return_inverse=True)
+        # FIXME: Probably no longer need the code below to assert int
+
         # postprocessing can't handle 0/1 as floating point numbers, so this
         # converts it to int
         if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
@@ -354,9 +357,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             a scalar. Otherwise the result will be a vector.
         """
         check_is_fitted(self)
-        return self.interpolated_thresholder_.predict(
+        y = self.interpolated_thresholder_.predict(
             X, sensitive_features=sensitive_features, random_state=random_state
         )
+        return self.classes_[y]
 
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.
