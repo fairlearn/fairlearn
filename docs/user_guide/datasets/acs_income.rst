@@ -140,7 +140,7 @@ A threshold can be applied to PINCP to frame this as a binary classification tas
       - Description
 
    *  - PINCP
-      - Total income per person, denoted as an integer ranging from 104 to 1,423,000.
+      - Total annual income per person, denoted as an integer ranging from 104 to 1,423,000.
 
 
 .. topic:: References:
