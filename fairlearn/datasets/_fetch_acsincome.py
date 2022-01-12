@@ -52,8 +52,11 @@ def fetch_acsincome(*, cache=True, data_home=None,
         object.
 
     states: list, default=None
-        List containing state abbreviations. If None, data from all 50 US
-        states, including Puerto Rico, will be returned.
+        List containing two letter (capitalized) state abbreviations.
+        If None, data from all 50 US states, including Puerto Rico, will be returned.
+        The state abbreviations and codes can be found on page 1 of the data dictionary at ACS PUMS
+        https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf
+        and are reproduced in the `_STATE_CODES` dictionary below.
 
     Returns
     -------
