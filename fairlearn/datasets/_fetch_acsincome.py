@@ -64,7 +64,7 @@ def fetch_acsincome(*, cache=True, data_home=None,
             Each row corresponding to the 10 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (1664500,)
-            Integer denoting each person's income.
+            Integer denoting each person's annual income.
             A threshold can be applied as a postprocessing step to frame this
             as a binary classification problem.
             If ``as_frame`` is True, ``target`` is a pandas object.
