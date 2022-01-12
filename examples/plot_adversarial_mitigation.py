@@ -246,6 +246,7 @@ def validate(mitigator):
 
 schedulers = []
 
+
 def optimizer_constructor(model):
     global schedulers
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -253,6 +254,7 @@ def optimizer_constructor(model):
         torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.995)
     )
     return optimizer
+
 
 step = 1
 
