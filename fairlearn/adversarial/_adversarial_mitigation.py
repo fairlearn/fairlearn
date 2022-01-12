@@ -79,7 +79,8 @@ class AdversarialFairness(BaseEstimator):
         the number of nodes :math:`k_i` (if :math:`k_i` is integer) or a keyword
         that indicates an activation function (if :math:`k_i` is a string) or
         a layer or activation function instance directly (if :math:`k_i` is
-        callable).
+        callable). The default parameter is :code:`[]`, which indicates
+        a neural network without any hidden layers.
         However, the number of nodes in the input
         and output layer are automatically inferred from data, and the final
         activation function (such as softmax for categorical
@@ -88,7 +89,8 @@ class AdversarialFairness(BaseEstimator):
         that uses a different backend.
 
     adversary_model : list, torch.nn.Module, tensorflow.keras.Model
-        The adversary model to train. Must be the same type as the
+        The adversary model to train. Defined similarly as predictor_model.
+        Must be the same type as the
         :code:`predictor_model`.
 
     predictor_loss : str, callable, default = 'auto'
@@ -228,8 +230,8 @@ class AdversarialFairness(BaseEstimator):
         self,
         *,
         backend="auto",
-        predictor_model,
-        adversary_model,
+        predictor_model=[],  # [] is a NN with no hidden layers.
+        adversary_model=[],
         predictor_loss="auto",
         adversary_loss="auto",
         predictor_function="auto",
