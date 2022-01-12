@@ -5,23 +5,22 @@ Retiring Adult: ACSIncome
 Introduction
 ^^^^^^^^^^^^^^^^^
 
-The ACSIncome dataset is one of five datasets created by Ding et al. [#0]_ 
+The ACSIncome dataset is one of five datasets created by Ding et al. [1]_ 
 as an improved alternative to the popular UCI Adult dataset.
 The authors compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
 Note that this is a different source than the Annual Social and Economic Supplement (ASEC) 
 of the Current Population Survey (CPS) used to construct the original UCI Adult dataset.
-Ding et al. [#0]_ filtered the data such that ACSIncome only includes individuals above 16 years old 
+Ding et al. [1]_ filtered the data such that ACSIncome only includes individuals above 16 years old 
 who worked at least 1 hour per week in the past year and had an income of at least $100.
-
-
 
 
 .. _acsincome_dataset_description:
 
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
-Data is provided from 2018 for all 50 states and Puerto Rico.
-There are 1,664,500 rows and 10 features, which are described below:
+The authors provide data from 2014-2018 for all 50 states and Puerto Rico.
+We uploaded the 2018 data to OpenML, which fairlearn can access.
+The dataset contains 1,664,500 rows. Each row describes a person and contains 10 features, which we describe below:
 
 .. list-table::
    :header-rows: 1
@@ -105,8 +104,8 @@ There are 1,664,500 rows and 10 features, which are described below:
          13. Unmarried partner
          14. Foster child
          15. Other nonrelative
-         16. Institutionalized group quarters population
-         17. Noninstitutionalized group quarters population
+         16. Institutionalized group quarters population. Includes correctional facilities, nursing homes, and mental hopsitals. [2]_
+         17. Noninstitutionalized group quarters population. Includes college dormitories, military barracks, group homes, missions, and shelters. [2]_
 
    *  - WKHP
       - Usual hours worked per week in the past 12 months. Values are an integer from 1 to 99. Any hours above 99 are rounded down to 99
@@ -141,25 +140,14 @@ A threshold can be applied to PINCP to frame this as a binary classification tas
       - Description
 
    *  - PINCP
-      - Total income, denoted as an integer ranging from 104 to 1,423,000.
-
-
-An additonal column for the state code is also provided so users to easily filter the data to focus on subsets by state.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 7 30
-   :stub-columns: 1
-
-   *  - Column name
-      - Description
-
-   *  - ST
-      - State Code based on 2010 Census definitions. Please see the data dictionary at `ACS PUMS documentation <https://www.census.gov/programs-surveys/acs/microdata/documentation.2018.html>`_ for the full list.
+      - Total income per person, denoted as an integer ranging from 104 to 1,423,000.
 
 
 .. topic:: References:
 
-  .. [#0] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
+  .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
       Advances in Neural Information Processing Systems 34, 2021.
+
+  .. [2] `"Group Quarters and Residence Rules for Poverty", <https://www.census.gov/topics/income-poverty/poverty/guidance/group-quarters.html>`_,
+      United States Census Bureau.
 
