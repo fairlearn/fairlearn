@@ -3,7 +3,7 @@
 Datasets
 ==========
 
-In this section we dive deeper into various datasets that have fairness-related concerns.
+In this section, we dive deeper into various datasets that have fairness-related concerns.
 
 .. toctree::
    :maxdepth: 2
