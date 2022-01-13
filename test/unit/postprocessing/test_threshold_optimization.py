@@ -182,18 +182,17 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform,
                                                    y_data, pos_label):
     y = y_transform(y_data)
+    if pos_label: pos_label = 1 if y_data is labels_ex else 'y'
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     # PassThroughPredictor takes scores_ex as input in predict and
     # returns score_transform(scores_ex) as output
     estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
                                    constraints='demographic_parity',
                                    flip=True,
-                                   predict_method='predict')
-    if pos_label:
-        pos_label = 1 if y_data is labels_ex else 'y'
+                                   predict_method='predict',
+                                   pos_label=pos_label)
     estimator.fit(pd.DataFrame(scores_ex), y,
-                               sensitive_features=sensitive_features,
-                               pos_label=pos_label)
+                               sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
         return estimator._pmf_predict(
