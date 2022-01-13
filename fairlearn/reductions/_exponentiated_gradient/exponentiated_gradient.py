@@ -7,6 +7,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
+from ...utils._input_validation import _encode_y
 from ._constants import _ACCURACY_MUL, _REGRET_CHECK_START_T, _REGRET_CHECK_INCREASE_T, \
     _SHRINK_REGRET, _SHRINK_ETA, _MIN_ITER, _PRECISION, _INDENTATION
 from ._lagrangian import _Lagrangian
@@ -80,11 +81,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         .. versionadded:: 0.5.0
 
+    pos_label : object
+        The label object to regard as the positive label.
+
     """
 
     def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
                  eta0=2.0, run_linprog_step=True,
-                 sample_weight_name='sample_weight'):  # noqa: D103
+                 sample_weight_name='sample_weight',
+                 pos_label=None):  # noqa: D103
         self.estimator = estimator
         self.constraints = constraints
         self.eps = eps
@@ -93,6 +98,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.eta0 = eta0
         self.run_linprog_step = run_linprog_step
         self.sample_weight_name = sample_weight_name
+        self.pos_label = pos_label
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
@@ -104,6 +110,16 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
             Label vector
         """
+
+        # TODO: def predict still outputs 0/1's
+        if True:  # FIXME: if classification!
+            self.classes_, y = _encode_y(
+                y,
+                pos_label=self.pos_label,
+                check=True,
+                enforce_binary=False  # Probably True but don't want to make assump.
+            )
+
         self.lambda_vecs_EG_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
         self.lambda_vecs_ = pd.DataFrame()
@@ -258,7 +274,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             randomized_pred = np.zeros(pred.shape[0])
             for i in range(pred.shape[0]):
                 randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
-            return randomized_pred
+            return self.classes_[randomized_pred]
 
     def _pmf_predict(self, X):
         """Probability mass function for the given input data.

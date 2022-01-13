@@ -12,15 +12,16 @@ X3 =                 [int(x) for x in '1111111' '1111111' '111111']  # noqa: E22
 scores =          [int(x)/10 for x in '0001124' '0223346' '134447']  # noqa: E222
 
 
-def _get_data(A_two_dim=False, y_as_scores=False, flip_y=False):
+def _get_data(A_two_dim=False, y_as_scores=False, flip_y=False, y_as_str=False):
     X = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
 
     if y_as_scores:
         y = pd.Series(scores)
     else:  # classification
-        y = pd.Series(labels)
+        labs = ['x' if i==0 else 'y' for i in labels] if y_as_str else labels
+        y = pd.Series(labs)
         if flip_y:
-            y = pd.Series([int(not i) for i in labels])
+            y = pd.Series([int(not i) for i in labs])
 
     if A_two_dim:
         # Stacking the same column a few times will result in the identical groups

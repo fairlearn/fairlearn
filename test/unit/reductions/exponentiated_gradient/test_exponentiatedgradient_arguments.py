@@ -12,7 +12,7 @@ from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import DemographicParity
 from fairlearn.reductions import ErrorRate
 from fairlearn.utils._input_validation import \
-    (_LABELS_NOT_0_1_ERROR_MESSAGE)
+    (_LABELS_NOT_BINARY_ERROR_MESSAGE)
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data
 
@@ -37,10 +37,11 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
+    @pytest.mark.parametrize("y_as_str", [True, False])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_argument_types_difference_bound(self, transformX, transformY, transformA, A_two_dim):
+    def test_argument_types_difference_bound(self, transformX, transformY, transformA, A_two_dim, y_as_str):
         # This is an expanded-out version of one of the smoke tests
-        X, y, A = _get_data(A_two_dim)
+        X, y, A = _get_data(A_two_dim, y_as_str=y_as_str)
         merged_A = _map_into_single_column(A)
 
         transformed_X = transformX(X)
@@ -48,10 +49,17 @@ class TestExponentiatedGradientArguments:
         transformed_A = transformA(A)
         eps = 0.1
 
+        # FIXME should fix testcases and make EG predict original labels.
+        pos_label=None
+        if y_as_str:
+            pos_label = 'y'
+            # Change y back to 0/1 encoding, because we use this to check output
+            y = (y == pos_label).astype(int)
+
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(difference_bound=eps),
-            eps=eps)
+            eps=eps, pos_label=pos_label)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
@@ -153,16 +161,17 @@ class TestExponentiatedGradientArguments:
         assert isinstance(args[1], pd.Series)
         assert isinstance(kwargs['sample_weight'], pd.Series)
 
-    def test_binary_classifier_0_1_required(self):
+    def test_binary_classifier_binary_required(self):
         X, y, A = _get_data()
-        y = 2 * y
+        if y.ndim == 1: y[0] = 2
+        elif y.ndim == 2: y[0,0] = 2
 
         expgrad = ExponentiatedGradient(LogisticRegression(),
                                         constraints=DemographicParity(),
                                         max_iter=1)
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert _LABELS_NOT_BINARY_ERROR_MESSAGE == execInfo.value.args[0]
 
     def test_sample_weights_argument(self):
         estimator = Pipeline(
