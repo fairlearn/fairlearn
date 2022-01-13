@@ -191,7 +191,9 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                    predict_method='predict')
     if pos_label:
         pos_label = 1 if y_data is labels_ex else 'y'
-    estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features, pos_label=pos_label)
+    estimator.fit(pd.DataFrame(scores_ex), y,
+                               sensitive_features=sensitive_features,
+                               pos_label=pos_label)
 
     def prob_pred(sensitive_features, scores):
         return estimator._pmf_predict(
