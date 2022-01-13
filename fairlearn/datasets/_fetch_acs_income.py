@@ -9,10 +9,10 @@ from sklearn.datasets import fetch_openml
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_acsincome(*, cache=True, data_home=None,
-                    as_frame=False, return_X_y=False,
-                    states=None,
-                    ):
+def fetch_acs_income(*, cache=True, data_home=None,
+                     as_frame=False, return_X_y=False,
+                     states=None,
+                     ):
     """Load the ACS Income dataset.
 
     Download it if necessary.
