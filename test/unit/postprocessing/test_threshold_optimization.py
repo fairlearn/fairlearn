@@ -15,7 +15,6 @@ from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import (
     NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
-from fairlearn.postprocessing._tradeoff_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
 from .conftest import (sensitive_features_ex1, labels_ex, labels_ex_string,
                        degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
@@ -121,7 +120,6 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
                                             constraints=constraints,
                                             predict_method='predict')
 
-    feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
     with pytest.raises(ValueError, match=_LABELS_NOT_BINARY_ERROR_MESSAGE):
         adjusted_predictor.fit(data_X_sf.X, y,
                                sensitive_features=data_X_sf.sensitive_features)
@@ -182,7 +180,8 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform,
                                                    y_data, pos_label):
     y = y_transform(y_data)
-    if pos_label: pos_label = 1 if y_data is labels_ex else 'y'
+    if pos_label is not None:
+        pos_label = 1 if y_data is labels_ex else 'y'
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     # PassThroughPredictor takes scores_ex as input in predict and
     # returns score_transform(scores_ex) as output
@@ -191,8 +190,8 @@ def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                    flip=True,
                                    predict_method='predict',
                                    pos_label=pos_label)
-    estimator.fit(pd.DataFrame(scores_ex), y,
-                               sensitive_features=sensitive_features)
+    estimator.fit(pd.DataFrame(scores_ex),
+                  y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
         return estimator._pmf_predict(

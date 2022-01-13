@@ -18,7 +18,7 @@ def _get_data(A_two_dim=False, y_as_scores=False, flip_y=False, y_as_str=False):
     if y_as_scores:
         y = pd.Series(scores)
     else:  # classification
-        labs = ['x' if i==0 else 'y' for i in labels] if y_as_str else labels
+        labs = ['x' if i == 0 else 'y' for i in labels] if y_as_str else labels
         y = pd.Series(labs)
         if flip_y:
             y = pd.Series([int(not i) for i in labs])

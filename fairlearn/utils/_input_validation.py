@@ -148,13 +148,17 @@ def _encode_y(y, pos_label=None, check=True, enforce_binary=False):
     """
     Encode discrete target column from objects to numerical.
 
-    hi
-
     Parameters
     ----------
     y : numpy.ndarray
         Array of targets to encode
     pos_label : the positive label
+        The label object to regard as the positive label.
+    check : bool
+        Whether to use scikit-learn's check_array on y. May be False if
+        :meth:`_validate_and_reformat_input` was called before this.
+    enforce_binary : bool
+        Enforce that there must be two unique values in y.
 
     Returns
     -------

@@ -110,7 +110,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
             Label vector
         """
-
         # TODO: def predict still outputs 0/1's
         if True:  # FIXME: if classification!
             self.classes_, y = _encode_y(

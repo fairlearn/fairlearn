@@ -39,7 +39,8 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.parametrize("y_as_str", [True, False])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_argument_types_difference_bound(self, transformX, transformY, transformA, A_two_dim, y_as_str):
+    def test_argument_types_difference_bound(self, transformX, transformY,
+                                             transformA, A_two_dim, y_as_str):
         # This is an expanded-out version of one of the smoke tests
         X, y, A = _get_data(A_two_dim, y_as_str=y_as_str)
         merged_A = _map_into_single_column(A)
@@ -50,7 +51,7 @@ class TestExponentiatedGradientArguments:
         eps = 0.1
 
         # FIXME should fix testcases and make EG predict original labels.
-        pos_label=None
+        pos_label = None
         if y_as_str:
             pos_label = 'y'
             # Change y back to 0/1 encoding, because we use this to check output
@@ -163,8 +164,10 @@ class TestExponentiatedGradientArguments:
 
     def test_binary_classifier_binary_required(self):
         X, y, A = _get_data()
-        if y.ndim == 1: y[0] = 2
-        elif y.ndim == 2: y[0,0] = 2
+        if y.ndim == 1:
+            y[0] = 2
+        elif y.ndim == 2:
+            y[0, 0] = 2
 
         expgrad = ExponentiatedGradient(LogisticRegression(),
                                         constraints=DemographicParity(),
