@@ -142,3 +142,42 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
                .replace(_MERGE_COLUMN_SEPARATOR,
                         "\\" + _MERGE_COLUMN_SEPARATOR)
                for i in range(len(row))]), axis=1).values
+
+
+def _encode_y(y, pos_label=None, check=True, enforce_binary=False):
+    """
+    Encode discrete target column from objects to numerical.
+
+    hi
+
+    Parameters
+    ----------
+    y : numpy.ndarray
+        Array of targets to encode
+    pos_label : the positive label
+
+    Returns
+    -------
+    (classes, y) : Tuple(list, array)
+        Returns the classes (unique values) of y, and the encoding of y s.t.
+        :code:`classes[y] = original y`.
+    """
+    if check:
+        y = check_array(y, ensure_2d=False, dtype=None)
+    if pos_label is not None:
+        labels = np.unique(y)
+        if not len(labels) == 2:  # Even if not enforcing binary.
+            raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
+        if pos_label == labels[0]:
+            classes = [labels[1], labels[0]]
+        elif pos_label == labels[1]:
+            classes = [labels[0], labels[1]]
+        else:
+            raise ValueError(_LABELS_MISSING_POS_LABEL)
+        y = (y == pos_label).astype(int)
+    else:
+        classes, y = np.unique(y, return_inverse=True)
+        if enforce_binary and len(classes) != 2:
+            raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
+        # else: do we want to enforce pos_label to be set?
+    return classes, y

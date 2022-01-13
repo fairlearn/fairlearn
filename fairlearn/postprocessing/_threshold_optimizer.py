@@ -31,8 +31,7 @@ from sklearn.utils import Bunch
 from ..utils._common import _get_soft_predictions
 from ..utils._input_validation import (
     _validate_and_reformat_input,
-    _LABELS_NOT_BINARY_ERROR_MESSAGE,
-    _LABELS_MISSING_POS_LABEL,
+    _encode_y,
     _KW_CONTROL_FEATURES,
 )
 from ._constants import (
@@ -202,6 +201,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             From version 0.7, 'predict' is deprecated as the default value and
             the default will change to 'auto' from v0.10.
 
+    pos_label : object
+        The label object to regard as the positive label.
+
     Notes
     -----
     The procedure is based on the algorithm of
@@ -224,7 +226,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         grid_size=1000,
         flip=False,
         prefit=False,
-        predict_method="deprecated"
+        predict_method="deprecated",
+        pos_label=None
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -233,6 +236,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.flip = flip
         self.prefit = prefit
         self.predict_method = predict_method
+        self.pos_label = pos_label
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -290,20 +294,12 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             enforce_binary_labels=True,
         )
 
-        pos_label = kwargs.get('pos_label', None)
-        if pos_label:
-            labels = np.unique(y)
-            if not len(labels) == 2:
-                raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
-            if pos_label == labels[0]:
-                self.classes_ = [labels[1], labels[0]]
-            elif pos_label == labels[1]:
-                self.classes_ = [labels[0], labels[1]]
-            else:
-                raise ValueError(_LABELS_MISSING_POS_LABEL)
-            y = (y == pos_label).astype(int)
-        else:
-            self.classes_, y = np.unique(y, return_inverse=True)
+        self.classes_, y = _encode_y(
+            y,
+            pos_label=self.pos_label,
+            check=False,
+            enforce_binary=True
+        )
 
         if not self.prefit:
             # Following is on two lines due to issue when estimator comes from
