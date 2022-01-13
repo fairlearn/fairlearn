@@ -122,7 +122,7 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
                                             predict_method='predict')
 
     feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
-    with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):
+    with pytest.raises(ValueError, match=_LABELS_NOT_BINARY_ERROR_MESSAGE):
         adjusted_predictor.fit(data_X_sf.X, y,
                                sensitive_features=data_X_sf.sensitive_features)
 
@@ -177,7 +177,7 @@ class PassThroughPredictor(BaseEstimator):
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
 @pytest.mark.parametrize("y_data", [labels_ex, labels_ex_string])
-@pytest.mark.parametrize("pos_label", [False, True])
+@pytest.mark.parametrize("pos_label", [None, True])
 def test_threshold_optimization_demographic_parity(score_transform, y_transform,
                                                    sensitive_features_transform,
                                                    y_data, pos_label):
