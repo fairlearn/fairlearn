@@ -10,6 +10,7 @@ from ..utils._input_validation import (
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
 from typing import Callable, Union
+from re import compile, match
 
 
 def plot_model_comparison(
@@ -22,11 +23,12 @@ def plot_model_comparison(
     ax=None,
     axis_labels=True,
     point_labels=True,
-    color_gradient=True,
+    group_by_name=False,
+    color_gradient=False,
     plot=True,
     **kwargs,
 ):
-    """
+    r"""
     Plot a model comparison.
 
     Parameters
@@ -68,11 +70,20 @@ def plot_model_comparison(
     point_labels : bool
         If true, add the model name to the point.
 
+    group_by_name : bool, str
+        If true, derive groupings by common prefixes. In particular, model names
+        that look like the regular expression :code:`\D.*. We use regular
+        expression matching from the START of the string. If you want to
+        use a different regular expression to group names, you can pass a
+        RE pattern as well (for instance, :code:`group_by_name=r"\D.+"`).
+        Tip: use cmap to change the color of different
+        groups.
+
     color_gradient : bool
         If true, then a colormap gradient will be applied to
         the models. Colormaps can be supplied using the cmap kwarg.
         Colormap values are inferred from y_preds. If the
-        model names are not all integer, the index of the models become the
+        model names are not all numbers, the index of the models become the
         colormap value.
 
     plot : bool
@@ -105,6 +116,22 @@ def plot_model_comparison(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
                 "y_preds", "dict", type(y_preds).__name__
             )
+        )
+
+    pattern = r"\D*"
+    if not isinstance(group_by_name, bool):
+        if isinstance(group_by_name, str):
+            pattern = group_by_name
+            group_by_name = True
+        else:
+            raise ValueError(
+                "Keyword argument group_by_name must be a bool or a RE pattern"
+            )
+
+    if group_by_name and color_gradient:
+        raise ValueError(
+            "Can not set both keyword arguments "
+            + "group_by_name and color_gradient to True"
         )
 
     # Input validation
@@ -157,12 +184,32 @@ def plot_model_comparison(
                 )
             )
 
-    model_names_int_ = True
-    for key in y_preds:
-        if not isinstance(key, int):
-            model_names_int_ = False
+    # Add groupings
+    groups = {}
+    if group_by_name:
+        pattern = compile(pattern)
+        for i, key in enumerate(y_preds):
+            # important: using match, so must be at start
+            match_object = match(pattern, key)
+            if not match_object:
+                raise ValueError("can not match")
+            group = match_object.group(0)
+            remaining = key[match_object.end(0):]
+            if groups.get(group, None) is None:
+                groups[group] = {}
+            # i here is the index in x and y
+            groups[group][remaining] = i
+        c = [0] * len(x)
+        for i, group_key in enumerate(groups.keys()):
+            group = groups[group_key]
+            for item_key in group.keys():
+                item = group[item_key]
+                # item is the index of x and y
+                # i is the index of the groups
+                c[item] = i
+        kwargs["c"] = c
 
-    # NOTE: If an ax was provided, we rather not overwrite this, right?
+    # Add axis labels
     if axis_labels:
         for f, m in (
             (ax.set_xlabel, x_axis_metric),
@@ -178,13 +225,18 @@ def plot_model_comparison(
                 name = m.__repr__
             f(name.replace("_", " "))
 
-    # Add labels
+    # Add point labels
     if point_labels:
         for i, key in enumerate(y_preds):
             ax.text(x[i], y[i], key)
 
-    # Add color
+    # Add color gradient
     if color_gradient:
+        model_names_int_ = True
+        for key in y_preds:
+            if not isinstance(key, (int, float)):
+                model_names_int_ = False
+
         if model_names_int_:
             model_names = [key for key in y_preds.keys()]
         else:
@@ -193,9 +245,20 @@ def plot_model_comparison(
 
     # Add to ax
     try:
-        ax.scatter(
+        scatter = ax.scatter(
             x, y, **kwargs
         )  # Does it make sense to pass all other kwarg's?
+
+        # NOTE: in order to support per-group things such as markers,
+        # we must call scatter once per group. However, a nice
+        # interface to support this will require some more thought.
+        # However, for now, we are able to add a legend without calling
+        # scatter once per group, but this requires the following call:
+        if len(groups.keys()) > 0:
+            ax.legend(
+                handles=scatter.legend_elements(prop="colors")[0],
+                labels=groups.keys(),
+            )
     except AttributeError as e:
         # FIXME: Add some info?
         raise e

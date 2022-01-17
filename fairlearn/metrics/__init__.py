@@ -28,7 +28,7 @@ import sys as _sys
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 
-from ._multi_curve_plot import plot_model_comparison
+from ._multi_curve_plot import plot_model_comparison  # noqa: F401
 
 from ._generated_metrics import _generated_metric_dict
 
