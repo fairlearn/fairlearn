@@ -227,8 +227,14 @@ def plot_model_comparison(
 
     # Add point labels
     if point_labels:
-        for i, key in enumerate(y_preds):
-            ax.text(x[i], y[i], key)
+        label = lambda i, t: ax.text(x[i], y[i], t)
+        if group_by_name:
+            for group in groups.keys():
+                for item in groups[group].keys():
+                    label(groups[group][item], item)
+        else:
+            for i, key in enumerate(y_preds):
+                label(i, key)
 
     # Add color gradient
     if color_gradient:
