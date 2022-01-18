@@ -8,8 +8,7 @@ import pytest
 from fairlearn.datasets import (
     fetch_adult,
     fetch_boston,
-    fetch_bank_marketing,
-    fetch_credit_card,
+    fetch_bank_marketing
 )
 
 # =============================================

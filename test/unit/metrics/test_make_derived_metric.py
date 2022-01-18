@@ -31,8 +31,7 @@ def test_derived_difference_between_groups():
                                         transform='difference',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.accuracy_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.accuracy_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid, method='between_groups')
@@ -44,8 +43,7 @@ def test_derived_difference_default_is_between_groups():
                                         transform='difference',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.accuracy_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.accuracy_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid)
@@ -57,8 +55,7 @@ def test_derived_difference_to_overall():
                                         transform='difference',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.accuracy_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.accuracy_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid, method='to_overall')
@@ -73,8 +70,7 @@ def test_derived_difference_broadcast_arg():
 
     my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
     my_fbeta.__name__ = "my_fbeta"
-    grouped = metrics.MetricFrame(my_fbeta,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=my_fbeta, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
 
     actual = my_fn(y_t, y_p, sensitive_features=gid,
@@ -89,8 +85,7 @@ def test_derived_difference_sample_arg():
                                         transform='difference',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(my_fbeta,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=my_fbeta, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid,
                                   sample_params={'sample_weight': wgt})
     actual = my_fn(y_t, y_p, sensitive_features=gid,
@@ -106,8 +101,7 @@ def test_derived_difference_both_arg_types():
 
     my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
     my_fbeta.__name__ = "my_fbeta"
-    grouped = metrics.MetricFrame(my_fbeta,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=my_fbeta, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid,
                                   sample_params={'sample_weight': wgt})
 
@@ -126,8 +120,7 @@ def test_derived_difference_both_arg_types_default_sample_param_names():
 
     my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
     my_fbeta.__name__ = "my_fbeta"
-    grouped = metrics.MetricFrame(my_fbeta,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=my_fbeta, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid,
                                   sample_params={'sample_weight': wgt})
 
@@ -143,8 +136,7 @@ def test_derived_ratio_between_groups():
                                         transform='ratio',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.precision_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.precision_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid, method='between_groups')
     assert actual == grouped.ratio(method='between_groups')
@@ -155,8 +147,7 @@ def test_derived_ratio_default_is_between_groups():
                                         transform='ratio',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.precision_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.precision_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid)
     assert actual == grouped.ratio()
@@ -167,8 +158,7 @@ def test_derived_ratio_to_overall():
                                         transform='ratio',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.precision_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.precision_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid, method='to_overall')
     assert actual == grouped.ratio(method='to_overall')
@@ -179,8 +169,7 @@ def test_group_min():
                                         transform='group_min',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.precision_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.precision_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid)
     assert actual == grouped.group_min()
@@ -191,8 +180,7 @@ def test_group_max():
                                         transform='group_max',
                                         sample_param_names=['sample_weight'])
 
-    grouped = metrics.MetricFrame(skm.precision_score,
-                                  y_t, y_p,
+    grouped = metrics.MetricFrame(metrics=skm.precision_score, y_true=y_t, y_pred=y_p,
                                   sensitive_features=gid)
     actual = my_fn(y_t, y_p, sensitive_features=gid)
     assert actual == grouped.group_max()

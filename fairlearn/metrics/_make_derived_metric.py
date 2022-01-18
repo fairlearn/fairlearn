@@ -73,8 +73,9 @@ class _DerivedMetric:
             bound_fn_name = bound_fn_name + '_' + k + '_' + str(v)
         dispatch_fn.__name__ = bound_fn_name
 
-        all_metrics = MetricFrame(dispatch_fn,
-                                  y_true, y_pred,
+        all_metrics = MetricFrame(metrics=dispatch_fn,
+                                  y_true=y_true,
+                                  y_pred=y_pred,
                                   sensitive_features=sensitive_features,
                                   sample_params=sample_params)
 
@@ -131,7 +132,9 @@ def make_derived_metric(
         The metric function from which the new function should be derived
 
     transform : str
-        Selects the transformation aggregation the resultant function should use
+        Selects the transformation aggregation the resultant function should use.
+        The list of possible options is:
+        ['difference', 'group_min', 'group_max', 'ratio'].
 
     sample_param_names : List[str]
         A list of parameters names of the underlying :code:`metric` which should
@@ -145,7 +148,7 @@ def make_derived_metric(
     -------
     callable
         Function with the same signature as the :code:`metric` but with additional
-        :code:`sensitive_feature=` and :code:`method=` arguments, to enable the
+        :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
     dm = _DerivedMetric(metric=metric,

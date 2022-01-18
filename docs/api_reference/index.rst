@@ -1,14 +1,13 @@
 .. _api_reference:
 
-API Reference
-=============
+API Docs
+========
 
 .. toctree::
    :maxdepth: 1
 
+   fairlearn.datasets
    fairlearn.metrics
    fairlearn.postprocessing
-   fairlearn.reductions
-   fairlearn.widget
-   fairlearn.datasets
    fairlearn.preprocessing
+   fairlearn.reductions

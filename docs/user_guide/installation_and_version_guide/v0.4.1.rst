@@ -1,0 +1,5 @@
+v0.4.1
+======
+
+* Fix to determine whether operating as binary classifier or regressor in
+  dashboard

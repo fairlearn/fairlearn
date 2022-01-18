@@ -19,9 +19,9 @@ from test.unit.input_convertors import conversions_for_1d
 def test_basic(transform_y_t, transform_y_p):
     # If there are failures here, other, more specific tests should also fail
     g_f = pd.DataFrame(data=g_4, columns=['My feature'])
-    target = metrics.MetricFrame(skm.recall_score,
-                                 transform_y_t(y_t),
-                                 transform_y_p(y_p),
+    target = metrics.MetricFrame(metrics=skm.recall_score,
+                                 y_true=transform_y_t(y_t),
+                                 y_pred=transform_y_p(y_p),
                                  sensitive_features=g_f)
 
     # Check on the indices properties
@@ -61,9 +61,9 @@ def test_basic(transform_y_t, transform_y_p):
 def test_basic_metric_dict(transform_y_t, transform_y_p):
     # If there are failures here, other, more specific tests should also fail
     g_f = pd.DataFrame(data=g_4, columns=['My feature'])
-    target = metrics.MetricFrame({'recall': skm.recall_score},
-                                 transform_y_t(y_t),
-                                 transform_y_p(y_p),
+    target = metrics.MetricFrame(metrics={'recall': skm.recall_score},
+                                 y_true=transform_y_t(y_t),
+                                 y_pred=transform_y_p(y_p),
                                  sensitive_features=g_f)
 
     # Check on the indices properties
@@ -105,9 +105,9 @@ def test_basic_metric_dict(transform_y_t, transform_y_p):
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
 def test_1m_1sf_1cf(transform_y_t, transform_y_p):
     # If there are failures here, other, more specific tests should also fail
-    target = metrics.MetricFrame(skm.recall_score,
-                                 transform_y_t(y_t),
-                                 transform_y_p(y_p),
+    target = metrics.MetricFrame(metrics=skm.recall_score,
+                                 y_true=transform_y_t(y_t),
+                                 y_pred=transform_y_p(y_p),
                                  sensitive_features=g_2,
                                  control_features=g_3)
 
@@ -168,9 +168,9 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
 @pytest.mark.parametrize("transform_y_t", conversions_for_1d)
 def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
     # If there are failures here, other, more specific tests should also fail
-    target = metrics.MetricFrame({'recall': skm.recall_score},
-                                 transform_y_t(y_t),
-                                 transform_y_p(y_p),
+    target = metrics.MetricFrame(metrics={'recall': skm.recall_score},
+                                 y_true=transform_y_t(y_t),
+                                 y_pred=transform_y_p(y_p),
                                  sensitive_features=g_2,
                                  control_features=g_3)
 
@@ -229,7 +229,6 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
 
 def test_1m_1_sf_sample_weights():
     """Check that sample weights are passed correctly to a single metric."""
-
     def multi_sp(y_t, y_p, p1, p2):
         """Metric to check passing of sample parameters.
 
@@ -249,8 +248,7 @@ def test_1m_1_sf_sample_weights():
 
     # Note that we pass in the s_w array for y_true, to get
     # a little more variety in the results
-    target = metrics.MetricFrame(multi_sp,
-                                 s_w, y_p,
+    target = metrics.MetricFrame(metrics=multi_sp, y_true=s_w, y_pred=y_p,
                                  sensitive_features=g_1,
                                  sample_params={'p1': param1, 'p2': param2})
 
@@ -270,7 +268,6 @@ def test_1m_1_sf_sample_weights():
 
 def test_2m_1sf_sample_weights():
     """Check that sample weights are passed correctly to two metrics."""
-
     def sp_is_sum(y_t, y_p, some_param_name):
         """Metric accepting a single sample parameter.
 
@@ -324,9 +321,7 @@ def test_2m_1sf_sample_weights():
     # Compute the metrics. Note that we pass in the
     # s_w array for y_pred, in the interests of having some
     # more variety in the results
-    target = metrics.MetricFrame(metrics_dict,
-                                 y_t,
-                                 s_w,
+    target = metrics.MetricFrame(metrics=metrics_dict, y_true=y_t, y_pred=s_w,
                                  sensitive_features=g_2,
                                  sample_params=sample_params)
 
@@ -353,9 +348,7 @@ def test_duplicate_sf_names():
     groups = pd.DataFrame(np.stack([g_2, g_3], axis=1), columns=["A", "A"])
     msg = "Detected duplicate feature name: 'A'"
     with pytest.raises(ValueError) as execInfo:
-        _ = metrics.MetricFrame(skm.recall_score,
-                                y_t,
-                                y_p,
+        _ = metrics.MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
                                 sensitive_features=groups)
     assert execInfo.value.args[0] == msg
 
@@ -364,9 +357,7 @@ def test_duplicate_cf_names():
     groups = pd.DataFrame(np.stack([g_2, g_3], axis=1), columns=["B", "B"])
     msg = "Detected duplicate feature name: 'B'"
     with pytest.raises(ValueError) as execInfo:
-        _ = metrics.MetricFrame(skm.recall_score,
-                                y_t,
-                                y_p,
+        _ = metrics.MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
                                 sensitive_features=g_4,
                                 control_features=groups)
     assert execInfo.value.args[0] == msg
@@ -377,15 +368,15 @@ def test_duplicate_cf_sf_names():
     sf = {"B": g_1, "C": g_4}
     msg = "Detected duplicate feature name: 'B'"
     with pytest.raises(ValueError) as execInfo:
-        _ = metrics.MetricFrame(skm.recall_score,
-                                y_t,
-                                y_p,
+        _ = metrics.MetricFrame(metrics=skm.recall_score, y_true=y_t, y_pred=y_p,
                                 sensitive_features=sf,
                                 control_features=cf)
     assert execInfo.value.args[0] == msg
 
 
 def test_single_element_lists():
-    mf = metrics.MetricFrame(skm.balanced_accuracy_score,
-                             [1], [1], sensitive_features=[0])
+    mf = metrics.MetricFrame(metrics=skm.balanced_accuracy_score,
+                             y_true=[1],
+                             y_pred=[1],
+                             sensitive_features=[0])
     assert mf.overall == 1

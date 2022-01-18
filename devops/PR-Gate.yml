@@ -24,7 +24,7 @@ jobs:
   parameters:
     platforms:  { Windows: vs2017-win2016 }
     installationType: 'PipLocal'
-    pyVersions: [3.6]
+    pyVersions: [3.7]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
     
@@ -33,10 +33,8 @@ jobs:
     platforms: { MacOS: macos-latest }
     testRunTypes: ['Unit']
     installationType: 'None'
-    pyVersions: [3.7, 3.8]
+    pyVersions: [3.7, 3.9]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
-
-- template: templates/build-widget-job-template.yml
 
 - template: templates/limited-installation-job-template.yml
