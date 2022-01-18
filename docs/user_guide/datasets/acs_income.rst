@@ -14,7 +14,7 @@ a few improvements, such as providing more datapoints (1,664,500 vs. 48,842)
 and more recent data (2018 vs. 1994). Further, the binary labels in the UCI 
 Adult dataset indicate whether an individual earned more than $50k US dollars 
 in that year. Ding et al. show that the choice of threshold impacts the 
-amount of fairness violation, so they allow users to define any threshold 
+amount of disparity, so they allow users to define any threshold 
 rather than fixing it at $50k.
 
 Ding et al. compiled data from the American Community Survey (ACS) Public 
