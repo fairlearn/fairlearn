@@ -1,4 +1,4 @@
-.. _acsincome-data:
+.. _acsincome_data:
 ACSIncome
 ---------
 
@@ -14,9 +14,7 @@ a few improvements, such as providing more datapoints (1,664,500 vs. 48,842)
 and more recent data (2018 vs. 1994). Further, the binary labels in the UCI 
 Adult dataset indicate whether an individual earned more than $50k US dollars 
 in that year. Ding et al. show that the choice of threshold impacts the 
-amount of fairness violation, so they allow users to define any threshold 
-rather than fixing it at $50k.
-
+amount of fairness violation, so they allow users to define any threshold.
 Ding et al. compiled data from the American Community Survey (ACS) Public 
 Use Microdata Sample (PUMS). Note that this is a different source than the 
 Annual Social and Economic Supplement (ASEC) of the Current Population 
@@ -26,11 +24,12 @@ years old who worked at least 1 hour per week in the past year and had an
 income of at least $100.
 
 
-.. _acsincome-dataset-description:
+.. _acsincome_dataset_description:
 
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
 Ding et al. provide data from 2014-2018 for all 50 states and Puerto Rico.
+Note that Puerto Rico is the only US territory included in this dataset.
 We uploaded the 2018 data to OpenML, which anyone can access.
 The dataset contains 1,664,500 rows. Each row describes a person and contains 
 10 features, which we describe below:

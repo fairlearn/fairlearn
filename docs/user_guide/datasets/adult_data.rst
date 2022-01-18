@@ -1,9 +1,9 @@
-.. _adult-data:
+.. _adult_data:
 Adult Census Dataset
 --------------------
 
 This section contains datasets created by Ding et al. [1]_. The 
-authors indend for their dataset to replace the UCI Adult dataset [2]_, 
+authors intend for their dataset to replace the UCI Adult dataset [2]_, 
 which is a popular benchmark dataset for comparing algorithmic interventions 
 with respect to fairness metrics.
 

@@ -25,6 +25,7 @@ people under age 65 may qualify if they have certain disabilities.
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
 The authors provide 2018 data for all 50 states and Puerto Rico.
+Note that Puerto Rico is the only US territory included in this dataset.
 The dataset contains 1,138,289 rows and 19 features, which we describe below:
 
 .. list-table::
