@@ -12,6 +12,7 @@ from fairlearn.metrics import (
     MetricFrame,
     false_positive_rate,
     true_positive_rate,
+    true_negative_rate,
     selection_rate,
     count,
 )
@@ -35,7 +36,7 @@ metrics = {
     "precision": precision_score,
     "recall": recall_score,
     "false positive rate": false_positive_rate,
-    "true positive rate": true_positive_rate,
+    "true negative rate": true_negative_rate,
     "selection rate": selection_rate,
     "count": count,
 }
