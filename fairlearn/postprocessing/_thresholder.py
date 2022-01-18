@@ -94,6 +94,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     >>> # Example with one sensitive feature
     >>> X = pd.DataFrame([[0, 4], [6, 2], [1, 3], [10, 5], [1, 7], [-2, 1]])
     >>> y = pd.Series([1, 1, 1, 0, 0, 0])
+    >>> sensitive_features_train = pd.DataFrame([['A'], ['B'], ['C'], ['A'], ['B'], ['C']], columns=['SF1']) # noqa: E501
     >>> estimator = RandomForestClassifier(random_state=1)
     >>> estimator.fit(X, y)
     >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
@@ -107,7 +108,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     ...                      threshold_dict=threshold_dict,
     ...                      prefit=True,
     ...                      predict_method='predict_proba')
-    >>> thresholder.fit(X, y)
+    >>> thresholder.fit(X, y, sensitive_features=sensitive_features_train)
     >>> thresholder.predict(
     ...        X_test, sensitive_features=sensitive_features_test)
     0   1.0
@@ -342,10 +343,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             sf : any
                 value of sensitive feature to identify subgroup by
             threshold : { `float` , ( '>' , `float` ), ( '<' , `float` )}
-                threshold to base the prediciton on
+                threshold to base the prediction on
             """
-            # The threshold is provided as either a float or
-            # ('>',float) or ('<',float)
             if isinstance(threshold, float):
                 operation = ThresholdOperation('>', threshold)
             else:
