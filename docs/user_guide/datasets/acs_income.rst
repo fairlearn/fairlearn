@@ -1,4 +1,4 @@
-.. _acsincome-data:
+.. _acsincome_data:
 ACSIncome
 ---------
 
@@ -26,11 +26,12 @@ years old who worked at least 1 hour per week in the past year and had an
 income of at least $100.
 
 
-.. _acsincome-dataset-description:
+.. _acsincome_dataset_description:
 
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
 Ding et al. provide data from 2014-2018 for all 50 states and Puerto Rico.
+Note that Puerto Rico is the only US territory included in this dataset.
 We uploaded the 2018 data to OpenML, which anyone can access.
 The dataset contains 1,664,500 rows. Each row describes a person and contains 
 10 features, which we describe below:
