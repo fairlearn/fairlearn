@@ -1,4 +1,4 @@
-.. _adult-data:
+.. _adult_data:
 Adult Census Dataset
 --------------------
 
