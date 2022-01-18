@@ -33,7 +33,7 @@ def check_states_valid(states):
                                         f"Note that PR is the abbreviation for Puerto Rico.")
 
 
-def fetch_acspubliccoverage(*, cache=True, data_home=None,
+def fetch_acs_public_coverage(*, cache=True, data_home=None,
                             as_frame=False, return_X_y=False,
                             states=None
                             ):

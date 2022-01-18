@@ -1,4 +1,4 @@
-.. _acs-public-coverage:
+.. _acs_public_coverage:
 ACSPublicCoverage
 -------------------------
 
@@ -10,15 +10,17 @@ as an improved alternative to the popular UCI Adult dataset [2]_.
 Briefly, the UCI Adult dataset is commonly used as a benchmark dataset when comparing
 different algorithmic fairness interventions. While UCI Adult is used to predict 
 whether an individual's annual income is above $50,000, the authors created 
-ACSPublicCoverage to predict whether an individual is covered by public health insurance.
+ACSPublicCoverage to predict whether a low-income individual who is not eligible for Medicare 
+is covered by public health insurance, such as Medicaid or Medicare.
 The authors compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
 Note that this is a different source than the Annual Social and Economic Supplement (ASEC) 
 of the Current Population Survey (CPS) used to construct the original UCI Adult dataset.
 Ding et al. [#0]_ filtered the data such that ACSPublicCoverage only includes individuals under 65 years old 
-had an income of less than $30,000.
+had an income of less than $30,000. Although usually only people over age 65 are eligible for Medicare,
+people under age 65 may qualify if they have certain disabilities. 
 
 
-.. _acspubliccoverage_dataset_description:
+.. _acs_public_coverage_dataset_description:
 
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
@@ -193,5 +195,5 @@ The target label is given by PUBCOV, which can be used for a binary classificati
   .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
       Advances in Neural Information Processing Systems 34, 2021.
 
-  .. [2] R. Kohavi and B. Becker. "UCI Adult Data Set." UCI Meachine Learning Repository, 5, 1996.
+  .. [2] R. Kohavi and B. Becker. "UCI Adult Data Set." UCI Machine Learning Repository, 5, 1996.
 

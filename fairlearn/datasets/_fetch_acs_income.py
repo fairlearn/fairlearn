@@ -9,10 +9,10 @@ from sklearn.datasets import fetch_openml
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_acsincome(*, cache=True, data_home=None,
-                    as_frame=False, return_X_y=False,
-                    states=None,
-                    ):
+def fetch_acs_income(*, cache=True, data_home=None,
+                     as_frame=False, return_X_y=False,
+                     states=None,
+                     ):
     """Load the ACS Income dataset.
 
     Download it if necessary.
@@ -53,8 +53,9 @@ def fetch_acsincome(*, cache=True, data_home=None,
 
     states: list, default=None
         List containing two letter (capitalized) state abbreviations.
-        If None, data from all 50 US states, including Puerto Rico, will be returned.
-        The state abbreviations and codes can be found on page 1 of the data dictionary at ACS PUMS
+        If None, data from all 50 US states and Puerto Rico will be returned.
+        The state abbreviations and codes can be found on page 1 of the data
+        dictionary at ACS PUMS:
         https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf
 
     Returns
