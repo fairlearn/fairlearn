@@ -136,7 +136,7 @@ their label:
     sex
     Female    0.0635...
     Male      0.2135...
-    Name: selection_rate, dtype: object
+    Name: selection_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`
@@ -185,7 +185,7 @@ a vastly reduced difference in selection rate:
     sex
     Female    0.1552...
     Male      0.1715...
-    Name: selection_rate, dtype: object
+    Name: selection_rate, dtype: float64
 
 
 What's next?

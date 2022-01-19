@@ -629,7 +629,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> bgl.gamma(lambda X: y_pred)
     group_id
     a    0.05
-    b    0.50
+    b    0.5
     Name: loss, dtype: float64
 
 .. note::
