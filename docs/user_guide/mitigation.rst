@@ -623,13 +623,13 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b    0.5
+    b    0.50
     Name: mean_absolute_error, dtype: float64
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
     group_id
     a    0.05
-    b    0.5
+    b    0.50
     Name: loss, dtype: float64
 
 .. note::

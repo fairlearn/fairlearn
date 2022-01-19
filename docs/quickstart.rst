@@ -119,7 +119,7 @@ we can evaluate metrics for subgroups within the data as below:
     sex
     Female    0.9251...
     Male      0.8042...
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population which have '1' as
