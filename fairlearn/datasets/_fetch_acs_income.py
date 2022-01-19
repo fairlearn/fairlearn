@@ -13,16 +13,17 @@ def fetch_acs_income(*, cache=True, data_home=None,
                      as_frame=False, return_X_y=False,
                      states=None,
                      ):
-    """Load the ACS Income dataset.
+    """Load the ACS Income dataset (regression).
+    Read more in the :ref:`User Guide <acsincome_data>`.
 
     Download it if necessary.
 
-    ==============   ==============
-    Samples total           1664500
-    Dimensionality               10
-    Features                   real
-    Target                     real
-    ==============   ==============
+    ==============   ====================
+    Samples total                 1664500
+    Dimensionality                     10
+    Features         numeric, categorical
+    Target                        numeric
+    ==============   ====================
 
     Source: Paper: Ding et al. (2021) [1]_
             and corresponding repository https://github.com/zykls/folktables/
@@ -56,8 +57,7 @@ def fetch_acs_income(*, cache=True, data_home=None,
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
         The state abbreviations and codes can be found on page 1 of the data
-        dictionary at ACS PUMS:
-        https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf
+        dictionary at ACS PUMS [2]_.
 
     Returns
     -------
@@ -88,6 +88,9 @@ def fetch_acs_income(*, cache=True, data_home=None,
     .. [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021).
        "Retiring Adult: New Datasets for Fair Machine Learning."
        Advances in Neural Information Processing Systems, 34.
+
+    .. [2] `"2018 ACS PUMS Data Dictionary" <https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf>`_,
+       United States Census Bureau.
 
     """
     # State Code based on 2010 Census definitions
