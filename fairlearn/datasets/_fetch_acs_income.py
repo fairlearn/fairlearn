@@ -14,6 +14,7 @@ def fetch_acs_income(*, cache=True, data_home=None,
                      states=None,
                      ):
     """Load the ACS Income dataset (regression).
+
     Read more in the :ref:`User Guide <acsincome_data>`.
 
     Download it if necessary.
@@ -89,8 +90,7 @@ def fetch_acs_income(*, cache=True, data_home=None,
        "Retiring Adult: New Datasets for Fair Machine Learning."
        Advances in Neural Information Processing Systems, 34.
 
-    .. [2] `"2018 ACS PUMS Data Dictionary" <https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf>`_,
-       United States Census Bureau.
+    .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
 
     """
     # State Code based on 2010 Census definitions
