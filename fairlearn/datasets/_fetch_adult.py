@@ -10,6 +10,7 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 def fetch_adult(*, cache=True, data_home=None,
                 as_frame=False, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
+
     Read more in the :ref:`User Guide <boston_housing_data>`.
 
     Download it if necessary.
