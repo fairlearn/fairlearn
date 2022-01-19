@@ -11,14 +11,16 @@ def fetch_adult(*, cache=True, data_home=None,
                 as_frame=False, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
 
+    Read more in the :ref:`User Guide <boston_housing_data>`.
+
     Download it if necessary.
 
-    ==============   ==============
-    Samples total             48842
-    Dimensionality               14
-    Features                   real
-    Classes                       2
-    ==============   ==============
+    ==============   ====================
+    Samples total                   48842
+    Dimensionality                     14
+    Features         numeric, categorical
+    Classes                             2
+    ==============   ====================
 
     Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
 
