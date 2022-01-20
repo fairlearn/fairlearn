@@ -114,7 +114,7 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
 
 
 def _check_A(A):
-    """Reformat A if multiple sensitive features, create descriptive variables
+    """Reformat A if multiple sensitive features, create descriptive variables.
 
     Parameters
     ----------
@@ -134,7 +134,7 @@ def _check_A(A):
         The number of samples observed of each sensitive feature (combination)
 
     nmbr_test_samples : int
-        len(A), number of rows in the data
+        The number of rows in the data
     """
     if len(A.shape) > 1 and A.shape[1] > 1:
         cols = A.columns
@@ -152,20 +152,20 @@ def _check_A(A):
 
 
 def _create_statistics_dict(sf_to_plot, value):
-    """Create dictionary to keep track of desired information
+    """Create dictionary to keep track of desired information.
 
-    What exactly is this desired information differs, and is specified
+    The information that is desired differs, and is specified
     by the value parameter
 
     Parameters
     ----------
-    sf_to_plot : numpy.array or list
+    sf_to_plot : numpy.ndarray or list
         List with all sensitive features to be plotted. Will be the
         keys of the returned dict.
 
-    value : numpy.array, dict or int
+    value : numpy.ndarray or int
         The values of the returned dict. The form this value takes
-        is dependent on the desired plot
+        is dependent on the information needed to create the desired plot
 
     Returns
     -------
@@ -182,9 +182,9 @@ def _create_statistics_dict(sf_to_plot, value):
 
 
 def plot_proba_distr(sensitive_features, Y_pred_proba, specified_sf_to_plot=None):
-    """Creates a stacked barplot showing the distribution of probabilities
+    """Create a stacked barplot showing the distribution of probabilities.
 
-    The created plot is grouped by sensitive feature value
+    The created plot is grouped by sensitive feature value.
 
     Parameters
     ----------
@@ -241,7 +241,8 @@ def plot_proba_distr(sensitive_features, Y_pred_proba, specified_sf_to_plot=None
         labels.insert(0, '{} - {}'.format(i/10, (i+1)/10))
 
         # Create text annotation
-        for xpos, ypos, yval in zip(sf_to_plot, bottom+nmbr_probas_percentages/2, nmbr_probas_percentages):
+        for xpos, ypos, yval in zip(sf_to_plot, bottom+nmbr_probas_percentages/2,
+                                    nmbr_probas_percentages):
             if yval >= 5:
                 plt.text(xpos, ypos, '{}%'.format(round(yval, 1)), ha="center", va="center")
 
@@ -256,9 +257,9 @@ def plot_proba_distr(sensitive_features, Y_pred_proba, specified_sf_to_plot=None
 
 
 def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=None):
-    """Creates barplot showing the percentage of positive predictions
+    """Create barplot showing the percentage of positive predictions.
 
-    The created plot is grouped by sensitive feature value        
+    The created plot is grouped by sensitive feature value.
 
     Parameters
     ----------
@@ -305,7 +306,7 @@ def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=N
 
 
 def plot_histograms_per_group(sensitive_features, continuous_output, specified_sf_to_plot=None):
-    """Creates histogram of :code:`continuous_output` for each sensitive feature value
+    """Create hist of distribution of :code:`continuous_output` for each sensitive feature value.
 
     Parameters
     ----------
@@ -314,8 +315,8 @@ def plot_histograms_per_group(sensitive_features, continuous_output, specified_s
 
     continuous_output : numpy.ndarray
         The continuous output returned by an estimator. This can be
-        regression output, probabilities obtained by calling 
-        :code:`predict_proba()`, or the decision function obtained by 
+        regression output, probabilities obtained by calling
+        :code:`predict_proba()`, or the decision function obtained by
         calling :code:`decision_function()`
 
     specified_sf_to_plot : list or None, default=None
