@@ -9,10 +9,13 @@ learn how to adjust the predictor's output from the training data.
 
 from ._thresholder import Thresholder  # noqa: F401
 from ._threshold_optimizer import ThresholdOptimizer  # noqa: F401
-from ._plotting import plot_threshold_optimizer  # noqa: F401
+from ._plotting import plot_threshold_optimizer, plot_histograms_per_group, plot_positive_predictions, plot_proba_distr  # noqa: F401
 
 __all__ = [
     "Thresholder",
     "ThresholdOptimizer",
     "plot_threshold_optimizer",
+    "plot_histograms_per_group",
+    "plot_positive_predictions",
+    "plot_proba_distr"
 ]

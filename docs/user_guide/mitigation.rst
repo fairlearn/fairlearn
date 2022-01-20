@@ -217,6 +217,7 @@ to investigate are:
 
     >>> from sklearn.ensemble import RandomForestClassifier
     >>> from fairlearn.metrics import MetricFrame, false_negative_rate
+    >>> from fairlearn.postprocessing import plot_positive_predictions, plot_proba_distr
 
     >>> classifier = RandomForestClassifier(random_state=1)
     >>> classifier.fit(X_train,Y_train)
@@ -235,7 +236,7 @@ to investigate are:
     Other              0.421875
     Name: false_negative_rate, dtype: object
 
-    >>> plotter.plot_positive_predictions(Y_pred_clf)    
+    >>> plot_positive_predictions(A_test,Y_pred_clf)    
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_no_thresholds.png
     :align: center
@@ -248,7 +249,7 @@ predictions.
 .. doctest:: mitigation
     :options: +NORMALIZE_WHITESPACE
 
-    >>> plotter.plot_proba_distr(Y_pred_proba_clf)
+    >>> plot_proba_distr(A_test,Y_pred_proba_clf)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_proba_distr.png
     :align: center
@@ -294,7 +295,7 @@ amount of positive predictions.
     Other                 0.125
     Name: false_negative_rate, dtype: object
 
-    >>> plotter.plot_positive_predictions(Y_pred_thresholded)
+    >>> plot_positive_predictions(A_test,Y_pred_thresholded)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_two_ways_pos_threshold.png
     :align: center
@@ -334,7 +335,7 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     Other                 0.875
     Name: false_negative_rate, dtype: object
 
-    >>> plotter.plot_positive_predictions(Y_pred_switched_threshold)
+    >>> plot_positive_predictions(A_test,Y_pred_switched_threshold)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_switch_predictions.png
     :align: center
@@ -372,7 +373,7 @@ ways shown above.
     Other                 0.125
     Name: false_negative_rate, dtype: object
 
-    >>> plotter.plot_positive_predictions(default_thresholded_pred)
+    >>> plot_positive_predictions(A_test,default_thresholded_pred)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_default_threshold.png
     :align: center
@@ -455,6 +456,8 @@ groups.
     First, the output is continuous: 
     [23.50867458 22.94718558 33.00839918 33.9504757 3.22390622].
 
+    >>> threshold_dict = {'0-10': 33.5}
+
     >>> thresholder_regression = Thresholder(estimator=regressor,
                                         threshold_dict=threshold_dict,
                                         prefit=True,
@@ -467,9 +470,9 @@ groups.
     Now the output is a binary prediction: 
     0    1.0
     1    1.0
-    2    1.0
+    2    0.0
     3    1.0
-    4    0.0
+    4    1.0
     dtype: float64
 
 Specify threshold for predict_method = 'decision_function'
@@ -485,13 +488,14 @@ same as specifying a threshold as in the previous examples.
     :options: +NORMALIZE_WHITESPACE
 
     >>> from sklearn.linear_model import LogisticRegression
+    >>> from fairlearn.postprocessing import plot_histograms_per_group
     
     >>> classifier = LogisticRegression()
     >>> classifier.fit(X_train,Y_train)
     >>> Y_pred_decision_func = classifier.decision_function(X_test)
 
     >>> #Check distribution of decision function output
-    >>> plotter.plot_continuous_output(Y_pred_decision_func)
+    >>> plot_histograms_per_group(A_test,Y_pred_decision_func)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_decision_func_distr.png
     :align: center
@@ -514,7 +518,7 @@ same as specifying a threshold as in the previous examples.
     Other                0.4375
     Name: false_negative_rate, dtype: object
 
-    >>> plotter.plot_positive_predictions(Y_pred)
+    >>> plot_positive_predictions(A_test,Y_pred)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_decision_func_positive_pred_no_threshold.png
     :align: center
@@ -546,7 +550,7 @@ same as specifying a threshold as in the previous examples.
     Other                0.4375
     Name: false_negative_rate, dtype: object
 
-    >>> plotter.plot_positive_predictions(Y_pred_thresholded)
+    >>> plot_positive_predictions(A_test,Y_pred_thresholded)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_decision_func_positive_pred_yes_threshold.png
     :align: center    
@@ -603,8 +607,7 @@ women will be specified as ('Asian','Female').
                      Male      0.272727
     Name: false_negative_rate, dtype: object
 
-    >>> plotter_multiple_sf = PlotPredictionInfoClassifier(A_multiple_test, Y_test)
-    >>> plotter_multiple_sf.plot_positive_predictions(Y_pred_clf_multiple)   
+    >>> plot_positive_predictions(A_multiple_test,Y_pred_clf_multiple)   
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_multiple_sf_no_threshold.png
     :align: center
@@ -639,7 +642,7 @@ women will be specified as ('Asian','Female').
                      Male      0.272727
     Name: false_negative_rate, dtype: object
 
-    >>> plotter_multiple_sf.plot_positive_predictions(Y_pred_multiple_sf_thresholded)
+    >>> plot_positive_predictions(A_multiple_test,Y_pred_multiple_sf_thresholded)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_multiple_sf_with_threshold.png
     :align: center
