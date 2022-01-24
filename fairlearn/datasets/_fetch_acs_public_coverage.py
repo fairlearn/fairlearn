@@ -21,10 +21,26 @@ _STATE_CODES = {'AL': '01', 'AK': '02', 'AZ': '04', 'AR': '05', 'CA': '06',
 
 
 class InvalidStateException(Exception):
+    """Exception thrown for invalid state codes."""
+
     pass
 
 
 def check_states_valid(states):
+    """Check that all states codes are valid according to the 2010 Census definition.
+
+    Parameters
+    ----------
+    states : list
+        List containing two letter (capitalized) state abbreviations.
+        Note that Puerto Rico is the only US territory with an accepted abbreviation.
+
+    Returns
+    -------
+    Throws an InvalidStateException if an invalid state code is found, else None
+
+    """
+
     for st in states:
         if st not in _STATE_CODES:
             raise InvalidStateException(f"'{st}' is an invalid state code.\n"
@@ -34,10 +50,12 @@ def check_states_valid(states):
 
 
 def fetch_acs_public_coverage(*, cache=True, data_home=None,
-                            as_frame=False, return_X_y=False,
-                            states=None
-                            ):
+                              as_frame=False, return_X_y=False,
+                              states=None
+                              ):
     """Load the ACS Public Coverage dataset.
+
+    Read more in the :ref:`User Guide <acs_public_coverage>`.
 
     Download it if necessary.
 
@@ -83,8 +101,7 @@ def fetch_acs_public_coverage(*, cache=True, data_home=None,
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
         The state abbreviations and codes can be found on page 1 of the data
-        dictionary at ACS PUMS:
-        https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2018.pdf
+        dictionary at ACS PUMS [2]_.
 
     Returns
     -------
@@ -114,6 +131,8 @@ def fetch_acs_public_coverage(*, cache=True, data_home=None,
     .. [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021).
        "Retiring Adult: New Datasets for Fair Machine Learning."
        Advances in Neural Information Processing Systems, 34.
+
+    .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
 
     """
 
