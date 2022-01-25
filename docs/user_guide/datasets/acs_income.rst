@@ -17,7 +17,6 @@ in that year. Ding et al. show that the choice of threshold impacts the
 amount of disparity in proportion of positives, so they allow users to 
 define any threshold rather than fixing it at $50k.
 
->>>>>>> 094661abb56cec98a34d9ce68e2dc4eaec32d811
 Ding et al. compiled data from the American Community Survey (ACS) Public 
 Use Microdata Sample (PUMS). Note that this is a different source than the 
 Annual Social and Economic Supplement (ASEC) of the Current Population 
