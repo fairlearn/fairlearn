@@ -194,14 +194,6 @@ The target label is given by PUBCOV, which can be used for a binary classificati
       - Public health coverage, with PUBCOV == 1 if the individual has public health coverage, else 0
 
 
-.. _acs_public_coverage_dataset_analysis:
-
-Dataset Analysis
-^^^^^^^^^^^^^^^^
-
-TODO
-
-
 .. _acs_public_coverage_discussion:
 
 Discussion
@@ -211,34 +203,50 @@ the intervention, and the effects of different interventions vary widely by stat
 Similarly, datasets should be carefully designed for the specific prediction task
 in mind. 
 
-Although the purpose of ACSPublicCoverage is to "predict whether a
-low-income individual, not eligible for Medicare, has coverage from public health
-insurance," this dataset should not be blindly used for all prediction tasks that fall
-in that category. Ding et al. filters ACS PUMS for all individuals whose income is below 
-$30,000, but the 'low-income' threshold differs for every state, so applying 
-one threshold to all states can lead to flawed results. The paper does not
-justify the choice of $30,000, but the authors answer in `this Github
-issue <https://github.com/zykls/folktables/issues/14>`_ that it was calculated approximately 
-in accordance with Affordable Care Act (ACA) eligibilty guidelines qualifying 
-adults with income up to 133% of the 2021 Federal Poverty Line for Medicaid. Note 
-that we examine the 2018 dataset in this article, and 2018 had a different poverty line. 
-Furthermore, not all states expanded Medicaid under the ACA, so some states
-have a much lower poverty line.
+Therefore, to investigate how viable ACSPublicCoverage is as a fairness benchmark 
+dataset, we must first ask what real-world tasks might require a
+prediction of whether an individual is covered by public health insurance. Usually,
+the entity that needs this information (e.g. the government checking for eligibilty
+in a social program) will simply ask the individual directly. Ding et al. do not provide
+any examples, so it is difficult to evaluate what "fair" even means without context.
+For now, the rest of this discussion focuses on preliminary data analysis of
+ACSPublicCoverage and identifies potential problems that users should be aware of
+beforehand.
 
-The authors acknowledge that the calculation was a very rough approximation, and 
-ACSPublicCoverage is not designed to accommodate all the subtleties that contribute to 
-the low-income designation and subsequent Medicaid eligibility. As a result, 
-users of ACSPublicCoverage should be aware of the dataset's limitations and possibly
-tweak the data for their task. 
+1. A uniform $30,000 threshold ignores differences between states.
 
-Although the paper states that ACSPublicCoverage excludes individuals not 
-eligible for Medicare, this is not strictly true. While 65 traditionally is the 
-eligibilty age for Medicare, and the data filters for people under 65 years old, 
-younger people with disabilities may still qualify [3]_.
+    Although the purpose of ACSPublicCoverage is to "predict whether a
+    low-income individual, not eligible for Medicare, has coverage from public health
+    insurance," this dataset should not be blindly used for all prediction tasks that fall
+    in that category. Ding et al. filters ACS PUMS for all individuals whose income is below 
+    $30,000, but the 'low-income' threshold differs for every state, so applying 
+    one threshold to all states can lead to flawed results. The paper does not
+    justify the choice of $30,000, but the authors answer in `this Github
+    issue <https://github.com/zykls/folktables/issues/14>`_ that it was calculated approximately 
+    in accordance with Affordable Care Act (ACA) eligibilty guidelines qualifying 
+    adults with income up to 133% of the 2021 Federal Poverty Line for Medicaid. Note 
+    that we examine the 2018 dataset in this article, and 2018 had a different poverty line. 
+    Furthermore, not all states expanded Medicaid under the ACA, so some states
+    have a much lower poverty line.
 
-The dataset focuses on individuals, but low-income status also depends on household
-size, which is not one of the 19 features in ACSPublicCoverage. This could affect
-prediction tasks.
+    The authors acknowledge that the calculation was a very rough approximation, and 
+    ACSPublicCoverage is not designed to accommodate all the subtleties that contribute to 
+    the low-income designation and subsequent Medicaid eligibility. As a result, 
+    users of ACSPublicCoverage should be aware of the dataset's limitations and possibly
+    modify the data for their task. 
+
+2. Slight misstatement of data contents.
+
+    The paper states that ACSPublicCoverage excludes individuals not eligible for Medicare,
+    but this is not strictly true. While 65 traditionally is the eligibilty age for Medicare, 
+    and the data filters for people under 65 years old, younger people with disabilities may 
+    still qualify [3]_.
+
+3. Missing features that contribute to low-income status.
+
+    The dataset focuses on individuals, but low-income status also depends on household
+    size, which is not one of the 19 features in ACSPublicCoverage. This could affect
+    prediction tasks.
 
 
 
