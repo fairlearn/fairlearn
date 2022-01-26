@@ -6,11 +6,11 @@ Introduction
 ^^^^^^^^^^^^
 
 The ACSPublicCoverage dataset is one of five datasets created by Ding et al. [1]_ 
-as an improved alternative to the popular UCI Adult dataset [2]_.
-Briefly, the UCI Adult dataset is commonly used as a benchmark dataset when comparing
-different algorithmic fairness interventions. While UCI Adult is used to predict 
-whether an individual's annual income is above $50,000, the authors created 
-ACSPublicCoverage to predict whether a low-income individual who is not eligible for Medicare 
+as an improved fairness benchmark dataset to the popular UCI Adult dataset [2]_.
+It is used to evaluate different algorithmic fairness interventions. While UCI Adult 
+predicts whether an individual's annual income is above $50,000, the 
+authors introduced ACSPublicCoverage to cover the healthcare domain. ACSPublicCoverage 
+predicts whether a low-income individual who is not eligible for Medicare 
 is covered by public health insurance, such as Medicaid or Medicare.
 
 The authors compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
