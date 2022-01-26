@@ -100,9 +100,6 @@ class TestSingleFeature():
             _ = target._process_features("Unused", raw_feature, y_true)
         assert msg == ve.value.args[0]
         assert ve.value.__cause__ is not None
-        assert isinstance(ve.value.__cause__, ValueError)
-        # Ensure we got the gnomic pandas message
-        assert ve.value.__cause__.args[0] == 'If using all scalar values, you must pass an index'
 
 
 class TestTwoFeatures():
