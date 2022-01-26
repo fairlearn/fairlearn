@@ -1,6 +1,4 @@
-Datasets
-==========
-
+.. _boston_housing_data:
 Revisiting the Boston Housing Dataset
 -------------------------------------
 
