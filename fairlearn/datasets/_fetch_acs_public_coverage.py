@@ -94,7 +94,6 @@ def fetch_acs_public_coverage(*, cache=True, data_home=None,
     .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
 
     """
-
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 

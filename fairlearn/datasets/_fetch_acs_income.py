@@ -94,7 +94,6 @@ def fetch_acs_income(*, cache=True, data_home=None,
     .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
 
     """
-
     # number of features
     _NUM_FEATS = 10
 

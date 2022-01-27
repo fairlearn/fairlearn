@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
 # State Code based on 2010 Census definitions
 _STATE_CODES = {'AL': '01', 'AK': '02', 'AZ': '04', 'AR': '05', 'CA': '06',
                 'CO': '08', 'CT': '09', 'DE': '10', 'FL': '12', 'GA': '13',
@@ -10,6 +13,7 @@ _STATE_CODES = {'AL': '01', 'AK': '02', 'AZ': '04', 'AR': '05', 'CA': '06',
                 'SD': '46', 'TN': '47', 'TX': '48', 'UT': '49', 'VT': '50',
                 'VA': '51', 'WA': '53', 'WV': '54', 'WI': '55', 'WY': '56',
                 'PR': '72'}
+
 
 class InvalidStateException(Exception):
     """Exception thrown for invalid state codes."""
@@ -31,7 +35,6 @@ def check_states_valid(states):
     Throws an InvalidStateException if an invalid state code is found, else None
 
     """
-
     for st in states:
         if st not in _STATE_CODES:
             raise InvalidStateException(f"'{st}' is an invalid state code.\n"
