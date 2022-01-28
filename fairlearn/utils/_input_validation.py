@@ -49,6 +49,9 @@ _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES = [
 _ALLOWED_INPUT_TYPES_Y = [np.ndarray, pd.DataFrame, pd.Series, list]
 
 _MERGE_COLUMN_SEPARATOR = ","
+_INCONSISTENT_ARRAY_LENGTH = (
+    "Arrays {} have an inconsistent number of items"
+)
 
 
 def _validate_and_reformat_input(

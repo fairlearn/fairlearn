@@ -2,15 +2,15 @@
 # Licensed under the MIT License.
 
 from ..utils._input_validation import (
-    _validate_and_reformat_labels,
     _validate_and_reformat_labels_and_sf,
-    check_consistent_length,
+    _INCONSISTENT_ARRAY_LENGTH,
     _INPUT_DATA_FORMAT_ERROR_MESSAGE,
 )
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
 from typing import Callable, Union
-from re import compile, match
+from numpy import array, unique, where
+from sklearn.utils.validation import check_array
 
 
 def plot_model_comparison(
@@ -22,9 +22,10 @@ def plot_model_comparison(
     sensitive_features,
     ax=None,
     axis_labels=True,
-    point_labels=True,
-    group_by_name=False,
-    color_gradient=False,
+    point_labels=None,
+    groups=None,
+    group_kwargs=None,
+    legend=False,
     plot=True,
     **kwargs,
 ):
@@ -48,9 +49,9 @@ def plot_model_comparison(
     y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
         The ground-truth labels (for classification) or target values (for regression).
 
-    y_preds : dict
-        A dictionary mapping a model name (string) to its predictions (
-        List, pandas.Series, numpy.ndarray, pandas.DataFrame)
+    y_preds : array-like
+        An array-like containing predictions per model. Hence, predictions of
+        model :code:`i` should be in :code:`y_preds[i]`.
 
     sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, optional
         The sensitive features which should be used to create the subgroups.
@@ -67,24 +68,26 @@ def plot_model_comparison(
     axis_labels : bool
         If true, add the names of x and y axis metrics
 
-    point_labels : bool
-        If true, add the model name to the point.
+    point_labels : list
+        Add textual label :code:`point_labels[i]` to the position
+        of model :code:`i`.
 
-    group_by_name : bool, str
-        If true, derive groupings by common prefixes. In particular, model names
-        that look like the regular expression :code:`\D.*. We use regular
-        expression matching from the START of the string. If you want to
-        use a different regular expression to group names, you can pass a
-        RE pattern as well (for instance, :code:`group_by_name=r"\D.+"`).
-        Tip: use cmap to change the color of different
-        groups.
+    groups : list
+        For a model at index :code:`i` (same order as in :code:`y_preds`),
+        :code:`groups[i]` is the group of the model. Every model with the
+        same group name is plotted similarly. Group names should be numbers
+        or strings, as long as all group names have the same data type.
 
-    color_gradient : bool
-        If true, then a colormap gradient will be applied to
-        the models. Colormaps can be supplied using the cmap kwarg.
-        Colormap values are inferred from y_preds. If the
-        model names are not all numbers, the index of the models become the
-        colormap value.
+    group_kwargs : Dict[Dict]
+        For each group name :code:`name` in groups, pass as key-word argument
+        :code:`group_kwargs[name]` to the plotting of that group. Useful to
+        define per-group markers, colors, color maps, etc. If you are not
+        grouping, then we just pass extra kwargs from
+        :meth:`plot_model_comparison` to the plotting.
+
+    legend : bool
+        If True, add a legend about the various groups. Must set
+        :code:`group_kwargs[g]['label']` for every group :code:`g`.
 
     plot : bool
         If true, call pyplot.plot. In any case, return axis
@@ -106,75 +109,28 @@ def plot_model_comparison(
     In case no Axes object is supplied, axis labels are
     automatically inferred from their class name.
     """  # noqa: E501
+    # --- CHECK DEPENDENCY ---
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    if not isinstance(y_preds, dict):
-        raise ValueError(
-            _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                "y_preds", "dict", type(y_preds).__name__
-            )
-        )
-
-    pattern = r"\D*"
-    if not isinstance(group_by_name, bool):
-        if isinstance(group_by_name, str):
-            pattern = group_by_name
-            group_by_name = True
-        else:
-            raise ValueError(
-                "Keyword argument group_by_name must be a bool or a RE pattern"
-            )
-
-    if group_by_name and color_gradient:
-        raise ValueError(
-            "Can not set both keyword arguments "
-            + "group_by_name and color_gradient to True"
-        )
+    # --- VALIDATE INPUT ---
+    y_preds = check_array(y_preds)
 
     # Input validation
     y_true, sensitive_features, _ = _validate_and_reformat_labels_and_sf(
         y_true, sensitive_features=sensitive_features
     )
-    for key in y_preds:
-        y_preds[key] = _validate_and_reformat_labels(y_preds[key])
-    check_consistent_length(y_true, *list(y_preds.values()))
 
-    # Calculate metrics
-    # try-except structure because we expect: metric(y_true, y_pred, sensitive_attribute)
-    # but we have as fallback: metric(y_true, y_pred)
-    try:
-        x = [
-            x_axis_metric(
-                y_true, y_preds[key], sensitive_features=sensitive_features
-            )
-            for key in y_preds
-        ]
-    except TypeError:
-        x = [x_axis_metric(y_true, y_preds[key]) for key in y_preds]
-
-    try:
-        y = [
-            y_axis_metric(
-                y_true, y_preds[key], sensitive_features=sensitive_features
-            )
-            for key in y_preds
-        ]
-    except TypeError:
-        y = [y_axis_metric(y_true, y_preds[key]) for key in y_preds]
-
-    ax_supplied_ = ax is not None
-
-    # Init ax
-    if not ax_supplied_:
-        ax = plt.axes()
+    if not len(y_true) == y_preds.shape[1]:
+        raise ValueError(
+            _INCONSISTENT_ARRAY_LENGTH.format("y_true and the rows of y_preds")
+        )
 
     for (kwarg, name) in (
         (axis_labels, "axis_labels"),
-        (point_labels, "point_labels"),
-        (color_gradient, "color_gradient"),
+        (legend, "legend"),
         (plot, "plot"),
     ):
         if not isinstance(kwarg, bool):
@@ -184,30 +140,76 @@ def plot_model_comparison(
                 )
             )
 
-    # Add groupings
-    groups = {}
-    if group_by_name:
-        pattern = compile(pattern)
-        for i, key in enumerate(y_preds):
-            # important: using match, so must be at start
-            match_object = match(pattern, key)
-            if not match_object:
-                raise ValueError("can not match")
-            group = match_object.group(0)
-            remaining = key[match_object.end(0):]
-            if groups.get(group, None) is None:
-                groups[group] = {}
-            # i here is the index in x and y
-            groups[group][remaining] = i
-        c = [0] * len(x)
-        for i, group_key in enumerate(groups.keys()):
-            group = groups[group_key]
-            for item_key in group.keys():
-                item = group[item_key]
-                # item is the index of x and y
-                # i is the index of the groups
-                c[item] = i
-        kwargs["c"] = c
+    for (kwarg, name) in (
+        (point_labels, "point_labels"),
+        (groups, "groups"),
+    ):
+        if kwarg is not None:
+            if not isinstance(kwarg, list):
+                raise ValueError(
+                    _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                        name, "list", type(kwarg).__name__
+                    )
+                )
+            if not len(kwarg) == y_preds.shape[0]:
+                raise ValueError(
+                    _INCONSISTENT_ARRAY_LENGTH.format(f"{name} and y_preds")
+                )
+
+    if group_kwargs is not None:
+        if not isinstance(group_kwargs, dict):
+            raise ValueError(
+                _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                    "group_kwargs", "dict", type(group_kwargs).__name__
+                )
+            )
+        for group_name in group_kwargs:
+            if group_name not in groups:
+                raise ValueError(
+                    f"Provided kwargs for group {group_name}, "
+                    + "but there are no points in that group."
+                )
+            item = group_kwargs[group_name]
+            if not isinstance(item, dict):
+                raise ValueError(
+                    _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                        "items of group_kwargs", "dict", type(item).__name__
+                    )
+                )
+
+    # --- COMPUTE METRICS ---
+    # try-except structure because we expect: metric(y_true, y_pred, sensitive_attribute)
+    # but we have as fallback: metric(y_true, y_pred)
+    try:
+        x = array(
+            [
+                x_axis_metric(
+                    y_true, y_pred, sensitive_features=sensitive_features
+                )
+                for y_pred in y_preds
+            ]
+        )
+    except TypeError:
+        x = array([x_axis_metric(y_true, y_pred) for y_pred in y_preds])
+
+    try:
+        y = array(
+            [
+                y_axis_metric(
+                    y_true, y_pred, sensitive_features=sensitive_features
+                )
+                for y_pred in y_preds
+            ]
+        )
+    except TypeError:
+        y = array([y_axis_metric(y_true, y_pred) for y_pred in y_preds])
+
+    # --- PLOTTING ---
+    ax_supplied_ = ax is not None
+
+    # Init ax
+    if not ax_supplied_:
+        ax = plt.axes()
 
     # Add axis labels
     if axis_labels:
@@ -226,49 +228,46 @@ def plot_model_comparison(
             f(name.replace("_", " "))
 
     # Add point labels
-    if point_labels:
-        label = lambda i, t: ax.text(x[i], y[i], t)
-        if group_by_name:
-            for group in groups.keys():
-                for item in groups[group].keys():
-                    label(groups[group][item], item)
-        else:
-            for i, key in enumerate(y_preds):
-                label(i, key)
+    if point_labels is not None:
+        for i, key in enumerate(y_preds):
+            ax.text(x[i], y[i], key)
 
-    # Add color gradient
-    if color_gradient:
-        model_names_int_ = True
-        for key in y_preds:
-            if not isinstance(key, (int, float)):
-                model_names_int_ = False
-
-        if model_names_int_:
-            model_names = [key for key in y_preds.keys()]
-        else:
-            model_names = [i for i, _ in enumerate(y_preds)]
-        kwargs["c"] = model_names
-
-    # Add to ax
+    # Add actual points
     try:
-        scatter = ax.scatter(
-            x, y, **kwargs
-        )  # Does it make sense to pass all other kwarg's?
+        if groups is None:
+            ax.scatter(x, y, **kwargs)
+        else:
+            # We call scatter once per group and pass group kwargs to each
+            # call. This achieves the desired effect of seperate style for each
+            # group.
+            # FIXME: @hildeweerts Do we need to set xlim/ylim separately?
+            # NOTE: If so, I think matplotlib automatically has 5% margin
+            # x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
+            # x_margin, y_margin = (x_max - x_min) * 0.05, (y_max - y_min) * 0.05
+            # ax.set_xlim(left=x_min - x_margin, right=x_max + x_margin)
+            # ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
 
-        # NOTE: in order to support per-group things such as markers,
-        # we must call scatter once per group. However, a nice
-        # interface to support this will require some more thought.
-        # However, for now, we are able to add a legend without calling
-        # scatter once per group, but this requires the following call:
-        if len(groups.keys()) > 0:
-            ax.legend(
-                handles=scatter.legend_elements(prop="colors")[0],
-                labels=groups.keys(),
-            )
+            # NOTE because we use unique/array, if there's a single string then
+            # all group names are converted to strings, so we can't support
+            # mixed-type lists.
+            groups = array(groups)
+            group_names = unique(groups)
+            for group in group_names:
+                index = where(group == groups)
+                if group_kwargs is not None:
+                    # NOTE: debatable design choice to copy and add kwargs.
+                    kws = kwargs.copy()
+                    kws.update(group_kwargs.get(group, {}))
+                    ax.scatter(x[index], y[index], **kws)
+                else:
+                    ax.scatter(x[index], y[index], **kwargs)
+        if legend:
+            ax.legend()
     except AttributeError as e:
-        # FIXME: Add some info?
+        # FIXME: Add some info, as this is probably because of wrong kwargs.
         raise e
 
+    # User may want to draw in an ax but not plot it yet.
     if plot:
         plt.show()
 
