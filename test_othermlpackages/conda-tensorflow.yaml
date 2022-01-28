@@ -6,6 +6,5 @@ dependencies:
 - python==3.8
 - pip>=19.1.1
 - pytest
-- tensorflow>=2.4
+- tensorflow>=2.7.0
 - scikeras
-- pip:
