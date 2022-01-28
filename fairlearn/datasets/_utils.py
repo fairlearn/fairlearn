@@ -1,6 +1,9 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+# Common functions for retrieving ACS datasets as constructed in folktables: 
+#    https://github.com/zykls/folktables
+
 # State Code based on 2010 Census definitions
 _STATE_CODES = {'AL': '01', 'AK': '02', 'AZ': '04', 'AR': '05', 'CA': '06',
                 'CO': '08', 'CT': '09', 'DE': '10', 'FL': '12', 'GA': '13',
