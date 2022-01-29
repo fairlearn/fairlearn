@@ -7,4 +7,5 @@ dependencies:
 - pip>=19.1.1
 - pytest
 - pip:
-   - scikeras[tensorflow] # Latest TF not on conda-forge
+   - scikeras
+   - tensorflow # Latest TF not on conda-forge
