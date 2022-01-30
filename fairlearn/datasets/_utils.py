@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-# Common functions for retrieving ACS datasets as constructed in folktables: 
+# Common functions for retrieving ACS datasets as constructed in folktables:
 #    https://github.com/zykls/folktables
 
 # State Code based on 2010 Census definitions
