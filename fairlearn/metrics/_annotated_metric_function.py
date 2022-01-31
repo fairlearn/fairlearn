@@ -16,7 +16,13 @@ _METRIC_FUNCTION_NOT_CALLABLE = "Object passed as metric function not callable"
 
 
 class AnnotatedMetricFunction:
-    """Wrapper for functions, to give them args and kwargs."""
+    """Wraps functions to make them callable with a DataFrame argument.
+    
+    The :class:`MetricFrame` makes extensive use of `pandas` DataFrames
+    internally. In particular, combinations of sensitive (and control)
+    features are selected using `DataFrame.groupby()` and acted on via
+    `DataFrame.apply()`.
+    """
 
     def __init__(
         self,
