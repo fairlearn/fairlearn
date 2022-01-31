@@ -68,7 +68,7 @@ def apply_to_dataframe(
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
-        values[function_name] = metric_function.invoke(data)
+        values[function_name] = metric_function(data)
     result = pd.Series(data=values.values(), index=values.keys())
     return result
 
