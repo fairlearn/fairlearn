@@ -295,13 +295,15 @@ class MetricFrame:
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
 
-        all_data = pd.DataFrame(dtype='object')
-
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        all_data['y_true'] = list(y_t)
-        all_data['y_pred'] = list(y_p)
+        all_data = pd.DataFrame.from_dict(
+            {
+                'y_true': list(y_t),
+                'y_pred': list(y_p)
+            }
+        )
 
         annotated_funcs = self._process_functions(metrics, sample_params, all_data)
 
