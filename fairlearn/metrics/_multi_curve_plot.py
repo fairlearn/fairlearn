@@ -229,8 +229,8 @@ def plot_model_comparison(
 
     # Add point labels
     if point_labels is not None:
-        for i, key in enumerate(y_preds):
-            ax.text(x[i], y[i], key)
+        for i, label in enumerate(point_labels):
+            ax.text(x[i], y[i], label)
 
     # Add actual points
     try:
