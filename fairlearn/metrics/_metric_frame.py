@@ -50,8 +50,6 @@ def apply_to_dataframe(
     The incoming DataFrame may have been sliced via `groupby()`.
     This function applies each annotated function in turn to the
     supplied DataFrame.
-    The `multi_d_columns` argument provides information about arguments
-    which are multi-dimensional arrays
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
