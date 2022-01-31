@@ -209,6 +209,23 @@ class MetricFrame:
         .. deprecated:: 0.7.0
             `metric` will be removed in version 0.10.0, use `metrics` instead.
 
+    n_boot : int
+        Used to produce confidence intervals. This parameter controls the number of
+        bootstrap iterations MetricFrame runs to estimate uncertainty in each metric.
+        For best results, it is recommended to set this to 500 or more. Setting to None
+        disables confidence interval functionality.
+
+    ci : float, List, tuple
+        Determines the quantiles reported for confidence intervals. All entries must
+        be in the range [0, 1]. A single float is interpreted as the width of the 
+        desired confidence interval (e.g. 0.95 is a 95% interval), while a List or Tuple
+        reports exact quantiles from the empirical bootstrap distribution 
+        (e.g. (0, 0.33, 0.5, 0.66, 1) will calculate the min, 33rd, 50th, 66th, and max quantiles).
+
+    n_jobs : int
+        The number of jobs to run in parallel. Only used for confidence interval calculations.
+        None means 1 unless in a joblib.parallel_backend context. -1 means using all processors. 
+
     Examples
     --------
     >>> from fairlearn.metrics import MetricFrame, selection_rate
@@ -291,7 +308,10 @@ class MetricFrame:
                  y_pred,
                  sensitive_features,
                  control_features=None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
+                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
+                 n_boot: Optional[int] = None,
+                 ci: Union[int, float] = 0.95,
+                 n_jobs: int = 1):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
 
@@ -334,39 +354,45 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        if self._cf_names is None:
-            self._overall = apply_to_dataframe(
-                all_data,
-                metric_functions=annotated_funcs)
-        else:
-            temp = all_data.groupby(by=self._cf_names).apply(
-                apply_to_dataframe,
-                metric_functions=annotated_funcs
-            )
-            # If there are multiple control features, might have missing combinations
-            if len(self._cf_names) > 1:
-                all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
-                                                         names=[x.name_ for x in cf_list])
-
-                self._overall = temp.reindex(index=all_indices)
+        def _build_overall_frame(data, functions):
+            if self._cf_names is None:
+                return apply_to_dataframe(
+                    data,
+                    metric_functions=functions)
             else:
-                self._overall = temp
+                temp = data.groupby(by=self._cf_names).apply(
+                    apply_to_dataframe,
+                    metric_functions=functions
+                )
+                # If there are multiple control features, might have missing combinations
+                if len(self._cf_names) > 1:
+                    all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
+                                                            names=[x.name_ for x in cf_list])
+
+                    return temp.reindex(index=all_indices)
+                else:
+                    return temp
+
+        self._overall = _build_overall_frame(all_data, annotated_funcs)
 
         grouping_features = copy.deepcopy(sf_list)
         if cf_list is not None:
             # Prepend the conditional features, so they are 'higher'
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
-        temp = all_data.groupby([x.name_ for x in grouping_features]).apply(
-            apply_to_dataframe,
-            metric_functions=annotated_funcs)
-        if len(grouping_features) > 1:
-            all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
-                                                     names=[x.name_ for x in grouping_features])
+        def _build_by_group_frame(data, functions):
+            temp = data.groupby([x.name_ for x in grouping_features]).apply(
+                apply_to_dataframe,
+                metric_functions=functions)
+            if len(grouping_features) > 1:
+                all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
+                                                        names=[x.name_ for x in grouping_features])
 
-            self._by_group = temp.reindex(index=all_indices)
-        else:
-            self._by_group = temp
+                return temp.reindex(index=all_indices)
+            else:
+                return temp
+
+        self._by_group = _build_by_group_frame(all_data, annotated_funcs)
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
