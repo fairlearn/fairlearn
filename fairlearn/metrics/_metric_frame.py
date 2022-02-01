@@ -9,11 +9,13 @@ from typing import Any, Callable, Dict, List, Optional, Union
 from sklearn.utils import check_consistent_length
 import warnings
 from functools import wraps
+from joblib import Parallel, delayed
+from tqdm import tqdm
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._group_feature import GroupFeature
 from ._annotated_metric_function import AnnotatedMetricFunction
-
+from ._bootstrap import process_ci_bounds
 
 logger = logging.getLogger(__name__)
 
@@ -212,7 +214,7 @@ class MetricFrame:
     n_boot : int
         Used to produce confidence intervals. This parameter controls the number of
         bootstrap iterations MetricFrame runs to estimate uncertainty in each metric.
-        For best results, it is recommended to set this to 500 or more. Setting to None
+        For best results, it is recommended to set this to 100 or more. Setting to None
         disables confidence interval functionality.
 
     ci : float, List, tuple
@@ -393,6 +395,36 @@ class MetricFrame:
                 return temp
 
         self._by_group = _build_by_group_frame(all_data, annotated_funcs)
+
+        def _bootstrap_metrics_calc(data, functions):
+            overall_frame = _build_overall_frame(data, functions)
+            by_group_frame = _build_by_group_frame(data, functions)
+            # TODO: Consider implementing .difference() and .ratio() operators here?
+            return overall_frame, by_group_frame
+
+        if n_boot is not None:
+            ci = process_ci_bounds(ci)
+            parallel_output = Parallel(n_jobs=n_jobs)(
+                delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True), annotated_funcs)
+                for _ in tqdm(range(n_boot))
+            )
+            self._overall_runs, self._by_group_runs = list(zip(*parallel_output)) # TODO: remove pinning for all runs
+
+            # Summarize results, using main output as protoype # TODO: Needs to upgrade to control features.
+            # overall_index = self._overall.index
+            # overall_quantile_frames = np.quantile(self._overall_runs, q=ci, axis=0)
+            # self._overall_quantiles = [
+            #     {quantile : pd.Series(qmf, index=overall_index)} 
+            #     for quantile, qmf in zip(ci, overall_quantile_frames)
+            # ]
+
+            # by_group_index, by_group_columns = self._by_group.index, self._by_group.columns
+            # by_group_quantile_frames = np.quantile(self._by_group_runs, q=ci, axis=0)
+            # self._by_group_quantiles = [
+            #     {quantile : pd.DataFrame(qmf, index=by_group_index, columns=by_group_columns)} 
+            #     for quantile, qmf in zip(ci, by_group_quantile_frames)
+            # ]
+        
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
