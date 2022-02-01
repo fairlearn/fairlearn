@@ -410,20 +410,27 @@ class MetricFrame:
             )
             self._overall_runs, self._by_group_runs = list(zip(*parallel_output)) # TODO: remove pinning for all runs
 
-            # Summarize results, using main output as protoype # TODO: Needs to upgrade to control features.
-            # overall_index = self._overall.index
-            # overall_quantile_frames = np.quantile(self._overall_runs, q=ci, axis=0)
-            # self._overall_quantiles = [
-            #     {quantile : pd.Series(qmf, index=overall_index)} 
-            #     for quantile, qmf in zip(ci, overall_quantile_frames)
-            # ]
-
-            # by_group_index, by_group_columns = self._by_group.index, self._by_group.columns
-            # by_group_quantile_frames = np.quantile(self._by_group_runs, q=ci, axis=0)
-            # self._by_group_quantiles = [
-            #     {quantile : pd.DataFrame(qmf, index=by_group_index, columns=by_group_columns)} 
-            #     for quantile, qmf in zip(ci, by_group_quantile_frames)
-            # ]
+            # Summarize results, using main output as protoype
+            overall_index = self._overall.index
+            overall_quantile_frames = np.quantile(self._overall_runs, q=ci, axis=0)
+            if isinstance(self._overall, pd.Series):
+                self._overall_quantiles = [
+                    {quantile : pd.Series(qmf, index=overall_index)}
+                    for quantile, qmf in zip(ci, overall_quantile_frames)
+                ]
+            else:
+                overall_columns = self._overall.columns
+                self._overall_quantiles = [
+                    {quantile : pd.DataFrame(qmf, index=overall_index, columns=overall_columns)}
+                    for quantile, qmf in zip(ci, overall_quantile_frames)
+                ]
+                
+            by_group_index, by_group_columns = self._by_group.index, self._by_group.columns
+            by_group_quantile_frames = np.quantile(self._by_group_runs, q=ci, axis=0)
+            self._by_group_quantiles = [
+                {quantile : pd.DataFrame(qmf, index=by_group_index, columns=by_group_columns)} 
+                for quantile, qmf in zip(ci, by_group_quantile_frames)
+            ]
         
 
     @property
