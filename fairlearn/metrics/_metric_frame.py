@@ -42,6 +42,11 @@ _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = \
 _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells. " \
     "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
 
+# Harsha's Open Questions on Bootstrap Procedures: 
+# -Which functions in ratio, difference, group_max, group_min should support error bars?
+# -Should uncertainty metrics be yielded when calling output functions?
+# -Do we pre-calculate all permutations of options or pin all bootstrap distribution frames (>1000x obj size)?
+# -Add support for these at visualization time?
 
 def apply_to_dataframe(
         data: pd.DataFrame,
@@ -402,32 +407,34 @@ class MetricFrame:
             # TODO: Consider implementing .difference() and .ratio() operators here?
             return overall_frame, by_group_frame
 
+        self._overall_runs, self._by_group_runs, self._by_group_ci = None, None, None
         if n_boot is not None:
             ci = process_ci_bounds(ci)
             parallel_output = Parallel(n_jobs=n_jobs)(
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True), annotated_funcs)
                 for _ in tqdm(range(n_boot))
             )
-            self._overall_runs, self._by_group_runs = list(zip(*parallel_output)) # TODO: remove pinning for all runs
+            # NOTE: currently pin all bootstrap runs to support .difference and .ratio. Discuss alternatives?
+            self._overall_runs, self._by_group_runs = list(zip(*parallel_output)) 
 
-            # Summarize results, using main output as protoype
+            # Summarize results, using main output as protoype.
             overall_index = self._overall.index
             overall_quantile_frames = np.quantile(self._overall_runs, q=ci, axis=0)
             if isinstance(self._overall, pd.Series):
-                self._overall_quantiles = [
+                self._overall_ci = [
                     {quantile : pd.Series(qmf, index=overall_index)}
                     for quantile, qmf in zip(ci, overall_quantile_frames)
                 ]
             else:
                 overall_columns = self._overall.columns
-                self._overall_quantiles = [
+                self._overall_ci = [
                     {quantile : pd.DataFrame(qmf, index=overall_index, columns=overall_columns)}
                     for quantile, qmf in zip(ci, overall_quantile_frames)
                 ]
                 
             by_group_index, by_group_columns = self._by_group.index, self._by_group.columns
             by_group_quantile_frames = np.quantile(self._by_group_runs, q=ci, axis=0)
-            self._by_group_quantiles = [
+            self._by_group_ci = [
                 {quantile : pd.DataFrame(qmf, index=by_group_index, columns=by_group_columns)} 
                 for quantile, qmf in zip(ci, by_group_quantile_frames)
             ]
@@ -472,6 +479,22 @@ class MetricFrame:
         else:
             return self._overall
 
+    # NOTE: making this a property to match current .overall implementation. 
+    @property
+    def by_group_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
+        '''Return estimates of by_group metrics calculated via bootstrap.'''
+
+        if self._overall_ci:
+            if self._user_supplied_callable:
+                if self.control_levels:
+                    return [{key : val.iloc[:, 0] for key, val in self._overall_ci.items()}]
+                else:
+                    return [{key : val.iloc[0] for key, val in self._overall_ci.items()}]
+            else:
+                return self._overall_ci
+
+        return None
+
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
         """Return the collection of metrics evaluated for each subgroup.
@@ -501,6 +524,19 @@ class MetricFrame:
             return self._by_group.iloc[:, 0]
         else:
             return self._by_group
+
+    # NOTE: making this a property to match current .by_group implementation. 
+    @property
+    def by_group_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
+        '''Return estimates of by_group metrics calculated via bootstrap.'''
+
+        if self._by_group_ci:
+            if self._user_supplied_callable:
+                return [{key : val.iloc[:, 0] for key, val in self._by_group_ci.items()}]
+            else:
+                return self._by_group_ci
+    
+        return None
 
     @property
     def control_levels(self) -> List[str]:
