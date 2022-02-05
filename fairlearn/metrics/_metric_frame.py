@@ -15,7 +15,7 @@ from tqdm import tqdm
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._group_feature import GroupFeature
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._bootstrap import process_ci_bounds
+from ._bootstrap import process_ci_bounds, create_ci_output
 
 logger = logging.getLogger(__name__)
 
@@ -361,83 +361,53 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        def _build_overall_frame(data, functions):
-            if self._cf_names is None:
-                return apply_to_dataframe(
-                    data,
-                    metric_functions=functions)
-            else:
-                temp = data.groupby(by=self._cf_names).apply(
-                    apply_to_dataframe,
-                    metric_functions=functions
-                )
-                # If there are multiple control features, might have missing combinations
-                if len(self._cf_names) > 1:
-                    all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
-                                                            names=[x.name_ for x in cf_list])
-
-                    return temp.reindex(index=all_indices)
-                else:
-                    return temp
-
-        self._overall = _build_overall_frame(all_data, annotated_funcs)
+        # Create ._overall and ._by_group frames on dataset
+        self._overall = self._build_overall_frame(all_data, annotated_funcs, cf_list, self._cf_names)
 
         grouping_features = copy.deepcopy(sf_list)
         if cf_list is not None:
             # Prepend the conditional features, so they are 'higher'
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
-        def _build_by_group_frame(data, functions):
-            temp = data.groupby([x.name_ for x in grouping_features]).apply(
-                apply_to_dataframe,
-                metric_functions=functions)
-            if len(grouping_features) > 1:
-                all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
-                                                        names=[x.name_ for x in grouping_features])
+        self._by_group = self._build_by_group_frame(all_data, annotated_funcs, grouping_features)
+        
+        # NOTE: Temporarily making these to test downstream functions. TODO: remove/re-implement these
+        group_min_output = self.__group(self._by_group, 'min')
+        group_max_output = self.__group(self._by_group, 'max')
 
-                return temp.reindex(index=all_indices)
-            else:
-                return temp
+        # Calculate uncertainty intervals using bootstrapped versions of data
+        def _bootstrap_metrics_calc(data):
+            overall_frame = self._build_overall_frame(data, annotated_funcs, cf_list, self._cf_names)
+            by_group_frame = self._build_by_group_frame(data, annotated_funcs, grouping_features)
+            group_min_frame = self.__group(by_group_frame, 'min')
+            group_max_frame = self.__group(by_group_frame, 'max')
+            # TODO: Implement following extra frame calculations:
+            # - difference (between groups)
+            # - difference (to overall)
+            # - ratio (between groups)
+            # - ratio (to overall)
+            return overall_frame, by_group_frame, group_min_frame, group_max_frame
 
-        self._by_group = _build_by_group_frame(all_data, annotated_funcs)
+        self._overall_runs, self._by_group_runs = None, None
+        self._overall_ci, self._by_group_ci = None, None
+        self._difference_overall_ci, self._difference_groups_ci = None, None
+        self._ratio_overall_ci, self._ratio_groups_ci = None, None
+        self._group_min_ci, self._group_max_ci = None, None
 
-        def _bootstrap_metrics_calc(data, functions):
-            overall_frame = _build_overall_frame(data, functions)
-            by_group_frame = _build_by_group_frame(data, functions)
-            # TODO: Consider implementing .difference() and .ratio() operators here?
-            return overall_frame, by_group_frame
-
-        self._overall_runs, self._by_group_runs, self._by_group_ci = None, None, None
         if n_boot is not None:
             ci = process_ci_bounds(ci)
             parallel_output = Parallel(n_jobs=n_jobs)(
-                delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True), annotated_funcs)
+                delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
                 for _ in tqdm(range(n_boot))
             )
-            # NOTE: currently pin all bootstrap runs to support .difference and .ratio. Discuss alternatives?
-            self._overall_runs, self._by_group_runs = list(zip(*parallel_output)) 
+            # NOTE: currently pin all bootstrap runs to debug. TODO: Drop pinning on all runs objects
+            self._overall_runs, self._by_group_runs, self._group_min_runs, self._group_max_runs = list(zip(*parallel_output))
 
             # Summarize results, using main output as protoype.
-            overall_index = self._overall.index
-            overall_quantile_frames = np.quantile(self._overall_runs, q=ci, axis=0)
-            if isinstance(self._overall, pd.Series):
-                self._overall_ci = [
-                    {quantile : pd.Series(qmf, index=overall_index)}
-                    for quantile, qmf in zip(ci, overall_quantile_frames)
-                ]
-            else:
-                overall_columns = self._overall.columns
-                self._overall_ci = [
-                    {quantile : pd.DataFrame(qmf, index=overall_index, columns=overall_columns)}
-                    for quantile, qmf in zip(ci, overall_quantile_frames)
-                ]
-                
-            by_group_index, by_group_columns = self._by_group.index, self._by_group.columns
-            by_group_quantile_frames = np.quantile(self._by_group_runs, q=ci, axis=0)
-            self._by_group_ci = [
-                {quantile : pd.DataFrame(qmf, index=by_group_index, columns=by_group_columns)} 
-                for quantile, qmf in zip(ci, by_group_quantile_frames)
-            ]
+            self._overall_ci = create_ci_output(self._overall_runs, ci, prototype=self._overall)
+            self._by_group_ci = create_ci_output(self._by_group_runs, ci, prototype=self._by_group)
+            self._group_min_ci = create_ci_output(self._group_min_runs, ci, prototype=group_min_output)
+            self._group_max_ci = create_ci_output(self._group_max_runs, ci, prototype=group_max_output)
         
 
     @property
@@ -481,7 +451,7 @@ class MetricFrame:
 
     # NOTE: making this a property to match current .overall implementation. 
     @property
-    def by_group_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
+    def overall_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
         '''Return estimates of by_group metrics calculated via bootstrap.'''
 
         if self._overall_ci:
@@ -569,7 +539,7 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def __group(self, grouping_function: str, errors: str = 'raise') \
+    def __group(self, by_group_frame: pd.DataFrame, grouping_function: str, errors: str = 'raise') \
             -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -597,18 +567,18 @@ class MetricFrame:
         if not self.control_levels:
             if errors == "raise":
                 try:
-                    mf = self._by_group
+                    mf = by_group_frame
                     if grouping_function == 'min':
                         vals = [mf[m].min() for m in mf.columns]
                     else:
                         vals = [mf[m].max() for m in mf.columns]
 
-                    result = pd.Series(vals, index=self._by_group.columns, dtype='object')
+                    result = pd.Series(vals, index=mf.columns, dtype='object')
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 if not self.control_levels:
-                    mf = self._by_group
+                    mf = by_group_frame
                     # Fill in the possible min/max values, else np.nan
                     if grouping_function == 'min':
                         vals = [mf[m].min() if np.isscalar(mf[m].values[0])
@@ -622,14 +592,14 @@ class MetricFrame:
             if errors == 'raise':
                 try:
                     if grouping_function == 'min':
-                        result = self._by_group.groupby(level=self.control_levels).min()
+                        result = by_group_frame.groupby(level=self.control_levels).min()
                     else:
-                        result = self._by_group.groupby(level=self.control_levels).max()
+                        result = by_group_frame.groupby(level=self.control_levels).max()
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == 'coerce':
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self._by_group.copy()
+                mf = by_group_frame.copy()
                 mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
                 if grouping_function == 'min':
                     result = mf.groupby(level=self.control_levels).min()
@@ -666,7 +636,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group('max', errors)
+        return self.__group(self._by_group, 'max', errors)
 
     def group_min(self, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -690,7 +660,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group('min', errors)
+        return self.__group(self._by_group, 'min', errors)
 
     def difference(self,
                    method: str = 'between_groups',
@@ -943,3 +913,35 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    # Private helper functions for building attribute frames during MetricFrame initialization
+    def _build_overall_frame(self, data, metric_funcs, cf_list, cf_names):
+        if cf_names is None:
+            return apply_to_dataframe(
+                data,
+                metric_functions=metric_funcs)
+        else:
+            temp = data.groupby(by=cf_names).apply(
+                apply_to_dataframe,
+                metric_functions=metric_funcs
+            )
+            # If there are multiple control features, might have missing combinations
+            if len(cf_names) > 1:
+                all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
+                                                        names=[x.name_ for x in cf_list])
+
+                return temp.reindex(index=all_indices)
+            else:
+                return temp
+
+    def _build_by_group_frame(self, data, metric_funcs, grouping_features):
+        temp = data.groupby([x.name_ for x in grouping_features]).apply(
+            apply_to_dataframe,
+            metric_functions=metric_funcs)
+        if len(grouping_features) > 1:
+            all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
+                                                    names=[x.name_ for x in grouping_features])
+
+            return temp.reindex(index=all_indices)
+        else:
+            return temp
