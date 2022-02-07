@@ -136,24 +136,29 @@ and the values corresond to the threshold. Below, we will show all different
 kind of ways to specify thresholds.
 
 Furthermore, we will plot some information about the obtained predictions,
-in order to help gain an insight in the way :class:`Thresholder` works.
+in order to help gain an insight in the way :class:`Thresholder` works. Throughout
+this example, unless specified otherwise, we will be using the
+:ref:`clinical hospital readmissions dataset<hospital_readmissions_dataset>`.
 
-Dataset
-********
-The dataset used in all examples below, unless specified otherwise, is a
-clincial dataset of hospital re-admissions over a ten-year period (1998-2008)
-for diabetic patients across 130 different hospitals in the US. Each record
-represents the hospital admission records for a patient diagnosed with
-diabetes whose stay lasted one to fourteen days. We would like to develop a
-classification model, which decides whether the patients should be suggested
-to their primary care physicians for an enrollment into the high-risk care
-management program. The positive prediction will mean recommendation into the
-care program.
+Classifier: Default predictions
+********************************
+The classifier we will be using throughout this example is a
+RandomForestClassifier. We first investigate the output when we call predict
+on this estimator, without using :class:`Thresholder`. This means all groups
+are thresholded at 0.5 (this is the default threshold used by most
+classification algorithms). 
 
+Considering the nature of the problem at hand, important aspects of our model
+to investigate are:
+
+- How many patients are recommended for care (selection rate = what % of predictions are positive) 
+- Reducing false negative rate (we don't want people that need extra care not receiving it)
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> #Import dataset, do train_test_split, balance positive/negative samples
+    
     >>> import pandas as pd
     >>> import numpy as np
     >>> from sklearn.model_selection import train_test_split
@@ -198,22 +203,10 @@ care program.
     >>> X_train, Y_train, A_train = resample_dataset(X_train, Y_train, A_train)
    
 
-Classifier: Default predictions
-********************************
-The classifier we will be using throughout this example is a
-RandomForestClassifier. We first investigate the output when we call predict
-on this estimator, without using :class:`Thresholder`. This means all groups
-are thresholded at 0.5 (this is the default threshold used by most
-classification algorithms). 
-
-Considering the nature of the problem at hand, important aspects of our model
-to investigate are:
-
-- How many patients are recommended for care (selection rate = what % of predictions are positive) 
-- Reducing false negative rate (we don't want people that need extra care not receiving it)
-
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
+
+    >>> #Train classifier, make and inspect default predictions
 
     >>> from sklearn.ensemble import RandomForestClassifier
     >>> from fairlearn.metrics import MetricFrame, false_negative_rate
@@ -424,9 +417,9 @@ Specify thresholds for a regressor
 It is also possible to threshold the predicted output of a regressor.
 This can be useful if it is desired to transform the continuous output
 of a regressor into a binary prediction. To illustrate how this could work,
-consider a simple LinearRegression example on the boston housing dataset,
-where the sensitive feature is the LSTAT variable categorized into four
-groups. 
+consider a simple LinearRegression example on the
+:ref:`boston housing dataset<boston_dataset>`, where the sensitive feature
+is the LSTAT variable categorized into four groups. 
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
