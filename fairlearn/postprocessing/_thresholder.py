@@ -94,7 +94,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     >>> # Example with one sensitive feature
     >>> X = pd.DataFrame([[0, 4], [6, 2], [1, 3], [10, 5], [1, 7], [-2, 1]])
     >>> y = pd.Series([1, 1, 1, 0, 0, 0])
-    >>> sensitive_features_train = pd.DataFrame([['A'], ['B'], ['C'], ['A'], ['B'], ['C']], columns=['SF1']) # noqa: E501
+    >>> sensitive_features_train = pd.DataFrame(
+    ...                   [['A'], ['B'], ['C'], ['A'], ['B'], ['C']], columns=['SF1'])
     >>> estimator = RandomForestClassifier(random_state=1)
     >>> estimator.fit(X, y)
     >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
@@ -105,28 +106,32 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     [0 1 1]
     >>> threshold_dict = {'A': .2, 'B': ('<', .6), 'C': ('>', .7)}
     >>> thresholder = Thresholder(estimator=estimator,
-    ...                      threshold_dict=threshold_dict,
-    ...                      prefit=True,
-    ...                      predict_method='predict_proba')
+    ...                           threshold_dict=threshold_dict,
+    ...                           prefit=True,
+    ...                           predict_method='predict_proba')
     >>> thresholder.fit(X, y, sensitive_features=sensitive_features_train)
-    >>> thresholder.predict(
-    ...        X_test, sensitive_features=sensitive_features_test)
+    >>> thresholder.predict(X_test, sensitive_features=sensitive_features_test)
     0   1.0
     1   0.0
     2   0.0
 
     >>> # Example with multiple sensitive features
+    >>> sensitive_features_train = pd.DataFrame([['A', 'D'],
+    ...                                          ['B', 'E'],
+    ...                                          ['B', 'D'],
+    ...                                          ['A', 'D'],
+    ...                                          ['B', 'E'],
+    ...                                          ['B', 'D']], columns=['SF1', 'SF2'])
     >>> sensitive_features_test = pd.DataFrame([['A', 'D'],
     ...                                         ['B', 'E'],
     ...                                         ['B', 'D']], columns=['SF1', 'SF2'])
     >>> threshold_dict = {('A', 'D'): .2, ('B', 'E'): ('<', .6), ('B', 'D'): ('>', .7)}
     >>> thresholder = Thresholder(estimator=estimator,
-    ...                      threshold_dict=threshold_dict,
-    ...                      prefit=True,
-    ...                      predict_method='predict_proba')
-    >>> thresholder.fit(X, y)
-    >>> thresholder.predict(
-    ...        X_test, sensitive_features=sensitive_features_test)
+    ...                           threshold_dict=threshold_dict,
+    ...                           prefit=True,
+    ...                           predict_method='predict_proba')
+    >>> thresholder.fit(X, y, sensitive_features=sensitive_features_train)
+    >>> thresholder.predict(X_test, sensitive_features=sensitive_features_test)
     0   1.0
     1   0.0
     2   0.0
