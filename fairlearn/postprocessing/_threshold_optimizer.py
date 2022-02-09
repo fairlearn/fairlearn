@@ -247,16 +247,16 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     ...                    objective="balanced_accuracy_score",
     ...                    prefit=True,
     ...                    predict_method='predict_proba')
-    >>> postprocess_est.fit(X_train, Y_train, sensitive_features=sensitive_train)
+    >>> postprocess_est.fit(X_train, y_train, sensitive_features=sensitive_train)
 
     Record and evaluate the output of the trained ThresholdOptimizer on test data
 
-    >>> Y_pred_postprocess = postprocess_est.predict(X_test, sensitive_features=sensitive_test)
+    >>> y_pred_postprocess = postprocess_est.predict(X_test, sensitive_features=sensitive_test)
     >>> metrics = {"selection_rate": selection_rate}
     >>> metricframe_postprocess = MetricFrame(
     ...                            metrics=metrics,
     ...                            y_true=y_test,
-    ...                            y_pred=Y_pred_postprocess,
+    ...                            y_pred=y_pred_postprocess,
     ...                            sensitive_features=sensitive_test)
 
     Access the disaggregated metrics via a pandas Series
