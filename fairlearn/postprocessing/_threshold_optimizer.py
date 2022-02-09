@@ -238,6 +238,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     ...                         ("preprocessing", StandardScaler()),
     ...                         ("logistic_regression", LogisticRegression(max_iter=1000))])
     >>> unmitigated_pipeline.fit(X_train, y_train)
+    Pipeline(steps=[('preprocessing', StandardScaler()),
+                    ('logistic_regression', LogisticRegression(max_iter=1000))])
 
     Now we instantiate the ThresholdOptimizer with the logistic regression estimator
 
@@ -248,6 +250,13 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     ...                    prefit=True,
     ...                    predict_method='predict_proba')
     >>> postprocess_est.fit(X_train, y_train, sensitive_features=sensitive_train)
+    ThresholdOptimizer(constraints='false_negative_rate_parity',
+                       estimator=Pipeline(steps=[('preprocessing',
+                                                  StandardScaler()),
+                                                 ('logistic_regression',
+                                                  LogisticRegression(max_iter=1000))]),
+                       objective='balanced_accuracy_score',
+                       predict_method='predict_proba', prefit=True)
 
     Record and evaluate the output of the trained ThresholdOptimizer on test data
 
