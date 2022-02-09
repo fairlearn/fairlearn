@@ -273,8 +273,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     >>> metricframe_postprocess.by_group # doctest: +NORMALIZE_WHITESPACE
                         selection_rate
     sensitive_feature_0
-    a                             1.0
-    b                             1.0
+    a                              0.5
+    b                              1.0
     """
 
     def __init__(
