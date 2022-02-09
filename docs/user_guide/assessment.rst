@@ -508,6 +508,18 @@ argument. Here is an example of a pie chart.
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
 
+In order to save a plot, access the `matplotlib` Figure as below and save it with your
+desired filename.
+
+    >>> fig = metric_frame.by_group[["count"]].plot(
+    ...                                         kind="pie",
+    ...                                         subplots=True,
+    ...                                         layout=[1, 1],
+    ...                                         legend=False,
+    ...                                         figsize=[12, 8],
+    ...                                         title="Show count metric in pie chart")
+    >>> fig[0][0].figure.savefig("filename.png")
+
 .. _dashboard:
 
 Fairlearn dashboard
