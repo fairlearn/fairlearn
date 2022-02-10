@@ -214,67 +214,24 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Examples
     --------
     >>> from fairlearn.postprocessing import ThresholdOptimizer
-    >>> from fairlearn.metrics import MetricFrame, selection_rate
-    >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.linear_model import LogisticRegression
-    >>> from sklearn.model_selection import train_test_split
-    >>> from sklearn.preprocessing import StandardScaler
-    >>> from sklearn.pipeline import Pipeline
     >>> from sklearn.metrics import balanced_accuracy_score
     >>> import numpy as np
-
-    First we create some artificial data and fit an unmitigated pipeline to it
-
     >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
     >>> y                  = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  1 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
-    ...                                                                     X,
-    ...                                                                     y,
-    ...                                                                     sensitive_features,
-    ...                                                                     stratify=y,
-    ...                                                                     random_state=1)
-    >>> unmitigated_pipeline = Pipeline(steps=[
-    ...                         ("preprocessing", StandardScaler()),
-    ...                         ("logistic_regression", LogisticRegression(max_iter=1000))])
-    >>> unmitigated_pipeline.fit(X_train, y_train)
-    Pipeline(steps=[('preprocessing', StandardScaler()),
-                    ('logistic_regression', LogisticRegression(max_iter=1000))])
-
-    Now we instantiate the ThresholdOptimizer with the logistic regression estimator
-
+    >>> unmitigated_lr = LogisticRegression().fit(X, y)
     >>> postprocess_est = ThresholdOptimizer(
-    ...                    estimator=unmitigated_pipeline,
+    ...                    estimator=unmitigated_lr,
     ...                    constraints="false_negative_rate_parity",
     ...                    objective="balanced_accuracy_score",
     ...                    prefit=True,
     ...                    predict_method='predict_proba')
-    >>> postprocess_est.fit(X_train, y_train, sensitive_features=sensitive_train)
+    >>> postprocess_est.fit(X, y, sensitive_features)
     ThresholdOptimizer(constraints='false_negative_rate_parity',
-                       estimator=Pipeline(steps=[('preprocessing',
-                                                  StandardScaler()),
-                                                 ('logistic_regression',
-                                                  LogisticRegression(max_iter=1000))]),
+                       estimator=LogisticRegression(),
                        objective='balanced_accuracy_score',
                        predict_method='predict_proba', prefit=True)
-
-    Record and evaluate the output of the trained ThresholdOptimizer on test data
-
-    >>> y_pred_postprocess = postprocess_est.predict(X_test, sensitive_features=sensitive_test)
-    >>> metrics = {"selection_rate": selection_rate}
-    >>> metricframe_postprocess = MetricFrame(
-    ...                            metrics=metrics,
-    ...                            y_true=y_test,
-    ...                            y_pred=y_pred_postprocess,
-    ...                            sensitive_features=sensitive_test)
-
-    Access the disaggregated metrics via a pandas Series
-
-    >>> metricframe_postprocess.by_group # doctest: +NORMALIZE_WHITESPACE
-                        selection_rate
-    sensitive_feature_0
-    a                              0.5
-    b                              1.0
     """
 
     def __init__(
