@@ -20,5 +20,6 @@ v0.7.1
 * Added the ACSIncome dataset and corresponding documentation.
 * Added :class:`~fairlearn.postprocessing.Thresholder`, including the corresponding
   documentation and a user guide.
-* Added :func:`~fairlearn.postprocessing.plot_histograms_per_group`, :func:`~fairlearn.postprocessing.plot_positive_predictions`,
+* Added :func:`~fairlearn.postprocessing.plot_histograms_per_group`,
+  :func:`~fairlearn.postprocessing.plot_positive_predictions`,
   :func:`~fairlearn.postprocessing.plot_proba_distribution` to :code:`fairlearn.postprocessing`.
