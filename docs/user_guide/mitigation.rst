@@ -169,7 +169,7 @@ to investigate are:
     >>> df = df[df['gender'] != 'Unknown/Invalid']
     >>> df = df[df['race'] != 'Unknown']
 
-    >>> Y, A = df.loc[:, 'readmit_30_days'], df.loc[:, 'race']
+    >>> Y, sensitive_features = df.loc[:, 'readmit_30_days'], df.loc[:, 'race']
 
     >>> #Create dummy's, drop A from X, drop columns that correlate with Y 
     >>> X = pd.get_dummies(df.drop(columns=["race", "discharge_disposition_id",
@@ -177,10 +177,10 @@ to investigate are:
     ...                                     "readmit_binary",
     ...                                     "readmit_30_days"]))
 
-    >>> X_train, X_test, Y_train, Y_test, A_train, A_test, df_train, df_test = train_test_split(
+    >>> X_train, X_test, Y_train, Y_test, sf_train, sf_test, df_train, df_test = train_test_split(
     ...        X,
     ...        Y,
-    ...        A,
+    ...        sensitive_features,
     ...        df,
     ...        test_size=0.50,
     ...        stratify=Y,
@@ -188,7 +188,7 @@ to investigate are:
 
     >>> # Resample dataset such that training data has same number of positive and negative samples
     
-    >>> def resample_dataset(X_train, Y_train, A_train):
+    >>> def resample_dataset(X_train, Y_train, sf_train):
     >>>   negative_ids = Y_train[Y_train == 0].index
     >>>   positive_ids = Y_train[Y_train == 1].index
     >>>   np.random.seed(1)
@@ -196,11 +196,11 @@ to investigate are:
 
     >>>   X_train = X_train.loc[balanced_ids, :]
     >>>   Y_train = Y_train.loc[balanced_ids]
-    >>>   A_train = A_train.loc[balanced_ids]
+    >>>   sf_train = sf_train.loc[balanced_ids]
     
-    >>>   return X_train, Y_train, A_train
+    >>>   return X_train, Y_train, sf_train
 
-    >>> X_train, Y_train, A_train = resample_dataset(X_train, Y_train, A_train)
+    >>> X_train, Y_train, sf_train = resample_dataset(X_train, Y_train, sf_train)
    
 
 .. doctest:: mitigation
@@ -220,7 +220,7 @@ to investigate are:
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=Y_pred_clf, 
-    ...             sensitive_features=A_test).by_group
+    ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.381274
     Asian              0.439024
@@ -229,7 +229,7 @@ to investigate are:
     Other              0.421875
     Name: false_negative_rate, dtype: object
 
-    >>> plot_positive_predictions(A_test,Y_pred_clf)    
+    >>> plot_positive_predictions(sf_test,Y_pred_clf)    
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_no_thresholds.png
     :align: center
@@ -242,7 +242,7 @@ predictions.
 .. doctest:: mitigation
     :options: +NORMALIZE_WHITESPACE
 
-    >>> plot_proba_distribution(A_test,Y_pred_proba_clf)
+    >>> plot_proba_distribution(sf_test,Y_pred_proba_clf)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_proba_distr.png
     :align: center
@@ -273,13 +273,13 @@ amount of positive predictions.
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
     
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=A_train)
-    >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=A_test)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=Y_pred_thresholded, 
-    ...             sensitive_features=A_test).by_group
+    ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.381274
     Asian              0.121951
@@ -288,7 +288,7 @@ amount of positive predictions.
     Other                 0.125
     Name: false_negative_rate, dtype: object
 
-    >>> plot_positive_predictions(A_test,Y_pred_thresholded)
+    >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_two_ways_pos_threshold.png
     :align: center
@@ -313,13 +313,13 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
     
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=A_train)
-    >>> Y_pred_switched_threshold = thresholder.predict(X_test,sensitive_features=A_test)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> Y_pred_switched_threshold = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=Y_pred_switched_threshold, 
-    ...             sensitive_features=A_test).by_group
+    ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.381274
     Asian              0.878049
@@ -328,7 +328,7 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     Other                 0.875
     Name: false_negative_rate, dtype: object
 
-    >>> plot_positive_predictions(A_test,Y_pred_switched_threshold)
+    >>> plot_positive_predictions(sf_test,Y_pred_switched_threshold)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_switch_predictions.png
     :align: center
@@ -351,13 +351,13 @@ ways shown above.
     ...                           predict_method='predict_proba',
     ...                           default_threshold=0.55)
 
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=A_train)
-    >>> default_thresholded_pred = thresholder.predict(X_test,sensitive_features=A_test)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> default_thresholded_pred = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=default_thresholded_pred, 
-    ...             sensitive_features=A_test).by_group
+    ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.511583
     Asian              0.121951
@@ -366,7 +366,7 @@ ways shown above.
     Other                 0.125
     Name: false_negative_rate, dtype: object
 
-    >>> plot_positive_predictions(A_test,default_thresholded_pred)
+    >>> plot_positive_predictions(sf_test,default_thresholded_pred)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_default_threshold.png
     :align: center
@@ -393,8 +393,8 @@ matter whether or the estimator is fit beforehand or in the
     ...                                     prefit=False,
     ...                                     predict_method='predict_proba')
     
-    >>> thresholder_no_prefit.fit(X_train,Y_train,sensitive_features=A_train)
-    >>> Y_pred_no_prefit = thresholder_no_prefit.predict(X_test,sensitive_features=A_test)
+    >>> thresholder_no_prefit.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> Y_pred_no_prefit = thresholder_no_prefit.predict(X_test,sensitive_features=sf_test)
 
     >>> #Prefit = True
     >>> classifier_prefit = RandomForestClassifier(random_state=1)
@@ -405,8 +405,8 @@ matter whether or the estimator is fit beforehand or in the
     ...                                  prefit=True,
     ...                                  predict_method='predict_proba')
     
-    >>> thresholder_prefit.fit(X_train,Y_train,sensitive_features=A_train)
-    >>> Y_pred_prefit = thresholder_prefit.predict(X_test,sensitive_features=A_test)
+    >>> thresholder_prefit.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> Y_pred_prefit = thresholder_prefit.predict(X_test,sensitive_features=sf_test)
 
     >>> #Results are the same
     >>> print(np.array_equal(Y_pred_no_prefit,Y_pred_prefit))    
@@ -488,7 +488,7 @@ same as specifying a threshold as in the previous examples.
     >>> Y_pred_decision_func = classifier.decision_function(X_test)
 
     >>> #Check distribution of decision function output
-    >>> plot_histograms_per_group(A_test,Y_pred_decision_func)
+    >>> plot_histograms_per_group(sf_test,Y_pred_decision_func)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_decision_func_distr.png
     :align: center
@@ -502,7 +502,7 @@ same as specifying a threshold as in the previous examples.
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=Y_pred, 
-    ...             sensitive_features=A_test).by_group
+    ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.423745
     Asian              0.463415
@@ -511,7 +511,7 @@ same as specifying a threshold as in the previous examples.
     Other                0.4375
     Name: false_negative_rate, dtype: object
 
-    >>> plot_positive_predictions(A_test,Y_pred)
+    >>> plot_positive_predictions(sf_test,Y_pred)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_decision_func_positive_pred_no_threshold.png
     :align: center
@@ -528,13 +528,13 @@ same as specifying a threshold as in the previous examples.
     ...                         predict_method='decision_function',
     ...                         default_threshold=0.0)
 
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=A_train)
-    >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=A_test)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=Y_pred_thresholded, 
-    ...             sensitive_features=A_test).by_group
+    ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.423745
     Asian               0.04878
@@ -543,7 +543,7 @@ same as specifying a threshold as in the previous examples.
     Other                0.4375
     Name: false_negative_rate, dtype: object
 
-    >>> plot_positive_predictions(A_test,Y_pred_thresholded)
+    >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_decision_func_positive_pred_yes_threshold.png
     :align: center    
@@ -570,8 +570,8 @@ women will be specified as ('Asian','Female').
 
     >>> #Include gender as sensitive feature as well
     >>> A_multiple = df.loc[:, ['race','gender']]
-    >>> A_multiple_train = A_multiple.loc[A_train.index, :]
-    >>> A_multiple_test = A_multiple.loc[A_test.index, :]
+    >>> A_multiple_train = A_multiple.loc[sf_train.index, :]
+    >>> A_multiple_test = A_multiple.loc[sf_test.index, :]
 
     >>> #Remove gender from the X data, as it is now a sensitive feature
     >>> X_train_multiple_sf = X_train.drop(columns=['gender_Female','gender_Male'])
