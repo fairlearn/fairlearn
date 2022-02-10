@@ -113,42 +113,42 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
 """Utilities to plot information about the output of an estimator"""
 
 
-def _check_A(A):
-    """Reformat A if multiple sensitive features, create descriptive variables.
+def _check_sensitive_features(sensitive_features):
+    """Reformat sensitive_features if multiple sensitive features, create descriptive variables.
 
     Parameters
     ----------
-    A : pandas.Series or pandas.DataFrame
+    sensitive_features : pandas.Series or pandas.DataFrame
         Sensitive features to identify groups by
 
     Returns
     -------
-    A : pandas.Series
+    sensitive_features : pandas.Series
         Sensitive features to identify groups by. If there are multiple
         sensitive features, these are combined into one string
 
-    all_sf : numpy.ndarray
-        List with all sensitive feature (combinations) observed in A
+    all_sf : list
+        List with all sensitive feature (combinations) observed in sensitive_features
 
     samples_each_sf : pandas.Series
         The number of samples observed of each sensitive feature (combination)
 
-    nmbr_test_samples : int
+    n_test_samples : int
         The number of rows in the data
     """
-    if len(A.shape) > 1 and A.shape[1] > 1:
-        cols = A.columns
-        A_single_col = deepcopy(A[cols[0]])
+    if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
+        cols = sensitive_features.columns
+        A_single_col = deepcopy(sensitive_features[cols[0]])
         for i in range(1, len(cols)):
-            A_single_col += ',' + deepcopy(A[cols[i]])
+            A_single_col += ',' + deepcopy(sensitive_features[cols[i]])
 
-        A = A_single_col
+        sensitive_features = A_single_col
 
-    all_sf = np.unique(A)
-    samples_each_sf = A.value_counts()
-    nmbr_test_samples = len(A)
+    all_sf = np.unique(sensitive_features).tolist()
+    samples_each_sf = sensitive_features.value_counts()
+    n_test_samples = len(sensitive_features)
 
-    return A, all_sf, samples_each_sf, nmbr_test_samples
+    return sensitive_features, all_sf, samples_each_sf, n_test_samples
 
 
 def _create_statistics_dict(sf_to_plot, value):
@@ -181,7 +181,7 @@ def _create_statistics_dict(sf_to_plot, value):
     return statistics_dict
 
 
-def plot_proba_distr(sensitive_features, Y_pred_proba, specified_sf_to_plot=None):
+def plot_proba_distribution(sensitive_features, Y_pred_proba, specified_sf_to_plot=None):
     """Create a stacked barplot showing the distribution of probabilities.
 
     The created plot is grouped by sensitive feature value.
@@ -198,7 +198,8 @@ def plot_proba_distr(sensitive_features, Y_pred_proba, specified_sf_to_plot=None
         If None, plot information about all known sensitive features.
         If list, plot information about sensitive features in list
     """
-    A, all_sf, samples_each_sf, nmbr_test_samples = _check_A(sensitive_features)
+    sensitive_features, all_sf, samples_each_sf, n_test_samples = \
+        _check_sensitive_features(sensitive_features)
 
     sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf
 
@@ -207,8 +208,8 @@ def plot_proba_distr(sensitive_features, Y_pred_proba, specified_sf_to_plot=None
     statistics_dict = _create_statistics_dict(sf_to_plot, np.zeros(10))
 
     # loop through A and Y_pred_proba simultaneously, and only once
-    for i in range(nmbr_test_samples):
-        sf = A.iloc[i]
+    for i in range(n_test_samples):
+        sf = sensitive_features.iloc[i]
         if sf in statistics_dict:
             stats_array = statistics_dict[sf]
             # append predict proba to correct interval
@@ -273,7 +274,8 @@ def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=N
         If None, plot information about all known sensitive features.
         If list, plot information about sensitive features in list.
     """
-    A, all_sf, samples_each_sf, nmbr_test_samples = _check_A(sensitive_features)
+    sensitive_features, all_sf, samples_each_sf, n_test_samples = _check_sensitive_features(
+        sensitive_features)
 
     sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf
 
@@ -282,8 +284,8 @@ def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=N
 
     # Keep track of the number of postive predictions for all groups,
     # by looping through Y_pred only once
-    for i in range(nmbr_test_samples):
-        sf = A.iloc[i]
+    for i in range(n_test_samples):
+        sf = sensitive_features.iloc[i]
         if sf in statistics_dict:
             statistics_dict[sf] += Y_pred[i]
 
@@ -323,7 +325,7 @@ def plot_histograms_per_group(sensitive_features, continuous_output, specified_s
         If None, plot information about all known sensitive features.
         If list, plot information about sensitive features in list.
     """
-    A, all_sf, _, nmbr_test_samples = _check_A(sensitive_features)
+    sensitive_features, all_sf, _, n_test_samples = _check_sensitive_features(sensitive_features)
 
     sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf
     nmbr_sf_to_plot = len(sf_to_plot)
@@ -333,8 +335,8 @@ def plot_histograms_per_group(sensitive_features, continuous_output, specified_s
 
     # Keep track of all values for each group simultaneously,
     # by looping through the continuous output only once
-    for i in range(nmbr_test_samples):
-        sf = A.iloc[i]
+    for i in range(n_test_samples):
+        sf = sensitive_features.iloc[i]
         if sf in statistics_dict:
             statistics_dict[sf] = np.append(statistics_dict[sf], continuous_output[i])
 

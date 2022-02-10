@@ -69,20 +69,6 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         mentioned in the ``threshold_dict`` are compared. Providing
         `float` has the same effect as ( '>' , `float` ).
 
-    Notes
-    -----
-    The procedure is based on the algorithm of
-    `Kamiran et al. (2012) <>
-    `Hardt et al. (2016) <https://ieeexplore.ieee.org/document/6413831>`_ [1]_.
-
-    References
-    ----------
-    .. [1] F. Kamiran, A. Karim and X. Zhang,
-        "Decision Theory for Discrimination-Aware Classification,"
-        2012 IEEE 12th International Conference on Data Mining, 2012,
-        pp. 924-929, doi: 10.1109/ICDM.2012.45.
-        Available: https://ieeexplore.ieee.org/document/6413831
-
     Examples
     --------
     The following example shows how to threshold predictions for both data with
@@ -163,38 +149,38 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         if len(keys) > 1:
             for key in keys[1:]:
                 if isinstance(type(key), type(keys[0])):
-                    warn("Not all the keys of 'threshold_dict' are of the same type. \
-                        {} is of type '{}', while {} is of type '{}'. \
-                        Please make sure that all keys are of the same type.".format(
-                        keys[0], type(keys[0]).__name__, key, type(key).__name__))
+                    warn("Not all the keys of 'threshold_dict' are of the same type. "
+                         "{} is of type '{}', while {} is of type '{}'. "
+                         "Please make sure that all keys are of the same type.".format(
+                             keys[0], type(keys[0]).__name__, key, type(key).__name__))
                     break
 
         # Check the provided thresholds
         for threshold in values:
             # Check if all specified thresholds are of type 'float' or 'tuple'
             if not isinstance(threshold, (float, tuple)):
-                warn("All specified thresholds should be of type 'float' or 'tuple',\
-                     but {} is of type '{}'".format(
-                    threshold, type(threshold).__name__))
+                warn("All specified thresholds should be of type 'float' or 'tuple', "
+                     "but {} is of type '{}'".format(
+                         threshold, type(threshold).__name__))
                 break
 
             # If provided in tuple, check if done so correctly
             if isinstance(threshold, tuple):
                 msg = ''
                 if threshold[0] not in ['>', '<']:
-                    msg += "The operator of a specified threshold operation should be \
-                        either '>' or '<'. However, for {} it is {}.".format(
-                        threshold, threshold[0])
+                    msg += "The operator of a specified threshold operation should " +\
+                           "be either '>' or '<'. However, for {} it is {}.".format(
+                               threshold, threshold[0])
                 if not isinstance(threshold[1], float):
                     if msg:
-                        msg += " The threshold should be of type 'float', \
-                            however {} is of type '{}'.".format(
-                            threshold[1], type(threshold[1]).__name__)
+                        msg += " The threshold should be of type 'float', " +\
+                            "however {} is of type '{}'.".format(
+                                threshold[1], type(threshold[1]).__name__)
                     else:
-                        msg += "The threshold of a specified threshold \
-                                operation should be of type 'float'. \
-                                However, for {} it is of type '{}'.".format(
-                            threshold, type(threshold[1]).__name__)
+                        msg += "The threshold of a specified threshold " +\
+                               "operation should be of type 'float'. " +\
+                               "However, for {} it is of type '{}'.".format(
+                                   threshold, type(threshold[1]).__name__)
                 if msg:
                     warn(msg)
                     break
@@ -226,7 +212,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         Returns
         -------
-        Warning message if there are unseen feature value(s) (combinations),
+        Error message if there are unseen feature value(s) (combinations),
         None if not
         """
         new_sf_values = []
@@ -239,8 +225,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         if new_sf_values:
 
-            msg = 'The following groups are provided at predict time,\
-                    but were not observed at fit time: '
+            msg = "The following groups are provided at predict time, " +\
+                  "but were not observed at fit time:"
 
             for new_sf in new_sf_values:
                 msg += ' {}'.format(new_sf)
@@ -332,11 +318,11 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
             self._reformat_threshold_dict_keys()
 
-        # warn if there are sensitive features not in threshold dict
+        # Raise error if there are sensitive features not in threshold dict
         potential_msg = \
             self._check_for_unseen_sf_values(sensitive_feature_vector)
         if potential_msg:
-            raise Error(potential_msg)
+            raise ValueError(potential_msg)
 
         final_predictions = 0.0*base_predictions_vector
 

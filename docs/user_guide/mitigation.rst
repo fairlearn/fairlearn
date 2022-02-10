@@ -34,7 +34,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - Postprocessing algorithm that outputs a binary prediction and allows
         the user to manually specify group-specific thresholds.
       - ✔
-      - ✔
+      - ✘
       - ✘
    *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
@@ -96,7 +96,7 @@ What it does
 :class:`fairlearn.postprocessing.Thresholder` is a post processing technique
 which outputs a binary prediction based on group-specific thresholds. The
 specified thresholds can work in two directions (positive/negative), and can
-be applied to the output of the :code:`predict()` function a regressor,
+be applied to the output of the :code:`predict()` function of a regressor,
 :code:`predict_proba()[:,1]` of a classifier, or on
 :code:`decision_function()` of SVC/LogisticRegression. Examples of these
 different applications can be found below. 
@@ -210,7 +210,7 @@ to investigate are:
 
     >>> from sklearn.ensemble import RandomForestClassifier
     >>> from fairlearn.metrics import MetricFrame, false_negative_rate
-    >>> from fairlearn.postprocessing import plot_positive_predictions, plot_proba_distr
+    >>> from fairlearn.postprocessing import plot_positive_predictions, plot_proba_distribution
 
     >>> classifier = RandomForestClassifier(random_state=1)
     >>> classifier.fit(X_train,Y_train)
@@ -242,7 +242,7 @@ predictions.
 .. doctest:: mitigation
     :options: +NORMALIZE_WHITESPACE
 
-    >>> plot_proba_distr(A_test,Y_pred_proba_clf)
+    >>> plot_proba_distribution(A_test,Y_pred_proba_clf)
 
 .. figure:: ../auto_examples/images/user_guide_thresholder_proba_distr.png
     :align: center
