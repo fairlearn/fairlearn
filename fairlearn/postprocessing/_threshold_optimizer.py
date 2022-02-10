@@ -227,7 +227,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     ...                    objective="balanced_accuracy_score",
     ...                    prefit=True,
     ...                    predict_method='predict_proba')
-    >>> postprocess_est.fit(X, y, sensitive_features)
+    >>> postprocess_est.fit(X, y, sensitive_features=sensitive_features)
     ThresholdOptimizer(constraints='false_negative_rate_parity',
                        estimator=LogisticRegression(),
                        objective='balanced_accuracy_score',
