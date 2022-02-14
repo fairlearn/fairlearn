@@ -215,10 +215,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     --------
     >>> from fairlearn.postprocessing import ThresholdOptimizer
     >>> from sklearn.linear_model import LogisticRegression
-    >>> import numpy as np
-    >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
-    >>> y                  = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  1 ,  0 ,  0 ,  0 ])
-    >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
+    >>> X                  = [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]]
+    >>> y                  = [ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  1 ,  0 ,  0 ,  0 ]
+    >>> sensitive_features = ["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"]
     >>> unmitigated_lr = LogisticRegression().fit(X, y)
     >>> postprocess_est = ThresholdOptimizer(
     ...                    estimator=unmitigated_lr,
