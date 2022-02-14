@@ -188,8 +188,8 @@ What happened to the :code:`FairlearnDashboard`?
     metrics.
 
     The :code:`FairlearnDashboard` is no longer being developed as
-    part of Fairlearn.
-    For more information on how to use it refer to
+    part of Fairlearn. Instead, it has found a new home at Microsoft with the name
+    :code:`FairnessDashboard`. For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
     Fairlearn provides some of the existing functionality through
     :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
