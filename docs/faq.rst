@@ -183,8 +183,8 @@ What is the relationship between Fairlearn and Microsoft?
 
 What happened to the :code:`FairlearnDashboard`?
     The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
-    model's predictions impact different groups (e.g., different ethnicities), and
-    also for comparing multiple models along different fairness and performance
+    model's predictions impact different groups as defined by sensitive features, and
+    also for comparing multiple models in terms of various fairness and performance
     metrics.
 
     The :code:`FairlearnDashboard` is no longer being developed as
