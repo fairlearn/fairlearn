@@ -15,10 +15,9 @@ Implements the "reweighing" algorithm from
 without discrimination" paper by Kamiran and Calders.
 
 Reference to paper:
-    Arrieta, A. B., Díaz-Rodríguez, N., Del Ser, J., Bennetot, A.,
-    Tabik, S., Barbado, A., ... & Herrera, F. (2020). Explainable
-    Artificial Intelligence (XAI): Concepts, taxonomies, opportunities
-    and challenges toward responsible AI. Information fusion, 58, 82-115.
+    Kamiran, F., & Calders, T. (2012). Data preprocessing techniques for
+    classification without discrimination. Knowledge and information systems,
+    33(1), 1-33.
 """
 
 
@@ -88,10 +87,9 @@ class Reweighing(BaseEstimator, MetaEstimatorMixin):
 
     References
     ----------
-    .. [1] Arrieta, A. B., Díaz-Rodríguez, N., Del Ser, J., Bennetot, A.,
-       Tabik, S., Barbado, A., ... & Herrera, F. (2020). Explainable
-       Artificial Intelligence (XAI): Concepts, taxonomies, opportunities
-       and challenges toward responsible AI. Information fusion, 58, 82-115.
+    .. [1] Kamiran, F., & Calders, T. (2012). Data preprocessing techniques for
+       classification without discrimination. Knowledge and information systems,
+       33(1), 1-33.
     """
 
     # TODO Possible enhancements:
