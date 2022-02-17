@@ -74,6 +74,62 @@ Preprocessing
    
 .. currentmodule:: fairlearn.preprocessing
 
+Preprocessing algortihms transform the dataset to mitigate possible unfairness
+present in the data.
+Preprocessing algorithms in Fairlearn follow the `scikit-learn transformers
+<https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin>`_
+class, meaning that they can :code:`fit` to the dataset and :code:`transform` it.
+A :code:`fit_transform` might not always be available, in which case the separate
+:code:`fit` and :code:`transform` methods need to be used in sequence.
+
+.. _correlation_remover:
+
+Correlation Remover
+~~~~~~~~~~~~~~~~~~~
+Sensitive features can be correlated with non sensitive features in the dataset.
+By applying the :code:`CorrelationRemover`, these correlations are filtered out while
+as much as possible information is retained (as measured by the least-squares error).
+This is mathemetically described as:
+
+.. math::
+        \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}
+        -\mathbf{x}_{i}\right\|^{2} \\
+        \text{subject to} \\
+        \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i}\left(\mathbf{s}_{i}-\overline{\mathbf{s}}
+        \right)^{T}=\mathbf{0}
+
+In the example below, a subset of the `adult dataset <https://www.openml.org/d/1590>`_
+is loaded and the correlation between sex and the non-sensitive features is removed.
+
+.. doctest:: mitigation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.preprocessing import CorrelationRemover
+    >>> import pandas as pd
+    >>> from sklearn.datasets import fetch_openml
+    >>> data = fetch_openml(data_id=1590, as_frame=True)
+    >>> X = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
+    >>> X = pd.get_dummies(X)
+    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female', 'sex_Male'])
+    >>> cr.fit(X)
+    CorrelationRemover(sensitive_feature_ids=['sex_Female', 'sex_Male'])
+    >>> X_transform = cr.transform(X)
+
+..  I am not sure whether it would be valuable to show the transformed data here,
+    as well as in the next example.
+
+This procedure will drop the sensitive features from the dataset. However, the
+:code:`CorrelationRemover` has an :code:`alpha` parameter that does allow you to
+tweak the amount of filtering that gets applied. Revisiting the same example,
+we can now see how the values in the transformed dataset are different.
+
+.. doctest:: mitigation
+
+    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female', 'sex_Male'], alpha=0.5)
+    >>> cr.fit(X)
+    CorrelationRemover(alpha=0.5, sensitive_feature_ids=['sex_Female', 'sex_Male'])
+    >>> X_transform = cr.transform(X)
+
 .. _postprocessing:
 
 Postprocessing
