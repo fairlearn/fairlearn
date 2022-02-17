@@ -17,8 +17,8 @@ from fairlearn.utils._input_validation import \
      _LABELS_NOT_0_1_ERROR_MESSAGE)
 from fairlearn.reductions import GridSearch, DemographicParity, EqualizedOdds, BoundedGroupLoss, \
     ZeroOneLoss
-from fairlearn.reductions._grid_search._grid_generator import GRID_DIMENSION_WARN_THRESHOLD, \
-    GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
+from fairlearn.reductions._grid_search._grid_generator import _GridGenerator, \
+    GRID_DIMENSION_WARN_THRESHOLD, GRID_DIMENSION_WARN_TEMPLATE, GRID_SIZE_WARN_TEMPLATE
 
 from test.unit.fixes import get_sklearn_expected_1d_message
 from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, ensure_dataframe
@@ -231,6 +231,45 @@ class ArgumentTests:
         else:
             assert len(log_records) == 0
 
+    @pytest.mark.parametrize("transformX", candidate_X_transforms)
+    @pytest.mark.parametrize("transformY", candidate_Y_transforms)
+    @pytest.mark.parametrize("transformA", candidate_A_transforms)
+    def test_custom_grid(self, transformX, transformY, transformA):
+
+        # Creating a standard grid with the default parameters
+        grid_size = 10
+        grid_limit = 2.0
+        grid_offset = 0.1
+
+        disparity_moment = EqualizedOdds()
+        X, y, A = _quick_data(False)
+
+        disparity_moment.load_data(X, y, sensitive_features=A)
+
+        grid = _GridGenerator(
+            grid_size, grid_limit,
+            disparity_moment.pos_basis, disparity_moment.neg_basis,
+            disparity_moment.neg_basis_present, False, grid_offset).grid
+
+        # Creating a custom grid by selecting only a few columns from the grid to try out
+        indices = [7, 3, 4]
+        grid = grid.iloc[:, indices]
+
+        gs = GridSearch(
+            estimator=LogisticRegression(solver='liblinear'),
+            constraints=EqualizedOdds(),
+            grid=grid,
+        )
+
+        # Check that fit runs successfully with the custom grid
+        gs.fit(
+            transformX(X),
+            transformY(y),
+            sensitive_features=transformA(A))
+
+        # Check that it trained the correct number of predictors
+        assert len(gs.predictors_) == len(grid.columns)
+
     # ----------------------------
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -238,6 +277,7 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_df_bad_columns(self, transformX, transformA, A_two_dim):
+
         gs = GridSearch(self.estimator, self.disparity_criterion,
                         sample_weight_name=self.sample_weight_name)
         X, Y, A = _quick_data(A_two_dim)

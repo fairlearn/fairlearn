@@ -18,9 +18,12 @@ from ._group_feature import GroupFeature
 logger = logging.getLogger(__name__)
 
 _SUBGROUP_COUNT_WARNING_THRESHOLD = 20
+_VALID_ERROR_STRING = ['raise', 'coerce']
+_VALID_GROUPING_FUNCTION = ['min', 'max']
 
 _SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
-    "Please ensure each array is strictly 1-D."
+    "Please ensure each array is strictly 1-D. " \
+    "The __cause__ field of this exception may contain further information."
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
@@ -29,6 +32,12 @@ _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
     "Keys in 'sample_params' do not match those in 'metric'"
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. " \
+                                      "Valid values are {0}".format(_VALID_ERROR_STRING)
+_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = \
+    "Invalid grouping function specified. Valid values are {0}".format(_VALID_GROUPING_FUNCTION)
+_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells. " \
+    "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -87,7 +96,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
 
 
 class MetricFrame:
-    """Collection of disaggregated metric values.
+    r"""Collection of disaggregated metric values.
 
     This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
@@ -181,6 +190,76 @@ class MetricFrame:
 
         .. deprecated:: 0.7.0
             `metric` will be removed in version 0.10.0, use `metrics` instead.
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import MetricFrame, selection_rate
+    >>> from sklearn.metrics import accuracy_score
+    >>> import pandas as pd
+    >>> y_true = [1,1,1,1,1,0,0,1,1,0]
+    >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
+    >>> sex = ['Female']*5 + ['Male']*5
+    >>> metrics = {"selection_rate": selection_rate}
+    >>> mf1 = MetricFrame(
+    ...      metrics=metrics,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas Series
+
+    >>> mf1.by_group # doctest: +NORMALIZE_WHITESPACE
+                        selection_rate
+    sensitive_feature_0
+    Female                         0.8
+    Male                           0.4
+
+    Access the largest difference, smallest ratio, and worst case performance
+
+    >>> print(f"difference: {mf1.difference()[0]:.3}\t"
+    ...      f"ratio: {mf1.ratio()[0]:.3}\t"
+    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    ...# doctest: +NORMALIZE_WHITESPACE
+    difference: 0.4     ratio: 0.5      max across groups: 0.8
+
+    You can also evaluate multiple metrics by providing a dictionary
+
+    >>> metrics_dict = {"accuracy":accuracy_score, "selection_rate": selection_rate}
+    >>> mf2 = MetricFrame(
+    ...      metrics=metrics_dict,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas DataFrame
+
+    >>> mf2.by_group # doctest: +NORMALIZE_WHITESPACE
+                        accuracy selection_rate
+    sensitive_feature_0
+    Female                   0.8            0.8
+    Male                     0.6            0.4
+
+    The largest difference, smallest ratio, and the maximum and minimum values
+    across the groups are then all pandas Series, for example:
+
+    >>> mf2.difference()
+    accuracy          0.2
+    selection_rate    0.4
+    dtype: object
+
+    You'll probably want to view them transposed
+
+    >>> pd.DataFrame({'difference': mf2.difference(),
+    ...               'ratio': mf2.ratio(),
+    ...               'group_min': mf2.group_min(),
+    ...               'group_max': mf2.group_max()}).T
+               accuracy selection_rate
+    difference      0.2            0.4
+    ratio          0.75            0.5
+    group_min       0.6            0.4
+    group_max       0.8            0.8
+
+    More information about plotting metrics can be found in the following section: :ref:`plot`
     """
 
     # The deprecation decorator does two things:
@@ -372,7 +451,82 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def group_max(self) -> Union[Any, pd.Series, pd.DataFrame]:
+    def __group(self, grouping_function: str, errors: str = 'raise') \
+            -> Union[Any, pd.Series, pd.DataFrame]:
+        """Return the minimum/maximum value of the metric over the sensitive features.
+
+        This is a private method, please use .group_min() or .group_max() instead.
+
+        Parameters
+        ----------
+        grouping_function: {'min', 'max'}
+        errors: {'raise', 'coerce'}, default 'raise'
+        if 'raise', then invalid parsing will raise an exception
+        if 'coerce', then invalid parsing will be set as NaN
+
+        Returns
+        -------
+        typing.Any pandas.Series or pandas.DataFrame
+            The minimum value over sensitive features. The exact type
+            follows the table in :attr:`.MetricFrame.overall`.
+        """
+        if grouping_function not in _VALID_GROUPING_FUNCTION:
+            raise ValueError(_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE)
+
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        if not self.control_levels:
+            if errors == "raise":
+                try:
+                    mf = self._by_group
+                    if grouping_function == 'min':
+                        vals = [mf[m].min() for m in mf.columns]
+                    else:
+                        vals = [mf[m].max() for m in mf.columns]
+
+                    result = pd.Series(vals, index=self._by_group.columns, dtype='object')
+                except ValueError as ve:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
+            elif errors == 'coerce':
+                if not self.control_levels:
+                    mf = self._by_group
+                    # Fill in the possible min/max values, else np.nan
+                    if grouping_function == 'min':
+                        vals = [mf[m].min() if np.isscalar(mf[m].values[0])
+                                else np.nan for m in mf.columns]
+                    else:
+                        vals = [mf[m].max() if np.isscalar(mf[m].values[0])
+                                else np.nan for m in mf.columns]
+
+                    result = pd.Series(vals, index=mf.columns, dtype='object')
+        else:
+            if errors == 'raise':
+                try:
+                    if grouping_function == 'min':
+                        result = self._by_group.groupby(level=self.control_levels).min()
+                    else:
+                        result = self._by_group.groupby(level=self.control_levels).max()
+                except ValueError as ve:
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
+            elif errors == 'coerce':
+                # Fill all impossible columns with NaN before grouping metric frame
+                mf = self._by_group.copy()
+                mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+                if grouping_function == 'min':
+                    result = mf.groupby(level=self.control_levels).min()
+                else:
+                    result = mf.groupby(level=self.control_levels).max()
+
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return result.iloc[:, 0]
+            else:
+                return result.iloc[0]
+        else:
+            return result
+
+    def group_max(self, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -382,30 +536,22 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Parameters
+        ----------
+        errors: {'raise', 'coerce'}, default 'raise'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if not self.control_levels:
-            result = pd.Series(index=self._by_group.columns, dtype='object')
-            for m in result.index:
-                max_val = self._by_group[m].max()
-                result[m] = max_val
-        else:
-            result = self._by_group.groupby(level=self.control_levels).max()
+        return self.__group('max', errors)
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
-        else:
-            return result
-
-    def group_min(self) -> Union[Any, pd.Series, pd.DataFrame]:
-        """Return the minimum value of the metric over the sensitive features.
+    def group_min(self, errors: str = 'raise') -> Union[Any, pd.Series, pd.DataFrame]:
+        """Return the maximum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
         sensitive features for each underlying metric function in the :attr:`.by_group`
@@ -414,30 +560,23 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Parameters
+        ----------
+        errors: {'raise', 'coerce'}, default 'raise'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+
         Returns
         -------
-        typing.Any pandas.Series or pandas.DataFrame
-            The minimum value over sensitive features. The exact type
+        typing.Any or pandas.Series or pandas.DataFrame
+            The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if not self.control_levels:
-            result = pd.Series(index=self._by_group.columns, dtype='object')
-            for m in result.index:
-                min_val = self._by_group[m].min()
-                result[m] = min_val
-        else:
-            result = self._by_group.groupby(level=self.control_levels).min()
-
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
-        else:
-            return result
+        return self.__group('min', errors)
 
     def difference(self,
-                   method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
+                   method: str = 'between_groups',
+                   errors: str = 'coerce') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -461,24 +600,38 @@ class MetricFrame:
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'raise', 'coerce'}, default 'coerce'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        subtrahend = np.nan
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
         if method == 'between_groups':
-            subtrahend = self.group_min()
+            subtrahend = self.group_min(errors=errors)
         elif method == 'to_overall':
             subtrahend = self.overall
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        return (self.by_group - subtrahend).abs().max(level=self.control_levels)
+        mf = self.by_group.copy()
+        # Can assume errors='coerce', else error would already have been raised in .group_min
+        # Fill all non-scalar values with NaN
+        if isinstance(mf, pd.Series):
+            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
+        else:
+            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+
+        return (mf - subtrahend).abs().max(level=self.control_levels)
 
     def ratio(self,
-              method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
+              method: str = 'between_groups',
+              errors: str = 'coerce') -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -504,15 +657,21 @@ class MetricFrame:
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'raise', 'coerce'}, default 'coerce'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
         result = None
         if method == 'between_groups':
-            result = self.group_min() / self.group_max()
+            result = self.group_min(errors=errors) / self.group_max(errors=errors)
         elif method == 'to_overall':
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall

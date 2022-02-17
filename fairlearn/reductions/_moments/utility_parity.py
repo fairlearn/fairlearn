@@ -122,7 +122,7 @@ class UtilityParity(ClassificationMoment):
 
         The `utilities` is a 2-d array which corresponds to g(X,A,Y,h(X)) as
         mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>` [2]_.
+        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [2]_.
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
@@ -248,8 +248,8 @@ class UtilityParity(ClassificationMoment):
            16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
 
         """
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).sum(level=_EVENT) / \
-            self.prob_event
+        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]) \
+            .groupby(level=_EVENT).sum() / self.prob_event
         lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
             self.prob_group_event
         adjust = lambda_event - lambda_group_event
@@ -279,10 +279,11 @@ class DemographicParity(UtilityParity):
     :class:`pandas:pandas.Series`
     will only have a single entry, which will be equal to 1.
     Similarly, the `index` property will have twice as many entries
-    (corresponding to the Lagrange multipliers for positive and negative constraints)
-    as there are unique values for the sensitive feature.
-    The :meth:`signed_weights` method will compute the costs according
-    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [4]_.
+    (corresponding to the Lagrange multipliers for positive and negative
+    constraints) as there are unique values for the sensitive feature.
+    The :meth:`UtilityParity.signed_weights` method will compute the costs
+    according to Example 3 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [4]_.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the Demographic Parity constraint applied within
@@ -318,7 +319,7 @@ class DemographicParity(UtilityParity):
 class TruePositiveRateParity(UtilityParity):
     r"""Implementation of true positive rate parity as a moment.
 
-    .. note:
+    .. note::
 
         The true positive rate parity fairness criterion is also known
         as "equal opportunity".
@@ -341,9 +342,9 @@ class TruePositiveRateParity(UtilityParity):
     by two (for the Lagrange multipliers for positive and negative
     constraints).
 
-    With these definitions, the :meth:`signed_weights` method will calculate
-    the costs for `Y=1` as they are calculated in Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
+    With these definitions, the :meth:`UtilityParity.signed_weights` method
+    will calculate the costs for `Y=1` as they are calculated in Example 4 of
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_, but will use
     the weights equal to zero for `Y=0` [5]_.
 
     This :class:`~Moment` also supports control features, which can be used to
