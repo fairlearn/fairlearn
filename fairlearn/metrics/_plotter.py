@@ -130,7 +130,7 @@ def _plot_df(
 def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
-    kind: str = "scatter",
+    kind: str = "point",
     metrics: Union[List[str], str] = None,
     conf_intervals: Union[List[str], str] = None,
     subplots: bool = True,
@@ -139,7 +139,7 @@ def plot_metric_frame(
     error_labels_fontsize: int = 8,
     error_labels_color: str = "black",
     error_labels_ha: str = "center",
-    error_legend_label: str = "Conf. Intervals",
+    error_labels_legend: str = "Conf. Intervals",
     **kwargs
 ):
     r"""Visualization for metrics with and without confidence intervals.
@@ -158,7 +158,7 @@ def plot_metric_frame(
     metric_frame : fairlearn.metrics.MetricFrame
         The collection of disaggregated metric values, along with the metric errors.
 
-    kind : str, default="scatter"
+    kind : str, default="point"
         The type of plot to display. e.g. "bar", "line", etc.
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
@@ -192,7 +192,7 @@ def plot_metric_frame(
     error_labels_ha : str, default="center"
         The horizontal alignment modifier to use for error labels
 
-    error_legend_label : str, default="Conf. Intervals"
+    error_labels_legend : str, default="Conf. Intervals"
         The label corresponding to the confidence interval bars
 
     \*\*kwargs
@@ -234,7 +234,7 @@ def plot_metric_frame(
     # plotting without confidence intervals
     # Note: Returns early
     if conf_intervals is None:
-        axs = _plot_df(df, metrics, kind, subplots, error_legend_label, **kwargs)
+        axs = _plot_df(df, metrics, kind, subplots, error_labels_legend, **kwargs)
         return axs
 
     # check for valid confidence intervals
@@ -262,7 +262,7 @@ def plot_metric_frame(
             df_all_bounds[metric] = df[conf_interval]
 
     axs = _plot_df(
-        df, metrics, kind, subplots, error_legend_label, df_all_errors, **kwargs
+        df, metrics, kind, subplots, error_labels_legend, df_all_errors, **kwargs
     )
 
     # Error labels don't get plotted when subplots=False
