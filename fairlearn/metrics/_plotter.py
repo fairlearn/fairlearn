@@ -44,7 +44,7 @@ def _build_legend(ax, kind, legend_label):
         The type of plot to display. e.g. "bar", "line", etc.
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
-    legend_label : str, default="95% CI"
+    legend_label : str
         The label corresponding to the confidence interval bars
     """
     color = ax.lines[0].get_color() if kind == "scatter" else "black"
