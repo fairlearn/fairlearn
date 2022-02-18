@@ -130,7 +130,7 @@ def _plot_df(
 def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
-    kind: str = "point",
+    kind: str = "scatter",
     metrics: Union[List[str], str] = None,
     conf_intervals: Union[List[str], str] = None,
     subplots: bool = True,
@@ -158,7 +158,7 @@ def plot_metric_frame(
     metric_frame : fairlearn.metrics.MetricFrame
         The collection of disaggregated metric values, along with the metric errors.
 
-    kind : str, default="point"
+    kind : str, default="scatter"
         The type of plot to display. e.g. "bar", "line", etc.
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
