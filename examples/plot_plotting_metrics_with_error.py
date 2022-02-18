@@ -88,7 +88,7 @@ z_score = 1.959964
 digits_of_precision = 4
 
 
-def general_wilson(p, n, digits=digits_of_precision, z=z_score):
+def general_wilson(p, n, digits=4, z=1.959964):
     """Return lower and upper bound using Wilson Interval.
 
     Parameters
@@ -98,9 +98,10 @@ def general_wilson(p, n, digits=digits_of_precision, z=z_score):
     n : int
         Total number of trials.
     digits : int
-        Digits of precisions to which the returned bound will be rounded
+        Digits of precision to which the returned bound will be rounded
     z : float
-        Z-score, which indicates the number of standard deviations of confidence
+        Z-score, which indicates the number of standard deviations of confidence.
+        The default value of 1.959964 is for a 95% confidence interval
 
     Returns
     -------
@@ -240,7 +241,7 @@ axs = plot_metric_frame(
     conf_intervals=["Recall Bounds", "Accuracy Bounds"],
     subplots=True,
     legend_label="95% Confidence Interval",
-    # the following parameters are passed into `df.plot` as kwargs
+    # the following parameters are passed into `pandas.DataFrame.plot` as kwargs
     layout=[1, 2],
     rot=45,
     colormap="rainbow",
