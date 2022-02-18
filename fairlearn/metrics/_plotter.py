@@ -139,7 +139,7 @@ def plot_metric_frame(
     error_labels_fontsize: int = 8,
     error_labels_color: str = "black",
     error_labels_ha: str = "center",
-    legend_label: str = "95% CI",
+    error_legend_label: str = "Conf. Intervals",
     **kwargs
 ):
     r"""Visualization for metrics with and without confidence intervals.
@@ -192,7 +192,7 @@ def plot_metric_frame(
     error_labels_ha : str, default="center"
         The horizontal alignment modifier to use for error labels
 
-    legend_label : str, default="95% CI"
+    error_legend_label : str, default="Conf. Intervals"
         The label corresponding to the confidence interval bars
 
     \*\*kwargs
@@ -234,7 +234,7 @@ def plot_metric_frame(
     # plotting without confidence intervals
     # Note: Returns early
     if conf_intervals is None:
-        axs = _plot_df(df, metrics, kind, subplots, legend_label, **kwargs)
+        axs = _plot_df(df, metrics, kind, subplots, error_legend_label, **kwargs)
         return axs
 
     # check for valid confidence intervals
@@ -262,7 +262,7 @@ def plot_metric_frame(
             df_all_bounds[metric] = df[conf_interval]
 
     axs = _plot_df(
-        df, metrics, kind, subplots, legend_label, df_all_errors, **kwargs
+        df, metrics, kind, subplots, error_legend_label, df_all_errors, **kwargs
     )
 
     # Error labels don't get plotted when subplots=False
