@@ -1,20 +1,111 @@
 Assessment
 ==========
 
+Introduction
+------------
+
+The goal of fairness assessment is to answer the question: Which groups of 
+people may be disproportionately negatively impacted by an AI system and in 
+what ways?
+
+The steps of the assesment are as follows:
+1. Identify harms
+2. Identify the groups that might be harmed
+3. Quantify harms
+4. Compare quantified harms across the groups
+
+We next examine these four steps in more detail.
+
+1. Identify harms
+^^^^^^^^^^^^^^^^^
+
+For example, in a system for screening job applications, qualified candidates 
+that are automatically rejected experience an allocation harm. In a 
+speech-to-text transcription system, high error rates constitute harm in the 
+quality of service.
+
+2. Identify the groups that might be harmed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In most applications, we consider demographic groups including historically 
+marginalized groups (e.g., based on gender, race, ethnicity). We should also 
+consider groups that are relevant to a particular application. For example, for 
+speech-to-text transcription, groups based on the regional dialect or being a  
+native or a non-native speaker.
+
+It is also important to consider group intersections, for example, in addition
+to considering groups according to gender and groups according to race, it is 
+also important to consider their intersections (e.g., Black women, Latinx 
+nonbinary people, etc.).
+
+3. Quantify harms
+^^^^^^^^^^^^^^^^^
+
+Define metrics that quantify harms or benefits:
+
+* In job screening scenario, we need to quantify the number of candidates that 
+are classified as "negative" (not recommended for the job), but whose true 
+label is "positive" (they are qualified). One possible metric is the false 
+negative rate: fraction of qualified candidates that are screened out.
+* In speech-to-text scenario, the harm could be measured by word error rate, 
+number of mistakes in a transcript divided by the overall number of words.
+
+4. Compare quantified harms across the groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The workhorse of fairness assessment are disaggregated metrics, which are 
+metrics evaluated on slices of data. For example, to measure harms due to 
+errors, we would begin by evaluating the errors on each slice of the data that 
+corresponds to a group. If some of the groups are seeing much larger errors 
+than other groups, we would flag this as a fairness harm.
+
+To summarize the disparities in errors (or other metrics), we may want to 
+report quantities such as the difference or ratio of the metric values between 
+the best and the worst slice. In settings where the goal is to guarantee 
+certain minimum quality of service (such as speech recognition), it is also 
+meaningful to report the worst performance across all considered groups.
+
+For example, when comparing false negative rate across groups defined by race, 
+we may summarize our findings with a table like the following:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 7 30
+   :stub-columns: 1
+
+   *  - 
+      - false negative rate (FNR)
+
+   *  - AfricanAmerican
+      - 0.43
+
+   *  - Caucasian
+      - 0.44
+
+   *  - Other
+      - 0.52
+
+   *  - Unknown
+      - 0.67
+
+   *  - largest difference
+      - 0.24 (best is 0.0)
+
+   *  - smallest ratio
+      - 0.64 (best is 1.0)
+
+   *  - maximum (worst-case) FNR
+      - 0.67
+
 Metrics
 -------
 
 .. currentmodule:: fairlearn.metrics
 
-The :py:mod:`fairlearn.metrics` module provides the means to assess fairness-related
-metrics for models. This applies for any kind of model that users may already
-use, but also for models created with mitigation techniques from the
-:ref:`mitigation` section. The :ref:`dashboard` provides a visual way to
-compare metrics between models as well as compare metrics for different groups
-on a single model.
-
-Ungrouped Metrics
-^^^^^^^^^^^^^^^^^
+The :py:mod:`fairlearn.metrics` module provides the means to assess 
+fairness-related metrics for models. This applies for any kind of model that 
+users may already use, but also for models created with mitigation techniques 
+from the :ref:`mitigation` section.
 
 At their simplest, metrics take a set of 'true' values :math:`Y_{true}` (from
 the input data) and predicted values :math:`Y_{pred}` (by applying the model
@@ -42,17 +133,26 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 
 .. _metrics_with_grouping:
 
-Metrics with Grouping
-^^^^^^^^^^^^^^^^^^^^^
+Assessment with :code:`MetricFrame`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When considering fairness, each row of input data will have an associated
+In a typical fairness assessment, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
-for each :math:`g`. To help with this, Fairlearn provides a class, which takes
-an existing (ungrouped) metric function, and applies it to each group within a
+for each :math:`g`. To help with this, Fairlearn provides a class that takes
+an existing (ungrouped) metric function and applies it to each group within a
 set of data.
 
-Suppose in addition to the :math:`Y_{true}` and :math:`Y_{pred}` above, we had
-the following set of labels:
+This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
+of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
+takes four arguments:
+* metric_function with signature metric_function(y_true, y_pred)
+* y_true: array of labels
+* y_pred: array of predictions
+* sensitive_features: array of sensitive feature values
+
+The code chunk below displays a case where in addition to the :math:`Y_{true}` 
+and :math:`Y_{pred}` above, the dataset also contains the following set of 
+labels, denoted by the "group_membership_data" column:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -99,11 +199,12 @@ We then calculate a metric which shows the subgroups:
     >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
-Note that the overall recall is the same as that calculated above in the
-Ungrouped Metric section, while the 'by group' dictionary can be checked
-against the table above.
+The disaggregated metrics are stored in a pandas Series 
+:code:`grouped_metric.by_group`. Note that the overall recall is the same 
+as that calculated above in the Ungrouped Metric section, while the 'by group' 
+dictionary can be checked against the table above.
 
-In addition to these basic scores, Fairlearn also provides
+In addition to these basic scores, Fairlearn provides
 convenience functions to recover the maximum and minimum values of the metric
 across groups and also the difference and ratio between the maximum and minimum:
 
@@ -118,43 +219,15 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-Multiclass metrics
-^^^^^^^^^^^^^^^^^^
-
-We may also be interested in multiclass classification. However, typical group
-fairness metrics such as equalized odds and demographic parity are only defined
-for binary classification. One way to measure fairness in the multiclass
-scenario is to define one-to-one or one-to-rest classifications for each group
-and calculate the metrics on this instead. Alternatively, we can use predefined
-metrics for multiclass classification. For example, accuracy is a multiclass
-metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
-in combination with a :code:`MetricFrame` as follows:
-
-.. doctest:: assessment_metrics
-
-    >>> from sklearn.metrics import accuracy_score
-    >>> from fairlearn.metrics import MetricFrame
-    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
-    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
-    >>> mf = MetricFrame(metric=accuracy_score,
-    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
-    ...                  sensitive_features=group_membership_data)
-    >>> print(mf.by_group) # series with accuracy for each sensitive group
-    sensitive_feature_0
-    a         1.0
-    b         0.5
-    c    0.428571
-    d         1.0
-    Name: accuracy_score, dtype: object
-    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
-    0.5714285714285714
 
 Multiple metrics in one :code:`MetricFrame`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
-show each group's size):
+metrics simultaneously by providing the `metrics` argument with a 
+dictionary of desired metrics. The disaggregated metrics are then stored in a 
+pandas DataFrame. Note that :func:`fairlearn.metrics.count` can 
+be used to show each group's size:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -177,8 +250,8 @@ show each group's size):
     c                         0.6   0.75     7
     d                         0.0    0.0     3
 
-If there are per-sample arguments (such as sample weights), these can also be provided
-in a dictionary via the ``sample_params`` argument.:
+If there are per-sample arguments (such as sample weights), these can also be 
+provided in a dictionary via the ``sample_params`` argument.:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -200,16 +273,16 @@ in a dictionary via the ``sample_params`` argument.:
     d    0...
     Name: recall_score, dtype: object
 
-If multiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
-dictionaries, with the first key corresponding matching that in the dictionary holding
-the desired underlying metric functions.
+If multiple metrics are being evaluated, then ``sample_params`` becomes a 
+dictionary of dictionaries, with the first key corresponding matching that in 
+the dictionary holding the desired underlying metric functions.
 
 Non-sample parameters
 ^^^^^^^^^^^^^^^^^^^^^
 
-We do not support non-sample parameters at the current time. If these are required, then
-use :func:`functools.partial` to prebind the required arguments to the metric
-function:
+We do not support non-sample parameters at the current time. If these are 
+required, then use :func:`functools.partial` to prebind the required arguments 
+to the metric function:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -230,11 +303,43 @@ function:
     d    0...
     Name: metric, dtype: object
 
+Multiclass metrics
+^^^^^^^^^^^^^^^^^^
+
+We may also be interested in multiclass classification. However, typical group
+fairness metrics such as equalized odds and demographic parity are only defined
+for binary classification. One way to measure fairness in the multiclass
+scenario is to define one-to-one or one-to-rest classifications for each group
+and calculate the metrics on this instead. Alternatively, we can use predefined
+metrics for multiclass classification. For example, accuracy is a multiclass
+metric that we can use through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
+in combination with a :code:`MetricFrame` as follows:
+
+.. doctest:: assessment_metrics
+
+    >>> from sklearn.metrics import accuracy_score
+    >>> from fairlearn.metrics import MetricFrame
+    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
+    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
+    >>> mf = MetricFrame(metric=accuracy_score,
+    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
+    ...                  sensitive_features=group_membership_data)
+    >>> print(mf.by_group) # series with accuracy for each sensitive group
+    sensitive_feature_0
+    a         1.0
+    b         0.5
+    c    0.428571
+    d         1.0
+    Name: accuracy_score, dtype: object
+    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
+    0.5714285714285714
+
+
 Multiple sensitive features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Finally, multiple sensitive features can be specified. The ``by_groups`` property then
-holds the intersections of these groups:
+Finally, multiple sensitive features can be specified. The ``by_groups`` 
+property then holds the intersections of these groups:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -507,22 +612,3 @@ argument. Here is an example of a pie chart.
 
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
-
-.. _dashboard:
-
-Fairlearn dashboard
--------------------
-
-The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
-model's predictions impact different groups (e.g., different ethnicities), and
-also for comparing multiple models along different fairness and performance
-metrics.
-
-.. note::
-
-    The :code:`FairlearnDashboard` is no longer being developed as
-    part of Fairlearn.
-    For more information on how to use it refer to
-    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
-    Fairlearn provides some of the existing functionality through
-    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
