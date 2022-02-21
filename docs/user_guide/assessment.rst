@@ -133,7 +133,7 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 
 .. _metrics_with_grouping:
 
-Metrics with Grouping using :code:`MetricFrame`
+Metrics with grouping using :code:`MetricFrame`
 -----------------------------------------------
 
 In a typical fairness assessment, each row of input data will have an associated
@@ -552,6 +552,9 @@ see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
 .. _plot:
+
+Plotting
+--------
 
 Plotting grouped metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^
