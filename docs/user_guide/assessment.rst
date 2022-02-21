@@ -42,13 +42,11 @@ nonbinary people, etc.).
 ^^^^^^^^^^^^^^^^^
 
 Define metrics that quantify harms or benefits:
-
-In job screening scenario, we need to quantify the number of candidates that 
+* In job screening scenario, we need to quantify the number of candidates that 
 are classified as "negative" (not recommended for the job), but whose true 
 label is "positive" (they are qualified). One possible metric is the false 
 negative rate: fraction of qualified candidates that are screened out.
-
-In speech-to-text scenario, the harm could be measured by word error rate, 
+* In speech-to-text scenario, the harm could be measured by word error rate, 
 number of mistakes in a transcript divided by the overall number of words.
 
 4. Compare quantified harms across the groups
