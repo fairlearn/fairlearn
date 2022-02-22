@@ -72,7 +72,6 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     'sphinx_multiversion',
     'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
-    'sphinxcontrib.bibtex',
 ]
 
 source_suffix = ['.rst']
@@ -247,5 +246,28 @@ mathjax3_config = {
     }
 }
 
+# TODO: Change Function to check for versions that are greater than equal to 0.7.1
+# by comparing version numbers.
+def check_if_v071dev0():
+    """Check to see if current version being built is v0.7.1.dev0"""
+    result = False
+
+    if fairlearn.__version__ == "0.7.1.dev0":
+        print("Detected 0.7.1.dev0 in fairlearn.__version__")
+        result = True
+
+    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
+    if smv_name is not None:
+        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
+        result = smv_name == "v0.7.1.dev0"
+    else:
+        print("SPHINX_MULTIVERSION_NAME not in environment")
+
+    return result
+
 # Setup for sphinx-bibtex
-bibtex_bibfiles = ['refs.bib']
+
+# Only use sphinx-bibtex if matches version 0.7.1.dev0
+if check_if_v071dev0():
+    extensions += ['sphinxcontrib.bibtex',]
+    bibtex_bibfiles = ['refs.bib']
