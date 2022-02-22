@@ -17,22 +17,22 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - supported fairness definitions
    *  - :class:`~fairlearn.reductions.ExponentiatedGradient`
       - A wrapper (reduction) approach to fair classification described in *A Reductions*
-        *Approach to Fair Classification* [#2]_.
+        *Approach to Fair Classification* :footcite:t:`agarwal2018reductions`.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
    *  - :class:`~fairlearn.reductions.GridSearch`
       - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
-        *Approach to Fair Classification* [#2]_. For regression it acts as a
+        *Approach to Fair Classification* :footcite:t:`agarwal2018reductions`. For regression it acts as a
         grid-search variant of the algorithm described in Section 5 of
         *Fair Regression: Quantitative Definitions and Reduction-based*
-        *Algorithms* [#1]_.
+        *Algorithms* :footcite:t:`agarwal2019fair`.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
    *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
-        *in Supervised Learning* [#3]_. This technique takes as input an
+        *in Supervised Learning* :footcite:t:`hardt2016equality`. This technique takes as input an
         existing classifier and the sensitive feature, and derives a monotone
         transformation of the classifier's prediction to enforce the specified
         parity constraints.
@@ -106,7 +106,7 @@ and :ref:`constraints_regression`.
 
 The reductions approach for classification seeks to reduce binary
 classification subject to fairness constraints to a sequence of weighted
-classification problems (see [#2]_), and similarly for regression (see [#1]_).
+classification problems (see :footcite:t:`agarwal2018reductions`), and similarly for regression (see :footcite:t:`agarwal2019fair`).
 As a result, the reduction algorithms
 in Fairlearn only require a wrapper access to any "base" learning algorithm.
 By this we mean that the "base" algorithm only needs to implement :code:`fit` and
