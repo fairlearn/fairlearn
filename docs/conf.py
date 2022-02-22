@@ -246,10 +246,11 @@ mathjax3_config = {
     }
 }
 
+
 # TODO: Change Function to check for versions that are greater than equal to 0.7.1
 # by comparing version numbers.
 def check_if_v071dev0():
-    """Check to see if current version being built is v0.7.1.dev0"""
+    """Check to see if current version being built is v0.7.1.dev0."""
     result = False
 
     if fairlearn.__version__ == "0.7.1.dev0":
@@ -258,9 +259,10 @@ def check_if_v071dev0():
 
     return result
 
+
 # Setup for sphinx-bibtex
 
 # Only use sphinx-bibtex if matches version 0.7.1.dev0
 if check_if_v071dev0():
-    extensions += ['sphinxcontrib.bibtex',]
+    extensions += ['sphinxcontrib.bibtex', ]
     bibtex_bibfiles = ['refs.bib']
