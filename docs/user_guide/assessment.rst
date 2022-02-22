@@ -142,9 +142,13 @@ set of data.
 This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
 of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
 takes four arguments:
+
 * metric_function with signature metric_function(y_true, y_pred)
+
 * y_true: array of labels
+
 * y_pred: array of predictions
+
 * sensitive_features: array of sensitive feature values
 
 The code chunk below displays a case where in addition to the :math:`Y_{true}` 
