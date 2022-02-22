@@ -256,13 +256,6 @@ def check_if_v071dev0():
         print("Detected 0.7.1.dev0 in fairlearn.__version__")
         result = True
 
-    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
-    if smv_name is not None:
-        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
-        result = smv_name == "v0.7.1.dev0"
-    else:
-        print("SPHINX_MULTIVERSION_NAME not in environment")
-
     return result
 
 # Setup for sphinx-bibtex
