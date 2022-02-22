@@ -72,6 +72,7 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     'sphinx_multiversion',
     'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
+    'sphinxcontrib.bibtex',
 ]
 
 source_suffix = ['.rst']
@@ -245,3 +246,6 @@ mathjax3_config = {
         }
     }
 }
+
+# Setup for sphinx-bibtex
+bibtex_bibfiles = ['refs.bib']
