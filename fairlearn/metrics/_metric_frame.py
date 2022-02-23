@@ -130,7 +130,7 @@ class MetricFrame:
     the aggregation functions will not be well defined in this case.
 
     Group fairness metrics are obtained by methods that implement
-    various aggregators over group-level metrics, such such as the
+    various aggregators over group-level metrics, such as the
     maximum, minimum, or the worst-case difference or ratio.
 
     This data structure also supports the concept of 'control features.' Like the sensitive
