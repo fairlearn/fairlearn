@@ -3,7 +3,6 @@
 
 import functools
 import numpy as np
-import pytest
 from sklearn.metrics import recall_score
 from fairlearn.metrics._annotated_metric_function import AnnotatedMetricFunction
 
