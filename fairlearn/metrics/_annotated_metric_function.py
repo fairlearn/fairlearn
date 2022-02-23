@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from typing import Callable, Dict, List, Optional
+import warnings
 
 import logging
 import numpy as np
@@ -60,7 +61,7 @@ class AnnotatedMetricFunction:
             if hasattr(func, "__name__"):
                 self.name = func.__name__
             else:
-                logger.warning("Supplied 'func' had no __name__ attribute")
+                warnings.warn("Supplied 'func' had no __name__ attribute")
                 self.name = _DEFAULT_NAME
         else:
             self.name = name
