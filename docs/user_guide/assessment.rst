@@ -1,8 +1,5 @@
-Assessment
-==========
-
 Introduction
-------------
+============
 
 The goal of fairness assessment is to answer the question: Which groups of 
 people may be disproportionately negatively impacted by an AI system and in 
@@ -17,7 +14,7 @@ The steps of the assesment are as follows:
 We next examine these four steps in more detail.
 
 1. Identify harms
-^^^^^^^^^^^^^^^^^
+-----------------
 
 For example, in a system for screening job applications, qualified candidates 
 that are automatically rejected experience an allocation harm. In a 
@@ -25,7 +22,7 @@ speech-to-text transcription system, high error rates constitute harm in the
 quality of service.
 
 2. Identify the groups that might be harmed
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
 
 In most applications, we consider demographic groups including historically 
 marginalized groups (e.g., based on gender, race, ethnicity). We should also 
@@ -39,7 +36,7 @@ also important to consider their intersections (e.g., Black women, Latinx
 nonbinary people, etc.).
 
 3. Quantify harms
-^^^^^^^^^^^^^^^^^
+-----------------
 
 Define metrics that quantify harms or benefits:
 
@@ -47,8 +44,12 @@ Define metrics that quantify harms or benefits:
 
 * In speech-to-text scenario, the harm could be measured by word error rate, number of mistakes in a transcript divided by the overall number of words.
 
+Note that in some cases, harms might not be readily identifiable. If you 
+choose to use a proxy to represent the harm, check the proxy regularly 
+to ensure it remains useful over time.
+
 4. Compare quantified harms across the groups
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------
 
 The workhorse of fairness assessment are disaggregated metrics, which are 
 metrics evaluated on slices of data. For example, to measure harms due to 
@@ -59,8 +60,8 @@ than other groups, we would flag this as a fairness harm.
 To summarize the disparities in errors (or other metrics), we may want to 
 report quantities such as the difference or ratio of the metric values between 
 the best and the worst slice. In settings where the goal is to guarantee 
-certain minimum quality of service (such as speech recognition), it is also 
-meaningful to report the worst performance across all considered groups.
+certain minimum quality of service across all groups (such as speech recognition), 
+it is also meaningful to report the worst performance across all considered groups.
 
 For example, when comparing false negative rate across groups defined by race, 
 we may summarize our findings with a table like the following:
@@ -94,8 +95,8 @@ we may summarize our findings with a table like the following:
    *  - maximum (worst-case) FNR
       - 0.67
 
-Ungrouped metrics
------------------
+Disaggregated metrics
+=====================
 
 .. currentmodule:: fairlearn.metrics
 
@@ -131,7 +132,7 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 .. _metrics_with_grouping:
 
 Metrics with grouping using :code:`MetricFrame`
------------------------------------------------
+===============================================
 
 In a typical fairness assessment, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
@@ -222,7 +223,7 @@ across groups and also the difference and ratio between the maximum and minimum:
 
 
 Multiple metrics in one :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously by providing the `metrics` argument with a 
@@ -279,7 +280,7 @@ dictionary of dictionaries, with the first key corresponding matching that in
 the dictionary holding the desired underlying metric functions.
 
 Non-sample parameters
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 We do not support non-sample parameters at the current time. If these are 
 required, then use :func:`functools.partial` to prebind the required arguments 
@@ -305,7 +306,7 @@ to the metric function:
     Name: metric, dtype: object
 
 Multiclass metrics
-^^^^^^^^^^^^^^^^^^
+------------------
 
 We may also be interested in multiclass classification. However, typical group
 fairness metrics such as equalized odds and demographic parity are only defined
@@ -337,7 +338,7 @@ in combination with a :code:`MetricFrame` as follows:
 
 
 Multiple sensitive features
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` 
 property then holds the intersections of these groups:
@@ -374,7 +375,7 @@ that there were no samples in it.
 .. _scalar_metric_results:
 
 Scalar results from :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often
 make use of metric functions to guide their optimisations.
@@ -444,7 +445,7 @@ For example :code:`fairlearn.metrics.accuracy_score_difference` and
 .. _control_features_metrics:
 
 Control features for grouped metrics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------
 
 Control features (sometimes called 'conditional' features) enable more detailed
 fairness insights by providing a further means of splitting the data into
@@ -555,10 +556,10 @@ see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 .. _plot:
 
 Plotting
---------
+========
 
 Plotting grouped metrics
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 The simplest way to visualize grouped metrics from the :class:`MetricFrame` is
 to take advantage of the inherent plotting capabilities of
@@ -576,7 +577,7 @@ to take advantage of the inherent plotting capabilities of
 It is possible to customize the plots. Here are some common examples.
 
 Customize Plots: :code:`ylim`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The y-axis range is automatically set, which can be misleading, therefore it is
 sometimes useful to set the `ylim` argument to define the yaxis range.
 
@@ -590,7 +591,7 @@ sometimes useful to set the `ylim` argument to define the yaxis range.
 
 
 Customize Plots: :code:`colormap`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To change the color scheme, we can use the `colormap` argument. A list of colorschemes
 can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_.
 
@@ -603,7 +604,7 @@ can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.htm
     :align: center
 
 Customize Plots: :code:`kind`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
 argument. Here is an example of a pie chart.
 
