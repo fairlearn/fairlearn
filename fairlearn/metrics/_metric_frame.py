@@ -23,7 +23,8 @@ _VALID_ERROR_STRING = ['raise', 'coerce']
 _VALID_GROUPING_FUNCTION = ['min', 'max']
 
 _SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
-    "Please ensure each array is strictly 1-D."
+    "Please ensure each array is strictly 1-D. " \
+    "The __cause__ field of this exception may contain further information."
 _BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
