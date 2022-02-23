@@ -282,7 +282,7 @@ the predicted labels.
     SF 0
     a    0.6
     b    0.2
-    Name: selection_rate, dtype: object
+    Name: selection_rate, dtype: float64
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
     sign  event  group_id
@@ -370,7 +370,7 @@ In practice this can be used in a difference-based relaxation as follows:
     sensitive_feature_0
     a    0.75...
     b    0.33...
-    Name: true_positive_rate, dtype: object
+    Name: true_positive_rate, dtype: float64
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
@@ -468,7 +468,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     sensitive_feature_0
     a    0.8
     b    0.4
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
     >>> erp = ErrorRateParity(difference_bound=0.01)
     >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> erp.gamma(lambda X: y_pred)
@@ -623,8 +623,8 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b    0.5
-    Name: mean_absolute_error, dtype: object
+    b    0.50
+    Name: mean_absolute_error, dtype: float64
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
     group_id
