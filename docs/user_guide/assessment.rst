@@ -26,7 +26,7 @@ quality of service.
 
 In most applications, we consider demographic groups including historically 
 marginalized groups (e.g., based on gender, race, ethnicity). We should also 
-consider groups that are relevant to a particular application. For example, for 
+consider groups that are relevant to a particular use case or deployment context. For example, for 
 speech-to-text transcription, groups based on the regional dialect or being a  
 native or a non-native speaker.
 
