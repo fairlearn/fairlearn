@@ -57,10 +57,13 @@ def test_categorical():
     est = CategoricalNB()
     main_test(est, X, Y, A)
 
+
 def test_calculation():
     # for all: w = 2 x 2 / 4 x 1 = 1.0
     assert calculate_weights([0, 0, 1, 1], [0, 1, 0, 1]).tolist() == [1.0] * 4
     # for 0,0: w = 4 x 4 / (6 x 3)
     # for 0,1 and 1,0: w = 4 x 2 / (6 x 1)
     # for 1,1: w = 2 x 2 / (6 x 1)
-    assert calculate_weights([0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 0, 0]).tolist() == [16/18, 8/6, 8/6, 4/6, 16/18, 16/18]
+    assert calculate_weights(
+        [0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 0, 0]
+    ).tolist() == [16 / 18, 8 / 6, 8 / 6, 4 / 6, 16 / 18, 16 / 18]
