@@ -13,7 +13,7 @@ The steps of the assesment are as follows:
 
 We next examine these four steps in more detail.
 
-1. Identify harms
+1. Identify types of harms
 -----------------
 
 For example, in a system for screening job applications, qualified candidates 
