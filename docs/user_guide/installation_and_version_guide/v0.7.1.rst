@@ -17,3 +17,4 @@ v0.7.1
   integers.
 * :class:`~fairlearn.preprocessing.CorrelationRemover` now exposes
   :code:`n_features_in_` and :code:`feature_names_in_`.
+* Added the ACSIncome dataset and corresponding documentation.

@@ -64,7 +64,7 @@ def fetch_boston(*, cache=True, data_home=None,
 
     data_home : str, default=None
         Specify another download and cache folder for the datasets.
-        By default, all scikit-learn data is stored in '~/.fairlearn-data'
+        By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
     as_frame : bool, default=False
@@ -101,7 +101,7 @@ def fetch_boston(*, cache=True, data_home=None,
         DESCR : string
             Description of the Boston housing dataset.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
+    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
         if ``return_X_y`` is True and ``as_frame`` is False
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
