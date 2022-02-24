@@ -36,17 +36,17 @@ class TestGetLabelsForConfusionMatrix:
         r1 = _get_labels_for_confusion_matrix([-1], None)
         assert np.array_equal(r1, [-1, 1])
         r2 = _get_labels_for_confusion_matrix([1], None)
-        assert np.array_equal(r2, [None, 1])
+        assert np.array_equal(r2, [np.iinfo(np.int64).min, 1])
 
     def test_single_value_numeric_pos_label(self):
         r0 = _get_labels_for_confusion_matrix([0], 3)
         assert np.array_equal(r0, [0, 3])
         r1 = _get_labels_for_confusion_matrix([0], 0)
-        assert np.array_equal(r1, [None, 0])
+        assert np.array_equal(r1, [np.iinfo(np.int64).min, 0])
 
     def test_single_value_alpha_pos_label(self):
         r0 = _get_labels_for_confusion_matrix(['a'], 'a')
-        assert np.array_equal(r0, [None, 'a'])
+        assert np.array_equal(r0, [np.iinfo(np.int64).min, 'a'])
         r1 = _get_labels_for_confusion_matrix(['a'], 0)
         assert np.array_equal(r1, ['a', 0])
 
@@ -418,3 +418,32 @@ class TestSingleValueArrays:
         assert metrics.false_positive_rate(neg_ones, neg_ones, pos_label=-1) == 0
         assert metrics.true_negative_rate(neg_ones, neg_ones, pos_label=-1) == 0
         assert metrics.false_negative_rate(neg_ones, neg_ones, pos_label=-1) == 0
+
+
+class TestCount:
+    def test_empty_group(self):
+        y_true = []
+        y_pred = []
+
+        assert 0 == metrics.count(y_true, y_pred)
+
+    def test_group_of_one(self):
+        y_true = [1]
+        y_pred = [0]
+
+        assert 1 == metrics.count(y_true, y_pred)
+
+    def test_multi_group(self):
+        y_true = [0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0]
+        y_pred = [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0]
+
+        assert 26 == metrics.count(y_true, y_pred)
+
+    def test_unequal_y_sizes(self):
+        y_true = [0, 1, 0, 1, 0, 1, 1]
+        y_pred = [0, 0, 1, 1]
+        expected_msg = "Found input variables with inconsistent numbers of samples: [7, 4]"
+
+        with pytest.raises(ValueError) as error:
+            metrics.count(y_true, y_pred)
+        assert str(error.value) == expected_msg

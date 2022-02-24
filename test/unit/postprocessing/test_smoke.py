@@ -17,11 +17,14 @@ _ESTIMATORS = [LogisticRegression, SVC, DecisionTreeClassifier]
 if platform.system() != "Darwin":
     # MacOS requires extra steps to install lightgbm properly, skipping for now
     from lightgbm import LGBMClassifier
+
     _ESTIMATORS.append(LGBMClassifier)
 
 
 @pytest.mark.parametrize("Mitigator", [ThresholdOptimizer])
-@pytest.mark.parametrize("constraints", ["demographic_parity", "equalized_odds"])
+@pytest.mark.parametrize(
+    "constraints", ["demographic_parity", "equalized_odds"]
+)
 @pytest.mark.parametrize("Estimator", _ESTIMATORS)
 @pytest.mark.parametrize("prefit", [True, False])
 def test_smoke(Mitigator, constraints, Estimator, prefit):
@@ -35,12 +38,17 @@ def test_smoke(Mitigator, constraints, Estimator, prefit):
     A = np.random.choice([0, 1], size=n)
     df = pd.DataFrame({"X0": X0, "X1": X1})
     # Set X1 as categorical
-    df['X1'] = df['X1'].astype('category')
+    df["X1"] = df["X1"].astype("category")
 
     estimator = Estimator()
     if prefit:
         estimator.fit(df, Y)
 
-    mitigator = Mitigator(estimator=estimator, constraints=constraints, prefit=prefit)
+    mitigator = Mitigator(
+        estimator=estimator,
+        constraints=constraints,
+        prefit=prefit,
+        predict_method="predict",
+    )
     mitigator.fit(df, Y, sensitive_features=A)
     mitigator.predict(df, sensitive_features=A)

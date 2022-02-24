@@ -12,12 +12,3 @@ adding new ones please consult the guide on
 
     The Fairlearn API is still evolving, so if you want to run these
     on your local Fairlearn installation, make sure to match versions.
-
-.. toctree::
-   :maxdepth: 2
-
-   plot_grid_search_census
-
-   plot_new_metrics
-
-   plot_make_derived_metric

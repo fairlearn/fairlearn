@@ -23,7 +23,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     """Estimator to perform a grid search given a blackbox estimator algorithm.
 
     The approach used is taken from section 3.4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_.
+
+    .. versionadded:: 0.3.0
+
+    .. versionchanged:: 0.4.6
+        Enabled for more than two sensitive feature values
 
     Parameters
     ----------
@@ -62,6 +67,15 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     sample_weight_name : str
         Name of the argument to `estimator.fit()` which supplies the sample weights
         (defaults to `sample_weight`)
+
+        .. versionadded:: 0.5.0
+
+    References
+    ----------
+    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
+       and H. Wallach, "A Reductions Approach to Fair Classification,"
+       arXiv.org, 16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+
     """
 
     def __init__(self,
@@ -82,7 +96,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         if (selection_rule == TRADEOFF_OPTIMIZATION):
             if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")   # noqa: E501
+                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
         else:
             raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
@@ -191,7 +205,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(i):
                 return self.objective_weight * self.objectives_[i] + \
-                    self.constraint_weight * self.gammas_[i].max()
+                    self.constraint_weight * self.gammas_[grid.columns[i]].max()
             losses = [loss_fct(i) for i in range(len(self.objectives_))]
             self.best_idx_ = losses.index(min(losses))
         else:
