@@ -7,7 +7,6 @@ from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 from warnings import warn
-from copy import Error
 
 from ._threshold_operation import ThresholdOperation
 
@@ -78,12 +77,12 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     >>> import pandas as pd
     >>> from sklearn.ensemble import RandomForestClassifier
     >>> # Example with one sensitive feature
-    >>> X = pd.DataFrame([[0, 4], [6, 2], [1, 3], [10, 5], [1, 7], [-2, 1]])
-    >>> y = pd.Series([1, 1, 1, 0, 0, 0])
+    >>> X_train = pd.DataFrame([[0, 4], [6, 2], [1, 3], [10, 5], [1, 7], [-2, 1]])
+    >>> y_train = pd.Series([1, 1, 1, 0, 0, 0])
     >>> sensitive_features_train = pd.DataFrame(
     ...                   [['A'], ['B'], ['C'], ['A'], ['B'], ['C']], columns=['SF1'])
     >>> estimator = RandomForestClassifier(random_state=1)
-    >>> estimator.fit(X, y)
+    >>> estimator.fit(X_train, y_train)
     >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
     >>> sensitive_features_test = pd.DataFrame([['A'], ['B'], ['C']], columns=['SF1'])
     >>> estimator.predict_proba(X_test)[:, 1]
@@ -95,7 +94,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     ...                           threshold_dict=threshold_dict,
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
-    >>> thresholder.fit(X, y, sensitive_features=sensitive_features_train)
+    >>> thresholder.fit(X_train, y_train, sensitive_features=sensitive_features_train)
     >>> thresholder.predict(X_test, sensitive_features=sensitive_features_test)
     0   1.0
     1   0.0
@@ -116,7 +115,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     ...                           threshold_dict=threshold_dict,
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
-    >>> thresholder.fit(X, y, sensitive_features=sensitive_features_train)
+    >>> thresholder.fit(X_train, y_train, sensitive_features=sensitive_features_train)
     >>> thresholder.predict(X_test, sensitive_features=sensitive_features_test)
     0   1.0
     1   0.0
