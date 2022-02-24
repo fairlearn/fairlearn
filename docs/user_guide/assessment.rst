@@ -6,7 +6,7 @@ people may be disproportionately negatively impacted by an AI system and in
 what ways?
 
 The steps of the assesment are as follows:
-1. Identify harms
+1. Identify types of harms
 2. Identify the groups that might be harmed
 3. Quantify harms
 4. Compare quantified harms across the groups
