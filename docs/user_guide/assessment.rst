@@ -42,7 +42,7 @@ Define metrics that quantify harms or benefits:
 
 * In job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are qualified). One possible metric is the false negative rate: fraction of qualified candidates that are screened out.
 
-* In speech-to-text scenario, the harm could be measured by word error rate, number of mistakes in a transcript divided by the overall number of words.
+* For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
 
 Note that in some cases, harms might not be readily identifiable. If you 
 choose to use a proxy to represent the harm, check the proxy regularly 
