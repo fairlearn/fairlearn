@@ -17,6 +17,8 @@ import os
 import sys
 import inspect
 from datetime import datetime
+from packaging.version import parse
+
 rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -247,14 +249,12 @@ mathjax3_config = {
 }
 
 
-# TODO: Change Function to check for versions that are greater than equal to 0.7.1
-# by comparing version numbers.
 def check_if_v071dev0():
-    """Check to see if current version being built is v0.7.1.dev0."""
+    """Check to see if current version being built is >= v0.7.1.dev0."""
     result = False
 
-    if fairlearn.__version__ == "0.7.1.dev0":
-        print("Detected 0.7.1.dev0 in fairlearn.__version__")
+    if parse(fairlearn.__version__) >= parse("0.7.1.dev0"):
+        print("Detected version >= 0.7.1.dev0 in fairlearn.__version__")
         result = True
 
     return result
@@ -262,7 +262,7 @@ def check_if_v071dev0():
 
 # Setup for sphinx-bibtex
 
-# Only use sphinx-bibtex if matches version 0.7.1.dev0
+# Only use sphinx-bibtex if matches version 0.7.1.dev0 or above
 if check_if_v071dev0():
     extensions += ['sphinxcontrib.bibtex', ]
     bibtex_bibfiles = ['refs.bib']
