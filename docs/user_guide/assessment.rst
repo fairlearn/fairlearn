@@ -27,7 +27,7 @@ quality of service.
 In most applications, we consider demographic groups including historically 
 marginalized groups (e.g., based on gender, race, ethnicity). We should also 
 consider groups that are relevant to a particular use case or deployment context. For example, for 
-speech-to-text transcription, groups based on the regional dialect or being a  
+speech-to-text transcription, this might include groups who speak a regional dialect or people who are a  
 native or a non-native speaker.
 
 It is also important to consider group intersections, for example, in addition
