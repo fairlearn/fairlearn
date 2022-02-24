@@ -18,7 +18,7 @@ We next examine these four steps in more detail.
 
 For example, in a system for screening job applications, qualified candidates 
 that are automatically rejected experience an allocation harm. In a 
-speech-to-text transcription system, high error rates constitute harm in the 
+speech-to-text transcription system, disparities in word error rates for different groups may result in harms due to differences in the 
 quality of service.
 
 2. Identify the groups that might be harmed
