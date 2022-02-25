@@ -1,10 +1,10 @@
-v0.7.1
+v0.8
 ======
 
 .. note::
 
-  v0.7.1 is not yet released. This page reflects changes on the current
-  :code:`main` branch that will eventually be a part of v0.7.1.
+  v0.8 is not yet released. This page reflects changes on the current
+  :code:`main` branch that will eventually be a part of v0.8
 
 * Relaxed checks made on :code:`X` in :code:`_validate_and_reformat_input()`
   since that is the concern of the underlying estimator and not Fairlearn.
@@ -17,4 +17,5 @@ v0.7.1
   integers.
 * :class:`~fairlearn.preprocessing.CorrelationRemover` now exposes
   :code:`n_features_in_` and :code:`feature_names_in_`.
-* Added the ACSIncome and ACSPublicCoverage datasets and corresponding documentations.
+* Added the ``ACSIncome`` and ``ACSPublicCoverage`` datasets and corresponding
+  documentations.

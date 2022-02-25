@@ -5,30 +5,35 @@ ACSPublicCoverage
 Introduction
 ^^^^^^^^^^^^
 
-The ACSPublicCoverage dataset is one of five datasets created by Ding et al. [1]_ 
-as an improved fairness benchmark dataset to the popular UCI Adult dataset [2]_.
-It is used to evaluate different algorithmic fairness interventions. While UCI Adult 
-predicts whether an individual's annual income is above $50,000, the 
-authors introduced ACSPublicCoverage to cover the healthcare domain. ACSPublicCoverage 
-predicts whether a low-income individual who is not eligible for Medicare 
-is covered by public health insurance, such as Medicaid or Medicare.
+The ACSPublicCoverage dataset is one of five datasets created by Ding et al.
+[1]_ as an improved fairness benchmark dataset to the popular UCI Adult dataset
+[2]_. It is used to evaluate different algorithmic fairness interventions.
+While UCI Adult predicts whether an individual's annual income is above
+$50,000, the authors introduced ACSPublicCoverage to cover the healthcare
+domain. ACSPublicCoverage predicts whether a low-income individual who is not
+eligible for Medicare is covered by public health insurance, such as Medicaid
+or Medicare.
 
-The authors compiled data from the American Community Survey (ACS) Public Use Microdata Sample (PUMS). 
-Note that this is a different source than the Annual Social and Economic Supplement (ASEC) 
-of the Current Population Survey (CPS) used to construct the original UCI Adult dataset.
-Ding et al. [1]_ filtered the data such that ACSPublicCoverage only includes individuals under 65 years old 
-had an income of less than $30,000. Although usually only people over age 65 are eligible for Medicare,
-people under age 65 may qualify if they have certain disabilities. 
+The authors compiled data from the American Community Survey (ACS) Public Use
+Microdata Sample (PUMS). Note that this is a different source than the Annual
+Social and Economic Supplement (ASEC) of the Current Population Survey (CPS)
+used to construct the original UCI Adult dataset. Ding et al. [1]_ filtered the
+data such that ACSPublicCoverage only includes individuals under 65 years old
+had an income of less than $30,000. Although usually only people over age 65
+are eligible for Medicare, people under age 65 may qualify if they have certain
+disabilities.
 
 
 .. _acs_public_coverage_dataset_description:
 
 Dataset Description
 ^^^^^^^^^^^^^^^^^^^
-The authors provide 2018 data for all 50 states and Puerto Rico.
-Note that Puerto Rico is the only US territory included in this dataset.
-We uploaded the 2018 data to `OpenML <https://www.openml.org/d/43140>`_, which anyone can access.
-The dataset contains 1,138,289 rows and 19 features, which we describe below:
+
+The authors provide 2018 data for all 50 states and Puerto Rico. Note that
+Puerto Rico is the only US territory included in this dataset. We uploaded the
+2018 data to `OpenML <https://www.openml.org/d/43140>`_, which anyone can
+access. The dataset contains 1,138,289 rows and 19 features, which we describe
+below:
 
 .. list-table::
    :header-rows: 1
@@ -147,7 +152,9 @@ The dataset contains 1,138,289 rows and 19 features, which we describe below:
          2. No
          
    *  - PINCP
-      - Total annual income per person as an integer between -19997 and 4209995 US dollars. Loss of $19998 or more is coded as -19998. Income of $4209995 or more is coded as 4209995.
+      - Total annual income per person as an integer between -19997 and 4209995
+        US dollars. Loss of $19998 or more is coded as -19998. Income of
+        $4209995 or more is coded as 4209995.
 
    *  - ESR
       - Employment status recode:
@@ -159,8 +166,9 @@ The dataset contains 1,138,289 rows and 19 features, which we describe below:
          6. Not in labor force
          
    *  - ST
-      - State code:
-         Please see data dictionary at `ACS PUMS documentation <https://www.census.gov/programs-surveys/acs/microdata/documentation.2018.html>`_ for the full list of state codes.  
+      - State code: Please see data dictionary at `ACS PUMS documentation
+         <https://www.census.gov/programs-surveys/acs/microdata/documentation.2018.html>`_
+         for the full list of state codes.
 
    *  - FER
       - Gave birth to child within the past 12 months:
@@ -173,14 +181,16 @@ The dataset contains 1,138,289 rows and 19 features, which we describe below:
          2. Black or African American alone
          3. American Indian alone
          4. Alaska Native alone
-         5. American Indian and Alaska native tribes specified; or American Indian or Alaska Native, not specified and no other races
+         5. American Indian and Alaska native tribes specified; or American
+            Indian or Alaska Native, not specified and no other races
          6. Asian alone
          7. Native Hawaiian and Other Pacific Islander alone
          8. Some Other Race alone
          9. Two or More races
 
 
-The target label is given by PUBCOV, which can be used for a binary classification task.
+The target label is given by PUBCOV, which can be used for a binary
+classification task.
 
 .. list-table::
    :header-rows: 1
@@ -191,72 +201,81 @@ The target label is given by PUBCOV, which can be used for a binary classificati
       - Description
 
    *  - PUBCOV
-      - Public health coverage, with PUBCOV == 1 if the individual has public health coverage, else 0
+      - Public health coverage, with PUBCOV == 1 if the individual has public
+        health coverage, else 0
 
 
 .. _acs_public_coverage_discussion:
 
 Discussion
 ^^^^^^^^^^
-As Ding et al. [1]_ notes, algorithmic (un)fairness must be evaluated in context of 
-the intervention, and the effects of different interventions vary widely by state.
-Similarly, datasets should be carefully designed for the specific prediction task
-in mind. 
 
-Therefore, to investigate how viable ACSPublicCoverage is as a fairness benchmark 
-dataset, we must first ask what real-world tasks might require a
-prediction of whether an individual is covered by public health insurance. Usually,
-the entity that needs this information (e.g. the government checking for eligibilty
-in a social program) will simply ask the individual directly. Ding et al. do not provide
-any examples, so it is difficult to evaluate what "fair" even means without context.
-For now, the rest of this discussion focuses on preliminary data analysis of
-ACSPublicCoverage and identifies potential problems that users should be aware of
-beforehand.
+As Ding et al. [1]_ notes, algorithmic (un)fairness must be evaluated in
+context of the intervention, and the effects of different interventions vary
+widely by state. Similarly, datasets should be carefully designed for the
+specific prediction task in mind.
+
+Therefore, to investigate how viable ACSPublicCoverage is as a fairness
+benchmark dataset, we must first ask what real-world tasks might require a
+prediction of whether an individual is covered by public health insurance.
+Usually, the entity that needs this information (e.g. the government checking
+for eligibilty in a social program) will simply ask the individual directly.
+Ding et al. do not provide any examples, so it is difficult to evaluate what
+"fair" even means without context. For now, the rest of this discussion focuses
+on preliminary data analysis of ACSPublicCoverage and identifies potential
+problems that users should be aware of beforehand.
 
 1. A uniform $30,000 threshold ignores differences between states.
 
     Although the purpose of ACSPublicCoverage is to "predict whether a
-    low-income individual, not eligible for Medicare, has coverage from public health
-    insurance," this dataset should not be blindly used for all prediction tasks that fall
-    in that category. Ding et al. filters ACS PUMS for all individuals whose income is below 
-    $30,000, but the 'low-income' threshold differs for every state, so applying 
-    one threshold to all states can lead to flawed results. The paper does not
-    justify the choice of $30,000, but the authors answer in `this Github
-    issue <https://github.com/zykls/folktables/issues/14>`_ that it was calculated approximately 
-    in accordance with Affordable Care Act (ACA) eligibilty guidelines qualifying 
-    adults with income up to 133% of the 2021 Federal Poverty Line for Medicaid. Note 
-    that we examine the 2018 dataset in this article, and 2018 had a different poverty line. 
-    Furthermore, not all states expanded Medicaid under the ACA, so some states
-    have a much lower poverty line.
+    low-income individual, not eligible for Medicare, has coverage from public
+    health insurance," this dataset should not be blindly used for all
+    prediction tasks that fall in that category. Ding et al. filters ACS PUMS
+    for all individuals whose income is below $30,000, but the 'low-income'
+    threshold differs for every state, so applying one threshold to all states
+    can lead to flawed results. The paper does not justify the choice of
+    $30,000, but the authors answer in `this Github issue
+    <https://github.com/zykls/folktables/issues/14>`_ that it was calculated
+    approximately in accordance with Affordable Care Act (ACA) eligibilty
+    guidelines qualifying adults with income up to 133% of the 2021 Federal
+    Poverty Line for Medicaid. Note that we examine the 2018 dataset in this
+    article, and 2018 had a different poverty line. Furthermore, not all states
+    expanded Medicaid under the ACA, so some states have a much lower poverty
+    line.
 
-    The authors acknowledge that the calculation was a very rough approximation, and 
-    ACSPublicCoverage is not designed to accommodate all the subtleties that contribute to 
-    the low-income designation and subsequent Medicaid eligibility. As a result, 
-    users of ACSPublicCoverage should be aware of the dataset's limitations and possibly
-    modify the data for their task. 
+    The authors acknowledge that the calculation was a very rough
+    approximation, and ACSPublicCoverage is not designed to accommodate all the
+    subtleties that contribute to the low-income designation and subsequent
+    Medicaid eligibility. As a result, users of ACSPublicCoverage should be
+    aware of the dataset's limitations and possibly modify the data for their
+    task.
 
 2. Slight misstatement of data contents.
 
-    The paper states that ACSPublicCoverage excludes individuals not eligible for Medicare,
-    but this is not strictly true. While 65 traditionally is the eligibilty age for Medicare, 
-    and the data filters for people under 65 years old, younger people with disabilities may 
-    still qualify [3]_.
+    The paper states that ACSPublicCoverage excludes individuals not eligible
+    for Medicare, but this is not strictly true. While 65 traditionally is the
+    eligibilty age for Medicare, and the data filters for people under 65 years
+    old, younger people with disabilities may still qualify [3]_.
 
 3. Missing features that contribute to low-income status.
 
-    The dataset focuses on individuals, but low-income status also depends on household
-    size, which is not one of the 19 features in ACSPublicCoverage. This could affect
-    prediction tasks.
+    The dataset focuses on individuals, but low-income status also depends on
+    household size, which is not one of the 19 features in ACSPublicCoverage.
+    This could affect prediction tasks.
 
 
 
 .. topic:: References:
 
-  .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring Adult: New Datasets for Fair Machine Learning" <https://arxiv.org/pdf/2108.04884.pdf>`_,
-      Advances in Neural Information Processing Systems 34, 2021.
+  .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring
+      Adult: New Datasets for Fair Machine Learning"
+      <https://arxiv.org/pdf/2108.04884.pdf>`_, Advances in Neural Information
+      Processing Systems 34, 2021.
 
-  .. [2] R. Kohavi and B. Becker. "UCI Adult Data Set." UCI Machine Learning Repository, 5, 1996.
+  .. [2] R. Kohavi and B. Becker. "UCI Adult Data Set." UCI Machine Learning
+         Repository, 5, 1996.
   
-  .. [3] U.S. Department of Health & Human Services. `"Who is eligible for Medicare?" <https://www.hhs.gov/answers/medicare-and-medicaid/who-is-eligible-for-medicare/index.html>`_,
+  .. [3] U.S. Department of Health & Human Services. `"Who is eligible for
+      Medicare?"
+      <https://www.hhs.gov/answers/medicare-and-medicaid/who-is-eligible-for-medicare/index.html>`_,
       HHS.gov, 2014.
-

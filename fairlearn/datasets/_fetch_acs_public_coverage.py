@@ -8,10 +8,14 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 from ._utils import _STATE_CODES, check_states_valid
 
 
-def fetch_acs_public_coverage(*, cache=True, data_home=None,
-                              as_frame=False, return_X_y=False,
-                              states=None
-                              ):
+def fetch_acs_public_coverage(
+    *,
+    cache=True,
+    data_home=None,
+    as_frame=False,
+    return_X_y=False,
+    states=None,
+):
     """Load the ACS Public Coverage dataset.
 
     Read more in the :ref:`User Guide <acs_public_coverage>`.
@@ -109,7 +113,9 @@ def fetch_acs_public_coverage(*, cache=True, data_home=None,
         states = [st.upper() for st in states]
         check_states_valid(states)
 
-        query = " or ".join(f"ST == {float(_STATE_CODES[st])}" for st in states)
+        query = " or ".join(
+            f"ST == {float(_STATE_CODES[st])}" for st in states
+        )
         indices = data.data.query(query).index.to_list()
 
         data.data = data.data.query(query)
