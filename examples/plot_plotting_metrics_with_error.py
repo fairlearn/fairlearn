@@ -85,7 +85,7 @@ test_set_sex = X_test["race"]
 # We aim to create a 95% confidence interval, so we use a :code:`z_score` of 1.959964
 z_score = 1.959964
 digits_of_precision = 4
-error_labels_legend="95% Confidence Interval"
+error_labels_legend = "95% Confidence Interval"
 
 
 def general_wilson(p, n, digits=4, z=1.959964):
