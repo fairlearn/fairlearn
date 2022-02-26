@@ -24,7 +24,9 @@ For example, in a system for screening job applications, qualified candidates
 that are automatically rejected experience an allocation harm. In a 
 speech-to-text transcription system, disparities in word error rates for 
 different groups may result in harms due to differences in the quality of service.
-One system can also lead to multiple harms
+Note that one system can lead to multiple harms, and different types of 
+harms are not mutually exclusive. For more information, review 
+Fairlearn's `2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
 
 2. Identify the groups that might be harmed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -45,13 +47,19 @@ nonbinary people, etc.).
 
 Define metrics that quantify harms or benefits:
 
-* In job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are qualified). One possible metric is the false negative rate: fraction of qualified candidates that are screened out.
+* In job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`.
 
 * For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
 
-Note that in some cases, harms might not be readily identifiable. If you 
-choose to use a proxy to represent the harm, check the proxy regularly 
-to ensure it remains useful over time.
+Note that in some cases, harms might not be readily identifiable. 
+In these cases, we might choose to use a closely related variable 
+to stand in for the missing variable. For example, suppose that in 
+the job screening scenario, we have data on whether the candidate passes 
+the first two stages, but not if they are ultimately recommended for the 
+job. An alternative measure of harm might be if the candidate does not pass 
+the first stage of the screen. If you choose to use a proxy variable to 
+represent the harm, check the proxy variable regularly to ensure it 
+remains useful over time.
 
 4. Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
