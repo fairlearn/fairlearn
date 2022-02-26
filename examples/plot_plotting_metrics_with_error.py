@@ -191,7 +191,7 @@ metric_frame = MetricFrame(
 # ========
 # Plot metrics without confidence intervals
 # -----------------------------------------
-plot_metric_frame(metric_frame, kind="scatter", metrics=["Recall", "Accuracy"])
+plot_metric_frame(metric_frame, kind="point", metrics=["Recall", "Accuracy"])
 
 
 # %%
@@ -207,7 +207,7 @@ plot_metric_frame(
 )
 plot_metric_frame(
     metric_frame,
-    kind="scatter",
+    kind="point",
     metrics="Recall",
     conf_intervals="Recall Bounds",
 )
@@ -236,7 +236,7 @@ plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 
 axs = plot_metric_frame(
     metric_frame,
-    kind="scatter",
+    kind="point",
     metrics=["Recall", "Accuracy"],
     conf_intervals=["Recall Bounds", "Accuracy Bounds"],
     subplots=True,

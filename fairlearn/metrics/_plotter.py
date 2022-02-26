@@ -47,7 +47,7 @@ def _build_legend(ax, kind, legend_label):
     legend_label : str
         The label corresponding to the confidence interval bars
     """
-    color = ax.lines[0].get_color() if kind == "scatter" else "black"
+    color = ax.lines[0].get_color() if kind == "point" else "black"
 
     # extend legend with user-provided legend_label
     handles, labels = ax.get_legend_handles_labels()
@@ -97,7 +97,7 @@ def _plot_df(
                 for metric in metrics
             ]
         )
-        if kind == "scatter":
+        if kind == "point":
             axs = df[metrics].plot(
                 linestyle="",
                 marker="o",
@@ -117,7 +117,7 @@ def _plot_df(
             _build_legend(axs, kind, legend_label)
 
     else:
-        if kind == "scatter":
+        if kind == "point":
             axs = df[metrics].plot(
                 linestyle="", marker="o", subplots=subplots, **kwargs
             )
@@ -130,7 +130,7 @@ def _plot_df(
 def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
-    kind: str = "scatter",
+    kind: str = "point",
     metrics: Union[List[str], str] = None,
     conf_intervals: Union[List[str], str] = None,
     subplots: bool = True,
@@ -158,7 +158,7 @@ def plot_metric_frame(
     metric_frame : fairlearn.metrics.MetricFrame
         The collection of disaggregated metric values, along with the metric errors.
 
-    kind : str, default="scatter"
+    kind : str, default="point"
         The type of plot to display. e.g. "bar", "line", etc.
         List of options is detailed in :meth:`pandas.DataFrame.plot`
 
