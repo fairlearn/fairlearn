@@ -42,11 +42,6 @@ _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = \
 _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = "Metric frame contains non-scalar cells. " \
     "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
 
-# Harsha's Open Questions on Bootstrap Procedures: 
-# -Which functions in ratio, difference, group_max, group_min should support error bars?
-# -Should uncertainty metrics be yielded when calling output functions?
-# -Do we pre-calculate all permutations of options or pin all bootstrap distribution frames (>1000x obj size)?
-# -Add support for these at visualization time?
 
 def apply_to_dataframe(
         data: pd.DataFrame,
@@ -370,44 +365,68 @@ class MetricFrame:
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
         self._by_group = self._build_by_group_frame(all_data, annotated_funcs, grouping_features)
-        
-        # NOTE: Temporarily making these to test downstream functions. TODO: remove/re-implement these
-        group_min_output = self.__group(self._by_group, 'min')
-        group_max_output = self.__group(self._by_group, 'max')
 
         # Calculate uncertainty intervals using bootstrapped versions of data
         def _bootstrap_metrics_calc(data):
             overall_frame = self._build_overall_frame(data, annotated_funcs, cf_list, self._cf_names)
             by_group_frame = self._build_by_group_frame(data, annotated_funcs, grouping_features)
-            group_min_frame = self.__group(by_group_frame, 'min')
-            group_max_frame = self.__group(by_group_frame, 'max')
-            # TODO: Implement following extra frame calculations:
-            # - difference (between groups)
-            # - difference (to overall)
-            # - ratio (between groups)
-            # - ratio (to overall)
-            return overall_frame, by_group_frame, group_min_frame, group_max_frame
+            group_min_frame = self.__group(by_group_frame, 'min', errors='coerce')
+            group_max_frame = self.__group(by_group_frame, 'max', errors='coerce')
+
+            overall_calc_frame, by_group_calc_frame = overall_frame, by_group_frame
+            if self._user_supplied_callable: # This logic is borrowed from .overall/.by_group -- refactor?
+                by_group_calc_frame = by_group_frame.iloc[:, 0]
+                if self.control_levels:
+                    overall_calc_frame = overall_frame.iloc[:, 0]
+                else:
+                    overall_calc_frame = overall_frame.iloc[0]
+
+            diff_group_frame = self._difference(by_group_calc_frame, group_min_frame)
+            diff_overall_frame = self._difference(by_group_calc_frame, overall_calc_frame)
+            ratio_group_frame = group_min_frame / group_max_frame
+            ratio_overall_frame = self._calc_ratio_overall(by_group_calc_frame, overall_calc_frame)
+
+            # NOTE: Consider packaging these per bootstrap run outputs better -- maybe as dictionary?
+            return overall_frame, by_group_frame, group_min_frame, group_max_frame, \
+                diff_group_frame, diff_overall_frame, ratio_group_frame, ratio_overall_frame
 
         self._overall_runs, self._by_group_runs = None, None
         self._overall_ci, self._by_group_ci = None, None
-        self._difference_overall_ci, self._difference_groups_ci = None, None
+        self._difference_overall_ci, self._difference_group_ci = None, None
         self._ratio_overall_ci, self._ratio_groups_ci = None, None
         self._group_min_ci, self._group_max_ci = None, None
 
         if n_boot is not None:
+            # Calculate all outputs across entire dataset to assist bootstrap calculations
+            # NOTE: Consider caching these results for on-demand regular calls?
+            try:
+                group_min_output = self.__group(self._by_group, 'min')
+                group_max_output = self.__group(self._by_group, 'max')
+                difference_group_output = self._difference(self.by_group, group_min_output)
+                difference_overall_output = self._difference(self.by_group, self.overall)
+                ratio_group_output = group_min_output / group_max_output
+                ratio_overall_output = self._calc_ratio_overall(self.by_group, self.overall)
+            except:
+                raise ValueError("Metrics with non-scalar outputs do not currently support confidence intervals. \
+                    Set n_boot=None to disable confidence interval calculation.")
             ci = process_ci_bounds(ci)
             parallel_output = Parallel(n_jobs=n_jobs)(
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
                 for _ in tqdm(range(n_boot))
             )
-            # NOTE: currently pin all bootstrap runs to debug. TODO: Drop pinning on all runs objects
-            self._overall_runs, self._by_group_runs, self._group_min_runs, self._group_max_runs = list(zip(*parallel_output))
+            # NOTE: currently pin all bootstrap runs for debugging. TODO: Drop pinning on all runs objects
+            self._overall_runs, self._by_group_runs, self._group_min_runs, self._group_max_runs, \
+                self._diff_group_runs, self._diff_overall_runs, self._ratio_group_runs, self._ratio_overall_runs = list(zip(*parallel_output))
 
-            # Summarize results, using main output as protoype.
+            # Summarize results, using main output as a prototype to provide appropriate index/columns.
             self._overall_ci = create_ci_output(self._overall_runs, ci, prototype=self._overall)
             self._by_group_ci = create_ci_output(self._by_group_runs, ci, prototype=self._by_group)
             self._group_min_ci = create_ci_output(self._group_min_runs, ci, prototype=group_min_output)
             self._group_max_ci = create_ci_output(self._group_max_runs, ci, prototype=group_max_output)
+            self._difference_group_ci = create_ci_output(self._diff_group_runs, ci, prototype=difference_group_output)
+            self._difference_overall_ci = create_ci_output(self._diff_overall_runs, ci, prototype=difference_overall_output)
+            self._ratio_group_ci = create_ci_output(self._ratio_group_runs, ci, prototype=ratio_group_output)
+            self._ratio_overall_ci = create_ci_output(self._ratio_overall_runs, ci, prototype=ratio_overall_output)
         
 
     @property
@@ -449,7 +468,6 @@ class MetricFrame:
         else:
             return self._overall
 
-    # NOTE: making this a property to match current .overall implementation. 
     @property
     def overall_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
         '''Return estimates of by_group metrics calculated via bootstrap.'''
@@ -495,7 +513,6 @@ class MetricFrame:
         else:
             return self._by_group
 
-    # NOTE: making this a property to match current .by_group implementation. 
     @property
     def by_group_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
         '''Return estimates of by_group metrics calculated via bootstrap.'''
@@ -662,6 +679,18 @@ class MetricFrame:
         """
         return self.__group(self._by_group, 'min', errors)
 
+    # TODO: Make fully private after debugging
+    def _difference(self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame) \
+            -> Union[Any, pd.Series, pd.DataFrame]:
+
+        mf = by_group_frame.copy()
+        if isinstance(mf, pd.Series):
+            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
+        else:
+            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+
+        return (mf - subtrahend).abs().max(level=self.control_levels)
+
     def difference(self,
                    method: str = 'between_groups',
                    errors: str = 'coerce') -> Union[Any, pd.Series, pd.DataFrame]:
@@ -707,15 +736,35 @@ class MetricFrame:
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        mf = self.by_group.copy()
-        # Can assume errors='coerce', else error would already have been raised in .group_min
-        # Fill all non-scalar values with NaN
-        if isinstance(mf, pd.Series):
-            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
+        return self._difference(self.by_group, subtrahend)
+    
+    # TODO: Make fully private after debugging
+    def _calc_ratio_overall(self, by_group_frame, overall_frame):
+        if self._user_supplied_callable:
+            tmp = by_group_frame / overall_frame
+            result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
         else:
-            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+            ratios = None
 
-        return (mf - subtrahend).abs().max(level=self.control_levels)
+            if self.control_levels:
+                # It's easiest to give in to the DataFrame columns preference
+                ratios = self.by_group.unstack(level=self.control_levels) /  \
+                    self.overall.unstack(level=self.control_levels)
+            else:
+                ratios = self.by_group / self.overall
+
+            def ratio_sub_one(x):
+                if x > 1:
+                    return 1/x
+                else:
+                    return x
+
+            ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+            if not self.control_levels:
+                result = ratios.min()
+            else:
+                result = ratios.min().unstack(0)
+        return result
 
     def ratio(self,
               method: str = 'between_groups',
@@ -761,30 +810,7 @@ class MetricFrame:
         if method == 'between_groups':
             result = self.group_min(errors=errors) / self.group_max(errors=errors)
         elif method == 'to_overall':
-            if self._user_supplied_callable:
-                tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
-            else:
-                ratios = None
-
-                if self.control_levels:
-                    # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(level=self.control_levels) /  \
-                        self.overall.unstack(level=self.control_levels)
-                else:
-                    ratios = self.by_group / self.overall
-
-                def ratio_sub_one(x):
-                    if x > 1:
-                        return 1/x
-                    else:
-                        return x
-
-                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-                if not self.control_levels:
-                    result = ratios.min()
-                else:
-                    result = ratios.min().unstack(0)
+            result = self._calc_ratio_overall(self.by_group, self.overall)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
