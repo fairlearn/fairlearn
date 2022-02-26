@@ -135,11 +135,11 @@ def plot_metric_frame(
     conf_intervals: Union[List[str], str] = None,
     subplots: bool = True,
     plot_error_labels: bool = False,
-    error_labels_precision: int = 4,
-    error_labels_fontsize: int = 8,
-    error_labels_color: str = "black",
-    error_labels_ha: str = "center",
-    error_labels_legend: str = "Conf. Intervals",
+    ci_labels_precision: int = 4,
+    ci_labels_fontsize: int = 8,
+    ci_labels_color: str = "black",
+    ci_labels_ha: str = "center",
+    ci_labels_legend: str = "Conf. Intervals",
     **kwargs
 ):
     r"""Visualization for metrics with and without confidence intervals.
@@ -177,22 +177,22 @@ def plot_metric_frame(
     subplots : bool, default=True
         Whether or not to plot metrics on separate subplots
 
-    plot_error_labels : bool, default=False
-        Whether or not to plot numerical labels for the error bounds
+    plot_ci_labels : bool, default=False
+        Whether or not to plot numerical labels for the confidence intervals
 
-    error_labels_precision : int, default=4
-        The number of digits of precision to show for error labels
+    ci_labels_precision : int, default=4
+        The number of digits of precision to show for confidence interval labels
 
-    error_labels_fontsize : int, default=8
-        The font size to use for error labels
+    ci_labels_fontsize : int, default=8
+        The font size to use for confidence interval labels
 
-    error_labels_color : str, default="black"
-        The font color to use for error labels
+    ci_labels_color : str, default="black"
+        The font color to use for confidence interval labels
 
-    error_labels_ha : str, default="center"
-        The horizontal alignment modifier to use for error labels
+    ci_labels_ha : str, default="center"
+        The horizontal alignment modifier to use for confidence interval labels
 
-    error_labels_legend : str, default="Conf. Intervals"
+    ci_labels_legend : str, default="Conf. Intervals"
         The label corresponding to the confidence interval bars
 
     \*\*kwargs
@@ -234,7 +234,7 @@ def plot_metric_frame(
     # plotting without confidence intervals
     # Note: Returns early
     if conf_intervals is None:
-        axs = _plot_df(df, metrics, kind, subplots, error_labels_legend, **kwargs)
+        axs = _plot_df(df, metrics, kind, subplots, ci_labels_legend, **kwargs)
         return axs
 
     # check for valid confidence intervals
@@ -262,7 +262,7 @@ def plot_metric_frame(
             df_all_bounds[metric] = df[conf_interval]
 
     axs = _plot_df(
-        df, metrics, kind, subplots, error_labels_legend, df_all_errors, **kwargs
+        df, metrics, kind, subplots, ci_labels_legend, df_all_errors, **kwargs
     )
 
     # Error labels don't get plotted when subplots=False
@@ -280,18 +280,18 @@ def plot_metric_frame(
                 temp_axs[j].text(
                     i,
                     df_all_bounds[metric][i][0] - 0.05 * y_range,
-                    round(df_all_bounds[metric][i][0], error_labels_precision),
-                    fontsize=error_labels_fontsize,
-                    color=error_labels_color,
-                    ha=error_labels_ha,
+                    round(df_all_bounds[metric][i][0], ci_labels_precision),
+                    fontsize=ci_labels_fontsize,
+                    color=ci_labels_color,
+                    ha=ci_labels_ha,
                 )
                 temp_axs[j].text(
                     i,
                     df_all_bounds[metric][i][1] + 0.01 * y_range,
-                    round(df_all_bounds[metric][i][1], error_labels_precision),
-                    fontsize=error_labels_fontsize,
-                    color=error_labels_color,
-                    ha=error_labels_ha,
+                    round(df_all_bounds[metric][i][1], ci_labels_precision),
+                    fontsize=ci_labels_fontsize,
+                    color=ci_labels_color,
+                    ha=ci_labels_ha,
                 )
 
     return axs

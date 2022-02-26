@@ -240,7 +240,7 @@ axs = plot_metric_frame(
     metrics=["Recall", "Accuracy"],
     conf_intervals=["Recall Bounds", "Accuracy Bounds"],
     subplots=True,
-    error_labels_legend=error_labels_legend,
+    ci_labels_legend=error_labels_legend,
     # the following parameters are passed into `pandas.DataFrame.plot` as kwargs
     layout=[1, 2],
     rot=45,
