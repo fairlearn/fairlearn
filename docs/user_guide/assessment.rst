@@ -9,28 +9,32 @@ people may be disproportionately negatively impacted by an AI system and in
 what ways?
 
 The steps of the assesment are as follows:
-1. Identify harms
+1. Identify types of harms
 2. Identify the groups that might be harmed
 3. Quantify harms
 4. Compare quantified harms across the groups
 
 We next examine these four steps in more detail.
 
-1. Identify harms
-^^^^^^^^^^^^^^^^^
+1. Identify types of harms
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+See :ref:`types_of_harms` for a guide to types of fairness-related harms. 
 For example, in a system for screening job applications, qualified candidates 
 that are automatically rejected experience an allocation harm. In a 
-speech-to-text transcription system, high error rates constitute harm in the 
-quality of service.
+speech-to-text transcription system, disparities in word error rates for 
+different groups may result in harms due to differences in the quality of service.
+Note that one system can lead to multiple harms, and different types of 
+harms are not mutually exclusive. For more information, review 
+Fairlearn's `2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
 
 2. Identify the groups that might be harmed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In most applications, we consider demographic groups including historically 
 marginalized groups (e.g., based on gender, race, ethnicity). We should also 
-consider groups that are relevant to a particular application. For example, for 
-speech-to-text transcription, groups based on the regional dialect or being a  
+consider groups that are relevant to a particular use case or deployment context. For example, for 
+speech-to-text transcription, this might include groups who speak a regional dialect or people who are a  
 native or a non-native speaker.
 
 It is also important to consider group intersections, for example, in addition
@@ -43,12 +47,19 @@ nonbinary people, etc.).
 
 Define metrics that quantify harms or benefits:
 
-* In job screening scenario, we need to quantify the number of candidates that 
-are classified as "negative" (not recommended for the job), but whose true 
-label is "positive" (they are qualified). One possible metric is the false 
-negative rate: fraction of qualified candidates that are screened out.
-* In speech-to-text scenario, the harm could be measured by word error rate, 
-number of mistakes in a transcript divided by the overall number of words.
+* In job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`.
+
+* For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
+
+Note that in some cases, harms might not be readily identifiable. 
+In these cases, we might choose to use a closely related variable 
+to stand in for the missing variable. For example, suppose that in 
+the job screening scenario, we have data on whether the candidate passes 
+the first two stages, but not if they are ultimately recommended for the 
+job. An alternative measure of harm might be if the candidate does not pass 
+the first stage of the screen. If you choose to use a proxy variable to 
+represent the harm, check the proxy variable regularly to ensure it 
+remains useful over time.
 
 4. Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -62,8 +73,8 @@ than other groups, we would flag this as a fairness harm.
 To summarize the disparities in errors (or other metrics), we may want to 
 report quantities such as the difference or ratio of the metric values between 
 the best and the worst slice. In settings where the goal is to guarantee 
-certain minimum quality of service (such as speech recognition), it is also 
-meaningful to report the worst performance across all considered groups.
+certain minimum quality of service across all groups (such as speech recognition), 
+it is also meaningful to report the worst performance across all considered groups.
 
 For example, when comparing false negative rate across groups defined by race, 
 we may summarize our findings with a table like the following:
@@ -97,8 +108,8 @@ we may summarize our findings with a table like the following:
    *  - maximum (worst-case) FNR
       - 0.67
 
-Metrics
--------
+Disaggregated metrics
+---------------------
 
 .. currentmodule:: fairlearn.metrics
 
@@ -133,8 +144,8 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 
 .. _metrics_with_grouping:
 
-Assessment with :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Metrics with grouping using :code:`MetricFrame`
+-----------------------------------------------
 
 In a typical fairness assessment, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
@@ -145,9 +156,13 @@ set of data.
 This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
 of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
 takes four arguments:
+
 * metric_function with signature metric_function(y_true, y_pred)
+
 * y_true: array of labels
+
 * y_pred: array of predictions
+
 * sensitive_features: array of sensitive feature values
 
 The code chunk below displays a case where in addition to the :math:`Y_{true}` 
@@ -221,7 +236,7 @@ across groups and also the difference and ratio between the maximum and minimum:
 
 
 Multiple metrics in one :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------------------------
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously by providing the `metrics` argument with a 
@@ -553,6 +568,9 @@ see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 
 .. _plot:
 
+Plotting
+--------
+
 Plotting grouped metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -573,6 +591,7 @@ It is possible to customize the plots. Here are some common examples.
 
 Customize Plots: :code:`ylim`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The y-axis range is automatically set, which can be misleading, therefore it is
 sometimes useful to set the `ylim` argument to define the yaxis range.
 
@@ -587,6 +606,7 @@ sometimes useful to set the `ylim` argument to define the yaxis range.
 
 Customize Plots: :code:`colormap`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 To change the color scheme, we can use the `colormap` argument. A list of colorschemes
 can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_.
 
@@ -600,6 +620,7 @@ can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.htm
 
 Customize Plots: :code:`kind`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
 argument. Here is an example of a pie chart.
 
