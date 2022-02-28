@@ -202,7 +202,7 @@ plot_metric_frame(
     kind="bar",
     metrics=["Recall", "Accuracy"],
     conf_intervals=["Recall Bounds", "Accuracy Bounds"],
-    plot_error_labels=True,
+    plot_ci_labels=True,
     subplots=False,
 )
 plot_metric_frame(
@@ -221,7 +221,7 @@ plot_metric_frame(
     metrics="Recall",
     conf_intervals="Recall Bounds",
     colormap="Pastel1",
-    plot_error_labels=True,
+    plot_ci_labels=True,
 )
 
 # %%

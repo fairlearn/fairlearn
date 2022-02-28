@@ -134,7 +134,7 @@ def plot_metric_frame(
     metrics: Union[List[str], str] = None,
     conf_intervals: Union[List[str], str] = None,
     subplots: bool = True,
-    plot_error_labels: bool = False,
+    plot_ci_labels: bool = False,
     ci_labels_precision: int = 4,
     ci_labels_fontsize: int = 8,
     ci_labels_color: str = "black",
@@ -258,7 +258,7 @@ def plot_metric_frame(
         )
         df_all_errors[metric] = df_temp["error"]
 
-        if plot_error_labels:
+        if plot_ci_labels:
             df_all_bounds[metric] = df[conf_interval]
 
     axs = _plot_df(
@@ -266,7 +266,7 @@ def plot_metric_frame(
     )
 
     # Error labels don't get plotted when subplots=False
-    if plot_error_labels and kind == "bar" and subplots:
+    if plot_ci_labels and kind == "bar" and subplots:
         for j, metric in enumerate(metrics):
             temp_axs = (
                 axs.flatten()
