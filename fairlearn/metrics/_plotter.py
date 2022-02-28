@@ -41,8 +41,8 @@ def _build_legend(ax, kind, legend_label):
         The Axes for which the legend will be modified.
 
     kind : str
-        The type of plot to display. e.g. "bar", "line", etc.
-        List of options is detailed in :meth:`pandas.DataFrame.plot`
+        The type of plot to display, e.g., "point", "bar", "line", etc.
+        The supported values are "point" and those listed in :meth:`pandas.DataFrame.plot`
 
     legend_label : str
         The label corresponding to the confidence interval bars
@@ -71,8 +71,8 @@ def _plot_df(
         Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 
     kind : str
-        The type of plot to display. e.g. "bar", "line", etc.
-        List of options is detailed in :meth:`pandas.DataFrame.plot`
+        The type of plot to display, e.g., "point", "bar", "line", etc.
+        The supported values are "point" and those listed in :meth:`pandas.DataFrame.plot`
 
     subplots : bool
         Whether or not to plot metrics on separate subplots
@@ -159,8 +159,8 @@ def plot_metric_frame(
         The collection of disaggregated metric values, along with the metric errors.
 
     kind : str, default="point"
-        The type of plot to display. e.g. "bar", "line", etc.
-        List of options is detailed in :meth:`pandas.DataFrame.plot`
+        The type of plot to display, e.g., "point", "bar", "line", etc.
+        The supported values are "point" and those listed in :meth:`pandas.DataFrame.plot`
 
     metrics : str or list of str
         The name of the metrics to plot.
@@ -265,7 +265,7 @@ def plot_metric_frame(
         df, metrics, kind, subplots, ci_labels_legend, df_all_errors, **kwargs
     )
 
-    # Error labels don't get plotted when subplots=False
+    # Confidence interval labels don't get plotted when subplots=False
     if plot_ci_labels and kind == "bar" and subplots:
         for j, metric in enumerate(metrics):
             temp_axs = (
