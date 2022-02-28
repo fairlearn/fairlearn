@@ -390,7 +390,6 @@ class MetricFrame:
             return overall_frame, by_group_frame, group_min_frame, group_max_frame, \
                 diff_group_frame, diff_overall_frame, ratio_group_frame, ratio_overall_frame
 
-        self._overall_runs, self._by_group_runs = None, None
         self._overall_ci, self._by_group_ci = None, None
         self._difference_overall_ci, self._difference_group_ci = None, None
         self._ratio_overall_ci, self._ratio_groups_ci = None, None
@@ -399,7 +398,7 @@ class MetricFrame:
         if n_boot is not None:
             # Calculate all outputs across entire dataset to assist bootstrap calculations
             # NOTE: Consider caching these results for on-demand regular calls?
-            try:
+            try: # TODO: Find a better way of checking for non-standard functions
                 group_min_output = self.__group(self._by_group, 'min')
                 group_max_output = self.__group(self._by_group, 'max')
                 difference_group_output = self._difference(self.by_group, group_min_output)
@@ -414,20 +413,19 @@ class MetricFrame:
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
                 for _ in tqdm(range(n_boot))
             )
-            # NOTE: currently pin all bootstrap runs for debugging. TODO: Drop pinning on all runs objects
-            self._overall_runs, self._by_group_runs, self._group_min_runs, self._group_max_runs, \
-                self._diff_group_runs, self._diff_overall_runs, self._ratio_group_runs, self._ratio_overall_runs = list(zip(*parallel_output))
+
+            overall_runs, by_group_runs, group_min_runs, group_max_runs, \
+                diff_group_runs, diff_overall_runs, ratio_group_runs, ratio_overall_runs = list(zip(*parallel_output))
 
             # Summarize results, using main output as a prototype to provide appropriate index/columns.
-            self._overall_ci = create_ci_output(self._overall_runs, ci, prototype=self._overall)
-            self._by_group_ci = create_ci_output(self._by_group_runs, ci, prototype=self._by_group)
-            self._group_min_ci = create_ci_output(self._group_min_runs, ci, prototype=group_min_output)
-            self._group_max_ci = create_ci_output(self._group_max_runs, ci, prototype=group_max_output)
-            self._difference_group_ci = create_ci_output(self._diff_group_runs, ci, prototype=difference_group_output)
-            self._difference_overall_ci = create_ci_output(self._diff_overall_runs, ci, prototype=difference_overall_output)
-            self._ratio_group_ci = create_ci_output(self._ratio_group_runs, ci, prototype=ratio_group_output)
-            self._ratio_overall_ci = create_ci_output(self._ratio_overall_runs, ci, prototype=ratio_overall_output)
-        
+            self._overall_ci = create_ci_output(overall_runs, ci, sample_estimate=self._overall)
+            self._by_group_ci = create_ci_output(by_group_runs, ci, sample_estimate=self._by_group)
+            self._group_min_ci = create_ci_output(group_min_runs, ci, sample_estimate=group_min_output)
+            self._group_max_ci = create_ci_output(group_max_runs, ci, sample_estimate=group_max_output)
+            self._difference_group_ci = create_ci_output(diff_group_runs, ci, sample_estimate=difference_group_output)
+            self._difference_overall_ci = create_ci_output(diff_overall_runs, ci, sample_estimate=difference_overall_output)
+            self._ratio_group_ci = create_ci_output(ratio_group_runs, ci, sample_estimate=ratio_group_output)
+            self._ratio_overall_ci = create_ci_output(ratio_overall_runs, ci, sample_estimate=ratio_overall_output)
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
