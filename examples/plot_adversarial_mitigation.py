@@ -18,8 +18,7 @@ Mitigating Fairness using Adversarial Mitigation
 # predictor not only to minimize its own loss, but also minimize the predictive
 # ability of the adversarial. If this model converges properly,
 # the adversary will attain a loss equal to the entropy, so the adversary
-# can not
-# predict the sensitive features from the predictions.
+# can not predict the sensitive features from the predictions.
 #
 # We provide an implementation that supports:
 #
@@ -159,14 +158,14 @@ mf = MetricFrame(
 print(mf.by_group)
 
 # %%
-# When using adversarial debiasing out-of-the-box, you may not yield such
+# When using adversarial debiasing out-of-the-box, users may not yield such
 # good training results after the first attempt. In general, training
-# adversarial networks is hard, and you may need to tweak the
+# adversarial networks is hard, and users may need to tweak the
 # hyperparameters continuously. Besides general scikit-learn algorithms
-# that finetune your estimator,
+# that finetune estimators,
 # Example 2 will demonstrate some problem-specific
 # techniques we can use such as using dynamic hyperparameters,
-# validation, and early stopping to improve this method.
+# validation, and early stopping to improve adversarial training.
 
 # %%
 # Example 2: Finetuning
@@ -177,14 +176,14 @@ print(mf.by_group)
 # predictor and adversary trap themselves in a local minimum by favoring one
 # class (mode). Problems with diverging parameters may also occur, which
 # may be an indication of a bad choice of hyperparameters, such as a
-# learning rate that is too large. This problems one may encounter are
+# learning rate that is too large. The problems teh user may encounter are
 # of course case specific, but general good practices when training
 # such models are: train slowly, ensuring the
 # losses remain balanced, and keep track of validation accuracies.
 # Additionally, we found that single hidden layer neural
 # networks work best for this use case.
 
-# In this example, we show some of these good practices in practice.
+# In this example, we demonstrate some of these good practices.
 # We start by defining our
 # predictor neural network explicitely so that it is more apparant.
 # We will be using PyTorch, but the same can be achieved using Tensorflow!
@@ -283,7 +282,8 @@ def callbacks(model, *args):
 
 # %%
 # Then, the instance itself. Notice that we do not explicitely define loss
-# functions, because the model is able to infer this on its own in this example.
+# functions, because adversarial fairness is able to infer the loss function
+# on its own in this example.
 
 mitigator = AdversarialFairnessClassifier(
     predictor_model=predictor_model,

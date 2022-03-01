@@ -15,14 +15,34 @@ from sklearn.utils.multiclass import type_of_target
 from numpy import all as np_all
 from numpy import sum as np_sum
 
+# FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
+
 
 class FloatTransformer(BaseEstimator, TransformerMixin):
     """
     Transformer that maps dataframes to numpy arrays of floats.
 
-    Applies one-hot-encoding to categorical columns, 'passthrough' to
-    numerical columns.
-    """
+    It is in essence a wrapper around sklearn transformers that
+    automatically infers the type of data, and encodes it as floating point
+    numbers. It applies one-hot-encoding
+    to categorical columns, and 'passthrough' (nothing) to
+    numerical columns. The usefulness of this class is that it can
+    preprocess different kinds of data (discrete, continuous) to one
+    standard format while also remembering what kind of data was inputted.
+    An estimator using this preprocessor can use
+    this classes' :code:`dist_type_` attribute to know what kind of data
+    was originally inputted.
+
+    Attributes
+    ----------
+    in_type_ : Object
+        the type of the input data. Should be either a list, DataFrame,
+        ndarray, or Series.
+    dist_type_ : str
+        A string that in dicates the distribution type of the original data.
+        It is one of :code:`"binary"`, :code:`"category"`,
+        or :code:`"continuous"`
+    """ # noqa : RST306
 
     def __init__(self, dist_assumption="auto"):
         """
@@ -59,14 +79,14 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         """
         if init:
             self.in_type_ = type(X)
-            self.inferred_type_ = _infer_type(X)
+            self.inferred_type_ = type_of_target(X)
             self.dist_type_ = _get_type(X, self.dist_assumption)
         else:
             if not isinstance(X, self.in_type_):
                 raise ValueError(
                     _ARG_ERROR_MESSAGE.format("X", "of type " + self.in_type_)
                 )
-            inferred = _infer_type(X)
+            inferred = type_of_target(X)
             if not inferred == self.inferred_type_:
                 raise ValueError(
                     "Inferred distribution type of X does not match "
@@ -147,23 +167,9 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         return inverse
 
 
-# hash = lambda d : id(d) + sum(d.shape) + d.size + id(d.dtype)
-# memoize_store = {}
-def _infer_type(data):
-    """Memoize type_of_target without prohibiting data garbage-disposal."""
-    # memoized = memoize_store.get(hash(data), None)
-    # if memoized is not None:
-    #     print("hit")
-    #     return memoized
-    # print("miss")
-    inferred = type_of_target(data)
-    # memoize_store[hash(data)] = inferred
-    return inferred
-
-
 def _get_type(data, assumption):
     """Get the type (binary, category, continuous) of the data under assump."""
-    inferred = _infer_type(data)
+    inferred = type_of_target(data)
     if inferred == "multilabel-indicator":
         #  Design choice: multiple binary columns are not supported.
         #                 multiple columns may only be one-hot encoding

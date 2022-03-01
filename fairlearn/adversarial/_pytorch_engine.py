@@ -14,7 +14,7 @@ torch = None
 class PytorchEngine(BackendEngine):
     """Adds PyTorch specific functions."""
 
-    def __init__(self, base, X, Y, Z):
+    def __init__(self, base, X, Y, A):
         """
         Initialize the (Pytorch specific parts) of the backend engine.
 
@@ -28,7 +28,7 @@ class PytorchEngine(BackendEngine):
 
         self.model_class = torch.nn.Module
         self.optim_class = torch.optim.Optimizer
-        super(PytorchEngine, self).__init__(base, X, Y, Z)
+        super(PytorchEngine, self).__init__(base, X, Y, A)
 
     def __move_model__(self):
         """Move model to CUDA."""
@@ -45,13 +45,13 @@ class PytorchEngine(BackendEngine):
             self.adversary_model = self.adversary_model.to(self.device)
             self.predictor_model = self.predictor_model.to(self.device)
 
-    def shuffle(self, X, Y, Z):
+    def shuffle(self, X, Y, A):
         """Override base's shuffle to work with `torch.FloatTensor`."""
         idx = torch.randperm(X.shape[0])
         X = X[idx].view(X.size())
         Y = Y[idx].view(Y.size())
-        Z = Z[idx].view(Z.size())
-        return X, Y, Z
+        A = A[idx].view(A.size())
+        return X, Y, A
 
     def evaluate(self, X):
         """
@@ -72,7 +72,7 @@ class PytorchEngine(BackendEngine):
             Y_pred = Y_pred.numpy()
         return Y_pred
 
-    def train_step(self, X, Y, Z):
+    def train_step(self, X, Y, A):
         """
         Perform one training step over data in PyTorch models.
 
@@ -106,8 +106,8 @@ class PytorchEngine(BackendEngine):
         if self.base.pass_y_:
             Y_hat = torch.cat((Y_hat, Y), dim=1)
 
-        Z_hat = self.adversary_model(Y_hat)
-        LA = self.adversary_loss(Z_hat, Z)
+        A_hat = self.adversary_model(Y_hat)
+        LA = self.adversary_loss(A_hat, A)
         LA.backward()
 
         dW_LA = [
@@ -129,22 +129,6 @@ class PytorchEngine(BackendEngine):
 
         self.predictor_optimizer.step()
         self.adversary_optimizer.step()
-
-        # EXTRA STEPS
-
-        # self.predictor_model.eval()
-        # Y_hat = self.predictor_model(X).detach()
-
-        # if self.base.pass_y_:
-        #     Y_hat = torch.cat((Y_hat, Y), dim=1)
-
-        # for i in range(30):
-        #     self.adversary_optimizer.zero_grad()
-
-        #     Z_hat = self.adversary_model(Y_hat)
-        #     LA = self.adversary_loss(Z_hat, Z)
-        #     LA.backward()
-        #     self.adversary_optimizer.step()
 
         return (LP.item(), LA.item())
 
@@ -247,15 +231,15 @@ class PytorchEngine(BackendEngine):
 
         return model
 
-    def validate_input(self, X, Y, Z):
+    def validate_input(self, X, Y, A):
         """Extend the base `_validate_input` to send data to GPU when required."""
         X = torch.from_numpy(X).float()
         Y = torch.from_numpy(Y).float()
-        Z = torch.from_numpy(Z).float()
+        A = torch.from_numpy(A).float()
 
         if self.cuda:
             X = X.to(self.device)
             Y = Y.to(self.device)
-            Z = Z.to(self.device)
+            A = A.to(self.device)
 
-        return X, Y, Z
+        return X, Y, A

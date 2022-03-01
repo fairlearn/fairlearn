@@ -207,7 +207,7 @@ class RemoveAll(BackendEngine):
 
     def evaluate(self, X):
         """Deterministic evaluation function."""
-        cols = self.base.y_transform_.n_features_out_
+        cols = self.base._y_transform.n_features_out_
         rows = len(X)
         y = []
         for row in range(rows):

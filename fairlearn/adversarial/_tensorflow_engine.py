@@ -11,7 +11,7 @@ tensorflow = None
 class TensorflowEngine(BackendEngine):
     """Adds TensorFlow specific functions."""
 
-    def __init__(self, base, X, Y, Z):
+    def __init__(self, base, X, Y, A):
         """
         Initialize the (Tensorflow specific parts) of the backend engine.
 
@@ -25,7 +25,7 @@ class TensorflowEngine(BackendEngine):
 
         self.model_class = tensorflow.keras.Model
         self.optim_class = tensorflow.keras.optimizers.Optimizer
-        super(TensorflowEngine, self).__init__(base, X, Y, Z)
+        super(TensorflowEngine, self).__init__(base, X, Y, A)
 
     def evaluate(self, X):
         """
@@ -38,7 +38,7 @@ class TensorflowEngine(BackendEngine):
         Y_pred = Y_pred.numpy()
         return Y_pred
 
-    def train_step(self, X, Y, Z):
+    def train_step(self, X, Y, A):
         """
         Perform one training step over data in TensorFlow models.
 
@@ -58,9 +58,9 @@ class TensorflowEngine(BackendEngine):
             if self.base.pass_y_:
                 Y_hat = tensorflow.concat((Y_hat, Y), axis=1)
 
-            Z_hat = self.adversary_model(Y_hat)
+            A_hat = self.adversary_model(Y_hat)
 
-            LA = self.adversary_loss(Z, Z_hat)
+            LA = self.adversary_loss(A, A_hat)
 
         dW_LP = tape.gradient(LP, self.predictor_model.trainable_variables)
         dU_LA = tape.gradient(LA, self.adversary_model.trainable_variables)

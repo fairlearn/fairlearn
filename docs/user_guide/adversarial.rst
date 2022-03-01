@@ -107,8 +107,8 @@ liking.
 Data Preprocessing
 ~~~~~~~~~~~~~~~~~~
 
-In contrast to other mitigation techniques, we require you to
-preprocess your data :math:`X`
+In contrast to other mitigation techniques, we require the user to
+preprocess their data :math:`X`
 to matrices (2d array-like) of floats. It is very typical to be dealing
 with data other than numbers,
 such as categorical data, and in those cases we leave it to the
@@ -154,7 +154,7 @@ Loss functions
 ~~~~~~~~~~~~~~
 
 In [#4]_, loss functions are not defined explicitely.
-To accomodate and provide the most general interface, you can pass your
+To accomodate and provide the most general interface, the user can pass their
 own loss functions. This can be either PyTorch or TensorFlow loss functions,
 depending on which module the neural networks are. For instance, in the
 following example we set the :code:`predictor_loss` to a PyTorch-implemented
@@ -184,8 +184,8 @@ entropy loss is used, along with a softmax on the output layer of the model,
 and an argmax for the discrete prediction function. 
 
 We also offer some shortcuts for binary, categorical, and continuous data
-that you may use to further specify appropriate types. This is useful when
-you want to be sure that the inferred distribution type is what you expect.
+that the user may use to further specify appropriate types. This is useful to
+ensure that the inferred distribution type is as expected.
 For instance, to indicate that the predictions should be categorical, you
 pass :code:`predictor_loss='category'`
 and :code:`prediction_function='category'`.
@@ -258,13 +258,19 @@ normal distributions.
 Training
 ~~~~~~~~
 Adversarial Learning is inherently difficult because of various issues,
-such as mode collapse, divergence, and diminishing gradients. 
+such as mode collapse, divergence, and diminishing gradients. Mode collapse
+is the scenario where the predictor learns to produce one output, and because
+it does this relatively well, it will never learn any other output. Diminishing
+gradients are common as well, and could be due to an adversary that is trained
+too well in comparison to the predictor.
 Such problems
-have been studied extensively by others, so we encourage you to find remedies
+have been studied extensively by others, so we encourage the user to find remedies
 elsewhere from more extensive sources. As a general rule of thumb,
-training adversarially is best done slowly while ensuring the
+training adversarially is best done with a lower and possibly decaying learning
+rate while ensuring the
 losses remain balanced, and keeping track of validation accuracies every few
-iterations may save you a lot of headaches.
+iterations may save you a lot of headaches if the model suddenly diverges or
+collapses.
 
 Additionally, we can provide two specific pieces of advice regarding training
 this specific model.

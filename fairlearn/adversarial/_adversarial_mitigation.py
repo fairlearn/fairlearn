@@ -3,6 +3,7 @@
 
 from math import ceil
 from time import time
+
 from ._constants import (
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
@@ -30,6 +31,9 @@ from sklearn.utils.validation import (
 )
 from sklearn.exceptions import NotFittedError
 from numpy import zeros, argmax, arange
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AdversarialFairness(BaseEstimator):
@@ -47,11 +51,14 @@ class AdversarialFairness(BaseEstimator):
 
     As per [1]_, the neural network models :code:`predictor_model` and
     :code:`adversary_model` may not have a discrete prediction at the end of the
-    model. Instead, even if we are dealing with discrete predictions, we may output
-    the sigmoidal or soft-max, but we may not output discrete integer predictions.
+    model, as gradients do not propagate through a discretization step.
+    Instead, even if we desire discrete predictions in the end, we must
+    output the sigmoidal or soft-max during training. You can supply the final
+    discrete prediction function later,
+    see parameter :code:`prediction_function`.
 
     The distribution types of :code:`y` and :code:`sensitive_features`
-    are set by their preprocessor :code:`y_transform` and :code:`z_transform`
+    are set by their preprocessor :code:`y_transform` and :code:`a_transform`
     respectively. The default transformer :code:`FloatTransformer("auto")`
     attempts to automatically infer
     whether to assume binomial, multinomial, or normally distributed data.
@@ -85,7 +92,7 @@ class AdversarialFairness(BaseEstimator):
         and output layer are automatically inferred from data, and the final
         activation function (such as softmax for categorical
         predictors) are inferred from data.
-        If :code:`backend` is specified, we cannot pass a model
+        If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
     adversary_model : list, torch.nn.Module, tensorflow.keras.Model
@@ -159,7 +166,7 @@ class AdversarialFairness(BaseEstimator):
         one-hot encodings, and it maps strictly continuous-valued (possible 2d)
         to itself.
 
-    z_transform : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer("auto")
+    a_transform : sklearn.base.TransformerMixin, default = fairlearn.adversarial.FloatTransformer("auto")
         The preprocessor to use on the :code:`sensitive_features`.
         The given transformer *must* map data
         to a 2d ndarray containing only floats. Per default, we use a
@@ -172,7 +179,10 @@ class AdversarialFairness(BaseEstimator):
         A small number greater than zero to set as initial learning rate
 
     alpha : float, default = 1.0
-        A small number :math:`\alpha` as specified in the paper.
+        A small number :math:`\alpha` as specified in the paper. It
+        is the factor that balances the training towards predicting :math:`Y`
+        (choose :math:`\alpha` closer to zero) or increasing fairness
+        (choose larger :math:`\alpha`).
 
     epochs : int, default = 1
         Number of epochs to train for.
@@ -181,7 +191,7 @@ class AdversarialFairness(BaseEstimator):
         Batch size. For no batching, set this to -1.
 
     shuffle : bool, default = False
-        Iff true, shuffle the data after every iteration.
+        When true, shuffle the data after every iteration.
 
     progress_updates : number, optional, default = None
         If a number :math:`t` is provided, we print an update
@@ -239,7 +249,7 @@ class AdversarialFairness(BaseEstimator):
         adversary_optimizer="Adam",
         constraints="demographic_parity",
         y_transform=FloatTransformer("auto"),
-        z_transform=FloatTransformer("auto"),
+        a_transform=FloatTransformer("auto"),
         learning_rate=0.001,
         alpha=1.0,
         epochs=1,
@@ -264,7 +274,7 @@ class AdversarialFairness(BaseEstimator):
         self.adversary_optimizer = adversary_optimizer
         self.constraints = constraints
         self.y_transform = y_transform
-        self.z_transform = z_transform
+        self.a_transform = a_transform
         self.learning_rate = learning_rate
         self.alpha = alpha
         self.epochs = epochs
@@ -278,7 +288,7 @@ class AdversarialFairness(BaseEstimator):
         self.warm_start = warm_start
         self.random_state = random_state
 
-    def __setup(self, X, Y, Z):
+    def __setup(self, X, Y, A):
         """
         Initialize the entire model from the parameters and the given data.
 
@@ -311,7 +321,9 @@ class AdversarialFairness(BaseEstimator):
         ):
             if kw and kw < 0.0:
                 raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(kwname, "a non-negative number")
+                    _KWARG_ERROR_MESSAGE.format(
+                        kwname, "a non-negative number"
+                    )
                 )
 
         # Positive or -1 parameters
@@ -337,21 +349,27 @@ class AdversarialFairness(BaseEstimator):
                     _KWARG_ERROR_MESSAGE.format(kwname, "a boolean")
                 )
 
-        if self.callbacks and not callable(self.callbacks):
-            if not isinstance(self.callbacks, list):
-                raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(
-                        "callbacks", "a callable or list of callables"
-                    )
-                )
-            else:
-                for cb in self.callbacks:
-                    if not callable(cb):
-                        raise ValueError(
-                            _KWARG_ERROR_MESSAGE.format(
-                                "callbacks", "a callable or list of callables"
-                            )
+        self.callbacks_ = None
+        if self.callbacks:
+            if not callable(self.callbacks):
+                if not isinstance(self.callbacks, list):
+                    raise ValueError(
+                        _KWARG_ERROR_MESSAGE.format(
+                            "callbacks", "a callable or list of callables"
                         )
+                    )
+                else:
+                    for cb in self.callbacks:
+                        if not callable(cb):
+                            raise ValueError(
+                                _KWARG_ERROR_MESSAGE.format(
+                                    "callbacks",
+                                    "a callable or list of callables",
+                                )
+                            )
+                    self.callbacks_ = self.callbacks
+            else:
+                self.callbacks_ = [self.callbacks]
 
         # NOTE: inferring distribution type should happen before transforming
         read_kw = (
@@ -361,7 +379,7 @@ class AdversarialFairness(BaseEstimator):
         )
 
         self.predictor_loss_ = read_kw(Y, self.predictor_loss)
-        self.adversary_loss_ = read_kw(Z, self.adversary_loss)
+        self.adversary_loss_ = read_kw(A, self.adversary_loss)
         self.predictor_function_ = read_kw(Y, self.predictor_function)
 
         kws = ["binary", "category", "continuous"]
@@ -384,7 +402,7 @@ class AdversarialFairness(BaseEstimator):
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
-            (self.z_transform, "z_transform"),
+            (self.a_transform, "a_transform"),
         ):
             if not (
                 issubclass(type(kw), TransformerMixin)
@@ -398,8 +416,8 @@ class AdversarialFairness(BaseEstimator):
                     )
                 )
 
-        self.y_transform_ = self.y_transform.fit(Y)
-        self.z_transform_ = self.z_transform.fit(Z)
+        self._y_transform = self.y_transform.fit(Y)
+        self._a_transform = self.a_transform.fit(A)
 
         if self.cuda and not isinstance(self.cuda, str):
             raise ValueError(
@@ -415,11 +433,13 @@ class AdversarialFairness(BaseEstimator):
 
         # Initialize backend
         # here, losses and optimizers are also set up.
-        self.backendEngine_ = self.backend_(self, X, Y, Z)
+        self.backendEngine_ = self.backend_(self, X, Y, A)
 
         # Sklearn-parameters
         self.n_features_in_ = X.shape[1]
-        self.n_features_out_ = self.y_transform_.n_features_in_
+        self.n_features_out_ = self._y_transform.n_features_in_
+
+        self._is_setup = True
 
     def fit(self, X, y, *, sensitive_features=None):
         """
@@ -441,7 +461,7 @@ class AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, Y, Z = self._validate_input(
+        X, Y, A = self._validate_input(
             X, y, sensitive_features, reinitialize=True
         )
 
@@ -471,8 +491,6 @@ class AdversarialFairness(BaseEstimator):
         start_time = time()
         last_update_time = start_time
 
-        # logger = logging.getLogger(__name__) FIXME: use logger
-
         predictor_losses = [None]
         adversary_losses = []
 
@@ -485,28 +503,26 @@ class AdversarialFairness(BaseEstimator):
                         progress = (epoch / epochs) + (
                             batch / (batches * epochs)
                         )
-                        print(
-                            _PROGRESS_UPDATE.format(
-                                "=" * round(20 * progress),
-                                " " * round(20 * (1 - progress)),
-                                epoch + 1,
-                                epochs,
-                                " " * (len(str(batch + 1)) - len(str(batches))),
-                                batch + 1,
-                                batches,
-                                ((last_update_time - start_time) / progress)
-                                * (1 - progress),
-                                predictor_losses[-1],
-                                adversary_losses[-1],
-                            ),
-                            end="\n",
-                        )
+                        logger.info(_PROGRESS_UPDATE.format( # noqa : G001
+                            "=" * round(20 * progress),
+                            " " * round(20 * (1 - progress)), # noqa : G003
+                            epoch + 1, # noqa : G003
+                            epochs,
+                            " " # noqa : G003
+                            * (len(str(batch + 1)) - len(str(batches))), # noqa : G003
+                            batch + 1, # noqa : G003
+                            batches,
+                            ((last_update_time - start_time) / progress)
+                            * (1 - progress),
+                            predictor_losses[-1],
+                            adversary_losses[-1],
+                        ))
                 batch_slice = slice(
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
                 (LP, LA) = self.backendEngine_.train_step(
-                    X[batch_slice], Y[batch_slice], Z[batch_slice]
+                    X[batch_slice], Y[batch_slice], A[batch_slice]
                 )
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
@@ -517,24 +533,20 @@ class AdversarialFairness(BaseEstimator):
                 if self.max_iter != -1 and self.step_ >= self.max_iter:
                     return self
 
-                if self.callbacks:
+                if self.callbacks_:
                     stop = False
-                    if isinstance(self.callbacks, list):
-                        for cb in self.callbacks:
-                            result = cb(self, self.step_)
-                            if result and not isinstance(result, bool):
-                                raise RuntimeError(_CALLBACK_RETURNS_ERROR)
-                            stop = stop or result
-                    else:  # callable(self.callbacks):
-                        result = self.callbacks(self, self.step_)
+                    for cb in self.callbacks_:
+                        result = cb(self, self.step_)
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
-                        stop = result
+                        stop = stop or result
 
                     if stop:
                         return self
-            if self.shuffle and epoch != epochs - 1:  # Don't shuffle last epoch
-                X, Y, Z = self.backendEngine_.shuffle(X, Y, Z)
+            if (
+                self.shuffle and epoch != epochs - 1
+            ):  # Don't shuffle last epoch
+                X, Y, A = self.backendEngine_.shuffle(X, Y, A)
 
         return self
 
@@ -554,10 +566,10 @@ class AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive feature of the
             training data.
         """
-        X, Y, Z = self._validate_input(
+        X, Y, A = self._validate_input(
             X, y, sensitive_features, reinitialize=False
         )
-        self.backendEngine_.train_step(X, Y, Z)
+        self.backendEngine_.train_step(X, Y, A)
 
         return self
 
@@ -583,7 +595,10 @@ class AdversarialFairness(BaseEstimator):
 
     def predict(self, X):
         """
-        Compute discrete predictions for given test data.
+        Compute predictions for given test data.
+
+        Predictions are discrete for classifiers, making use of the
+        predictor_function.
 
         Parameters
         ----------
@@ -601,10 +616,10 @@ class AdversarialFairness(BaseEstimator):
 
         Y_pred = self.backendEngine_.evaluate(X)
         Y_pred = self.predictor_function_(Y_pred)
-        Y_pred = self.y_transform_.inverse_transform(Y_pred)
+        Y_pred = self._y_transform.inverse_transform(Y_pred)
         return Y_pred
 
-    def _validate_input(self, X, Y, Z, reinitialize=False):
+    def _validate_input(self, X, Y, A, reinitialize=False):
         """
         Validate the input data and possibly setup this estimator.
 
@@ -621,22 +636,22 @@ class AdversarialFairness(BaseEstimator):
         except NotFittedError:
             is_fitted = False
 
-        if Z is None:
-            print("Warning: no sensitive_features provided")  # FIXME : logger?
-            Z = [0] * X.shape[0]
+        if A is None:
+            logger.warning("no sensitive_features provided")
+            A = [0] * X.shape[0]
 
         if (not is_fitted) or (reinitialize):
-            self.__setup(X, Y, Z)
+            self.__setup(X, Y, A)
 
         if not self.skip_validation:
-            Y = self.y_transform_.transform(Y)
-            Z = self.z_transform_.transform(Z)
+            Y = self._y_transform.transform(Y)
+            A = self._a_transform.transform(A)
 
         # Check for equal number of samples
-        if not (X.shape[0] == Y.shape[0] and X.shape[0] == Z.shape[0]):
+        if not (X.shape[0] == Y.shape[0] and X.shape[0] == A.shape[0]):
             raise ValueError(
                 "Input data has an ambiguous number of rows: {}, {}, {}.".format(
-                    X.shape[0], Y.shape[0], Z.shape[0]
+                    X.shape[0], Y.shape[0], A.shape[0]
                 )
             )
 
@@ -645,9 +660,9 @@ class AdversarialFairness(BaseEstimator):
             # such as moving to GPU.
             attr = getattr(self.backendEngine_, "validate_input", None)
             if attr:
-                X, Y, Z = attr(X, Y, Z)
+                X, Y, A = attr(X, Y, A)
 
-        return X, Y, Z
+        return X, Y, A
 
     def _validate_backend(self):
         """
@@ -777,6 +792,10 @@ class AdversarialFairness(BaseEstimator):
                 raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
         else:
             raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
+
+    def __sklearn_is_fitted__(self):
+        """Speed up check_is_fitted."""
+        return hasattr(self, '_is_setup')
 
 
 class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):

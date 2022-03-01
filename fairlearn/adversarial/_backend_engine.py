@@ -20,7 +20,7 @@ class BackendEngine:
     model_class = None
     optim_class = None
 
-    def __init__(self, base, X, Y, Z):
+    def __init__(self, base, X, Y, A):
         """
         Initialize the generic parts of the backend engine.
 
@@ -33,8 +33,8 @@ class BackendEngine:
         self.base = base
 
         n_X_features = X.shape[1]  # FIXME: what if X.ndim > 2?
-        n_Y_features = base.y_transform_.n_features_out_
-        n_Z_features = base.z_transform_.n_features_out_
+        n_Y_features = base._y_transform.n_features_out_
+        n_A_features = base._a_transform.n_features_out_
 
         # Set up models
         if base.warm_start and hasattr(base, 'backendEngine_'):
@@ -52,7 +52,7 @@ class BackendEngine:
                 base.adversary_model,
                 base.adversary_loss_,
                 n_Y_features * (2 if base.pass_y_ else 1),
-                n_Z_features,
+                n_A_features,
                 "adversary",
             )
 
@@ -190,14 +190,14 @@ class BackendEngine:
             )
         )
 
-    def shuffle(self, X, Y, Z):
+    def shuffle(self, X, Y, A):
         """
-        Shuffle the rows of X, Y, Z.
+        Shuffle the rows of X, Y, A.
 
         Needs to be overriden by backends that are non-compatible such as torch.
         """
-        X, Y, Z = shuffle(X, Y, Z, random_state=self.base.random_state_)
-        return X, Y, Z
+        X, Y, A = shuffle(X, Y, A, random_state=self.base.random_state_)
+        return X, Y, A
 
     def evaluate(self, X: ndarray) -> ndarray:
         """
@@ -208,7 +208,7 @@ class BackendEngine:
         """
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
-    def train_step(self, X: ndarray, Y: ndarray, Z: ndarray):
+    def train_step(self, X: ndarray, Y: ndarray, A: ndarray):
         """
         Perform one training step over data.
 
