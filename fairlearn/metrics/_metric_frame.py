@@ -5,7 +5,7 @@ import copy
 import logging
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from sklearn.utils import check_consistent_length
 import warnings
 from functools import wraps
@@ -54,22 +54,6 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
     "Metric frame contains non-scalar cells. "
     "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
 )
-
-
-def apply_to_dataframe(
-    data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
-) -> pd.Series:
-    """Apply metric functions to a DataFrame.
-
-    The incoming DataFrame may have been sliced via `groupby()`.
-    This function applies each annotated function in turn to the
-    supplied DataFrame.
-    """
-    values = dict()
-    for function_name, metric_function in metric_functions.items():
-        values[function_name] = metric_function(data)
-    result = pd.Series(data=values.values(), index=values.keys())
-    return result
 
 
 def apply_to_dataframe(
@@ -252,7 +236,8 @@ class MetricFrame:
         Used to produce confidence intervals. This parameter controls the number of
         bootstrap iterations MetricFrame runs to estimate uncertainty in each metric.
         For best results, it is recommended to set this to 100 or more. Setting to None
-        disables confidence interval functionality.
+        disables confidence interval functionality. Confidence intervals are currently 
+        not supported on complex metrics that yield multiple outputs.
 
     ci : float, List, tuple
         Determines the quantiles reported for confidence intervals. All entries must
@@ -349,7 +334,7 @@ class MetricFrame:
                  control_features=None,
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
                  n_boot: Optional[int] = None,
-                 ci: Union[int, float] = 0.95,
+                 ci: Union[float, List[float], Tuple[float]] = 0.95,
                  n_jobs: int = 1):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
