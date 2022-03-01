@@ -10,7 +10,6 @@ from sklearn.utils import check_consistent_length
 import warnings
 from functools import wraps
 from joblib import Parallel, delayed
-from tqdm import tqdm
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._group_feature import GroupFeature
@@ -419,12 +418,12 @@ class MetricFrame:
                 else:
                     overall_calc_frame = overall_frame.iloc[0]
 
-            diff_group_frame = self._difference(by_group_calc_frame, group_min_frame)
-            diff_overall_frame = self._difference(by_group_calc_frame, overall_calc_frame)
-            ratio_group_frame = group_min_frame / group_max_frame
+            diff_overall_frame = self.__difference(by_group_calc_frame, overall_calc_frame)
+            diff_group_frame = self.__difference(by_group_calc_frame, group_min_frame)
             ratio_overall_frame = self._calc_ratio_overall(by_group_calc_frame, overall_calc_frame)
+            ratio_group_frame = group_min_frame / group_max_frame
 
-            # NOTE: Consider packaging these per bootstrap run outputs better -- maybe as dictionary?
+
             return overall_frame, by_group_frame, group_min_frame, group_max_frame, \
                 diff_group_frame, diff_overall_frame, ratio_group_frame, ratio_overall_frame
 
@@ -434,22 +433,23 @@ class MetricFrame:
         self._group_min_ci, self._group_max_ci = None, None
 
         if n_boot is not None:
-            # Calculate all outputs across entire dataset to assist bootstrap calculations
+            # Calculate all outputs across entire dataset to assist bootstrap bias calculations
             # NOTE: Consider caching these results for on-demand regular calls?
             try: # TODO: Find a better way of checking for non-standard functions
                 group_min_output = self.__group(self._by_group, 'min')
                 group_max_output = self.__group(self._by_group, 'max')
-                difference_group_output = self._difference(self.by_group, group_min_output)
-                difference_overall_output = self._difference(self.by_group, self.overall)
+                difference_group_output = self.__difference(self.by_group, group_min_output)
+                difference_overall_output = self.__difference(self.by_group, self.overall)
                 ratio_group_output = group_min_output / group_max_output
                 ratio_overall_output = self._calc_ratio_overall(self.by_group, self.overall)
             except:
                 raise ValueError("Metrics with non-scalar outputs do not currently support confidence intervals. \
                     Set n_boot=None to disable confidence interval calculation.")
+            
             ci = process_ci_bounds(ci)
             parallel_output = Parallel(n_jobs=n_jobs)(
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
-                for _ in tqdm(range(n_boot))
+                for _ in range(n_boot)
             )
 
             overall_runs, by_group_runs, group_min_runs, group_max_runs, \
@@ -506,7 +506,7 @@ class MetricFrame:
 
     @property
     def overall_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
-        '''Return estimates of by_group metrics calculated via bootstrap.'''
+        '''Return estimates of overall confidence intervals calculated via bootstrap.'''
 
         if self._overall_ci:
             if self._user_supplied_callable:
@@ -551,7 +551,7 @@ class MetricFrame:
 
     @property
     def by_group_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
-        '''Return estimates of by_group metrics calculated via bootstrap.'''
+        '''Return estimates of by_group confidence intervals calculated via bootstrap.'''
 
         if self._by_group_ci:
             if self._user_supplied_callable:
@@ -731,8 +731,7 @@ class MetricFrame:
         """
         return self.__group(self._by_group, 'min', errors)
 
-    # TODO: Make fully private after debugging
-    def _difference(self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame) \
+    def __difference(self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame) \
             -> Union[Any, pd.Series, pd.DataFrame]:
 
         mf = by_group_frame.copy()
@@ -790,9 +789,8 @@ class MetricFrame:
                 "Unrecognised method '{0}' in difference() call".format(method)
             )
 
-        return self._difference(self.by_group, subtrahend)
+        return self.__difference(self.by_group, subtrahend)
     
-    # TODO: Make fully private after debugging
     def _calc_ratio_overall(self, by_group_frame, overall_frame):
         if self._user_supplied_callable:
             tmp = by_group_frame / overall_frame
