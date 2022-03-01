@@ -740,7 +740,9 @@ class MetricFrame:
         else:
             mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
 
-        return (mf - subtrahend).abs().max(level=self.control_levels)
+        if self.control_levels:
+            return (mf - subtrahend).abs().groupby(level=self.control_levels).max()
+        return (mf - subtrahend).abs().max()
 
     def difference(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -794,7 +796,10 @@ class MetricFrame:
     def _calc_ratio_overall(self, by_group_frame, overall_frame):
         if self._user_supplied_callable:
             tmp = by_group_frame / overall_frame
-            result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
+            if self.control_levels:
+                result = tmp.transform(lambda x: min(x, 1/x)).groupby(level=self.control_levels).min()
+            else:
+                result = tmp.transform(lambda x: min(x, 1/x)).min()
         else:
             ratios = None
 
