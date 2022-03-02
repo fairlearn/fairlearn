@@ -123,7 +123,8 @@ want to encode the categorical data using one-hot encodings,
 and we want to scale the other features to a standard range.
 An easy way to do this, using sci-kit learn, is
 to create a :py:class:`ColumnTransform` with column selectors that apply
-:py:class:`OneHotEncoding` and :py:class:`StandardScalar` transforms.::
+:py:class:`OneHotEncoding`and :py:class:`StandardScalar`
+transforms.::
 
     >>> from sklearn.compose import make_column_transformer, make_column_selector
     >>> from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -156,9 +157,7 @@ following example we set the :code:`predictor_loss` to a PyTorch-implemented
 binary cross-entropy, and the :code:`adversary_loss` to the mean squared error.
 Additionally, we explicitely specify how the **discrete predictions** are
 computed, by providing a :code:`predictor_function`. In this case,
-the predictor function maps sigmoid logits to the discrete prediction.
-
-.. testcode::
+the predictor function maps sigmoid logits to the discrete prediction.::
 
     mitigator = AdversarialFairness(
         backend="torch",
