@@ -127,7 +127,7 @@ X_prep_test = ct.transform(X_test)
 
 
 mitigator = AdversarialFairnessClassifier(
-    backend="tensorflow",
+    backend="torch",
     predictor_model=[50, "leaky_relu"],
     adversary_model=[3, "leaky_relu"],
     batch_size=2 ** 8,
@@ -341,7 +341,7 @@ pipeline = Pipeline(
         (
             "classifier",
             AdversarialFairnessClassifier(
-                backend="tensorflow",
+                backend="torch",
                 predictor_model=[50, "leaky_relu"],
                 adversary_model=[3, "leaky_relu"],
                 batch_size=2 ** 8,
