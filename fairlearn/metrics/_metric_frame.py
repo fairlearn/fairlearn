@@ -239,12 +239,18 @@ class MetricFrame:
         disables confidence interval functionality. Confidence intervals are currently 
         not supported on complex metrics that yield multiple outputs.
 
-    ci : float, List, tuple
+    ci : float, list, tuple
         Determines the quantiles reported for confidence intervals. All entries must
         be in the range [0, 1]. A single float is interpreted as the width of the 
         desired confidence interval (e.g. 0.95 is a 95% interval), while a List or Tuple
         reports exact quantiles from the empirical bootstrap distribution 
         (e.g. (0, 0.33, 0.5, 0.66, 1) will calculate the min, 33rd, 50th, 66th, and max quantiles).
+
+    ci_method: str
+        One of {'percentile', 'bias-corrected'}. This method determines the algorithm used to 
+        produce valid confidence intervals from the bootstrap distribution. 'percentine' returns
+        quantiles directly from the empirical bootstrap distribution. 'bias-corrected' estimates 
+        the statistical bias in the bootstrap estimates of each metric and adjusts the interval.
 
     n_jobs : int
         The number of jobs to run in parallel. Only used for confidence interval calculations.
@@ -335,6 +341,7 @@ class MetricFrame:
                  sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
                  n_boot: Optional[int] = None,
                  ci: Union[float, List[float], Tuple[float]] = 0.95,
+                 ci_method: str = 'percentile',
                  n_jobs: int = 1):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -418,9 +425,9 @@ class MetricFrame:
         self._group_min_ci, self._group_max_ci = None, None
 
         if n_boot is not None:
-            # Calculate all outputs across entire dataset to assist bootstrap bias calculations
+            # Calculate all outputs across entire data sample to assist bootstrap bias calculations
             # NOTE: Consider caching these results for on-demand regular calls?
-            try: # TODO: Find a better way of checking for non-standard functions
+            try: # TODO: Find a better way of checking for functions with non-scalar return types.
                 group_min_output = self.__group(self._by_group, 'min')
                 group_max_output = self.__group(self._by_group, 'max')
                 difference_group_output = self.__difference(self.by_group, group_min_output)
@@ -431,7 +438,7 @@ class MetricFrame:
                 raise ValueError("Metrics with non-scalar outputs do not currently support confidence intervals. \
                     Set n_boot=None to disable confidence interval calculation.")
             
-            ci = process_ci_bounds(ci)
+            ci = process_ci_bounds(ci, ci_method)
             parallel_output = Parallel(n_jobs=n_jobs)(
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
                 for _ in range(n_boot)
@@ -443,12 +450,12 @@ class MetricFrame:
             # Summarize results, using main output as a prototype to provide appropriate index/columns.
             self._overall_ci = create_ci_output(overall_runs, ci, sample_estimate=self._overall)
             self._by_group_ci = create_ci_output(by_group_runs, ci, sample_estimate=self._by_group)
-            self._group_min_ci = create_ci_output(group_min_runs, ci, sample_estimate=group_min_output)
-            self._group_max_ci = create_ci_output(group_max_runs, ci, sample_estimate=group_max_output)
-            self._difference_group_ci = create_ci_output(diff_group_runs, ci, sample_estimate=difference_group_output)
-            self._difference_overall_ci = create_ci_output(diff_overall_runs, ci, sample_estimate=difference_overall_output)
-            self._ratio_group_ci = create_ci_output(ratio_group_runs, ci, sample_estimate=ratio_group_output)
-            self._ratio_overall_ci = create_ci_output(ratio_overall_runs, ci, sample_estimate=ratio_overall_output)
+            self.group_min_ci = create_ci_output(group_min_runs, ci, sample_estimate=group_min_output)
+            self.group_max_ci = create_ci_output(group_max_runs, ci, sample_estimate=group_max_output)
+            self.difference_group_ci = create_ci_output(diff_group_runs, ci, sample_estimate=difference_group_output)
+            self.difference_overall_ci = create_ci_output(diff_overall_runs, ci, sample_estimate=difference_overall_output)
+            self.ratio_group_ci = create_ci_output(ratio_group_runs, ci, sample_estimate=ratio_group_output)
+            self.ratio_overall_ci = create_ci_output(ratio_overall_runs, ci, sample_estimate=ratio_overall_output)
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -490,15 +497,15 @@ class MetricFrame:
             return self._overall
 
     @property
-    def overall_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
+    def overall_ci(self) -> Optional[List[Tuple[float, Union[pd.Series, pd.DataFrame]]]]:
         '''Return estimates of overall confidence intervals calculated via bootstrap.'''
 
         if self._overall_ci:
             if self._user_supplied_callable:
                 if self.control_levels:
-                    return [{key : val.iloc[:, 0] for key, val in self._overall_ci.items()}]
+                    return [(quantile, output.iloc[:, 0]) for quantile, output in self._overall_ci]
                 else:
-                    return [{key : val.iloc[0] for key, val in self._overall_ci.items()}]
+                    return [(quantile, output.iloc[0]) for quantile, output in self._overall_ci]
             else:
                 return self._overall_ci
 
@@ -540,7 +547,7 @@ class MetricFrame:
 
         if self._by_group_ci:
             if self._user_supplied_callable:
-                return [{key : val.iloc[:, 0] for key, val in self._by_group_ci.items()}]
+                return [(quantile, output.iloc[:, 0]) for quantile, output in self._by_group_ci]
             else:
                 return self._by_group_ci
     
