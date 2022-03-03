@@ -212,11 +212,13 @@ def test_examples():
     assert (
         abs(
             array(list(RESULT2a))
-            - array([
-                0.12749738693557688,
-                0.8005937148121609,
-                0.8286416214556249,
-            ])
+            - array(
+                [
+                    0.12749738693557688,
+                    0.8005937148121609,
+                    0.8286416214556249,
+                ]
+            )
         )
         < error
     ).all()
@@ -228,5 +230,3 @@ def test_examples():
         < error
     ).all()
     assert (RESULT1.values == RESULT3.values).all()
-
-test_examples()
