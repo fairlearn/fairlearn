@@ -197,7 +197,8 @@ def test_examples():
 
     RESULT3 = mf.by_group
 
-    # NOTE the following test could be done, but it is probably not reliable
+    # NOTE the following test could be done, but it is probably not reliable as
+    # it is dependent on the random state.
     from numpy import array, abs
 
     error = 1e-5
@@ -208,11 +209,17 @@ def test_examples():
         )
         < error
     ).all()
-    assert RESULT2a == (
-        0.12749738693557688,
-        0.8005937148121609,
-        0.8286416214556249,
-    )
+    assert (
+        abs(
+            array(list(RESULT2a))
+            - array([
+                0.12749738693557688,
+                0.8005937148121609,
+                0.8286416214556249,
+            ])
+        )
+        < error
+    ).all()
     assert (
         abs(
             RESULT2b.values
@@ -221,3 +228,5 @@ def test_examples():
         < error
     ).all()
     assert (RESULT1.values == RESULT3.values).all()
+
+test_examples()
