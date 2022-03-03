@@ -420,9 +420,9 @@ class MetricFrame:
                 diff_group_frame, diff_overall_frame, ratio_group_frame, ratio_overall_frame
 
         self._overall_ci, self._by_group_ci = None, None
-        self._difference_overall_ci, self._difference_group_ci = None, None
-        self._ratio_overall_ci, self._ratio_groups_ci = None, None
-        self._group_min_ci, self._group_max_ci = None, None
+        self.difference_overall_ci, self.difference_group_ci = None, None
+        self.ratio_overall_ci, self.ratio_groups_ci = None, None
+        self.group_min_ci, self.group_max_ci = None, None
 
         if n_boot is not None:
             # Calculate all outputs across entire data sample to assist bootstrap bias calculations
