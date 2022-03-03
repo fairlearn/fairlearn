@@ -448,14 +448,14 @@ class MetricFrame:
                 diff_group_runs, diff_overall_runs, ratio_group_runs, ratio_overall_runs = list(zip(*parallel_output))
 
             # Summarize results, using main output as a prototype to provide appropriate index/columns.
-            self._overall_ci = create_ci_output(overall_runs, ci, sample_estimate=self._overall)
-            self._by_group_ci = create_ci_output(by_group_runs, ci, sample_estimate=self._by_group)
-            self.group_min_ci = create_ci_output(group_min_runs, ci, sample_estimate=group_min_output)
-            self.group_max_ci = create_ci_output(group_max_runs, ci, sample_estimate=group_max_output)
-            self.difference_group_ci = create_ci_output(diff_group_runs, ci, sample_estimate=difference_group_output)
-            self.difference_overall_ci = create_ci_output(diff_overall_runs, ci, sample_estimate=difference_overall_output)
-            self.ratio_group_ci = create_ci_output(ratio_group_runs, ci, sample_estimate=ratio_group_output)
-            self.ratio_overall_ci = create_ci_output(ratio_overall_runs, ci, sample_estimate=ratio_overall_output)
+            self._overall_ci = create_ci_output(overall_runs, ci, sample_estimate=self._overall, interval_type=ci_method)
+            self._by_group_ci = create_ci_output(by_group_runs, ci, sample_estimate=self._by_group, interval_type=ci_method)
+            self.group_min_ci = create_ci_output(group_min_runs, ci, sample_estimate=group_min_output, interval_type=ci_method)
+            self.group_max_ci = create_ci_output(group_max_runs, ci, sample_estimate=group_max_output, interval_type=ci_method)
+            self.difference_group_ci = create_ci_output(diff_group_runs, ci, sample_estimate=difference_group_output, interval_type=ci_method)
+            self.difference_overall_ci = create_ci_output(diff_overall_runs, ci, sample_estimate=difference_overall_output, interval_type=ci_method)
+            self.ratio_group_ci = create_ci_output(ratio_group_runs, ci, sample_estimate=ratio_group_output, interval_type=ci_method)
+            self.ratio_overall_ci = create_ci_output(ratio_overall_runs, ci, sample_estimate=ratio_overall_output, interval_type=ci_method)
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:

@@ -48,55 +48,15 @@ def process_ci_bounds(ci, ci_method, precision=6):
 
 def create_ci_output(bootstrap_runs, ci, sample_estimate, interval_type='percentile'):
     '''Calculates and formats confidence intervals from bootstrap samples.'''
-
-    # Adjust which quantiles we sample from the empirical bootstrap distribution if bias correcting
-    if interval_type == 'bias_corrected':
-        # Follows Efron and Tibshirani (1993)
-        # with an additional adjustment for overestimating bias in the presence of ties
-        num_less = np.sum([x < sample_estimate for x in bootstrap_runs], axis=0)
-        num_equal = np.sum([x == sample_estimate for x in bootstrap_runs], axis=0)
-        prop_less = (num_less + num_equal/2) / len(bootstrap_runs)
-        z0 = norm.ppf(prop_less)
-        z_alphas = norm.ppf(ci)
-        adjusted_ci = norm.cdf(2*z0 + z_alphas)
-    else:
-        adjusted_ci = ci
-
-    bootstrap_quantiles = np.quantile(bootstrap_runs, q=adjusted_ci, axis=0)
+    
+    #--- Check if there is significant bias in sample statistics ---
     bootstrap_mean = np.mean(bootstrap_runs, axis=0)
 
     # Need to use this incredibly odd workaround to support frames with "object" dtypes
     # object typed frames are produced by default from .__group()
     bootstrap_std = np.sqrt(np.var(bootstrap_runs, axis=0, dtype='float64'))
-
-    # Reshape CI outputs to look like original MetricFrame outputs
-    if isinstance(sample_estimate, numbers.Number):
-        quantiles = [(quantile, qmf) for quantile, qmf in zip(ci, bootstrap_quantiles)]
-
-    elif isinstance(sample_estimate, pd.Series):
-        prototype_index = sample_estimate.index
-
-        quantiles = [
-            (quantile, pd.Series(qmf, index=prototype_index))
-            for quantile, qmf in zip(ci, bootstrap_quantiles)
-        ]
-        bootstrap_mean = pd.Series(bootstrap_mean, index=prototype_index)
-        bootstrap_std = pd.Series(bootstrap_std, index=prototype_index)
-
-    else:
-        prototype_index = sample_estimate.index
-        prototype_columns = sample_estimate.columns
-       
-        quantiles = [
-            (quantile, pd.DataFrame(qmf, index=prototype_index, columns=prototype_columns))
-            for quantile, qmf in zip(ci, bootstrap_quantiles)
-        ]
-        bootstrap_mean = pd.DataFrame(bootstrap_mean, index=prototype_index, columns=prototype_columns)
-        bootstrap_std = pd.DataFrame(bootstrap_std, index=prototype_index, columns=prototype_columns)
-
-    # Calculate bias
     bias = bootstrap_mean - sample_estimate
-    bias_adjusted_mean_estimate = 2*sample_estimate - bootstrap_mean # TODO: Decide to publish?
+    bias_adjusted_mean_estimate = 2*sample_estimate - bootstrap_mean # Might be useful to publish?
 
     # Efron and Tibshirani (1993) guidance on identifying "large" bias via bootstrap
     high_bias_regions = np.abs(bias) >= (0.25 * bootstrap_std)
@@ -104,7 +64,47 @@ def create_ci_output(bootstrap_runs, ci, sample_estimate, interval_type='percent
         #TODO: Add bias indication regions into warning. Simply printing all "high_bias_regions" is overwhelming.
         warn(
             f"""Some statistics calculated by MetricFrame are detected to have high bias 
-            Consider setting `ci_method` == 'bias_corrected' to mitigate inaccuracies in
+            Consider setting `ci_method` == 'bias-corrected' to mitigate inaccuracies in
             confidence interval calculations."""
         )
+
+    #--- Bootstrap quantile summary calculations ---
+
+    # Adjust which quantiles we sample from the empirical bootstrap distribution if bias correcting
+    if interval_type == 'bias-corrected':
+        # Follows Efron and Tibshirani (1993)
+        # with an additional adjustment for overestimating bias in the presence of ties
+        num_less = np.sum([x < sample_estimate for x in bootstrap_runs], axis=0)
+        num_equal = np.sum([x == sample_estimate for x in bootstrap_runs], axis=0)
+        prop_less = (num_less + num_equal/2) / len(bootstrap_runs)
+        z0 = norm.ppf(prop_less)
+        z_alphas = norm.ppf(ci)
+        adjusted_ci = [norm.cdf(2*z0 + alpha) for alpha in z_alphas]
+    else:
+        # Match bias adjusted ci datastructures for downstream code
+        adjusted_ci = np.repeat(ci, np.prod(sample_estimate.shape)).reshape((len(ci), *sample_estimate.shape))
+
+
+    # Potentially slow loop -- cannot seem to vectorize because we need a different set of quantiles for each cell
+    # TODO: Look into optimizing this further
+    quantiles = []
+    for user_ci, q in zip(ci, adjusted_ci): # Calculated based on adjusted_ci values but store with user requested
+        bootstrap_quantile = np.zeros_like(sample_estimate)
+        for index, index_quantile in np.ndenumerate(q):
+            bootstrap_quantile[index] = np.quantile([x.iloc[index] if isinstance(x, (pd.Series, pd.DataFrame)) else x for x in bootstrap_runs], q=index_quantile, axis=0)
+
+        # Reshape CI outputs to look like original MetricFrame outputs
+        if isinstance(sample_estimate, numbers.Number):
+            quantiles.append((user_ci, bootstrap_quantile[()]))
+    
+        elif isinstance(sample_estimate, pd.Series):
+            quantiles.append((user_ci, pd.Series(bootstrap_quantile, index=sample_estimate.index)))
+
+        elif isinstance(sample_estimate, pd.DataFrame):
+            quantiles.append(
+                (user_ci, pd.DataFrame(bootstrap_quantile, index=sample_estimate.index, columns=sample_estimate.columns))
+            )
+        else:
+            raise ValueError(f"Datatype: {type(sample_estimate)} is unsupported in create_ci_output bootstrap function. Must be one of type 'Number', 'Pandas Series', 'Pandas DataFrame'.")
+    
     return quantiles
