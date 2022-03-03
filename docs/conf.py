@@ -250,7 +250,7 @@ mathjax3_config = {
 
 
 def check_if_v07():
-    """Check to see if current version being built is > v0.7"""
+    """Check to see if current version being built is > v0.7."""
     result = False
 
     if parse(fairlearn.__version__) > parse("0.7"):
