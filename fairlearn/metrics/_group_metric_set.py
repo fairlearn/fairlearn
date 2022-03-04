@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import logging
+
 import sklearn.metrics as skm
 from sklearn import preprocessing
 
@@ -16,6 +18,8 @@ from ._extra_metrics import (_balanced_root_mean_squared_error,
                              count)
 from ._metric_frame import MetricFrame
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
+
+logger = logging.getLogger(__name__)
 
 _Y_TRUE = 'trueY'
 _Y_PRED = 'predictedY'
@@ -64,6 +68,21 @@ SELECTION_RATE = "selection_rate"
 SPECIFICITY_SCORE = "specificity_score"
 ZERO_ONE_LOSS = "zero_one_loss"
 
+
+class func_wrapper:
+    def __init__(self, metric_function):
+        self.metric_function = metric_function
+
+    def __call__(self, y_true, y_pred):
+        result = 0
+        try:
+            result = self.metric_function(y_true, y_pred)
+        except ValueError:
+            msg = "Evaluation of {0} failed. Substituting 0"
+            logger.warning(msg.format(self.metric_function.__name__))
+        return result
+
+
 BINARY_CLASSIFICATION_METRICS = {}
 BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE] = skm.accuracy_score
 BINARY_CLASSIFICATION_METRICS[COUNT] = count
@@ -74,7 +93,7 @@ BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION] = _mean_underprediction
 BINARY_CLASSIFICATION_METRICS[MISS_RATE] = false_negative_rate
 BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE] = skm.precision_score
 BINARY_CLASSIFICATION_METRICS[RECALL_SCORE] = skm.recall_score
-BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE] = skm.roc_auc_score
+BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE] = func_wrapper(skm.roc_auc_score)
 BINARY_CLASSIFICATION_METRICS[SELECTION_RATE] = selection_rate
 BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE] = true_negative_rate
 
