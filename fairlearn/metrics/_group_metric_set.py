@@ -73,9 +73,11 @@ ZERO_ONE_LOSS = "zero_one_loss"
 
 class _func_wrapper:
     """
-    Simple wrapper fo rmetric functions, so they return 0
-    if they raise a ValueError
+    Metric function wrapper, so they return 0 rather than raising ValueError.
+
+    This is primarily to deal with roc_auc_score()
     """
+
     def __init__(self, metric_function):
         self.metric_function = metric_function
 
