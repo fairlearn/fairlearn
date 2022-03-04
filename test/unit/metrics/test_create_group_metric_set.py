@@ -214,7 +214,7 @@ class TestCreateGroupMetricSet:
         assert actual_roc['global'] == expected.overall['roc_auc_score']
         assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
 
-    def test_roc_auc_single_class(self):
+    def test_roc_auc_single_class(self, recwarn):
         # Note that y_t and s_f are identical, so subgroup evaluation will fail for
         # roc_auc_score
         y_p = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
@@ -229,12 +229,20 @@ class TestCreateGroupMetricSet:
                                           sensitive_feature,
                                           'binary_classification')
 
-        # Check that the error case was intercepted
+        # Check that the error case was intercepted for roc_auc_score
         validate_dashboard_dictionary(actual)
         actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
         expected_all_roc = skm.roc_auc_score(y_t, y_p)
         assert actual_roc['global'] == expected_all_roc
-        assert actual_roc['bins'] == [0, 0]
+        assert actual_roc['bins'] == [0, 0] # We substituted zero
+        # Check that the right warnings were issued
+        assert len(recwarn) == 4
+        msgs = sorted([str(x.message) for x in recwarn])
+        # We get the message from roc_auc_score once for each subgroup
+        assert msgs[0] == "Evaluation of roc_auc_score failed. Substituting 0"
+        assert msgs[1] == "Evaluation of roc_auc_score failed. Substituting 0"
+        assert msgs[2].startswith("Recall is ill-defined and being set to 0.0")
+        assert msgs[3] == "Supplied 'func' had no __name__ attribute"
 
     def test_regression_prediction_type(self):
         # For regression, both y_t and y_p can have floating point values
