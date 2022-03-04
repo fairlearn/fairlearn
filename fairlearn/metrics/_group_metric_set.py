@@ -71,7 +71,11 @@ SPECIFICITY_SCORE = "specificity_score"
 ZERO_ONE_LOSS = "zero_one_loss"
 
 
-class func_wrapper:
+class _func_wrapper:
+    """
+    Simple wrapper fo rmetric functions, so they return 0
+    if they raise a ValueError
+    """
     def __init__(self, metric_function):
         self.metric_function = metric_function
 
@@ -95,7 +99,7 @@ BINARY_CLASSIFICATION_METRICS[MEAN_UNDERPREDICTION] = _mean_underprediction
 BINARY_CLASSIFICATION_METRICS[MISS_RATE] = false_negative_rate
 BINARY_CLASSIFICATION_METRICS[PRECISION_SCORE] = skm.precision_score
 BINARY_CLASSIFICATION_METRICS[RECALL_SCORE] = skm.recall_score
-BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE] = func_wrapper(skm.roc_auc_score)
+BINARY_CLASSIFICATION_METRICS[ROC_AUC_SCORE] = _func_wrapper(skm.roc_auc_score)
 BINARY_CLASSIFICATION_METRICS[SELECTION_RATE] = selection_rate
 BINARY_CLASSIFICATION_METRICS[SPECIFICITY_SCORE] = true_negative_rate
 
