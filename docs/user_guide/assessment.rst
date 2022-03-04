@@ -51,7 +51,7 @@ Define metrics that quantify harms or benefits:
 
 * For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
 
-Note that in some cases, harms might not be readily identifiable. 
+Note that in some cases, harms might not be readily quantifiable. 
 In these cases, we might choose to use a closely related variable 
 to stand in for the missing variable. For example, suppose that in 
 the job screening scenario, we have data on whether the candidate passes 
