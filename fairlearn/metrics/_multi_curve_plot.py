@@ -23,7 +23,7 @@ def plot_model_comparison(
     ax=None,
     axis_labels=True,
     point_labels=None,
-    groups=None,
+    model_group=None,
     group_kwargs=None,
     legend=False,
     plot=True,
@@ -72,21 +72,22 @@ def plot_model_comparison(
         Add textual label :code:`point_labels[i]` to the position
         of model :code:`i`.
 
-    groups : list
+    model_group : list
         For a model at index :code:`i` (same order as in :code:`y_preds`),
-        :code:`groups[i]` is the group of the model. Every model with the
+        :code:`model_group[i]` is the group of the model. Every model with the
         same group name is plotted similarly. Group names should be numbers
         or strings, as long as all group names have the same data type.
 
     group_kwargs : Dict[Dict]
-        For each group name :code:`name` in groups, pass as key-word argument
+        For each group name :code:`name` in :code:`model_group`,
+        pass as key-word argument
         :code:`group_kwargs[name]` to the plotting of that group. Useful to
         define per-group markers, colors, color maps, etc. If you are not
         grouping, then we just pass extra kwargs from
         :meth:`plot_model_comparison` to the plotting.
 
     legend : bool
-        If True, add a legend about the various groups. Must set
+        If True, add a legend about the various model_group. Must set
         :code:`group_kwargs[g]['label']` for every group :code:`g`.
 
     plot : bool
@@ -142,7 +143,7 @@ def plot_model_comparison(
 
     for (kwarg, name) in (
         (point_labels, "point_labels"),
-        (groups, "groups"),
+        (model_group, "model_group"),
     ):
         if kwarg is not None:
             if not isinstance(kwarg, list):
@@ -164,7 +165,7 @@ def plot_model_comparison(
                 )
             )
         for group_name in group_kwargs:
-            if group_name not in groups:
+            if group_name not in model_group:
                 raise ValueError(
                     f"Provided kwargs for group {group_name}, "
                     + "but there are no points in that group."
@@ -234,7 +235,7 @@ def plot_model_comparison(
 
     # Add actual points
     try:
-        if groups is None:
+        if model_group is None:
             ax.scatter(x, y, **kwargs)
         else:
             # We call scatter once per group and pass group kwargs to each
@@ -250,10 +251,10 @@ def plot_model_comparison(
             # NOTE because we use unique/array, if there's a single string then
             # all group names are converted to strings, so we can't support
             # mixed-type lists.
-            groups = array(groups)
-            group_names = unique(groups)
+            model_group = array(model_group)
+            group_names = unique(model_group)
             for group in group_names:
-                index = where(group == groups)
+                index = where(group == model_group)
                 if group_kwargs is not None:
                     # NOTE: debatable design choice to copy and add kwargs.
                     kws = kwargs.copy()
