@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import logging
+import warnings
 
 import sklearn.metrics as skm
 from sklearn import preprocessing
@@ -18,8 +18,6 @@ from ._extra_metrics import (_balanced_root_mean_squared_error,
                              count)
 from ._metric_frame import MetricFrame
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
-
-logger = logging.getLogger(__name__)
 
 _Y_TRUE = 'trueY'
 _Y_PRED = 'predictedY'
@@ -79,7 +77,7 @@ class func_wrapper:
             result = self.metric_function(y_true, y_pred)
         except ValueError:
             msg = "Evaluation of {0} failed. Substituting 0"
-            logger.warning(msg.format(self.metric_function.__name__))
+            warnings.warn(msg.format(self.metric_function.__name__))
         return result
 
 
