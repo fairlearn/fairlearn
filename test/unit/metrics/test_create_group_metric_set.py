@@ -214,6 +214,28 @@ class TestCreateGroupMetricSet:
         assert actual_roc['global'] == expected.overall['roc_auc_score']
         assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])
 
+    def test_roc_auc_single_class(self):
+        # Note that y_t and s_f are identical, so subgroup evaluation will fail for
+        # roc_auc_score
+        y_p = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_t = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        actual = _create_group_metric_set(y_t,
+                                          predictions,
+                                          sensitive_feature,
+                                          'binary_classification')
+
+        # Check that the error case was intercepted
+        validate_dashboard_dictionary(actual)
+        actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
+        expected_all_roc = skm.roc_auc_score(y_t, y_p)
+        assert actual_roc['global'] == expected_all_roc
+        assert actual_roc['bins'] == [0, 0]
+
     def test_regression_prediction_type(self):
         # For regression, both y_t and y_p can have floating point values
         y_t = [0, 1, 1, 0, 1, 1, 1.5, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
