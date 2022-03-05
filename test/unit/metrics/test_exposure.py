@@ -118,9 +118,7 @@ def test_proportional_exposure_weighted():
     assert round(result, 3) == 0.331
 
 
-'''
-    Test disparities
-'''
+# Test disparities
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
