@@ -24,9 +24,7 @@ y_p = list(range(len(y_t)))
 
 _aggregate_methods = ['between_groups', 'to_overall']
 
-'''
-    Test metrics
-'''
+# Test metrics
 
 
 def test_exposure_empty():
