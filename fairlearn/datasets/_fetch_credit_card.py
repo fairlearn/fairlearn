@@ -9,10 +9,10 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 def fetch_credit_card(*, cache=True, data_home=None,
                       as_frame=False, return_X_y=False):
-    """Loads the 'Default of Credit Card clients" dataset (binary classification).
+    """Load the 'Default of Credit Card clients" dataset (binary classification).
 
     ===============   ===============
-    Samples total               30000 
+    Samples total               30000
     Dimensionality                 24
     Features                     real
     Classes                         2
@@ -74,4 +74,3 @@ def fetch_credit_card(*, cache=True, data_home=None,
             as_frame=as_frame,
             return_X_y=return_X_y,
         )
-        
