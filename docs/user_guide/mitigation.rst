@@ -74,7 +74,7 @@ Preprocessing
    
 .. currentmodule:: fairlearn.preprocessing
 
-Preprocessing algortihms transform the dataset to mitigate possible unfairness
+Preprocessing algorithms transform the dataset to mitigate possible unfairness
 present in the data.
 Preprocessing algorithms in Fairlearn follow the `scikit-learn transformers
 <https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin>`_
@@ -86,10 +86,10 @@ A :code:`fit_transform` might not always be available, in which case the separat
 
 Correlation Remover
 ~~~~~~~~~~~~~~~~~~~
-Sensitive features can be correlated with non sensitive features in the dataset.
+Sensitive features can be correlated with non-sensitive features in the dataset.
 By applying the :code:`CorrelationRemover`, these correlations are filtered out while
 as much as possible information is retained (as measured by the least-squares error).
-This is mathemetically described as:
+This is mathematically described as:
 
 .. math::
         \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}
