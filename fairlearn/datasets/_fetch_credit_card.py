@@ -2,15 +2,14 @@
 # Licensed under the MIT License.
 
 from pathlib import Path
-import warnings
 
 from sklearn.datasets import fetch_openml
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
+
 def fetch_credit_card(*, cache=True, data_home=None,
                       as_frame=False, return_X_y=False):
-    """
-    Loads the UCI 'Default of Credit Card clients" dataset (binary classification)
+    """Loads the 'Default of Credit Card clients" dataset (binary classification).
 
     ===============   ===============
     Samples total               30000 
@@ -20,7 +19,7 @@ def fetch_credit_card(*, cache=True, data_home=None,
     ===============   ===============
 
     Source: https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients
-    I-Cheng Yeh and Che-hui Lien, "The comparisons of data mining techniques for the 
+    I-Cheng Yeh and Che-hui Lien, "The comparisons of data mining techniques for the
     predictive accuracy of probability of default of credit card clients", Expert Systems
     with Applications, 36(2), 2473-2480, 2009
 
@@ -75,3 +74,4 @@ def fetch_credit_card(*, cache=True, data_home=None,
             as_frame=as_frame,
             return_X_y=return_X_y,
         )
+        
