@@ -337,6 +337,32 @@ def _logistic_regression_path(
     return np.array(coefs), np.array(Cs), n_iter
 
 
+def _ohe_sensitive_features(X, sensitive_feature_ids):
+    """
+    One-hot-encode the sensitive features such that they can be splitted
+    from X and that the constraints can be correctly coded per feature value.
+    """
+    enc = OneHotEncoder(handle_unknown='ignore', drop='if_binary')
+    if isinstance(X, pd.DataFrame):
+        transformed = enc.fit_transform(X[sensitive_feature_ids]).toarray()
+        # Create a Pandas DataFrame of the hot encoded column
+        ohe_df = pd.DataFrame(transformed, columns=enc.get_feature_names_out())
+        # concat with original data
+        X = pd.concat([X, ohe_df], axis=1).drop(sensitive_feature_ids, axis=1)
+        sensitive_feature_ids = list(enc.get_feature_names_out())
+    else:  # Numpy array
+        transformed = enc.fit_transform(X[:, sensitive_feature_ids]).toarray()
+        if len(enc.get_feature_names_out()) == 1:  # Only a single binary column
+            X[:, sensitive_feature_ids] = transformed
+        else:  # One or more columns that contain at least three values
+            # Delete the old column and append the transformed columns
+            X_without_sensitive = np.delete(X, sensitive_feature_ids, axis=1)
+            X_with_sensitive = np.append(X_without_sensitive, transformed, axis=1)
+            # Need to return the new transformed sensitive feature ids, since they have changed
+            sensitive_feature_ids = list(range(X_without_sensitive.shape[1], X_with_sensitive.shape[1]))
+    return X, sensitive_feature_ids
+
+
 class FairLogisticRegression(LogisticRegression):
     """" TODO: add docstring, check in BalancedRandomForestClassifier how they handle docstrings for inherited class"""
 
@@ -376,3 +402,41 @@ class FairLogisticRegression(LogisticRegression):
             n_jobs=n_jobs,
             l1_ratio=l1_ratio,
         )
+
+    # Below code is almost entirely reused from the CorrelationRemover, should this maybe be abstracted higher up?
+    # Also not sure if this should be a function of the FairLogisticRegression class, doesn't really feel like it.
+    # That is also why I feel like it is a good reason to abstract it higher up. Seems like something for utils maybe?
+    def _split_X(self, X, sensitive_feature_ids):
+        """Split up X into a sensitive and non-sensitive group."""
+        sensitive = [self.lookup_[i] for i in sensitive_feature_ids]
+        non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
+        if isinstance(X, pd.DataFrame):
+            return X.iloc[:, non_sensitive], X.iloc[:, sensitive]
+        else:  # Numpy arrays
+            return X[:, non_sensitive], X[:, sensitive]
+
+    def _create_lookup(self, X):
+        """Create a lookup to handle column names correctly."""
+        if isinstance(X, pd.DataFrame):
+            self.lookup_ = {c: i for i, c in enumerate(X.columns)}
+            return X.values
+        # correctly handle a 1d input
+        if len(X.shape) == 1:
+            return {0: 0}
+        self.lookup_ = {i: i for i in range(X.shape[1])}
+        return X
+
+    def fit(self, X, y, sensitive_feature_ids, sensitive_attrs_to_cov_thresh, sample_weight=None):
+        """" TODO: add docstring"""
+        # One-hot-encode the data and return the new sensitive feature ids that come along with the encoded data
+        X_ohe, sensitive_feature_ids = _ohe_sensitive_features(X, sensitive_feature_ids)
+        # Split the data similarly to how the CorrelationRemover does it
+        self._create_lookup(X_ohe)
+        X_nonsensitive, X_sensitive = self._split_X(X_ohe, sensitive_feature_ids)
+
+        constraints = _get_constraint_list_cov(X_nonsensitive, X_sensitive, y,
+                                               sensitive_feature_ids, sensitive_attrs_to_cov_thresh)
+
+        # TODO: Think about whether the constraints should be implemented in `fit`, or in `_logistic_regression_path`
+
+        return X_nonsensitive, X_sensitive
