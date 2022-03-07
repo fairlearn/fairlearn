@@ -88,8 +88,9 @@ Correlation Remover
 ~~~~~~~~~~~~~~~~~~~
 Sensitive features can be correlated with non-sensitive features in the dataset.
 By applying the :code:`CorrelationRemover`, these correlations are filtered out while
-as much as possible information is retained (as measured by the least-squares error).
-This is mathematically described as:
+details from the original data are retained as much as possible (as measured by the
+least-squares error). The user can control the level of filtering via the :code:`alpha`
+parameter. The removal of correlation is mathematically described as:
 
 .. math::
         \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}
@@ -97,6 +98,12 @@ This is mathematically described as:
         \text{subject to} \\
         \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i}\left(\mathbf{s}_{i}-\overline{\mathbf{s}}
         \right)^{T}=\mathbf{0}
+
+The amount of filtering (as controlled with the :code:`alpha` parameter) is then
+described as follows:
+
+.. math::
+        X_{\mathrm{tfm}}=\alpha X_{\text {filtered }}+(1-\alpha) X_{\mathrm{orig}}
 
 In the example below, a subset of the `adult dataset <https://www.openml.org/d/1590>`_
 is loaded and the correlation between sex and the non-sensitive features is removed.
@@ -118,10 +125,10 @@ is loaded and the correlation between sex and the non-sensitive features is remo
 ..  I am not sure whether it would be valuable to show the transformed data here,
     as well as in the next example.
 
-This procedure will drop the sensitive features from the dataset. However, the
-:code:`CorrelationRemover` has an :code:`alpha` parameter that does allow you to
-tweak the amount of filtering that gets applied. Revisiting the same example,
-we can now see how the values in the transformed dataset are different.
+This procedure will drop the sensitive features from the dataset. We can also
+use the :code:`alpha` parameter with :math:`\alpha=0.5` to filter only half of
+the correlation between the sensitive and non-sensitive features. Revisiting the
+same example, we can now see how the values in the transformed dataset are different.
 
 .. doctest:: mitigation
 
