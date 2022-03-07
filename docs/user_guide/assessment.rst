@@ -52,12 +52,17 @@ Define metrics that quantify harms or benefits:
 * For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
 
 Note that in some cases, harms might not be readily quantifiable. 
-In these cases, we might choose to use a closely related variable 
+In these cases, we might choose to use a closely related variable,
+often called a "proxy",  
 to stand in for the missing variable. For example, suppose that in 
 the job screening scenario, we have data on whether the candidate passes 
 the first two stages, but not if they are ultimately recommended for the 
-job. An alternative measure of harm might be if the candidate does not pass 
-the first stage of the screen. If you choose to use a proxy variable to 
+job.
+
+As an alternative to the unobservable final recommendation, we could
+therefore measure the harm using the proxy variable indicating whether
+the candidate passes the first stage of the screen.
+If you choose to use a proxy variable to 
 represent the harm, check the proxy variable regularly to ensure it 
 remains useful over time.
 
