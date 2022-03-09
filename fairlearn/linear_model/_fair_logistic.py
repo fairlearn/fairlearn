@@ -216,8 +216,6 @@ def _logistic_regression_path(
 
     solver = _check_solver(solver, penalty, dual)
 
-    constraints = _get_constraint_list_cov(X, A, y, sensitive_feature_ids, sensitive_features_to_cov_thresh)
-
     # Preprocessing.
     if check_input:
         X = check_array(
