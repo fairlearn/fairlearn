@@ -170,6 +170,23 @@ def _test_sensitive_attr_constraint_cov(model, x_arr, y_arr_dist_boundary, x_con
     return ans
 
 
+def _get_constraint_list_cov(X_train, A_train, y_train, renamed_sensitive_feature_ids, sensitive_attrs_to_cov_thresh):
+    # For now, I only work with a constant threshold.
+    # The paper works with a threshold per category of a sensitive feature (if not binary), and else per sens feature.
+    constraints = []
+
+    for attr in renamed_sensitive_feature_ids:
+        if isinstance(A_train, pd.DataFrame):
+            c = ({'type': 'ineq', 'fun': _test_sensitive_attr_constraint_cov,
+                  'args': (X_train, y_train, A_train[attr].to_numpy(), sensitive_attrs_to_cov_thresh)})
+        else:
+            c = ({'type': 'ineq', 'fun': _test_sensitive_attr_constraint_cov,
+                  'args': (X_train, y_train, A_train[:, attr], sensitive_attrs_to_cov_thresh)})
+
+        constraints.append(c)
+    return constraints
+
+
 def _logistic_regression_path(
     X,  # TODO: Does A need to be in here? --> Probably yes, since we need it in the constraints parameter later on.
         # This depends on whether I implement the constraints in the fit function, or here. Not yet sure what is best
