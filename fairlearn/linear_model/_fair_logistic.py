@@ -365,13 +365,13 @@ def _logistic_regression_path(
                 np.searchsorted(np.array([0, 1, 2, 3]), verbose)
             ]
             opt_res = optimize.minimize(
-                func,
-                w0,
-                method="L-BFGS-B",
-                jac=True,
-                args=(X, target, 1.0 / C, sample_weight),
-                options={"iprint": iprint, "gtol": tol, "maxiter": max_iter},
-                # constraints=constraints, TODO: Implement constraints
+                fun=_logistic_loss,
+                x0=np.random.rand(X.shape[1],),
+                method="SLSQP",  # TODO: CAREFUL HERE, NEED TO CHANGE EVERYWHERE ELSE IN THE CODE IF I KEEP USING IT
+                # jac=True,
+                args=(X, target),
+                options={"iprint": iprint, "maxiter": max_iter},
+                constraints=constraints,
             )
             n_iter_i = _check_optimize_result(
                 solver,
