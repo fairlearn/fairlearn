@@ -210,7 +210,10 @@ def _logistic_regression_path(
         l1_ratio=None,
         constraints=None
 ):
-    """TODO: add docsting"""
+    """
+    TODO: add docstring
+    All this code is copied from the sklearn _logistic_regression_path function, except for the constraints argument
+    """
     if isinstance(Cs, numbers.Integral):
         Cs = np.logspace(-4, 4, Cs)
 
