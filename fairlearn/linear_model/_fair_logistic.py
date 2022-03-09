@@ -302,8 +302,8 @@ def _logistic_regression_path(
                 n_classes = 1
 
             if coef.shape[0] != n_classes or coef.shape[1] not in (
-                n_features,
-                n_features + 1,
+                    n_features,
+                    n_features + 1,
             ):
                 raise ValueError(
                     "Initialization coef is of shape (%d, %d), expected "
@@ -331,7 +331,6 @@ def _logistic_regression_path(
             w0 = w0.ravel()
         target = Y_multi
         if solver == "lbfgs":
-
             def func(x, *args):
                 return _multinomial_loss_grad(x, *args)[0:2]
 
