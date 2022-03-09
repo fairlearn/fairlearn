@@ -2,16 +2,22 @@
 # Licensed under the MIT License.
 
 import numbers
+import warnings
+
 import numpy as np
 import pandas as pd
+from scipy import optimize
+from joblib import Parallel
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model._logistic import _multinomial_loss_grad, _logistic_loss_and_grad, _check_multi_class
 from sklearn.preprocessing import LabelEncoder, LabelBinarizer, OneHotEncoder
 from sklearn.utils import check_array, check_consistent_length, check_random_state, compute_class_weight
-from sklearn.utils.validation import _check_sample_weight
+from sklearn.utils.extmath import row_norms
+from sklearn.utils.fixes import delayed, _joblib_parallel_args
+from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.optimize import _check_optimize_result
-from scipy import optimize
-
+from sklearn.utils.validation import _check_sample_weight
 
 _LOGISTIC_SOLVER_CONVERGENCE_MSG = (
     "Please also refer to the documentation for alternative solver options:\n"
