@@ -470,25 +470,23 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     One-hot-encode the sensitive features such that they can be splitted
     from X and that the constraints can be correctly coded per feature value.
     """
-    enc = OneHotEncoder(handle_unknown='ignore', drop='if_binary')
+    enc = OneHotEncoder(handle_unknown='ignore')
     if isinstance(X, pd.DataFrame):
         transformed = enc.fit_transform(X[sensitive_feature_ids]).toarray()
+        renamed_sensitive_feature_ids = list(enc.get_feature_names_out())
         # Create a Pandas DataFrame of the hot encoded column
-        ohe_df = pd.DataFrame(transformed, columns=enc.get_feature_names_out())
-        # concat with original data
+        ohe_df = pd.DataFrame(transformed, columns=renamed_sensitive_feature_ids)
+        # concat with original data, drop the original sensitive_feature_ids
         X = pd.concat([X, ohe_df], axis=1).drop(sensitive_feature_ids, axis=1)
-        sensitive_feature_ids = list(enc.get_feature_names_out())
     else:  # Numpy array
         transformed = enc.fit_transform(X[:, sensitive_feature_ids]).toarray()
-        if len(enc.get_feature_names_out()) == 1:  # Only a single binary column
-            X[:, sensitive_feature_ids] = transformed
-        else:  # One or more columns that contain at least three values
-            # Delete the old column and append the transformed columns
-            X_without_sensitive = np.delete(X, sensitive_feature_ids, axis=1)
-            X_with_sensitive = np.append(X_without_sensitive, transformed, axis=1)
-            # Need to return the new transformed sensitive feature ids, since they have changed
-            sensitive_feature_ids = list(range(X_without_sensitive.shape[1], X_with_sensitive.shape[1]))
-    return X, sensitive_feature_ids
+        # Delete the old column and append the transformed columns
+        X_without_sensitive = np.delete(X, sensitive_feature_ids, axis=1)
+        X = np.append(X_without_sensitive, transformed, axis=1)
+        # Need to return the new transformed sensitive feature ids, since there are more columns now
+        renamed_sensitive_feature_ids = list(range(X_without_sensitive.shape[1], X.shape[1]))
+
+    return X, renamed_sensitive_feature_ids
 
 
 class FairLogisticRegression(LogisticRegression):
