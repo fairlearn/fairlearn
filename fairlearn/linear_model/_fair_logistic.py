@@ -552,14 +552,17 @@ class FairLogisticRegression(LogisticRegression):
         self.lookup_ = {i: i for i in range(X.shape[1])}
         return X
 
-    def fit(self, X, y, sensitive_feature_ids, sensitive_attrs_to_cov_thresh, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, sensitive_feature_ids=None, sensitive_attrs_to_cov_thresh=None):
         """" TODO: add docstring"""
+        # TODO: Maybe turn below code until constraints into a preprocessing function?
+        X = _add_intercept(X)
         # One-hot-encode the data and return the new sensitive feature ids that come along with the encoded data
-        X_ohe, sensitive_feature_ids = _ohe_sensitive_features(X, sensitive_feature_ids)
+        X_ohe, renamed_sensitive_feature_ids = _ohe_sensitive_features(X, sensitive_feature_ids)
         # Split the data similarly to how the CorrelationRemover does it
         self._create_lookup(X_ohe)
-        X_nonsensitive, X_sensitive = self._split_X(X_ohe, sensitive_feature_ids)
+        X_nonsensitive, X_sensitive, renamed_sensitive_feature_ids = self._split_X(X_ohe, renamed_sensitive_feature_ids)
 
+        # TODO: Think about whether the constraints should be implemented in `fit`, or in `_logistic_regression_path`
         constraints = _get_constraint_list_cov(X_nonsensitive, X_sensitive, y,
                                                sensitive_feature_ids, sensitive_attrs_to_cov_thresh)
 
