@@ -65,6 +65,111 @@ def _check_solver(solver, penalty, dual):
     return solver
 
 
+def _add_intercept(X):
+
+    """ Add intercept to the data before linear classification """
+    m, n = X.shape
+    intercept = np.ones(m).reshape(m, 1)  # the constant b
+    return np.concatenate((X, intercept), axis=1)
+
+
+def _log_logistic(X):
+    """ This function is used from scikit-learn source code. Source link below """
+
+    """Compute the log of the logistic function, ``log(1 / (1 + e ** -x))``.
+    This implementation is numerically stable because it splits positive and
+    negative values::
+        -log(1 + exp(-x_i))     if x_i > 0
+        x_i - log(1 + exp(x_i)) if x_i <= 0
+    
+    Parameters
+    ----------
+    X: array-like, shape (M, N)
+        Argument to the logistic function
+    
+    Returns
+    -------
+    out: array, shape (M, N)
+        Log of the logistic function evaluated at every point in x
+    Notes
+    -----
+    Source code at:
+    https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/utils/extmath.py
+    -----
+    
+    See the blog post describing this implementation:
+    http://fa.bianp.net/blog/2013/numerical-optimizers-for-logistic-regression/
+    """
+    if X.ndim > 1: raise Exception("Array of samples cannot be more than 1-D!")
+    out = np.empty_like(X)  # same dimensions and data types
+
+    idx = X > 0
+    out[idx] = -np.log(1.0 + np.exp(-X[idx]))
+    out[~idx] = X[~idx] - np.log(1.0 + np.exp(X[~idx]))
+    return out
+
+
+def _logistic_loss(w, X, y, return_arr=None):
+    """Computes the logistic loss.
+
+    This function is used from scikit-learn source code
+
+    Parameters
+    ----------
+    w : ndarray, shape (n_features,) or (n_features + 1,)
+        Coefficient vector.
+
+    X : {array-like, sparse matrix}, shape (n_samples, n_features)
+        Training data.
+
+    y : ndarray, shape (n_samples,)
+        Array of labels.
+
+    """
+
+    yz = y * np.dot(X, w)
+    # Logistic loss is the negative of the log of the logistic function.
+    if return_arr == True:
+        out = -(_log_logistic(yz))
+    else:
+        out = -np.sum(_log_logistic(yz))
+    return out
+
+
+def _test_sensitive_attr_constraint_cov(model, x_arr, y_arr_dist_boundary, x_control, thresh):
+    """
+    The covariance is computed b/w the sensitive attr val and the distance from the boundary
+    If the model is None, we assume that the y_arr_dist_boundary contains the distace from the decision boundary
+    If the model is not None, we just compute a dot product or model and x_arr
+    for the case of SVM, we pass the distace from bounday becase the intercept in internalized for the class
+    and we have compute the distance using the project function
+
+    this function will return -1 if the constraint specified by thresh parameter is not satifsified
+    otherwise it will reutrn +1
+    if the return value is >=0, then the constraint is satisfied
+    """
+
+    assert (x_arr.shape[0] == x_control.shape[0])
+    if len(x_control.shape) > 1:  # make sure we just have one column in the array
+        assert (x_control.shape[1] == 1)
+
+    arr = []
+    if model is None:
+        arr = y_arr_dist_boundary  # simply the output labels
+    else:
+        arr = np.dot(model, x_arr.T)  # the product with the weight vector -- the sign of this is the output label
+
+    arr = np.array(arr, dtype=np.float64)
+
+    cov = np.dot(x_control - np.mean(x_control), arr) / float(len(x_control))
+
+    ans = thresh - abs(
+        cov)  # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
+    # ans = thresh - cov # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
+
+    return ans
+
+
 def _logistic_regression_path(
     X,  # TODO: Does A need to be in here? --> Probably yes, since we need it in the constraints parameter later on.
         # This depends on whether I implement the constraints in the fit function, or here. Not yet sure what is best
