@@ -537,9 +537,11 @@ class FairLogisticRegression(LogisticRegression):
         sensitive = [self.lookup_[i] for i in sensitive_feature_ids]
         non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
         if isinstance(X, pd.DataFrame):
-            return X.iloc[:, non_sensitive], X.iloc[:, sensitive]
+            return X.iloc[:, non_sensitive], X.iloc[:, sensitive], sensitive_feature_ids
         else:  # Numpy arrays
-            return X[:, non_sensitive], X[:, sensitive]
+            # Change the sensitive_feature_ids because they are now in a different array with different indices
+            sensitive_feature_ids = list(range(X[:, sensitive].shape[1]))
+            return X[:, non_sensitive], X[:, sensitive], sensitive_feature_ids
 
     def _create_lookup(self, X):
         """Create a lookup to handle column names correctly."""
