@@ -188,29 +188,27 @@ def _get_constraint_list_cov(X_train, A_train, y_train, renamed_sensitive_featur
 
 
 def _logistic_regression_path(
-    X,  # TODO: Does A need to be in here? --> Probably yes, since we need it in the constraints parameter later on.
-        # This depends on whether I implement the constraints in the fit function, or here. Not yet sure what is best
-    A,
-    y,
-    pos_class=None,
-    Cs=10,
-    fit_intercept=True,
-    max_iter=100,
-    tol=1e-4,
-    verbose=0,
-    solver="lbfgs",
-    coef=None,
-    class_weight=None,
-    dual=False,
-    penalty="l2",
-    intercept_scaling=1.0,
-    multi_class="auto",
-    random_state=None,
-    check_input=True,
-    max_squared_sum=None,
-    sample_weight=None,
-    sensitive_feature_ids=None,  # Names or ids of the sensitive features in X
-    sensitive_features_to_cov_thresh=None,  # Covariance threshold that should be achieved for every sens feature, dict
+        X,
+        y,
+        pos_class=None,
+        Cs=10,
+        fit_intercept=True,
+        max_iter=100,
+        tol=1e-4,
+        verbose=0,
+        solver="lbfgs",
+        coef=None,
+        class_weight=None,
+        dual=False,
+        penalty="l2",
+        intercept_scaling=1.0,
+        multi_class="auto",
+        random_state=None,
+        check_input=True,
+        max_squared_sum=None,
+        sample_weight=None,
+        l1_ratio=None,
+        constraints=None
 ):
     """TODO: add docsting"""
     if isinstance(Cs, numbers.Integral):
