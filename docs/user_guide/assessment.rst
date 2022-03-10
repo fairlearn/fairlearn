@@ -64,7 +64,10 @@ therefore measure the harm using the proxy variable indicating whether
 the candidate passes the first stage of the screen.
 If you choose to use a proxy variable to 
 represent the harm, check the proxy variable regularly to ensure it 
-remains useful over time.
+remains useful over time. Our section on :ref:`construct_validity`
+describes how to determine whether a  
+proxy variable measures the intended construct in a meaningful 
+and useful way.
 
 4. Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
