@@ -3,6 +3,7 @@
 
 import warnings
 
+import numpy as np
 import sklearn.metrics as skm
 from sklearn import preprocessing
 
@@ -213,8 +214,14 @@ def _create_group_metric_set(
                     sensitive_features=g[_BIN_VECTOR],
                 )
                 curr_dict = dict()
-                curr_dict[_GLOBAL] = gmr.overall
-                curr_dict[_BINS] = list(gmr.by_group)
+                if np.issubdtype(type(gmr.overall), np.integer):
+                    # Ensure return value is JSON serialisable
+                    # Sometimes you have to listen carefully to the quack
+                    curr_dict[_GLOBAL] = int(gmr.overall)
+                    curr_dict[_BINS] = [int(x) for x in list(gmr.by_group)]
+                else:
+                    curr_dict[_GLOBAL] = gmr.overall
+                    curr_dict[_BINS] = list(gmr.by_group)
                 metric_dict[metric_key] = curr_dict
             by_prediction_list.append(metric_dict)
         result[_PRECOMPUTED_METRICS].append(by_prediction_list)
