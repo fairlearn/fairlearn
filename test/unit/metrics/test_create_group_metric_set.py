@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import json
 import pytest
 
 import sklearn.metrics as skm
@@ -248,6 +249,23 @@ class TestCreateGroupMetricSet:
         assert msgs[1] == "Evaluation of roc_auc_score failed. Substituting 0"
         assert msgs[2].startswith("Recall is ill-defined and being set to 0.0")
         assert msgs[3] == "Supplied 'func' had no __name__ attribute"
+
+    def test_json_serializable(self):
+        y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
+        y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
+        s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
+
+        predictions = {"some model": y_p}
+        sensitive_feature = {"my sf": s_f}
+
+        actual = _create_group_metric_set(
+            y_t, predictions, sensitive_feature, "binary_classification"
+        )
+
+        # Check that we can turn the dictionary into JSON
+        # Sometimes, you need to listen carefully to the quack
+        result = json.dumps(actual)
+        assert isinstance(result, str)
 
     def test_regression_prediction_type(self):
         # For regression, both y_t and y_p can have floating point values
