@@ -428,16 +428,45 @@ the algorithm may impact the intended outcomes of a given model.
 
 
 The 4/5ths Rule: A Common Trap
----------------------------
+------------------------------
 
 In the literature around fairness in machine learning, one will often find
 the so-called "4/5ths rule" or "80% rule" used to assess whether a model
 (or mitigation technique) has produced a 'fair' result.
 This rule is an implementation of the demographic parity ratio introduced
-in `_disparity_metrics`, with a result considered 'fair' if the ratio
+in :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
 exceeds 80% for all identified subgroups.
+*Unthinking application of this threshold is an extremely common abstraction trap.*
 
+The trap springs on three levels:
 
+1. Where is it valid?
+2. What does it mean, legally?
+3. Why 80%?
+
+*Where is the 4/5ths rule valid?*
+The answer is that it is only valid
+within a specific area of US federal employment law.
+Outside this context, the rule has no particular claim to validity.
+
+*What exactly does the rule mean?*
+Legally, the 80% threshold is a limit for
+`prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
+that illegal discrimination has occurred.
+However, is does not prove or disprove any case.
+It is possible to argue successfully that a demographic parity
+ratio of 50% is still fair.
+It is equally possible to argue that even at a 95% ratio, illegal
+discrimination has occurred.
+
+*Why is the ratio set at 80%?*
+So far as we can determine, the value of 80% was negotiated
+as a political compromise.
+
+Taken together, we see that applying the 4/5ths rule will
+not be appropriate in most cases.
+Even in cases where it is appropriate, it does not automatically
+avoid legal jeopardy, much less ensure that results are fair.
 
 
 .. topic:: References:
