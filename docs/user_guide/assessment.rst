@@ -16,8 +16,6 @@ The steps of the assesment are as follows:
 
 We next examine these four steps in more detail.
 
-.. sectnum::
-
 Identify types of harms
 ^^^^^^^^^^^^^^^^^^^^^^^
 
