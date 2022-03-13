@@ -16,8 +16,10 @@ The steps of the assesment are as follows:
 
 We next examine these four steps in more detail.
 
-1. Identify types of harms
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. sectnum::
+
+Identify types of harms
+^^^^^^^^^^^^^^^^^^^^^^^
 
 See :ref:`types_of_harms` for a guide to types of fairness-related harms. 
 For example, in a system for screening job applications, qualified candidates 
@@ -28,8 +30,8 @@ Note that one system can lead to multiple harms, and different types of
 harms are not mutually exclusive. For more information, review 
 Fairlearn's `2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
 
-2. Identify the groups that might be harmed
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Identify the groups that might be harmed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In most applications, we consider demographic groups including historically 
 marginalized groups (e.g., based on gender, race, ethnicity). We should also 
@@ -42,8 +44,8 @@ to considering groups according to gender and groups according to race, it is
 also important to consider their intersections (e.g., Black women, Latinx 
 nonbinary people, etc.).
 
-3. Quantify harms
-^^^^^^^^^^^^^^^^^
+Quantify harms
+^^^^^^^^^^^^^^
 
 Define metrics that quantify harms or benefits:
 
@@ -69,8 +71,8 @@ describes how to determine whether a
 proxy variable measures the intended construct in a meaningful 
 and useful way.
 
-4. Compare quantified harms across the groups
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Compare quantified harms across the groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The workhorse of fairness assessment are disaggregated metrics, which are 
 metrics evaluated on slices of data. For example, to measure harms due to 
