@@ -199,7 +199,8 @@ def _logistic_regression_path(
 ):
     """
     TODO: add docstring
-    All this code is copied from the sklearn _logistic_regression_path function, except for the constraints argument
+    All this code is copied from the sklearn _logistic_regression_path function, except for the constraints argument,
+    the changed solver and the loss function used (all in the optimize.minimize function)
     """
     if isinstance(Cs, numbers.Integral):
         Cs = np.logspace(-4, 4, Cs)
@@ -311,6 +312,7 @@ def _logistic_regression_path(
             else:
                 w0[:, : coef.shape[1]] = coef
 
+    # TODO: Sklearn uses different loss functions based on multinomial or ovr, this is currently not implemented
     if multi_class == "multinomial":
         # scipy.optimize.minimize and newton-cg accepts only
         # ravelled parameters.
@@ -321,28 +323,10 @@ def _logistic_regression_path(
             def func(x, *args):
                 return _multinomial_loss_grad(x, *args)[0:2]
 
-        # elif solver == "newton-cg":
-        #
-        #     def func(x, *args):
-        #         return _multinomial_loss(x, *args)[0]
-        #
-        #     def grad(x, *args):
-        #         return _multinomial_loss_grad(x, *args)[1]
-        #
-        #     hess = _multinomial_grad_hess
-        warm_start_sag = {"coef": w0.T}
     else:
         target = y_bin
         if solver == "lbfgs":
             func = _logistic_loss_and_grad
-        # elif solver == "newton-cg":
-        #     func = _logistic_loss
-        #
-        #     def grad(x, *args):
-        #         return _logistic_loss_and_grad(x, *args)[1]
-        #
-        #     hess = _logistic_grad_hess
-        warm_start_sag = {"coef": np.expand_dims(w0, axis=1)}
 
     coefs = list()
     n_iter = np.zeros(len(Cs), dtype=np.int32)
@@ -354,7 +338,7 @@ def _logistic_regression_path(
             opt_res = optimize.minimize(
                 fun=_logistic_loss,
                 x0=np.random.rand(X.shape[1],),
-                method="SLSQP",  # TODO: CAREFUL HERE, NEED TO CHANGE EVERYWHERE ELSE IN THE CODE IF I KEEP USING IT
+                method="SLSQP",
                 # jac=True,
                 args=(X, target),
                 options={"iprint": iprint, "maxiter": max_iter},
@@ -604,7 +588,7 @@ class FairLogisticRegression(LogisticRegression):
             **_joblib_parallel_args(prefer=prefer),
         )(
             path_func(
-                X_nonsensitive,
+                X_nonsensitive,  # Only use the nonsensitive features
                 y,
                 pos_class=class_,
                 Cs=[C_],
