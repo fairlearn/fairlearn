@@ -28,10 +28,10 @@ _LOGISTIC_SOLVER_CONVERGENCE_MSG = (
 
 # Some helper check functions
 def _check_solver(solver, penalty, dual):
-    all_solvers = ["lbfgs"]
+    all_solvers = ["SLSQP"]
     if solver not in all_solvers:
         raise ValueError(
-            "Logistic Regression supports only solvers in %s, got %s."
+            "Fair Logistic Regression supports only solvers in %s, got %s."
             % (all_solvers, solver)
         )
 
@@ -327,7 +327,7 @@ def _logistic_regression_path(
     if multi_class == "multinomial":
         # scipy.optimize.minimize and newton-cg accepts only
         # ravelled parameters.
-        if solver in ["lbfgs", "newton-cg"]:
+        if solver in ["lbfgs", "newton-cg", "SLSQP"]:
             w0 = w0.ravel()
         target = Y_multi
         if solver == "lbfgs":
@@ -360,7 +360,7 @@ def _logistic_regression_path(
     coefs = list()
     n_iter = np.zeros(len(Cs), dtype=np.int32)
     for i, C in enumerate(Cs):
-        if solver == "lbfgs":
+        if solver == "SLSQP":
             iprint = [-1, 50, 1, 100, 101][
                 np.searchsorted(np.array([0, 1, 2, 3]), verbose)
             ]
@@ -442,7 +442,7 @@ def _logistic_regression_path(
 
         else:
             raise ValueError(
-                "solver must be {'lbfgs'}, got '%s' instead" % solver
+                "solver must be {'SLSQP'}, got '%s' instead" % solver
             )
             # raise ValueError(
             #     "solver must be one of {'liblinear', 'lbfgs', "
@@ -501,7 +501,7 @@ class FairLogisticRegression(LogisticRegression):
             intercept_scaling=1,
             class_weight=None,
             random_state=None,
-            solver="lbfgs",
+            solver="SLSQP",
             max_iter=100,
             multi_class="auto",
             verbose=0,
