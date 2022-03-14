@@ -46,14 +46,18 @@ def _check_solver(solver, penalty, dual):
 
 
 def _add_intercept(X):
-    """ Add intercept to the data before linear classification """
+    """ Copied from the paper:
+    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L271-L276
+    Add intercept to the data before linear classification """
     m, n = X.shape
     intercept = np.ones(m).reshape(m, 1)  # the constant b
     return np.concatenate((X, intercept), axis=1)
 
 
 def _log_logistic(X):
-    """ This function is used from scikit-learn source code. Source link below """
+    """ Copied from the paper:
+    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/loss_funcs.py#L59-L93
+    This function is used from scikit-learn source code. Source link below """
 
     """Compute the log of the logistic function, ``log(1 / (1 + e ** -x))``.
     This implementation is numerically stable because it splits positive and
@@ -89,7 +93,9 @@ def _log_logistic(X):
 
 
 def _logistic_loss(w, X, y, return_arr=None):
-    """Computes the logistic loss.
+    """ Copied from the paper:
+    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/loss_funcs.py#L19-L44
+    Computes the logistic loss.
 
     This function is used from scikit-learn source code
 
@@ -117,6 +123,8 @@ def _logistic_loss(w, X, y, return_arr=None):
 
 def _test_sensitive_attr_constraint_cov(model, x_arr, y_arr_dist_boundary, x_control, thresh):
     """
+    Copied from the paper:
+    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
     The covariance is computed b/w the sensitive attr val and the distance from the boundary
     If the model is None, we assume that the y_arr_dist_boundary contains the distace from the decision boundary
     If the model is not None, we just compute a dot product or model and x_arr
