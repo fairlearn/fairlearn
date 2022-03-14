@@ -434,7 +434,7 @@ In the literature around fairness in machine learning, one will often find
 the so-called "4/5ths rule" or "80% rule" used to assess whether a model
 (or mitigation technique) has produced a 'fair' result.
 This rule is an implementation of the demographic parity ratio introduced
-in :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
+in the :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
 exceeds 80% for all identified subgroups.
 *Unthinking application of this threshold is an extremely common abstraction trap.*
 
