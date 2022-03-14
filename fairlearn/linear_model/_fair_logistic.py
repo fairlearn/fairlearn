@@ -662,3 +662,29 @@ class FairLogisticRegression(LogisticRegression):
 
         return self
 
+
+if __name__ == "__main__":
+    from sklearn.datasets import fetch_openml
+
+    data = fetch_openml(data_id=1590, as_frame=True)
+    y_global = (data.target == '>50K') * 1
+    FairLR = FairLogisticRegression(verbose=10)
+    # Pandas test code
+    # X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
+    # Add another category to sex for extra testing
+    # extra_cat = pd.DataFrame({"age": 25, "fnlwgt": 226802, "education-num": 7, "sex": "Unknown"},
+    #                          index=[len(X_global)])
+    # X_global = pd.concat([X_global, extra_cat])
+    # X_global["sex2"] = X_global["sex"]
+    # X_global.at[48842, "sex2"] = "Male"
+    # y_global = y_global.append(pd.Series(1))
+    # FairLR.fit(X_global, y_global, sensitive_feature_ids=['sex', 'sex2'], sensitive_attrs_to_cov_thresh=0)
+
+    # Numpy arrays test code
+    X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']].to_numpy()
+    y_global = y_global.to_numpy()
+    FairLR.fit(X_global, y_global, sensitive_feature_ids=[3],
+               sensitive_attrs_to_cov_thresh=0)
+
+    # Predict on the first sample
+    print(FairLR.predict([X_global[0, :3]]))
