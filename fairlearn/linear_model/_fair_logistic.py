@@ -10,9 +10,18 @@ from scipy import optimize
 from joblib import Parallel
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model._logistic import _multinomial_loss_grad, _logistic_loss_and_grad, _check_multi_class
+from sklearn.linear_model._logistic import (
+    _multinomial_loss_grad,
+    _logistic_loss_and_grad,
+    _check_multi_class,
+)
 from sklearn.preprocessing import LabelEncoder, LabelBinarizer, OneHotEncoder
-from sklearn.utils import check_array, check_consistent_length, check_random_state, compute_class_weight
+from sklearn.utils import (
+    check_array,
+    check_consistent_length,
+    check_random_state,
+    compute_class_weight,
+)
 from sklearn.utils.extmath import row_norms
 from sklearn.utils.fixes import delayed, _joblib_parallel_args
 from sklearn.utils.multiclass import check_classification_targets
@@ -46,18 +55,18 @@ def _check_solver(solver, penalty, dual):
 
 
 def _add_intercept(X):
-    """ Copied from the paper:
+    """Copied from the paper:
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L271-L276
-    Add intercept to the data before linear classification """
+    Add intercept to the data before linear classification"""
     m, n = X.shape
     intercept = np.ones(m).reshape(m, 1)  # the constant b
     return np.concatenate((X, intercept), axis=1)
 
 
 def _log_logistic(X):
-    """ Copied from the paper:
+    """Copied from the paper:
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/loss_funcs.py#L59-L93
-    This function is used from scikit-learn source code. Source link below """
+    This function is used from scikit-learn source code. Source link below"""
 
     """Compute the log of the logistic function, ``log(1 / (1 + e ** -x))``.
     This implementation is numerically stable because it splits positive and
@@ -83,7 +92,8 @@ def _log_logistic(X):
     See the blog post describing this implementation:
     http://fa.bianp.net/blog/2013/numerical-optimizers-for-logistic-regression/
     """
-    if X.ndim > 1: raise Exception("Array of samples cannot be more than 1-D!")
+    if X.ndim > 1:
+        raise Exception("Array of samples cannot be more than 1-D!")
     out = np.empty_like(X)  # same dimensions and data types
 
     idx = X > 0
@@ -93,7 +103,7 @@ def _log_logistic(X):
 
 
 def _logistic_loss(w, X, y, return_arr=None):
-    """ Copied from the paper:
+    """Copied from the paper:
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/loss_funcs.py#L19-L44
     Computes the logistic loss.
 
@@ -114,14 +124,16 @@ def _logistic_loss(w, X, y, return_arr=None):
 
     yz = y * np.dot(X, w)
     # Logistic loss is the negative of the log of the logistic function.
-    if return_arr == True:
+    if return_arr is True:
         out = -(_log_logistic(yz))
     else:
         out = -np.sum(_log_logistic(yz))
     return out
 
 
-def _test_sensitive_attr_constraint_cov(model, x_arr, y_arr_dist_boundary, x_control, thresh):
+def _test_sensitive_attr_constraint_cov(
+    model, x_arr, y_arr_dist_boundary, x_control, thresh
+):
     """
     Copied from the paper:
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
@@ -136,66 +148,93 @@ def _test_sensitive_attr_constraint_cov(model, x_arr, y_arr_dist_boundary, x_con
     if the return value is >=0, then the constraint is satisfied
     """
 
-    assert (x_arr.shape[0] == x_control.shape[0])
-    if len(x_control.shape) > 1:  # make sure we just have one column in the array
-        assert (x_control.shape[1] == 1)
+    assert x_arr.shape[0] == x_control.shape[0]
+    if (
+        len(x_control.shape) > 1
+    ):  # make sure we just have one column in the array
+        assert x_control.shape[1] == 1
 
     arr = []
     if model is None:
         arr = y_arr_dist_boundary  # simply the output labels
     else:
-        arr = np.dot(model, x_arr.T)  # the product with the weight vector -- the sign of this is the output label
+        arr = np.dot(
+            model, x_arr.T
+        )  # the product with the weight vector -- the sign of this is the output label
 
     arr = np.array(arr, dtype=np.float64)
 
     cov = np.dot(x_control - np.mean(x_control), arr) / float(len(x_control))
 
     ans = thresh - abs(
-        cov)  # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
+        cov
+    )  # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
     # ans = thresh - cov # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
 
     return ans
 
 
-def _get_constraint_list_cov(X_train, A_train, y_train, renamed_sensitive_feature_ids, sensitive_attrs_to_cov_thresh):
+def _get_constraint_list_cov(
+    X_train,
+    A_train,
+    y_train,
+    renamed_sensitive_feature_ids,
+    sensitive_attrs_to_cov_thresh,
+):
     # For now, I only work with a constant threshold.
     # The paper works with a threshold per category of a sensitive feature (if not binary), and else per sens feature.
     constraints = []
 
     for attr in renamed_sensitive_feature_ids:
         if isinstance(A_train, pd.DataFrame):
-            c = ({'type': 'ineq', 'fun': _test_sensitive_attr_constraint_cov,
-                  'args': (X_train, y_train, A_train[attr].to_numpy(), sensitive_attrs_to_cov_thresh)})
+            c = {
+                "type": "ineq",
+                "fun": _test_sensitive_attr_constraint_cov,
+                "args": (
+                    X_train,
+                    y_train,
+                    A_train[attr].to_numpy(),
+                    sensitive_attrs_to_cov_thresh,
+                ),
+            }
         else:
-            c = ({'type': 'ineq', 'fun': _test_sensitive_attr_constraint_cov,
-                  'args': (X_train, y_train, A_train[:, attr], sensitive_attrs_to_cov_thresh)})
+            c = {
+                "type": "ineq",
+                "fun": _test_sensitive_attr_constraint_cov,
+                "args": (
+                    X_train,
+                    y_train,
+                    A_train[:, attr],
+                    sensitive_attrs_to_cov_thresh,
+                ),
+            }
 
         constraints.append(c)
     return constraints
 
 
 def _logistic_regression_path(
-        X,
-        y,
-        pos_class=None,
-        Cs=10,
-        fit_intercept=True,
-        max_iter=100,
-        tol=1e-4,
-        verbose=0,
-        solver="lbfgs",
-        coef=None,
-        class_weight=None,
-        dual=False,
-        penalty="l2",
-        intercept_scaling=1.0,
-        multi_class="auto",
-        random_state=None,
-        check_input=True,
-        max_squared_sum=None,
-        sample_weight=None,
-        l1_ratio=None,
-        constraints=None
+    X,
+    y,
+    pos_class=None,
+    Cs=10,
+    fit_intercept=True,
+    max_iter=100,
+    tol=1e-4,
+    verbose=0,
+    solver="lbfgs",
+    coef=None,
+    class_weight=None,
+    dual=False,
+    penalty="l2",
+    intercept_scaling=1.0,
+    multi_class="auto",
+    random_state=None,
+    check_input=True,
+    max_squared_sum=None,
+    sample_weight=None,
+    l1_ratio=None,
+    constraints=None,
 ):
     """
     TODO: add docstring
@@ -232,14 +271,18 @@ def _logistic_regression_path(
     # If sample weights exist, convert them to array (support for lists)
     # and check length
     # Otherwise set them to 1 for all examples
-    sample_weight = _check_sample_weight(sample_weight, X, dtype=X.dtype, copy=True)
+    sample_weight = _check_sample_weight(
+        sample_weight, X, dtype=X.dtype, copy=True
+    )
 
     # If class_weights is a dict (provided by the user), the weights
     # are assigned to the original labels. If it is "balanced", then
     # the class_weights are assigned after masking the labels with a OvR.
     le = LabelEncoder()
     if isinstance(class_weight, dict) or multi_class == "multinomial":
-        class_weight_ = compute_class_weight(class_weight, classes=classes, y=y)
+        class_weight_ = compute_class_weight(
+            class_weight, classes=classes, y=y
+        )
         sample_weight *= class_weight_[le.fit_transform(y)]
 
     # For doing a ovr, we need to mask the labels first. for the
@@ -270,7 +313,9 @@ def _logistic_regression_path(
             Y_multi = le.fit_transform(y).astype(X.dtype, copy=False)
 
         w0 = np.zeros(
-            (classes.size, n_features + int(fit_intercept)), order="F", dtype=X.dtype
+            (classes.size, n_features + int(fit_intercept)),
+            order="F",
+            dtype=X.dtype,
         )
 
     if coef is not None:
@@ -290,8 +335,8 @@ def _logistic_regression_path(
                 n_classes = 1
 
             if coef.shape[0] != n_classes or coef.shape[1] not in (
-                    n_features,
-                    n_features + 1,
+                n_features,
+                n_features + 1,
             ):
                 raise ValueError(
                     "Initialization coef is of shape (%d, %d), expected "
@@ -320,6 +365,7 @@ def _logistic_regression_path(
             w0 = w0.ravel()
         target = Y_multi
         if solver == "lbfgs":
+
             def func(x, *args):
                 return _multinomial_loss_grad(x, *args)[0:2]
 
@@ -337,7 +383,9 @@ def _logistic_regression_path(
             ]
             opt_res = optimize.minimize(
                 fun=_logistic_loss,
-                x0=np.random.rand(X.shape[1],),
+                x0=np.random.rand(
+                    X.shape[1],
+                ),
                 method="SLSQP",
                 # jac=True,
                 args=(X, target),
@@ -345,7 +393,7 @@ def _logistic_regression_path(
                 constraints=constraints,
             )
             n_iter_i = _check_optimize_result(
-                solver='lbfgs',  # Not the actual solver we are using, but it works fine like this
+                solver="lbfgs",  # Not the actual solver we are using, but it works fine like this
                 result=opt_res,
                 max_iter=max_iter,
                 extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG,
@@ -376,12 +424,14 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     One-hot-encode the sensitive features such that they can be splitted
     from X and that the constraints can be correctly coded per feature value.
     """
-    enc = OneHotEncoder(handle_unknown='ignore')
+    enc = OneHotEncoder(handle_unknown="ignore")
     if isinstance(X, pd.DataFrame):
         transformed = enc.fit_transform(X[sensitive_feature_ids]).toarray()
         renamed_sensitive_feature_ids = list(enc.get_feature_names_out())
         # Create a Pandas DataFrame of the hot encoded column
-        ohe_df = pd.DataFrame(transformed, columns=renamed_sensitive_feature_ids)
+        ohe_df = pd.DataFrame(
+            transformed, columns=renamed_sensitive_feature_ids
+        )
         # concat with original data, drop the original sensitive_feature_ids
         X = pd.concat([X, ohe_df], axis=1).drop(sensitive_feature_ids, axis=1)
     else:  # Numpy array
@@ -390,32 +440,34 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
         X_without_sensitive = np.delete(X, sensitive_feature_ids, axis=1)
         X = np.append(X_without_sensitive, transformed, axis=1)
         # Need to return the new transformed sensitive feature ids, since there are more columns now
-        renamed_sensitive_feature_ids = list(range(X_without_sensitive.shape[1], X.shape[1]))
+        renamed_sensitive_feature_ids = list(
+            range(X_without_sensitive.shape[1], X.shape[1])
+        )
 
     return X, renamed_sensitive_feature_ids
 
 
 class FairLogisticRegression(LogisticRegression):
-    """" TODO: add docstring, check in BalancedRandomForestClassifier how they handle docstrings for inherited class"""
+    """TODO: add docstring, check in BalancedRandomForestClassifier how they handle docstrings for inherited class"""
 
     def __init__(
-            self,
-            penalty="l2",
-            *,
-            dual=False,
-            tol=1e-4,
-            C=1.0,
-            fit_intercept=True,
-            intercept_scaling=1,
-            class_weight=None,
-            random_state=None,
-            solver="SLSQP",
-            max_iter=100,
-            multi_class="auto",
-            verbose=0,
-            warm_start=False,
-            n_jobs=None,
-            l1_ratio=None,
+        self,
+        penalty="l2",
+        *,
+        dual=False,
+        tol=1e-4,
+        C=1.0,
+        fit_intercept=True,
+        intercept_scaling=1,
+        class_weight=None,
+        random_state=None,
+        solver="SLSQP",
+        max_iter=100,
+        multi_class="auto",
+        verbose=0,
+        warm_start=False,
+        n_jobs=None,
+        l1_ratio=None,
     ):
         super().__init__(
             penalty=penalty,
@@ -443,7 +495,11 @@ class FairLogisticRegression(LogisticRegression):
         sensitive = [self.lookup_[i] for i in sensitive_feature_ids]
         non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
         if isinstance(X, pd.DataFrame):
-            return X.iloc[:, non_sensitive], X.iloc[:, sensitive], sensitive_feature_ids
+            return (
+                X.iloc[:, non_sensitive],
+                X.iloc[:, sensitive],
+                sensitive_feature_ids,
+            )
         else:  # Numpy arrays
             # Change the sensitive_feature_ids because they are now in a different array with different indices
             sensitive_feature_ids = list(range(X[:, sensitive].shape[1]))
@@ -460,8 +516,15 @@ class FairLogisticRegression(LogisticRegression):
         self.lookup_ = {i: i for i in range(X.shape[1])}
         return X
 
-    def fit(self, X, y, sample_weight=None, sensitive_feature_ids=None, sensitive_attrs_to_cov_thresh=None):
-        """" TODO: add docstring"""
+    def fit(
+        self,
+        X,
+        y,
+        sample_weight=None,
+        sensitive_feature_ids=None,
+        sensitive_attrs_to_cov_thresh=None,
+    ):
+        """TODO: add docstring"""
         # TODO: Maybe turn below code until constraints into a preprocessing function?
 
         # Probably shouldn't do it like this, this is kind of how the paper does it.
@@ -469,25 +532,38 @@ class FairLogisticRegression(LogisticRegression):
         if self.fit_intercept:
             X = _add_intercept(X)
         # One-hot-encode the data and return the new sensitive feature ids that come along with the encoded data
-        X_ohe, renamed_sensitive_feature_ids = _ohe_sensitive_features(X, sensitive_feature_ids)
+        X_ohe, renamed_sensitive_feature_ids = _ohe_sensitive_features(
+            X, sensitive_feature_ids
+        )
         # Split the data similarly to how the CorrelationRemover does it
         self._create_lookup(X_ohe)
-        X_nonsensitive, X_sensitive, renamed_sensitive_feature_ids = self._split_X(X_ohe, renamed_sensitive_feature_ids)
+        (
+            X_nonsensitive,
+            X_sensitive,
+            renamed_sensitive_feature_ids,
+        ) = self._split_X(X_ohe, renamed_sensitive_feature_ids)
 
         # TODO: Think about whether the constraints should be implemented in `fit`, or in `_logistic_regression_path`
-        constraints = _get_constraint_list_cov(X_nonsensitive, X_sensitive, y,
-                                               renamed_sensitive_feature_ids, sensitive_attrs_to_cov_thresh)
+        constraints = _get_constraint_list_cov(
+            X_nonsensitive,
+            X_sensitive,
+            y,
+            renamed_sensitive_feature_ids,
+            sensitive_attrs_to_cov_thresh,
+        )
 
         # We continue with the code from sklearn here
         solver = _check_solver(self.solver, self.penalty, self.dual)
 
         if not isinstance(self.C, numbers.Number) or self.C < 0:
-            raise ValueError("Penalty term must be positive; got (C=%r)" % self.C)
+            raise ValueError(
+                "Penalty term must be positive; got (C=%r)" % self.C
+            )
         if self.penalty == "elasticnet":
             if (
-                    not isinstance(self.l1_ratio, numbers.Number)
-                    or self.l1_ratio < 0
-                    or self.l1_ratio > 1
+                not isinstance(self.l1_ratio, numbers.Number)
+                or self.l1_ratio < 0
+                or self.l1_ratio > 1
             ):
                 raise ValueError(
                     "l1_ratio must be between 0 and 1; got (l1_ratio=%r)"
@@ -521,7 +597,7 @@ class FairLogisticRegression(LogisticRegression):
                 % self.tol
             )
 
-        if solver == "lbfgs":
+        if solver == "lbfgs":  # TODO: Check if this matters for me
             _dtype = np.float64
         else:
             _dtype = [np.float64, np.float32]
@@ -537,7 +613,9 @@ class FairLogisticRegression(LogisticRegression):
         check_classification_targets(y)
         self.classes_ = np.unique(y)
 
-        multi_class = _check_multi_class(self.multi_class, solver, len(self.classes_))
+        multi_class = _check_multi_class(
+            self.multi_class, solver, len(self.classes_)
+        )
 
         if solver in ["sag", "saga"]:
             max_squared_sum = row_norms(X, squared=True).max()
@@ -550,8 +628,7 @@ class FairLogisticRegression(LogisticRegression):
             raise ValueError(
                 "This solver needs samples of at least 2 classes"
                 " in the data, but the data contains only one"
-                " class: %r"
-                % classes_[0]
+                " class: %r" % classes_[0]
             )
 
         if len(self.classes_) == 2:
@@ -606,7 +683,7 @@ class FairLogisticRegression(LogisticRegression):
                 penalty=penalty,
                 max_squared_sum=max_squared_sum,
                 sample_weight=sample_weight,
-                constraints=constraints
+                constraints=constraints,
             )
             for class_, warm_start_coef_ in zip(classes_, warm_start_coef)
         )
@@ -615,7 +692,9 @@ class FairLogisticRegression(LogisticRegression):
         self.n_iter_ = np.asarray(n_iter_, dtype=np.int32)[:, 0]
 
         if self.fit_intercept:
-            n_features = X_nonsensitive.shape[1] - 1  # Don't count the intercept --> Probably shouldn't do it like this
+            n_features = (
+                X_nonsensitive.shape[1] - 1
+            )  # Don't count the intercept --> Probably shouldn't do it like this
         else:
             n_features = X_nonsensitive.shape[1]
         if multi_class == "multinomial":
@@ -639,7 +718,7 @@ if __name__ == "__main__":
     from sklearn.datasets import fetch_openml
 
     data = fetch_openml(data_id=1590, as_frame=True)
-    y_global = (data.target == '>50K') * 1
+    y_global = (data.target == ">50K") * 1
     FairLR = FairLogisticRegression(verbose=10)
     # Pandas test code
     # X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
@@ -653,10 +732,14 @@ if __name__ == "__main__":
     # FairLR.fit(X_global, y_global, sensitive_feature_ids=['sex', 'sex2'], sensitive_attrs_to_cov_thresh=0)
 
     # Numpy arrays test code
-    X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']].to_numpy()
+    X_global = data.data[["age", "fnlwgt", "education-num", "sex"]].to_numpy()
     y_global = y_global.to_numpy()
-    FairLR.fit(X_global, y_global, sensitive_feature_ids=[3],
-               sensitive_attrs_to_cov_thresh=0)
+    FairLR.fit(
+        X_global,
+        y_global,
+        sensitive_feature_ids=[3],
+        sensitive_attrs_to_cov_thresh=0,
+    )
 
     # Predict on the first sample
     print(FairLR.predict([X_global[0, :3]]))
