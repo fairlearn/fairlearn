@@ -491,7 +491,11 @@ class FairLogisticRegression(LogisticRegression):
     def fit(self, X, y, sample_weight=None, sensitive_feature_ids=None, sensitive_attrs_to_cov_thresh=None):
         """" TODO: add docstring"""
         # TODO: Maybe turn below code until constraints into a preprocessing function?
-        X = _add_intercept(X)
+
+        # Probably shouldn't do it like this, this is kind of how the paper does it.
+        # I should be looking to implement it more like sklearn does.
+        if self.fit_intercept:
+            X = _add_intercept(X)
         # One-hot-encode the data and return the new sensitive feature ids that come along with the encoded data
         X_ohe, renamed_sensitive_feature_ids = _ohe_sensitive_features(X, sensitive_feature_ids)
         # Split the data similarly to how the CorrelationRemover does it
@@ -638,7 +642,10 @@ class FairLogisticRegression(LogisticRegression):
         fold_coefs_, _, n_iter_ = zip(*fold_coefs_)
         self.n_iter_ = np.asarray(n_iter_, dtype=np.int32)[:, 0]
 
-        n_features = X_nonsensitive.shape[1] - 1  # Don't count the intercept
+        if self.fit_intercept:
+            n_features = X_nonsensitive.shape[1] - 1  # Don't count the intercept --> Probably shouldn't do it like this
+        else:
+            n_features = X_nonsensitive.shape[1]
         if multi_class == "multinomial":
             self.coef_ = fold_coefs_[0][0]
         else:
