@@ -66,7 +66,6 @@ def _check_solver(solver, penalty, dual):
 
 
 def _add_intercept(X):
-
     """ Add intercept to the data before linear classification """
     m, n = X.shape
     intercept = np.ones(m).reshape(m, 1)  # the constant b
@@ -380,74 +379,11 @@ def _logistic_regression_path(
                 extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG,
             )
             w0, loss = opt_res.x, opt_res.fun
-        # elif solver == "newton-cg":
-        #     args = (X, target, 1.0 / C, sample_weight)
-        #     w0, n_iter_i = _newton_cg(
-        #         hess, func, grad, w0, args=args, maxiter=max_iter, tol=tol
-        #     )
-        # elif solver == "liblinear":
-        #     coef_, intercept_, n_iter_i, = _fit_liblinear(
-        #         X,
-        #         target,
-        #         C,
-        #         fit_intercept,
-        #         intercept_scaling,
-        #         None,
-        #         penalty,
-        #         dual,
-        #         verbose,
-        #         max_iter,
-        #         tol,
-        #         random_state,
-        #         sample_weight=sample_weight,
-        #     )
-        #     if fit_intercept:
-        #         w0 = np.concatenate([coef_.ravel(), intercept_])
-        #     else:
-        #         w0 = coef_.ravel()
-        #
-        # elif solver in ["sag", "saga"]:
-        #     if multi_class == "multinomial":
-        #         target = target.astype(X.dtype, copy=False)
-        #         loss = "multinomial"
-        #     else:
-        #         loss = "log"
-        #     # alpha is for L2-norm, beta is for L1-norm
-        #     if penalty == "l1":
-        #         alpha = 0.0
-        #         beta = 1.0 / C
-        #     elif penalty == "l2":
-        #         alpha = 1.0 / C
-        #         beta = 0.0
-        #     else:  # Elastic-Net penalty
-        #         alpha = (1.0 / C) * (1 - l1_ratio)
-        #         beta = (1.0 / C) * l1_ratio
-        #
-        #     w0, n_iter_i, warm_start_sag = sag_solver(
-        #         X,
-        #         target,
-        #         sample_weight,
-        #         loss,
-        #         alpha,
-        #         beta,
-        #         max_iter,
-        #         tol,
-        #         verbose,
-        #         random_state,
-        #         False,
-        #         max_squared_sum,
-        #         warm_start_sag,
-        #         is_saga=(solver == "saga"),
-        #     )
 
         else:
             raise ValueError(
                 "solver must be {'SLSQP'}, got '%s' instead" % solver
             )
-            # raise ValueError(
-            #     "solver must be one of {'liblinear', 'lbfgs', "
-            #     "'newton-cg', 'sag'}, got '%s' instead" % solver
-            # )
 
         if multi_class == "multinomial":
             n_classes = max(2, classes.size)
