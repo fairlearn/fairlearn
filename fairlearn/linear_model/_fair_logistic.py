@@ -373,9 +373,9 @@ def _logistic_regression_path(
                 constraints=constraints,
             )
             n_iter_i = _check_optimize_result(
-                solver,
-                opt_res,
-                max_iter,
+                solver='lbfgs',  # Not the actual solver we are using, but it works fine like this
+                result=opt_res,
+                max_iter=max_iter,
                 extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG,
             )
             w0, loss = opt_res.x, opt_res.fun
