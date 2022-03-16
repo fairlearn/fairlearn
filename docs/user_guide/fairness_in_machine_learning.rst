@@ -433,33 +433,37 @@ The 4/5ths Rule: A Common Trap
 In the literature around fairness in machine learning, one will often find
 the so-called "4/5ths rule" or "80% rule" used to assess whether a model
 (or mitigation technique) has produced a 'fair' result.
-This rule is an implementation of the demographic parity ratio introduced
+Typically, the rule is implemented by using the demographic parity ratio introduced
 in the :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
 exceeds 80% for all identified subgroups.
-*Unthinking application of this threshold is an extremely common abstraction trap.*
+*Unthinking application of this threshold is wrong in many scenarios.*
 
-The trap springs on three levels:
+There are three particular things which should be considered before applying
+the "4/5ths rule" to a particular scenario:
 
-1. Where is it valid?
-2. What does it mean, legally?
+1. What does the rule mean, legally?
+2. Where is the rule valid?
 3. Why 80%?
 
-*Where is the 4/5ths rule valid?*
-The answer is that it is only valid
-within a specific area of US federal employment law.
-Outside this context, the rule has no particular claim to validity.
-
-*What exactly does the rule mean?*
+**What exactly does the rule mean?**
 Legally, the 80% threshold is a limit for
 `prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
-that illegal discrimination has occurred.
-However, is does not prove or disprove any case.
+that illegal discrimination has occurred relative to a chosen,
+relevant control population.
+However, it does not prove or disprove any case.
 It is possible to argue successfully that a demographic parity
 ratio of 50% is still fair.
 It is equally possible to argue that even at a 95% ratio, illegal
 discrimination has occurred.
+Conflating the *disparate impact metric* with the *legal finding of disparate impact*
+is a form of epistemic trespassing.
 
-*Why is the ratio set at 80%?*
+**Where is the 4/5ths rule valid?**
+The answer is that it is only valid
+within a specific area of US federal employment law.
+Outside this context, the rule has no particular claim to validity.
+
+**Why is the ratio set at 80%?**
 So far as we can determine, the value of 80% was negotiated
 as a political compromise.
 
