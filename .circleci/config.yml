@@ -9,7 +9,7 @@ version: 2.0
 jobs:
   build-doc:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.4
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -43,7 +43,7 @@ jobs:
 
   build-doctest:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.4
 
     working_directory: ~/tmp-fairlearn
     steps:
