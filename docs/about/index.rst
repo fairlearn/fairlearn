@@ -272,7 +272,7 @@ February 2022.
 .. image:: ../_static/images/huggingface_logo-noborder.svg
   :width: 50pt
   :align: center
-  :target: https://corporate.zalando.com/en
+  :target: https://huggingface.co/
 
 .. raw:: html
 
