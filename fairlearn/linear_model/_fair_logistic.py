@@ -36,7 +36,7 @@ _LOGISTIC_SOLVER_CONVERGENCE_MSG = (
 
 
 # Some helper check functions
-def _check_solver(solver, penalty, dual):
+def _check_solver(solver, penalty):
     all_solvers = ["SLSQP"]
     if solver not in all_solvers:
         raise ValueError(
@@ -138,13 +138,11 @@ def _test_sensitive_attr_constraint_cov(
     Copied from the paper:
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
     The covariance is computed b/w the sensitive attr val and the distance from the boundary
-    If the model is None, we assume that the y_arr_dist_boundary contains the distace from the decision boundary
+    If the model is None, we assume that the y_arr_dist_boundary contains the distance from the decision boundary
     If the model is not None, we just compute a dot product or model and x_arr
-    for the case of SVM, we pass the distace from bounday becase the intercept in internalized for the class
-    and we have compute the distance using the project function
 
-    this function will return -1 if the constraint specified by thresh parameter is not satifsified
-    otherwise it will reutrn +1
+    this function will return -1 if the constraint specified by thresh parameter is not satisfied
+    otherwise it will return +1
     if the return value is >=0, then the constraint is satisfied
     """
 
@@ -222,7 +220,7 @@ def _logistic_regression_path(
     max_iter=100,
     tol=1e-4,
     verbose=0,
-    solver="lbfgs",
+    solver="SLSQP",
     coef=None,
     class_weight=None,
     dual=False,
@@ -244,7 +242,7 @@ def _logistic_regression_path(
     if isinstance(Cs, numbers.Integral):
         Cs = np.logspace(-4, 4, Cs)
 
-    solver = _check_solver(solver, penalty, dual)
+    solver = _check_solver(solver, penalty)
 
     # Preprocessing.
     if check_input:
@@ -359,10 +357,9 @@ def _logistic_regression_path(
 
     # TODO: Sklearn uses different loss functions based on multinomial or ovr, this is currently not implemented
     if multi_class == "multinomial":
-        # scipy.optimize.minimize and newton-cg accepts only
+        # scipy.optimize.minimize (used in SLSQP) accepts only
         # ravelled parameters.
-        if solver in ["lbfgs", "newton-cg", "SLSQP"]:
-            w0 = w0.ravel()
+        w0 = w0.ravel()
         target = Y_multi
         if solver == "lbfgs":
 
@@ -553,7 +550,7 @@ class FairLogisticRegression(LogisticRegression):
         )
 
         # We continue with the code from sklearn here
-        solver = _check_solver(self.solver, self.penalty, self.dual)
+        solver = _check_solver(self.solver, self.penalty)
 
         if not isinstance(self.C, numbers.Number) or self.C < 0:
             raise ValueError(
@@ -597,7 +594,7 @@ class FairLogisticRegression(LogisticRegression):
                 % self.tol
             )
 
-        if solver == "lbfgs":  # TODO: Check if this matters for me
+        if solver == "SLSQP":
             _dtype = np.float64
         else:
             _dtype = [np.float64, np.float32]
