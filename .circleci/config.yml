@@ -17,6 +17,14 @@ jobs:
       - checkout
 
       - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
@@ -50,6 +58,14 @@ jobs:
       # check out PR branch
       - checkout
       
+      - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
       - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
