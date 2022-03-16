@@ -34,7 +34,7 @@ jobs:
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
+          command: python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
@@ -84,7 +84,7 @@ jobs:
       
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
+          command: python scripts/install_requirements.py --pinned False
       
       - run:
           name: 'Build doctest'
