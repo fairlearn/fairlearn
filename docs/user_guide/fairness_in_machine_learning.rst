@@ -49,9 +49,15 @@ The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
-In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
+In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task.
+Which target variable do we intend to predict?
+What features will be included?
+What (fairness) constraints do we consider?
+Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness :footcite:`10.1145/3442188.3445901`. This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in :footcite:cts:`10.1145/3442188.3445901`.
+This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
+In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
 Key Terms 
 ~~~~~~~~~
@@ -77,7 +83,9 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`doi:10.1126/science.aax2342` for a related example. 
 
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness :footcite:`10.1145/3442188.3445901` for more detailed examples.
+**Note:**
+We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
+Please reference :footcite:cts:`10.1145/3442188.3445901` for more detailed examples.
  
  
 .. _construct_validity:
@@ -85,19 +93,20 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness :footcite:`10.1145/3442188.3445901` paper explores both construct reliability and construct validity, we focus our 
-exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness :footcite:`10.1145/3442188.3445901` offers a fairness-oriented conceptualization of construct validity, that 
-is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
-can serve as a framework for analyzing an AI task and attempting to establish construct validity:
+Though :footcite:cts:`10.1145/3442188.3445901` explore both construct reliability and construct validity, we focus our 
+exploration below on construct Validity.
+We note that both play an important role in understanding fairness in sociotechnical contexts.
+With that said, :footcite:cts:`10.1145/3442188.3445901` offers a fairness-oriented conceptualization of construct validity, that 
+is helpful in thinking about fairness in sociotechnical contexts.
+We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
 1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
 
 2. **Content validity** – This has three subcomponents:
 
-   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
-   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
-   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
+   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context dependent).
+   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
+   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
 
 3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
    measurement models for which construct validity has been established? 
@@ -245,7 +254,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. :footcite:`10.1145/3287560.3287598`
+In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`10.1145/3287560.3287598`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
