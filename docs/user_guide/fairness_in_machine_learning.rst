@@ -436,6 +436,6 @@ pipeline, and an awareness of how the relationship between various social actors
 the algorithm may impact the intended outcomes of a given model.
 
 References
-~~~~~~~~~~
+----------
 
 .. footbibliography::
