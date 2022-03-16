@@ -22,7 +22,6 @@ from sklearn.utils import (
     check_random_state,
     compute_class_weight,
 )
-from sklearn.utils.extmath import row_norms
 from sklearn.utils.fixes import delayed, _joblib_parallel_args
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.optimize import _check_optimize_result
@@ -52,54 +51,6 @@ def _check_solver(solver, penalty):
         )
 
     return solver
-
-
-def _add_intercept(X):
-    """Copied from the paper:
-    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L271-L276
-    Add intercept to the data before linear classification"""
-    m, n = X.shape
-    intercept = np.ones(m).reshape(m, 1)  # the constant b
-    return np.concatenate((X, intercept), axis=1)
-
-
-def _log_logistic(X):
-    """Copied from the paper:
-    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/loss_funcs.py#L59-L93
-    This function is used from scikit-learn source code. Source link below"""
-
-    """Compute the log of the logistic function, ``log(1 / (1 + e ** -x))``.
-    This implementation is numerically stable because it splits positive and
-    negative values::
-        -log(1 + exp(-x_i))     if x_i > 0
-        x_i - log(1 + exp(x_i)) if x_i <= 0
-    
-    Parameters
-    ----------
-    X: array-like, shape (M, N)
-        Argument to the logistic function
-    
-    Returns
-    -------
-    out: array, shape (M, N)
-        Log of the logistic function evaluated at every point in x
-    Notes
-    -----
-    Source code at:
-    https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/utils/extmath.py
-    -----
-    
-    See the blog post describing this implementation:
-    http://fa.bianp.net/blog/2013/numerical-optimizers-for-logistic-regression/
-    """
-    if X.ndim > 1:
-        raise Exception("Array of samples cannot be more than 1-D!")
-    out = np.empty_like(X)  # same dimensions and data types
-
-    idx = X > 0
-    out[idx] = -np.log(1.0 + np.exp(-X[idx]))
-    out[~idx] = X[~idx] - np.log(1.0 + np.exp(X[~idx]))
-    return out
 
 
 def _test_sensitive_attr_constraint_cov(
@@ -271,15 +222,10 @@ def _logistic_regression_path(
             sample_weight *= class_weight_[le.fit_transform(y_bin)]
 
     else:
-        if solver not in ["sag", "saga"]:
-            lbin = LabelBinarizer()
-            Y_multi = lbin.fit_transform(y)
-            if Y_multi.shape[1] == 1:
-                Y_multi = np.hstack([1 - Y_multi, Y_multi])
-        else:
-            # SAG multinomial solver needs LabelEncoder, not LabelBinarizer
-            le = LabelEncoder()
-            Y_multi = le.fit_transform(y).astype(X.dtype, copy=False)
+        lbin = LabelBinarizer()
+        Y_multi = lbin.fit_transform(y)
+        if Y_multi.shape[1] == 1:
+            Y_multi = np.hstack([1 - Y_multi, Y_multi])
 
         w0 = np.zeros(
             (classes.size, n_features + int(fit_intercept)),
@@ -326,7 +272,6 @@ def _logistic_regression_path(
             else:
                 w0[:, : coef.shape[1]] = coef
 
-    # TODO: Sklearn uses different loss functions based on multinomial or ovr, this is currently not implemented
     if multi_class == "multinomial":
         # scipy.optimize.minimize (used in SLSQP) accepts only
         # ravelled parameters.
@@ -577,10 +522,7 @@ class FairLogisticRegression(LogisticRegression):
             self.multi_class, solver, len(self.classes_)
         )
 
-        if solver in ["sag", "saga"]:
-            max_squared_sum = row_norms(X, squared=True).max()
-        else:
-            max_squared_sum = None
+        max_squared_sum = None
 
         n_classes = len(self.classes_)
         classes_ = self.classes_
@@ -613,12 +555,7 @@ class FairLogisticRegression(LogisticRegression):
 
         path_func = delayed(_logistic_regression_path)
 
-        # The SAG solver releases the GIL so it's more efficient to use
-        # threads for this solver.
-        if solver in ["sag", "saga"]:
-            prefer = "threads"
-        else:
-            prefer = "processes"
+        prefer = "processes"
         fold_coefs_ = Parallel(
             n_jobs=self.n_jobs,
             verbose=self.verbose,
