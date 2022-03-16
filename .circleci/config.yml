@@ -9,7 +9,7 @@ version: 2.0
 jobs:
   build-doc:
     docker:
-      - image: cimg/python:3.8.4
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -43,7 +43,7 @@ jobs:
 
   build-doctest:
     docker:
-      - image: cimg/python:3.8.4
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -69,7 +69,7 @@ jobs:
       
   deploy-doc:
     docker:
-      - image: node:14.0.0-stretch  # npm required for gh-pages
+      - image: cimg/node:14.0.0  # npm required for gh-pages
 
     steps:
       - checkout
