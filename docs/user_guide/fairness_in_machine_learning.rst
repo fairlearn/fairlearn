@@ -192,11 +192,11 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  [#0]_
+  :footcite:`agarwal2019fair`
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#0]_
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. :footcite:`agarwal2019fair`
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
@@ -425,6 +425,11 @@ which judging and recommending an outcome take place. This frame might
 incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
+
+References
+~~~~~~~~~~
+
+.. footbibliography::
 
 .. topic:: References:
 
