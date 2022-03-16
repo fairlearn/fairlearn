@@ -51,7 +51,7 @@ Construct validity
 ^^^^^^^^^^^^^^^^^^
 In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness [#4]_ . This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness :footcite:`10.1145/3442188.3445901`. This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
 Key Terms 
 ~~~~~~~~~
@@ -75,9 +75,9 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See [#5]_ for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`doi:10.1126/science.aax2342` for a related example. 
 
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
+**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness :footcite:`10.1145/3442188.3445901` for more detailed examples.
  
  
 .. _construct_validity:
@@ -85,9 +85,9 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness [#4]_ paper explores both construct reliability and construct validity, we focus our 
+Though the Measurement and Fairness :footcite:`10.1145/3442188.3445901` paper explores both construct reliability and construct validity, we focus our 
 exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
+contexts. With that said, Measurement and Fairness :footcite:`10.1145/3442188.3445901` offers a fairness-oriented conceptualization of construct validity, that 
 is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
 can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
@@ -245,7 +245,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#3]_
+In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. :footcite:`10.1145/3287560.3287598`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
@@ -430,16 +430,3 @@ References
 ~~~~~~~~~~
 
 .. footbibliography::
-
-.. topic:: References:
-
-   .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
-      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
-      (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
-      (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
-
-   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
-      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
-
-   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
-      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
