@@ -173,14 +173,14 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#2]_
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.  :footcite:`agarwal2018reductions`
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  [#2]_
+  :footcite:`agarwal2018reductions`
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
@@ -432,19 +432,11 @@ References
 .. footbibliography::
 
 .. topic:: References:
-
-   .. [#0] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
-      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
-      ICML, 2019.
    
    .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
       Learning"
       <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
       NIPS, 2016.
-   
-   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
-      Approach to Fair Classification"
-      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
 	  
    .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
       Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
