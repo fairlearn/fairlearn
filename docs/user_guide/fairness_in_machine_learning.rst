@@ -184,7 +184,7 @@ For example, in Fairlearn, we consider the following types of parity constraints
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  [#1]_
+  :footcite:`hardt2016equality`
 
 *Regression*:
 
@@ -432,12 +432,7 @@ References
 .. footbibliography::
 
 .. topic:: References:
-   
-   .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
-      Learning"
-      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NIPS, 2016.
-	  
+
    .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
       Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
       (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
