@@ -11,8 +11,8 @@ from joblib import Parallel
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model._logistic import (
-    _multinomial_loss_grad,
-    _logistic_loss_and_grad,
+    _multinomial_loss,
+    _logistic_loss,
     _check_multi_class,
 )
 from sklearn.preprocessing import LabelEncoder, LabelBinarizer, OneHotEncoder
@@ -99,35 +99,6 @@ def _log_logistic(X):
     idx = X > 0
     out[idx] = -np.log(1.0 + np.exp(-X[idx]))
     out[~idx] = X[~idx] - np.log(1.0 + np.exp(X[~idx]))
-    return out
-
-
-def _logistic_loss(w, X, y, return_arr=None):
-    """Copied from the paper:
-    https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/loss_funcs.py#L19-L44
-    Computes the logistic loss.
-
-    This function is used from scikit-learn source code
-
-    Parameters
-    ----------
-    w : ndarray, shape (n_features,) or (n_features + 1,)
-        Coefficient vector.
-
-    X : {array-like, sparse matrix}, shape (n_samples, n_features)
-        Training data.
-
-    y : ndarray, shape (n_samples,)
-        Array of labels.
-
-    """
-
-    yz = y * np.dot(X, w)
-    # Logistic loss is the negative of the log of the logistic function.
-    if return_arr is True:
-        out = -(_log_logistic(yz))
-    else:
-        out = -np.sum(_log_logistic(yz))
     return out
 
 
@@ -361,15 +332,13 @@ def _logistic_regression_path(
         # ravelled parameters.
         w0 = w0.ravel()
         target = Y_multi
-        if solver == "lbfgs":
 
-            def func(x, *args):
-                return _multinomial_loss_grad(x, *args)[0:2]
+        def func(x, *args):
+            return _multinomial_loss(x, *args)[0]
 
     else:
         target = y_bin
-        if solver == "lbfgs":
-            func = _logistic_loss_and_grad
+        func = _logistic_loss
 
     coefs = list()
     n_iter = np.zeros(len(Cs), dtype=np.int32)
@@ -379,13 +348,11 @@ def _logistic_regression_path(
                 np.searchsorted(np.array([0, 1, 2, 3]), verbose)
             ]
             opt_res = optimize.minimize(
-                fun=_logistic_loss,
-                x0=np.random.rand(
-                    X.shape[1],
-                ),
+                fun=func,
+                x0=w0,
                 method="SLSQP",
                 # jac=True,
-                args=(X, target),
+                args=(X, target, 1.0 / C, sample_weight),
                 options={"iprint": iprint, "maxiter": max_iter},
                 constraints=constraints,
             )
