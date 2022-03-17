@@ -17,6 +17,8 @@ import os
 import sys
 import inspect
 from datetime import datetime
+from packaging.version import parse
+
 rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -81,7 +83,12 @@ intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
                        'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'matplotlib': ('https://matplotlib.org/', None)}
+                       'matplotlib': ('https://matplotlib.org/', None,),
+                       'tensorflow': (
+                            'https://www.tensorflow.org/api_docs/python',
+                            'https://raw.githubusercontent.com/GPflow/'
+                            'tensorflow-intersphinx/master/tf2_py_objects.inv'
+                        )}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -143,7 +150,7 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "_static/images/fairlearn_full_color.png"
+html_logo = "_static/images/fairlearn_full_color.svg"
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -241,3 +248,22 @@ mathjax3_config = {
         }
     }
 }
+
+
+def check_if_v07():
+    """Check to see if current version being built is > v0.7."""
+    result = False
+
+    if parse(fairlearn.__version__) > parse("0.7"):
+        print("Detected version > 0.7 in fairlearn.__version__")
+        result = True
+
+    return result
+
+
+# Setup for sphinx-bibtex
+
+# Only use sphinx-bibtex if version is above 0.7
+if check_if_v07():
+    extensions += ['sphinxcontrib.bibtex', ]
+    bibtex_bibfiles = ['refs.bib']

@@ -73,7 +73,7 @@ from fairlearn.metrics import selection_rate, count
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
-y = (data.target == '>50K') * 1
+y = (data.target == ">50K") * 1
 
 # %%
 # For purposes of clarity, we consolidate the 'race' column to have
@@ -82,14 +82,16 @@ y = (data.target == '>50K') * 1
 
 def race_transform(input_str):
     """Reduce values to White, Black and Other."""
-    result = 'Other'
-    if input_str == 'White' or input_str == 'Black':
+    result = "Other"
+    if input_str == "White" or input_str == "Black":
         result = input_str
     return result
 
 
-X_raw['race'] = X_raw['race'].map(race_transform).fillna('Other').astype('category')
-print(np.unique(X_raw['race']))
+X_raw["race"] = (
+    X_raw["race"].map(race_transform).fillna("Other").astype("category")
+)
+print(np.unique(X_raw["race"]))
 
 # %%
 # Now, we manufacture the columns for the credit score band and
@@ -100,30 +102,30 @@ print(np.unique(X_raw['race']))
 
 def marriage_transform(m_s_string):
     """Perform some simple manipulations."""
-    result = 'Low'
+    result = "Low"
     if m_s_string.startswith("Married"):
-        result = 'Medium'
+        result = "Medium"
     elif m_s_string.startswith("Widowed"):
-        result = 'High'
+        result = "High"
     return result
 
 
 def occupation_transform(occ_string):
     """Perform some simple manipulations."""
-    result = 'Small'
+    result = "Small"
     if occ_string.startswith("Machine"):
-        result = 'Large'
+        result = "Large"
     return result
 
 
-col_credit = X_raw['marital-status'].map(marriage_transform).fillna('Low')
+col_credit = X_raw["marital-status"].map(marriage_transform).fillna("Low")
 col_credit.name = "Credit Score"
-col_loan_size = X_raw['occupation'].map(occupation_transform).fillna('Small')
+col_loan_size = X_raw["occupation"].map(occupation_transform).fillna("Small")
 col_loan_size.name = "Loan Size"
 
-A = X_raw[['race', 'sex']]
-A['Credit Score'] = col_credit
-A['Loan Size'] = col_loan_size
+A = X_raw[["race", "sex"]]
+A["Credit Score"] = col_credit
+A["Loan Size"] = col_loan_size
 A
 
 # %%
@@ -161,21 +163,18 @@ A_test = A_test.reset_index(drop=True)
 # have poorer data quality.
 
 numeric_transformer = Pipeline(
-    steps=[
-        ("impute", SimpleImputer()),
-        ("scaler", StandardScaler()),
-    ]
+    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())]
 )
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore")),
+        ("ohe", OneHotEncoder(handle_unknown="ignore"))
     ]
 )
 preprocessor = ColumnTransformer(
     transformers=[
         ("num", numeric_transformer, selector(dtype_exclude="category")),
-        ("cat", categorical_transformer, selector(dtype_include="category")),
+        ("cat", categorical_transformer, selector(dtype_include="category"))
     ]
 )
 
@@ -188,8 +187,8 @@ unmitigated_predictor = Pipeline(
         ("preprocessor", preprocessor),
         (
             "classifier",
-            LogisticRegression(solver="liblinear", fit_intercept=True),
-        ),
+            LogisticRegression(solver="liblinear", fit_intercept=True)
+        )
     ]
 )
 
@@ -231,14 +230,20 @@ print("fbeta:", skm.fbeta_score(y_test, y_pred, beta=0.6))
 # class. Let us construct an instance of this class, and then look at
 # its capabilities:
 
-fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
+fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6, zero_division=1)
 
-metric_fns = {'selection_rate': selection_rate, 'fbeta_06': fbeta_06, 'count': count}
+metric_fns = {
+    "selection_rate": selection_rate,
+    "fbeta_06": fbeta_06,
+    "count": count
+}
 
-grouped_on_sex = MetricFrame(metrics=metric_fns,
-                             y_true=y_test,
-                             y_pred=y_pred,
-                             sensitive_features=A_test['sex'])
+grouped_on_sex = MetricFrame(
+    metrics=metric_fns,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test["sex"]
+)
 
 # %%
 # The :class:`fairlearn.metrics.MetricFrame` object requires a
@@ -263,8 +268,12 @@ grouped_on_sex = MetricFrame(metrics=metric_fns,
 # the metrics evaluated on the entire dataset. We see that this contains the
 # same values calculated above:
 
-assert grouped_on_sex.overall['selection_rate'] == selection_rate(y_test, y_pred)
-assert grouped_on_sex.overall['fbeta_06'] == skm.fbeta_score(y_test, y_pred, beta=0.6)
+assert grouped_on_sex.overall["selection_rate"] == selection_rate(
+    y_test, y_pred
+)
+assert grouped_on_sex.overall["fbeta_06"] == skm.fbeta_score(
+    y_test, y_pred, beta=0.6
+)
 print(grouped_on_sex.overall)
 
 # %%
@@ -283,10 +292,12 @@ grouped_on_sex.by_group
 # We can also create another :class:`fairlearn.metrics.MetricFrame` object
 # using race as the sensitive feature:
 
-grouped_on_race = MetricFrame(metrics=metric_fns,
-                              y_true=y_test,
-                              y_pred=y_pred,
-                              sensitive_features=A_test['race'])
+grouped_on_race = MetricFrame(
+    metrics=metric_fns,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test["race"]
+)
 
 # %%
 # The ``overall`` property is unchanged:
@@ -323,23 +334,27 @@ grouped_on_race.by_group
 random_weights = np.random.rand(len(y_test))
 
 example_sample_params = {
-    'selection_rate': {'sample_weight': random_weights},
-    'fbeta_06': {'sample_weight': random_weights},
+    "selection_rate": {"sample_weight": random_weights},
+    "fbeta_06": {"sample_weight": random_weights}
 }
 
 
-grouped_with_weights = MetricFrame(metrics=metric_fns,
-                                   y_true=y_test,
-                                   y_pred=y_pred,
-                                   sensitive_features=A_test['sex'],
-                                   sample_params=example_sample_params)
+grouped_with_weights = MetricFrame(
+    metrics=metric_fns,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test["sex"],
+    sample_params=example_sample_params
+)
 
 # %%
 # We can inspect the overall values, and check they are as expected:
-assert grouped_with_weights.overall['selection_rate'] == \
-    selection_rate(y_test, y_pred, sample_weight=random_weights)
-assert grouped_with_weights.overall['fbeta_06'] == \
-    skm.fbeta_score(y_test, y_pred, beta=0.6, sample_weight=random_weights)
+assert grouped_with_weights.overall["selection_rate"] == selection_rate(
+    y_test, y_pred, sample_weight=random_weights
+)
+assert grouped_with_weights.overall["fbeta_06"] == skm.fbeta_score(
+    y_test, y_pred, beta=0.6, sample_weight=random_weights
+)
 print(grouped_with_weights.overall)
 
 # %%
@@ -371,25 +386,25 @@ grouped_on_race.group_min()
 # This can be quantified in terms of a difference between the subgroup with
 # the highest value of the metric, and the subgroup with the lowest value.
 # For this, we provide the method ``difference(method='between_groups)``:
-grouped_on_race.difference(method='between_groups')
+grouped_on_race.difference(method="between_groups")
 
 # %%
 # We can also evaluate the difference relative to the corresponding overall
 # value of the metric. In this case we take the absolute value, so that the
 # result is always positive:
-grouped_on_race.difference(method='to_overall')
+grouped_on_race.difference(method="to_overall")
 
 # %%
 # There are situations where knowing the ratios of the metrics evaluated on
 # the subgroups is more useful. For this we have the ``ratio()`` method.
 # We can take the ratios between the minimum and maximum values of each metric:
-grouped_on_race.ratio(method='between_groups')
+grouped_on_race.ratio(method="between_groups")
 
 # %%
 # We can also compute the ratios relative to the overall value for each
 # metric. Analogous to the differences, the ratios are always in the range
 # :math:`[0,1]`:
-grouped_on_race.ratio(method='to_overall')
+grouped_on_race.ratio(method="to_overall")
 
 # %%
 # Intersections of Features
@@ -407,10 +422,12 @@ grouped_on_race.ratio(method='to_overall')
 # multiple columns to the :class:`fairlearn.metrics.MetricFrame`
 # constructor:
 
-grouped_on_race_and_sex = MetricFrame(metrics=metric_fns,
-                                      y_true=y_test,
-                                      y_pred=y_pred,
-                                      sensitive_features=A_test[['race', 'sex']])
+grouped_on_race_and_sex = MetricFrame(
+    metrics=metric_fns,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test[["race", "sex"]]
+)
 
 # %%
 # The overall values are unchanged, but the ``by_group`` table now
@@ -430,7 +447,7 @@ grouped_on_race_and_sex.group_min()
 # Looking at the ``ratio()`` method, we see that the disparity is worse
 # (specifically between white males and black females, if we check in
 # the ``by_group`` table):
-grouped_on_race_and_sex.ratio(method='between_groups')
+grouped_on_race_and_sex.ratio(method="between_groups")
 
 # %%
 # Control Features
@@ -447,11 +464,13 @@ grouped_on_race_and_sex.ratio(method='between_groups')
 #
 # Control features are introduced by the ``control_features=``
 # argument to the :class:`fairlearn.metrics.MetricFrame` object:
-cond_credit_score = MetricFrame(metrics=metric_fns,
-                                y_true=y_test,
-                                y_pred=y_pred,
-                                sensitive_features=A_test[['race', 'sex']],
-                                control_features=A_test['Credit Score'])
+cond_credit_score = MetricFrame(
+    metrics=metric_fns,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test[["race", "sex"]],
+    control_features=A_test["Credit Score"]
+)
 
 # %%
 # This has an immediate effect on the ``overall`` property. Instead
@@ -470,7 +489,7 @@ cond_credit_score.group_min()
 
 # %%
 # And:
-cond_credit_score.ratio(method='between_groups')
+cond_credit_score.ratio(method="between_groups")
 
 # %%
 # In our data, we see that we have a dearth of positive results
@@ -478,11 +497,13 @@ cond_credit_score.ratio(method='between_groups')
 # aggregates.
 #
 # We can continue adding more control features:
-cond_both = MetricFrame(metrics=metric_fns,
-                        y_true=y_test,
-                        y_pred=y_pred,
-                        sensitive_features=A_test[['race', 'sex']],
-                        control_features=A_test[['Loan Size', 'Credit Score']])
+cond_both = MetricFrame(
+    metrics=metric_fns,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test[["race", "sex"]],
+    control_features=A_test[["Loan Size", "Credit Score"]]
+)
 
 # %%
 # The ``overall`` property now splits into more values:
@@ -503,11 +524,13 @@ def member_counts(y_true, y_pred):
     return len(y_true)
 
 
-counts = MetricFrame(metrics=member_counts,
-                     y_true=y_test,
-                     y_pred=y_pred,
-                     sensitive_features=A_test[['race', 'sex']],
-                     control_features=A_test[['Loan Size', 'Credit Score']])
+counts = MetricFrame(
+    metrics=member_counts,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=A_test[["race", "sex"]],
+    control_features=A_test[["Loan Size", "Credit Score"]]
+)
 
 counts.by_group
 

@@ -25,6 +25,11 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     The approach used is taken from section 3.4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_.
 
+    .. versionadded:: 0.3.0
+
+    .. versionchanged:: 0.4.6
+        Enabled for more than two sensitive feature values
+
     Parameters
     ----------
     estimator : estimator
@@ -62,6 +67,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     sample_weight_name : str
         Name of the argument to `estimator.fit()` which supplies the sample weights
         (defaults to `sample_weight`)
+
+        .. versionadded:: 0.5.0
 
     References
     ----------
@@ -198,7 +205,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
             def loss_fct(i):
                 return self.objective_weight * self.objectives_[i] + \
-                    self.constraint_weight * self.gammas_[i].max()
+                    self.constraint_weight * self.gammas_[grid.columns[i]].max()
             losses = [loss_fct(i) for i in range(len(self.objectives_))]
             self.best_idx_ = losses.index(min(losses))
         else:
