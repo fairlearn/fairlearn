@@ -21,10 +21,6 @@ jobs:
           command: python --version
 
       - run:
-          name: Update apt
-          command: sudo apt update
-
-      - run:
           name: Show Ubuntu version
           command: lsb_release -a
 
@@ -65,10 +61,6 @@ jobs:
       - run:
           name: Show Python version
           command: python --version
-
-      - run:
-          name: Update apt
-          command: sudo apt update
 
       - run:
           name: Show Ubuntu version
