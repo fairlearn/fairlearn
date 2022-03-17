@@ -242,7 +242,6 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-
 Multiple metrics in one :code:`MetricFrame`
 -------------------------------------------
 
@@ -264,14 +263,14 @@ be used to show each group's size:
     >>> multi_metric.overall
     precision    0.5555...
     recall       0.5...
-    dtype: object
+    dtype: float64
     >>> multi_metric.by_group
-                        precision recall count
+                         precision  recall  count
     sensitive_feature_0
-    a                         0.0    0.0     2
-    b                         1.0    0.5     4
-    c                         0.6   0.75     7
-    d                         0.0    0.0     3
+    a                          0.0    0.00    2.0
+    b                          1.0    0.50    4.0
+    c                          0.6    0.75    7.0
+    d                          0.0    0.00    3.0
 
 If there are per-sample arguments (such as sample weights), these can also be 
 provided in a dictionary via the ``sample_params`` argument.:
@@ -294,7 +293,7 @@ provided in a dictionary via the ``sample_params`` argument.:
     b    0.5...
     c    0.7142...
     d    0...
-    Name: recall_score, dtype: object
+    Name: recall_score, dtype: float64
 
 If multiple metrics are being evaluated, then ``sample_params`` becomes a 
 dictionary of dictionaries, with the first key corresponding matching that in 
@@ -324,7 +323,7 @@ to the metric function:
     b    0.7906...
     c    0.6335...
     d    0...
-    Name: metric, dtype: object
+    Name: metric, dtype: float64
 
 Multiclass metrics
 ^^^^^^^^^^^^^^^^^^
@@ -386,7 +385,7 @@ property then holds the intersections of these groups:
           8       0.5
     d     6       0.0
           8       0.0
-    Name: recall_score, dtype: object
+    Name: recall_score, dtype: float64
 
 With such a small number of samples, we are obviously running into cases where
 there are no members in a particular combination of sensitive features. In this
@@ -525,7 +524,7 @@ parameter:
     CF
     H    0.4285...
     L    0.375...
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
     >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
     CF  SF
@@ -535,7 +534,7 @@ parameter:
     L   A     0.4...
         B     0.2857...
         C     0.5...
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
 supplied control feature. The :attr:`MetricFrame.by_group` property allows
