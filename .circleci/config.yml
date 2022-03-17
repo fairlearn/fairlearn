@@ -9,7 +9,7 @@ version: 2.0
 jobs:
   build-doc:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -17,16 +17,28 @@ jobs:
       - checkout
 
       - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
+          command: python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
+          command: python scripts/install_requirements.py --pinned False
 
       - run:
           name: "Build Documentation"
@@ -43,7 +55,7 @@ jobs:
 
   build-doctest:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -51,16 +63,28 @@ jobs:
       - checkout
       
       - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
+          command: python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
+          command: python scripts/install_requirements.py --pinned False
       
       - run:
           name: 'Build doctest'
@@ -69,7 +93,7 @@ jobs:
       
   deploy-doc:
     docker:
-      - image: node:14.0.0-stretch  # npm required for gh-pages
+      - image: cimg/node:14.0.0  # npm required for gh-pages
 
     steps:
       - checkout
