@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Show Ubuntu version
           command: lsb_release -a
-      
+
       - run:
           name: Update apt
           command: sudo apt update
