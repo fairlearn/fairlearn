@@ -261,43 +261,18 @@ Hilde Weerts since March 2020.
   <div class="sponsor-div">
   <div class="sponsor-div-box">
 
-`Zalando <https://corporate.zalando.com/en>`_ has funded Adrin Jalali since
-August 2020.
+`Hugging Face <https://huggingface.co/>`_ has funded Adrin Jalali since
+February 2022.
 
 .. raw:: html
 
   </div>
   <div class="sponsor-div-box">
 
-.. image:: ../_static/images/zalando.png
-  :width: 100pt
+.. image:: ../_static/images/huggingface_logo-noborder.svg
+  :width: 50pt
   :align: center
-  :target: https://corporate.zalando.com/en
-
-.. raw:: html
-
-  </div>
-  </div>
-
-Past Sponsors
-^^^^^^^^^^^^^
-
-.. raw:: html
-
-  <div class="sponsor-div">
-  <div class="sponsor-div-box">
-
-`Anaconda <https://www.anaconda.com/>`_ funded Adrin Jalali in 2019.
-
-.. raw:: html
-
-  </div>
-  <div class="sponsor-div-box">
-  
-.. image:: ../_static/images/anaconda.png
-  :width: 100pt
-  :align: center
-  :target: https://www.anaconda.com/
+  :target: https://huggingface.co/
 
 .. raw:: html
 
