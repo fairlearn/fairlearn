@@ -254,7 +254,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`selbst2019fairnessabstraction`
+In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`selbst2019fairness`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
