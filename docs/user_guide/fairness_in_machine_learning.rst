@@ -55,7 +55,7 @@ What features will be included?
 What (fairness) constraints do we consider?
 Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in :footcite:cts:`10.1145/3442188.3445901`.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in :footcite:cts:`jacobs2021measurement`.
 This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
 In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
@@ -81,11 +81,11 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`doi:10.1126/science.aax2342` for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example. 
 
 **Note:**
 We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
-Please reference :footcite:cts:`10.1145/3442188.3445901` for more detailed examples.
+Please reference :footcite:cts:`jacobs2021measurement` for more detailed examples.
  
  
 .. _construct_validity:
@@ -93,10 +93,10 @@ Please reference :footcite:cts:`10.1145/3442188.3445901` for more detailed examp
 What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though :footcite:cts:`10.1145/3442188.3445901` explore both construct reliability and construct validity, we focus our 
+Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our 
 exploration below on construct Validity.
 We note that both play an important role in understanding fairness in sociotechnical contexts.
-With that said, :footcite:cts:`10.1145/3442188.3445901` offers a fairness-oriented conceptualization of construct validity, that 
+With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that 
 is helpful in thinking about fairness in sociotechnical contexts.
 We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
@@ -254,7 +254,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`10.1145/3287560.3287598`
+In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`selbst2019fairnessabstraction`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
