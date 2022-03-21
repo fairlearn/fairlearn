@@ -53,11 +53,11 @@ def _check_solver(solver, penalty):
     return solver
 
 
-def _test_sensitive_attr_constraint_cov(
+def _sensitive_attr_constraint_cov(
     model, x_arr, y_arr_dist_boundary, x_control, thresh
 ):
     """
-    Copied from the paper:
+    Copied from the paper, but also rewritten for a large part:
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
     The covariance is computed b/w the sensitive attr val and the distance from the boundary
     If the model is None, we assume that the y_arr_dist_boundary contains the distance from the decision boundary
@@ -74,13 +74,27 @@ def _test_sensitive_attr_constraint_cov(
     ):  # make sure we just have one column in the array
         assert x_control.shape[1] == 1
 
-    arr = []
-    if model is None:
-        arr = y_arr_dist_boundary  # simply the output labels
-    else:
-        arr = np.dot(
-            model, x_arr.T
-        )  # the product with the weight vector -- the sign of this is the output label
+    intercept = 0.0
+
+    # Reshape the model variable (w0) in the multinomial case
+    num_classes = len(np.unique(y_arr_dist_boundary))
+    num_features = x_arr.shape[1]
+    if num_classes > 2:  # Multinomial case, need to retransform ravelled array
+        if model.size == num_classes * (
+            num_features + 1
+        ):  # True if the intercept needs to be fitted
+            model = model.reshape(num_classes, -1)
+            intercept = model[:, -1]
+            model = model[:, :-1]
+    else:  # Binary case
+        if (
+            model.size == num_features + 1
+        ):  # True if the intercept needs to be fitted
+            intercept = model[-1]
+            model = model[:-1]
+
+    arr = np.dot(model, x_arr.T) + intercept
+    # the product with the weight vector -- the sign of this is the output label
 
     arr = np.array(arr, dtype=np.float64)
 
@@ -109,7 +123,7 @@ def _get_constraint_list_cov(
         if isinstance(A_train, pd.DataFrame):
             c = {
                 "type": "ineq",
-                "fun": _test_sensitive_attr_constraint_cov,
+                "fun": _sensitive_attr_constraint_cov,
                 "args": (
                     X_train,
                     y_train,
@@ -120,7 +134,7 @@ def _get_constraint_list_cov(
         else:
             c = {
                 "type": "ineq",
-                "fun": _test_sensitive_attr_constraint_cov,
+                "fun": _sensitive_attr_constraint_cov,
                 "args": (
                     X_train,
                     y_train,
