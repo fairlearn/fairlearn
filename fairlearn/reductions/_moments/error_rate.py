@@ -27,14 +27,14 @@ class ErrorRate(ClassificationMoment):
     .. math::
       c_{FP} P[h(X)=1, Y=0] + c_{FN} P[h(X)=0, Y=1]
 
-    where :math:`c_{FP}` and `c_{FN}` are the costs of false positive
+    where :math:`c_{FP}` and :math:`c_{FN}` are the costs of false positive
     and false negative errors respectively. The standard misclassification
     error corresponds to :math:`c_{FP}=c_{FN}=1.0`.
 
     Parameters
     ----------
     costs : dict
-        The dictionary with keys ``"fp"`` and ``"fn"`` containing the
+        The dictionary with keys :code:`'fp'` and :code:`'fn'` containing the
         costs of false positives and false negatives. If none are provided
         costs of 1.0 are assumed.
     """
@@ -56,7 +56,6 @@ class ErrorRate(ClassificationMoment):
             self.fn_cost = costs['fn']
         else:
             raise ValueError(_MESSAGE_BAD_COSTS)
-        self.sum_costs = self.fp_cost + self.fn_cost
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
@@ -92,7 +91,7 @@ class ErrorRate(ClassificationMoment):
 
     def signed_weights(self, lambda_vec=None):
         """Return the signed weights."""
-        weights = self.sum_costs * self.tags[_LABEL] - self.fp_cost
+        weights = -self.fp_cost + (self.fp_cost + self.fn_cost) * self.tags[_LABEL]
         if lambda_vec is None:
             return weights
         else:

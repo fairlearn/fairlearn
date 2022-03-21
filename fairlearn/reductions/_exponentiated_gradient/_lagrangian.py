@@ -11,12 +11,13 @@ from time import time
 
 from ._constants import _PRECISION, _INDENTATION, _LINE
 
-from fairlearn.reductions._moments import ClassificationMoment, LossMoment
+from fairlearn.reductions._moments import ClassificationMoment
 
 logger = logging.getLogger(__name__)
 
 
-_MESSAGE_BAD_OBJECTIVE = "Objective needs to be of the same type as constraints."
+_MESSAGE_BAD_OBJECTIVE = "Objective needs to be of the same type as constraints. "\
+    "Objective is {}, constraints are {}."
 
 
 class _Lagrangian:
@@ -49,19 +50,31 @@ class _Lagrangian:
         (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, y, estimator, constraints, *, B, objective=None, opt_lambda=True,
-                 sample_weight_name='sample_weight', **kwargs):
+    def __init__(
+        self,
+        *,
+        X,
+        y,
+        estimator,
+        constraints,
+        B,
+        objective=None,
+        opt_lambda=True,
+        sample_weight_name="sample_weight",
+        **kwargs
+    ):
         self.constraints = constraints
         self.constraints.load_data(X, y, **kwargs)
         if objective is None:
             self.obj = self.constraints.default_objective()
-        elif ((isinstance(constraints, ClassificationMoment)
-               and isinstance(objective, ClassificationMoment)) or
-              (isinstance(constraints, LossMoment)
-               and isinstance(objective, LossMoment))):
+        elif objective._moment_type() == constraints._moment_type():
             self.obj = objective
         else:
-            raise ValueError(_MESSAGE_BAD_OBJECTIVE)
+            raise ValueError(
+                _MESSAGE_BAD_OBJECTIVE.format(
+                    objective._moment_type(), constraints._moment_type()
+                )
+            )
         self.obj.load_data(X, y, **kwargs)
         self.estimator = estimator
         self.B = B
@@ -108,7 +121,9 @@ class _Lagrangian:
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
-            L = error + np.sum(lambda_projected * (gamma - self.constraints.bound()))
+            L = error + np.sum(
+                lambda_projected * (gamma - self.constraints.bound())
+            )
         else:
             L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
@@ -126,7 +141,9 @@ class _Lagrangian:
         for mul in [1.0, 2.0, 5.0, 10.0]:
             _, h_hat_idx = self.best_h(mul * lambda_hat)
             logger.debug("%smul=%.0f", _INDENTATION, mul)
-            L_low_mul, _, _, _ = self._eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
+            L_low_mul, _, _, _ = self._eval(
+                pd.Series({h_hat_idx: 1.0}), lambda_hat
+            )
             if L_low_mul < result.L_low:
                 result.L_low = L_low_mul
             if result.gap() > nu + _PRECISION:
@@ -139,29 +156,50 @@ class _Lagrangian:
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0),
-                               -np.ones((n_constraints, 1))), axis=1)
+        A_ub = np.concatenate(
+            (
+                self.gammas.sub(self.constraints.bound(), axis=0),
+                -np.ones((n_constraints, 1)),
+            ),
+            axis=1,
+        )
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
+        result = opt.linprog(
+            c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="simplex"
+        )
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
-        dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
+        dual_A_ub = np.concatenate(
+            (-A_ub.transpose(), A_eq.transpose()), axis=1
+        )
         dual_b_ub = c
-        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]  # noqa: E501
-        result_dual = opt.linprog(dual_c,
-                                  A_ub=dual_A_ub,
-                                  b_ub=dual_b_ub,
-                                  bounds=dual_bounds,
-                                  method='simplex')
+        dual_bounds = [
+            (None, None) if i == n_constraints else (0, None)
+            for i in range(n_constraints + 1)
+        ]
+        result_dual = opt.linprog(
+            dual_c,
+            A_ub=dual_A_ub,
+            b_ub=dual_b_ub,
+            bounds=dual_bounds,
+            method="simplex",
+        )
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
+        self.last_linprog_result = (
+            Q,
+            lambda_vec,
+            self.eval_gap(Q, lambda_vec, nu),
+        )
         return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
-        signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
+        signed_weights = (
+            self.obj.signed_weights()
+            + self.constraints.signed_weights(lambda_vec)
+        )
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
         else:
@@ -174,8 +212,9 @@ class _Lagrangian:
         estimator = None
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
-            estimator = DummyClassifier(strategy='constant',
-                                        constant=redY_unique[0])
+            estimator = DummyClassifier(
+                strategy="constant", constant=redY_unique[0]
+            )
             self.n_oracle_calls_dummy_returned += 1
         else:
             # use sklearn.base.clone to clone the estimator.
@@ -186,7 +225,9 @@ class _Lagrangian:
             estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
+        estimator.fit(
+            self.constraints.X, redY, **{self.sample_weight_name: redW}
+        )
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
@@ -221,7 +262,9 @@ class _Lagrangian:
             best_value = np.PINF
 
         if h_value < best_value - _PRECISION:
-            logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
+            logger.debug(
+                "%sbest_h: val improvement %f", _LINE, best_value - h_value
+            )
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
             self.predictors.at[h_idx] = classifier

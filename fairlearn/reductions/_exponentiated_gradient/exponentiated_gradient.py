@@ -85,7 +85,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
     """
 
-    def __init__(self, estimator, constraints, objective=None,
+    def __init__(self, estimator, constraints, *, objective=None,
                  eps=0.01, max_iter=50, nu=None,
                  eta0=2.0, run_linprog_step=True,
                  sample_weight_name='sample_weight'):  # noqa: D103
@@ -116,7 +116,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self.eps
-        lagrangian = _Lagrangian(X, y, self.estimator, self.constraints,
+        lagrangian = _Lagrangian(X=X, y=y, estimator=self.estimator, constraints=self.constraints,
                                  B=B, objective=self.objective,
                                  sample_weight_name=self.sample_weight_name,
                                  **kwargs)

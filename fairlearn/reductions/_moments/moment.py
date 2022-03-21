@@ -78,6 +78,10 @@ class Moment:
         """Return the signed weights."""
         raise NotImplementedError()
 
+    def _moment_type(self):
+        """Return the moment type, e.g., ClassificationMoment vs LossMoment."""
+        return NotImplementedError()
+
 
 # Ensure that Moment shows up in correct place in documentation
 # when it is used as a base class
@@ -86,6 +90,9 @@ Moment.__module__ = "fairlearn.reductions"
 
 class ClassificationMoment(Moment):
     """Moment that can be expressed as weighted classification error."""
+
+    def _moment_type(self):
+        return ClassificationMoment
 
 
 # Ensure that ClassificationMoment shows up in correct place in documentation
@@ -99,6 +106,9 @@ class LossMoment(Moment):
     def __init__(self, loss):
         super().__init__()
         self.reduction_loss = loss
+
+    def _moment_type(self):
+        return LossMoment
 
 
 # Ensure that LossMoment shows up in correct place in documentation

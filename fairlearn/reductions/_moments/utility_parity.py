@@ -395,7 +395,7 @@ class FalsePositiveRateParity(UtilityParity):
     either NaN or `label=0` (so only one unique non-NaN value), multiplied by
     two (for the Lagrange multipliers for positive and negative constraints).
 
-    With these definitions, the :meth:`signed_weights` method will calculate
+    With these definitions, the :meth:`UtilityParity.signed_weights` method will calculate
     the costs for `Y=0` as they are calculated in Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_,
     but will use the weights equal to zero for `Y=1` [6]_.
@@ -448,7 +448,7 @@ class EqualizedOdds(UtilityParity):
     the number of unique values of the `Y` array, multiplied by two (for
     the Lagrange multipliers for positive and negative constraints).
 
-    With these definitions, the :meth:`signed_weights` method
+    With these definitions, the :meth:`UtilityParity.signed_weights` method
     will calculate the costs according to Example 4 of
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [7]_.
 
@@ -495,8 +495,8 @@ class ErrorRateParity(UtilityParity):
     The `index` property will have twice as many entries (corresponding to the Lagrange multipliers
     for positive and negative constraints) as there are unique values for the sensitive feature.
 
-    The :meth:`signed_weights` method will compute the costs according to Example 3 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [8]_.
+    The :meth:`UtilityParity.signed_weights` method will compute the costs according to Example 3
+    of :footcite:t:`agarwal2018reductions`.
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
 
     This :class:`~Moment` also supports control features, which can be used to
@@ -505,10 +505,7 @@ class ErrorRateParity(UtilityParity):
 
     References
     ----------
-    .. [8] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
-
+    .. footbibliography::
     """
 
     short_name = "ErrorRateParity"
