@@ -5,7 +5,7 @@ import setuptools
 import fairlearn
 
 # Fetch ReadMe
-with open("README.md", "r") as fh:
+with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 # Use requirements.txt to set the install_requires
@@ -30,13 +30,13 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/fairlearn/fairlearn",
     packages=setuptools.find_packages(),
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=install_requires,
     extras_require=extras_require,
     classifiers=[
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha"

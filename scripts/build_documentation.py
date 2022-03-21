@@ -10,7 +10,7 @@ versions.
 This makes the documentation build a three-stage process:
 1. Copy the static pages into the output directory
 2. Do the sphinx build
-3. Make a duplicate copy of a single PNG in the output directory (a logo)
+3. Make a duplicate copy of a single SVG in the output directory (a logo)
 
 This ordering is in part because shutil.copytree() only acquired the
 dirs_exist_ok argument in Python 3.8
@@ -29,7 +29,7 @@ _logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
 
 landing_page_directory = "static_landing_page"
-extra_png_src_path = os.path.join("_static", "images", "fairlearn_full_color.png")
+extra_png_src_path = os.path.join("_static", "images", "fairlearn_full_color.svg")
 
 
 def _build_argument_parser():

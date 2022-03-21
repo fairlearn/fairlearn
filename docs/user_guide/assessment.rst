@@ -90,8 +90,9 @@ We then calculate a metric which shows the subgroups:
 .. doctest:: assessment_metrics
 
     >>> from fairlearn.metrics import MetricFrame
-    >>> grouped_metric = MetricFrame(skm.recall_score, 
-    ...                              y_true, y_pred,
+    >>> grouped_metric = MetricFrame(metrics=skm.recall_score,
+    ...                              y_true=y_true,
+    ...                              y_pred=y_pred,
     ...                              sensitive_features=group_membership_data)
     >>> print("Overall recall = ", grouped_metric.overall)
     Overall recall =  0.5
@@ -117,26 +118,65 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously:
+Multiclass metrics
+^^^^^^^^^^^^^^^^^^
+
+We may also be interested in multiclass classification. However, typical group
+fairness metrics such as equalized odds and demographic parity are only defined
+for binary classification. One way to measure fairness in the multiclass
+scenario is to define one-to-one or one-to-rest classifications for each group
+and calculate the metrics on this instead. Alternatively, we can use predefined
+metrics for multiclass classification. For example, accuracy is a multiclass
+metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
+in combination with a :code:`MetricFrame` as follows:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> multi_metric = MetricFrame({'precision':skm.precision_score, 'recall':skm.recall_score},
+    >>> from sklearn.metrics import accuracy_score
+    >>> from fairlearn.metrics import MetricFrame
+    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
+    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
+    >>> mf = MetricFrame(metric=accuracy_score,
+    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
+    ...                  sensitive_features=group_membership_data)
+    >>> print(mf.by_group) # series with accuracy for each sensitive group
+    sensitive_feature_0
+    a         1.0...
+    b         0.5...
+    c         0.428...
+    d         1.0...
+    Name: accuracy_score, dtype: float64
+    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
+    0.5714285714285714
+
+Multiple metrics in one :code:`MetricFrame`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
+metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
+show each group's size):
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import count
+    >>> multi_metric = MetricFrame({'precision':skm.precision_score,
+    ...                             'recall':skm.recall_score,
+    ...                             'count': count},
     ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
     precision    0.5555...
     recall       0.5...
-    dtype: object
+    dtype: float64
     >>> multi_metric.by_group
-                        precision recall
+                         precision  recall  count
     sensitive_feature_0
-    a                         0.0    0.0
-    b                         1.0    0.5
-    c                         0.6   0.75
-    d                         0.0    0.0
+    a                          0.0    0.00    2.0
+    b                          1.0    0.50    4.0
+    c                          0.6    0.75    7.0
+    d                          0.0    0.00    3.0
 
 If there are per-sample arguments (such as sample weights), these can also be provided
 in a dictionary via the ``sample_params`` argument.:
@@ -146,8 +186,9 @@ in a dictionary via the ``sample_params`` argument.:
 
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
     >>> s_p = { 'sample_weight':s_w }
-    >>> weighted = MetricFrame(skm.recall_score,
-    ...                        y_true, y_pred,
+    >>> weighted = MetricFrame(metrics=skm.recall_score,
+    ...                        y_true=y_true,
+    ...                        y_pred=y_pred,
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
@@ -158,11 +199,14 @@ in a dictionary via the ``sample_params`` argument.:
     b    0.5...
     c    0.7142...
     d    0...
-    Name: recall_score, dtype: object
+    Name: recall_score, dtype: float64
 
 If multiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
 dictionaries, with the first key corresponding matching that in the dictionary holding
 the desired underlying metric functions.
+
+Non-sample parameters
+^^^^^^^^^^^^^^^^^^^^^
 
 We do not support non-sample parameters at the current time. If these are required, then
 use :func:`functools.partial` to prebind the required arguments to the metric
@@ -173,8 +217,9 @@ function:
 
     >>> import functools
     >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
-    >>> metric_beta = MetricFrame(fbeta_06,
-    ...                           y_true, y_pred,
+    >>> metric_beta = MetricFrame(metrics=fbeta_06,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
     ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
     0.5396825396825397
@@ -184,7 +229,10 @@ function:
     b    0.7906...
     c    0.6335...
     d    0...
-    Name: metric, dtype: object
+    Name: metric, dtype: float64
+
+Multiple sensitive features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Finally, multiple sensitive features can be specified. The ``by_groups`` property then
 holds the intersections of these groups:
@@ -195,8 +243,9 @@ holds the intersections of these groups:
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
     >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
     ...                          columns=['SF 0', 'SF 1'])
-    >>> metric_2sf = MetricFrame(skm.recall_score,
-    ...                          y_true, y_pred,
+    >>> metric_2sf = MetricFrame(metrics=skm.recall_score,
+    ...                          y_true=y_true,
+    ...                          y_pred=y_pred,
     ...                          sensitive_features=s_f_frame)
     >>> metric_2sf.overall  # Same as before
     0.5
@@ -210,7 +259,7 @@ holds the intersections of these groups:
           8       0.5
     d     6       0.0
           8       0.0
-    Name: recall_score, dtype: object
+    Name: recall_score, dtype: float64
 
 With such a small number of samples, we are obviously running into cases where
 there are no members in a particular combination of sensitive features. In this
@@ -219,7 +268,7 @@ that there were no samples in it.
 
 .. _scalar_metric_results:
 
-Scalar Results from :code:`MetricFrame`
+Scalar results from :code:`MetricFrame`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often
@@ -252,8 +301,9 @@ the requested aggregation. For example:
     0.752525...
     >>> # But as noted above, functools.partial is needed for MetricFrame
     >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
-    >>> MetricFrame(fbeta_07,
-    ...             y_true, y_pred,
+    >>> MetricFrame(metrics=fbeta_07,
+    ...             y_true=y_true,
+    ...             y_pred=y_pred,
     ...             sensitive_features=group_membership_data).difference()
     0.752525...
 
@@ -312,7 +362,7 @@ might be correlated with various sensitive features. Because of this, control
 features should be used with particular caution.
 
 The :class:`MetricFrame` constructor allows us to specify control features in
-a manner similar to sensitive features, using a :code:`conditional_features=`
+a manner similar to sensitive features, using a :code:`control_features=`
 parameter:
 
 .. doctest:: assessment_metrics
@@ -338,8 +388,9 @@ parameter:
     ...    'C','B','C','A','C','C','B','B','C','A',
     ...    'B','B','C','A','B','A','B','B','A','A'
     ... ]
-    >>> metric_c_f = MetricFrame(skm.accuracy_score,
-    ...                          decision, prediction,
+    >>> metric_c_f = MetricFrame(metrics=skm.accuracy_score,
+    ...                          y_true=decision,
+    ...                          y_pred=prediction,
     ...                          sensitive_features={'SF' : sensitive_feature},
     ...                          control_features={'CF' : control_feature})
     >>> # The 'overall' property is now split based on the control feature
@@ -347,7 +398,7 @@ parameter:
     CF
     H    0.4285...
     L    0.375...
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
     >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
     >>> metric_c_f.by_group
     CF  SF
@@ -357,7 +408,7 @@ parameter:
     L   A     0.4...
         B     0.2857...
         C     0.5...
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
 
 Note how the :attr:`MetricFrame.overall` property is stratified based on the
 supplied control feature. The :attr:`MetricFrame.by_group` property allows
@@ -408,11 +459,55 @@ to take advantage of the inherent plotting capabilities of
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Analyze metrics using MetricFrame
+    :end-before: # Customize plots with ylim
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
-    :align: center 
+    :align: center
 
+It is possible to customize the plots. Here are some common examples.
+
+Customize Plots: :code:`ylim`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The y-axis range is automatically set, which can be misleading, therefore it is
+sometimes useful to set the `ylim` argument to define the yaxis range.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Customize plots with ylim
+    :end-before: # Customize plots with colormap
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_002.png
+    :align: center
+
+
+Customize Plots: :code:`colormap`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To change the color scheme, we can use the `colormap` argument. A list of colorschemes
+can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Customize plots with colormap
+    :end-before: # Customize plots with kind
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_003.png
+    :align: center
+
+Customize Plots: :code:`kind`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
+argument. Here is an example of a pie chart.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Customize plots with kind
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
+    :align: center
+
+There are many other customizations that can be done. More information can be found in
+:meth:`pandas.DataFrame.plot`.
 
 .. _dashboard:
 

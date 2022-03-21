@@ -22,6 +22,12 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     The exponentiated gradient algorithm is described in detail by
     `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
 
+    .. versionchanged:: 0.3.0
+        Was a function before, not a class
+
+    .. versionchanged:: 0.4.6
+        Requires 0-1 labels for classification problems
+
     Parameters
     ----------
     estimator : estimator
@@ -42,21 +48,41 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         have the error within :code:`2*best_gap` of the best error under
         constraint `eps`; the constraint violation is at most
         :code:`2*(eps+best_gap)`
+
+        .. versionchanged:: 0.5.0
+            :code:`eps` is now only responsible for setting the L1 norm bound
+            in the optimization
+
     max_iter : int
         Maximum number of iterations
+
+        .. versionadded:: 0.5.0
+            Used to be :code:`T`
+
     nu : float
         Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty
         in measuring classification error
+
     eta_0 : float
         Initial setting of the learning rate
+
+        .. versionadded:: 0.5.0
+            Used to be :code:`eta_mul`
+
     run_linprog_step : bool
         if True each step of exponentiated gradient is followed by the saddle
         point optimization over the convex hull of classifiers returned so
         far; default True
+
+        .. versionadded:: 0.5.0
+
     sample_weight_name : str
         Name of the argument to `estimator.fit()` which supplies the sample weights
         (defaults to `sample_weight`)
+
+        .. versionadded:: 0.5.0
+
     """
 
     def __init__(self, estimator, constraints, objective=None,

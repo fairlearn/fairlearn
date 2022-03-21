@@ -15,31 +15,31 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - binary classification
       - regression
       - supported fairness definitions
-   *  - :code:`fairlearn.` :code:`reductions.` :code:`ExponentiatedGradient`
+   *  - :class:`~fairlearn.reductions.ExponentiatedGradient`
       - A wrapper (reduction) approach to fair classification described in *A Reductions*
-        *Approach to Fair Classification* [#2]_.
+        *Approach to Fair Classification* :footcite:`agarwal2018reductions`.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :code:`fairlearn.` :code:`reductions.` :code:`GridSearch`
+   *  - :class:`~fairlearn.reductions.GridSearch`
       - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
-        *Approach to Fair Classification* [#2]_. For regression it acts as a
+        *Approach to Fair Classification* :footcite:`agarwal2018reductions`. For regression it acts as a
         grid-search variant of the algorithm described in Section 5 of
         *Fair Regression: Quantitative Definitions and Reduction-based*
-        *Algorithms* [#1]_.
+        *Algorithms* :footcite:`agarwal2019fair`.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :code:`fairlearn.` :code:`postprocessing.` :code:`ThresholdOptimizer`
+   *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
-        *in Supervised Learning* [#3]_. This technique takes as input an
+        *in Supervised Learning* :footcite:`hardt2016equality`. This technique takes as input an
         existing classifier and the sensitive feature, and derives a monotone
         transformation of the classifier's prediction to enforce the specified
         parity constraints.
       - ✔
       - ✘
       - DP, EO, TPRP, FPRP
-   *  - :code:`fairlearn.` :code:`preprocessing.` :code:`CorrelationRemover`
+   *  - :class:`~fairlearn.preprocessing.CorrelationRemover`
       - Preprocessing algorithm that removes correlation between sensitive
         features and non-sensitive features through linear transformations.
       - ✔
@@ -106,7 +106,7 @@ and :ref:`constraints_regression`.
 
 The reductions approach for classification seeks to reduce binary
 classification subject to fairness constraints to a sequence of weighted
-classification problems (see [#2]_), and similarly for regression (see [#1]_).
+classification problems (see :footcite:`agarwal2018reductions`), and similarly for regression (see :footcite:`agarwal2019fair`).
 As a result, the reduction algorithms
 in Fairlearn only require a wrapper access to any "base" learning algorithm.
 By this we mean that the "base" algorithm only needs to implement :code:`fit` and
@@ -272,8 +272,9 @@ the predicted labels.
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  0 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> selection_rate_summary = MetricFrame(selection_rate,
-    ...                                      y_true, y_pred,
+    >>> selection_rate_summary = MetricFrame(metrics=selection_rate,
+    ...                                      y_true=y_true,
+    ...                                      y_pred=y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall
         0.4
@@ -281,7 +282,7 @@ the predicted labels.
     SF 0
     a    0.6
     b    0.2
-    Name: selection_rate, dtype: object
+    Name: selection_rate, dtype: float64
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
     sign  event  group_id
@@ -359,8 +360,9 @@ In practice this can be used in a difference-based relaxation as follows:
     >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
     >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
     >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
-    >>> tpr_summary = MetricFrame(true_positive_rate,
-    ...                           y_true, y_pred,
+    >>> tpr_summary = MetricFrame(metrics=true_positive_rate,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
     ...                           sensitive_features=sensitive_features)
     >>> tpr_summary.overall
     0.5714285714285714
@@ -368,7 +370,7 @@ In practice this can be used in a difference-based relaxation as follows:
     sensitive_feature_0
     a    0.75...
     b    0.33...
-    Name: true_positive_rate, dtype: object
+    Name: true_positive_rate, dtype: float64
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
@@ -456,8 +458,9 @@ the overall error rate by more than the value of :code:`difference_bound`.
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> from sklearn.metrics import accuracy_score
-    >>> accuracy_summary = MetricFrame(accuracy_score,
-    ...                                y_true, y_pred,
+    >>> accuracy_summary = MetricFrame(metrics=accuracy_score,
+    ...                                y_true=y_true,
+    ...                                y_pred=y_pred,
     ...                                sensitive_features=sensitive_features)
     >>> accuracy_summary.overall
     0.6
@@ -465,7 +468,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     sensitive_feature_0
     a    0.8
     b    0.4
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
     >>> erp = ErrorRateParity(difference_bound=0.01)
     >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> erp.gamma(lambda X: y_pred)
@@ -541,10 +544,10 @@ The other constraints acquire similar modifications.
 
 .. _constraints_multi_class_classification:
 
-Fairness constraints for multi-class classification
+Fairness constraints for multiclass classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Reductions approaches do not support multi-class classification yet at this
+Reductions approaches do not support multiclass classification yet at this
 point. If this is an important scenario for you please let us know!
 
 .. _constraints_regression:
@@ -611,16 +614,17 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> y_true             = np.array([0.3, 0.5, 0.1, 1.0])
     >>> y_pred             = np.array([0.3, 0.6, 0.6, 0.5])
     >>> sensitive_features = np.array(["a", "a", "b", "b"])
-    >>> mae_frame = MetricFrame(mean_absolute_error,
-    ...                         y_true, y_pred,
+    >>> mae_frame = MetricFrame(metrics=mean_absolute_error,
+    ...                         y_true=y_true,
+    ...                         y_pred=y_pred,
     ...                         sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> mae_frame.overall
     0.275
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b    0.5
-    Name: mean_absolute_error, dtype: object
+    b    0.50
+    Name: mean_absolute_error, dtype: float64
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
     group_id
@@ -645,17 +649,9 @@ Exponentiated Gradient
 Grid Search
 ~~~~~~~~~~~
 
-.. topic:: References:
+.. _references:
 
-   .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
-      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
-      ICML, 2019.
-   
-   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
-      Approach to Fair Classification"
-      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
-   
-   .. [#3] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
-      Learning"
-      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NeurIPS, 2016.
+References
+~~~~~~~~~~
+
+.. footbibliography::

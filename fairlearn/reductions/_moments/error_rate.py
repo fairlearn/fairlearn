@@ -6,7 +6,7 @@ import pandas as pd
 from .moment import ClassificationMoment
 from .moment import _ALL, _LABEL
 
-from fairlearn._input_validation import _validate_and_reformat_input
+from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 
 _MESSAGE_BAD_COSTS = "costs needs to be a dictionary with keys " \

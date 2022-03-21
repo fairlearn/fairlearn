@@ -16,6 +16,9 @@
 import os
 import sys
 import inspect
+from datetime import datetime
+from packaging.version import parse
+
 rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
@@ -29,8 +32,8 @@ print("================================")
 # -- Project information -----------------------------------------------------
 
 project = 'Fairlearn'
-copyright = '2019, Microsoft Corporation and contributors.'
-author = 'Microsoft and Fairlearn contributors'
+copyright = f'2018 - {datetime.now().year}, Fairlearn contributors'
+author = 'Fairlearn contributors'
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
@@ -69,13 +72,22 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_gallery.gen_gallery',
-    'sphinx_multiversion'
+    'sphinx_multiversion',
+    'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
 ]
+
+source_suffix = ['.rst']
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None), }
+                       'sklearn': ('https://scikit-learn.org/stable/', None),
+                       'matplotlib': ('https://matplotlib.org/', None,),
+                       'tensorflow': (
+                            'https://www.tensorflow.org/api_docs/python',
+                            'https://raw.githubusercontent.com/GPflow/'
+                            'tensorflow-intersphinx/master/tf2_py_objects.inv'
+                        )}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -83,13 +95,14 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.rst']
 
 master_doc = 'index'
 
 # Multiversion settings
-
-smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d|^v0\.6\.\d+$'
+# Show only the highest patch versions of each minor version.
+# Example: include 0.4.6, but not 0.4.0 to 0.4.5
+smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.0|^v0\.6\.2|^v0\.7\.0+$'
 smv_branch_whitelist = r'^main$'
 
 if check_if_v046():
@@ -108,19 +121,35 @@ html_theme = 'pydata_sphinx_theme'
 # documentation.
 html_theme_options = {
     "logo_link": "https://fairlearn.org",
-    # TODO: fork the pydata-sphinx-theme to integrate these with logo
-    "external_links": [
-        {"name": "Gitter", "url": "https://gitter.im/fairlearn/community"},
-        {"name": "StackOverflow", "url": "https://stackoverflow.com/questions/tagged/fairlearn"}
+
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/fairlearn/fairlearn",
+            "icon": "fab fa-github",
+        },
+        {
+            "name": "Twitter",
+            "url": "https://twitter.com/fairlearn",
+            "icon": "fab fa-twitter",
+        },
+        {
+            "name": "StackOverflow",
+            "url": "https://stackoverflow.com/questions/tagged/fairlearn",
+            "icon": "fab fa-stack-overflow",
+        },
+        {
+            "name": "Discord",
+            "url": "https://discord.gg/R22yCfgsRn",
+            "icon": "fab fa-discord",
+        },
     ],
-    "github_url": "https://github.com/fairlearn/fairlearn",
-    # "twitter_url": "https://twitter.com/fairlearn" TODO: start using this
     "show_prev_next": False
 }
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "_static/images/fairlearn_full_color.png"
+html_logo = "_static/images/fairlearn_full_color.svg"
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -135,7 +164,7 @@ html_use_index = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_css_files = []
+html_css_files = ['css/custom.css']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -218,3 +247,22 @@ mathjax3_config = {
         }
     }
 }
+
+
+def check_if_v07():
+    """Check to see if current version being built is > v0.7."""
+    result = False
+
+    if parse(fairlearn.__version__) > parse("0.7"):
+        print("Detected version > 0.7 in fairlearn.__version__")
+        result = True
+
+    return result
+
+
+# Setup for sphinx-bibtex
+
+# Only use sphinx-bibtex if version is above 0.7
+if check_if_v07():
+    extensions += ['sphinxcontrib.bibtex', ]
+    bibtex_bibfiles = ['refs.bib']

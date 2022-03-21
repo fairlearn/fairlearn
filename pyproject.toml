@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 79
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::FutureWarning",
+    'ignore:the imp module is deprecated:DeprecationWarning',
+    'ignore:Using or importing the ABCs from:DeprecationWarning',
+    "ignore:tostring:DeprecationWarning",
+]

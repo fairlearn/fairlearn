@@ -31,7 +31,10 @@ nbval
 # Required for documentation
 bokeh
 pypandoc
-sphinx
+sphinx==4.2.0
 sphinx-gallery
 git+https://github.com/Holzhaus/sphinx-multiversion.git
 pydata-sphinx-theme==0.6.3
+sphinx-autodoc-typehints
+sphinxcontrib-bibtex
+packaging
