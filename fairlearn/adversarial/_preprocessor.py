@@ -14,6 +14,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.multiclass import type_of_target
 from numpy import all as np_all
 from numpy import sum as np_sum
+from numpy import unique
 
 # FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
 
@@ -22,9 +23,9 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
     """
     Transformer that maps dataframes to numpy arrays of floats.
 
-    It is in essence a wrapper around sklearn transformers that
-    automatically infers the type of data, and encodes it as floating point
-    numbers. It applies one-hot-encoding
+    It is in essence a wrapper around sklearn transformers (meta-transformer)
+    that automatically infers the type of data, or makes sure the transformer
+    encodes it as floating point numbers. It applies one-hot-encoding
     to categorical columns, and 'passthrough' (nothing) to
     numerical columns. The usefulness of this class is that it can
     preprocess different kinds of data (discrete, continuous) to one
@@ -42,46 +43,122 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         A string that in dicates the distribution type of the original data.
         It is one of :code:`"binary"`, :code:`"category"`,
         or :code:`"continuous"`
-    """ # noqa : RST306
+    """  # noqa : RST306
 
-    def __init__(self, dist_assumption="auto"):
+    def __init__(self, transformer="auto"):
         """
         Initialize empty transformers with the given distribution assumption.
 
         Parameters
         ----------
-        dist_assumption : str, default = "auto"
-            This is a string that indicates an assumption about the
-            distribution of
-            the data that will be transformed. Possible assumptions are
-            "binary", "category", "continuous", "classification",
-            "auto" (default).
-            If the data is not
-            describable using one of these keywords,
-            you must build your own transformer instead.
+        transformer : str, sklearn.base.TransformerMixin, optional, default = "auto"
+            This is a string that indicates the transformer, such as
+            :code:`"auto"`, :code:`"one_hot_encoder"`, :code:`"binarizer"`.
+            Or, None, for pass-through. Or, a transformer object.
         """
-        self.dist_assumption = dist_assumption
+        if isinstance(transformer, str) or transformer is None:
+            if transformer in [None, "continuous"]:
+                self.dist_assumption = "continuous"
+            elif transformer == "auto":
+                self.dist_assumption = "auto"
+            elif transformer in ["one_hot_encoder", "category"]:
+                self.dist_assumption = "category"
+            elif transformer in ["binarizer", "binary"]:
+                self.dist_assumption = "binary"
+            elif transformer == "classification":
+                self.dist_assumption = "classification"
+            else:
+                raise ValueError(
+                    "Can not interpret keyword for preprocessing transformer: "
+                    + transformer
+                )
+        # TODO perhaps warn that the user is responsible for preprocessing
+        # correctly to float-matrices?
+        self.transformer = transformer
 
-    def _prep(self, X, dtype=None, init=False):
+    def _check(self, X, dtype=None, init=False):
         """
-        Prepare X by doing some checks and converting to ndarray.
+        Check X and convert to 2d ndarray.
 
         dtype : numpy.dtype
             None to keep dtypes, float to coerce to numeric.
 
         init : bool
-            Whether this is the first call to _prep or not.
+            Whether this is the first call to _check or not. Useful to store
+            the dimensions of X, so we can use this for inverse_transform
 
         Returns
         -------
-        X : pandas.DataFrame, numpy.ndarray
+        X : numpy.ndarray
             validated input
         """
+        X = check_array(
+            X,
+            accept_sparse=False,
+            accept_large_sparse=False,
+            dtype=dtype,
+            ensure_2d=False,
+        )
         if init:
-            self.in_type_ = type(X)
+            self.input_dim_ = X.ndim
+        else:
+            if X.ndim != self.input_dim_:
+                raise ValueError(
+                    "Dimension of data is inconsistent with previous call"
+                )
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+
+        return X
+
+    def fit(self, X, y=None):
+        """Fit the three transformers."""
+        # Sci-kit learn parameter
+        if isinstance(self.transformer, str) or self.transformer is None:
             self.inferred_type_ = type_of_target(X)
             self.dist_type_ = _get_type(X, self.dist_assumption)
+            self.in_type_ = type(X)
+            if self.in_type_ == DataFrame:
+                self.columns_ = X.columns
+
+            X = self._check(X, init=True)
+            self.n_features_in_ = X.shape[0]
+            self.n_features_out_ = X.shape[0]
+
+            if self.inferred_type_ in ["binary", "multiclass"]:
+                # NOTE: if 'binary' then it could be possible it is already 0/1
+                # encoded. So may want to skip redundant OHE in that case...
+                self.transform_ = OneHotEncoder(
+                    drop="if_binary", sparse=False, handle_unknown="error"
+                )
+                self.transform_.fit(X)
+                self.n_features_out_ = sum(
+                    len(cat) if len(cat) != 2 else 1
+                    for cat in self.transform_.categories_
+                )
+            # elif "multilabel-indicator" needn't be encoded, so we do not create
+            # an encoder then.
         else:
+            # It is useful to gather n_features_out_ to use in constructing NN
+            # After, we discard the checked data and just feed unchecked data
+            # to the transformer.
+            X_temp = self._check(X, init=True)
+            self.n_features_in_ = X_temp.shape[0]
+            if _get_type(X_temp, self.dist_assumption) == "category":
+                self.n_features_out_ = unique(X_temp)
+            else:
+                self.n_features_out_ = self.n_features_in_
+
+            self.transform_ = self.transformer
+            self.transform_.fit(X)
+            if hasattr(self.transform_, "n_features_out_"):
+                self.n_features_out_ = self.transform_.n_features_out_
+
+        return self
+
+    def transform(self, X):
+        """Transform X using the fitted encoder or passthrough."""
+        if isinstance(self.transformer, str) or self.transformer is None:
             if not isinstance(X, self.in_type_):
                 raise ValueError(
                     _ARG_ERROR_MESSAGE.format("X", "of type " + self.in_type_)
@@ -95,74 +172,43 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             if not _get_type(X, self.dist_assumption) == self.dist_type_:
                 raise ValueError(_TYPE_CHECK_ERROR.format(self.dist_type_))
 
-        if self.in_type_ == DataFrame:
-            self.columns_ = X.columns
-
-        X = check_array(
-            X,
-            accept_sparse=False,
-            accept_large_sparse=False,
-            dtype=dtype,
-            ensure_2d=False,
-        )
-
-        self.input_dim_ = X.ndim
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
-
-        return X
-
-    def fit(self, X, y=None):
-        """Fit the three transformers."""
-        X = self._prep(X, init=True)
-        self.n_features_in_ = X.shape[1]
-        self.n_features_out_ = X.shape[1]
-
-        if self.inferred_type_ in ["binary", "multiclass"]:
-            # NOTE: if 'binary' then it could be possible it is already 0/1
-            # encoded. So may want to skip redundant OHE in that case...
-            self.ct_ = OneHotEncoder(
-                drop="if_binary", sparse=False, handle_unknown="error"
-            )
-            self.ct_.fit(X)
-            self.n_features_out_ = sum(
-                len(cat) if len(cat) != 2 else 1 for cat in self.ct_.categories_
-            )
-        # elif "multilabel-indicator" needn't be encoded, so we do not create
-        # an encoder then.
-
-        return self
-
-    def transform(self, X):
-        """Transform X using the fitted encoder or passthrough."""
-        if self.inferred_type_ in ["continuous", "continuous-multioutput"]:
-            return self._prep(X, dtype=float)
-        elif self.inferred_type_ in ["binary", "multiclass"]:
-            return self.ct_.transform(self._prep(X)).astype(float)
-        elif self.inferred_type_ == "multilabel-indicator":
-            return self._prep(X, dtype=float)
+            if self.inferred_type_ in ["binary", "multiclass"]:
+                return self.transform_.transform(self._check(X)).astype(float)
+            else:
+                # This is for:
+                # self.inferred_type_ in "continuous", "continuous-multioutput",
+                #                        "multilabel-indicator"
+                return self._check(X, dtype=float)
+        else:
+            return self.transform_.transform(X)
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
         inverse = None
-        if self.inferred_type_ in ["continuous", "continuous-multioutput"]:
-            inverse = y
-        elif self.inferred_type_ in ["binary", "multiclass"]:
-            inverse = self.ct_.inverse_transform(y)
-        elif self.inferred_type_ == "multilabel-indicator":
-            inverse = y
+        if isinstance(self.transformer, str):
+            if self.inferred_type_ in ["binary", "multiclass"]:
+                inverse = self.transform_.inverse_transform(y)
+            else:
+                # This is for:
+                # self.inferred_type_ in "continuous", "continuous-multioutput",
+                #                        "multilabel-indicator"
+                inverse = y
 
-        if self.input_dim_ == 1:
-            inverse = inverse.reshape(-1)
+            if self.input_dim_ == 1:
+                inverse = inverse.reshape(-1)
 
-        # Because we are kind, we try to translate back to the original data
-        # type, but we only support DataFrame, Series, list(, ndarray).
-        if self.in_type_ == DataFrame:
-            inverse = DataFrame(inverse, columns=self.columns_)
-        elif self.in_type_ == Series:
-            inverse = Series(inverse)
-        elif self.in_type_ == list:
-            inverse = inverse.tolist()
+            # Because we are kind, we try to translate back to the original data
+            # type, but we only support DataFrame, Series, list(, ndarray).
+            if self.in_type_ == DataFrame:
+                inverse = DataFrame(inverse, columns=self.columns_)
+            elif self.in_type_ == Series:
+                inverse = Series(inverse)
+            elif self.in_type_ == list:
+                inverse = inverse.tolist()
+        elif self.transformer is None:
+            inverse = y
+        else:
+            inverse = self.transform_.inverse_transform(y)
 
         return inverse
 

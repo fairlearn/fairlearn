@@ -154,13 +154,13 @@ def test_fake_models_df_inputs():
 def check_type_helper(data, actual_type, valid_choices, invalid_choices):
     """Help to check if distribution types are interpreted correctly."""
     for valid_choice in valid_choices:
-        prep = FloatTransformer(valid_choice)
+        prep = FloatTransformer(transformer=valid_choice)
         prep.fit(data)
         assert prep.dist_type_ == actual_type
 
     for invalid_choice in invalid_choices:
         with pytest.raises(ValueError) as exc:
-            prep = FloatTransformer(invalid_choice)
+            prep = FloatTransformer(transformer=invalid_choice)
             prep.fit(data)
             assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
                 invalid_choice, prep.inferred_type_
@@ -184,24 +184,22 @@ def test_check_type_correct_data():
     check_type_helper(
         Cont1d,
         Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],
+        [Keyword_AUTO, Keyword_CONTINUOUS, None],
         [
             Keyword_BINARY,
             Keyword_CATEGORY,
             Keyword_CLASSIFICATION,
-            None,
             "bogus",
         ],
     )
     check_type_helper(
         Cont2d,
         Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],
+        [Keyword_AUTO, Keyword_CONTINUOUS, None],
         [
             Keyword_BINARY,
             Keyword_CATEGORY,
             Keyword_CLASSIFICATION,
-            None,
             "bogus",
         ],
     )
@@ -221,7 +219,7 @@ def test_check_type_correct_data():
     )
 
     with pytest.raises(ValueError) as exc:
-        prep = FloatTransformer(Keyword_AUTO)
+        prep = FloatTransformer(transformer=Keyword_AUTO)
         prep.fit(Bin2d)
         assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
             Keyword_AUTO, prep.inferred_type_
