@@ -849,6 +849,7 @@ class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
+        self._estimator_type = "classifier"
         kwargs["y_transform"] = "classification"
         kwargs["predictor_loss"] = "classification"
         kwargs["predictor_function"] = "classification"
@@ -860,6 +861,7 @@ class AdversarialFairnessRegressor(AdversarialFairness, RegressorMixin):
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
+        self._estimator_type = "regressor"
         kwargs["y_transform"] = None
         kwargs["predictor_function"] = None
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
