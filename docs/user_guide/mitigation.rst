@@ -78,9 +78,8 @@ Preprocessing algorithms transform the dataset to mitigate possible unfairness
 present in the data.
 Preprocessing algorithms in Fairlearn follow the `scikit-learn transformers
 <https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin>`_
-class, meaning that they can :code:`fit` to the dataset and :code:`transform` it.
-A :code:`fit_transform` might not always be available, in which case the separate
-:code:`fit` and :code:`transform` methods need to be used in sequence.
+class, meaning that they can :code:`fit` to the dataset and :code:`transform` it
+(or :code:`fit_transform` to fit and transform in one go).
 
 .. _correlation_remover:
 
