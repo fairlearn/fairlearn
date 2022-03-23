@@ -487,7 +487,8 @@ class ConstrainedLogisticRegression(LogisticRegression):
             X_sensitive,
             y,
             renamed_sensitive_feature_ids,
-            sensitive_attrs_to_cov_thresh,
+            categories,
+            self.covariance_bound,
         )
 
         # We continue with the code from sklearn here
