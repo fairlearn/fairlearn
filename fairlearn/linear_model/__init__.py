@@ -3,8 +3,8 @@
 
 """This module contains existing linear models that have been adapted to work with fairness constraints."""
 
-from ._fair_logistic import FairLogisticRegression
+from ._fair_logistic import ConstrainedLogisticRegression
 
 __all__ = [
-    "FairLogisticRegression"
+    "ConstrainedLogisticRegression"
 ]

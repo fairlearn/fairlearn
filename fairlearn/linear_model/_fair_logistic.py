@@ -39,14 +39,14 @@ def _check_solver(solver, penalty):
     all_solvers = ["SLSQP"]
     if solver not in all_solvers:
         raise ValueError(
-            "Fair Logistic Regression supports only solvers in %s, got %s."
+            "Constrained Logistic Regression supports only solvers in %s, got %s."
             % (all_solvers, solver)
         )
 
     all_penalties = ["l1", "l2", "elasticnet", "none"]
     if penalty not in all_penalties:
         raise ValueError(
-            "Logistic Regression supports only penalties in %s, got %s."
+            "Constrained Logistic Regression supports only penalties in %s, got %s."
             % (all_penalties, penalty)
         )
 
@@ -370,7 +370,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     return X, renamed_sensitive_feature_ids
 
 
-class FairLogisticRegression(LogisticRegression):
+class ConstrainedLogisticRegression(LogisticRegression):
     """TODO: add docstring, check in BalancedRandomForestClassifier how they handle docstrings for inherited class"""
 
     def __init__(
@@ -411,7 +411,7 @@ class FairLogisticRegression(LogisticRegression):
         )
 
     # Below code is almost entirely reused from the CorrelationRemover, should this maybe be abstracted higher up?
-    # Also not sure if this should be a function of the FairLogisticRegression class, doesn't really feel like it.
+    # Also not sure if this should be a function of the ConstrainedLogisticRegression class, doesn't really feel like it.
     # That is also why I feel like it is a good reason to abstract it higher up. Seems like something for utils maybe?
     def _split_X(self, X, sensitive_feature_ids):
         """Split up X into a sensitive and non-sensitive group."""
