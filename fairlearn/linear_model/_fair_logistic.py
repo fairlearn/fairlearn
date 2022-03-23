@@ -43,7 +43,7 @@ def _check_solver(solver, penalty):
             % (all_solvers, solver)
         )
 
-    all_penalties = ["l1", "l2", "elasticnet", "none"]
+    all_penalties = ["l2", "none"]
     if penalty not in all_penalties:
         raise ValueError(
             "Constrained Logistic Regression supports only penalties in %s, got %s."
@@ -477,22 +477,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
         if not isinstance(self.C, numbers.Number) or self.C < 0:
             raise ValueError(
                 "Penalty term must be positive; got (C=%r)" % self.C
-            )
-        if self.penalty == "elasticnet":
-            if (
-                not isinstance(self.l1_ratio, numbers.Number)
-                or self.l1_ratio < 0
-                or self.l1_ratio > 1
-            ):
-                raise ValueError(
-                    "l1_ratio must be between 0 and 1; got (l1_ratio=%r)"
-                    % self.l1_ratio
-                )
-        elif self.l1_ratio is not None:
-            warnings.warn(
-                "l1_ratio parameter is only used when penalty is "
-                "'elasticnet'. Got "
-                "(penalty={})".format(self.penalty)
             )
         if self.penalty == "none":
             if self.C != 1.0:  # default values
