@@ -381,6 +381,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     def __init__(
         self,
+        constraints="demographic_parity",
         penalty="l2",
         *,
         covariance_bound=0.0,
@@ -417,6 +418,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
             l1_ratio=l1_ratio,
         )
 
+        self.constraints = constraints
         self.covariance_bound = covariance_bound
 
         # The covariance_bound needs to be in a list for _get_constraint_list_cov
@@ -460,6 +462,11 @@ class ConstrainedLogisticRegression(LogisticRegression):
         sensitive_feature_ids=None,
     ):
         """TODO: add docstring"""
+
+        if self.constraints is None:
+            clf = LogisticRegression(self)
+            return clf.fit(X, y)
+
         # TODO: Maybe turn below code until constraints into a preprocessing function?
 
         # One-hot-encode the data and return the new sensitive feature ids that come along with the encoded data
