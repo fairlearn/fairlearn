@@ -177,18 +177,8 @@ For instance, if the data appears categorical, categorical cross
 entropy loss is used, along with a softmax on the output layer of the model,
 and an argmax for the discrete prediction function. 
 
-We also offer some shortcuts for binary, categorical, and continuous data
-that the user may use to further specify appropriate types. This is useful to
-ensure that the inferred distribution type is as expected.
-For instance, to indicate that the predictions should be categorical, you
-pass :code:`predictor_loss='category'`
-and :code:`prediction_function='category'`.
-For a list of keywords and their
-implications, see the Table below. 
-.. Additionally, there are keywords
-.. :code:`auto` and :code:`classification`. The former indicates to automatically
-.. infer the distribution (which is the default keyword), and the latter indicates
-.. to select either :code:`binary` or :code:`category`.
+Below are some natural choices of parameters to construct models. These will
+also be inferred from the data, if applicable.
 
 .. list-table::
    :header-rows: 1
@@ -197,7 +187,7 @@ implications, see the Table below.
 
    *  - keyword
       - distribution assumption
-      - requirements
+      - inferred if the follow holds
       - loss
       - predictor function
    *  - :code:`'continuous'`

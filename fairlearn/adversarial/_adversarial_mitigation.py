@@ -64,10 +64,12 @@ class AdversarialFairness(BaseEstimator):
     whether to assume binomial, multinomial, or normally distributed data.
     You can force the transformer to assume one of the above by passing
     :code:`"binary"`, :code:`"category"`,
-    :code:`"continuous"` instead.
+    :code:`"continuous"` instead. Better yet,
+    you can pass :code:`"one_hot_encoder"` or :code:`None` en choose a
+    preprocessing technique.
     Loss functions and decision functions
-    for the target and sensitive features are also predefined for keywords
-    "auto",
+    for the target and sensitive features are also predefined for keywords such
+    as "auto", "cross_entropy_loss",
     "logistic_loss", "squared_loss", "binary", "category", and "continuous".
     The :code:`predictor_function` parameter can be automatically interpreted
     as well, or set to :code:`"argmax"` or :code:`"threshold"`.
@@ -104,7 +106,7 @@ class AdversarialFairness(BaseEstimator):
 
     predictor_loss : str, callable, default = 'auto'
         Either a keyword, such as:
-        :code:`'auto'`, :code:`'logistic_loss'`,
+        :code:`'auto'`, :code:`'logistic_loss'`, :code:`'cross_entropy_loss'`,
         :code:`'multinomial_logistic_loss'`, :code:`'square_loss'`.
         Or, a callable. The string
         :code:`'auto'` indicates to infer the loss
@@ -117,7 +119,7 @@ class AdversarialFairness(BaseEstimator):
 
     adversary_loss : str, callable, default = 'auto'
         Either a keyword, such as:
-        :code:`'auto'`, :code:`'logistic_loss'`,
+        :code:`'auto'`, :code:`'logistic_loss'`, :code:`'cross_entropy_loss'`,
         :code:`'multinomial_logistic_loss'`, :code:`'square_loss'`.
         Or, a callable. The string
         :code:`'auto'` indicates to infer the loss
@@ -318,18 +320,20 @@ class AdversarialFairness(BaseEstimator):
                 )
             )
 
-        # Non-negative parameters
-        for kw, kwname in (
-            (self.threshold_value, "threshold_value"),
-            (self.learning_rate, "learning_rate"),
-            (self.alpha, "alpha"),
-            (self.progress_updates, "progress_updates"),
-        ):
+        # Numbers
+        for kw, kwname in ((self.threshold_value, "threshold_value"),):
             if kw and not isinstance(kw, (int, float)):
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(kwname, "a number")
                 )
-            elif kw and kw < 0.0:
+
+        # Non-negative parameters
+        for kw, kwname in (
+            (self.learning_rate, "learning_rate"),
+            (self.alpha, "alpha"),
+            (self.progress_updates, "progress_updates"),
+        ):
+            if kw and kw < 0.0:
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(
                         kwname, "a non-negative number"
@@ -392,9 +396,17 @@ class AdversarialFairness(BaseEstimator):
                     "category",
                 ]:
                     expected_dist = kw_or_func
-                elif kw_or_func in ["logistic_loss"]:
+                elif kw_or_func in [
+                    "logistic_loss",
+                    "cross_entropy_loss",
+                    "log_loss",
+                ]:
                     expected_dist = "classification"
-                elif kw_or_func in ["multinomial_logistic_loss", "argmax"]:
+                elif kw_or_func in [
+                    "multinomial_logistic_loss",
+                    "argmax",
+                    "categorical_cross_entropy_loss",
+                ]:
                     expected_dist = "category"
                 elif kw_or_func in ["threshold"]:
                     expected_dist = "binary"
