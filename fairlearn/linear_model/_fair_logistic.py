@@ -113,13 +113,19 @@ def _get_constraint_list_cov(
     A_train,
     y_train,
     renamed_sensitive_feature_ids,
-    sensitive_attrs_to_cov_thresh,
+    categories,
+    covariance_bound,
 ):
-    # For now, I only work with a constant threshold.
-    # The paper works with a threshold per category of a sensitive feature (if not binary), and else per sens feature.
+
+    # New covariance bound list such that it correctly handles the OHE sensitive features
+    # Now we can have a separate covariance bound per sensitive feature
+    cov_bound = []
+    for index, array in enumerate(categories):
+        cov_bound.extend([covariance_bound[index]] * len(array))
+
     constraints = []
 
-    for attr in renamed_sensitive_feature_ids:
+    for index, attr in enumerate(renamed_sensitive_feature_ids):
         if isinstance(A_train, pd.DataFrame):
             c = {
                 "type": "ineq",
@@ -128,7 +134,7 @@ def _get_constraint_list_cov(
                     X_train,
                     y_train,
                     A_train[attr].to_numpy(),
-                    sensitive_attrs_to_cov_thresh,
+                    cov_bound[index],
                 ),
             }
         else:
@@ -139,7 +145,7 @@ def _get_constraint_list_cov(
                     X_train,
                     y_train,
                     A_train[:, attr],
-                    sensitive_attrs_to_cov_thresh,
+                    cov_bound[index],
                 ),
             }
 
@@ -367,7 +373,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
             range(X_without_sensitive.shape[1], X.shape[1])
         )
 
-    return X, renamed_sensitive_feature_ids
+    return X, renamed_sensitive_feature_ids, enc.categories_
 
 
 class ConstrainedLogisticRegression(LogisticRegression):
@@ -377,6 +383,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         self,
         penalty="l2",
         *,
+        covariance_bound=0.0,
         dual=False,
         tol=1e-4,
         C=1.0,
@@ -409,6 +416,12 @@ class ConstrainedLogisticRegression(LogisticRegression):
             n_jobs=n_jobs,
             l1_ratio=l1_ratio,
         )
+
+        self.covariance_bound = covariance_bound
+
+        # The covariance_bound needs to be in a list for _get_constraint_list_cov
+        if not isinstance(self.covariance_bound, list):
+            self.covariance_bound = list(self.covariance_bound)
 
     # Below code is almost entirely reused from the CorrelationRemover, should this maybe be abstracted higher up?
     # Also not sure if this should be a function of the ConstrainedLogisticRegression class, doesn't really feel like it.
@@ -445,7 +458,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
         y,
         sample_weight=None,
         sensitive_feature_ids=None,
-        sensitive_attrs_to_cov_thresh=None,
     ):
         """TODO: add docstring"""
         # TODO: Maybe turn below code until constraints into a preprocessing function?
