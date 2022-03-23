@@ -197,7 +197,7 @@ def test_examples():
 
     RESULT3 = mf.by_group
 
-    # NOTE because of the random state, it is hard to test. Needs to be improved
+    # NOTE because of the random state it is hard to test. Needs to be improved
     # though.
     assert RESULT1 is not None
     assert RESULT2a is not None
