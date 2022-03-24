@@ -4,6 +4,8 @@
 from math import ceil
 from time import time
 
+from sklearn.utils import check_scalar
+
 from ._constants import (
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
@@ -43,7 +45,8 @@ class AdversarialFairness(BaseEstimator):
     `"Mitigating Unwanted Biases with Adversarial Learning"
     <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
     This algorithm takes as input two neural network
-    models, a predictor model and an adversarial model, defined either as a `PyTorch module
+    models, a predictor model and an adversarial model, defined either as a
+    `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
     `Tensorflow2 model
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
@@ -52,10 +55,11 @@ class AdversarialFairness(BaseEstimator):
     As per [1]_, the neural network models :code:`predictor_model` and
     :code:`adversary_model` should not have a discrete prediction at the end of the
     model, as gradients do not propagate through a discretization step.
-    Instead, even if we desire discrete predictions in the end, we must
-    output the sigmoidal or soft-max during training. You can supply the final
-    discrete prediction function later,
-    see parameter :code:`prediction_function`.
+    When discrete predictions are required, as is the case in binary and
+    multiclass classification, please just supply the predictor model that
+    produces continuous values, e.g., using a sigmoidal or soft-max
+    activation, and specify the appropriate final transformation separately via
+    parameter :code:`prediction_function`.
 
     The distribution types of :code:`y` and :code:`sensitive_features`
     are set by their preprocessor :code:`y_transform` and :code:`sf_transform`
@@ -181,7 +185,7 @@ class AdversarialFairness(BaseEstimator):
         to a 2d ndarray containing only floats.
 
     learning_rate : float, default = 0.001
-        A small number greater than zero to set as initial learning rate
+        A small number greater than zero to set as learning rate
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
@@ -213,10 +217,11 @@ class AdversarialFairness(BaseEstimator):
     callbacks : callable
         Callback function, called after every batch. For instance useable when
         wanting to validate. Can also be a list of callback functions
-        We pass as arguments:
-        :code:`(self, step)`. A callable may return a boolean that, if
-        true, the fitting stops, which is useful when
-        implementing *early stopping*.
+        Each callback function is passed two arguments :code:`self` (the
+        estimator instance) and :code:`step` (the completed iteration), and
+        may return a Boolean value. If the returned value is `True`, the
+        optimization algorithm terminates. This can be used to implement
+        *early stopping*.
 
     cuda : str, default = None
         A string to indicate which device to use when training. For instance,
@@ -321,31 +326,32 @@ class AdversarialFairness(BaseEstimator):
             )
 
         # Numbers
-        for kw, kwname in ((self.threshold_value, "threshold_value"),):
-            if kw and not isinstance(kw, (int, float)):
-                raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(kwname, "a number")
-                )
+        check_scalar(self.threshold_value, "threshold_value", (int, float))
 
-        # Non-negative parameters
+        # Non-negative numbers
         for kw, kwname in (
             (self.learning_rate, "learning_rate"),
             (self.alpha, "alpha"),
             (self.progress_updates, "progress_updates"),
         ):
-            if kw and kw < 0.0:
-                raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(
-                        kwname, "a non-negative number"
-                    )
+            if kw:
+                check_scalar(
+                    kw,
+                    kwname,
+                    (int, float),
+                    min_val=0.0,
+                    include_boundary="left",
                 )
 
-        # Positive or -1 parameters
+        # Positive or -1 numbers
         for kw, kwname in (
             (self.batch_size, "batch_size"),
             (self.epochs, "epochs"),
             (self.max_iter, "max_iter"),
         ):
+            check_scalar(
+                kw, kwname, (int, float), min_val=-1, include_boundary="left"
+            )
             if kw <= 0.0 and kw != -1:
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(
@@ -683,8 +689,7 @@ class AdversarialFairness(BaseEstimator):
             is_fitted = False
 
         if A is None:
-            logger.warning("no sensitive_features provided")
-            A = [0] * X.shape[0]
+            raise ValueError("No sensitive_features provided")
 
         if (not is_fitted) or (reinitialize):
             self.__setup(X, Y, A)
