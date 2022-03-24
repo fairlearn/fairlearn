@@ -37,20 +37,20 @@ logger = logging.getLogger(__name__)
 
 
 class AdversarialFairness(BaseEstimator):
-    r"""Train complex predictors while mitigating biases in PyTorch or Tensorflow.
+    r"""Train complex predictors while mitigating unfairness in PyTorch or Tensorflow.
 
     This model implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
     <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
     This algorithm takes as input two neural network
-    models, a predictor and an adversarial, defined either as a `PyTorch module
+    models, a predictor model and an adversarial model, defined either as a `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
     `Tensorflow2 model
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
     predictor using an API that is similar to estimators in `sklearn`.
 
     As per [1]_, the neural network models :code:`predictor_model` and
-    :code:`adversary_model` may not have a discrete prediction at the end of the
+    :code:`adversary_model` should not have a discrete prediction at the end of the
     model, as gradients do not propagate through a discretization step.
     Instead, even if we desire discrete predictions in the end, we must
     output the sigmoidal or soft-max during training. You can supply the final
@@ -196,7 +196,7 @@ class AdversarialFairness(BaseEstimator):
         Batch size. For no batching, set this to -1.
 
     shuffle : bool, default = False
-        When true, shuffle the data after every iteration.
+        When true, shuffle the data after every epoch.
 
     progress_updates : number, optional, default = None
         If a number :math:`t` is provided, we print an update
