@@ -36,3 +36,4 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Vincent Xu](https://github.com/vingu)
 - [Beth Zeranski](https://github.com/bethz)
 - [Vlad Iliescu](https://vladiliescu.net)
+- [Hrittik RoyChoudhury](https://github.com/Hrittik20)
