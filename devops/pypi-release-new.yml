@@ -46,7 +46,7 @@ stages:
     parameters:
       platforms:  { Linux: ubuntu-latest, Windows: windows-latest }
       installationType: 'PipLocal'
-      pyVersions: [3.7, 3.8, 3.9, "3.10"]
+      pyVersions: ["3.7", "3.8", "3.9", "3.10"]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
       
@@ -55,7 +55,7 @@ stages:
       platforms: { MacOS: macos-latest }
       testRunTypes: ['Unit']
       installationType: 'None'
-      pyVersions: [3.7, 3.8, 3.9, "3.10"]
+      pyVersions: ["3.7", "3.8", "3.9", "3.10"]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
 
@@ -131,7 +131,7 @@ stages:
       parameters:
         platforms: { Linux: ubuntu-latest, Windows: windows-latest }
         installationType: 'WheelArtifact'
-        pyVersions: [3.7, 3.8, 3.9, "3.10"]
+        pyVersions: ["3.7", "3.8", "3.9", "3.10"]
         freezeArtifactStem: $(freezeArtifactStem)
         freezeFileStem: $(freezeFileStem)
         wheelArtifactName: $(packageArtifactName)
@@ -141,7 +141,7 @@ stages:
         platforms: { MacOS: macos-latest }
         testRunTypes: ['Unit']
         installationType: 'WheelArtifact'
-        pyVersions: [3.7, 3.8, 3.9, "3.10"]
+        pyVersions: ["3.7", "3.8", "3.9", "3.10"]
         freezeArtifactStem: $(freezeArtifactStem)
         freezeFileStem: $(freezeFileStem)
         wheelArtifactName: $(packageArtifactName)
@@ -221,7 +221,7 @@ stages:
   - template: templates/all-tests-job-template.yml
     parameters:
       platforms:  { Linux: ubuntu-latest, Windows: windows-latest }
-      pyVersions: [3.7, 3.8, 3.9, "3.10"]
+      pyVersions: ["3.7", "3.8", "3.9", "3.10"]
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
       installationType: 'PyPI'
@@ -232,7 +232,7 @@ stages:
   - template: templates/all-tests-job-template.yml
     parameters:
       platforms: { MacOS: macos-latest }
-      pyVersions: [3.7, 3.8, 3.9, "3.10"]
+      pyVersions: ["3.7", "3.8", "3.9", "3.10"]
       testRunTypes: ['Unit']
       freezeArtifactStem: $(freezeArtifactStem)
       freezeFileStem: $(freezeFileStem)
