@@ -142,9 +142,9 @@ same example, we can now see how the values in the transformed dataset are diffe
 
 .. doctest:: mitigation
 
-    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female', 'sex_Male'], alpha=0.5)
+    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female'], alpha=0.5)
     >>> cr.fit(X)
-    CorrelationRemover(alpha=0.5, sensitive_feature_ids=['sex_Female', 'sex_Male'])
+    CorrelationRemover(alpha=0.5, sensitive_feature_ids=['sex_Female'])
     >>> X_transform = cr.transform(X)
 
 .. _postprocessing:
