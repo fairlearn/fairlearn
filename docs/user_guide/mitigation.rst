@@ -106,6 +106,7 @@ described as follows:
 
 In the example below, a subset of the `adult dataset <https://www.openml.org/d/1590>`_
 is loaded and the correlation between sex and the non-sensitive features is removed.
+This procedure will drop the sensitive features from the dataset.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -116,16 +117,26 @@ is loaded and the correlation between sex and the non-sensitive features is remo
     >>> data = fetch_openml(data_id=1590, as_frame=True)
     >>> X = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
     >>> X = pd.get_dummies(X)
-    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female', 'sex_Male'])
+    >>> X = X.drop('sex_Male', axis=1)
+    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female'])
     >>> cr.fit(X)
-    CorrelationRemover(sensitive_feature_ids=['sex_Female', 'sex_Male'])
+    CorrelationRemover(sensitive_feature_ids=['sex_Female'])
     >>> X_transform = cr.transform(X)
 
-..  I am not sure whether it would be valuable to show the transformed data here,
-    as well as in the next example.
+By inspecting the correlation matrices before and after running
+the :code:`CorrelationRemover`, we can see what happened.
+Even though there was not a high amount of correlation to begin with,
+the :code:`CorrelationRemover` successfully removed all correlation between
+'sex_Female' and the other columns while retaining the correlation
+between the other features.
 
-This procedure will drop the sensitive features from the dataset. We can also
-use the :code:`alpha` parameter with :math:`\alpha=0.5` to filter only half of
+.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_001.png
+    :align: center
+
+.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
+    :align: center
+
+We can also use the :code:`alpha` parameter with :math:`\alpha=0.5` to filter only half of
 the correlation between the sensitive and non-sensitive features. Revisiting the
 same example, we can now see how the values in the transformed dataset are different.
 
