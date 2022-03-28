@@ -256,7 +256,6 @@ def test_objective_constraints_compatibility(Constraints, Objective):
                 B=1.0,
                 sensitive_features=A,
             )
-
         assert _MESSAGE_BAD_OBJECTIVE.format(
             objective._moment_type(), constraints._moment_type()
         ) in execInfo.value.args[0]

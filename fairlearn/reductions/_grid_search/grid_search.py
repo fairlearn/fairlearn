@@ -23,7 +23,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     """Estimator to perform a grid search given a blackbox estimator algorithm.
 
     The approach used is taken from section 3.4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [1]_.
+    :footcite:t:`agarwal2018reductions`.
 
     .. versionadded:: 0.3.0
 
@@ -69,12 +69,6 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         (defaults to `sample_weight`)
 
         .. versionadded:: 0.5.0
-
-    References
-    ----------
-    .. [1] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford,
-       and H. Wallach, "A Reductions Approach to Fair Classification,"
-       arXiv.org, 16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
 
     """
 

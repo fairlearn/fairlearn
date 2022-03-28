@@ -5,3 +5,7 @@ fairlearn\.reductions package
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. topic:: References:
+
+    .. footbibliography::

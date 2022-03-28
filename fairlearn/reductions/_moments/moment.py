@@ -15,9 +15,10 @@ _SIGN = "sign"
 class Moment:
     """Generic moment.
 
-    Our implementations of the reductions approach to fairness described
-    in `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ make use
-    of :class:`Moment` objects to describe the disparity constraints
+    Our implementations of the reductions approach to fairness
+    :footcite:p:`agarwal2018reductions` make use
+    of :class:`Moment` objects to describe both the optimization objective
+    and the fairness constraints
     imposed on the solution. This is an abstract class for all such objects.
     """
 

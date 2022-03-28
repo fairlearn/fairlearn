@@ -20,7 +20,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient reduction.
 
     The exponentiated gradient algorithm is described in detail by
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    :footcite:t:`agarwal2018reductions`.
 
     .. versionchanged:: 0.3.0
         Was a function before, not a class
@@ -39,20 +39,20 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :code:`predict(X)` are either 0 or 1.
         In regression values `y` and predictions are continuous.
     constraints : fairlearn.reductions.Moment
-        The fairness constraints
+        The fairness constraints expressed as a :class:`~Moment`.
     objective : fairlearn.reductions.Moment
-        The objective. The default is :code:`ErrorRate()` for
-        binary classification and :code:`MeanLoss(...)` for regression.
+        The objective expressed as a :class:`~Moment`. The default is
+        :code:`ErrorRate()` for binary classification and
+        :code:`MeanLoss(...)` for regression.
     eps : float
         Allowed fairness constraint violation; the solution is guaranteed to
         have the error within :code:`2*best_gap` of the best error under
         constraint `eps`; the constraint violation is at most
-        :code:`2*(eps+best_gap)`
+        :code:`2*(eps+best_gap)`.
 
         .. versionchanged:: 0.5.0
             :code:`eps` is now only responsible for setting the L1 norm bound
             in the optimization
-
     max_iter : int
         Maximum number of iterations
 
