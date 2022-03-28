@@ -33,7 +33,7 @@ jobs:
     platforms: { MacOS: macos-latest }
     testRunTypes: ['Unit']
     installationType: 'None'
-    pyVersions: [3.7, 3.10]
+    pyVersions: [3.7, "3.10"]
     freezeArtifactStem: $(FreezeArtifactStem)
     freezeFileStem: $(FreezeFileStem)
 
