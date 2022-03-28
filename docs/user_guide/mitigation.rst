@@ -128,17 +128,20 @@ the :code:`CorrelationRemover`, we can see what happened.
 Even though there was not a high amount of correlation to begin with,
 the :code:`CorrelationRemover` successfully removed all correlation between
 'sex_Female' and the other columns while retaining the correlation
-between the other features.
+between the other features. The code for generating these matrices
+can be found in `this example notebook
+<../auto_examples/plot_correlationremover_before_after.html>`_.
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_001.png
     :align: center
+    :target: ../auto_examples/plot_correlationremover_before_after.html
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
     :align: center
+    :target: ../auto_examples/plot_correlationremover_before_after.html
 
 We can also use the :code:`alpha` parameter with :math:`\alpha=0.5` to filter only half of
-the correlation between the sensitive and non-sensitive features. Revisiting the
-same example, we can now see how the values in the transformed dataset are different.
+the correlation between the sensitive and non-sensitive features.
 
 .. doctest:: mitigation
 
