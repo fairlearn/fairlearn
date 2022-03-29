@@ -9,6 +9,8 @@ v0.7.1
 * Relaxed checks made on :code:`X` in :code:`_validate_and_reformat_input()`
   since that is the concern of the underlying estimator and not Fairlearn.
 * Add support for Python 3.9
+* Added new `SensitiveDatasetMaker` in `fairlearn.datasets` to allow
+  for creation of a synthetic dataset with user-selected number of features.
 * Added error handling in :code:`MetricFrame`. Methods :code:`group_max`, :code:`group_min`,
   :code:`difference` and :code:`ratio` now accept :code:`errors` as a parameter,
   which could either be :code:`raise` or :code:`coerce`.

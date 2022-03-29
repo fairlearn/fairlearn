@@ -16,6 +16,7 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Parul Gupta](https://github.com/parul100495)
 - [Laura Gutierrez Funderburk](https://github.com/lgfunderburk)
 - [Abdul Hannan](https://github.com/hannanabdul55)
+- [Corey Harris](https://github.com/coreysharris)
 - [Nick Hart](https://github.com/enharten)
 - [Brandon Horn](https://github.com/rihorn2)
 - [Adrin Jalali](https://github.com/adrinjalali)

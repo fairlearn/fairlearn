@@ -9,10 +9,16 @@ from ._fetch_acs_income import fetch_acs_income
 from ._fetch_adult import fetch_adult
 from ._fetch_boston import fetch_boston
 from ._fetch_bank_marketing import fetch_bank_marketing
+from ._synthetic import (
+    SensitiveDatasetMaker, SensitiveFeature, SensitiveFeatureGroupConfig
+)
 
 __all__ = [
     "fetch_acs_income",
     "fetch_adult",
     "fetch_boston",
     "fetch_bank_marketing",
+    "SensitiveDatasetMaker",
+    "SensitiveFeature",
+    "SensitiveFeatureGroupConfig",
 ]
