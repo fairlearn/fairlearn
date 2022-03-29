@@ -18,7 +18,7 @@ parameters:
   type: string
 - name: pythonVersion
   type: string
-  default: "3.7"
+  default: "3.9"
 - name: pinRequirements
   type: boolean
   default: False
