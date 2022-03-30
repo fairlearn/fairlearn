@@ -35,19 +35,19 @@ from fairlearn.preprocessing import CorrelationRemover
 # Also, we create a mask which represents the target values which are either 0 or 1.
 
 data = fetch_openml(data_id=1590, as_frame=True)
-X_raw = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
+X_raw = data.data[["age", "fnlwgt", "education-num", "sex"]]
 X_raw = pd.get_dummies(X_raw)
-X_raw = X_raw.drop(['sex_Male'], axis=1)
+X_raw = X_raw.drop(["sex_Male"], axis=1)
 
 # %%
 # We are now going to fit the CorrelationRemover to the data,
 # and transform it. The transformed array will be placed back
 # in a Pandas DataFrame, for plotting purposes.
 
-cr = CorrelationRemover(sensitive_feature_ids=['sex_Female'])
+cr = CorrelationRemover(sensitive_feature_ids=["sex_Female"])
 X_cr = cr.fit_transform(X_raw)
-X_cr = pd.DataFrame(X_cr, columns=['age', 'fnlwgt', 'education-num'])
-X_cr['sex_Female'] = X_raw['sex_Female']
+X_cr = pd.DataFrame(X_cr, columns=["age", "fnlwgt", "education-num"])
+X_cr["sex_Female"] = X_raw["sex_Female"]
 
 # %%
 # We can now plot the correlation matrices before
@@ -56,29 +56,34 @@ X_cr['sex_Female'] = X_raw['sex_Female']
 # `matplotlib docs <https://matplotlib.org/devdocs/gallery/images_contours_and_fields/image_annotated_heatmap.html>`_.
 
 cols = list(X_raw.columns)
-before, after = X_raw, X_cr
-datasets = ['before', 'after']
 
-for dataset in datasets:
-    fig, ax = plt.subplots()
-    im = ax.imshow(eval(dataset).corr(), cmap='coolwarm')
+fig, ax = plt.subplots()
+im = ax.imshow(round(X_raw.corr() - X_cr.corr(), 2), cmap="coolwarm_r")
 
-    # Show all ticks and label them with the respective list entries
-    ax.set_xticks(np.arange(len(cols)), labels=cols)
-    ax.set_yticks(np.arange(len(cols)), labels=cols)
+# Show all ticks and label them with the respective list entries
+ax.set_xticks(np.arange(len(cols)), labels=cols)
+ax.set_yticks(np.arange(len(cols)), labels=cols)
 
-    # Rotate the tick labels and set their alignment.
-    plt.setp(ax.get_xticklabels(), rotation=15, ha="right",
-             rotation_mode="anchor")
+# Rotate the tick labels and set their alignment.
+plt.setp(ax.get_xticklabels(), rotation=15, ha="right", rotation_mode="anchor")
 
-    # Loop over data dimensions and create text annotations.
-    for i in range(len(cols)):
-        for j in range(len(cols)):
-            text = ax.text(j, i, round(eval(dataset).corr().to_numpy()[i, j], 2),
-                           ha="center", va="center", color="w")
+diffs = np.around((X_raw.corr() - X_cr.corr()).to_numpy(), 2)
+percentages = diffs / np.around(X_raw.corr().to_numpy(), 2) * 100
 
-    ax.set_title(f"Correlation matrix {dataset} CorrelationRemover")
-    plt.show()
+# Loop over data dimensions and create text annotations.
+for i in range(len(cols)):
+    for j in range(len(cols)):
+        text = ax.text(
+            j,
+            i,
+            f"{diffs[i, j]}\n" f"({percentages[i, j]}%)",
+            ha="center",
+            va="center",
+            color="w",
+        )
+
+ax.set_title("Differences in correlation values")
+plt.show()
 
 # %%
 # Even though there was not a high amount of correlation to begin with,
