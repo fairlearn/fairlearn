@@ -123,25 +123,24 @@ This procedure will drop the sensitive features from the dataset.
     CorrelationRemover(sensitive_feature_ids=['sex_Female'])
     >>> X_transform = cr.transform(X)
 
-By inspecting the correlation matrices before and after running
-the :code:`CorrelationRemover`, we can see what happened.
-Even though there was not a high amount of correlation to begin with,
-the :code:`CorrelationRemover` successfully removed all correlation between
-'sex_Female' and the other columns while retaining the correlation
-between the other features. The code for generating these matrices
-can be found in `this example notebook
+In order to see what the :code:`CorrelationRemover` has done,
+we plot the correlation matrix of this dataset. In fact, we plot
+the differences in correlation values before and after the
+:code:`CorrelationRemover` was applied. Below those values, the
+percentual change in correlation is shown. Due to rounding, some of the
+0.0 values appear as -0.0. Either way, the :code:`CorrelationRemover`
+successfully removed all correlation between 'sex_Female' and the other
+columns while retaining the correlation between the other features.
+The code for generating these matrices can be found
+in `this example notebook
 <../auto_examples/plot_correlationremover_before_after.html>`_.
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_001.png
     :align: center
     :target: ../auto_examples/plot_correlationremover_before_after.html
 
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
-    :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
-
-We can also use the :code:`alpha` parameter with :math:`\alpha=0.5` to filter only half of
-the correlation between the sensitive and non-sensitive features.
+We can also use the :code:`alpha` parameter with for instance :math:`\alpha=0.5`
+to control the level of filtering between the sensitive and non-sensitive features.
 
 .. doctest:: mitigation
 
