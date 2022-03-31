@@ -1,5 +1,4 @@
-<!--- Make sure to add a description of your changes in docs/user_guide/installation_and_version_guide/v<major>.<minor>.<patch>.rst -->
-<!--- Feel free to add your name to AUTHORS.md. -->
+<!--- If relevant, make sure to add a description of your changes in docs/user_guide/installation_and_version_guide/v<major>.<minor>.<patch>.rst -->
 
 ## Description
 <!--- Provide a general summary of your changes. -->
