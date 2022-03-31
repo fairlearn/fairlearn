@@ -30,15 +30,13 @@ jobs:
 
       - run:
           name: 'BUG REPRO'
-          command: |
-            sudo apt-get install npm
+          command: sudo apt-get install npm
 
       - run:
           name: 'BUG REPRO'
-          command: |
-            sudo npm install -g --silent gh-pages@2.0.1
+          command: sudo npm install -g --silent gh-pages@2.0.1
 
-       - run:
+      - run:
           name: 'BUG REPRO'
           command: |
             git config user.email "ci-build@fairlearn.org"
