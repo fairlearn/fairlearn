@@ -31,7 +31,7 @@ jobs:
       - run:
           name: 'BUG REPRO'
           command: |
-            sudo apt-get install npm
+            # sudo apt-get install npm
 
       - run:
           name: 'BUG REPRO'
