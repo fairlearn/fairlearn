@@ -31,6 +31,7 @@ jobs:
       - run:
           name: 'BUG REPRO'
           command: |
+            sudo apt-get install npm
             npm install -g --silent gh-pages@2.0.1
 
       - run:
