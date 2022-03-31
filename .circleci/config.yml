@@ -123,9 +123,16 @@ jobs:
           command: echo "fairlearn.org" > docs/_build/html/CNAME
 
       - run:
-          name: 'Install gh-pages and configure dependencies'
+          name: Install npm
+          command: sudo apt-get install npm
+
+      - run:
+          name: Install gh-pages
+          command: sudo npm install -g --silent gh-pages@2.0.1
+
+      - run:
+          name: Configure git
           command: |
-            npm install -g --silent gh-pages@2.0.1
             git config user.email "ci-build@fairlearn.org"
             git config user.name "ci-build"
 
