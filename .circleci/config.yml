@@ -29,6 +29,11 @@ jobs:
           command: sudo apt update
 
       - run:
+          name: 'BUG REPRO'
+          command: |
+            npm install -g --silent gh-pages@2.0.1
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
