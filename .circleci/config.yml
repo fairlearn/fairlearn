@@ -123,6 +123,10 @@ jobs:
           command: echo "fairlearn.org" > docs/_build/html/CNAME
 
       - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
           name: Install npm
           command: sudo apt-get install npm
 
