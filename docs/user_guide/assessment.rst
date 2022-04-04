@@ -352,7 +352,7 @@ in combination with a :code:`MetricFrame` as follows:
     b    0.500000
     c    0.428571
     d    1.000000
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
     >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
     0.5714285714285714
 
