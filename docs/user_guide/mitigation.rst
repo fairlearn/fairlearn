@@ -110,10 +110,9 @@ The amount of correlation that is removed can be controlled using the
         X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
 
 Note that the lack of correlation does not imply anything about statistical dependence.
-Therefore, we expect this to be most appropriate as a preprocessing step for
-(generalized) linear models. Furthermore, since correlation measures linear
-relationships, it might still be possible that non-linear relationships exist in
-the data.
+In particular, since correlation measures linear relationships, it might still be
+possible that non-linear relationships exist in the data. Therefore, we expect this
+to be most appropriate as a preprocessing step for (generalized) linear models.
 
 In the example below, a subset of the `adult dataset <https://www.openml.org/d/1590>`_
 is loaded and the correlation between sex and the non-sensitive features is removed.
