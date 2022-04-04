@@ -56,11 +56,12 @@ def _check_solver(solver, penalty):
 def _sensitive_attr_constraint_cov(
     model, x_arr, y_arr_dist_boundary, x_control, thresh
 ):
-    """
-    Copied from the paper, but also rewritten for a large part:
+    """Copied from the paper, but also rewritten for a large part:
+
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
     The covariance is computed b/w the sensitive attr val and the distance from the boundary
-    If the model is None, we assume that the y_arr_dist_boundary contains the distance from the decision boundary
+    If the model is None, we assume that the y_arr_dist_boundary contains the distance from the
+    decision boundary
     If the model is not None, we just compute a dot product or model and x_arr
 
     this function will return -1 if the constraint specified by thresh parameter is not satisfied
@@ -100,11 +101,7 @@ def _sensitive_attr_constraint_cov(
 
     cov = np.dot(x_control - np.mean(x_control), arr) / float(len(x_control))
 
-    ans = thresh - abs(
-        cov
-    )  # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
-    # ans = thresh - cov # will be <0 if the covariance is greater than thresh -- that is, the condition is not satisfied
-
+    ans = thresh - abs(cov)
     return ans
 
 
@@ -116,7 +113,6 @@ def _get_constraint_list_cov(
     categories,
     covariance_bound,
 ):
-
     # New covariance bound list such that it correctly handles the OHE sensitive features
     # Now we can have a separate covariance bound per sensitive feature
     cov_bound = []
@@ -177,9 +173,11 @@ def _logistic_regression_path(
     constraints=None,
 ):
     """
-    TODO: add docstring
-    All this code is copied from the sklearn _logistic_regression_path function, except for the constraints argument,
-    the changed solver and the loss function used (all in the optimize.minimize function)
+    TODO: add docstring.
+
+    All this code is copied from the sklearn _logistic_regression_path function,
+    except for the constraints argument and the changed solver
+    (all in the optimize.minimize function)
     """
     if isinstance(Cs, numbers.Integral):
         Cs = np.logspace(-4, 4, Cs)
@@ -316,7 +314,7 @@ def _logistic_regression_path(
                 fun=func,
                 x0=w0,
                 method="SLSQP",
-                # jac=True,
+                # jac=True,  # Commented because it is not used by the authors of the paper
                 args=(X, target, 1.0 / C, sample_weight),
                 options={"iprint": iprint, "maxiter": max_iter},
                 constraints=constraints,
@@ -327,7 +325,7 @@ def _logistic_regression_path(
                 max_iter=max_iter,
                 extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG,
             )
-            w0, loss = opt_res.x, opt_res.fun
+            w0, _ = opt_res.x, opt_res.fun
 
         else:
             raise ValueError(
@@ -350,8 +348,26 @@ def _logistic_regression_path(
 
 def _ohe_sensitive_features(X, sensitive_feature_ids):
     """
-    One-hot-encode the sensitive features such that they can be splitted
+    One-hot-encode the sensitive features.
+
+    We one-hot-encode the sensitive features.such that they can be splitted
     from X and that the constraints can be correctly coded per feature value.
+
+    Parameters
+    ----------
+    X : numpy.ndarray or pandas.DataFrame
+        Feature data
+    sensitive_feature_ids : list
+        columns to filter out this can be a sequence of
+        either int ,in the case of numpy, or string, in the case of pandas.
+    Returns
+    -------
+    X : numpy.ndarray or pandas.DataFrame
+        Feature data with one-hot-encoded values
+    renamed_sensitive_feature_ids : list
+        The renamed sensitive feature ids, either as strings or as numbers
+    enc.categories_ : list
+        The categories from the encoder
     """
     enc = OneHotEncoder(handle_unknown="ignore")
     if isinstance(X, pd.DataFrame):
@@ -377,7 +393,10 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
 
 
 class ConstrainedLogisticRegression(LogisticRegression):
-    """TODO: add docstring, check in BalancedRandomForestClassifier how they handle docstrings for inherited class"""
+    """TODO: add docstring.
+
+    Check in BalancedRandomForestClassifier how they handle docstrings for inherited class
+    """
 
     def __init__(
         self,
@@ -425,9 +444,12 @@ class ConstrainedLogisticRegression(LogisticRegression):
         if not isinstance(self.covariance_bound, list):
             self.covariance_bound = list(self.covariance_bound)
 
-    # Below code is almost entirely reused from the CorrelationRemover, should this maybe be abstracted higher up?
-    # Also not sure if this should be a function of the ConstrainedLogisticRegression class, doesn't really feel like it.
-    # That is also why I feel like it is a good reason to abstract it higher up. Seems like something for utils maybe?
+    # Below code is almost entirely reused from the CorrelationRemover,
+    # should this maybe be abstracted higher up?
+    # Also not sure if this should be a function of the ConstrainedLogisticRegression class,
+    # doesn't really feel like it.
+    # That is also why I feel like it is a good reason to abstract it higher up.
+    # Seems like something for utils maybe?
     def _split_X(self, X, sensitive_feature_ids):
         """Split up X into a sensitive and non-sensitive group."""
         sensitive = [self.lookup_[i] for i in sensitive_feature_ids]
@@ -439,7 +461,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
                 sensitive_feature_ids,
             )
         else:  # Numpy arrays
-            # Change the sensitive_feature_ids because they are now in a different array with different indices
+            # Sensitive_feature_ids are now in a different array with different indices
             sensitive_feature_ids = list(range(X[:, sensitive].shape[1]))
             return X[:, non_sensitive], X[:, sensitive], sensitive_feature_ids
 
@@ -461,18 +483,18 @@ class ConstrainedLogisticRegression(LogisticRegression):
         sample_weight=None,
         sensitive_feature_ids=None,
     ):
-        """TODO: add docstring"""
-
+        """TODO: add docstring."""
         if self.constraints is None:
             clf = LogisticRegression(self)
             return clf.fit(X, y)
 
         # TODO: Maybe turn below code until constraints into a preprocessing function?
 
-        # One-hot-encode the data and return the new sensitive feature ids that come along with the encoded data
-        X_ohe, renamed_sensitive_feature_ids = _ohe_sensitive_features(
-            X, sensitive_feature_ids
-        )
+        (
+            X_ohe,
+            renamed_sensitive_feature_ids,
+            categories,
+        ) = _ohe_sensitive_features(X, sensitive_feature_ids)
         # Split the data similarly to how the CorrelationRemover does it
         self._create_lookup(X_ohe)
         (
@@ -625,31 +647,49 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
 
 if __name__ == "__main__":
+    FairLR = ConstrainedLogisticRegression(
+        constraints="demographic_parity",
+        covariance_bound=[0.0, 10.0],
+        random_state=0,
+        verbose=10,
+    )
+
+    ### Adult dataset ###
     from sklearn.datasets import fetch_openml
 
     data = fetch_openml(data_id=1590, as_frame=True)
     y_global = (data.target == ">50K") * 1
-    FairLR = FairLogisticRegression(verbose=10)
+
     # Pandas test code
     # X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
-    # Add another category to sex for extra testing
+    # # Add another category to sex for extra testing
     # extra_cat = pd.DataFrame({"age": 25, "fnlwgt": 226802, "education-num": 7, "sex": "Unknown"},
     #                          index=[len(X_global)])
     # X_global = pd.concat([X_global, extra_cat])
     # X_global["sex2"] = X_global["sex"]
     # X_global.at[48842, "sex2"] = "Male"
-    # y_global = y_global.append(pd.Series(1))
-    # FairLR.fit(X_global, y_global, sensitive_feature_ids=['sex', 'sex2'], sensitive_attrs_to_cov_thresh=0)
 
     # Numpy arrays test code
-    X_global = data.data[["age", "fnlwgt", "education-num", "sex"]].to_numpy()
+    X_global = data.data[
+        ["fnlwgt", "education-num", "sex"]  # "age",
+    ].to_numpy()
+
+    # Bank marketing dataset
+    # from fairlearn.datasets import fetch_bank_marketing
+    # data = fetch_bank_marketing(as_frame=True)
+    # y_global = data.target
+    # X_global = data.data[["V1", "V3"]].to_numpy()
+
+    # General code
     y_global = y_global.to_numpy()
     FairLR.fit(
         X_global,
         y_global,
-        sensitive_feature_ids=[3],
-        sensitive_attrs_to_cov_thresh=0,
+        sensitive_feature_ids=[2],  # Change column per dataset
     )
 
-    # Predict on the first sample
-    print(FairLR.predict([X_global[0, :3]]))
+    # Adult with extra column
+    # FairLR.fit(X_global, y_global, sensitive_feature_ids=['sex', 'sex2'])
+
+    print(FairLR.score(X_global[:, :-1], y_global))  # Adult dataset
+    # print(FairLR.score(np.delete(X_global, 1, 1), y_global))  # Bank marketing dataset
