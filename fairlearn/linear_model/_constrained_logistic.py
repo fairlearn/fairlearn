@@ -56,19 +56,17 @@ def _check_solver(solver, penalty):
 def _sensitive_attr_constraint_cov(
     model, x_arr, y_arr_dist_boundary, x_control, thresh
 ):
-    """Copied from the paper, but also rewritten for a large part:
+    """Calculating the covariance threshold as in the paper.
 
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
     The covariance is computed b/w the sensitive attr val and the distance from the boundary
     If the model is None, we assume that the y_arr_dist_boundary contains the distance from the
     decision boundary
     If the model is not None, we just compute a dot product or model and x_arr
-
     this function will return -1 if the constraint specified by thresh parameter is not satisfied
     otherwise it will return +1
     if the return value is >=0, then the constraint is satisfied
     """
-
     assert x_arr.shape[0] == x_control.shape[0]
     if (
         len(x_control.shape) > 1
@@ -359,8 +357,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     X : numpy.ndarray or pandas.DataFrame
         Feature data
     sensitive_feature_ids : list
-        columns to filter out this can be a sequence of
-        either int ,in the case of numpy, or string, in the case of pandas.
+        columns to filter out, either as strings (DataFrame) or numbers (numpy)
     Returns
     -------
     X : numpy.ndarray or pandas.DataFrame
@@ -385,7 +382,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
         # Delete the old column and append the transformed columns
         X_without_sensitive = np.delete(X, sensitive_feature_ids, axis=1)
         X = np.append(X_without_sensitive, transformed, axis=1)
-        # Need to return the new transformed sensitive feature ids, since there are more columns now
+        # Need to return the new transformed sensitive feature ids since there are more columns now
         renamed_sensitive_feature_ids = list(
             range(X_without_sensitive.shape[1], X.shape[1])
         )
@@ -504,7 +501,8 @@ class ConstrainedLogisticRegression(LogisticRegression):
             renamed_sensitive_feature_ids,
         ) = self._split_X(X_ohe, renamed_sensitive_feature_ids)
 
-        # TODO: Think about whether the constraints should be implemented in `fit`, or in `_logistic_regression_path`
+        # TODO: Think about whether the constraints should be
+        #  implemented in `fit`, or in `_logistic_regression_path`
         constraints = _get_constraint_list_cov(
             X_nonsensitive,
             X_sensitive,
@@ -655,43 +653,33 @@ if __name__ == "__main__":
         verbose=10,
     )
 
-    ### Adult dataset ###
+    # Adult dataset
     from sklearn.datasets import fetch_openml
 
     data = fetch_openml(data_id=1590, as_frame=True)
     y_global = (data.target == ">50K") * 1
 
     # Pandas test code
-    # X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
-    # # Add another category to sex for extra testing
-    # extra_cat = pd.DataFrame({"age": 25, "fnlwgt": 226802, "education-num": 7, "sex": "Unknown"},
-    #                          index=[len(X_global)])
-    # X_global = pd.concat([X_global, extra_cat])
-    # X_global["sex2"] = X_global["sex"]
-    # X_global.at[48842, "sex2"] = "Male"
-    # y_global = y_global.append(pd.Series(2))
+    X_global = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
+    # Add another category to sex for extra testing
+    extra_cat = pd.DataFrame({"age": 25, "fnlwgt": 226802, "education-num": 7, "sex": "Unknown"},
+                             index=[len(X_global)])
+    X_global = pd.concat([X_global, extra_cat])
+    X_global["sex2"] = X_global["sex"]
+    X_global.at[48842, "sex2"] = "Male"
+    y_global = y_global.append(pd.Series(2))
 
     # Numpy arrays test code
-    X_global = data.data[
-        ["fnlwgt", "education-num", "sex"]  # "age",
-    ].to_numpy()
-
-    # Bank marketing dataset
-    # from fairlearn.datasets import fetch_bank_marketing
-    # data = fetch_bank_marketing(as_frame=True)
-    # y_global = data.target
-    # X_global = data.data[["V1", "V3"]].to_numpy()
+    # X_global = data.data[
+    #     ["fnlwgt", "education-num", "sex"]  # "age",
+    # ].to_numpy()
 
     # General code
     y_global = y_global.to_numpy()
-    FairLR.fit(
-        X_global,
-        y_global,
-        sensitive_feature_ids=[2],  # Change column per dataset
-    )
+    # FairLR.fit(X_global, y_global, sensitive_feature_ids=[2, 3])
 
     # Adult with extra column
-    # FairLR.fit(X_global, y_global, sensitive_feature_ids=['sex', 'sex2'])
+    FairLR.fit(X_global, y_global, sensitive_feature_ids=['sex', 'sex2'])
 
     print(FairLR.score(X_global[:, :-1], y_global))  # Adult dataset
     # print(FairLR.score(np.delete(X_global, 1, 1), y_global))  # Bank marketing dataset
