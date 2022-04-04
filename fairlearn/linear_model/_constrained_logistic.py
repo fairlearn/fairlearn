@@ -486,6 +486,13 @@ class ConstrainedLogisticRegression(LogisticRegression):
             clf = LogisticRegression(self)
             return clf.fit(X, y)
 
+        if len(self.covariance_bound) > len(sensitive_feature_ids):
+            raise ValueError(
+                f"Number of covariance bound values can not exceed"
+                f" the amount of sensitive features. Got {len(self.covariance_bound)}"
+                f" covariance bound values, got {len(sensitive_feature_ids)} sensitive features"
+            )
+
         # TODO: Maybe turn below code until constraints into a preprocessing function?
 
         (
