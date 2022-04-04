@@ -102,6 +102,7 @@ def _sensitive_attr_constraint_cov(
     cov = np.dot(x_control - np.mean(x_control), arr) / float(len(x_control))
 
     ans = thresh - abs(cov)
+    print(f"Ans: {ans}")
     return ans
 
 
@@ -668,6 +669,7 @@ if __name__ == "__main__":
     # X_global = pd.concat([X_global, extra_cat])
     # X_global["sex2"] = X_global["sex"]
     # X_global.at[48842, "sex2"] = "Male"
+    # y_global = y_global.append(pd.Series(2))
 
     # Numpy arrays test code
     X_global = data.data[
