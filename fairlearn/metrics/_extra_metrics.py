@@ -83,6 +83,8 @@ def true_positive_rate(y_true,
                        pos_label=None) -> float:
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
+
     Parameters
     ----------
     y_true : array-like
@@ -116,6 +118,8 @@ def true_negative_rate(y_true,
                        sample_weight=None,
                        pos_label=None) -> float:
     r"""Calculate the true negative rate (also called specificity or selectivity).
+
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------
@@ -151,6 +155,8 @@ def false_positive_rate(y_true,
                         pos_label=None) -> float:
     r"""Calculate the false positive rate (also called fall-out).
 
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
+
     Parameters
     ----------
     y_true : array-like
@@ -184,6 +190,8 @@ def false_negative_rate(y_true,
                         sample_weight=None,
                         pos_label=None) -> float:
     r"""Calculate the false negative rate (also called miss rate).
+
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------
@@ -223,6 +231,8 @@ def count(y_true, y_pred) -> int:
 
     The ``y_true`` argument is used to make this calculation. For consistency with
     other metric functions, the ``y_pred`` argument is required, but ignored.
+
+    Read more in the :ref:`User Guide <metrics_with_grouping>`.
 
     Parameters
     ----------

@@ -31,6 +31,8 @@ class ErrorRate(ClassificationMoment):
     and false negative errors respectively. The standard misclassification
     error corresponds to :math:`c_{FP}=c_{FN}=1.0`.
 
+    Read more in the :ref:`User Guide <error_rate_parity>`.
+
     Parameters
     ----------
     costs : dict
