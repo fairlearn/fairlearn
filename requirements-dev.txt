@@ -15,7 +15,7 @@ requirements-parser
 nbformat
 papermill
 # Pin pytest due to VS Code issue
-pytest==5.0.1
+pytest==7.1.1
 pytest-cov
 pytest-mock
 pytest-mpl>=0.11
