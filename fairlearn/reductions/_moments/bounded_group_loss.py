@@ -105,7 +105,9 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 
 
 class MeanLoss(ConditionalLossMoment):
-    """Moment for evaluating the mean loss. Read more in the :ref:`User Guide <constraints_regression>`.
+    """Moment for evaluating the mean loss.
+
+    Read more in the :ref:`User Guide <constraints_regression>`.
     """
 
     def __init__(self, loss):
@@ -113,7 +115,9 @@ class MeanLoss(ConditionalLossMoment):
 
 
 class BoundedGroupLoss(ConditionalLossMoment):
-    """Moment for constraining the worst-case loss by a group. For more information refer to the :ref:`user guide <bounded_group_loss>`.
+    """Moment for constraining the worst-case loss by a group.
+
+    For more information refer to the :ref:`user guide <bounded_group_loss>`.
     """
 
     def __init__(self, loss, *, upper_bound=None):
@@ -121,7 +125,9 @@ class BoundedGroupLoss(ConditionalLossMoment):
 
 
 class SquareLoss:
-    """Class to evaluate the square loss. Read more in the :ref:`User Guide <constraints_regression>`.
+    """Class to evaluate the square loss.
+
+    Read more in the :ref:`User Guide <constraints_regression>`.
     """
 
     def __init__(self, min_val, max_val):
@@ -137,7 +143,9 @@ class SquareLoss:
 
 
 class AbsoluteLoss:
-    """Class to evaluate absolute loss. Read more in the :ref:`User Guide <constraints_regression>`.
+    """Class to evaluate absolute loss.
+
+    Read more in the :ref:`User Guide <constraints_regression>`.
     """
 
     def __init__(self, min_val, max_val):
@@ -158,7 +166,9 @@ AbsoluteLoss.__module__ = "fairlearn.reductions"
 
 
 class ZeroOneLoss(AbsoluteLoss):
-    """Class to evaluate a zero-one loss. Read more in the :ref:`User Guide <constraints_regression>`.
+    """Class to evaluate a zero-one loss.
+
+    Read more in the :ref:`User Guide <constraints_regression>`.
     """
 
     def __init__(self):
