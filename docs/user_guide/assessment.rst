@@ -509,7 +509,7 @@ argument. Here is an example of a pie chart.
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
 
-In order to save a plot, access the `matplotlib` Figure as below and save it with your
+In order to save a plot, access the :class:`matplotlib.figure.Figure` as below and save it with your
 desired filename.
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
