@@ -86,7 +86,7 @@ Correlation Remover
 ~~~~~~~~~~~~~~~~~~~
 Sensitive features can be correlated with non-sensitive features in the dataset.
 By applying the :code:`CorrelationRemover`, these correlations are projected away
-whiledetails from the original data are retained as much as possible (as measured
+while details from the original data are retained as much as possible (as measured
 by the least-squares error). The user can control the level of projection via the
 :code:`alpha` parameter. In mathematical terms, assume we have the original dataset
 :math:`X` which contains a set of sensitive attributes :math:`S` and a set of
@@ -102,8 +102,8 @@ mathematically described as:
 
 The solution to this problem is found by centering sensitive features, fitting a
 linear regression model to the non-sensitive features and reporting the residual.
-The columns in :math:`S` will be dropped from the dataset :math:`X` but the
-amount of correlation that is removed can be controlled using the
+The columns in :math:`S` will be dropped from the dataset :math:`X`.
+The amount of correlation that is removed can be controlled using the
 :code:`alpha` parameter. This is described as follows:
 
 .. math::
