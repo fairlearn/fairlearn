@@ -144,8 +144,12 @@ jobs:
           name: Update SSH keys
           # Ideally, do something with https://github.blog/changelog/2022-01-18-githubs-ssh-host-keys-are-now-published-in-the-api/
           command: |
-            sudo ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
+            ssh-keyscan github.com > ssh_known_hosts
+            cat ssh_known_hosts
+            sudo mv ssh_known_hosts /etc/ssh/ssh_known_hosts
+            sudo chown root:root /etc/ssh/ssh_known_hosts
             sudo chmod 644 /etc/ssh/ssh_known_hosts
+            ls -alF /etc/ssh
 
       - run:
           name: 'Push to GitHub Pages repository'
