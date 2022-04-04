@@ -61,10 +61,6 @@ jobs:
     steps:
       # check out PR branch
       - checkout
-      
-      - run:
-          name: DEBUG ssh
-          command: ls -alF /etc/ssh
 
       - run:
           name: Show Python version
@@ -149,6 +145,7 @@ jobs:
           # Ideally, do something with https://github.blog/changelog/2022-01-18-githubs-ssh-host-keys-are-now-published-in-the-api/
           command: |
             sudo ssh-keyscan github.com >> /etc/ssh/ssh_known_hosts
+            sudo chmod 644 /etc/ssh/ssh_known_hosts
 
       - run:
           name: 'Push to GitHub Pages repository'
