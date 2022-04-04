@@ -26,7 +26,7 @@ def fetch_acs_income(*, cache=True, data_home=None,
 
     Source: Paper: Ding et al. (2021) [1]_
             and corresponding repository https://github.com/zykls/folktables/
-    
+
     Read more in the :ref:`User Guide <acsincome_data>`.
 
     .. versionadded:: 0.8.0
