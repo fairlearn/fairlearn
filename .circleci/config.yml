@@ -63,6 +63,10 @@ jobs:
       - checkout
       
       - run:
+          name: DEBUG ssh
+          command: ls -alF /etc/ssh
+
+      - run:
           name: Show Python version
           command: python --version
 
