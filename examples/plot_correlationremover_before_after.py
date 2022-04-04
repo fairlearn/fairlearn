@@ -60,12 +60,13 @@ X_cr_alpha["sex_Female"] = X_raw["sex_Female"]
 # The code is from  the
 # `matplotlib docs <https://matplotlib.org/devdocs/gallery/images_contours_and_fields/image_annotated_heatmap.html>`_.
 
+
 def plot_heatmap(df, title):
     df['target'] = y
     cols = list(df.columns)
 
     fig, ax = plt.subplots()
-    im = ax.imshow(round(df.corr(), 2), cmap="coolwarm")
+    ax.imshow(round(df.corr(), 2), cmap="coolwarm")
 
     # Show all ticks and label them with the respective list entries
     ax.set_xticks(np.arange(len(cols)), labels=cols)
@@ -77,7 +78,7 @@ def plot_heatmap(df, title):
     # Loop over data dimensions and create text annotations.
     for i in range(len(cols)):
         for j in range(len(cols)):
-            text = ax.text(
+            ax.text(
                 j,
                 i,
                 round(df.corr().to_numpy()[i, j], 2),
