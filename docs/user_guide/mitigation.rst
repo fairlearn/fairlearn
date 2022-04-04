@@ -91,7 +91,7 @@ by the least-squares error). The user can control the level of projection via th
 :code:`alpha` parameter. In mathematical terms, assume we have the original dataset
 :math:`X` which contains a set of sensitive attributes :math:`S` and a set of
 non-sensitive attributes :math:`Z`. The removal of correlation is then
-mathematically described as:
+described as:
 
 .. math::
         \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}
@@ -111,7 +111,9 @@ The amount of correlation that is removed can be controlled using the
 
 Note that the lack of correlation does not imply anything about statistical dependence.
 Therefore, we expect this to be most appropriate as a preprocessing step for
-(generalized) linear models.
+(generalized) linear models. Furthermore, since correlation measures linear
+relationships, it might still be possible that non-linear relationships exist in
+the data.
 
 In the example below, a subset of the `adult dataset <https://www.openml.org/d/1590>`_
 is loaded and the correlation between sex and the non-sensitive features is removed.
