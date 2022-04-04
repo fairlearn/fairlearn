@@ -142,7 +142,8 @@ jobs:
 
       - run:
           name: 'Push to GitHub Pages repository'
-          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+          # Next is only acceptable because this is running in a docker container which is not persisted
+          command: sudo gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
 
 # This workflow defines the ordering, in this case build-doc needs to happen
 # before deploy-doc.
