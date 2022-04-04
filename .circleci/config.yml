@@ -90,10 +90,6 @@ jobs:
           name: 'Build doctest'
           command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
-
-      - run:
-          name: "DEBUG ssh known-hosts"
-          command: ls /etc/ssh
       
   deploy-doc:
     docker:
