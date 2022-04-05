@@ -51,7 +51,8 @@ Define metrics that quantify harms or benefits:
 
 * For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
 
-Note that in some cases, harms might not be readily quantifiable. 
+Note that in some cases, the outcome we seek to measure is not 
+directly available. 
 Occasionally, another variable in our dataset provides a close 
 approximation to the phenomenon we seek to measure. 
 In these cases, we might choose to use that closely related variable, 
@@ -68,11 +69,9 @@ represent the harm, check the proxy variable regularly to ensure it
 remains useful over time. Our section on :ref:`construct_validity`
 describes how to determine whether a  
 proxy variable measures the intended construct in a meaningful 
-and useful way. Also be careful to ensure that the proxy measure 
-you choose does not abstract away the social context 
-of the problem you seek to solve. 
-For more on abstraction traps, review :ref:`abstraction_traps`.
-
+and useful way. It is important to ensure that the proxy is suitable 
+for the social context of the problem you seek to solve. 
+In particular, be careful of falling into one of the :refabstraction_traps. 
 
 Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
