@@ -94,7 +94,9 @@ jobs:
           name: DEBUG locate gh-pages
           command: locate gh-pages
           
-      
+      - run:
+          name: DEBUG Check out binary
+          command: cat /usr/local/bin/gh-pages
 
 
       - run:
