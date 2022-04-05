@@ -13,10 +13,10 @@ def discrimination_dataset(y, sensitive):
     :return: The discrimination of dataset
     """
     """
-    p0: ∣{𝑥 ∈ 𝐷 ∣ 𝑥.Sensitive = 0, clf(𝑥) = +}∣
-    p1: ∣{𝑥 ∈ 𝐷 ∣ 𝑥.Sensitive = 1, clf(𝑥) = +}∣
-    n_zero: ∣{𝑥 ∈ 𝐷 ∣ 𝑥.Sensitive = 0}∣
-    n_one: ∣{𝑥 ∈ 𝐷 ∣ 𝑥.Sensitive = 1}∣
+    p0: |{x in D ∣ x.Sensitive = 0, clf(x) = +}|
+    p1: |{x in D ∣ x.Sensitive = 1, clf(x) = +}|
+    n_zero: ∣{x in D ∣ x.Sensitive = 0}|
+    n_one: |{x in D ∣ x.Sensitive = 1}|
     """
     p0, p1, n_zero, n_one = 0, 0, 0, 0
     for i in range(0, len(y)):
@@ -79,34 +79,35 @@ def discrimination(y, y_pred, sensitive):
 
 
 class Leaf:
-    """Keep useful information from a sklearn leaf as an object.
-
-    :param path: A list of tuples representing a path to a leaf from the root node
-            where a tuple is a leaf in the tree.
-            The tuple is in the format (node id, feature, way).
-            "Node id" is id of the node in sklearn.
-            "Feature" is the feature of a leaf.
-            "Way" allows to know if we have to go left or right when we navigate in the tree.
-    :type path: tuple
-    :param node_id: The id of the node in sklearn.
-    :type node_id: int
-    :param u: The portion of item of the dataset whose class is negative
-            and the sensitive attribute is positive contained by leaf
-    :type u: float
-    :param v: The portion of item of the dataset whose class is positive
-            and the sensitive attribute is positive contained by leaf
-    :type v: float
-    :param w: The portion of item of the dataset whose class is negative
-            and the sensitive attribute is negative contained by leaf
-    :type w: float
-    :param x: The portion of item of the dataset whose class is positive
-            and the sensitive attribute is negative contained by leaf
-    :type x: float
-    :param transactions: A list of sample indexes used by the leaf
-    :type transactions: list
-    """
+    """Keep useful information from a sklearn leaf as an object."""
 
     def __init__(self, path, node_id, u, v, w, x, transactions=None):
+        """Init the object.
+
+        :param path: A list of tuples representing a path to a leaf from the root node
+                where a tuple is a leaf in the tree.
+                The tuple is in the format (node id, feature, way).
+                "Node id" is id of the node in sklearn.
+                "Feature" is the feature of a leaf.
+                "Way" allows to know if we have to go left or right when we navigate in the tree.
+        :type path: tuple
+        :param node_id: The id of the node in sklearn.
+        :type node_id: int
+        :param u: The portion of item of the dataset whose class is negative
+                and the sensitive attribute is positive contained by leaf
+        :type u: float
+        :param v: The portion of item of the dataset whose class is positive
+                and the sensitive attribute is positive contained by leaf
+        :type v: float
+        :param w: The portion of item of the dataset whose class is negative
+                and the sensitive attribute is negative contained by leaf
+        :type w: float
+        :param x: The portion of item of the dataset whose class is positive
+                and the sensitive attribute is negative contained by leaf
+        :type x: float
+        :param transactions: A list of sample indexes used by the leaf
+        :type transactions: list
+        """
         self.path = path
         self.node_id = node_id
         self.acc = None
