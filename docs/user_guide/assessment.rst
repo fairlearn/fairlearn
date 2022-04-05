@@ -242,7 +242,7 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-Multiple metrics in one :code:`MetricFrame`
+Multiple metrics in a single :code:`MetricFrame`
 -------------------------------------------
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
