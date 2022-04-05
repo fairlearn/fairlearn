@@ -22,6 +22,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     The exponentiated gradient algorithm is described in detail by
     :footcite:t:`agarwal2018reductions`.
 
+    Read more in the :ref:`User Guide <exponentiated_gradient>`.
+
     .. versionchanged:: 0.3.0
         Was a function before, not a class
 
