@@ -83,6 +83,10 @@ jobs:
           command: npm install gh-pages@3.2.3
 
       - run:
+          name: DEBUG Install gh-pages
+          command: sudo npm install -g gh-pages@3.2.3
+
+      - run:
           name: DEBUG update locate
           command: sudo updatedb
 
