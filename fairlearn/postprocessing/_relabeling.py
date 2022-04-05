@@ -1,9 +1,12 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 import numpy as np
 import pandas as pd
 
 
 def discrimination_dataset(y, sensitive):
-    """
+    """Calculate the discrimination of a dataset.
 
     :param y: The target values (class labels)
     :param sensitive: The sensitive sample
@@ -38,7 +41,7 @@ def discrimination_dataset(y, sensitive):
 
 
 def discrimination(y, y_pred, sensitive):
-    """
+    """Calculate the discrimination of a dataset.
 
     :param y: The target values (class labels)
     :param y_pred: The target values (class labels) predicted by the decision tree
@@ -76,7 +79,7 @@ def discrimination(y, y_pred, sensitive):
 
 
 class Leaf:
-    """
+    """Keep useful information from a sklearn leaf as an object.
 
     :param path: A list of tuples representing a path to a leaf from the root node
             where a tuple is a leaf in the tree.
@@ -115,7 +118,16 @@ class Leaf:
         self.x = x
         self.transactions = transactions
 
-    def accuracy(self, cnt_p, cnt_n, portion_zero, portion_one):
+    def compute_gain(self, cnt_p, cnt_n, portion_zero, portion_one):
+        """Calculate the loss in accuracy and discrimination if the leaf is relabeled.
+
+        :param cnt_p: The number of positive class in the leaf.
+        :param cnt_n: The number of negative class in the leaf.
+        :param portion_zero: Number of elements in the leaf that have the sensible feature
+            divided by the number of elements that have the sensible feature in the data set.
+        :param portion_one: Number of elements in the leaf that have not the sensible feature
+            divided by the number of elements that have not the sensible feature in the data set.
+        """
         n = self.u + self.w
         p = self.v + self.x
         """"
@@ -147,6 +159,10 @@ class Leaf:
             self.ratio = self.disc / self.acc
 
     def __str__(self):
+        """Return the string representation of the object.
+
+        :return: Return the string representation of the object.
+        """
         return f"Path: format -> (node id, feature, way)\n{self.path} " \
                f"\nnode_id: {self.node_id} " \
                f"\nThe effect of relabeling the leaf on accuracy: {self.acc}" \
@@ -156,12 +172,15 @@ class Leaf:
                f"\ntransactions: {self.transactions}"
 
     def __repr__(self):
+        """Return the object representation in string format.
+
+        :return: Return the object representation in string format
+        """
         return f"{self.path}"
 
 
 def get_transactions_by_leaf(clf, path, x):
-    """
-    Allows to retrieve the indexes of the samples of a leaf.
+    """Allow to retrieve the indexes of the samples of a leaf.
 
     :param clf: The decision tree.
     :param path: A list of tuples representing a path to a leaf from the root node
@@ -187,8 +206,7 @@ def get_transactions_by_leaf(clf, path, x):
 
 
 def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, path=tuple()):
-    """
-    Recovers leaves that could be used for relabeling.
+    """Recovers leaves that could be used for relabeling.
 
     :param clf: The decision tree classifier.
     :param x: The training input samples.
@@ -228,14 +246,14 @@ def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, 
         leaf = Leaf(tmp_path, node_id, u / length, v / length,
                     w / length, x / length, transactions)
         # leaf.value = copy.deepcopy(clf.tree_.value[node_id])
-        leaf.accuracy(v + x, u + w, cnt[0] / length, cnt[1] / length)
+        leaf.compute_gain(v + x, u + w, cnt[0] / length, cnt[1] / length)
         if leaf.disc < 0:
             leaves.append(leaf)
 
 
 # rem disc(𝐿) := disc 𝑇 + ∑ Δdisc 𝑙 ≤ 𝜖
 def rem_disc(disc_tree, leaves, threshold):
-    """
+    """Calculate the new discrimination of the tree if we relabel the leaves contained in "leaves".
 
     :param disc_tree: The discrimination of the tree.
     :param leaves: The leaves that we will keep to relabel them.
@@ -250,9 +268,7 @@ def rem_disc(disc_tree, leaves, threshold):
 
 
 def leaves_to_relabel(clf, x, y, y_pred, sensitive, threshold):
-    """
-    Select exactly this set of leaves that is "optimal" w.r.t. reducing the discrimination with
-    minimal loss in accuracy.
+    """Select the set of leaves that is "optimal".
 
     :param clf: The decision tree.
     :param x: The training input samples.
@@ -288,13 +304,11 @@ def leaves_to_relabel(clf, x, y, y_pred, sensitive, threshold):
 
 
 def browse_and_relab(clf, node_id):
-    """
-    Relabel one leafs of the decision tree.
+    """Relabel one leaf of the decision tree.
 
     :param clf: The decision tree.
     :param node_id: The id of the node (leaf) to be relabeled.
     """
-
     if clf.tree_.value[node_id][0][0] == clf.tree_.value[node_id][0][1]:
         clf.tree_.value[node_id][0][1] += 1
     else:
@@ -303,9 +317,7 @@ def browse_and_relab(clf, node_id):
 
 
 def relabeling(clf, x, y, y_pred, sensitive, threshold):
-    """
-    Relabel the leaves of the decision tree so that the discrimination decreases,
-    until it falls below the threshold, while minimizing the loss of accuracy.
+    """Relabel the leaves of the decision tree so that the discrimination decreases.
 
     :param clf: The decision tree.
     :param x: The training input samples.
