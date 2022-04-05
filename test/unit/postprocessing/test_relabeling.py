@@ -1,3 +1,6 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 from sklearn.metrics import accuracy_score
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
