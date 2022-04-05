@@ -132,7 +132,7 @@ jobs:
 
       - run:
           name: Install gh-pages
-          command: sudo npm install -g --silent gh-pages@2.0.1
+          command: npm install --silent gh-pages@2.0.1
 
       - run:
           name: Configure git
