@@ -6,22 +6,22 @@ Introduction
 ^^^^^^^^^^^^
 
 The ACSPublicCoverage dataset is one of five datasets created by Ding et al.
-[1]_ as an improved fairness benchmark dataset to the popular UCI Adult dataset
-[2]_. It is used to evaluate different algorithmic fairness interventions.
-While UCI Adult predicts whether an individual's annual income is above
-$50,000, the authors introduced ACSPublicCoverage to cover the healthcare
-domain. ACSPublicCoverage predicts whether a low-income individual who is not
-eligible for Medicare is covered by public health insurance, such as Medicaid
-or Medicare.
+:footcite:`ding2021retiring` as an improved fairness benchmark dataset to the
+popular UCI Adult dataset :footcite:`kohavi2017adult`. The authors propose to
+use the dataset to evaluate algorithmic fairness interventions. While UCI Adult
+predicts whether an individual's annual income is above $50,000, the authors
+introduced ACSPublicCoverage to cover the healthcare domain. ACSPublicCoverage
+predicts whether a low-income individual who is not eligible for Medicare is
+covered by public health insurance, such as Medicaid or Medicare.
 
 The authors compiled data from the American Community Survey (ACS) Public Use
 Microdata Sample (PUMS). Note that this is a different source than the Annual
 Social and Economic Supplement (ASEC) of the Current Population Survey (CPS)
-used to construct the original UCI Adult dataset. Ding et al. [1]_ filtered the
-data such that ACSPublicCoverage only includes individuals under 65 years old
-had an income of less than $30,000. Although usually only people over age 65
-are eligible for Medicare, people under age 65 may qualify if they have certain
-disabilities.
+used to construct the original UCI Adult dataset. Ding et al.
+:footcite:`ding2021retiring` filtered the data such that ACSPublicCoverage only
+includes individuals under 65 years old had an income of less than $30,000.
+Although usually only people over age 65 are eligible for Medicare, people
+under age 65 may qualify if they have certain disabilities.
 
 
 .. _acs_public_coverage_dataset_description:
@@ -210,20 +210,24 @@ classification task.
 Discussion
 ^^^^^^^^^^
 
-As Ding et al. [1]_ notes, algorithmic (un)fairness must be evaluated in
-context of the intervention, and the effects of different interventions vary
-widely by state. Similarly, datasets should be carefully designed for the
-specific prediction task in mind.
+A meaningful evaluation of algorithmic (un)fairness considers the context in
+which the machine learning model will be used. In this way, we can avoid
+falling into abstraction traps (see :footcite:`selbst2019fairness`). For
+example, the relationship between demographics and healthcare coverage may vary
+widely by state - a model that works well in one state may not be suitable to
+use in a different state.
 
-Therefore, to investigate how viable ACSPublicCoverage is as a fairness
-benchmark dataset, we must first ask what real-world tasks might require a
-prediction of whether an individual is covered by public health insurance.
-Usually, the entity that needs this information (e.g. the government checking
-for eligibilty in a social program) will simply ask the individual directly.
-Ding et al. do not provide any examples, so it is difficult to evaluate what
-"fair" even means without context. For now, the rest of this discussion focuses
-on preliminary data analysis of ACSPublicCoverage and identifies potential
-problems that users should be aware of beforehand.
+To investigate how viable ACSPublicCoverage is as a fairness benchmark dataset,
+we must first ask what real-world tasks might require a prediction of whether
+an individual is covered by public health insurance. Usually, the entity that
+needs this information (e.g., the government checking for eligibility in a
+social program) will simply ask the individual directly. Ding et al. do not
+provide any examples, so it is difficult to evaluate what notion of fairness is
+applicable without further context. 
+
+The remainder of this discussion focuses on preliminary data analysis of
+ACSPublicCoverage and identifies potential problems that users should be aware
+of beforehand.
 
 1. A uniform $30,000 threshold ignores differences between states.
 
@@ -232,9 +236,9 @@ problems that users should be aware of beforehand.
     health insurance," this dataset should not be blindly used for all
     prediction tasks that fall in that category. Ding et al. filters ACS PUMS
     for all individuals whose income is below $30,000, but the 'low-income'
-    threshold differs for every state, so applying one threshold to all states
-    can lead to flawed results. The paper does not justify the choice of
-    $30,000, but the authors answer in `this Github issue
+    threshold differs for every state. Consequently, applying one threshold to
+    all states can lead to flawed results. The paper does not justify the
+    choice of $30,000, but the authors answer in `this Github issue
     <https://github.com/zykls/folktables/issues/14>`_ that it was calculated
     approximately in accordance with Affordable Care Act (ACA) eligibilty
     guidelines qualifying adults with income up to 133% of the 2021 Federal
@@ -255,7 +259,8 @@ problems that users should be aware of beforehand.
     The paper states that ACSPublicCoverage excludes individuals not eligible
     for Medicare, but this is not strictly true. While 65 traditionally is the
     eligibilty age for Medicare, and the data filters for people under 65 years
-    old, younger people with disabilities may still qualify [3]_.
+    old, younger people with disabilities may still qualify
+    :footcite:`usgov2014who`.
 
 3. Missing features that contribute to low-income status.
 
@@ -263,19 +268,7 @@ problems that users should be aware of beforehand.
     household size, which is not one of the 19 features in ACSPublicCoverage.
     This could affect prediction tasks.
 
+References
+----------
 
-
-.. topic:: References:
-
-  .. [1] Frances Ding, Moritz Hardt, John Miller, Ludwig Schmidt `"Retiring
-      Adult: New Datasets for Fair Machine Learning"
-      <https://arxiv.org/pdf/2108.04884.pdf>`_, Advances in Neural Information
-      Processing Systems 34, 2021.
-
-  .. [2] R. Kohavi and B. Becker. "UCI Adult Data Set." UCI Machine Learning
-         Repository, 5, 1996.
-  
-  .. [3] U.S. Department of Health & Human Services. `"Who is eligible for
-      Medicare?"
-      <https://www.hhs.gov/answers/medicare-and-medicaid/who-is-eligible-for-medicare/index.html>`_,
-      HHS.gov, 2014.
+.. footbibliography::
