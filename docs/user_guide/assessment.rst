@@ -224,7 +224,7 @@ We then calculate a metric which shows the subgroups:
 
 The disaggregated metrics are stored in a pandas Series 
 :code:`grouped_metric.by_group`. Note that the overall recall is the same 
-as that calculated above in the Ungrouped Metric section, while the 'by group' 
+as that calculated above in the Ungrouped Metric section, while the 'by_group'
 dictionary can be checked against the table above.
 
 In addition to these basic scores, Fairlearn provides
