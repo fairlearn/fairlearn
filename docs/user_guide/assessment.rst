@@ -84,7 +84,7 @@ the best and the worst slice. In settings where the goal is to guarantee
 certain minimum quality of service across all groups (such as speech recognition), 
 it is also meaningful to report the worst performance across all considered groups.
 
-For example, when comparing false negative rate across groups defined by race, 
+For example, when comparing the false negative rate across groups defined by race, 
 we may summarize our findings with a table like the following:
 
 .. list-table::
