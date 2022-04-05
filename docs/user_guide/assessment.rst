@@ -72,7 +72,7 @@ and useful way.
 Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The workhorse of fairness assessment are disaggregated metrics, which are 
+The workhorse of fairness assessment in Fairlearn are disaggregated metrics, which are 
 metrics evaluated on slices of data. For example, to measure harms due to 
 errors, we would begin by evaluating the errors on each slice of the data that 
 corresponds to a group. If some of the groups are seeing much larger errors 
