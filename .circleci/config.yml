@@ -150,10 +150,6 @@ jobs:
             chmod 700 .ssh
             cp ssh_known_hosts .ssh/known_hosts
             chmod 600 .ssh/known_hosts
-            sudo mv ssh_known_hosts /etc/ssh/ssh_known_hosts
-            sudo chown root:root /etc/ssh/ssh_known_hosts
-            sudo chmod 644 /etc/ssh/ssh_known_hosts
-            ls -alF /etc/ssh
 
       - run:
           name: 'Push to GitHub Pages repository'
