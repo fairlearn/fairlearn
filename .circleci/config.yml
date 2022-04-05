@@ -75,6 +75,25 @@ jobs:
           command: sudo apt update
 
       - run:
+          name: DEBUG Install npm
+          command: sudo apt-get install npm
+
+      - run:
+          name: DEBUG Install gh-pages
+          command: npm install gh-pages@3.2.3
+
+      - run:
+          name: DEBUG update locate
+          command: sudo updatedb
+
+      - run:
+          name: DEBUG locate gh-pages
+          command: locate gh-pages
+          
+      
+
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
