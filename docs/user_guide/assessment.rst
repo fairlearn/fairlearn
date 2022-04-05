@@ -248,7 +248,7 @@ Multiple metrics in a single :code:`MetricFrame`
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously by providing the `metrics` argument with a 
 dictionary of desired metrics. The disaggregated metrics are then stored in a 
-pandas DataFrame. Note that :func:`fairlearn.metrics.count` can 
+pandas DataFrame. Note that :class:`pandas.DataFrame` can 
 be used to show each group's size:
 
 .. doctest:: assessment_metrics
