@@ -55,6 +55,8 @@ def fetch_boston(*, cache=True, data_home=None,
     MEDV     Median value of owner-occupied homes in $1000's
     =======  ======================================================================
 
+     Read more in the :ref:`User Guide <boston_housing_data>`.
+
     .. versionadded:: 0.5.0
 
     Parameters

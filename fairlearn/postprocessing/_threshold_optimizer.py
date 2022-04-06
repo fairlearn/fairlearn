@@ -129,6 +129,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     provided estimator. The thresholds are chosen to optimize the provided
     performance objective subject to the provided fairness constraints.
 
+    Read more in the :ref:`User Guide <postprocessing>`.
+
     Parameters
     ----------
     estimator : object

@@ -169,6 +169,8 @@ class MetricFrame:
     feature(s). The name 'control features' refers to the statistical practice
     of 'controlling' for a variable.
 
+    Read more in the :ref:`User Guide <metrics_with_grouping>`.
+
     Parameters
     ----------
     metrics : callable or dict
@@ -407,6 +409,8 @@ class MetricFrame:
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
+           Read more in the :ref:`User Guide <control_features_metrics>`.
+
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
@@ -449,6 +453,8 @@ class MetricFrame:
         The collection is defined by the combination of classes in the
         sensitive and control features. The exact type depends on
         the specification of the metric function.
+
+        Read more in the :ref:`User Guide <control_features_metrics>`.
 
         Returns
         -------
@@ -609,6 +615,8 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Read more in the :ref:`User Guide <metrics_with_grouping>`.
+
         Parameters
         ----------
         errors: {'raise', 'coerce'}, default 'raise'
@@ -634,6 +642,8 @@ class MetricFrame:
         functions return scalar values). The exact return type depends on
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
+
+        Read more in the :ref:`User Guide <metrics_with_grouping>`.
 
         Parameters
         ----------
@@ -670,6 +680,8 @@ class MetricFrame:
         corresponding value from :attr:`.overall` (if there are control
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
+
+        Read more in the :ref:`User Guide <control_features_metrics>`.
 
         Parameters
         ----------
@@ -729,6 +741,8 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric),
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
+
+        Read more in the :ref:`User Guide <metrics_with_grouping>`.
 
         Parameters
         ----------

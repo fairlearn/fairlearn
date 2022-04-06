@@ -20,6 +20,8 @@ class Moment:
     of :class:`Moment` objects to describe both the optimization objective
     and the fairness constraints
     imposed on the solution. This is an abstract class for all such objects.
+
+    Read more in the :ref:`User Guide <reductions>`.
     """
 
     def __init__(self):

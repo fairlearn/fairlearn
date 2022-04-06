@@ -9,6 +9,8 @@ class ThresholdOperation():
     The function can be evaluated at arbitrary points (usually the scores returned from
     unconstrained predictors) to return a bool value.
 
+    Read more in the :ref:`User Guide <postprocessing>`.
+
     :param operator: the threshold operator, can be either '>' or '<'
     :type operator: str
     :param threshold: the threshold, can be numpy.inf or -numpy.inf
