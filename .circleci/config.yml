@@ -9,7 +9,7 @@ version: 2.0
 jobs:
   build-doc:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -17,16 +17,28 @@ jobs:
       - checkout
 
       - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
+          command: python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
+          command: python scripts/install_requirements.py --pinned False
 
       - run:
           name: "Build Documentation"
@@ -43,24 +55,36 @@ jobs:
 
   build-doctest:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch
       - checkout
-      
+
+      - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
+
       - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
+          command: python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
+          command: python scripts/install_requirements.py --pinned False
       
       - run:
           name: 'Build doctest'
@@ -69,7 +93,7 @@ jobs:
       
   deploy-doc:
     docker:
-      - image: node:14.0.0-stretch  # npm required for gh-pages
+      - image: cimg/node:14.0.0  # npm required for gh-pages
 
     steps:
       - checkout
@@ -99,14 +123,38 @@ jobs:
           command: echo "fairlearn.org" > docs/_build/html/CNAME
 
       - run:
-          name: 'Install gh-pages and configure dependencies'
+          name: Update apt
+          command: sudo apt update
+
+      - run:
+          name: Install npm
+          command: sudo apt-get install npm
+
+      - run:
+          name: Install gh-pages
+          command: npm install --silent gh-pages@2.0.1
+
+      - run:
+          name: Configure git
           command: |
-            npm install -g --silent gh-pages@2.0.1
             git config user.email "ci-build@fairlearn.org"
             git config user.name "ci-build"
 
       - run:
+          name: Update SSH keys
+          # Ideally, do something with https://github.blog/changelog/2022-01-18-githubs-ssh-host-keys-are-now-published-in-the-api/
+          command: |
+            ssh-keyscan github.com > ssh_known_hosts
+            cat ssh_known_hosts
+            mkdir .ssh
+            chmod 700 .ssh
+            cp ssh_known_hosts .ssh/known_hosts
+            chmod 600 .ssh/known_hosts
+
+      - run:
           name: 'Push to GitHub Pages repository'
+          # Next is only acceptable because this is running in a docker container which is not persisted
+          # See https://github.com/tschaub/gh-pages/issues/422
           command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
 
 # This workflow defines the ordering, in this case build-doc needs to happen

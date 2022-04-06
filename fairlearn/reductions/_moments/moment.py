@@ -15,10 +15,13 @@ _SIGN = "sign"
 class Moment:
     """Generic moment.
 
-    Our implementations of the reductions approach to fairness described
-    in `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ make use
-    of :class:`Moment` objects to describe the disparity constraints
+    Our implementations of the reductions approach to fairness
+    :footcite:p:`agarwal2018reductions` make use
+    of :class:`Moment` objects to describe both the optimization objective
+    and the fairness constraints
     imposed on the solution. This is an abstract class for all such objects.
+
+    Read more in the :ref:`User Guide <reductions>`.
     """
 
     def __init__(self):
@@ -78,6 +81,10 @@ class Moment:
         """Return the signed weights."""
         raise NotImplementedError()
 
+    def _moment_type(self):
+        """Return the moment type, e.g., ClassificationMoment vs LossMoment."""
+        return NotImplementedError()
+
 
 # Ensure that Moment shows up in correct place in documentation
 # when it is used as a base class
@@ -86,6 +93,9 @@ Moment.__module__ = "fairlearn.reductions"
 
 class ClassificationMoment(Moment):
     """Moment that can be expressed as weighted classification error."""
+
+    def _moment_type(self):
+        return ClassificationMoment
 
 
 # Ensure that ClassificationMoment shows up in correct place in documentation
@@ -99,6 +109,9 @@ class LossMoment(Moment):
     def __init__(self, loss):
         super().__init__()
         self.reduction_loss = loss
+
+    def _moment_type(self):
+        return LossMoment
 
 
 # Ensure that LossMoment shows up in correct place in documentation

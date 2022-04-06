@@ -17,10 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
-    """An Estimator which implements the exponentiated gradient approach to reductions.
+    """An Estimator which implements the exponentiated gradient reduction.
 
     The exponentiated gradient algorithm is described in detail by
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_.
+    :footcite:t:`agarwal2018reductions`.
+
+    Read more in the :ref:`User Guide <exponentiated_gradient>`.
 
     .. versionchanged:: 0.3.0
         Was a function before, not a class
@@ -39,17 +41,20 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         :code:`predict(X)` are either 0 or 1.
         In regression values `y` and predictions are continuous.
     constraints : fairlearn.reductions.Moment
-        The disparity constraints expressed as moments
+        The fairness constraints expressed as a :class:`~Moment`.
+    objective : fairlearn.reductions.Moment
+        The objective expressed as a :class:`~Moment`. The default is
+        :code:`ErrorRate()` for binary classification and
+        :code:`MeanLoss(...)` for regression.
     eps : float
         Allowed fairness constraint violation; the solution is guaranteed to
         have the error within :code:`2*best_gap` of the best error under
         constraint `eps`; the constraint violation is at most
-        :code:`2*(eps+best_gap)`
+        :code:`2*(eps+best_gap)`.
 
         .. versionchanged:: 0.5.0
             :code:`eps` is now only responsible for setting the L1 norm bound
             in the optimization
-
     max_iter : int
         Maximum number of iterations
 
@@ -82,11 +87,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
     """
 
-    def __init__(self, estimator, constraints, eps=0.01, max_iter=50, nu=None,
+    def __init__(self, estimator, constraints, *, objective=None,
+                 eps=0.01, max_iter=50, nu=None,
                  eta0=2.0, run_linprog_step=True,
                  sample_weight_name='sample_weight'):  # noqa: D103
         self.estimator = estimator
         self.constraints = constraints
+        self.objective = objective
         self.eps = eps
         self.max_iter = max_iter
         self.nu = nu
@@ -111,8 +118,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         logger.debug("...Exponentiated Gradient STARTING")
 
         B = 1 / self.eps
-        lagrangian = _Lagrangian(X, y, self.estimator,
-                                 self.constraints, B,
+        lagrangian = _Lagrangian(X=X, y=y, estimator=self.estimator, constraints=self.constraints,
+                                 B=B, objective=self.objective,
                                  sample_weight_name=self.sample_weight_name,
                                  **kwargs)
 
