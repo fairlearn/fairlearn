@@ -11,9 +11,7 @@ from joblib import Parallel
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model._logistic import (
-    _multinomial_loss,
     _logistic_loss,
-    _check_multi_class,
 )
 from sklearn.preprocessing import LabelEncoder, LabelBinarizer, OneHotEncoder
 from sklearn.utils import (
@@ -75,22 +73,12 @@ def _sensitive_attr_constraint_cov(
 
     intercept = 0.0
 
-    # Reshape the model variable (w0) in the multinomial case
-    num_classes = len(np.unique(y_arr_dist_boundary))
     num_features = x_arr.shape[1]
-    if num_classes > 2:  # Multinomial case, need to retransform ravelled array
-        if model.size == num_classes * (
-            num_features + 1
-        ):  # True if the intercept needs to be fitted
-            model = model.reshape(num_classes, -1)
-            intercept = model[:, -1]
-            model = model[:, :-1]
-    else:  # Binary case
-        if (
-            model.size == num_features + 1
-        ):  # True if the intercept needs to be fitted
-            intercept = model[-1]
-            model = model[:-1]
+    if (
+        model.size == num_features + 1
+    ):  # True if the intercept needs to be fitted
+        intercept = model[-1]
+        model = model[:-1]
 
     arr = np.dot(model, x_arr.T) + intercept
     # the product with the weight vector -- the sign of this is the output label
@@ -199,7 +187,7 @@ def _logistic_regression_path(
     random_state = check_random_state(random_state)
 
     multi_class = _check_multi_class(multi_class, solver, len(classes))
-    if pos_class is None and multi_class != "multinomial":
+    if pos_class is None:
         if classes.size > 2:
             raise ValueError("To fit OvR, use the pos_class argument")
         # np.unique(y) gives labels in sorted order.
@@ -216,14 +204,13 @@ def _logistic_regression_path(
     # are assigned to the original labels. If it is "balanced", then
     # the class_weights are assigned after masking the labels with a OvR.
     le = LabelEncoder()
-    if isinstance(class_weight, dict) or multi_class == "multinomial":
+    if isinstance(class_weight, dict):
         class_weight_ = compute_class_weight(
             class_weight, classes=classes, y=y
         )
         sample_weight *= class_weight_[le.fit_transform(y)]
 
-    # For doing a ovr, we need to mask the labels first. for the
-    # multinomial case this is not necessary.
+    # For doing a ovr, we need to mask the labels first.
     if multi_class == "ovr":
         w0 = np.zeros(n_features + int(fit_intercept), dtype=X.dtype)
         mask_classes = np.array([-1, 1])
@@ -289,18 +276,8 @@ def _logistic_regression_path(
             else:
                 w0[:, : coef.shape[1]] = coef
 
-    if multi_class == "multinomial":
-        # scipy.optimize.minimize (used in SLSQP) accepts only
-        # ravelled parameters.
-        w0 = w0.ravel()
-        target = Y_multi
-
-        def func(x, *args):
-            return _multinomial_loss(x, *args)[0]
-
-    else:
-        target = y_bin
-        func = _logistic_loss
+    target = y_bin
+    func = _logistic_loss
 
     coefs = list()
     n_iter = np.zeros(len(Cs), dtype=np.int32)
@@ -331,14 +308,7 @@ def _logistic_regression_path(
                 "solver must be {'SLSQP'}, got '%s' instead" % solver
             )
 
-        if multi_class == "multinomial":
-            n_classes = max(2, classes.size)
-            multi_w0 = np.reshape(w0, (n_classes, -1))
-            if n_classes == 2:
-                multi_w0 = multi_w0[1][np.newaxis, :]
-            coefs.append(multi_w0.copy())
-        else:
-            coefs.append(w0.copy())
+        coefs.append(w0.copy())
 
         n_iter[i] = n_iter_i
 
@@ -592,10 +562,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
                 warm_start_coef, self.intercept_[:, np.newaxis], axis=1
             )
 
-        # Hack so that we iterate only once for the multinomial case.
-        if multi_class == "multinomial":
-            classes_ = [None]
-            warm_start_coef = [warm_start_coef]
         if warm_start_coef is None:
             warm_start_coef = [None] * n_classes
 
@@ -635,13 +601,11 @@ class ConstrainedLogisticRegression(LogisticRegression):
         self.n_iter_ = np.asarray(n_iter_, dtype=np.int32)[:, 0]
 
         n_features = X_nonsensitive.shape[1]
-        if multi_class == "multinomial":
-            self.coef_ = fold_coefs_[0][0]
-        else:
-            self.coef_ = np.asarray(fold_coefs_)
-            self.coef_ = self.coef_.reshape(
-                n_classes, n_features + int(self.fit_intercept)
-            )
+
+        self.coef_ = np.asarray(fold_coefs_)
+        self.coef_ = self.coef_.reshape(
+            n_classes, n_features + int(self.fit_intercept)
+        )
 
         if self.fit_intercept:
             self.intercept_ = self.coef_[:, -1]
