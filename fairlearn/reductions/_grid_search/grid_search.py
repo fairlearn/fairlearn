@@ -25,6 +25,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     The approach used is taken from section 3.4 of
     :footcite:t:`agarwal2018reductions`.
 
+    Read more in the :ref:`User Guide <grid_search>`.
+
     .. versionadded:: 0.3.0
 
     .. versionchanged:: 0.4.6

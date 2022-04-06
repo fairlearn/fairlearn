@@ -132,7 +132,7 @@ jobs:
 
       - run:
           name: Install gh-pages
-          command: sudo npm install -g --silent gh-pages@2.0.1
+          command: npm install --silent gh-pages@2.0.1
 
       - run:
           name: Configure git
@@ -146,16 +146,16 @@ jobs:
           command: |
             ssh-keyscan github.com > ssh_known_hosts
             cat ssh_known_hosts
-            sudo mv ssh_known_hosts /etc/ssh/ssh_known_hosts
-            sudo chown root:root /etc/ssh/ssh_known_hosts
-            sudo chmod 644 /etc/ssh/ssh_known_hosts
-            ls -alF /etc/ssh
+            mkdir .ssh
+            chmod 700 .ssh
+            cp ssh_known_hosts .ssh/known_hosts
+            chmod 600 .ssh/known_hosts
 
       - run:
           name: 'Push to GitHub Pages repository'
           # Next is only acceptable because this is running in a docker container which is not persisted
           # See https://github.com/tschaub/gh-pages/issues/422
-          command: sudo gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
 
 # This workflow defines the ordering, in this case build-doc needs to happen
 # before deploy-doc.
