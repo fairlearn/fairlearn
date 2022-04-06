@@ -162,7 +162,7 @@ Metrics with grouping using :code:`MetricFrame`
 
 In a typical fairness assessment, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
-for each :math:`g`. To help with this, Fairlearn provides a class that takes
+for each group :math:`g`. To help with this, Fairlearn provides a class that takes
 an existing (ungrouped) metric function, like from :module:`sklearn.metrics`, 
 and applies it to each group within a set of data.
 
