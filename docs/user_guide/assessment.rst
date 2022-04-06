@@ -71,7 +71,7 @@ describes how to determine whether a
 proxy variable measures the intended construct in a meaningful 
 and useful way. It is important to ensure that the proxy is suitable 
 for the social context of the problem you seek to solve. 
-In particular, be careful of falling into one of the :refabstraction_traps. 
+In particular, be careful of falling into one of the :ref:abstraction_traps. 
 
 Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
