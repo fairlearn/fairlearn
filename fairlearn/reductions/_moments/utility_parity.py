@@ -65,6 +65,8 @@ class UtilityParity(ClassificationMoment):
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
+    Read more in the :ref:`User Guide <constraints_binary_classification>`.
+
     Parameters
     ----------
     difference_bound : float
@@ -279,6 +281,8 @@ class DemographicParity(UtilityParity):
     .. math::
       P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
 
+    Read more in the :ref:`User Guide <demographic_parity>`.
+
     """
 
     short_name = "DemographicParity"
@@ -331,6 +335,8 @@ class TruePositiveRateParity(UtilityParity):
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
+    Read more in the :ref:`User Guide <true_positive_rate_parity>`.
+
     """
 
     short_name = "TruePositiveRateParity"
@@ -378,6 +384,8 @@ class FalsePositiveRateParity(UtilityParity):
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
+    Read more in the :ref:`User Guide <false_positive_rate_parity>`.
+
     """
 
     short_name = "FalsePositiveRateParity"
@@ -424,6 +432,8 @@ class EqualizedOdds(UtilityParity):
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
+    Read more in the :ref:`User Guide <equalized_odds>`.
+
     """
 
     short_name = "EqualizedOdds"
@@ -464,6 +474,8 @@ class ErrorRateParity(UtilityParity):
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
+
+    Read more in the :ref:`User Guide <error_rate_parity>`.
 
     """
 
