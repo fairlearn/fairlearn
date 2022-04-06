@@ -40,7 +40,8 @@ native or a non-native speaker.
 It is also important to consider group intersections, for example, in addition
 to considering groups according to gender and groups according to race, it is 
 also important to consider their intersections (e.g., Black women, Latinx 
-nonbinary people, etc.).
+nonbinary people, etc.). Kimberlé Crenshaw's `seminal work on intersectionality <https://www.jstor.org/stable/1229039>`_ 
+offers a thorough background on this topic.
 
 Quantify harms
 ^^^^^^^^^^^^^^
@@ -76,8 +77,8 @@ In particular, be careful of falling into one of the :ref:abstraction_traps.
 Compare quantified harms across the groups
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The workhorse of fairness assessment in Fairlearn are disaggregated metrics, which are 
-metrics evaluated on slices of data. For example, to measure harms due to 
+The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
+which are metrics evaluated on slices of data. For example, to measure harms due to 
 errors, we would begin by evaluating the errors on each slice of the data that 
 corresponds to a group. If some of the groups are seeing much larger errors 
 than other groups, we would flag this as a fairness harm.
@@ -162,14 +163,14 @@ Metrics with grouping using :code:`MetricFrame`
 In a typical fairness assessment, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
 for each :math:`g`. To help with this, Fairlearn provides a class that takes
-an existing (ungrouped) metric function and applies it to each group within a
-set of data.
+an existing (ungrouped) metric function, like from :module:`sklearn.metrics`, 
+and applies it to each group within a set of data.
 
 This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
 of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
 takes four arguments:
 
-* metric_function with signature metric_function(y_true, y_pred)
+* metric_function with signature :code:`metric_function(y_true, y_pred)`
 
 * y_true: array of labels
 
@@ -226,7 +227,7 @@ We then calculate a metric which shows the subgroups:
     >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
-The disaggregated metrics are stored in a pandas Series 
+The disaggregated metrics are stored in a :class:`pandas.Series` 
 :code:`grouped_metric.by_group`. Note that the overall recall is the same 
 as that calculated above in the Ungrouped Metric section, while the 'by_group'
 dictionary can be checked against the table above.
