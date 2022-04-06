@@ -51,6 +51,19 @@ def _check_solver(solver, penalty):
     return solver
 
 
+def _check_multi_class(multi_class, n_classes):
+    if multi_class not in ("auto", "ovr"):
+        raise ValueError(
+            "multi_class should be 'ovr' or 'auto'. Got %s." % multi_class
+        )
+    if multi_class == "auto":
+        if n_classes > 2:
+            multi_class = "ovr"
+        else:
+            multi_class = "auto"
+    return multi_class
+
+
 def _sensitive_attr_constraint_cov(
     model, x_arr, y_arr_dist_boundary, x_control, thresh
 ):
@@ -186,7 +199,7 @@ def _logistic_regression_path(
     classes = np.unique(y)
     random_state = check_random_state(random_state)
 
-    multi_class = _check_multi_class(multi_class, solver, len(classes))
+    multi_class = _check_multi_class(multi_class, len(classes))
     if pos_class is None:
         if classes.size > 2:
             raise ValueError("To fit OvR, use the pos_class argument")
@@ -534,9 +547,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         check_classification_targets(y)
         self.classes_ = np.unique(y)
 
-        multi_class = _check_multi_class(
-            self.multi_class, solver, len(self.classes_)
-        )
+        multi_class = _check_multi_class(self.multi_class, len(self.classes_))
 
         max_squared_sum = None
 
