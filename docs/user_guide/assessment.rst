@@ -90,7 +90,8 @@ certain minimum quality of service across all groups (such as speech recognition
 it is also meaningful to report the worst performance across all considered groups.
 
 For example, when comparing the false negative rate across groups defined by race, 
-we may summarize our findings with a table like the following:
+we may summarize our findings with a table. Note that the these statistics must 
+be drawn from a large enough sample size to draw meaningful conclusions. 
 
 .. list-table::
    :header-rows: 1
@@ -99,27 +100,35 @@ we may summarize our findings with a table like the following:
 
    *  - 
       - false negative rate (FNR)
+      - sample size
 
    *  - AfricanAmerican
       - 0.43
+      - 126
 
    *  - Caucasian
       - 0.44
+      - 620
 
    *  - Other
       - 0.52
+      - 200
 
    *  - Unknown
       - 0.67
+      - 60
 
    *  - largest difference
       - 0.24 (best is 0.0)
+      - N/A
 
    *  - smallest ratio
       - 0.64 (best is 1.0)
+      - N/A
 
    *  - maximum (worst-case) FNR
       - 0.67
+      - N/A
 
 Disaggregated metrics
 ---------------------
