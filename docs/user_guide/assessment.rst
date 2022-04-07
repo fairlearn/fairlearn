@@ -62,7 +62,7 @@ For example, suppose that in the job screening scenario,
 we have data on whether the candidate passes the first two stages, 
 but not if they are ultimately recommended for the job. 
 
-As an alternative to the unobservable final recommendation, we could
+As an alternative to the unobserved final recommendation, we could
 therefore measure the harm using the proxy variable indicating whether
 the candidate passes the first stage of the screen.
 If you choose to use a proxy variable to 
