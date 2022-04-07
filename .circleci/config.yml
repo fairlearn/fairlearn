@@ -53,27 +53,7 @@ jobs:
       - store_artifacts:
           path: docs/_build/html
 
-  build-doctest:
-    docker:
-      - image: cimg/python:3.8.12
-
-    working_directory: ~/tmp-fairlearn
-    steps:
-      # check out PR branch
-      - checkout
-
-      - run:
-          name: Show Python version
-          command: python --version
-
-      - run:
-          name: Show Ubuntu version
-          command: lsb_release -a
-
-      - run:
-          name: Update apt
-          command: sudo apt update
-
+      # Now try to figure out gh-pages
       - run:
           name: DEBUG Install npm and locate
           command: sudo apt-get install npm locate
@@ -97,7 +77,46 @@ jobs:
       - run:
           name: DEBUG Check out binary
           command: cat /usr/local/bin/gh-pages
+    
+      - run:
+          # By default GitHub attempts jekyll builds.
+          # Instead, we want the webpage to just point at index.html
+          name: DEBUG Disable jekyll builds
+          command: touch docs/_build/html/.nojekyll
+      
+      - run:
+          # Create CNAME file for fairlearn.org
+          name: DEBUG Create CNAME file
+          command: echo "fairlearn.org" > docs/_build/html/CNAME
 
+      
+      - run:
+          name: 'DEBUG Push to GitHub Pages repository'
+          # Next is only acceptable because this is running in a docker container which is not persisted
+          # See https://github.com/tschaub/gh-pages/issues/422
+          command: gh-pages --no-push --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+
+
+  build-doctest:
+    docker:
+      - image: cimg/python:3.8.12
+
+    working_directory: ~/tmp-fairlearn
+    steps:
+      # check out PR branch
+      - checkout
+
+      - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
 
       - run:
           name: Install pandoc
