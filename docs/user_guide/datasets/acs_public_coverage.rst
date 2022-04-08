@@ -212,7 +212,7 @@ Discussion
 
 A meaningful evaluation of algorithmic (un)fairness considers the context in
 which the machine learning model will be used. In this way, we can avoid
-falling into abstraction traps (see :footcite:`selbst2019fairness`). For
+falling into abstraction traps (see :ref:`abstraction_traps`). For
 example, the relationship between demographics and healthcare coverage may vary
 widely by state - a model that works well in one state may not be suitable to
 use in a different state.
