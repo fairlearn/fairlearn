@@ -502,12 +502,20 @@ argument. Here is an example of a pie chart.
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Customize plots with kind
+    :end-before: # Saving plots
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
     :align: center
 
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
+
+In order to save a plot, access the :class:`matplotlib.figure.Figure` as below and save it with your
+desired filename.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Saving plots
 
 .. _dashboard:
 

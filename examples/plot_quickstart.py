@@ -80,3 +80,14 @@ metric_frame.by_group[["count"]].plot(
     figsize=[12, 8],
     title="Show count metric in pie chart",
 )
+
+# Saving plots
+fig = metric_frame.by_group[["count"]].plot(
+    kind="pie",
+    subplots=True,
+    layout=[1, 1],
+    legend=False,
+    figsize=[12, 8],
+    title="Show count metric in pie chart",
+)
+fig[0][0].figure.savefig("filename.png")
