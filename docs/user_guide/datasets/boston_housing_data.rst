@@ -4,7 +4,6 @@ Revisiting the Boston Housing Dataset
 
 Introduction
 ^^^^^^^^^^^^^^^^^
-
 The Boston Housing dataset is one of the datasets currently callable in :mod:`fairlearn.datasets` module.
 In the past, it has commonly been used for benchmarking in popular machine learning libraries, 
 including `scikit-learn <https://scikit-learn.org/>`_ and `OpenML <https://www.openml.org/>`_. 
