@@ -52,8 +52,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         Defines which method of the ``estimator`` is used to get the values
         to be thresholded
 
-        - 'auto': use one of ``predict_proba``, ``decision_function``, or
-          ``predict``, in that order.
+        - 'auto': use one of `predict_proba`, `decision_function`, or
+          `predict`, in that order.
         - 'predict_proba': use the second column from the output of
           `predict_proba`. It is assumed that the second column represents the
           positive outcome.
@@ -62,11 +62,19 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         - 'predict': only use if estimator is a regressor. Uses the regression
           values given by `predict`.
 
-    default_threshold : { `float` , ( '>' , `float` ), ( '<' , `float` )}
-        default=0.5.
+    default_threshold : {'auto', `float` , ( '>' , `float` ), ( '<' , `float` )}
+            default='auto'.
+
         The default threshold is the threshold to which groups that are not
-        mentioned in the ``threshold_dict`` are compared. Providing
-        `float` has the same effect as ( '>' , `float` ).
+        mentioned in the ``threshold_dict`` are compared.
+
+        If 'auto':
+
+            - set ``default_threshold`` to 0.5 if ``predict_method`` is either
+              `predict_proba` or `predict`
+            - set ``default_threshold`` to 0 if ``predict_method`` is `decision_function`
+
+        Providing `float` has the same effect as ( '>' , `float` ).
 
     Examples
     --------
@@ -122,25 +130,63 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     2   0.0
     """
 
-    def __init__(self, estimator, threshold_dict, prefit=False,
-                 predict_method='deprecated', default_threshold=0.5):
+    def __init__(self, *, estimator, threshold_dict, prefit=False,
+                 predict_method='auto', default_threshold='auto'):
         self.estimator = estimator
         self.threshold_dict = threshold_dict
         self.prefit = prefit
-        self.predict_method = predict_method
-        self.default_threshold = default_threshold
 
         self._validate_threshold_dict()
+        self._validate_and_set_predict_method(predict_method)
+        self._validate_and_set_default_threshold(default_threshold)
+
+    def _validate_single_threshold(self, threshold):
+        """Check if a threshold is specified correctly.
+
+        Correct means either as `float` or `tuple`. If a threshold is specified in a tuple,
+        it should be in either of these two formast: ('>',float) or ('<',float).
+
+        Raise an error if the threshold is specified incorrectly.
+
+        Parameters
+        ----------
+        threshold: any
+            A user-specified threshold
+        """
+        # Check if thresholds is of type 'float' or 'tuple'
+        if not isinstance(threshold, (float, tuple)):
+            raise TypeError("All specified thresholds should be of type 'float' or 'tuple', "
+                            "but {} is of type '{}'".format(
+                                threshold, type(threshold).__name__))
+
+        # If provided in tuple, check if done so correctly
+        if isinstance(threshold, tuple):
+            msg = ''
+            if threshold[0] not in ['>', '<']:
+                msg += "The operator of a specified threshold operation should " +\
+                    "be either '>' or '<'. However, for {} it is {}.".format(
+                        threshold, threshold[0])
+            if not isinstance(threshold[1], float):
+                if msg:
+                    msg += " The threshold should be of type 'float', " +\
+                        "however {} is of type '{}'.".format(
+                            threshold[1], type(threshold[1]).__name__)
+                else:
+                    msg += "The threshold of a specified threshold " +\
+                        "operation should be of type 'float'. " +\
+                        "However, for {} it is of type '{}'.".format(
+                            threshold, type(threshold[1]).__name__)
+            if msg:
+                raise ValueError(msg)
 
     def _validate_threshold_dict(self):
         """Check if :code: `threshold_dict` is specified correctly.
 
         For the keys (subgroups/sensitive feature values), check if all keys are of the same type.
-        For the values (thresholds), check if they are provided as either `float` or `tuple`.
-        If a threshold is specified in a tuple, check if it done correctly, i.e. ('>',float)
-        or ('<',float)
+        Warn the user if this is not the case.
 
-        Warn the user if any of the above requirements are violated.
+        For the values (thresholds), check if they are provided correctly by calling
+        self._validate_single_threshold().
         """
         keys, values = zip(*self.threshold_dict.items())
 
@@ -156,33 +202,64 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         # Check the provided thresholds
         for threshold in values:
-            # Check if all specified thresholds are of type 'float' or 'tuple'
-            if not isinstance(threshold, (float, tuple)):
-                warn("All specified thresholds should be of type 'float' or 'tuple', "
-                     "but {} is of type '{}'".format(
-                         threshold, type(threshold).__name__))
-                break
+            self._validate_single_threshold(threshold)
 
-            # If provided in tuple, check if done so correctly
-            if isinstance(threshold, tuple):
-                msg = ''
-                if threshold[0] not in ['>', '<']:
-                    msg += "The operator of a specified threshold operation should " +\
-                           "be either '>' or '<'. However, for {} it is {}.".format(
-                               threshold, threshold[0])
-                if not isinstance(threshold[1], float):
-                    if msg:
-                        msg += " The threshold should be of type 'float', " +\
-                            "however {} is of type '{}'.".format(
-                                threshold[1], type(threshold[1]).__name__)
-                    else:
-                        msg += "The threshold of a specified threshold " +\
-                               "operation should be of type 'float'. " +\
-                               "However, for {} it is of type '{}'.".format(
-                                   threshold, type(threshold[1]).__name__)
-                if msg:
-                    warn(msg)
-                    break
+    def _validate_and_set_predict_method(self, predict_method):
+        """Validate and set predict_method.
+
+        If 'predict_method' is set to 'auto', set self.predict_method according
+        to predetermined logic.
+        If 'predict_method' is not set to 'auto', check correctness and set
+        self.predict_method if it is deemed correct, otherwise raise a ValueError.
+
+        Parameters
+        ----------
+        predict_method : any
+            The specified predict_method
+        """
+        if predict_method == "auto":
+            if hasattr(self.estimator, "predict_proba"):
+                self.predict_method = "predict_proba"
+            elif hasattr(self.estimator, "decision_function"):
+                self.predict_method = "decision_function"
+            else:
+                self.predict_method = "predict"
+        # If not 'auto', check correctness (=should be one of there three)
+        elif predict_method in ("predict_proba", "decision_function", "predict"):
+            self.predict_method = predict_method
+        # Raise error if predict_method is not one of
+        # ("auto", "predict_proba", "decision_function", "predict")
+        else:
+            raise ValueError("'predict_method' should be any of 'auto'"
+                             ", 'predict_proba', 'decision_function', 'predict', but is {}"
+                             .format(predict_method))
+
+    def _validate_and_set_default_threshold(self, default_threshold):
+        """Validate and set the default_threshold.
+
+        If 'default_theshold' is set to 'auto', set self.default_theshold according
+        to predetermined logic.
+        If 'default_theshold' is not set to 'auto', check correctness and set
+        self.default_theshold if it is deemed correct, otherwise raise an Error.
+
+        Parameters
+        ----------
+        default_threshold : any
+            The specified default_threshold
+        """
+        if default_threshold == "auto":
+            if self.predict_method == "predict_proba" or self.predict_method == "predict":
+                self.default_threshold = 0.5
+
+            # because ensuring that predict_method is either one of the three, this
+            # should only happen if it is decision_function
+            else:
+                self.default_threshold = 0
+
+        else:
+            self._validate_single_threshold(default_threshold)
+            # if we get here, no error was raised so we can safely set self.default_threshold
+            self.default_threshold = default_threshold
 
     def _reformat_threshold_dict_keys(self):
         """Reformats the keys of the provided :code: `threshold_dict`.
@@ -232,7 +309,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         return msg if new_sf_values else None
 
-    def fit(self, X, y, sensitive_features, **kwargs):
+    def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the estimator.
 
         If `prefit` is set to `True` then the base estimator is kept as is.
@@ -258,18 +335,6 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
-
-        if self.predict_method == "deprecated":
-            warn(
-                "'predict_method' default value is changed from 'predict' to "
-                "'auto'. Explicitly pass `predict_method='predict' to "
-                "replicate the old behavior, or pass `predict_method='auto' "
-                "or other valid values to silence this warning.",
-                FutureWarning,
-            )
-            self._predict_method = "predict"
-        else:
-            self._predict_method = self.predict_method
 
         if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
@@ -303,7 +368,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
 
         # get soft predictions
         base_predictions = np.array(
-            _get_soft_predictions(self.estimator_, X, self._predict_method)
+            _get_soft_predictions(self.estimator_, X, self.predict_method)
         )
 
         # validate and reformat input

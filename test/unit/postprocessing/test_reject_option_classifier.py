@@ -37,11 +37,10 @@ def test_thresholder():
         if prefit:
             clf.fit(X_train, y_train)
         reject_option_clf = RejectOptionClassifier(estimator=clf,
-                                                   theta=0.6,
-                                                   deprived_group=a1,
-                                                   favored_group=a2,
-                                                   prefit=prefit,
-                                                   predict_method='predict_proba')
+                                                   critical_width=0.2,
+                                                   group_to_upselect=a1,
+                                                   group_to_downselect=a2,
+                                                   prefit=prefit)
 
         reject_option_clf.fit(X_train, y_train, sensitive_features=A_train)
         outputted_y = reject_option_clf.predict(X_test, sensitive_features=A_test)

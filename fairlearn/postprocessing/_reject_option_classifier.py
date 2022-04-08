@@ -21,12 +21,13 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     r"""A classifier that produces group specific classifications inside a critical region.
 
     :code:`RejectOptionClassifier` looks at the certainty by which binary classification
-    decisions are made. For decisions made with high certainty (= with a posterior
-    probability close to 0 or 1), the result of the classification remains the same.
+    decisions are made. For decisions made with high certainty (= with a probability to get 1
+    close to 0 or 1), the result of the classification remains the same.
     For decisions with low certainty (= with a probability to get 1 close to 0.5), the
-    result is disregarded and instances from the favorable group receive the undesirable label,
-    whilst instances from the deprived group receive the desirable label. The exact range of
-    decisions considered to have low certainty is specified by the critical region.
+    result is disregarded and instances from the :code:`group_to_upselect` receive the
+    :code:`selection_label`, whilst instances from the :code:`group_to_downselect` receive
+    the opposite label. The exact range of decisions considered to have low certainty
+    is specified by the critical region.
 
     Parameters
     ----------
@@ -35,19 +36,21 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
         <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
         whose output is postprocessed.
 
-    theta : float
-        Number between 0 and 0.5 OR 0.5 and 1 to indicate the critical
-        region: [0.5 - theta, 0.5 + theta]
-        OR :math:`\max\{p(Y=1|X),1 - p(Y=1|X)\} \leq` theta
+    critical_width : float
+        Number between 0 and 1 to indicate the critical
+        region: [0.5 - critical_width/2, 0.5 + critical_width/2]
 
-    deprived_group : any
-        Sensitive feature value to identify the deprived group
+    group_to_upselect : any
+        Sensitive feature value to identify the group that receives the
+        :code:`selection_label` inside the critical region
 
-    favored_group : any
-        Sensitive feature value to identify the favored group
+    group_to_downselect : any
+        Sensitive feature value to identify the group that does not receive
+        the :code:`selection_label` inside the critical region
 
-    desired_label : {0, 1}, default=1
-        Number representing the desired label
+    selection_label : {0, 1}, default=1
+        Number representing the label received by the :code:`group_to_upselect`
+        inside the critical region
 
     prefit : bool, default=False
         If True, avoid refitting the given estimator. Note that when used with
@@ -87,9 +90,9 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     >>> estimator.predict(X_test)
     [1 1 0 0]
     >>> reject_clf = RejectOptionClassifier(estimator=estimator,
-    ...                                     theta=0.6,
-    ...                                     deprived_group='B',
-    ...                                     favored_group='A',
+    ...                                     critical_width=0.2,
+    ...                                     group_to_upselect='B',
+    ...                                     group_to_downselect='A',
     ...                                     prefit=True)
     >>> reject_clf.fit(X_train, y_train, sensitive_features=sensitive_features_train)
     >>> reject_clf.predict(X_test, sensitive_features=sensitive_features_test)
@@ -99,44 +102,39 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     3    0.0
     """
 
-    def __init__(self, estimator, theta, deprived_group, favored_group, desired_label=1,
-                 prefit=False):
+    def __init__(self, *, estimator, critical_width, group_to_upselect,
+                 group_to_downselect, selection_label=1, prefit=False):
 
         self.estimator = estimator
-        self.theta = theta
-        self.deprived_group = deprived_group
-        self.favored_group = favored_group
-        self.desired_label = desired_label
+        self.critical_width = critical_width
+        self.group_to_upselect = group_to_upselect
+        self.group_to_downselect = group_to_downselect
+        self.selection_label = selection_label
         self.prefit = prefit
 
-        self._validate_theta()
-        self._validate_desired_label()
+        self._validate_critical_width()
+        self._validate_selection_label()
 
-    def _validate_theta(self):
-        """Check if theta is float and between 0.5 and 1, raise error if not.
+    def _validate_critical_width(self):
+        """Check if critical_width is float between 0 and 1 (inclusive), raise error if not."""
+        # check if float
+        if not isinstance(self.critical_width, float):
+            raise TypeError("critical_width should be of type 'float', but is of "
+                            "type '{}'".format(type(self.critical_width).__name__))
 
-        OR between 0 and 0.5
-        """
-        if not isinstance(self.theta, float):
-            raise TypeError("theta should be of type 'float', but is of "
-                            "type '{}'".format(type(self.theta).__name__))
+        # check if between 0 and 1
+        if not 0 <= self.critical_width <= 1:
+            raise ValueError(
+                "critical_width should be between 0 and 1, but is {}".format(self.critical_width))
 
-        # my way
-        # if not 0 < self.theta < 0.5:
-        #     raise ValueError("theta should be between 0 and 0.5, but is {}".format(self.theta))
-
-        # paper way
-        if not 0.5 < self.theta < 1:
-            raise ValueError("theta should be between 0.5 and 1, but is {}".format(self.theta))
-
-    def _validate_desired_label(self):
-        """Check if desired_label is 0 or 1, raise error if not."""
-        if self.desired_label not in (0, 1):
-            raise ValueError("desired_label should be 0 or 1, but is {}"
-                             .format(self.desired_label))
+    def _validate_selection_label(self):
+        """Check if selection_label is 0 or 1, raise error if not."""
+        if self.selection_label not in (0, 1):
+            raise ValueError("selection_label should be 0 or 1, but is {}"
+                             .format(self.selection_label))
 
     def _check_observed_sf(self, observed_sf_values):
-        """Check if the observed sf values match the specified deprived/favored group.
+        """Check if the observed sf values match the specified group to (up/down)select.
 
         Parameters
         ----------
@@ -145,7 +143,7 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
             in fit() or predict()
         """
         unmentioned_sf_values = np.setdiff1d(observed_sf_values,
-                                             [self.deprived_group, self.favored_group])
+                                             [self.group_to_upselect, self.group_to_downselect])
 
         n_unmentioned_sf = len(unmentioned_sf_values)
 
@@ -164,12 +162,13 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
                 msg = "The observed sensitive feature value '{}' does not ".format(
                     unmentioned_sf_values[0])
 
-            msg += "correspond to the specified values of the deprived and favored group: " +\
-                "'{}' and '{}'.".format(self.deprived_group, self.favored_group)
+            msg += "correspond to the specified values of the group_to_upselect and "
+            "group_to_downselect: '{}' and '{}'.".format(
+                self.group_to_upselect, self.group_to_downselect)
 
             raise ValueError(msg)
 
-    def fit(self, X, y, sensitive_features, **kwargs):
+    def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the estimator.
 
         If `prefit` is set to `True` then the base estimator is kept as is.
@@ -239,30 +238,14 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
 
         final_predictions = 0.0*base_predictions_vector
 
-        # my way
-        # for sf_value in observed_sf_values:
-
-        #     if (sf_value == self.deprived_group and self.desired_label == 1) \
-        #            or (sf_value == self.favored_group and self.desired_label == 0):
-        #         operation = ThresholdOperation('>', 0.5 - self.theta)
-        #     else:
-        #         operation = ThresholdOperation('>', 0.5 + self.theta)
-
-        #     thresholded_predictions = 1.0 * operation(base_predictions_vector)
-
-        #     final_predictions[sensitive_feature_vector == sf_value] = \
-        #         thresholded_predictions[sensitive_feature_vector == sf_value]
-
-        # paper way
+        # make final predictions
         for sf_value in observed_sf_values:
 
-            if (sf_value == self.deprived_group and self.desired_label == 1) \
-                    or (sf_value == self.favored_group and self.desired_label == 0):
-
-                operation = ThresholdOperation('>', 1 - self.theta)
-
+            if (sf_value == self.group_to_upselect and self.selection_label == 1) \
+                    or (sf_value == self.group_to_downselect and self.selection_label == 0):
+                operation = ThresholdOperation('>', 0.5 - self.critical_width/2)
             else:
-                operation = ThresholdOperation('>', self.theta)
+                operation = ThresholdOperation('>', 0.5 + self.critical_width/2)
 
             thresholded_predictions = 1.0 * operation(base_predictions_vector)
 

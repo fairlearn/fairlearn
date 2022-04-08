@@ -35,14 +35,14 @@ Fairlearn contains the following algorithms for mitigating unfairness:
         the user to manually specify group-specific thresholds.
       - ✔
       - ✘
-      - ✘
+      - N/A
    *  - :class:`~fairlearn.postprocessing.RejectOptionClassifier`
       - Postprocessing algorithm based on the paper *Decision Theory for
         Discrimination-aware Classification* [#4]_. This algorithm 
         alters decisions made with low certainty in favor of the deprived group.
       - ✔
       - ✘
-      - ✘
+      - N/A
    *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
         *in Supervised Learning* [#3]_. This technique takes as input an
@@ -124,7 +124,7 @@ Why use it
 ^^^^^^^^^^^^
 :class:`Thresholder` is an easy to interpret tool, that can help explore different
 trade-offs. Where an algorithm like 
-:class:`fairlearn.postprocessing.ThresholdOptimizer` “blindly” satisfies
+:class:`ThresholdOptimizer` “blindly” satisfies
 a specific constraint, :class:`Thresholder` aids the user in manually exploring
 different trade-offs, which can help gain more insight into the data. Also,
 since :class:`Thresholder` is a post-processing technique, it is not necessary to alter
@@ -348,7 +348,8 @@ are switched, as there might be instances with a probability of exaclty 0.4.
 Specifying a default threshold
 ********************************
 In the previous examples, the threshold used for the groups that were not
-specified in the :code:`threshold_dict` was the default threshold of 0.5. It
+specified in the :code:`threshold_dict` was the default threshold of 0.5 (if
+:code:`predict_method` is either :code:`predict_proba` or :code:`predict`). It
 is possible to specify a different default threshold using the
 :code:`default_threshold` parameter. This threshold can be specified using all
 ways shown above.
@@ -486,7 +487,9 @@ If the classifier you are using is either
 :py:class:`sklearn.linear_model.LogisticRegression` or from
 :py:mod:`sklearn.svm`, it is also possible to threshold the predictions
 on the output of the decision function. Syntax-wise, this works exactly the
-same as specifying a threshold as in the previous examples.
+same as specifying a threshold as in the previous examples. Note that
+if :code:`predict_method` is set to :code:`decision_function`, the default
+threshold will automatically be set to 0.
 
 
 .. doctest:: mitigation
@@ -537,8 +540,7 @@ same as specifying a threshold as in the previous examples.
     >>> thresholder = Thresholder(estimator=classifier_log_reg,
     ...                           threshold_dict=threshold_dict,
     ...                           prefit=True,
-    ...                           predict_method='decision_function',
-    ...                           default_threshold=0.0)
+    ...                           predict_method='decision_function')
 
     >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
     >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=sf_test)
@@ -658,24 +660,24 @@ RejectOptionClassifier
 What it does 
 ^^^^^^^^^^^^^^
 :class:`RejectOptionClassifier` is a postprocessing technique that is
-based on the intuitive hypothesis that wrong decisions are more likely to be made close
+based on the intuitive hypothesis that biased decisions are more likely to be made close
 to the decision boundary. Translating this hypothesis to a relatable context: a decision you have
-made is more likely to be wrong if you are not very certain that this decision is the correct one.
-:class:`RejectOptionClassifier` splits all predictions into two groups: predictions made with
-sufficient certainty, and predictions made with insuffiecient certainty. The latter category is
-also called the **critical region**. Inside the critical region all instances from the deprived
-group receive the desirable label, while all instances from the favored group receive the
-undesirable label. Because of this split, the sensitive feature is expected to be binary.
+made is more likely to be wrong if you are not very certain that this decision is the correct one. 
+Therefore, :class:`RejectOptionClassifier` splits all predictions into two categories: predictions
+made with sufficient certainty, and predictions made with insufficient certainty. The latter
+category is also called the **critical region**. It is hypothesized that in this area of low
+certainty, one group will, unfairly, be selected more often than another group (in our hospital
+example, this refers to being selected for the primary care program (=receive label 1)).
+:class:`RejectOptionClassifier` tries to counter this by labeling all instances inside the
+critical region based on the group to which they belong. All instances from the group hypothesized
+to be selected less (set with the parameter :code:`group_to_upselect`) will be selected,
+whilst all instances from the other group (set with the parameter :code:`group_to_downselect`)
+will not be selected. Outside the critical region, the result of the classification remains
+unchanged. Because of this split into two groups, the sensitive feature is expected to be binary.
 
-| **Their way**
-| The size of the critical region is regulated by the parameter :code:`theta` (0.5 < :code:`theta`
-  < 1); it contains all instances that satisfy the constraint:
-  :math:`\max\{p(Y=1|X), 1 - p(Y=1|X)\} \leq` :code:`theta`.
-
-| **My way**
-| The size of the critical region is regulated by the parameter :code:`theta` (0 < :code:`theta`
-   < 0.5); it contains all instances that have a probability to get 1 in the range [0.5 - 
-   :code:`theta`, 0.5 + :code:`theta`].
+The size of the critical region is regulated by the parameter :code:`critical_width`
+(0 <= :code:`critical_width` <= 1); it contains all instances that have a probability to get 1
+in the range [0.5 - :code:`critical_width`/2, 0.5 + :code:`critical_width`/2].
 
 Why use it
 ^^^^^^^^^^
@@ -683,10 +685,10 @@ Like :class:`Thresholder`, :class:`RejectOptionClassifier` is an easy to interpr
 be used to explore different trade-offs, without blindly satisfying a constraint, where
 :class:`RejectOptionClassifier` specifically focusses on decisions made with low certainty.
 
-How to use it
-^^^^^^^^^^^^^^
+How to use it (and deal with multiple sensitive features)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Using :class:`RejectOptionClassifier` requires manually specifying the critical region, the
-deprived and favored group, and the label considered to be the desired label.
+group to (up/down) select, and the selection label.
 
 As mentioned above, :class:`RejectOptionClassifier` assumes that the sensitive feature is binary.
 Of course, it can happen that there are multiple sensitive features, or that the sensitive feature
@@ -702,12 +704,12 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
 
     >>> #create binary sensitive feature vector 
     >>> sf_train_reject_clf = sf_train.copy()\
-    ...                        .replace(['Asian','Other'], 'deprived')\
-    ...                        .replace(['Caucasian','AfricanAmerican','Hispanic'], 'favored')
+    ...                        .replace(['Asian','Other'], 'upselect')\
+    ...                        .replace(['Caucasian','AfricanAmerican','Hispanic'], 'downselect')
 
     >>> sf_test_reject_clf = sf_test.copy()\
-    ...                        .replace(['Asian','Other'], 'deprived')\
-    ...                        .replace(['Caucasian','AfricanAmerican','Hispanic'], 'favored')
+    ...                        .replace(['Asian','Other'], 'upselect')\
+    ...                        .replace(['Caucasian','AfricanAmerican','Hispanic'], 'downselect')
 
     >>> #Investigate predictions before using RejectOptionClassifier
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -715,8 +717,8 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     ...             y_pred=Y_pred_clf, 
     ...             sensitive_features=sf_test_reject_clf).by_group 
     race
-    deprived    0.428571
-    favored     0.395255
+    downselect    0.395255
+    upselect      0.428571
     Name: false_negative_rate, dtype: object
 
     >>> plot_positive_predictions(sf_test_reject_clf,Y_pred_clf)
@@ -732,12 +734,11 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     >>> from fairlearn.postprocessing import RejectOptionClassifier
 
     >>> reject_clf = RejectOptionClassifier(estimator=classifier,
-    ...                                     theta=0.6,
-    ...                                     deprived_group='deprived',
-    ...                                     favored_group='favored',
-    ...                                     desired_label=1,
-    ...                                     prefit=True,
-    ...                                     predict_method='predict_proba')
+    ...                                     critical_width=0.2,
+    ...                                     group_to_upselect='upselect',
+    ...                                     group_to_downselect='downselect',
+    ...                                     selection_label=1,
+    ...                                     prefit=True)
 
     >>> reject_clf.fit(X_train,Y_train,sensitive_features=sf_train_reject_clf)
     >>> Y_pred_reject_clf = reject_clf.predict(X_test,sensitive_features=sf_test_reject_clf)
@@ -747,8 +748,8 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     ...             y_pred=Y_pred_reject_clf, 
     ...             sensitive_features=sf_test_reject_clf).by_group
     race
-    deprived     0.12381
-    favored     0.673723
+    downselect    0.673723
+    upselect       0.12381
     Name: false_negative_rate, dtype: object
 
     >>> plot_positive_predictions(sf_test_reject_clf, Y_pred_reject_clf)
@@ -756,25 +757,24 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
 .. figure:: ../auto_examples/images/user_guide_reject_option_clf_binary_output.png
     :align: center
 
-Changing the desired label
+Changing the selection label
 *********************************
-By default, the desired label is assumed to be 1. It can happen of course, that the situation is
-such that it is fact desirable to get label 0. If this is the case, setting the parameter
-:code:`desired_label` to 0 is the only thing that needs to be changed in the configuration of
-:class:`RejectOptionClassifier`. The critical region itself remains the same, whilst the thing
-that changes is the label each instance inside it receives; the deprived group receives the label
-0, while the favored group receives 1.
+By default, the selection label is assumed to be 1. It can happen of course, that the situation is
+such that being selected corresponds to receiving the label 0. If this is the case, setting the
+parameter :code:`selection_label` to 0 is the only thing that needs to be changed in the
+configuration of :class:`RejectOptionClassifier`. The critical region itself remains the same,
+whilst the thing that changes is the label each instance inside it receives; the
+:code:`group_to_upselect` receives the label 0, while the :code:`group_to_downselect` receives 1.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
 
     >>> reject_clf = RejectOptionClassifier(estimator=classifier,
-    ...                                     theta=.6,
-    ...                                     deprived_group='deprived',
-    ...                                     favored_group='favored',
-    ...                                     desired_label=0,
-    ...                                     prefit=True,
-    ...                                     predict_method='predict_proba')
+    ...                                     critical_width=.2,
+    ...                                     group_to_upselect='upselect',
+    ...                                     group_to_downselect='downselect',
+    ...                                     selection_label=0,
+    ...                                     prefit=True)
 
     >>> reject_clf.fit(X_train,Y_train,sensitive_features=sf_train_reject_clf)
     >>> Y_pred_reject_clf = reject_clf.predict(X_test,sensitive_features=sf_test_reject_clf)
@@ -784,8 +784,8 @@ that changes is the label each instance inside it receives; the deprived group r
     ...             y_pred=Y_pred_reject_clf, 
     ...             sensitive_features=sf_test_reject_clf).by_group 
     race
-    deprived    0.647619
-    favored     0.183759
+    downselect    0.183759
+    upselect      0.647619
     Name: false_negative_rate, dtype: object
 
     >>> plot_positive_predictions(sf_test_reject_clf, Y_pred_reject_clf)

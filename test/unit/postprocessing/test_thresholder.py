@@ -49,7 +49,14 @@ def test_thresholder():
                            1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0])
 
     several_tests = [
-        # test for predict_method = 'predict'
+        # test for predict_method = 'predict' ('auto should also use 'predict')
+        {'estimator': LinearRegression(),
+         'predict_method': 'auto',
+         'prefit': True,
+         'A': A_combined,
+         'A_test': A_test_combined,
+         'threshold_dict': threshold_dict_combined
+         },
         {'estimator': LinearRegression(),
          'predict_method': 'predict',
          'prefit': True,
@@ -76,7 +83,7 @@ def test_thresholder():
          },
         # test for multiple sensitive features
         {'estimator': LogisticRegression(),
-         'predict_method': 'predict_proba',
+         'predict_method': 'auto',
          'prefit': False,
          'A': A_multiple,
          'A_test': A_test_multiple,

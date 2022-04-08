@@ -9,13 +9,8 @@ from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 from warnings import warn
 
-# for me to get it to work now
-from utils._common import _get_soft_predictions
-from utils._input_validation import _validate_and_reformat_input
-
-# how it should be
-# from ..utils._common import _get_soft_predictions
-# from ..utils._input_validation import _validate_and_reformat_input
+from ..utils._common import _get_soft_predictions
+from ..utils._input_validation import _validate_and_reformat_input
 
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
