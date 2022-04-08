@@ -16,6 +16,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     in order to remove their correlation with the sensitive feature columns while retaining
     as much information as possible (as measured by the least-squares error).
 
+    Read more in the :ref:`User Guide <preprocessing>`.
+
     Parameters
     ----------
         sensitive_feature_ids : list

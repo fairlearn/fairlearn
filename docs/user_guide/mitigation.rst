@@ -17,16 +17,16 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - supported fairness definitions
    *  - :class:`~fairlearn.reductions.ExponentiatedGradient`
       - A wrapper (reduction) approach to fair classification described in *A Reductions*
-        *Approach to Fair Classification* [#2]_.
+        *Approach to Fair Classification* :footcite:`agarwal2018reductions`.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
    *  - :class:`~fairlearn.reductions.GridSearch`
       - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
-        *Approach to Fair Classification* [#2]_. For regression it acts as a
+        *Approach to Fair Classification* :footcite:`agarwal2018reductions`. For regression it acts as a
         grid-search variant of the algorithm described in Section 5 of
         *Fair Regression: Quantitative Definitions and Reduction-based*
-        *Algorithms* [#1]_.
+        *Algorithms* :footcite:`agarwal2019fair`.
       - ✔
       - ✔
       - DP, EO, TPRP, FPRP, ERP, BGL
@@ -45,7 +45,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - N/A
    *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
       - Postprocessing algorithm based on the paper *Equality of Opportunity*
-        *in Supervised Learning* [#3]_. This technique takes as input an
+        *in Supervised Learning* :footcite:`hardt2016equality`. This technique takes as input an
         existing classifier and the sensitive feature, and derives a monotone
         transformation of the classifier's prediction to enforce the specified
         parity constraints.
@@ -825,7 +825,7 @@ and :ref:`constraints_regression`.
 
 The reductions approach for classification seeks to reduce binary
 classification subject to fairness constraints to a sequence of weighted
-classification problems (see [#2]_), and similarly for regression (see [#1]_).
+classification problems (see :footcite:`agarwal2018reductions`), and similarly for regression (see :footcite:`agarwal2019fair`).
 As a result, the reduction algorithms
 in Fairlearn only require a wrapper access to any "base" learning algorithm.
 By this we mean that the "base" algorithm only needs to implement :code:`fit` and
@@ -1001,7 +1001,7 @@ the predicted labels.
     SF 0
     a    0.6
     b    0.2
-    Name: selection_rate, dtype: object
+    Name: selection_rate, dtype: float64
     >>> dp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> dp.gamma(lambda X: y_pred)
     sign  event  group_id
@@ -1089,7 +1089,7 @@ In practice this can be used in a difference-based relaxation as follows:
     sensitive_feature_0
     a    0.75...
     b    0.33...
-    Name: true_positive_rate, dtype: object
+    Name: true_positive_rate, dtype: float64
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> tprp.gamma(lambda X: y_pred)
     sign  event    group_id
@@ -1187,7 +1187,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     sensitive_feature_0
     a    0.8
     b    0.4
-    Name: accuracy_score, dtype: object
+    Name: accuracy_score, dtype: float64
     >>> erp = ErrorRateParity(difference_bound=0.01)
     >>> erp.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> erp.gamma(lambda X: y_pred)
@@ -1342,8 +1342,8 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     >>> mae_frame.by_group
     SF 0
     a    0.05
-    b    0.5
-    Name: mean_absolute_error, dtype: object
+    b    0.50
+    Name: mean_absolute_error, dtype: float64
     >>> bgl.load_data(X, y_true, sensitive_features=sensitive_features)
     >>> bgl.gamma(lambda X: y_pred)
     group_id
@@ -1368,7 +1368,7 @@ Exponentiated Gradient
 Grid Search
 ~~~~~~~~~~~
 
-.. topic:: References:
+.. _references:
 
    .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
       Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
@@ -1386,3 +1386,7 @@ Grid Search
    .. [#4] Kamiran, Karim, Zhang `"Decision Theory for Discrimination-aware Classification"
       <https://ieeexplore.ieee.org/document/6413831>`_,
       IEEE ICDM, 2012
+References
+~~~~~~~~~~
+
+.. footbibliography::

@@ -51,7 +51,6 @@ class TestExponentiatedGradientSmoke:
          "best_iter": 5, "disp": 0.020000,
          "error": 0.332261, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 5},
-        # ================================================
         {"constraint_class": DemographicParity, "eps": 0.020,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": -0.020000,
@@ -78,6 +77,31 @@ class TestExponentiatedGradientSmoke:
          "error": 0.25, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 2, "ratio": 0.8},
         # ================================================
+        {"constraint_class": DemographicParity, "eps": 0.050,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.050000,
+         "error": 0.407142, "n_oracle_calls": 18, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 4},
+        {"constraint_class": DemographicParity, "eps": 0.050,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.050000,
+         "error": 0.263830, "n_oracle_calls": 21, "n_oracle_calls_dummy_returned": 12,
+         "n_predictors": 3, "ratio": 0.8},
+        {"constraint_class": DemographicParity, "eps": 0.020,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.020000,
+         "error": 0.422, "n_oracle_calls": 19, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 5},
+        {"constraint_class": DemographicParity, "eps": 0.020,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.020000,
+         "error": 0.286170, "n_oracle_calls": 21, "n_oracle_calls_dummy_returned": 12,
+         "n_predictors": 3, "ratio": 0.8},
+        # ================================================
         {"constraint_class": EqualizedOdds, "eps": 0.100,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.100000,
@@ -103,7 +127,6 @@ class TestExponentiatedGradientSmoke:
          "best_iter": 5, "disp": 0.020000,
          "error": 0.421531, "n_oracle_calls": 19, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 6},
-        # ================================================
         {"constraint_class": EqualizedOdds, "eps": 0.020,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.020000,
@@ -128,6 +151,31 @@ class TestExponentiatedGradientSmoke:
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.005000,
          "error": 0.306411, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
+         "n_predictors": 4, "ratio": 0.8},
+        # ================================================
+        {"constraint_class": EqualizedOdds, "eps": 0.050,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.050000,
+         "error": 0.4125, "n_oracle_calls": 23, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 6},
+        {"constraint_class": EqualizedOdds, "eps": 0.050,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.050000,
+         "error": 0.324067, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
+         "n_predictors": 4, "ratio": 0.8},
+        {"constraint_class": EqualizedOdds, "eps": 0.020,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.020000,
+         "error": 0.435, "n_oracle_calls": 23, "n_oracle_calls_dummy_returned": 0,
+         "n_predictors": 6},
+        {"constraint_class": EqualizedOdds, "eps": 0.020,
+         "objective": ErrorRate(costs={"fn": 2.0, "fp": 1.0}),
+         "best_gap": 0.000000, "last_iter": 5,
+         "best_iter": 5, "disp": 0.020000,
+         "error": 0.339179, "n_oracle_calls": 22, "n_oracle_calls_dummy_returned": 12,
          "n_predictors": 4, "ratio": 0.8},
         # ================================================
         {"constraint_class": ErrorRateParity, "eps": 0.1,
@@ -155,7 +203,6 @@ class TestExponentiatedGradientSmoke:
          "best_iter": 5, "disp": 0.019999,
          "error": 0.326250, "n_oracle_calls": 17, "n_oracle_calls_dummy_returned": 0,
          "n_predictors": 3},
-        # ================================================
         {"constraint_class": ErrorRateParity, "eps": 0.02,
          "best_gap": 0.000000, "last_iter": 5,
          "best_iter": 5, "disp": 0.020000,
@@ -292,6 +339,10 @@ class TestExponentiatedGradientSmoke:
         else:
             disparity_moment = data["constraint_class"](
                 difference_bound=data["eps"])
+        if "objective" in data.keys():
+            objective_moment = deepcopy(data["objective"])
+        else:
+            objective_moment = ErrorRate()
 
         # Create Exponentiated Gradient object with a copy of the constraint.
         # The original disparity_moment object is used for validation, so the
@@ -299,6 +350,7 @@ class TestExponentiatedGradientSmoke:
         expgrad = ExponentiatedGradient(
             learner,
             constraints=deepcopy(disparity_moment),
+            objective=deepcopy(objective_moment),
             eps=data["eps"])
 
         X, y, A = _get_data(A_two_dim=False, flip_y=flipped)
@@ -309,11 +361,10 @@ class TestExponentiatedGradientSmoke:
 
         # select probability of predicting 1
         def Q(X): return expgrad._pmf_predict(X)[:, 1]
-        default_objective = ErrorRate()
         disparity_moment.load_data(X, y, sensitive_features=A)
-        default_objective.load_data(X, y, sensitive_features=A)
+        objective_moment.load_data(X, y, sensitive_features=A)
         disparity = disparity_moment.gamma(Q).max()
-        error = default_objective.gamma(Q)[0]
+        error = objective_moment.gamma(Q)[0]
         assert disparity == pytest.approx(data["disp"], abs=_PRECISION)
         assert error == pytest.approx(data["error"], abs=_PRECISION)
 
@@ -425,3 +476,68 @@ class TestExponentiatedGradientSmoke:
         assert expgrad.n_oracle_calls_dummy_returned_ == data["n_oracle_calls_dummy_returned"]
         assert n_predictors == data["n_predictors"]
         assert len(expgrad.oracle_execution_times_) == expgrad.n_oracle_calls_
+
+    @pytest.mark.parametrize("eps", [0.05, 0.02])
+    @pytest.mark.parametrize("ratio", [None, 0.8])
+    @pytest.mark.parametrize("pos_copies", [0, 1, 2])
+    def test_error_rate_consistency(self, eps, ratio, pos_copies):
+        learner = LeastSquaresBinaryClassifierLearner()
+        if ratio is None:
+            constraints_moment = EqualizedOdds(difference_bound=eps)
+        else:
+            constraints_moment = EqualizedOdds(ratio_bound=ratio, ratio_bound_slack=eps)
+
+        results = {}
+        for method in ['costs', 'sampling']:
+            X, y, A = _get_data()
+
+            if method == 'sampling':
+                select = (y == 1)
+                X = pd.concat((X,) + (X.loc[select, :],) * pos_copies).values
+                y = pd.concat((y,) + (y[select],) * pos_copies).values
+                A = pd.concat((A,) + (A[select],) * pos_copies).values
+                objective_moment = ErrorRate()
+            else:
+                objective_moment = ErrorRate(costs={'fn': 1.0 + pos_copies, 'fp': 1.0})
+
+            expgrad = ExponentiatedGradient(
+                learner,
+                constraints=deepcopy(constraints_moment),
+                objective=deepcopy(objective_moment),
+                eps=eps,
+                nu=1e-3)
+
+            expgrad.fit(X, y, sensitive_features=A)
+
+            # select probability of predicting 1
+            def Q(X): return expgrad._pmf_predict(X)[:, 1]
+            constraints_eval = deepcopy(constraints_moment)
+            constraints_eval.load_data(X, y, sensitive_features=A)
+            disparity = constraints_eval.gamma(Q).max()
+
+            objective_eval = deepcopy(objective_moment)
+            objective_eval.load_data(X, y, sensitive_features=A)
+            total_error = objective_eval.gamma(Q)[0] * len(y)
+            results[method] = {
+                "error": objective_eval.gamma(Q)[0],
+                "total_error": total_error,
+                "disp": disparity,
+                "n_predictors": len(expgrad.predictors_),
+                "best_gap": expgrad.best_gap_,
+                "last_iter": expgrad.last_iter_,
+                "best_iter": expgrad.best_iter_,
+                "n_oracle_calls": expgrad.n_oracle_calls_,
+                "n_oracle_calls_dummy_returned": expgrad.n_oracle_calls_dummy_returned_,
+            }
+
+        self._assert_expgrad_two_states(results["costs"], results["sampling"])
+
+    def _assert_expgrad_two_states(self, state1, state2):
+        assert state1["total_error"] == pytest.approx(state2["total_error"], abs=_PRECISION)
+        assert state1["disp"] == pytest.approx(state2["disp"], abs=_PRECISION)
+        assert state1["n_predictors"] == state2["n_predictors"]
+        assert state1["best_gap"] == pytest.approx(state2["best_gap"], abs=_PRECISION)
+        assert state1["last_iter"] == state2["last_iter"]
+        assert state1["best_iter"] == state2["best_iter"]
+        assert state1["n_oracle_calls"] == state2["n_oracle_calls"]
+        assert state1["n_oracle_calls_dummy_returned"] == state2["n_oracle_calls_dummy_returned"]

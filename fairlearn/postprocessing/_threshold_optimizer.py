@@ -130,6 +130,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     provided estimator. The thresholds are chosen to optimize the provided
     performance objective subject to the provided fairness constraints.
 
+    Read more in the :ref:`User Guide <postprocessing>`.
+
     Parameters
     ----------
     estimator : object
@@ -212,6 +214,25 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
        Supervised Learning," arXiv.org, 07-Oct-2016.
        [Online]. Available: https://arxiv.org/abs/1610.02413.
 
+    Examples
+    --------
+    >>> from fairlearn.postprocessing import ThresholdOptimizer
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> X                  = [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]]
+    >>> y                  = [ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  1 ,  0 ,  0 ,  0 ]
+    >>> sensitive_features = ["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"]
+    >>> unmitigated_lr = LogisticRegression().fit(X, y)
+    >>> postprocess_est = ThresholdOptimizer(
+    ...                    estimator=unmitigated_lr,
+    ...                    constraints="false_negative_rate_parity",
+    ...                    objective="balanced_accuracy_score",
+    ...                    prefit=True,
+    ...                    predict_method='predict_proba')
+    >>> postprocess_est.fit(X, y, sensitive_features=sensitive_features)
+    ThresholdOptimizer(constraints='false_negative_rate_parity',
+                       estimator=LogisticRegression(),
+                       objective='balanced_accuracy_score',
+                       predict_method='predict_proba', prefit=True)
     """
 
     def __init__(

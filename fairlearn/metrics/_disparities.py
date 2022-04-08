@@ -21,6 +21,8 @@ def demographic_parity_difference(
     :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
     The demographic parity difference of 0 means that all groups have the same selection rate.
 
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
     Parameters
     ----------
     y_true : array-like
@@ -66,6 +68,8 @@ def demographic_parity_ratio(
     between the smallest and the largest group-level selection rate,
     :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
     The demographic parity ratio of 1 means that all groups have the same selection rate.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
 
     Parameters
     ----------
@@ -116,6 +120,8 @@ def equalized_odds_difference(
     The equalized odds difference of 0 means that all groups have the same
     true positive, true negative, false positive, and false negative rates.
 
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
     Parameters
     ----------
     y_true : array-like
@@ -160,6 +166,8 @@ def equalized_odds_ratio(
     :math:`P[h(X)=1 | A=a, Y=0]`.
     The equalized odds ratio of 1 means that all groups have the same
     true positive, true negative, false positive, and false negative rates.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
 
     Parameters
     ----------

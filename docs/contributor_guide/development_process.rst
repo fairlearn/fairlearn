@@ -91,7 +91,38 @@ script which runs :code:`pip install` on all three of the above files.
 This script will also optionally pin the requirements to any lower bound specified (by changing any
 occurrences of :code:`>=` to :code:`==` in each file).
 
+.. _contributing_pull_requests:
 
+Contributing a pull request
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Follow the steps below to create a pull request.
+
+1. Get a `GitHub account <https://github.com/>`_
+
+2. Install `git <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_
+
+3. Look at Fairlearn's issues on GitHub, specifically the ones marked `"help wanted" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22>`_. Within this category we've marked issues with labels:
+
+   - `"good first issue" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22good+first+issue%22>`_ means issues are a good fit for first time contributors including people with no prior experience with coding or GitHub. This is an excellent way to get started!
+   
+   - `"easy" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22easy%22+>`_ means the issue is somewhat harder than a "good first issue", but still quite doable if you have prior experience or you're willing to spend a little bit of time.
+   
+   - Neither of the two above: this means issues haven't been scoped out properly yet or are more difficult and likely won't be doable within a day or two. If you're still interested just let us know and we'll figure out a way! Once you find an issue you're interested in comment on the issue with any questions you may have and let us know that you'd like to do it. This helps us avoid duplication and we can help you quicker.
+
+4. Whenever questions come up don't hesitate to reach out (see :ref:`communication`). We're here to help!
+
+5. Clone the Fairlearn repository onto your machine using :code:`git clone https://github.com/fairlearn/fairlearn.git`
+
+6. Fork the Fairlearn repository (using the "Fork" button on the Fairlearn repo), then run :code:`git remote add <your-alias> https://github.com/<your-alias>/fairlearn.git` while replacing :code:`<your-alias>` with your actual alias. To check whether it worked run :code:`git remote -v` and it should show both :code:`origin` pointing to the original fairlearn repo and :code:`<your-alias>` pointing to your fork. Now you can create a new branch and start changing the world!
+
+7. To check your branch run :code:`git status`. Initially it will point to :code:`main` which is the default. Create a new branch for yourself by running :code:`git checkout -b <branch-name>`. :code:`git checkout` is your way of switching branches, while :code:`-b` creates a new branch and should only be added the first time you check out a (new) branch. Whenever you are ready to commit your changes run :code:`git add --all` and :code:`git commit --all` or use the version control functionality of your IDE (e.g., Visual Studio Code). To push the changes to your fork run :code:`git push <your-alias>`. Note that you cannot push to :code:`origin` (the main fairlean repository) because it is access-restricted.
+
+8. Build the website following :ref:`contributing_documentation`
+
+9. To create a pull request go to the `Fairlearn repo <https://github.com/fairlearn/fairlearn/pulls>`_ and select "New Pull Request". Click "compare across forks" and subsequently configure the "compare" branch to be the one you pushed your changes to. Briefly check the file changes in the resulting view and click "create pull request" when you're confident about your changes. The following view will ask you to add a pull request title and description, and if you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
+
+10. Celebrate! You did great by participating. If you would like to be a part of the Fairlearn community we'd be thrilled to discuss ways for you to get involved! Check out our communication channels, :ref:`communication`, for more information.
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

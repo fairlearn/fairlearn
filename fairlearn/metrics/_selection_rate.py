@@ -20,6 +20,7 @@ def selection_rate(y_true,
     The argument `pos_label` specifies the 'good' outcome. For consistency with
     other metric functions, the ``y_true`` argument is required, but ignored.
 
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------

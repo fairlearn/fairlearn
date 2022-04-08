@@ -24,6 +24,8 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
     Based on the values of sensitive features, it then applies a randomized thresholding
     transformation according to the provided `interpolation_dict`.
 
+    Read more in the :ref:`User Guide <postprocessing>`.
+
     Parameters
     ----------
     estimator :
