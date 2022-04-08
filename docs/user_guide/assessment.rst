@@ -649,9 +649,36 @@ argument. Here is an example of a pie chart.
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Customize plots with kind
+    :end-before: # Saving plots
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
     :align: center
 
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
+
+In order to save a plot, access the :class:`matplotlib.figure.Figure` as below and save it with your
+desired filename.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Saving plots
+
+.. _dashboard:
+
+Fairlearn dashboard
+-------------------
+
+The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
+model's predictions impact different groups (e.g., different ethnicities), and
+also for comparing multiple models along different fairness and performance
+metrics.
+
+.. note::
+
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
+    For more information on how to use it refer to
+    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    Fairlearn provides some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
