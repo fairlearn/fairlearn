@@ -9,10 +9,11 @@ people may be disproportionately negatively impacted by an AI system and in
 what ways?
 
 The steps of the assesment are as follows:
-1. Identify types of harms
-2. Identify the groups that might be harmed
-3. Quantify harms
-4. Compare quantified harms across the groups
+
+1. Identify types of harms 
+2. Identify the groups that might be harmed 
+3. Quantify harms 
+4. Compare quantified harms across the groups 
 
 We next examine these four steps in more detail.
 
@@ -48,7 +49,7 @@ Quantify harms
 
 Define metrics that quantify harms or benefits:
 
-* In a job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`.
+* In a job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`
 
 * For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
 
@@ -95,7 +96,7 @@ be drawn from a large enough sample size to draw meaningful conclusions.
 
 .. list-table::
    :header-rows: 1
-   :widths: 7 30
+   :widths: 7 30 30
    :stub-columns: 1
 
    *  - 
@@ -258,7 +259,7 @@ across groups and also the difference and ratio between the maximum and minimum:
     ratio in recall =  0.0
 
 Multiple metrics in a single :code:`MetricFrame`
--------------------------------------------
+------------------------------------------------
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
 metrics simultaneously by providing the `metrics` argument with a 
