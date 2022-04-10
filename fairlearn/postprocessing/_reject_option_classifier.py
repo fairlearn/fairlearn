@@ -130,7 +130,7 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     def _validate_selection_label(self):
         """Check if selection_label is 0 or 1, raise error if not."""
         if self.selection_label not in (0, 1):
-            raise ValueError("selection_label should be 0 or 1, but is {}"
+            raise ValueError("selection_label should be 0 or 1 (of type 'int'), but is {}"
                              .format(self.selection_label))
 
     def _check_observed_sf(self, observed_sf_values):
@@ -162,9 +162,9 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
                 msg = "The observed sensitive feature value '{}' does not ".format(
                     unmentioned_sf_values[0])
 
-            msg += "correspond to the specified values of the group_to_upselect and "
-            "group_to_downselect: '{}' and '{}'.".format(
-                self.group_to_upselect, self.group_to_downselect)
+            msg += "correspond to the specified values of the group_to_upselect and " +\
+                "group_to_downselect: '{}' and '{}'.".format(
+                    self.group_to_upselect, self.group_to_downselect)
 
             raise ValueError(msg)
 

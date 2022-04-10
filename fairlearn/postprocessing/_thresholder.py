@@ -155,7 +155,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         """
         # Check if thresholds is of type 'float' or 'tuple'
         if not isinstance(threshold, (float, tuple)):
-            raise TypeError("All specified thresholds should be of type 'float' or 'tuple', "
+            raise TypeError("All specified thresholds should be of type 'float' or 'tuple', " +
                             "but {} is of type '{}'".format(
                                 threshold, type(threshold).__name__))
 
@@ -193,7 +193,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         # Check if all keys are of the same type
         if len(keys) > 1:
             for key in keys[1:]:
-                if isinstance(type(key), type(keys[0])):
+                if not isinstance(key, type(keys[0])):
                     warn("Not all the keys of 'threshold_dict' are of the same type. "
                          "{} is of type '{}', while {} is of type '{}'. "
                          "Please make sure that all keys are of the same type.".format(
@@ -230,8 +230,8 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
         # Raise error if predict_method is not one of
         # ("auto", "predict_proba", "decision_function", "predict")
         else:
-            raise ValueError("'predict_method' should be any of 'auto'"
-                             ", 'predict_proba', 'decision_function', 'predict', but is {}"
+            raise ValueError("'predict_method' should be any of 'auto'" +
+                             ", 'predict_proba', 'decision_function', 'predict', but is '{}'"
                              .format(predict_method))
 
     def _validate_and_set_default_threshold(self, default_threshold):
@@ -254,7 +254,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             # because ensuring that predict_method is either one of the three, this
             # should only happen if it is decision_function
             else:
-                self.default_threshold = 0
+                self.default_threshold = 0.0
 
         else:
             self._validate_single_threshold(default_threshold)
@@ -383,8 +383,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
             self._reformat_threshold_dict_keys()
 
         # Raise error if there are sensitive features not in threshold dict
-        potential_msg = \
-            self._check_for_unseen_sf_values(sensitive_feature_vector)
+        potential_msg = self._check_for_unseen_sf_values(sensitive_feature_vector)
         if potential_msg:
             raise ValueError(potential_msg)
 
