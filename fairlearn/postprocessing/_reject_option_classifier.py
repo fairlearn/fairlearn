@@ -86,9 +86,9 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     >>> sensitive_features_test = pd.DataFrame(
     ...                 [['A'], ['A'], ['B'], ['B']], columns=['SF1'])
     >>> estimator.predict_proba(X_test)[:, 1]
-    [0.77 0.58 0.44 0.12]
+    array([0.77, 0.58, 0.44, 0.12])
     >>> estimator.predict(X_test)
-    [1 1 0 0]
+    array([1, 1, 0, 0])
     >>> reject_clf = RejectOptionClassifier(estimator=estimator,
     ...                                     critical_width=0.2,
     ...                                     group_to_upselect='B',
@@ -100,6 +100,7 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     1    0.0
     2    1.0
     3    0.0
+    dtype: float64
     """
 
     def __init__(self, *, estimator, critical_width, group_to_upselect,

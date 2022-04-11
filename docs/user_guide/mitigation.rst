@@ -201,16 +201,16 @@ to investigate are:
     >>> # Resample dataset such that training data has same number of positive and negative samples
     
     >>> def resample_dataset(X_train, Y_train, sf_train):
-    >>>   negative_ids = Y_train[Y_train == 0].index
-    >>>   positive_ids = Y_train[Y_train == 1].index
-    >>>   np.random.seed(1)
-    >>>   balanced_ids = positive_ids.union(np.random.choice(a=negative_ids, size=len(positive_ids)))
+    ...   negative_ids = Y_train[Y_train == 0].index
+    ...   positive_ids = Y_train[Y_train == 1].index
+    ...   np.random.seed(1)
+    ...   balanced_ids = positive_ids.union(np.random.choice(a=negative_ids, size=len(positive_ids)))
 
-    >>>   X_train = X_train.loc[balanced_ids, :]
-    >>>   Y_train = Y_train.loc[balanced_ids]
-    >>>   sf_train = sf_train.loc[balanced_ids]
+    ...   X_train = X_train.loc[balanced_ids, :]
+    ...   Y_train = Y_train.loc[balanced_ids]
+    ...   sf_train = sf_train.loc[balanced_ids]
     
-    >>>   return X_train, Y_train, sf_train
+    ...   return X_train, Y_train, sf_train
 
     >>> X_train, Y_train, sf_train = resample_dataset(X_train, Y_train, sf_train)
    
@@ -460,14 +460,14 @@ is the LSTAT variable categorized into four groups.
 
     >>> print('First, the output is continuous: \n{}'.format(Y_pred_regressor[:5]))
     First, the output is continuous: 
-    [23.50867458 22.94718558 33.00839918 33.9504757 3.22390622].
+    [23.50867458 22.94718558 33.00839918 33.9504757   3.22390622]
 
     >>> threshold_dict = {'0-10': 33.5}
 
     >>> thresholder_regression = Thresholder(estimator=regressor,
-                                        threshold_dict=threshold_dict,
-                                        prefit=True,
-                                        predict_method='predict')
+    ...                                      threshold_dict=threshold_dict,
+    ...                                      prefit=True,
+    ...                                      predict_method='predict')
 
     >>> thresholder_regression.fit(X_boston_train, Y_boston_train, sensitive_features=sf_boston_train)
     >>> Y_pred_thresholded_regressor = thresholder_regression.predict(X_boston_test, sensitive_features=sf_boston_test)

@@ -94,9 +94,9 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
     >>> sensitive_features_test = pd.DataFrame([['A'], ['B'], ['C']], columns=['SF1'])
     >>> estimator.predict_proba(X_test)[:, 1]
-    [0.24 0.82 0.61]
+    array([0.24, 0.82, 0.61])
     >>> estimator.predict(X_test)
-    [0 1 1]
+    array([0, 1, 1])
     >>> threshold_dict = {'A': .2, 'B': ('<', .6), 'C': ('>', .7)}
     >>> thresholder = Thresholder(estimator=estimator,
     ...                           threshold_dict=threshold_dict,
@@ -107,6 +107,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     0   1.0
     1   0.0
     2   0.0
+    dtype: float64
 
     >>> # Example with multiple sensitive features
     >>> sensitive_features_train = pd.DataFrame([['A', 'D'],
@@ -128,6 +129,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     0   1.0
     1   0.0
     2   0.0
+    dtype: float64
     """
 
     def __init__(self, *, estimator, threshold_dict, prefit=False,
