@@ -296,7 +296,7 @@ amount of positive predictions.
     Asian              0.121951
     Caucasian          0.399399
     Hispanic           0.365217
-    Other                 0.125
+    Other              0.125000
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
@@ -336,7 +336,7 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     Asian              0.878049
     Caucasian          0.399399
     Hispanic           0.365217
-    Other                 0.875
+    Other              0.875000
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_switched_threshold)
@@ -371,11 +371,11 @@ ways shown above.
     ...             y_pred=default_thresholded_pred, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican     0.67278
+    AfricanAmerican    0.672780
     Asian              0.121951
     Caucasian          0.673135
     Hispanic           0.704348
-    Other                 0.125
+    Other              0.125000
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,default_thresholded_pred)
@@ -519,7 +519,7 @@ threshold will automatically be set to 0.
     Asian              0.463415
     Caucasian          0.452529
     Hispanic           0.434783
-    Other                0.4375
+    Other              0.437500
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred)
@@ -547,10 +547,10 @@ threshold will automatically be set to 0.
     ...             sensitive_features=sf_test).by_group
     race
     AfricanAmerican    0.423745
-    Asian               0.04878
+    Asian              0.048780
     Caucasian          0.452529
     Hispanic           0.434783
-    Other                0.4375
+    Other              0.437500
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
@@ -631,7 +631,6 @@ women will be specified as ('Asian','Female').
     ...             y_true=Y_test,
     ...             y_pred=Y_pred_multiple_sf_thresholded, 
     ...             sensitive_features=A_multiple_test).by_group
-
     race             gender
     AfricanAmerican  Female    0.409236
                      Male      0.372549
@@ -745,7 +744,7 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     ...             sensitive_features=sf_test_reject_clf).by_group
     race
     downselect    0.673723
-    upselect       0.12381
+    upselect      0.123810
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test_reject_clf, Y_pred_reject_clf)
