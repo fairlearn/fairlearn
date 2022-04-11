@@ -205,11 +205,11 @@ to investigate are:
     ...   positive_ids = Y_train[Y_train == 1].index
     ...   np.random.seed(1)
     ...   balanced_ids = positive_ids.union(np.random.choice(a=negative_ids, size=len(positive_ids)))
-
+    ...
     ...   X_train = X_train.loc[balanced_ids, :]
     ...   Y_train = Y_train.loc[balanced_ids]
     ...   sf_train = sf_train.loc[balanced_ids]
-    
+    ...
     ...   return X_train, Y_train, sf_train
 
     >>> X_train, Y_train, sf_train = resample_dataset(X_train, Y_train, sf_train)
@@ -225,7 +225,7 @@ to investigate are:
     >>> from fairlearn.postprocessing import plot_positive_predictions, plot_proba_distribution
 
     >>> classifier = RandomForestClassifier(random_state=1)
-    >>> classifier.fit(X_train,Y_train)
+    >>> classifier.fit(X_train,Y_train)  # doctest: +SKIP
     >>> Y_pred_proba_clf = classifier.predict_proba(X_test)[:, 1]
     >>> Y_pred_clf = classifier.predict(X_test)
 
@@ -239,7 +239,7 @@ to investigate are:
     Caucasian          0.399399
     Hispanic           0.365217
     Other              0.421875
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_clf)    
 
@@ -285,7 +285,7 @@ amount of positive predictions.
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
     
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)  # doctest: +SKIP
     >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -298,7 +298,7 @@ amount of positive predictions.
     Caucasian          0.399399
     Hispanic           0.365217
     Other                 0.125
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
 
@@ -325,7 +325,7 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
     
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)  # doctest: +SKIP
     >>> Y_pred_switched_threshold = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -338,7 +338,7 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     Caucasian          0.399399
     Hispanic           0.365217
     Other                 0.875
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_switched_threshold)
 
@@ -364,7 +364,7 @@ ways shown above.
     ...                           predict_method='predict_proba',
     ...                           default_threshold=0.6)
 
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)  # doctest: +SKIP
     >>> default_thresholded_pred = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -377,7 +377,7 @@ ways shown above.
     Caucasian          0.673135
     Hispanic           0.704348
     Other                 0.125
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,default_thresholded_pred)
 
@@ -406,19 +406,19 @@ matter whether or the estimator is fit beforehand or in the
     ...                                     prefit=False,
     ...                                     predict_method='predict_proba')
     
-    >>> thresholder_no_prefit.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> thresholder_no_prefit.fit(X_train,Y_train,sensitive_features=sf_train)  # doctest: +SKIP
     >>> Y_pred_no_prefit = thresholder_no_prefit.predict(X_test,sensitive_features=sf_test)
 
     >>> #Prefit = True
     >>> classifier_prefit = RandomForestClassifier(random_state=1)
-    >>> classifier_prefit.fit(X_train,Y_train)
+    >>> classifier_prefit.fit(X_train,Y_train) # doctest: +SKIP
 
     >>> thresholder_prefit = Thresholder(estimator=classifier_prefit,
     ...                                  threshold_dict=threshold_dict,
     ...                                  prefit=True,
     ...                                  predict_method='predict_proba')
     
-    >>> thresholder_prefit.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> thresholder_prefit.fit(X_train,Y_train,sensitive_features=sf_train)  # doctest: +SKIP
     >>> Y_pred_prefit = thresholder_prefit.predict(X_test,sensitive_features=sf_test)
 
     >>> #Results are the same
@@ -454,7 +454,7 @@ is the LSTAT variable categorized into four groups.
     ...     random_state=2)
 
     >>> regressor = LinearRegression()
-    >>> regressor.fit(X_boston_train,Y_boston_train)
+    >>> regressor.fit(X_boston_train,Y_boston_train)  # doctest: +SKIP
 
     >>> Y_pred_regressor = regressor.predict(X_boston_test)
 
@@ -469,7 +469,7 @@ is the LSTAT variable categorized into four groups.
     ...                                      prefit=True,
     ...                                      predict_method='predict')
 
-    >>> thresholder_regression.fit(X_boston_train, Y_boston_train, sensitive_features=sf_boston_train)
+    >>> thresholder_regression.fit(X_boston_train, Y_boston_train, sensitive_features=sf_boston_train)  # doctest: +SKIP
     >>> Y_pred_thresholded_regressor = thresholder_regression.predict(X_boston_test, sensitive_features=sf_boston_test)
 
     >>> print('Now the output is a binary prediction: \n{}'.format(Y_pred_thresholded_regressor[:5]))
@@ -499,7 +499,7 @@ threshold will automatically be set to 0.
     >>> from fairlearn.postprocessing import plot_histograms_per_group
     
     >>> classifier_log_reg = LogisticRegression()
-    >>> classifier_log_reg.fit(X_train,Y_train)
+    >>> classifier_log_reg.fit(X_train,Y_train)  # doctest: +SKIP
     >>> Y_pred_decision_func = classifier_log_reg.decision_function(X_test)
 
     >>> #Check distribution of decision function output
@@ -524,7 +524,7 @@ threshold will automatically be set to 0.
     Caucasian          0.452529
     Hispanic           0.434783
     Other                0.4375
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred)
 
@@ -542,7 +542,7 @@ threshold will automatically be set to 0.
     ...                           prefit=True,
     ...                           predict_method='decision_function')
 
-    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)
+    >>> thresholder.fit(X_train,Y_train,sensitive_features=sf_train)  # doctest: +SKIP
     >>> Y_pred_thresholded = thresholder.predict(X_test,sensitive_features=sf_test)
 
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -555,7 +555,7 @@ threshold will automatically be set to 0.
     Caucasian          0.452529
     Hispanic           0.434783
     Other                0.4375
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
 
@@ -593,7 +593,7 @@ women will be specified as ('Asian','Female').
 
     >>> #Train a classifier on the new data and predict
     >>> classifier_multiple = RandomForestClassifier(random_state=1)
-    >>> classifier_multiple.fit(X_train_multiple_sf,Y_train)
+    >>> classifier_multiple.fit(X_train_multiple_sf,Y_train)  # doctest: +SKIP
     >>> Y_pred_clf_multiple = classifier_multiple.predict(X_test_multiple_sf)
 
     >>> #Inspect information about predictions
@@ -612,7 +612,7 @@ women will be specified as ('Asian','Female').
                      Male      0.381818
     Other            Female    0.483871
                      Male      0.272727
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(A_multiple_test,Y_pred_clf_multiple)   
 
@@ -628,7 +628,7 @@ women will be specified as ('Asian','Female').
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
 
-    >>> thresholder.fit(X_train_multiple_sf,Y_train,sensitive_features=A_multiple_train)
+    >>> thresholder.fit(X_train_multiple_sf,Y_train,sensitive_features=A_multiple_train)  # doctest: +SKIP
     >>> Y_pred_multiple_sf_thresholded = thresholder.predict(X_test_multiple_sf,sensitive_features=A_multiple_test)
   
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -647,7 +647,7 @@ women will be specified as ('Asian','Female').
                      Male      0.381818
     Other            Female    0.483871
                      Male      0.272727
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(A_multiple_test,Y_pred_multiple_sf_thresholded)
 
@@ -719,7 +719,7 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     race
     downselect    0.395255
     upselect      0.428571
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test_reject_clf,Y_pred_clf)
 
@@ -740,7 +740,7 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     ...                                     selection_label=1,
     ...                                     prefit=True)
 
-    >>> reject_clf.fit(X_train,Y_train,sensitive_features=sf_train_reject_clf)
+    >>> reject_clf.fit(X_train,Y_train,sensitive_features=sf_train_reject_clf)  # doctest: +SKIP
     >>> Y_pred_reject_clf = reject_clf.predict(X_test,sensitive_features=sf_test_reject_clf)
 
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -750,7 +750,7 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     race
     downselect    0.673723
     upselect       0.12381
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test_reject_clf, Y_pred_reject_clf)
 
@@ -776,7 +776,7 @@ whilst the thing that changes is the label each instance inside it receives; the
     ...                                     selection_label=0,
     ...                                     prefit=True)
 
-    >>> reject_clf.fit(X_train,Y_train,sensitive_features=sf_train_reject_clf)
+    >>> reject_clf.fit(X_train,Y_train,sensitive_features=sf_train_reject_clf)  # doctest: +SKIP
     >>> Y_pred_reject_clf = reject_clf.predict(X_test,sensitive_features=sf_test_reject_clf)
 
     >>> MetricFrame(metrics=false_negative_rate, 
@@ -786,7 +786,7 @@ whilst the thing that changes is the label each instance inside it receives; the
     race
     downselect    0.183759
     upselect      0.647619
-    Name: false_negative_rate, dtype: object
+    Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test_reject_clf, Y_pred_reject_clf)
 

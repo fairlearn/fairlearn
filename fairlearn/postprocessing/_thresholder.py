@@ -90,7 +90,7 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     >>> sensitive_features_train = pd.DataFrame(
     ...                   [['A'], ['B'], ['C'], ['A'], ['B'], ['C']], columns=['SF1'])
     >>> estimator = RandomForestClassifier(random_state=1)
-    >>> estimator.fit(X_train, y_train)
+    >>> estimator.fit(X_train, y_train)  # doctest: +SKIP
     >>> X_test = pd.DataFrame([[-1, 6], [2, 2], [8, -11]])
     >>> sensitive_features_test = pd.DataFrame([['A'], ['B'], ['C']], columns=['SF1'])
     >>> estimator.predict_proba(X_test)[:, 1]
@@ -102,11 +102,11 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     ...                           threshold_dict=threshold_dict,
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
-    >>> thresholder.fit(X_train, y_train, sensitive_features=sensitive_features_train)
+    >>> thresholder.fit(X_train, y_train, sensitive_features=sensitive_features_train)  # doctest: +SKIP # noqa: E501
     >>> thresholder.predict(X_test, sensitive_features=sensitive_features_test)
-    0   1.0
-    1   0.0
-    2   0.0
+    0    1.0
+    1    0.0
+    2    0.0
     dtype: float64
 
     >>> # Example with multiple sensitive features
@@ -124,11 +124,11 @@ class Thresholder(BaseEstimator, MetaEstimatorMixin):
     ...                           threshold_dict=threshold_dict,
     ...                           prefit=True,
     ...                           predict_method='predict_proba')
-    >>> thresholder.fit(X_train, y_train, sensitive_features=sensitive_features_train)
+    >>> thresholder.fit(X_train, y_train, sensitive_features=sensitive_features_train)  # doctest: +SKIP # noqa: E501
     >>> thresholder.predict(X_test, sensitive_features=sensitive_features_test)
-    0   1.0
-    1   0.0
-    2   0.0
+    0    1.0
+    1    0.0
+    2    0.0
     dtype: float64
     """
 

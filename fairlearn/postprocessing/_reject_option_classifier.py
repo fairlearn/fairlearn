@@ -81,7 +81,7 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     >>> sensitive_features_train = pd.DataFrame(
     ...                 [['A'], ['A'], ['A'], ['B'], ['B'], ['B']], columns=['SF1'])
     >>> estimator = RandomForestClassifier(random_state=1)
-    >>> estimator.fit(X_train, y_train)
+    >>> estimator.fit(X_train, y_train)  # doctest: +SKIP
     >>> X_test = pd.DataFrame([[0, 5], [-1, 6], [2, 2], [8, -11]])
     >>> sensitive_features_test = pd.DataFrame(
     ...                 [['A'], ['A'], ['B'], ['B']], columns=['SF1'])
@@ -94,7 +94,7 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     ...                                     group_to_upselect='B',
     ...                                     group_to_downselect='A',
     ...                                     prefit=True)
-    >>> reject_clf.fit(X_train, y_train, sensitive_features=sensitive_features_train)
+    >>> reject_clf.fit(X_train, y_train, sensitive_features=sensitive_features_train)  # doctest: +SKIP # noqa: E501
     >>> reject_clf.predict(X_test, sensitive_features=sensitive_features_test)
     0    1.0
     1    0.0
