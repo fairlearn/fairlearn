@@ -67,7 +67,7 @@ def test_thresholder():
         [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0])
 
     several_tests = [
-        ########################## Test correct output ##########################
+        ################## Test correct output ################## # noqa: E266
 
         # Test for predict_method = 'predict'
         {'estimator': LinearRegression(),
@@ -181,7 +181,7 @@ def test_thresholder():
          'expected_y': expected_y
          },
 
-        ########################## Test correct error messages ##########################
+        ################## Test correct error messages ################## # noqa: E266
 
         # Threshold specified incorrectly in threshold_dict -> type 'int'
         {'estimator': LinearRegression(),
@@ -287,5 +287,5 @@ def test_thresholder():
 
             assert (np.array_equal(outputted_y, test['expected_y']))
 
-        except (Exception, Warning) as message:
+        except (TypeError, ValueError, Warning) as message:
             assert(str(message) == test['expected_message'])

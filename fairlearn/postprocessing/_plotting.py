@@ -5,7 +5,6 @@
 
 import math
 from copy import deepcopy
-import matplotlib.pyplot as plt
 import numpy as np
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._threshold_optimizer import ThresholdOptimizer
@@ -198,6 +197,11 @@ def plot_proba_distribution(sensitive_features, Y_pred_proba, specified_sf_to_pl
         If None, plot information about all known sensitive features.
         If list, plot information about sensitive features in list
     """
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+
     sensitive_features, all_sf, samples_each_sf, n_test_samples = \
         _check_sensitive_features(sensitive_features)
 
@@ -274,6 +278,11 @@ def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=N
         If None, plot information about all known sensitive features.
         If list, plot information about sensitive features in list.
     """
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+
     sensitive_features, all_sf, samples_each_sf, n_test_samples = _check_sensitive_features(
         sensitive_features)
 
@@ -325,6 +334,11 @@ def plot_histograms_per_group(sensitive_features, continuous_output, specified_s
         If None, plot information about all known sensitive features.
         If list, plot information about sensitive features in list.
     """
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+
     sensitive_features, all_sf, _, n_test_samples = _check_sensitive_features(sensitive_features)
 
     sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf

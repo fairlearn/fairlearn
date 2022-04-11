@@ -35,7 +35,7 @@ def test_thresholder():
     expexted_y_cw_0 = pd.Series([0, 0, 0, 0, 1, 0, 0, 0])
 
     tests = [
-        #################### Test if output is correct ####################
+        ################## Test if output is correct ################## # noqa: E266
 
         # Test same result for prefit True/False
         {'cw': 0.2, 'group_to_upselect': a1, 'group_to_downselect': a2,
@@ -57,7 +57,7 @@ def test_thresholder():
         {'cw': 0.0, 'group_to_upselect': a1, 'group_to_downselect': a2, 'selection_label': 1,
             'prefit': True, 'expected_y': expexted_y_cw_0},
 
-        #################### Test if correct error messages come up ####################
+        ################## Test if correct error messages come up ################## # noqa: E266
 
         # cw is not a float
         {'cw': 1, 'group_to_upselect': a1, 'group_to_downselect': a2,
@@ -73,7 +73,8 @@ def test_thresholder():
         {'cw': 0.2, 'group_to_upselect': 'C', 'group_to_downselect': a2,
             'selection_label': 1, 'prefit': True, 'expected_y': expected_y,
             'expected_error': "The observed sensitive feature value 'A' does " +\
-            "not correspond to the specified values of the group_to_upselect and group_to_downselect: 'C' and 'B'."},
+            "not correspond to the specified values of the group_to_upselect and " +\
+            "group_to_downselect: 'C' and 'B'."},
 
         # Selection label not 0 or 1
         {'cw': 0.2, 'group_to_upselect': a1, 'group_to_downselect': a2,
@@ -88,17 +89,18 @@ def test_thresholder():
             clf.fit(X_train, y_train)
 
         try:
-            reject_option_clf = RejectOptionClassifier(estimator=clf,
-                                                       critical_width=test['cw'],
-                                                       group_to_upselect=test['group_to_upselect'],
-                                                       group_to_downselect=test['group_to_downselect'],
-                                                       selection_label=test['selection_label'],
-                                                       prefit=test['prefit'])
+            reject_option_clf = RejectOptionClassifier(
+                estimator=clf,
+                critical_width=test['cw'],
+                group_to_upselect=test['group_to_upselect'],
+                group_to_downselect=test['group_to_downselect'],
+                selection_label=test['selection_label'],
+                prefit=test['prefit'])
 
             reject_option_clf.fit(X_train, y_train, sensitive_features=A_train)
             outputted_y = reject_option_clf.predict(X_test, sensitive_features=A_test)
 
             assert(np.array_equal(outputted_y, test['expected_y']))
 
-        except Exception as error_message:
+        except (ValueError, TypeError) as error_message:
             assert(str(error_message) == test['expected_error'])
