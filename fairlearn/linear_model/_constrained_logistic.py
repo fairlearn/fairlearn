@@ -60,7 +60,7 @@ def _check_multi_class(multi_class):
 def _sensitive_attr_constraint_cov(
     model, x_arr, y_arr_dist_boundary, x_control, thresh
 ):
-    """Calculating the covariance threshold as in the paper.
+    """Calculate the covariance threshold as in the paper.
 
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
     The covariance is computed b/w the sensitive attr val and the distance from the boundary
@@ -334,13 +334,14 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
         Feature data
     sensitive_feature_ids : list
         columns to filter out, either as strings (DataFrame) or numbers (numpy)
+
     Returns
     -------
     X : numpy.ndarray or pandas.DataFrame
         Feature data with one-hot-encoded values
     renamed_sensitive_feature_ids : list
         The renamed sensitive feature ids, either as strings or as numbers
-    enc.categories_ : list
+    categories : list
         The categories from the encoder
     """
     enc = OneHotEncoder(handle_unknown="ignore")
@@ -362,8 +363,9 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
         renamed_sensitive_feature_ids = list(
             range(X_without_sensitive.shape[1], X.shape[1])
         )
+        categories = enc.categories_
 
-    return X, renamed_sensitive_feature_ids, enc.categories_
+    return X, renamed_sensitive_feature_ids, categories
 
 
 class ConstrainedLogisticRegression(LogisticRegression):
