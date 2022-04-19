@@ -416,7 +416,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
         # The covariance_bound needs to be in a list for _get_constraint_list_cov
         if not isinstance(self.covariance_bound, list):
-            self.covariance_bound = list(self.covariance_bound)
+            self.covariance_bound = [self.covariance_bound]
 
     # Below code is almost entirely reused from the CorrelationRemover,
     # should this maybe be abstracted higher up?
@@ -466,8 +466,22 @@ class ConstrainedLogisticRegression(LogisticRegression):
             raise ValueError(
                 f"Number of covariance bound values can not exceed"
                 f" the amount of sensitive features. Got {len(self.covariance_bound)}"
-                f" covariance bound values, got {len(sensitive_feature_ids)} sensitive features"
+                f" covariance bound values, got {len(sensitive_feature_ids)} sensitive features."
             )
+
+        if len(sensitive_feature_ids) > len(self.covariance_bound):
+            if len(self.covariance_bound) == 1:
+                self.covariance_bound = self.covariance_bound * len(
+                    sensitive_feature_ids
+                )
+            else:
+                raise ValueError(
+                    f"Number of covariance bound values is higher than 1 but lower than the"
+                    f" amount of sensitive features. Got {len(self.covariance_bound)}"
+                    f" covariance bound values, got {len(sensitive_feature_ids)} sensitive features."
+                    f" Either pick a covariance bound value per sensitive feature,"
+                    f" or only one covariance bound value."
+                )
 
         # TODO: Maybe turn below code until constraints into a preprocessing function?
 
