@@ -25,12 +25,6 @@ from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.optimize import _check_optimize_result
 from sklearn.utils.validation import _check_sample_weight
 
-_LOGISTIC_SOLVER_CONVERGENCE_MSG = (
-    "Please also refer to the documentation for alternative solver options:\n"
-    "    https://scikit-learn.org/stable/modules/linear_model.html"
-    "#logistic-regression"
-)
-
 
 # Some helper check functions
 def _check_solver(solver, penalty):
@@ -303,7 +297,6 @@ def _logistic_regression_path(
                 solver="lbfgs",  # Not the actual solver we are using, but it works fine like this
                 result=opt_res,
                 max_iter=max_iter,
-                extra_warning_msg=_LOGISTIC_SOLVER_CONVERGENCE_MSG,
             )
             w0, _ = opt_res.x, opt_res.fun
 
@@ -478,8 +471,8 @@ class ConstrainedLogisticRegression(LogisticRegression):
                 raise ValueError(
                     f"Number of covariance bound values is higher than 1 but lower than the"
                     f" amount of sensitive features. Got {len(self.covariance_bound)}"
-                    f" covariance bound values, got {len(sensitive_feature_ids)} sensitive features."
-                    f" Either pick a covariance bound value per sensitive feature,"
+                    f" covariance bound values, got {len(sensitive_feature_ids)} sensitive"
+                    f" features. Either pick a covariance bound value per sensitive feature,"
                     f" or only one covariance bound value."
                 )
 
