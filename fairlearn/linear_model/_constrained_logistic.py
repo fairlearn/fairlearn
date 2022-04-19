@@ -58,7 +58,7 @@ def _check_multi_class(multi_class):
 
 
 def _sensitive_attr_constraint_cov(
-    model, x_arr, y_arr_dist_boundary, x_control, thresh
+    model, x_arr, x_control, thresh
 ):
     """Calculate the covariance threshold as in the paper.
 
@@ -121,7 +121,6 @@ def _get_constraint_list_cov(
                 "fun": _sensitive_attr_constraint_cov,
                 "args": (
                     X_train,
-                    y_train,
                     A_train[attr].to_numpy(),
                     cov_bound[index],
                 ),
@@ -132,7 +131,6 @@ def _get_constraint_list_cov(
                 "fun": _sensitive_attr_constraint_cov,
                 "args": (
                     X_train,
-                    y_train,
                     A_train[:, attr],
                     cov_bound[index],
                 ),
