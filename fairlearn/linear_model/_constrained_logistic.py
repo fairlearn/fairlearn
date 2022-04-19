@@ -361,7 +361,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
         renamed_sensitive_feature_ids = list(
             range(X_without_sensitive.shape[1], X.shape[1])
         )
-        categories = enc.categories_
+    categories = enc.categories_
 
     return X, renamed_sensitive_feature_ids, categories
 
