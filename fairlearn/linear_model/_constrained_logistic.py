@@ -428,7 +428,11 @@ class ConstrainedLogisticRegression(LogisticRegression):
         else:  # Numpy arrays
             # Sensitive_feature_ids are now in a different array with different indices
             sensitive_feature_ids = list(range(X[:, sensitive].shape[1]))
-            return X[:, non_sensitive].astype('float'), X[:, sensitive], sensitive_feature_ids
+            return (
+                X[:, non_sensitive].astype("float"),
+                X[:, sensitive],
+                sensitive_feature_ids,
+            )
 
     def _create_lookup(self, X):
         """Create a lookup to handle column names correctly."""
