@@ -51,9 +51,7 @@ def _check_multi_class(multi_class):
     return multi_class
 
 
-def _sensitive_attr_constraint_cov(
-    model, x_arr, x_control, thresh
-):
+def _sensitive_attr_constraint_cov(model, x_arr, x_control, thresh):
     """Calculate the covariance threshold as in the paper.
 
     https://github.com/mbilalzafar/fair-classification/blob/master/fair_classification/utils.py#L348-L388
@@ -380,7 +378,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         random_state=None,
         solver="SLSQP",
         max_iter=100,
-        multi_class="auto",
+        multi_class="ovr",
         verbose=0,
         warm_start=False,
         n_jobs=None,
@@ -430,7 +428,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         else:  # Numpy arrays
             # Sensitive_feature_ids are now in a different array with different indices
             sensitive_feature_ids = list(range(X[:, sensitive].shape[1]))
-            return X[:, non_sensitive], X[:, sensitive], sensitive_feature_ids
+            return X[:, non_sensitive].astype('float'), X[:, sensitive], sensitive_feature_ids
 
     def _create_lookup(self, X):
         """Create a lookup to handle column names correctly."""
@@ -452,7 +450,23 @@ class ConstrainedLogisticRegression(LogisticRegression):
     ):
         """TODO: add docstring."""
         if self.constraints is None:
-            clf = LogisticRegression(self)
+            clf = LogisticRegression(
+                penalty=self.penalty,
+                dual=self.dual,
+                tol=self.tol,
+                C=self.C,
+                fit_intercept=self.fit_intercept,
+                intercept_scaling=self.intercept_scaling,
+                class_weight=self.class_weight,
+                random_state=self.random_state,
+                solver="lbfgs",
+                max_iter=self.max_iter,
+                multi_class=self.multi_class,
+                verbose=self.verbose,
+                warm_start=self.warm_start,
+                n_jobs=self.n_jobs,
+                l1_ratio=self.l1_ratio,
+            )
             return clf.fit(X, y)
 
         if len(self.covariance_bound) > len(sensitive_feature_ids):
