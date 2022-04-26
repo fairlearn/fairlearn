@@ -13,7 +13,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model._logistic import (
     _logistic_loss,
 )
-from sklearn.preprocessing import LabelEncoder, LabelBinarizer, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.utils import (
     check_array,
     check_consistent_length,
@@ -52,17 +52,22 @@ def _check_multi_class(multi_class):
 
 def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
     """
-    Calculate the covariance covariance_bound as in
+    Calculate the covariance bound.
+
+    The covariance bound is calculated as described in
     `Zafar et al. (2017) <https://proceedings.mlr.press/v54/zafar17a.html>`_.
 
     Parameters
     ----------
     model : numpy.ndarray
         Model weights.
+        
     X_train : numpy.ndarray or pandas.DataFrame
         Feature data.
+
     A_train : numpy.ndarray or pandas.DataFrame
         Sensitive features.
+
     covariance_bound : float
         The given covariance threshold that we optimize towards.
 
@@ -110,12 +115,16 @@ def _get_constraint_list_cov(
     ----------
     X_train : numpy.ndarray or pandas.DataFrame
         Feature data.
+
     A_train : numpy.ndarray or pandas.DataFrame
         Sensitive features.
+
     renamed_sensitive_feature_ids : list
         The renamed sensitive feature ids, either as strings or as numbers
+
     categories : list
         The categories from the encoder
+
     covariance_bound : float
         The given covariance threshold that we optimize towards.
 
@@ -183,8 +192,7 @@ def _logistic_regression_path(
     constraints=None,
 ):
     """
-    Compute a Logistic Regression model for a list of regularization
-    parameters.
+    Compute a Logistic Regression model.
 
     All code comes from the sklearn _logistic_regression_path function,
     except for the constraints argument and the changed solver
@@ -308,6 +316,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     ----------
     X : numpy.ndarray or pandas.DataFrame
         Feature data
+
     sensitive_feature_ids : list
         columns to filter out, either as strings (DataFrame) or numbers (numpy)
 
@@ -315,8 +324,10 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     -------
     X : numpy.ndarray or pandas.DataFrame
         Feature data with one-hot-encoded values
+
     renamed_sensitive_feature_ids : list
         The renamed sensitive feature ids, either as strings or as numbers
+
     categories : list
         The categories from the encoder
     """
@@ -376,31 +387,38 @@ class ConstrainedLogisticRegression(LogisticRegression):
         only the constraint as in [1]_ is implemented via the
         `'demographic_parity'` parameter. `'none'` will fall back to
         the LogisticRegression as in sklearn.
+
     penalty : {'l2', 'none'}, default='l2'
         Specify the norm of the penalty:
         - `'none'`: no penalty is added;
         - `'l2'`: add a L2 penalty term and it is the default choice;
+
     covariance_bound : float, default=0
         The covariance bound that the constraint optimizes towards.
         It can either be one of the following two:
-        - float: A single float that will be used for all sensitive features
-        - list: A list of floats such that each sensitive feature can have
-                its own covariance bound.
+        - A single float that will be used for all sensitive features.
+        - A list of floats such that each sensitive feature has its own covariance bound.
+
     dual : bool, default=False
         Dual or primal formulation. This parameter is not used.
         Only implemented for compatibility with sklearn.
+
     tol : float, default=1e-4
         Tolerance for stopping criteria.
+
     C : float, default=1.0
         Inverse of regularization strength; must be a positive float.
         Like in support vector machines, smaller values specify stronger
         regularization.
+
     fit_intercept : bool, default=True
         Specifies if a constant (a.k.a. bias or intercept) should be
         added to the decision function.
+
     intercept_scaling : float, default=1
         This parameter is not used.
         Only implemented for compatibility with sklearn.
+
     class_weight : dict or 'balanced', default=None
         Weights associated with classes in the form ``{class_label: weight}``.
         If not given, all classes are supposed to have weight one.
@@ -409,53 +427,67 @@ class ConstrainedLogisticRegression(LogisticRegression):
         as ``n_samples / (n_classes * np.bincount(y))``.
         Note that these weights will be multiplied with sample_weight (passed
         through the fit method) if sample_weight is specified.
+
     random_state : int, RandomState instance, default=None
         This parameter is not used.
         Only implemented for compatibility with sklearn.
-    solver : {'SLSQP'}, \
-            default='SLSQP'
+
+    solver : str, default='SLSQP'
         Algorithm to use in the optimization problem.
         SLSQP is used since it works with constraints. Other (default) solvers
         in sklearn are not compatible with constraints.
+
     max_iter : int, default=100
         Maximum number of iterations taken for the solvers to converge.
+
     multi_class : {'ovr'}, default='ovr'
         If the option chosen is 'ovr', then a binary problem is fit for each
         label. Sklearn also provides a 'multinomial' option, but this is not
         compatible with the constraints.
+
     verbose : int, default=0
         Set verbose to any positive number for verbosity.
+
     warm_start : bool, default=False
         When set to True, reuse the solution of the previous call to fit as
         initialization, otherwise, just erase the previous solution.
         See `the glossary <https://scikit-learn.org/stable/glossary.html#term-warm_start>`.
+
     n_jobs : int, default=None
         Number of CPU cores used when parallelizing over classes if
         multi_class='ovr'". ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
         context. ``-1`` means using all processors.
         See `the glossary <https://scikit-learn.org/stable/glossary.html#term-n_jobs>`
         for more details.
+
     l1_ratio : float, default=None
         This parameter is not used.
         Only implemented for compatibility with sklearn.
+
     Attributes
     ----------
+
     classes_ : ndarray of shape (n_classes, )
         A list of class labels known to the classifier.
+
     coef_ : ndarray of shape (1, n_features) or (n_classes, n_features)
         Coefficient of the features in the decision function.
         `coef_` is of shape (1, n_features) when the given problem is binary.
         In particular, when `multi_class='multinomial'`, `coef_` corresponds
         to outcome 1 (True) and `-coef_` corresponds to outcome 0 (False).
+
     intercept_ : ndarray of shape (1,) or (n_classes,)
         Intercept (a.k.a. bias) added to the decision function.
         If `fit_intercept` is set to False, the intercept is set to zero.
         `intercept_` is of shape (1,) when the given problem is binary.
+
     n_features_in_ : int
         Number of features seen during :term:`fit`.
+
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
         Names of features seen during :term:`fit`. Defined only when `X`
         has feature names that are all strings.
+
     n_iter_ : ndarray of shape (n_classes,) or (1, )
         Actual number of iterations for all classes. If binary or multinomial,
         it returns only 1 element. For liblinear solver, only the maximum
@@ -463,6 +495,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     References
     ----------
+
     .. [1] Zafar, Muhammad Bilal, et al.
        "Fairness constraints: Mechanisms for fair classification."
        Artificial Intelligence and Statistics. PMLR, 2017.
@@ -561,23 +594,29 @@ class ConstrainedLogisticRegression(LogisticRegression):
     ):
         """
         Fit the model according to the given training data and sensitive features.
+
         Parameters
         ----------
         X : {array-like, sparse matrix} of shape (n_samples, n_features)
             Training vector, where `n_samples` is the number of samples and
             `n_features` is the number of features.
+
         y : array-like of shape (n_samples,)
             Target vector relative to X.
+
         sample_weight : array-like of shape (n_samples,) default=None
             Array of weights that are assigned to individual samples.
             If not provided, then each sample is given unit weight.
+
         sensitive_feature_ids : list
+
         sensitive features in the data, either as strings (DataFrame) or numbers (numpy)
 
         Returns
         -------
         self
             Fitted estimator.
+
         Notes
         -----
         If `self.constraints` is None, the Logistic Regression from sklearn
