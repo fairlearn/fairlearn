@@ -114,9 +114,11 @@ In particular, since correlation measures linear relationships, it might still b
 possible that non-linear relationships exist in the data. Therefore, we expect this
 to be most appropriate as a preprocessing step for (generalized) linear models.
 
-In the example below, a subset of the `adult dataset <https://www.openml.org/d/1590>`_
-is loaded and the correlation between sex and the non-sensitive features is removed.
-This procedure will drop the sensitive features from the dataset.
+In the example below, the `Diabetes 130-Hospitals <https://www.openml.org/d/43874>`_
+is loaded and the correlation between the African American race and
+the non-sensitive features is removed. This dataset contains more races,
+but for the cause of this example we will only focus on the African
+American race. This procedure will drop the sensitive features from the dataset.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -124,24 +126,31 @@ This procedure will drop the sensitive features from the dataset.
     >>> from fairlearn.preprocessing import CorrelationRemover
     >>> import pandas as pd
     >>> from sklearn.datasets import fetch_openml
-    >>> data = fetch_openml(data_id=1590, as_frame=True)
-    >>> X = data.data[['age', 'fnlwgt', 'education-num', 'sex']]
+    >>> data = fetch_openml(data_id=43874, as_frame=True)
+    >>> X = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
     >>> X = pd.get_dummies(X)
-    >>> X = X.drop('sex_Male', axis=1)
-    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female'])
+    >>> X_raw = X_raw.drop(["race_Asian",
+    ...                     "race_Caucasian",
+    ...                     "race_Hispanic",
+    ...                     "race_Other",
+    ...                     "race_Unknown",
+    ...                     "had_inpatient_days_False",
+    ...                     "medicare_False"], axis=1)
+    >>> cr = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'])
     >>> cr.fit(X)
-    CorrelationRemover(sensitive_feature_ids=['sex_Female'])
+    CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'])
     >>> X_transform = cr.transform(X)
 
 In the visualization below, we see the correlation values in the
 original dataset. We are particularly interested in the correlations
-between the 'sex_Female' column and the three non-sensitive attributes
-'age', 'fnlwgt' and 'education-num'. The target variable is also
-included in these visualization for completeness, and it is defined as
-a binary feature which indicated an income higher than $50k. We see that
-'sex_Female' is not highly correlated with the three mentioned attributes,
-but we want to remove these correlations nonetheless.
-The code for generating the correlation matrix can be found in
+between the 'race_AfricanAmerican' column and the three non-sensitive attributes
+'time_in_hospital', 'had_inpatient_days' and 'medicare_True'. The target
+variable is also included in these visualization for completeness, and it is
+defined as a binary feature which indicated whether the readmission of a patient
+occurred within 30 days of the release. We see that 'race_AfricanAmerican' is
+not highly correlated with the three mentioned attributes, but we want to remove
+these correlations nonetheless. The code for generating the correlation matrix
+can be found in
 `this example notebook
 <../auto_examples/plot_correlationremover_before_after.html>`_.
 
@@ -153,8 +162,8 @@ In order to see the effect of :class:`CorrelationRemover`, we visualize
 how the correlation matrix has changed after the transformation of the
 dataset. Due to rounding, some of the 0.0 values appear as -0.0. Either
 way, the :code:`CorrelationRemover` successfully removed all correlation
-between 'sex_Female' and the other columns while retaining the correlation
-between the other features.
+between 'race_AfricanAmerican' and the other columns while retaining
+the correlation between the other features.
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
     :align: center
@@ -165,13 +174,13 @@ to control the level of filtering between the sensitive and non-sensitive featur
 
 .. doctest:: mitigation
 
-    >>> cr = CorrelationRemover(sensitive_feature_ids=['sex_Female'], alpha=0.5)
+    >>> cr = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
     >>> cr.fit(X)
-    CorrelationRemover(alpha=0.5, sensitive_feature_ids=['sex_Female'])
+    CorrelationRemover(alpha=0.5, sensitive_feature_ids=['race_AfricanAmerican'])
     >>> X_transform = cr.transform(X)
 
 As we can see in the visulization below, not all correlation between
-'sex_Female' and the other columns was removed. This is exactly what
+'race_AfricanAmerican' and the other columns was removed. This is exactly what
 we would expect with :math:`\alpha=0.5`.
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_003.png

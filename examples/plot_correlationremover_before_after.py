@@ -32,27 +32,39 @@ from fairlearn.preprocessing import CorrelationRemover
 
 # %%
 # Next, we import the data and transform the 'sex' column to a binary feature.
+# We also drop most dummy columns that are created, since we are looking
+# specifically at the African American race.
+# Finally, the columns are rearranged for consistency.
 
-data = fetch_openml(data_id=1590, as_frame=True)
-X_raw = data.data[["age", "fnlwgt", "education-num", "sex"]]
+data = fetch_openml(data_id=43874, as_frame=True)
+X_raw = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
 X_raw = pd.get_dummies(X_raw)
-X_raw = X_raw.drop(["sex_Male"], axis=1)
-y = (data.target == ">50K") * 1
+y = data.target
+
+X_raw = X_raw.drop(["race_Asian",
+                    'race_Caucasian',
+                    'race_Hispanic',
+                    'race_Other',
+                    'race_Unknown',
+                    'had_inpatient_days_False',
+                    'medicare_False'], axis=1)
+
+X_raw = X_raw[['time_in_hospital', 'had_inpatient_days_True', 'medicare_True', 'race_AfricanAmerican']]
 
 # %%
 # We are now going to fit the CorrelationRemover to the data,
 # and transform it. The transformed array will be placed back
 # in a Pandas DataFrame, for plotting purposes.
 
-cr = CorrelationRemover(sensitive_feature_ids=["sex_Female"])
+cr = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"])
 X_cr = cr.fit_transform(X_raw)
-X_cr = pd.DataFrame(X_cr, columns=["age", "fnlwgt", "education-num"])
-X_cr["sex_Female"] = X_raw["sex_Female"]
+X_cr = pd.DataFrame(X_cr, columns=['time_in_hospital', 'had_inpatient_days_True', 'medicare_True'])
+X_cr["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
-cr_alpha = CorrelationRemover(sensitive_feature_ids=['sex_Female'], alpha=0.5)
+cr_alpha = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
 X_cr_alpha = cr_alpha.fit_transform(X_raw)
-X_cr_alpha = pd.DataFrame(X_cr_alpha, columns=["age", "fnlwgt", "education-num"])
-X_cr_alpha["sex_Female"] = X_raw["sex_Female"]
+X_cr_alpha = pd.DataFrame(X_cr_alpha, columns=['time_in_hospital', 'had_inpatient_days_True', 'medicare_True'])
+X_cr_alpha["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
 # %%
 # We can now plot the correlation matrices before
@@ -63,9 +75,10 @@ X_cr_alpha["sex_Female"] = X_raw["sex_Female"]
 
 def plot_heatmap(df, title):
     df['target'] = y
+    df = df.rename(columns={"had_inpatient_days_True": "had_inpatient_days"})
     cols = list(df.columns)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8, 6))
     ax.imshow(round(df.corr(), 2), cmap="coolwarm")
 
     # Show all ticks and label them with the respective list entries
@@ -97,5 +110,6 @@ plot_heatmap(X_cr_alpha, "Correlation values after CorrelationRemover with alpha
 # %%
 # Even though there was not a high amount of correlation to begin with,
 # the CorrelationRemover successfully removed all correlation between
-# 'sex_Female' and the other columns while retaining the correlation
-# between the other features.
+# 'race_AfricanAmerican' and the other columns while retaining the correlation
+# between the other features. Using a lower value of alpha results in
+# not all the correlation being projected away.
