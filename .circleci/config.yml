@@ -100,11 +100,11 @@ jobs:
       # deployed.
       - attach_workspace:
           at: doc/_build
-      - run: ls -ltrh doc/_build/html/stable
+      - run: ls -ltrh doc/_build/html
       - deploy:
           command: |
             if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]+\.X$|adrin-testing ]]; then
-              bash build_tools/circle/push_doc.sh doc/_build/html/stable
+              bash build_tools/circle/push_doc.sh doc/_build/html
             fi
 
 # This workflow defines the ordering, in this case build-doc needs to happen
