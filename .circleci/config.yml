@@ -118,6 +118,6 @@ workflows:
       - deploy-doc:
           requires:
             - build-doc
-          filters:
-            branches:
-              only: main  # don't deploy to GitHub pages from other branches
+          #filters:
+          #  branches:
+          #    only: main  # don't deploy to GitHub pages from other branches
