@@ -52,11 +52,8 @@ def _check_multi_class(multi_class):
 
 def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
     """
-    Calculate the covariance covariance_boundold as in
+    Calculate the covariance covariance_bound as in
     `Zafar et al. (2017) <https://proceedings.mlr.press/v54/zafar17a.html>`_.
-
-    We one-hot-encode the sensitive features.such that they can be splitted
-    from X and that the constraints can be correctly coded per feature value.
 
     Parameters
     ----------
