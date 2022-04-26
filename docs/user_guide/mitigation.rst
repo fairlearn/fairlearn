@@ -129,7 +129,7 @@ American race. This procedure will drop the sensitive features from the dataset.
     >>> data = fetch_openml(data_id=43874, as_frame=True)
     >>> X = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
     >>> X = pd.get_dummies(X)
-    >>> X_raw = X_raw.drop(["race_Asian",
+    >>> X = X.drop(["race_Asian",
     ...                     "race_Caucasian",
     ...                     "race_Hispanic",
     ...                     "race_Other",
