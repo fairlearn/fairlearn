@@ -37,5 +37,5 @@ git config user.name $USERNAME
 git config push.default matching
 git add -f .
 git commit -m "$MSG" $dir
-# git push
+git push
 echo $MSG
