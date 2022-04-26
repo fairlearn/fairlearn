@@ -32,7 +32,7 @@ fi
 cd $DOC_REPO
 
 cp -R "$GENERATED_DOC_DIR"/* .
-git config user.email "ci-build@fairlearn.org"
+git config user.email "adrin.jalali@gmail.com"
 git config user.name $USERNAME
 git config push.default matching
 git add -f .
