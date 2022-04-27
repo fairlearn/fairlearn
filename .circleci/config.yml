@@ -98,7 +98,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "40:36:a9:4d:ea:9d:d9:94:60:0f:11:b5:fa:6a:b1:5d"
+            - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
       # Attach documentation generated in the 'doc' step so that it can be
       # deployed.
       - attach_workspace:
