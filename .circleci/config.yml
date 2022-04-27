@@ -97,6 +97,12 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
+          # To generate a new key:
+          # ssh-keygen -t ed25519 -C "ci-build@fairlearn.org" -f output_key_file
+          # Do not add a passphrase.
+          # Upload public key as a deploy key to the website GH repository.
+          # Upload private key to CircleCI as an SSH key at
+          # https://app.circleci.com/settings/project/github/fairlearn/fairlearn#ssh.
           fingerprints:  # fingerprint of deploy (public) key
             - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
       # Attach documentation generated in the 'doc' step so that it can be
@@ -106,7 +112,7 @@ jobs:
       - run: ls -ltrh doc/_build/html
       - deploy:
           command: |
-            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]+\.X$|adrin-testing ]]; then
+            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               bash devops/circle/push_doc.sh doc/_build/html
             fi
 
@@ -121,6 +127,7 @@ workflows:
       - deploy-doc:
           requires:
             - build-doc
-          #filters:
-          #  branches:
-          #    only: main  # don't deploy to GitHub pages from other branches
+          filters:
+            branches:
+              # don't deploy to GitHub pages from other branches
+              only: /^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$/
