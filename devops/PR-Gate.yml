@@ -15,6 +15,7 @@ jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
     platforms:  { Linux: ubuntu-latest }
+    testRunTypes: ['CodeCoverage']
     installationType: 'PipLocal'
     pyVersions: [3.9]
     freezeArtifactStem: $(FreezeArtifactStem)
@@ -23,6 +24,7 @@ jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
     platforms:  { Windows: windows-latest }
+    testRunTypes: ['CodeCoverage']
     installationType: 'PipLocal'
     pyVersions: [3.9]
     freezeArtifactStem: $(FreezeArtifactStem)
@@ -31,7 +33,7 @@ jobs:
 - template: templates/all-tests-job-template.yml
   parameters:
     platforms: { MacOS: macos-latest }
-    testRunTypes: ['Unit']
+    testRunTypes: ['CodeCoverage']
     installationType: 'None'
     pyVersions: ["3.8", "3.10"]
     freezeArtifactStem: $(FreezeArtifactStem)
