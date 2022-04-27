@@ -97,7 +97,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints:
+          fingerprints:  # fingerprint of deploy (public) key
             - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
       # Attach documentation generated in the 'doc' step so that it can be
       # deployed.
