@@ -44,6 +44,10 @@ jobs:
           name: "Build Documentation"
           command: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
           no_output_timeout: 30m
+      
+      - run:
+          name: "Disable jekyll builds"
+          command: touch docs/_build/html/.nojekyll
 
       - persist_to_workspace:
           root: docs/_build
