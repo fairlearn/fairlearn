@@ -9,7 +9,7 @@ from ..utils._input_validation import (
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
 from typing import Callable, Union
-from numpy import array, unique, where
+from numpy import amax, amin, array, unique, where
 from sklearn.utils.validation import check_array
 
 
@@ -23,8 +23,7 @@ def plot_model_comparison(
     ax=None,
     axis_labels=True,
     point_labels=None,
-    model_group=None,
-    group_kwargs=None,
+    model_kwargs=None,
     legend=False,
     plot=True,
     **kwargs,
@@ -72,23 +71,14 @@ def plot_model_comparison(
         Add textual label :code:`point_labels[i]` to the position
         of model :code:`i`.
 
-    model_group : list
-        For a model at index :code:`i` (same order as in :code:`y_preds`),
-        :code:`model_group[i]` is the group of the model. Every model with the
-        same group name is plotted similarly. Group names should be numbers
-        or strings, as long as all group names have the same data type.
-
-    group_kwargs : Dict[Dict]
-        For each group name :code:`name` in :code:`model_group`,
-        pass as key-word argument
-        :code:`group_kwargs[name]` to the plotting of that group. Useful to
-        define per-group markers, colors, color maps, etc. If you are not
-        grouping, then we just pass extra kwargs from
-        :meth:`plot_model_comparison` to the plotting.
+    model_kwargs : list[dict], optional
+        For a model at index :code:`i` (same order as in :code:`y_preds`), 
+        :code:`model_kwargs[i]` are passed along to matplotlib's scatter
+        plotting.
 
     legend : bool
-        If True, add a legend about the various model_group. Must set
-        :code:`group_kwargs[g]['label']` for every group :code:`g`.
+        If True, add a legend. Must set
+        :code:`model_kwargs[i]['label']` for every prediction :code:`i`.
 
     plot : bool
         If true, call pyplot.plot. In any case, return axis
@@ -143,7 +133,7 @@ def plot_model_comparison(
 
     for (kwarg, name) in (
         (point_labels, "point_labels"),
-        (model_group, "model_group"),
+        (model_kwargs, "model_kwargs"),
     ):
         if kwarg is not None:
             if not isinstance(kwarg, list):
@@ -157,24 +147,12 @@ def plot_model_comparison(
                     _INCONSISTENT_ARRAY_LENGTH.format(f"{name} and y_preds")
                 )
 
-    if group_kwargs is not None:
-        if not isinstance(group_kwargs, dict):
-            raise ValueError(
-                _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                    "group_kwargs", "dict", type(group_kwargs).__name__
-                )
-            )
-        for group_name in group_kwargs:
-            if group_name not in model_group:
-                raise ValueError(
-                    f"Provided kwargs for group {group_name}, "
-                    + "but there are no points in that group."
-                )
-            item = group_kwargs[group_name]
+    if model_kwargs is not None:
+        for item in model_kwargs:
             if not isinstance(item, dict):
                 raise ValueError(
                     _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                        "items of group_kwargs", "dict", type(item).__name__
+                        "items of model_kwargs", "dict", type(item).__name__
                     )
                 )
 
@@ -235,33 +213,20 @@ def plot_model_comparison(
 
     # Add actual points
     try:
-        if model_group is None:
+        if model_kwargs is None:
             ax.scatter(x, y, **kwargs)
         else:
-            # We call scatter once per group and pass group kwargs to each
-            # call. This achieves the desired effect of seperate style for each
-            # group.
             # FIXME: @hildeweerts Do we need to set xlim/ylim separately?
             # NOTE: If so, I think matplotlib automatically has 5% margin
-            # x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
-            # x_margin, y_margin = (x_max - x_min) * 0.05, (y_max - y_min) * 0.05
-            # ax.set_xlim(left=x_min - x_margin, right=x_max + x_margin)
-            # ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
+            x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
+            x_margin, y_margin = (x_max - x_min) * 0.05, (y_max - y_min) * 0.05
+            ax.set_xlim(left=x_min - x_margin, right=x_max + x_margin)
+            ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
 
-            # NOTE because we use unique/array, if there's a single string then
-            # all group names are converted to strings, so we can't support
-            # mixed-type lists.
-            model_group = array(model_group)
-            group_names = unique(model_group)
-            for group in group_names:
-                index = where(group == model_group)
-                if group_kwargs is not None:
-                    # NOTE: debatable design choice to copy and add kwargs.
-                    kws = kwargs.copy()
-                    kws.update(group_kwargs.get(group, {}))
-                    ax.scatter(x[index], y[index], **kws)
-                else:
-                    ax.scatter(x[index], y[index], **kwargs)
+            for i, this_model_kwargs in enumerate(model_kwargs):
+                kws = kwargs.copy()
+                kws.update(this_model_kwargs)
+                ax.scatter(x[i], y[i], **kws)
         if legend:
             ax.legend()
     except AttributeError as e:
