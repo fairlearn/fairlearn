@@ -32,6 +32,7 @@ fi
 cd $DOC_REPO
 
 cp -R "$GENERATED_DOC_DIR"/* .
+touch .nojekyll
 echo "fairlearn.org" > CNAME
 git config user.email "ci-build@fairlearn.org"
 git config user.name $USERNAME
