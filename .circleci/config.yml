@@ -93,69 +93,28 @@ jobs:
       
   deploy-doc:
     docker:
-      - image: cimg/node:14.0.0  # npm required for gh-pages
-
+      - image: cimg/python:3.8.12
     steps:
       - checkout
- 
       - add_ssh_keys:
-          # To generate a key run the following in git bash (on Windows):
-          # ssh-keygen -t rsa -m pem -C "ci-build@fairlearn.org"
+          # To generate a new key:
+          # ssh-keygen -t ed25519 -C "ci-build@fairlearn.org" -f output_key_file
           # Do not add a passphrase.
-          # Upload public key as a deploy key to the website repository.
+          # Upload public key as a deploy key to the website GH repository.
           # Upload private key to CircleCI as an SSH key at
           # https://app.circleci.com/settings/project/github/fairlearn/fairlearn#ssh.
           fingerprints:  # fingerprint of deploy (public) key
             - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
-
+      # Attach documentation generated in the 'doc' step so that it can be
+      # deployed.
       - attach_workspace:
-          at: docs/_build
-      
-      - run:
-          # By default GitHub attempts jekyll builds.
-          # Instead, we want the webpage to just point at index.html
-          name: Disable jekyll builds
-          command: touch docs/_build/html/.nojekyll
-      
-      - run:
-          # Create CNAME file for fairlearn.org
-          name: Create CNAME file
-          command: echo "fairlearn.org" > docs/_build/html/CNAME
-
-      - run:
-          name: Update apt
-          command: sudo apt update
-
-      - run:
-          name: Install npm
-          command: sudo apt-get install npm
-
-      - run:
-          name: Install gh-pages
-          command: npm install --silent gh-pages@2.0.1
-
-      - run:
-          name: Configure git
+          at: doc/_build
+      - run: ls -ltrh doc/_build/html
+      - deploy:
           command: |
-            git config user.email "ci-build@fairlearn.org"
-            git config user.name "ci-build"
-
-      - run:
-          name: Update SSH keys
-          # Ideally, do something with https://github.blog/changelog/2022-01-18-githubs-ssh-host-keys-are-now-published-in-the-api/
-          command: |
-            ssh-keyscan github.com > ssh_known_hosts
-            cat ssh_known_hosts
-            mkdir .ssh
-            chmod 700 .ssh
-            cp ssh_known_hosts .ssh/known_hosts
-            chmod 600 .ssh/known_hosts
-
-      - run:
-          name: 'Push to GitHub Pages repository'
-          # Next is only acceptable because this is running in a docker container which is not persisted
-          # See https://github.com/tschaub/gh-pages/issues/422
-          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              bash devops/circle/push_doc.sh doc/_build/html
+            fi
 
 # This workflow defines the ordering, in this case build-doc needs to happen
 # before deploy-doc.
@@ -170,4 +129,5 @@ workflows:
             - build-doc
           filters:
             branches:
-              only: main  # don't deploy to GitHub pages from other branches
+              # don't deploy to GitHub pages from other branches
+              only: /^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$/
