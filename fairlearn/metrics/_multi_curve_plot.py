@@ -72,7 +72,7 @@ def plot_model_comparison(
         of model :code:`i`.
 
     model_kwargs : list[dict], optional
-        For a model at index :code:`i` (same order as in :code:`y_preds`), 
+        For a model at index :code:`i` (same order as in :code:`y_preds`),
         :code:`model_kwargs[i]` are passed along to matplotlib's scatter
         plotting. If models have the same `model_kwargs`, they are passed
         in one call to :py:func:`Axes.scatter`, so they become one entry in
@@ -225,7 +225,7 @@ def plot_model_comparison(
             for i, mkws1 in enumerate(model_kwargs):
                 if not is_first[i]:
                     continue
-                for j, mkws2 in enumerate(model_kwargs[i+1:], start=i+1):
+                for j, mkws2 in enumerate(model_kwargs[i + 1 :], start=i + 1):
                     if mkws1 == mkws2:
                         is_first[j] = False
                         equivalence[i].append(j)
