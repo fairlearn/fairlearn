@@ -74,7 +74,9 @@ def plot_model_comparison(
     model_kwargs : list[dict], optional
         For a model at index :code:`i` (same order as in :code:`y_preds`), 
         :code:`model_kwargs[i]` are passed along to matplotlib's scatter
-        plotting.
+        plotting. If models have the same `model_kwargs`, they are passed
+        in one call to :py:func:`Axes.scatter`, so they become one entry in
+        the legend.
 
     legend : bool
         If True, add a legend. Must set
@@ -216,6 +218,18 @@ def plot_model_comparison(
         if model_kwargs is None:
             ax.scatter(x, y, **kwargs)
         else:
+            # Find the models with the same model_kwargs, and pass them into
+            # a single call to scatter.
+            is_first = [True for _ in model_kwargs]
+            equivalence = [[i] for i in range(len(model_kwargs))]
+            for i, mkws1 in enumerate(model_kwargs):
+                if not is_first[i]:
+                    continue
+                for j, mkws2 in enumerate(model_kwargs[i+1:], start=i+1):
+                    if mkws1 == mkws2:
+                        is_first[j] = False
+                        equivalence[i].append(j)
+
             # FIXME: @hildeweerts Do we need to set xlim/ylim separately?
             # NOTE: If so, I think matplotlib automatically has 5% margin
             x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
@@ -224,9 +238,11 @@ def plot_model_comparison(
             ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
 
             for i, this_model_kwargs in enumerate(model_kwargs):
-                kws = kwargs.copy()
-                kws.update(this_model_kwargs)
-                ax.scatter(x[i], y[i], **kws)
+                if is_first[i]:
+                    index = equivalence[i]
+                    kws = kwargs.copy()
+                    kws.update(this_model_kwargs)
+                    ax.scatter(x[index], y[index], **kws)
         if legend:
             ax.legend()
     except AttributeError as e:
