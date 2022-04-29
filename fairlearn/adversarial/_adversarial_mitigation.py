@@ -38,8 +38,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AdversarialFairness(BaseEstimator):
-    r"""Train complex predictors while mitigating unfairness in PyTorch or Tensorflow.
+class _AdversarialFairness(BaseEstimator):
+    r"""Train PyTorch or Tensorflow predictors while mitigating unfairness .
 
     This model implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
@@ -59,7 +59,7 @@ class AdversarialFairness(BaseEstimator):
     multiclass classification, please just supply the predictor model that
     produces continuous values, e.g., using a sigmoidal or soft-max
     activation, and specify the appropriate final transformation separately via
-    parameter :code:`prediction_function`.
+    parameter :code:`prediction_function` (or let us automatically infer this).
 
     The distribution types of :code:`y` and :code:`sensitive_features`
     are set by their preprocessor :code:`y_transform` and :code:`sf_transform`
@@ -542,7 +542,7 @@ class AdversarialFairness(BaseEstimator):
 
         self.step_ = 0
         for epoch in range(epochs):
-            if (self.shuffle):
+            if self.shuffle:
                 X, Y, A = self.backendEngine_.shuffle(X, Y, A)
             for batch in range(batches):
                 if self.progress_updates:
@@ -847,8 +847,164 @@ class AdversarialFairness(BaseEstimator):
         return hasattr(self, "_is_setup")
 
 
-class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
-    """Creates an AdversarialFairness with loss and predictions set to classification."""
+class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
+    r"""Train PyTorch or Tensorflow classifiers while mitigating unfairness.
+
+    This model implements the supervised learning method proposed in
+    `"Mitigating Unwanted Biases with Adversarial Learning"
+    <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
+    This algorithm takes as input two neural network
+    models, a predictor model and an adversarial model, defined either as a
+    `PyTorch module
+    <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
+    `Tensorflow2 model
+    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
+    predictor using an API that is similar to estimators in `sklearn`.
+
+    As per [1]_, the neural network models :code:`predictor_model` and
+    :code:`adversary_model` should not have a discrete prediction at the end of the
+    model, as gradients do not propagate through a discretization step.
+    When discrete predictions are required, as is the case in binary and
+    multiclass classification, please just supply the predictor model that
+    produces continuous values, e.g., using a sigmoidal or soft-max
+    activation, and specify the appropriate final transformation separately via
+    parameter :code:`prediction_function` (or let us automatically infer this).
+
+    We only support single-feature predictions. Sensitive features must be
+    single-feature discrete, or (possibly multi-output) continuous.
+    We apply preprocessing to ensure everything is encoded as floats, and
+    appropriate loss functions/predictor functions are inferred.
+
+    Parameters
+    ----------
+    backend : str, BackendEngine, default = 'auto'
+        The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
+        or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
+        automatically infer
+        the backend from the :code:`predictor_model` and which are installed.
+        You can also pass in a BackendEngine class.
+
+    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+        The predictor model to train.
+        Instead of a neural network model, we can pass a list of keywords
+        :math:`k_1, k_2, \dots` that indicate either
+        the number of nodes :math:`k_i` (if :math:`k_i` is integer) or a keyword
+        that indicates an activation function (if :math:`k_i` is a string) or
+        a layer or activation function instance directly (if :math:`k_i` is
+        callable). The default parameter is :code:`[]`, which indicates
+        a neural network without any hidden layers.
+        However, the number of nodes in the input
+        and output layer are automatically inferred from data, and the final
+        activation function (such as softmax for categorical
+        predictors) are inferred from data.
+        If :code:`backend` is specified, you cannot pass a model
+        that uses a different backend.
+
+    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+        The adversary model to train. Defined similarly as predictor_model.
+        Must be the same type as the
+        :code:`predictor_model`.
+
+    predictor_function : str, callable, default = 'auto'
+        Either a keyword, such as:
+        :code:`'auto'`, :code:`'argmax'`, :code:`'threshold'`,
+        or a callable. The string
+        :code:`'auto'` indicates to infer the predictor function
+        from the distribution type of :code:`y`
+        Currently, we do not apply one-hot-encoding to binary data, so you
+        will get an error if you use argmax if :code:`y` is binary. However,
+        if binary data was already passed one-hot-encoded, then :code:`'argmax'`
+        should be used and will be inferred nonetheless. A callable should be a
+        function that maps the continuous output of the predictor model to
+        a discrete prediction.
+
+    threshold_value : number
+        If the predictor function is 'threshold', the predictor function maps
+        :math:`y` to 1 if :math:`y \geq ` :code:`threshold_value`, else 0. This
+        is intended for sigmoidal outputs, in which case only a number between
+        0 and 1 makes sense.
+
+    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+        The optimizer class to use. If a string is passed instead, this must be
+        either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
+        initialized with the model and given learning rate.
+        If an instance of a subclass of torch.optim.Optimizer
+        or tensorflow.keras.optimizers.Optimizer is passed, this
+        is used directly. If a callable :code:`fn` is passed, we call this
+        callable and pass our model, and set the result of this call
+        as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
+
+    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+        The optimizer class to use. Similarly defined as
+        :code:`predictor_optimizer`
+
+    constraints : str, default = 'demographic_parity'
+        The fairness measure to optimize for. Must be either 'demographic_parity'
+        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+
+    learning_rate : float, default = 0.001
+        A small number greater than zero to set as learning rate
+
+    alpha : float, default = 1.0
+        A small number :math:`\alpha` as specified in the paper. It
+        is the factor that balances the training towards predicting :math:`Y`
+        (choose :math:`\alpha` closer to zero) or increasing fairness
+        (choose larger :math:`\alpha`).
+
+    epochs : int, default = 1
+        Number of epochs to train for.
+
+    batch_size : int, default = 32
+        Batch size. For no batching, set this to -1.
+
+    shuffle : bool, default = False
+        When true, shuffle the data before every epoch (including the first).
+
+    progress_updates : number, optional, default = None
+        If a number :math:`t` is provided, we print an update
+        about the training loop after processing a batch and :math:`t` seconds
+        have passed since the previous update.
+
+    skip_validation : bool, default = False
+        Skip the validation of the data. Useful because validate_input is
+        a costly operation, and we may instead pass all data to validate_input
+        at an earlier stage. Note that not only checking :math:`X`
+        is skipped, but also no tranform is applied to :math:`y` and
+        :math:`z` (sensitive features).
+
+    callbacks : callable
+        Callback function, called after every batch. For instance useable when
+        wanting to validate. Can also be a list of callback functions
+        Each callback function is passed two arguments :code:`self` (the
+        estimator instance) and :code:`step` (the completed iteration), and
+        may return a Boolean value. If the returned value is `True`, the
+        optimization algorithm terminates. This can be used to implement
+        *early stopping*.
+
+    cuda : str, default = None
+        A string to indicate which device to use when training. For instance,
+        set :code:`cuda='cuda:0'` to train on the first GPU. Only for PyTorch
+        backend.
+
+    warm_start : bool, default = False
+        Normally, when set to False, a call to fit triggers reinitialization,
+        which discards the models and intializes them again. Setting to
+        True triggers reuse of these models. Note: if pre-initialized models
+        were passed, the model (and its parameters) are never discard.
+
+    random_state : int, RandomState instance, default = None
+        Controls the randomized aspects of this algorithm, such as shuffling.
+        Useful to get reproducible output across multiple function calls.
+
+    References
+    ----------
+    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
+       Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
+       AIES, 2018.
+
+    """  # noqa : E501
+    # Hidden: predictor_loss, adversary_loss, y_transform,
+    # sf_transform
 
     def __init__(self, **kwargs):
         """Initialize model by setting the predictor loss and function."""
@@ -859,13 +1015,157 @@ class AdversarialFairnessClassifier(AdversarialFairness, ClassifierMixin):
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
 
-class AdversarialFairnessRegressor(AdversarialFairness, RegressorMixin):
-    """Create an AdversarialFairness that has predictor loss set to regression."""
+class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
+    r"""Train PyTorch or Tensorflow regressors while mitigating unfairness.
+
+    This model implements the supervised learning method proposed in
+    `"Mitigating Unwanted Biases with Adversarial Learning"
+    <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
+    This algorithm takes as input two neural network
+    models, a predictor model and an adversarial model, defined either as a
+    `PyTorch module
+    <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
+    `Tensorflow2 model
+    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
+    predictor using an API that is similar to estimators in `sklearn`.
+
+    As per [1]_, the neural network models :code:`predictor_model` and
+    :code:`adversary_model` should not have a discrete prediction at the end of the
+    model, as gradients do not propagate through a discretization step.
+    When discrete predictions are required, as is the case in binary and
+    multiclass classification, please just supply the predictor model that
+    produces continuous values, e.g., using a sigmoidal or soft-max
+    activation, and specify the appropriate final transformation separately via
+    parameter :code:`prediction_function` (or let us automatically infer this).
+
+    We support continuous vector predictions. Sensitive features must be
+    single-feature discrete, or (possibly multi-output) continuous.
+    We apply preprocessing to ensure everything is encoded as floats, and
+    appropriate loss functions/predictor functions are inferred.
+
+    Parameters
+    ----------
+    backend : str, BackendEngine, default = 'auto'
+        The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
+        or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
+        automatically infer
+        the backend from the :code:`predictor_model` and which are installed.
+        You can also pass in a BackendEngine class.
+
+    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+        The predictor model to train.
+        Instead of a neural network model, we can pass a list of keywords
+        :math:`k_1, k_2, \dots` that indicate either
+        the number of nodes :math:`k_i` (if :math:`k_i` is integer) or a keyword
+        that indicates an activation function (if :math:`k_i` is a string) or
+        a layer or activation function instance directly (if :math:`k_i` is
+        callable). The default parameter is :code:`[]`, which indicates
+        a neural network without any hidden layers.
+        However, the number of nodes in the input
+        and output layer are automatically inferred from data, and the final
+        activation function (such as softmax for categorical
+        predictors) are inferred from data.
+        If :code:`backend` is specified, you cannot pass a model
+        that uses a different backend.
+
+    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+        The adversary model to train. Defined similarly as predictor_model.
+        Must be the same type as the
+        :code:`predictor_model`.
+
+    threshold_value : number
+        If the predictor function is 'threshold', the predictor function maps
+        :math:`y` to 1 if :math:`y \geq ` :code:`threshold_value`, else 0. This
+        is intended for sigmoidal outputs, in which case only a number between
+        0 and 1 makes sense.
+
+    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+        The optimizer class to use. If a string is passed instead, this must be
+        either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
+        initialized with the model and given learning rate.
+        If an instance of a subclass of torch.optim.Optimizer
+        or tensorflow.keras.optimizers.Optimizer is passed, this
+        is used directly. If a callable :code:`fn` is passed, we call this
+        callable and pass our model, and set the result of this call
+        as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
+
+    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+        The optimizer class to use. Similarly defined as
+        :code:`predictor_optimizer`
+
+    constraints : str, default = 'demographic_parity'
+        The fairness measure to optimize for. Must be either 'demographic_parity'
+        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+
+    learning_rate : float, default = 0.001
+        A small number greater than zero to set as learning rate
+
+    alpha : float, default = 1.0
+        A small number :math:`\alpha` as specified in the paper. It
+        is the factor that balances the training towards predicting :math:`Y`
+        (choose :math:`\alpha` closer to zero) or increasing fairness
+        (choose larger :math:`\alpha`).
+
+    epochs : int, default = 1
+        Number of epochs to train for.
+
+    batch_size : int, default = 32
+        Batch size. For no batching, set this to -1.
+
+    shuffle : bool, default = False
+        When true, shuffle the data before every epoch (including the first).
+
+    progress_updates : number, optional, default = None
+        If a number :math:`t` is provided, we print an update
+        about the training loop after processing a batch and :math:`t` seconds
+        have passed since the previous update.
+
+    skip_validation : bool, default = False
+        Skip the validation of the data. Useful because validate_input is
+        a costly operation, and we may instead pass all data to validate_input
+        at an earlier stage. Note that not only checking :math:`X`
+        is skipped, but also no tranform is applied to :math:`y` and
+        :math:`z` (sensitive features).
+
+    callbacks : callable
+        Callback function, called after every batch. For instance useable when
+        wanting to validate. Can also be a list of callback functions
+        Each callback function is passed two arguments :code:`self` (the
+        estimator instance) and :code:`step` (the completed iteration), and
+        may return a Boolean value. If the returned value is `True`, the
+        optimization algorithm terminates. This can be used to implement
+        *early stopping*.
+
+    cuda : str, default = None
+        A string to indicate which device to use when training. For instance,
+        set :code:`cuda='cuda:0'` to train on the first GPU. Only for PyTorch
+        backend.
+
+    warm_start : bool, default = False
+        Normally, when set to False, a call to fit triggers reinitialization,
+        which discards the models and intializes them again. Setting to
+        True triggers reuse of these models. Note: if pre-initialized models
+        were passed, the model (and its parameters) are never discard.
+
+    random_state : int, RandomState instance, default = None
+        Controls the randomized aspects of this algorithm, such as shuffling.
+        Useful to get reproducible output across multiple function calls.
+
+    References
+    ----------
+    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
+       Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
+       AIES, 2018.
+
+    """  # noqa : E501
+    # Hidden: predictor_loss, adversary_loss, predictor_function, threshold,
+    # y_transform, sf_transform
 
     def __init__(self, *args, **kwargs):
         """Initialize model by setting the predictor loss."""
         self._estimator_type = "regressor"
         kwargs["y_transform"] = None
+        kwargs["predictor_loss"] = "continuous"
         kwargs["predictor_function"] = None
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
 

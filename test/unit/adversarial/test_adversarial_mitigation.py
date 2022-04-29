@@ -7,10 +7,10 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import estimator_checks
 from fairlearn.adversarial import (
-    AdversarialFairness,
     AdversarialFairnessClassifier,
     AdversarialFairnessRegressor,
 )
+from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 
@@ -78,10 +78,10 @@ from .helper import (
 )
 def test_estimator_checks(test_fn):
     instance = get_instance(
-        AdversarialFairness, torch=True, tensorflow=False, fake_mixin=True
+        _AdversarialFairness, torch=True, tensorflow=False, fake_mixin=True
     )
     test_fn(
-        AdversarialFairness.__name__,
+        _AdversarialFairness.__name__,
         instance,
     )
 
@@ -95,7 +95,7 @@ def test_classifier(torch1):
         torch=torch1,
         tensorflow=not torch1,
     )
-    assert isinstance(mitigator, AdversarialFairness)
+    assert isinstance(mitigator, _AdversarialFairness)
 
     mitigator.fit(Cont2d, Bin1d, sensitive_features=Cat)
     assert isinstance(mitigator.backendEngine_.predictor_loss, BCE)
@@ -111,7 +111,7 @@ def test_regressor(torch2):
         torch=torch2,
         tensorflow=not torch2,
     )
-    assert isinstance(mitigator, AdversarialFairness)
+    assert isinstance(mitigator, _AdversarialFairness)
 
     mitigator.fit(Cont2d, Cont2d, sensitive_features=Cat)
     assert isinstance(mitigator.backendEngine_.predictor_loss, MSE)

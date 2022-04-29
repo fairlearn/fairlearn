@@ -73,7 +73,7 @@ logits, not the one-hot-encoded discrete prediction.::
         tf.keras.layers.Dense(3, activation='relu'),
         tf.keras.layers.Dense(1)
     ])
-    mitigator = AdversarialFairness(
+    mitigator = AdversarialFairnessClassifier(
         predictor_model=predictor_model,
         adversary_model=adversary_model
     )
@@ -91,15 +91,14 @@ function (such as softmax for categorical predictors) are inferred from data.
 So, in the following example, the predictor model is
 a neural network with an input layer of
 the appropriate number of nodes, a hidden layer with 50 nodes and
-ReLU activations, and an output layer with an appropriate activation function.::
+ReLU activations, and an output layer with an appropriate activation function.
+The appropriate function in case of classification will be softmax for one
+hot encoded :math:`Y` and sigmoid for binary :math:`Y`.::
 
-    mitigator = AdversarialFairness(
+    mitigator = AdversarialFairnessClassifier(
         predictor_model=[50, "relu"],
         adversary_model=[3, "relu"]
     )
-
-Though, we do recommend you create your own neural networks beforehand,
-as you can tweak these to your liking.
 
 .. _data_preprocessing:
 
@@ -159,7 +158,7 @@ Additionally, we explicitely specify how the **discrete predictions** are
 computed, by providing a :code:`predictor_function`. In this case,
 the predictor function maps sigmoid logits to the discrete prediction.::
 
-    mitigator = AdversarialFairness(
+    mitigator = AdversarialFairnessClassifier(
         backend="torch",
         predictor_model=[50, "relu"],
         adversary_model=[3, "relu"]
@@ -207,9 +206,7 @@ also be inferred from the data, if applicable.
       - argmax :math:`\hat y`
 
 *Note: currently, all data needs to be passed to the model in the first call
-to fit. If you really need to circumvent this, you can manually use*
-:code:`AdversarialFairness.__setup(X, Y, A)` *with a portion of the full
-dataset that contains at least every class once.*
+to fit.*
 
 Theoretical results of [#4]_ show that under some strong assumptions,
 including which loss we take,
