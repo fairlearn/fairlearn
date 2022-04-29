@@ -119,7 +119,7 @@ def plot_model_comparison(
     # --- VALIDATE INPUT ---
     y_preds = check_array(y_preds)
     _, y_true, sensitive_features, _ = _validate_and_reformat_input(
-        zeros((len(y_true),1)),  # Dummy values for X
+        zeros((len(y_true), 1)),  # Dummy values for X
         y=y_true,
         sensitive_features=sensitive_features,
     )
@@ -243,7 +243,7 @@ def plot_model_comparison(
             for i, mkws1 in enumerate(model_kwargs):
                 if not is_first[i]:
                     continue
-                for j, mkws2 in enumerate(model_kwargs[i + 1 :], start=i + 1):
+                for j, mkws2 in enumerate(model_kwargs[i + 1:], start=i + 1):
                     if mkws1 == mkws2:
                         is_first[j] = False
                         equivalence[i].append(j)
