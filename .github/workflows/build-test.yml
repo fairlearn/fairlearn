@@ -1,0 +1,17 @@
+name: build-test
+on: [push, pull_request]
+jobs:
+  build-test-job:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.8", "3.9", "3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install .
+      - run: pip install -r requirements-dev.txt
+      - run: pytest test/
