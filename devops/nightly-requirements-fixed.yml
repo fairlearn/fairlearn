@@ -1,6 +1,6 @@
 # Nightly build pipeline with requirements pinned to lower bounds (if any)
 # This does not run on MacOS due to issues with the pinned requirements
-# There are also issues with running on Python 3.9
+# There are also issues with running on Python 3.9, hence dependency removed (for now)
 
 variables:
   FreezeArtifactStem: 'freeze'
