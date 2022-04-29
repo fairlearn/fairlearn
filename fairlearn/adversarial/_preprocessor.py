@@ -225,7 +225,7 @@ def _get_type(data, assumption):
         if not np_all(np_sum(data, axis=1) == 1):
             raise ValueError(_TYPE_CHECK_ERROR.format("category"))
         u = unique(data)
-        if len(u) != 2 or (not isin([0,1], u).all()):
+        if len(u) != 2 or (not isin([0, 1], u).all()):
             raise ValueError(_INVALID_OHE)
 
     # Match inferred with dist_assumption

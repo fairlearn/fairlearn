@@ -14,7 +14,7 @@ import sys
 import numpy as np
 
 from fairlearn.adversarial._adversarial_mitigation import (
-    _AdversarialFairness, # We just test the base class because this covers all
+    _AdversarialFairness,  # We just test the base class because this covers all
 )
 from fairlearn.adversarial._pytorch_engine import PytorchEngine
 from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
