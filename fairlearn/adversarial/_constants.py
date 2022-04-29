@@ -12,6 +12,7 @@ _INVALID_DATA = (
     "Data of '{}' can not be interpreted. Only continuous data or array "
     + "with only 0s and 1s."
 )
+_INVALID_OHE = "One-hot-encoded matrix does not contain precisely 0 and 1"
 _PREDICTION_FUNCTION_AMBIGUOUS = (
     "Can not interpret prediction_function. Please provide a callable as "
     + "key-word argument that maps soft-probabilities "

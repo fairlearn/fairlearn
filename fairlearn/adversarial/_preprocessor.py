@@ -6,6 +6,7 @@ from ._constants import (
     _TYPE_CHECK_ERROR,
     _ARG_ERROR_MESSAGE,
     _TYPE_UNKNOWN_ERROR,
+    _INVALID_OHE,
 )
 from sklearn.utils import check_array
 from sklearn.preprocessing import OneHotEncoder
@@ -14,7 +15,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.multiclass import type_of_target
 from numpy import all as np_all
 from numpy import sum as np_sum
-from numpy import unique
+from numpy import unique, isin
 
 # FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
 
@@ -223,6 +224,9 @@ def _get_type(data, assumption):
         # or not? because it could be multiple categorical... who knows!
         if not np_all(np_sum(data, axis=1) == 1):
             raise ValueError(_TYPE_CHECK_ERROR.format("category"))
+        u = unique(data)
+        if len(u) != 2 or (not isin([0,1], u).all()):
+            raise ValueError(_INVALID_OHE)
 
     # Match inferred with dist_assumption
     if inferred == "binary" and assumption in [
