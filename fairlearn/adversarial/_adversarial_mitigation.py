@@ -196,7 +196,7 @@ class AdversarialFairness(BaseEstimator):
     epochs : int, default = 1
         Number of epochs to train for.
 
-    batch_size : int, default = -1
+    batch_size : int, default = 32
         Batch size. For no batching, set this to -1.
 
     shuffle : bool, default = False
@@ -267,7 +267,7 @@ class AdversarialFairness(BaseEstimator):
         learning_rate=0.001,
         alpha=1.0,
         epochs=1,
-        batch_size=-1,
+        batch_size=32,
         max_iter=-1,
         shuffle=False,
         shuffle_start=False,
