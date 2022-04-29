@@ -200,10 +200,7 @@ class AdversarialFairness(BaseEstimator):
         Batch size. For no batching, set this to -1.
 
     shuffle : bool, default = False
-        When true, shuffle the data between every epoch.
-    
-    shuffle_start : bool, default = False
-        When true, shuffle the data before the first epoch.
+        When true, shuffle the data before every epoch (including the first).
 
     progress_updates : number, optional, default = None
         If a number :math:`t` is provided, we print an update
@@ -270,7 +267,6 @@ class AdversarialFairness(BaseEstimator):
         batch_size=32,
         max_iter=-1,
         shuffle=False,
-        shuffle_start=False,
         progress_updates=None,
         skip_validation=False,
         callbacks=None,
@@ -297,7 +293,6 @@ class AdversarialFairness(BaseEstimator):
         self.batch_size = batch_size
         self.max_iter = max_iter
         self.shuffle = shuffle
-        self.shuffle_start = shuffle_start
         self.progress_updates = progress_updates
         self.skip_validation = skip_validation
         self.callbacks = callbacks
@@ -366,7 +361,6 @@ class AdversarialFairness(BaseEstimator):
 
         for kw, kwname in (
             (self.shuffle, "shuffle"),
-            (self.shuffle_start, "shuffle_start")
             (self.skip_validation, "skip_validation"),
             (self.warm_start, "warm_start"),
         ):
@@ -548,9 +542,7 @@ class AdversarialFairness(BaseEstimator):
 
         self.step_ = 0
         for epoch in range(epochs):
-            if (
-                (self.shuffle and epoch != 0) or self.shuffle_start
-            ):
+            if (self.shuffle):
                 X, Y, A = self.backendEngine_.shuffle(X, Y, A)
             for batch in range(batches):
                 if self.progress_updates:
