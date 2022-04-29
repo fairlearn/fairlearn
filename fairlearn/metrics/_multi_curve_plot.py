@@ -9,7 +9,7 @@ from ..utils._input_validation import (
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
 from typing import Callable, Union
-from numpy import amax, amin, array, unique, where
+from numpy import amax, amin, array
 from sklearn.utils.validation import check_array
 
 
@@ -25,6 +25,7 @@ def plot_model_comparison(
     point_labels=None,
     model_kwargs=None,
     legend=False,
+    legend_kwargs={},
     plot=True,
     **kwargs,
 ):
@@ -82,6 +83,12 @@ def plot_model_comparison(
         If True, add a legend. Must set
         :code:`model_kwargs[i]['label']` for every prediction :code:`i`.
 
+    legend_kwargs : dict
+        Keyword arguments passed to :py:func:`Axes.legend`. For instance,
+        :code:`legend_kwargs={'bbox_to_anchor': (1.03,1), 'loc': 'upper left'}`
+        will create a legend to the right of the Axes (subfigure), or
+        :code:`legend_kwargs={'ncol': 2}` will create two columns in the legend.
+
     plot : bool
         If true, call pyplot.plot. In any case, return axis
 
@@ -92,12 +99,12 @@ def plot_model_comparison(
 
     Notes
     -----
-    To offer flexibility in plotting style, just as the
-    underlying `matplotlib` provides,
-    one has three options: 1) change the style of the returned Axes
-    2) supply an Axes with your own style already applied
-    3) supply matplotlib arguments as you normally
-    would to `matplotlib.axes.Axes.scatter`
+    To offer flexibility in stylistic features besides the aforementioned
+    API options, one has at least three options: 1) supply matplotlib arguments
+    to :code:`plot_model_comparison` as you normally
+    would to :code:`matplotlib.axes.Axes.scatter`
+    2) change the style of the returned Axes
+    3) supply an Axes with your own style already applied
 
     In case no Axes object is supplied, axis labels are
     automatically inferred from their class name.
@@ -158,6 +165,13 @@ def plot_model_comparison(
                     )
                 )
 
+    if not isinstance(legend_kwargs, dict):
+        raise ValueError(
+            _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                "legend_kwargs", "dict", type(legend_kwargs).__name__
+            )
+        )
+
     # --- COMPUTE METRICS ---
     # try-except structure because we expect: metric(y_true, y_pred, sensitive_attribute)
     # but we have as fallback: metric(y_true, y_pred)
@@ -209,6 +223,7 @@ def plot_model_comparison(
             f(name.replace("_", " "))
 
     # Add point labels
+    # This could be nicer, but we rather not add a dependency on other packages.
     if point_labels is not None:
         for i, label in enumerate(point_labels):
             ax.text(x[i], y[i], label)
@@ -225,7 +240,7 @@ def plot_model_comparison(
             for i, mkws1 in enumerate(model_kwargs):
                 if not is_first[i]:
                     continue
-                for j, mkws2 in enumerate(model_kwargs[i + 1 :], start=i + 1):
+                for j, mkws2 in enumerate(model_kwargs[i + 1:], start=i + 1):
                     if mkws1 == mkws2:
                         is_first[j] = False
                         equivalence[i].append(j)
@@ -244,7 +259,7 @@ def plot_model_comparison(
                     kws.update(this_model_kwargs)
                     ax.scatter(x[index], y[index], **kws)
         if legend:
-            ax.legend()
+            ax.legend(**legend_kwargs)
     except AttributeError as e:
         # FIXME: Add some info, as this is probably because of wrong kwargs.
         raise e
