@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 from ..utils._input_validation import (
-    _validate_and_reformat_labels_and_sf,
+    _validate_and_reformat_input,
     _INCONSISTENT_ARRAY_LENGTH,
     _INPUT_DATA_FORMAT_ERROR_MESSAGE,
 )
@@ -11,6 +11,7 @@ from ._make_derived_metric import _DerivedMetric
 from typing import Callable, Union
 from numpy import amax, amin, array
 from sklearn.utils.validation import check_array
+from numpy import zeros
 
 
 def plot_model_comparison(
@@ -117,11 +118,13 @@ def plot_model_comparison(
 
     # --- VALIDATE INPUT ---
     y_preds = check_array(y_preds)
-
-    # Input validation
-    y_true, sensitive_features, _ = _validate_and_reformat_labels_and_sf(
-        y_true, sensitive_features=sensitive_features
+    _, y_true, sensitive_features, _ = _validate_and_reformat_input(
+        zeros((len(y_true),1)),  # Dummy values for X
+        y=y_true,
+        sensitive_features=sensitive_features,
     )
+    y_true = y_true.values
+    sensitive_features = sensitive_features.values
 
     if not len(y_true) == y_preds.shape[1]:
         raise ValueError(
@@ -240,7 +243,7 @@ def plot_model_comparison(
             for i, mkws1 in enumerate(model_kwargs):
                 if not is_first[i]:
                     continue
-                for j, mkws2 in enumerate(model_kwargs[i + 1:], start=i + 1):
+                for j, mkws2 in enumerate(model_kwargs[i + 1 :], start=i + 1):
                     if mkws1 == mkws2:
                         is_first[j] = False
                         equivalence[i].append(j)
