@@ -23,7 +23,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install .
       - run: pip install -r requirements-dev.txt
-      - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
+      - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml -m "not notebooks" test/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
         with:
