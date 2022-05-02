@@ -1,5 +1,7 @@
 [tool.black]
-line-length = 79
+line-length = 88
+target_version = ['py37', 'py38', 'py39', 'py310']
+preview = true
 
 [tool.pytest.ini_options]
 filterwarnings = [
