@@ -93,13 +93,11 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     def transform(self, X):
         """Transform X by applying the correlation remover."""
         X = check_array(X, estimator=self)
-        check_is_fitted(
-            self, ["beta_", "X_shape_", "lookup_", "sensitive_mean_"]
-        )
+        check_is_fitted(self, ["beta_", "X_shape_", "lookup_", "sensitive_mean_"])
         if self.X_shape_[1] != X.shape[1]:
             raise ValueError(
-                f"The trained data has {self.X_shape_[1]} features while this dataset has "
-                f"{X.shape[1]}."
+                f"The trained data has {self.X_shape_[1]} features while this dataset"
+                f" has {X.shape[1]}."
             )
         X_use, X_sensitive = self._split_X(X)
         X_s_center = X_sensitive - self.sensitive_mean_
@@ -118,6 +116,6 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
                 "check_transformer_data_not_an_array": (
                     "this estimator only accepts pandas dataframes or numpy "
                     "ndarray as input."
-                )
+                ),
             }
         }

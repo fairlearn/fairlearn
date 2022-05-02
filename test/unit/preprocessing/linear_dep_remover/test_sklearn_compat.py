@@ -73,8 +73,6 @@ def test_linear_dependence_pd():
 
     df = pd.DataFrame(X, columns=["a", "b", "c"])
 
-    X_tfm = (
-        CorrelationRemover(sensitive_feature_ids=["a"]).fit(df).transform(df)
-    )
+    X_tfm = CorrelationRemover(sensitive_feature_ids=["a"]).fit(df).transform(df)
     assert X_tfm.shape[1] == 2
     assert np.allclose(X_tfm[:, 0], 1.5)

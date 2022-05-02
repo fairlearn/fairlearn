@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 
-class ThresholdOperation():
+class ThresholdOperation:
     """Represents the threshold operations that are used in postprocessing approaches.
 
     Threshold operations simply indicate a threshold and an operator, thereby defining a function.
@@ -18,7 +18,7 @@ class ThresholdOperation():
     """
 
     def __init__(self, operator, threshold):
-        if operator not in ['>', '<']:
+        if operator not in [">", "<"]:
             raise ValueError("Unrecognized operator: " + operator)
         self._operator = operator
         self._threshold = threshold
@@ -41,9 +41,9 @@ class ThresholdOperation():
         :return: the result of elementwise application of the threshold rule
         :rtype: array
         """
-        if self._operator == '>':
+        if self._operator == ">":
             return y_hat > self._threshold
-        elif self._operator == '<':
+        elif self._operator == "<":
             return y_hat < self._threshold
         else:
             raise ValueError("Unrecognized operator: " + self._operator)
