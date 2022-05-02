@@ -31,6 +31,7 @@ from sklearn.utils import Bunch
 from ..utils._common import _get_soft_predictions
 from ..utils._input_validation import (
     _validate_and_reformat_input,
+    _encode_y,
     _KW_CONTROL_FEATURES,
 )
 from ._constants import (
@@ -202,6 +203,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             From version 0.7, 'predict' is deprecated as the default value and
             the default will change to 'auto' from v0.10.
 
+    pos_label : object
+        The label object to regard as the positive label.
+
     Notes
     -----
     The procedure is based on the algorithm of
@@ -243,7 +247,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         grid_size=1000,
         flip=False,
         prefit=False,
-        predict_method="deprecated"
+        predict_method="deprecated",
+        pos_label=None
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -252,6 +257,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.flip = flip
         self.prefit = prefit
         self.predict_method = predict_method
+        self.pos_label = pos_label
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -302,19 +308,19 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         if kwargs.get(_KW_CONTROL_FEATURES) is not None:
             raise ValueError(NO_CONTROL_FEATURES)
 
-        _, _, sensitive_feature_vector, _ = _validate_and_reformat_input(
+        _, y, sensitive_feature_vector, _ = _validate_and_reformat_input(
             X,
             y,
             sensitive_features=sensitive_features,
             enforce_binary_labels=True,
         )
 
-        # postprocessing can't handle 0/1 as floating point numbers, so this
-        # converts it to int
-        if type(y) in [np.ndarray, pd.DataFrame, pd.Series]:
-            y = y.astype(int)
-        else:
-            y = [int(y_val) for y_val in y]
+        self.classes_, y = _encode_y(
+            y,
+            pos_label=self.pos_label,
+            check=False,
+            enforce_binary=True
+        )
 
         if not self.prefit:
             # Following is on two lines due to issue when estimator comes from
@@ -375,9 +381,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             a scalar. Otherwise the result will be a vector.
         """
         check_is_fitted(self)
-        return self.interpolated_thresholder_.predict(
+        y = self.interpolated_thresholder_.predict(
             X, sensitive_features=sensitive_features, random_state=random_state
         )
+        return self.classes_[y]
 
     def _pmf_predict(self, X, *, sensitive_features):
         """Probabilistic mass function.

@@ -10,13 +10,13 @@ import pytest
 from fairlearn.utils._input_validation import (
     _MESSAGE_Y_NONE,
     _MESSAGE_SENSITIVE_FEATURES_NONE,
-    _LABELS_NOT_0_1_ERROR_MESSAGE)
+    _LABELS_NOT_BINARY_ERROR_MESSAGE)
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import (
     NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
-from fairlearn.postprocessing._tradeoff_curve_utilities import DEGENERATE_LABELS_ERROR_MESSAGE
-from .conftest import (sensitive_features_ex1, labels_ex, degenerate_labels_ex,
+from .conftest import (sensitive_features_ex1, labels_ex, labels_ex_string,
+                       degenerate_labels_ex,
                        scores_ex, sensitive_feature_names_ex1, X_ex,
                        _get_predictions_by_sensitive_feature,
                        ExamplePredictor,
@@ -98,7 +98,7 @@ def test_threshold_optimization_non_binary_labels(data_X_y_sf, constraints):
                                             constraints=constraints,
                                             predict_method='predict')
 
-    with pytest.raises(ValueError, match=_LABELS_NOT_0_1_ERROR_MESSAGE):
+    with pytest.raises(ValueError, match=_LABELS_NOT_BINARY_ERROR_MESSAGE):
         adjusted_predictor.fit(data_X_y_sf.X, non_binary_y,
                                sensitive_features=data_X_y_sf.sensitive_features)
 
@@ -120,8 +120,7 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
                                             constraints=constraints,
                                             predict_method='predict')
 
-    feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
-    with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):
+    with pytest.raises(ValueError, match=_LABELS_NOT_BINARY_ERROR_MESSAGE):
         adjusted_predictor.fit(data_X_sf.X, y,
                                sensitive_features=data_X_sf.sensitive_features)
 
@@ -175,17 +174,24 @@ class PassThroughPredictor(BaseEstimator):
 @pytest.mark.parametrize("score_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("y_transform", candidate_Y_transforms)
 @pytest.mark.parametrize("sensitive_features_transform", candidate_A_transforms)
+@pytest.mark.parametrize("y_data", [labels_ex, labels_ex_string])
+@pytest.mark.parametrize("pos_label", [None, True])
 def test_threshold_optimization_demographic_parity(score_transform, y_transform,
-                                                   sensitive_features_transform):
-    y = y_transform(labels_ex)
+                                                   sensitive_features_transform,
+                                                   y_data, pos_label):
+    y = y_transform(y_data)
+    if pos_label is not None:
+        pos_label = 1 if y_data is labels_ex else 'y'
     sensitive_features = sensitive_features_transform(sensitive_features_ex1)
     # PassThroughPredictor takes scores_ex as input in predict and
     # returns score_transform(scores_ex) as output
     estimator = ThresholdOptimizer(estimator=PassThroughPredictor(score_transform),
                                    constraints='demographic_parity',
                                    flip=True,
-                                   predict_method='predict')
-    estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
+                                   predict_method='predict',
+                                   pos_label=pos_label)
+    estimator.fit(pd.DataFrame(scores_ex),
+                  y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
         return estimator._pmf_predict(

@@ -22,6 +22,8 @@ _INPUT_DATA_FORMAT_ERROR_MESSAGE = "The only allowed input data formats for {} a
     "Your provided data was of type {}."
 _EMPTY_INPUT_ERROR_MESSAGE = "At least one of sensitive_features, labels, or scores are empty."
 _LABELS_NOT_0_1_ERROR_MESSAGE = "Supplied y labels are not 0 or 1"
+_LABELS_NOT_BINARY_ERROR_MESSAGE = "Supplied y labels are not binary"
+_LABELS_MISSING_POS_LABEL = "The supplied pos_label is not a label in the data."
 _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE = "{} is a {} with more than one column"
 _NOT_ALLOWED_TYPE_ERROR_MESSAGE = "{} is not an ndarray, Series or DataFrame"
 _NDARRAY_NOT_TWO_DIMENSIONAL_ERROR_MESSAGE = "{} is an ndarray which is not 2D"
@@ -70,9 +72,9 @@ def _validate_and_reformat_input(X, y=None, expect_y=True, enforce_binary_labels
             y = y.to_numpy().reshape(-1)
 
         X, y = check_X_y(X, y, dtype=None, force_all_finite=False)
-        y = check_array(y, ensure_2d=False, dtype='numeric')
-        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
-            raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
+        y = check_array(y, ensure_2d=False, dtype=None)
+        if enforce_binary_labels and not len(np.unique(y)) <= 2:
+            raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
     else:
@@ -140,3 +142,46 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
                .replace(_MERGE_COLUMN_SEPARATOR,
                         "\\" + _MERGE_COLUMN_SEPARATOR)
                for i in range(len(row))]), axis=1).values
+
+
+def _encode_y(y, pos_label=None, check=True, enforce_binary=False):
+    """
+    Encode discrete target column from objects to numerical.
+
+    Parameters
+    ----------
+    y : numpy.ndarray
+        Array of targets to encode
+    pos_label : the positive label
+        The label object to regard as the positive label.
+    check : bool
+        Whether to use scikit-learn's check_array on y. May be False if
+        :meth:`_validate_and_reformat_input` was called before this.
+    enforce_binary : bool
+        Enforce that there must be two unique values in y.
+
+    Returns
+    -------
+    (classes, y) : Tuple(list, array)
+        Returns the classes (unique values) of y, and the encoding of y s.t.
+        :code:`classes[y] = original y`.
+    """
+    if check:
+        y = check_array(y, ensure_2d=False, dtype=None)
+    if pos_label is not None:
+        labels = np.unique(y)
+        if not len(labels) == 2:  # Even if not enforcing binary.
+            raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
+        if pos_label == labels[0]:
+            classes = [labels[1], labels[0]]
+        elif pos_label == labels[1]:
+            classes = [labels[0], labels[1]]
+        else:
+            raise ValueError(_LABELS_MISSING_POS_LABEL)
+        y = (y == pos_label).astype(int)
+    else:
+        classes, y = np.unique(y, return_inverse=True)
+        if enforce_binary and len(classes) != 2:
+            raise ValueError(_LABELS_NOT_BINARY_ERROR_MESSAGE)
+        # else: do we want to enforce pos_label to be set?
+    return classes, y

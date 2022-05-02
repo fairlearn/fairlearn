@@ -26,6 +26,7 @@ sensitive_feature_names_ex2 = ["x", "Y"]
 sensitive_features_ex2 = np.array([x for x in 'xxxYYYY' 'xYYYYYx' 'YYYYYY']).reshape(-1, 1)
 
 labels_ex = np.array([int(x) for x in '0110100' '0010111' '000111'])
+labels_ex_string = np.array([x for x in 'xyyxyxx' 'xxyxyyy' 'xxxyyy'])
 degenerate_labels_ex = np.array([int(x) for x in '0000000' '0000000' '000000'])
 scores_ex = np.array([int(x) for x in '0011233' '0001111' '011112'])
 
