@@ -2,13 +2,13 @@ name: build-test
 
 on: [push, pull_request]
 
+concurrency: 
+  # this ensures after each commit the old jobs are cancelled and the new ones
+  # run instead.
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  concurrency: 
-    # this ensures after each commit the old jobs are cancelled and the new ones
-    # run instead.
-    group: ${{ github.head_ref || github.run_id }}
-    cancel-in-progress: true
-  
   all-deps:
     # this job installs all dependencies and runs most tests
     strategy:
