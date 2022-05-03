@@ -242,7 +242,8 @@ plot_model_comparison(
     x_axis_metric=skm.accuracy_score,
     y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
     y_true=Y_test,
-    y_preds=predictions,
+    y_preds=[predictions[k] for k in predictions],
+    point_labels=[k for k in predictions],
     sensitive_features=A_test
 )
 # End model comparison
