@@ -66,7 +66,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         conservative automatic setting based on the statistical uncertainty
         in measuring classification error
 
-    eta_0 : float
+    eta0 : float
         Initial setting of the learning rate
 
         .. versionadded:: 0.5.0
