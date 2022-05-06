@@ -32,22 +32,23 @@ GridSearch with Census Data
 # We start by importing the various modules we're going to use:
 #
 
-from sklearn.model_selection import train_test_split
-from fairlearn.reductions import GridSearch
-from fairlearn.reductions import DemographicParity, ErrorRate
-from fairlearn.metrics import MetricFrame, selection_rate, count
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn import metrics as skm
 import pandas as pd
+from sklearn import metrics as skm
+from sklearn.datasets import fetch_openml
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+from fairlearn.metrics import MetricFrame, count, selection_rate
+from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
 
-from sklearn.datasets import fetch_openml
+
 data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
-Y = (data.target == '>50K') * 1
+Y = (data.target == ">50K") * 1
 X_raw
 
 # %%
@@ -59,7 +60,7 @@ X_raw
 # data into a format suitable for the ML algorithms
 
 A = X_raw["sex"]
-X = X_raw.drop(labels=['sex'], axis=1)
+X = X_raw.drop(labels=["sex"], axis=1)
 X = pd.get_dummies(X)
 
 sc = StandardScaler()
@@ -72,12 +73,9 @@ Y = le.fit_transform(Y)
 # %%
 # Finally, we split the data into training and test sets:
 
-X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(X_scaled,
-                                                                     Y,
-                                                                     A,
-                                                                     test_size=0.2,
-                                                                     random_state=0,
-                                                                     stratify=Y)
+X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(
+    X_scaled, Y, A, test_size=0.2, random_state=0, stratify=Y
+)
 
 # Work around indexing bug
 X_train = X_train.reset_index(drop=True)
@@ -94,23 +92,31 @@ A_test = A_test.reset_index(drop=True)
 # For speed of demonstration, we use the simple
 # :class:`sklearn.linear_model.LogisticRegression` class:
 
-unmitigated_predictor = LogisticRegression(solver='liblinear', fit_intercept=True)
+unmitigated_predictor = LogisticRegression(solver="liblinear", fit_intercept=True)
 
 unmitigated_predictor.fit(X_train, Y_train)
 
 # %%
 # We can start to assess the predictor's fairness using the `MetricFrame`:
-metric_frame = MetricFrame(metrics={"accuracy": skm.accuracy_score,
-                                    "selection_rate": selection_rate,
-                                    "count": count},
-                           sensitive_features=A_test,
-                           y_true=Y_test,
-                           y_pred=unmitigated_predictor.predict(X_test))
+metric_frame = MetricFrame(
+    metrics={
+        "accuracy": skm.accuracy_score,
+        "selection_rate": selection_rate,
+        "count": count,
+    },
+    sensitive_features=A_test,
+    y_true=Y_test,
+    y_pred=unmitigated_predictor.predict(X_test),
+)
 print(metric_frame.overall)
 print(metric_frame.by_group)
 metric_frame.by_group.plot.bar(
-        subplots=True, layout=[3, 1], legend=False, figsize=[12, 8],
-        title='Accuracy and selection rate by group')
+    subplots=True,
+    layout=[3, 1],
+    legend=False,
+    figsize=[12, 8],
+    title="Accuracy and selection rate by group",
+)
 
 # %%
 # Looking at the disparity in accuracy, we see that males have an error
@@ -143,9 +149,11 @@ metric_frame.by_group.plot.bar(
 # We are using this metric for the sake of simplicity; in general, the appropriate fairness
 # metric will not be obvious.
 
-sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
-                   constraints=DemographicParity(),
-                   grid_size=71)
+sweep = GridSearch(
+    LogisticRegression(solver="liblinear", fit_intercept=True),
+    constraints=DemographicParity(),
+    grid_size=71,
+)
 
 # %%
 # Our algorithms provide :code:`fit()` and :code:`predict()` methods, so they behave in a similar manner
@@ -156,8 +164,7 @@ sweep = GridSearch(LogisticRegression(solver='liblinear', fit_intercept=True),
 # After :code:`fit()` completes, we extract the full set of predictors from the
 # :class:`fairlearn.reductions.GridSearch` object.
 
-sweep.fit(X_train, Y_train,
-          sensitive_features=A_train)
+sweep.fit(X_train, Y_train, sensitive_features=A_train)
 
 predictors = sweep.predictors_
 
@@ -173,7 +180,9 @@ predictors = sweep.predictors_
 
 errors, disparities = [], []
 for m in predictors:
-    def classifier(X): return m.predict(X)
+
+    def classifier(X):
+        return m.predict(X)
 
     error = ErrorRate()
     error.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
@@ -183,11 +192,15 @@ for m in predictors:
     errors.append(error.gamma(classifier)[0])
     disparities.append(disparity.gamma(classifier).max())
 
-all_results = pd.DataFrame({"predictor": predictors, "error": errors, "disparity": disparities})
+all_results = pd.DataFrame(
+    {"predictor": predictors, "error": errors, "disparity": disparities}
+)
 
 non_dominated = []
 for row in all_results.itertuples():
-    errors_for_lower_or_eq_disparity = all_results["error"][all_results["disparity"] <= row.disparity]
+    errors_for_lower_or_eq_disparity = all_results["error"][
+        all_results["disparity"] <= row.disparity
+    ]
     if row.error <= errors_for_lower_or_eq_disparity.min():
         non_dominated.append(row.predictor)
 
@@ -200,16 +213,24 @@ for i in range(len(non_dominated)):
     key = "dominant_model_{0}".format(i)
     predictions[key] = non_dominated[i].predict(X_test)
 
-    metric_frames[key] = MetricFrame(metrics={"accuracy": skm.accuracy_score,
-                                              "selection_rate": selection_rate,
-                                              "count": count},
-                                     sensitive_features=A_test,
-                                     y_true=Y_test,
-                                     y_pred=predictions[key])
+    metric_frames[key] = MetricFrame(
+        metrics={
+            "accuracy": skm.accuracy_score,
+            "selection_rate": selection_rate,
+            "count": count,
+        },
+        sensitive_features=A_test,
+        y_true=Y_test,
+        y_pred=predictions[key],
+    )
 
 import matplotlib.pyplot as plt
-x = [metric_frame.overall['accuracy'] for metric_frame in metric_frames.values()]
-y = [metric_frame.difference()['selection_rate'] for metric_frame in metric_frames.values()]
+
+x = [metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()]
+y = [
+    metric_frame.difference()["selection_rate"]
+    for metric_frame in metric_frames.values()
+]
 keys = list(metric_frames.keys())
 plt.scatter(x, y)
 for i in range(len(x)):

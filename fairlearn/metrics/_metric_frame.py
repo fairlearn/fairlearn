@@ -3,19 +3,18 @@
 
 import copy
 import logging
-import numpy as np
-import pandas as pd
-from typing import Any, Callable, Dict, List, Optional, Union
-from sklearn.utils import check_consistent_length
 import warnings
 from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from fairlearn.metrics._input_manipulations import (
-    _convert_to_ndarray_and_squeeze,
-)
-from ._group_feature import GroupFeature
+import numpy as np
+import pandas as pd
+from sklearn.utils import check_consistent_length
+
+from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
+
 from ._annotated_metric_function import AnnotatedMetricFunction
-
+from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,7 @@ _SF_DICT_CONVERSION_FAILURE = (
     "Please ensure each array is strictly 1-D. "
     "The __cause__ field of this exception may contain further information."
 )
-_BAD_FEATURE_LENGTH = (
-    "Received a feature of length {0} when length {1} was expected"
-)
+_BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
 _SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = (
@@ -43,8 +40,7 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
     "Keys in 'sample_params' do not match those in 'metric'"
 )
 _INVALID_ERRORS_VALUE_ERROR_MESSAGE = (
-    "Invalid error value specified. "
-    "Valid values are {0}".format(_VALID_ERROR_STRING)
+    "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
 )
 _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = (
     "Invalid grouping function specified. Valid values are {0}".format(
@@ -52,8 +48,8 @@ _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = (
     )
 )
 _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
-    "Metric frame contains non-scalar cells. "
-    "Please remove non-scalar columns from your metric frame or use parameter errors='coerce'."
+    "Metric frame contains non-scalar cells. Please remove non-scalar columns from your"
+    " metric frame or use parameter errors='coerce'."
 )
 
 
@@ -99,19 +95,17 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
             raise TypeError(
                 f"{new_metric_frame_init.__name__}() takes 1 positional "
                 f"argument but {1+len(args)} positional arguments "
-                f"were given"
+                "were given"
             )
 
         # If 1-3 positional arguments are provided (apart fom self), issue warning.
         if len(args) > 0:
-            args_msg = ", ".join(
-                [f"'{name}'" for name in positional_dict.keys()]
-            )
+            args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
             warnings.warn(
                 f"You have provided {args_msg} as positional arguments. "
-                f"Please pass them as keyword arguments. From version "
+                "Please pass them as keyword arguments. From version "
                 f"{version} passing them as positional arguments "
-                f"will result in an error.",
+                "will result in an error.",
                 FutureWarning,
             )
 
@@ -120,18 +114,16 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
             warnings.warn(
-                f"The positional argument 'metric' has been replaced "
-                f"by a keyword argument 'metrics'. "
+                "The positional argument 'metric' has been replaced "
+                "by a keyword argument 'metrics'. "
                 f"From version {version} passing it as a positional argument "
-                f"or as a keyword argument 'metric' will result in an error",
+                "or as a keyword argument 'metric' will result in an error",
                 FutureWarning,
             )
 
         # Call the new constructor with positional arguments passed as keyword arguments
         # and with the `metric` keyword argument renamed to `metrics`.
-        new_metric_frame_init(
-            self, **metric_arg_dict, **positional_dict, **kwargs
-        )
+        new_metric_frame_init(self, **metric_arg_dict, **positional_dict, **kwargs)
 
     return compatible_metric_frame_init
 
@@ -327,18 +319,12 @@ class MetricFrame:
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        all_data = pd.DataFrame.from_dict(
-            {"y_true": list(y_t), "y_pred": list(y_p)}
-        )
+        all_data = pd.DataFrame.from_dict({"y_true": list(y_t), "y_pred": list(y_p)})
 
-        annotated_funcs = self._process_functions(
-            metrics, sample_params, all_data
-        )
+        annotated_funcs = self._process_functions(metrics, sample_params, all_data)
 
         # Now, prepare the sensitive features
-        sf_list = self._process_features(
-            "sensitive_feature_", sensitive_features, y_t
-        )
+        sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
         self._sf_names = [x.name_ for x in sf_list]
 
         # Prepare the control features
@@ -346,9 +332,7 @@ class MetricFrame:
         cf_list = None
         self._cf_names = None
         if control_features is not None:
-            cf_list = self._process_features(
-                "control_feature_", control_features, y_t
-            )
+            cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name_ for x in cf_list]
 
         # Add sensitive and conditional features to all_data
@@ -548,25 +532,19 @@ class MetricFrame:
                         vals, index=self._by_group.columns, dtype="object"
                     )
                 except ValueError as ve:
-                    raise ValueError(
-                        _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
-                    ) from ve
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 if not self.control_levels:
                     mf = self._by_group
                     # Fill in the possible min/max values, else np.nan
                     if grouping_function == "min":
                         vals = [
-                            mf[m].min()
-                            if np.isscalar(mf[m].values[0])
-                            else np.nan
+                            mf[m].min() if np.isscalar(mf[m].values[0]) else np.nan
                             for m in mf.columns
                         ]
                     else:
                         vals = [
-                            mf[m].max()
-                            if np.isscalar(mf[m].values[0])
-                            else np.nan
+                            mf[m].max() if np.isscalar(mf[m].values[0]) else np.nan
                             for m in mf.columns
                         ]
 
@@ -575,17 +553,11 @@ class MetricFrame:
             if errors == "raise":
                 try:
                     if grouping_function == "min":
-                        result = self._by_group.groupby(
-                            level=self.control_levels
-                        ).min()
+                        result = self._by_group.groupby(level=self.control_levels).min()
                     else:
-                        result = self._by_group.groupby(
-                            level=self.control_levels
-                        ).max()
+                        result = self._by_group.groupby(level=self.control_levels).max()
                 except ValueError as ve:
-                    raise ValueError(
-                        _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
-                    ) from ve
+                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self._by_group.copy()
@@ -603,9 +575,7 @@ class MetricFrame:
         else:
             return result
 
-    def group_max(
-        self, errors: str = "raise"
-    ) -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -631,9 +601,7 @@ class MetricFrame:
         """
         return self.__group("max", errors)
 
-    def group_min(
-        self, errors: str = "raise"
-    ) -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
@@ -762,9 +730,7 @@ class MetricFrame:
 
         result = None
         if method == "between_groups":
-            result = self.group_min(errors=errors) / self.group_max(
-                errors=errors
-            )
+            result = self.group_min(errors=errors) / self.group_max(errors=errors)
         elif method == "to_overall":
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
@@ -794,9 +760,7 @@ class MetricFrame:
                 else:
                     result = ratios.min().unstack(0)
         else:
-            raise ValueError(
-                "Unrecognised method '{0}' in ratio() call".format(method)
-            )
+            raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
         return result
 
@@ -830,15 +794,11 @@ class MetricFrame:
                 if name in s_p:
                     curr_s_p = s_p[name]
 
-                amf = self._process_one_function(
-                    func, name, curr_s_p, all_data
-                )
+                amf = self._process_one_function(func, name, curr_s_p, all_data)
                 func_dict[amf.name] = amf
         else:
             # This is the case where the user has supplied a single metric function
-            amf = self._process_one_function(
-                metric, None, sample_params, all_data
-            )
+            amf = self._process_one_function(metric, None, sample_params, all_data)
             func_dict[amf.name] = amf
         return func_dict
 
@@ -889,9 +849,7 @@ class MetricFrame:
             for i in range(len(features.columns)):
                 col_name = features.columns[i]
                 if not isinstance(col_name, str):
-                    msg = _FEATURE_DF_COLUMN_BAD_NAME.format(
-                        col_name, type(col_name)
-                    )
+                    msg = _FEATURE_DF_COLUMN_BAD_NAME.format(col_name, type(col_name))
                     raise ValueError(msg)
                 column = features.iloc[:, i]
                 check_consistent_length(column, sample_array)
@@ -912,9 +870,7 @@ class MetricFrame:
             for i in range(len(df.columns)):
                 col_name = df.columns[i]
                 if not isinstance(col_name, str):
-                    msg = _FEATURE_DF_COLUMN_BAD_NAME.format(
-                        col_name, type(col_name)
-                    )
+                    msg = _FEATURE_DF_COLUMN_BAD_NAME.format(col_name, type(col_name))
                     raise ValueError(msg)
                 column = df.iloc[:, i]
                 check_consistent_length(column, sample_array)

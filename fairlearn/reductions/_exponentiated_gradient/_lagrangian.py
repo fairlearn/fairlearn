@@ -2,22 +2,25 @@
 # Licensed under the MIT License.
 
 import logging
+from time import time
+
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
 from sklearn import clone
 from sklearn.dummy import DummyClassifier
-from time import time
-
-from ._constants import _PRECISION, _INDENTATION, _LINE
 
 from fairlearn.reductions._moments import ClassificationMoment
+
+from ._constants import _INDENTATION, _LINE, _PRECISION
 
 logger = logging.getLogger(__name__)
 
 
-_MESSAGE_BAD_OBJECTIVE = "Objective needs to be of the same type as constraints. "\
+_MESSAGE_BAD_OBJECTIVE = (
+    "Objective needs to be of the same type as constraints. "
     "Objective is {}, constraints are {}."
+)
 
 
 class _Lagrangian:
@@ -61,7 +64,7 @@ class _Lagrangian:
         objective=None,
         opt_lambda=True,
         sample_weight_name="sample_weight",
-        **kwargs
+        **kwargs,
     ):
         self.constraints = constraints
         self.constraints.load_data(X, y, **kwargs)
@@ -121,9 +124,7 @@ class _Lagrangian:
 
         if self.opt_lambda:
             lambda_projected = self.constraints.project_lambda(lambda_vec)
-            L = error + np.sum(
-                lambda_projected * (gamma - self.constraints.bound())
-            )
+            L = error + np.sum(lambda_projected * (gamma - self.constraints.bound()))
         else:
             L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
@@ -141,9 +142,7 @@ class _Lagrangian:
         for mul in [1.0, 2.0, 5.0, 10.0]:
             _, h_hat_idx = self.best_h(mul * lambda_hat)
             logger.debug("%smul=%.0f", _INDENTATION, mul)
-            L_low_mul, _, _, _ = self._eval(
-                pd.Series({h_hat_idx: 1.0}), lambda_hat
-            )
+            L_low_mul, _, _, _ = self._eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
                 result.L_low = L_low_mul
             if result.gap() > nu + _PRECISION:
@@ -171,9 +170,7 @@ class _Lagrangian:
         )
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
-        dual_A_ub = np.concatenate(
-            (-A_ub.transpose(), A_eq.transpose()), axis=1
-        )
+        dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [
             (None, None) if i == n_constraints else (0, None)
@@ -196,9 +193,8 @@ class _Lagrangian:
         return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
-        signed_weights = (
-            self.obj.signed_weights()
-            + self.constraints.signed_weights(lambda_vec)
+        signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(
+            lambda_vec
         )
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
@@ -212,9 +208,7 @@ class _Lagrangian:
         estimator = None
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
-            estimator = DummyClassifier(
-                strategy="constant", constant=redY_unique[0]
-            )
+            estimator = DummyClassifier(strategy="constant", constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
             # use sklearn.base.clone to clone the estimator.
@@ -225,9 +219,7 @@ class _Lagrangian:
             estimator = clone(estimator=self.estimator, safe=False)
 
         oracle_call_start_time = time()
-        estimator.fit(
-            self.constraints.X, redY, **{self.sample_weight_name: redW}
-        )
+        estimator.fit(self.constraints.X, redY, **{self.sample_weight_name: redW})
         self.oracle_execution_times.append(time() - oracle_call_start_time)
         self.n_oracle_calls += 1
 
@@ -262,9 +254,7 @@ class _Lagrangian:
             best_value = np.PINF
 
         if h_value < best_value - _PRECISION:
-            logger.debug(
-                "%sbest_h: val improvement %f", _LINE, best_value - h_value
-            )
+            logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
             h_idx = len(self.hs)
             self.hs.at[h_idx] = h
             self.predictors.at[h_idx] = classifier
