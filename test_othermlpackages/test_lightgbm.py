@@ -1,20 +1,20 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from . import package_test_common as ptc
+import lightgbm as lgb
 
 from fairlearn.reductions import DemographicParity
 
-import lightgbm as lgb
+from . import package_test_common as ptc
 
 
 def test_expgrad_classification():
     lgb_params = {
-        'objective': 'binary',
-        'metric': 'auc',
-        'learning_rate': 0.03,
-        'num_leaves': 10,
-        'max_depth': 3
+        "objective": "binary",
+        "metric": "auc",
+        "learning_rate": 0.03,
+        "num_leaves": 10,
+        "max_depth": 3,
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
     disparity_moment = DemographicParity()
@@ -24,11 +24,11 @@ def test_expgrad_classification():
 
 def test_gridsearch_classification():
     lgb_params = {
-        'objective': 'binary',
-        'metric': 'auc',
-        'learning_rate': 0.03,
-        'num_leaves': 10,
-        'max_depth': 3
+        "objective": "binary",
+        "metric": "auc",
+        "learning_rate": 0.03,
+        "num_leaves": 10,
+        "max_depth": 3,
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
     disparity_moment = DemographicParity()
@@ -38,11 +38,11 @@ def test_gridsearch_classification():
 
 def test_thresholdoptimizer_classification():
     lgb_params = {
-        'objective': 'binary',
-        'metric': 'auc',
-        'learning_rate': 0.03,
-        'num_leaves': 10,
-        'max_depth': 3
+        "objective": "binary",
+        "metric": "auc",
+        "learning_rate": 0.03,
+        "num_leaves": 10,
+        "max_depth": 3,
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
 

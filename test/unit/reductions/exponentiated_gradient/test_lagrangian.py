@@ -2,33 +2,32 @@
 # Licensed under the MIT License.
 
 from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.base import BaseEstimator
 from sklearn.dummy import DummyClassifier
 
-from fairlearn.reductions._exponentiated_gradient._lagrangian import (
-    _Lagrangian,
-)
 from fairlearn.reductions import (
+    BoundedGroupLoss,
     DemographicParity,
     EqualizedOdds,
-    TruePositiveRateParity,
-    FalsePositiveRateParity,
-    ErrorRateParity,
-    BoundedGroupLoss,
-    LossMoment,
-    ZeroOneLoss,
     ErrorRate,
+    ErrorRateParity,
+    FalsePositiveRateParity,
+    LossMoment,
+    TruePositiveRateParity,
+    ZeroOneLoss,
 )
-from fairlearn.reductions._moments.bounded_group_loss import MeanLoss
 from fairlearn.reductions._exponentiated_gradient._lagrangian import (
     _MESSAGE_BAD_OBJECTIVE,
+    _Lagrangian,
 )
+from fairlearn.reductions._moments.bounded_group_loss import MeanLoss
 
-from .test_utilities import _get_data
 from .simple_learners import LeastSquaresBinaryClassifierLearner, MockEstimator
+from .test_utilities import _get_data
 
 _PRECISION = 1e-6
 
@@ -96,9 +95,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
         )
     else:
         L_expected = (
-            best_h_error
-            + np.sum(lambda_vec * best_h_gamma)
-            - eps * np.sum(lambda_vec)
+            best_h_error + np.sum(lambda_vec * best_h_gamma) - eps * np.sum(lambda_vec)
         )
 
     L_high_expected = best_h_error + B * (best_h_gamma.max() - eps)
@@ -116,12 +113,8 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
 
     # in this particular example the estimator is always the same
     expected_estimator_weights = {
-        "regression": pd.Series(
-            {"X1": 0.541252, "X2": 0.454293, "X3": 0.019203}
-        ),
-        "classification": pd.Series(
-            {"X1": 0.538136, "X2": 0.457627, "X3": 0.021186}
-        ),
+        "regression": pd.Series({"X1": 0.541252, "X2": 0.454293, "X3": 0.019203}),
+        "classification": pd.Series({"X1": 0.538136, "X2": 0.457627, "X3": 0.021186}),
     }
     assert (
         np.isclose(
@@ -256,9 +249,12 @@ def test_objective_constraints_compatibility(Constraints, Objective):
                 B=1.0,
                 sensitive_features=A,
             )
-        assert _MESSAGE_BAD_OBJECTIVE.format(
-            objective._moment_type(), constraints._moment_type()
-        ) in execInfo.value.args[0]
+        assert (
+            _MESSAGE_BAD_OBJECTIVE.format(
+                objective._moment_type(), constraints._moment_type()
+            )
+            in execInfo.value.args[0]
+        )
     else:
         # No exception raised
         _ = _Lagrangian(
@@ -286,9 +282,7 @@ def get_lambda_new_weights_and_labels(constraints, X, y, A):
     lambda_vec = get_lambda_vec(constraints, X, y, A)
     objective = constraints.default_objective()
     objective.load_data(X, y, sensitive_features=A)
-    signed_weights = objective.signed_weights() + constraints.signed_weights(
-        lambda_vec
-    )
+    signed_weights = objective.signed_weights() + constraints.signed_weights(lambda_vec)
 
     if isinstance(constraints, LossMoment):
         redY = y

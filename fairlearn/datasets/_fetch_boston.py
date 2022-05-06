@@ -5,13 +5,15 @@ import pathlib
 import warnings
 
 from sklearn.datasets import fetch_openml
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 from fairlearn.exceptions import DataFairnessWarning
 
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
-def fetch_boston(*, cache=True, data_home=None,
-                 as_frame=False, return_X_y=False, warn=True):
+
+def fetch_boston(
+    *, cache=True, data_home=None, as_frame=False, return_X_y=False, warn=True
+):
     """Load the boston housing dataset (regression).
 
     Download it if necessary.

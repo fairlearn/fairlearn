@@ -3,16 +3,17 @@
 
 import copy
 import logging
+from time import time
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.dummy import DummyClassifier
 from sklearn.utils.validation import check_is_fitted
-from time import time
 
-from fairlearn.reductions._moments import Moment, ClassificationMoment
+from fairlearn.reductions._moments import ClassificationMoment, Moment
+
 from ._grid_generator import _GridGenerator
-
 
 logger = logging.getLogger(__name__)
 
@@ -74,23 +75,25 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
     """
 
-    def __init__(self,
-                 estimator,
-                 constraints,
-                 selection_rule=TRADEOFF_OPTIMIZATION,
-                 constraint_weight=0.5,
-                 grid_size=10,
-                 grid_limit=2.0,
-                 grid_offset=None,
-                 grid=None,
-                 sample_weight_name="sample_weight"):
+    def __init__(
+        self,
+        estimator,
+        constraints,
+        selection_rule=TRADEOFF_OPTIMIZATION,
+        constraint_weight=0.5,
+        grid_size=10,
+        grid_limit=2.0,
+        grid_offset=None,
+        grid=None,
+        sample_weight_name="sample_weight",
+    ):
         """Construct a GridSearch object."""
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")
         self.constraints = constraints
 
-        if (selection_rule == TRADEOFF_OPTIMIZATION):
+        if selection_rule == TRADEOFF_OPTIMIZATION:
             if not (0.0 <= constraint_weight <= 1.0):
                 raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
         else:
@@ -145,17 +148,21 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         pos_basis = self.constraints.pos_basis
         neg_basis = self.constraints.neg_basis
         neg_allowed = self.constraints.neg_basis_present
-        objective_in_the_span = (self.constraints.default_objective_lambda_vec is not None)
+        objective_in_the_span = (
+            self.constraints.default_objective_lambda_vec is not None
+        )
 
         if self.grid is None:
             logger.debug("Creating grid of size %i", self.grid_size)
-            grid = _GridGenerator(self.grid_size,
-                                  self.grid_limit,
-                                  pos_basis,
-                                  neg_basis,
-                                  neg_allowed,
-                                  objective_in_the_span,
-                                  self.grid_offset).grid
+            grid = _GridGenerator(
+                self.grid_size,
+                self.grid_limit,
+                pos_basis,
+                neg_basis,
+                neg_allowed,
+                objective_in_the_span,
+                self.grid_offset,
+            ).grid
         else:
             logger.debug("Using supplied grid")
             grid = self.grid
@@ -179,8 +186,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             y_reduction_unique = np.unique(y_reduction)
             if len(y_reduction_unique) == 1:
                 logger.debug("y_reduction had single value. Using DummyClassifier")
-                current_estimator = DummyClassifier(strategy='constant',
-                                                    constant=y_reduction_unique[0])
+                current_estimator = DummyClassifier(
+                    strategy="constant", constant=y_reduction_unique[0]
+                )
             else:
                 logger.debug("Using underlying estimator")
                 current_estimator = copy.deepcopy(self.estimator)
@@ -190,7 +198,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             oracle_call_execution_time = time() - oracle_call_start_time
             logger.debug("Call to estimator complete")
 
-            def predict_fct(X): return current_estimator.predict(X)
+            def predict_fct(X):
+                return current_estimator.predict(X)
+
             self.predictors_.append(current_estimator)
             self.lambda_vecs_[i] = lambda_vec
             self.objectives_.append(objective.gamma(predict_fct)[0])
@@ -199,9 +209,13 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
+
             def loss_fct(i):
-                return self.objective_weight * self.objectives_[i] + \
-                    self.constraint_weight * self.gammas_[grid.columns[i]].max()
+                return (
+                    self.objective_weight * self.objectives_[i]
+                    + self.constraint_weight * self.gammas_[grid.columns[i]].max()
+                )
+
             losses = [loss_fct(i) for i in range(len(self.objectives_))]
             self.best_idx_ = losses.index(min(losses))
         else:
