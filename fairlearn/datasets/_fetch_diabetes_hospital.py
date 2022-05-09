@@ -74,14 +74,13 @@ def fetch_diabetes_hospital(
             Each row corresponding to the 25 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (101766,)
-            Each value represents whether the client subscribed a
-            term deposit which is 'yes' if the client subscribed and 'no'
-            otherwise.
-            If ``as_frame`` is True, ``target`` is a pandas object.
+            Each value represents whether readmission of the patient
+            occurred within 30 days of the release. If ``as_frame``
+            is True, ``target`` is a pandas object.
         feature_names : list of length 25
             Array of ordered feature names used in the dataset.
         DESCR : string
-            Description of the UCI bank marketing dataset.
+            Description of the Diabetes 130-Hospitals dataset.
 
     (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
         if ``return_X_y`` is True and ``as_frame`` is False
