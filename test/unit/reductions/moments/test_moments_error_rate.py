@@ -4,20 +4,16 @@
 import pytest
 
 from fairlearn.reductions import ErrorRate
-
-from fairlearn.reductions._moments.error_rate import (
-    _MESSAGE_BAD_COSTS,
-)
-
+from fairlearn.reductions._moments.error_rate import _MESSAGE_BAD_COSTS
 
 BAD_COSTS_EXAMPLES = [
-    {'fp': 0.0, 'fn': 0.0},
-    {'fp': -1.0, 'fn': 1.0},
-    {'fp': 1.0, 'fn': -1.0},
+    {"fp": 0.0, "fn": 0.0},
+    {"fp": -1.0, "fn": 1.0},
+    {"fp": 1.0, "fn": -1.0},
     {},
-    {'FP': 1.0, 'FN': 1.0},
-    {'fp': 1.0},
-    {'fn': 1.0},
+    {"FP": 1.0, "FN": 1.0},
+    {"fp": 1.0},
+    {"fn": 1.0},
 ]
 
 

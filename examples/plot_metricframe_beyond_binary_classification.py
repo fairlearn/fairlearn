@@ -11,8 +11,11 @@ MetricFrame: Beyond Binary Classification
 # This notebook contains examples of using :class:`~fairlearn.metrics.MetricFrame`
 # for tasks which go beyond simple binary classification.
 
-import sklearn.metrics as skm
 import functools
+
+import numpy as np
+import sklearn.metrics as skm
+
 from fairlearn.metrics import MetricFrame
 
 # %%
@@ -28,7 +31,6 @@ from fairlearn.metrics import MetricFrame
 #
 # First, let us generate some random input data:
 
-import numpy as np
 
 rng = np.random.default_rng(seed=96132)
 
@@ -40,7 +42,7 @@ y_true = rng.integers(n_classes, size=n_rows)
 y_pred = rng.integers(n_classes, size=n_rows)
 
 temp = rng.integers(n_sensitive_features, size=n_rows)
-s_f = [chr(ord('a')+x) for x in temp]
+s_f = [chr(ord("a") + x) for x in temp]
 
 # %%
 # To use :func:`~sklearn.metrics.confusion_matrix`, we
@@ -49,17 +51,15 @@ s_f = [chr(ord('a')+x) for x in temp]
 # the possible labels
 
 
-conf_mat = functools.partial(skm.confusion_matrix,
-                             labels=np.unique(y_true))
+conf_mat = functools.partial(skm.confusion_matrix, labels=np.unique(y_true))
 
 # %%
 # With this now available, we can create our
 # :class:`~fairlearn.metrics.MetricFrame`:
 
-mf = MetricFrame(metrics={'conf_mat': conf_mat},
-                 y_true=y_true,
-                 y_pred=y_pred,
-                 sensitive_features=s_f)
+mf = MetricFrame(
+    metrics={"conf_mat": conf_mat}, y_true=y_true, y_pred=y_pred, sensitive_features=s_f
+)
 
 # %%
 # From this, we can view the overall confusion matrix:
@@ -82,14 +82,14 @@ mf.by_group
 # be mixed in a single :class:`~fairlearn.metrics.MetricFrame`.
 # For example:
 
-recall = functools.partial(skm.recall_score, average='macro')
+recall = functools.partial(skm.recall_score, average="macro")
 
-mf2 = MetricFrame(metrics={'conf_mat': conf_mat,
-                           'recall': recall
-                           },
-                  y_true=y_true,
-                  y_pred=y_pred,
-                  sensitive_features=s_f)
+mf2 = MetricFrame(
+    metrics={"conf_mat": conf_mat, "recall": recall},
+    y_true=y_true,
+    y_pred=y_pred,
+    sensitive_features=s_f,
+)
 
 print("Overall values")
 print(mf2.overall)
@@ -119,6 +119,7 @@ print(mf2.by_group)
 # bounding boxes, and returns the ratio of their areas.
 # If the bounding boxes are identical, then the metric will
 # be 1; if disjoint then it will be 0. A function to do this is:
+
 
 def bounding_box_iou(box_A_input, box_B_input):
     # The inputs are array-likes in the form
@@ -165,6 +166,7 @@ def bounding_box_iou(box_A_input, box_B_input):
 
     return iou
 
+
 # %%
 # This is a metric for two bounding boxes, but for :class:`~fairlearn.metrics.MetricFrame`
 # we need to compare two lists of bounding boxes. For the sake of
@@ -183,6 +185,7 @@ def mean_iou(true_boxes, predicted_boxes):
 
     return np.mean(all_iou)
 
+
 # %%
 # We need to generate some input data, so first create a function to
 # generate a single random bounding box:
@@ -194,16 +197,14 @@ def generate_bounding_box(max_coord, max_delta, rng):
 
     return np.concatenate((corner, delta))
 
+
 # %%
 # Now use this to create sample `y_true` and `y_pred` arrays of
 # bounding boxes:
 
 
 def many_bounding_boxes(n_rows, max_coord, max_delta, rng):
-    return [
-        generate_bounding_box(max_coord, max_delta, rng)
-        for _ in range(n_rows)
-    ]
+    return [generate_bounding_box(max_coord, max_delta, rng) for _ in range(n_rows)]
 
 
 true_bounding_boxes = many_bounding_boxes(n_rows, 5, 10, rng)
@@ -212,10 +213,12 @@ pred_bounding_boxes = many_bounding_boxes(n_rows, 5, 10, rng)
 # %%
 # Finally, we can use these in a :class:`~fairlearn.metrics.MetricFrame`:
 
-mf_bb = MetricFrame(metrics={'mean_iou': mean_iou},
-                    y_true=true_bounding_boxes,
-                    y_pred=pred_bounding_boxes,
-                    sensitive_features=s_f)
+mf_bb = MetricFrame(
+    metrics={"mean_iou": mean_iou},
+    y_true=true_bounding_boxes,
+    y_pred=pred_bounding_boxes,
+    sensitive_features=s_f,
+)
 
 print("Overall metric")
 print(mf_bb.overall)

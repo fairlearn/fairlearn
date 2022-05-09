@@ -3,17 +3,13 @@
 
 """Metrics for measuring disparity."""
 
-from ._extra_metrics import selection_rate, true_positive_rate, false_positive_rate
+from ._extra_metrics import false_positive_rate, selection_rate, true_positive_rate
 from ._metric_frame import MetricFrame
 
 
 def demographic_parity_difference(
-        y_true,
-        y_pred,
-        *,
-        sensitive_features,
-        method='between_groups',
-        sample_weight=None) -> float:
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
     """Calculate the demographic parity difference.
 
     The demographic parity difference is defined as the difference
@@ -46,22 +42,20 @@ def demographic_parity_difference(
     float
         The demographic parity difference
     """
-    sel_rate = MetricFrame(metrics=selection_rate,
-                           y_true=y_true,
-                           y_pred=y_pred,
-                           sensitive_features=sensitive_features,
-                           sample_params={'sample_weight': sample_weight})
+    sel_rate = MetricFrame(
+        metrics=selection_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": sample_weight},
+    )
     result = sel_rate.difference(method=method)
     return result
 
 
 def demographic_parity_ratio(
-        y_true,
-        y_pred,
-        *,
-        sensitive_features,
-        method='between_groups',
-        sample_weight=None) -> float:
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
     """Calculate the demographic parity ratio.
 
     The demographic parity ratio is defined as the ratio
@@ -94,22 +88,20 @@ def demographic_parity_ratio(
     float
         The demographic parity ratio
     """
-    sel_rate = MetricFrame(metrics=selection_rate,
-                           y_true=y_true,
-                           y_pred=y_pred,
-                           sensitive_features=sensitive_features,
-                           sample_params={'sample_weight': sample_weight})
+    sel_rate = MetricFrame(
+        metrics=selection_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": sample_weight},
+    )
     result = sel_rate.ratio(method=method)
     return result
 
 
 def equalized_odds_difference(
-        y_true,
-        y_pred,
-        *,
-        sensitive_features,
-        method='between_groups',
-        sample_weight=None) -> float:
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
     """Calculate the equalized odds difference.
 
     The greater of two metrics: `true_positive_rate_difference` and
@@ -151,12 +143,8 @@ def equalized_odds_difference(
 
 
 def equalized_odds_ratio(
-        y_true,
-        y_pred,
-        *,
-        sensitive_features,
-        method='between_groups',
-        sample_weight=None) -> float:
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
     """Calculate the equalized odds ratio.
 
     The smaller of two metrics: `true_positive_rate_ratio` and
@@ -198,12 +186,14 @@ def equalized_odds_ratio(
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
-    fns = {'tpr': true_positive_rate, 'fpr': false_positive_rate}
-    sw_dict = {'sample_weight': sample_weight}
-    sp = {'tpr': sw_dict, 'fpr': sw_dict}
-    eo = MetricFrame(metrics=fns,
-                     y_true=y_true,
-                     y_pred=y_pred,
-                     sensitive_features=sensitive_features,
-                     sample_params=sp)
+    fns = {"tpr": true_positive_rate, "fpr": false_positive_rate}
+    sw_dict = {"sample_weight": sample_weight}
+    sp = {"tpr": sw_dict, "fpr": sw_dict}
+    eo = MetricFrame(
+        metrics=fns,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params=sp,
+    )
     return eo
