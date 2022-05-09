@@ -38,7 +38,7 @@ def fetch_diabetes_hospital(
     Fairlearn". In this version, the target variable "readmitted" is binarized
     into whether the patient was re-admitted within thirty days.
 
-    # TODO: Read more in the :ref:`User Guide <diabetes_hospital_data>`.
+    Read more in the :ref:`User Guide <diabetes_hospital_data>`.
 
     .. versionadded:: 0.8.0
 
