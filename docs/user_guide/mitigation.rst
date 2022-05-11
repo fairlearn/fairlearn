@@ -117,8 +117,8 @@ to be most appropriate as a preprocessing step for (generalized) linear models.
 In the example below, the `Diabetes 130-Hospitals <https://www.openml.org/d/43874>`_
 is loaded and the correlation between the African American race and
 the non-sensitive features is removed. This dataset contains more races,
-but for the cause of this example we will only focus on the African
-American race. This procedure will drop the sensitive features from the dataset.
+but in example we will only focus on the African American race.
+The :code:`CorrelationRemover` will drop the sensitive features from the dataset.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
