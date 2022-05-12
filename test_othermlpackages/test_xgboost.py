@@ -2,9 +2,10 @@
 # Licensed under the MIT License.
 
 import pytest
-from . import package_test_common as ptc
 
 from fairlearn.reductions import DemographicParity
+
+from . import package_test_common as ptc
 
 xgb = pytest.importorskip("xgboost")
 

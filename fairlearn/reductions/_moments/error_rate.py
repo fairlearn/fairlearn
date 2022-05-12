@@ -3,14 +3,15 @@
 
 import numpy as np
 import pandas as pd
-from .moment import ClassificationMoment
-from .moment import _ALL, _LABEL
 
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 
+from .moment import _ALL, _LABEL, ClassificationMoment
 
-_MESSAGE_BAD_COSTS = "costs needs to be a dictionary with keys " \
+_MESSAGE_BAD_COSTS = (
+    "costs needs to be a dictionary with keys "
     "'fp' and 'fn' containing non-negative values, which are not both zero"
+)
 
 
 class ErrorRate(ClassificationMoment):
@@ -49,23 +50,27 @@ class ErrorRate(ClassificationMoment):
         if costs is None:
             self.fp_cost = 1.0
             self.fn_cost = 1.0
-        elif (type(costs) is dict
-              and costs.keys() == {'fp', 'fn'}
-              and costs['fp'] >= 0.0
-              and costs['fn'] >= 0.0
-              and costs['fp'] + costs['fn'] > 0.0):
-            self.fp_cost = costs['fp']
-            self.fn_cost = costs['fn']
+        elif (
+            type(costs) is dict
+            and costs.keys() == {"fp", "fn"}
+            and costs["fp"] >= 0.0
+            and costs["fn"] >= 0.0
+            and costs["fp"] + costs["fn"] > 0.0
+        ):
+            self.fp_cost = costs["fp"]
+            self.fn_cost = costs["fn"]
         else:
             raise ValueError(_MESSAGE_BAD_COSTS)
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, _ = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, _ = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
         # The following uses X  so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
         self.index = [_ALL]
@@ -82,8 +87,7 @@ class ErrorRate(ClassificationMoment):
         total_fn_cost = np.sum(signed_errors[signed_errors > 0] * self.fn_cost)
         total_fp_cost = np.sum(-signed_errors[signed_errors < 0] * self.fp_cost)
         error_value = (total_fn_cost + total_fp_cost) / self.total_samples
-        error = pd.Series(data=error_value,
-                          index=self.index)
+        error = pd.Series(data=error_value, index=self.index)
         self._gamma_descr = str(error)
         return error
 

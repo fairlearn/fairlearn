@@ -32,19 +32,18 @@ GridSearch with Census Data
 # We start by importing the various modules we're going to use:
 #
 
-from sklearn.model_selection import train_test_split
-from fairlearn.reductions import GridSearch
-from fairlearn.reductions import DemographicParity, ErrorRate
-from fairlearn.metrics import MetricFrame, selection_rate, count
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn import metrics as skm
 import pandas as pd
+from sklearn import metrics as skm
+from sklearn.datasets import fetch_openml
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+from fairlearn.metrics import MetricFrame, count, selection_rate
+from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
-
-from sklearn.datasets import fetch_openml
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X_raw = data.data
@@ -92,9 +91,7 @@ A_test = A_test.reset_index(drop=True)
 # For speed of demonstration, we use the simple
 # :class:`sklearn.linear_model.LogisticRegression` class:
 
-unmitigated_predictor = LogisticRegression(
-    solver="liblinear", fit_intercept=True
-)
+unmitigated_predictor = LogisticRegression(solver="liblinear", fit_intercept=True)
 
 unmitigated_predictor.fit(X_train, Y_train)
 
@@ -154,7 +151,7 @@ metric_frame.by_group.plot.bar(
 sweep = GridSearch(
     LogisticRegression(solver="liblinear", fit_intercept=True),
     constraints=DemographicParity(),
-    grid_size=30,
+    grid_size=31,
 )
 
 # %%
@@ -189,9 +186,7 @@ for m in predictors:
     error = ErrorRate()
     error.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
     disparity = DemographicParity()
-    disparity.load_data(
-        X_train, pd.Series(Y_train), sensitive_features=A_train
-    )
+    disparity.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
 
     errors.append(error.gamma(classifier)[0])
     disparities.append(disparity.gamma(classifier).max())
@@ -230,9 +225,7 @@ for i in range(len(non_dominated)):
 
 import matplotlib.pyplot as plt
 
-x = [
-    metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()
-]
+x = [metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()]
 y = [
     metric_frame.difference()["selection_rate"]
     for metric_frame in metric_frames.values()

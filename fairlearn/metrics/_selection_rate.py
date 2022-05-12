@@ -1,20 +1,18 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import numpy as np
 from typing import Any
+
+import numpy as np
 
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
+_EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = (
+    "Empty y_pred passed to selection_rate function."
+)
 
-_EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = "Empty y_pred passed to selection_rate function."
 
-
-def selection_rate(y_true,
-                   y_pred,
-                   *,
-                   pos_label: Any = 1,
-                   sample_weight=None) -> float:
+def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) -> float:
     """Calculate the fraction of predicted labels matching the 'good' outcome.
 
     The argument `pos_label` specifies the 'good' outcome. For consistency with
@@ -39,7 +37,7 @@ def selection_rate(y_true,
     if len(y_pred) == 0:
         raise ValueError(_EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE)
 
-    selected = (_convert_to_ndarray_and_squeeze(y_pred) == pos_label)
+    selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
     s_w = np.ones(len(selected))
     if sample_weight is not None:
         s_w = np.squeeze(np.asarray(sample_weight))
