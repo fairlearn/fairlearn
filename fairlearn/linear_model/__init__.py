@@ -1,7 +1,7 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""This module contains existing linear models adapted to work with fairness constraints."""
+"""This module contains linear models adapted to adhere to fairness constraints."""
 
 from ._constrained_logistic import ConstrainedLogisticRegression
 
