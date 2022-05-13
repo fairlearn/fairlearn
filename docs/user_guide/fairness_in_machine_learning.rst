@@ -49,9 +49,15 @@ The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
-In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
+In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task.
+Which target variable do we intend to predict?
+What features will be included?
+What (fairness) constraints do we consider?
+Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness [#4]_ . This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in :footcite:cts:`jacobs2021measurement`.
+This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
+In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
 Key Terms 
 ~~~~~~~~~
@@ -75,9 +81,11 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See [#5]_ for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example. 
 
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
+**Note:**
+We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
+Please reference :footcite:cts:`jacobs2021measurement` for more detailed examples.
  
  
 .. _construct_validity:
@@ -85,19 +93,20 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness [#4]_ paper explores both construct reliability and construct validity, we focus our 
-exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
-is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
-can serve as a framework for analyzing an AI task and attempting to establish construct validity:
+Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our 
+exploration below on construct Validity.
+We note that both play an important role in understanding fairness in sociotechnical contexts.
+With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that 
+is helpful in thinking about fairness in sociotechnical contexts.
+We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
 1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
 
 2. **Content validity** – This has three subcomponents:
 
-   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
-   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
-   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
+   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context dependent).
+   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
+   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
 
 3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
    measurement models for which construct validity has been established? 
@@ -173,18 +182,18 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#2]_
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.  :footcite:`agarwal2018reductions`
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  [#2]_
+  :footcite:`agarwal2018reductions`
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  [#1]_
+  :footcite:`hardt2016equality`
 
 *Regression*:
 
@@ -192,11 +201,11 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  [#0]_
+  :footcite:`agarwal2019fair`
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#0]_
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. :footcite:`agarwal2019fair`
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
@@ -245,7 +254,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#3]_
+In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`selbst2019fairness`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
@@ -426,28 +435,7 @@ incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
 
-.. topic:: References:
+References
+----------
 
-   .. [#0] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
-      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
-      ICML, 2019.
-   
-   .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
-      Learning"
-      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NIPS, 2016.
-   
-   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
-      Approach to Fair Classification"
-      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
-	  
-   .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
-      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
-      (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
-      (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
-
-   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
-      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
-
-   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
-      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
+.. footbibliography::

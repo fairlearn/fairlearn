@@ -37,13 +37,17 @@ def _build_argument_parser():
 
     parser = argparse.ArgumentParser(description=desc)
 
-    parser.add_argument("--documentation-path",
-                        help="The path to the documentation sources (conf.py directory)",
-                        required=True)
+    parser.add_argument(
+        "--documentation-path",
+        help="The path to the documentation sources (conf.py directory)",
+        required=True,
+    )
 
-    parser.add_argument("--output-path",
-                        help="The directory for the output files (will be created)",
-                        required=True)
+    parser.add_argument(
+        "--output-path",
+        help="The directory for the output files (will be created)",
+        required=True,
+    )
     return parser
 
 
@@ -52,7 +56,7 @@ def _pip_backwards_compatibility():
 
     This is specifically targeted at tempeh for v0.4.6.
     """
-    extra_packages = ['tempeh']
+    extra_packages = ["tempeh"]
 
     with _LogWrapper("Running pip install"):
         subprocess.check_call(["pip", "install"] + extra_packages)
@@ -66,17 +70,21 @@ def main(argv):
     _pip_backwards_compatibility()
 
     with _LogWrapper("copying static files"):
-        shutil.copytree(os.path.join(args.documentation_path, landing_page_directory),
-                        args.output_path)
+        shutil.copytree(
+            os.path.join(args.documentation_path, landing_page_directory),
+            args.output_path,
+        )
 
     with _LogWrapper("running Sphinx-Multiversion"):
-        subprocess.check_call(["sphinx-multiversion",
-                               args.documentation_path,
-                               args.output_path])
+        subprocess.check_call(
+            ["sphinx-multiversion", args.documentation_path, args.output_path]
+        )
 
     with _LogWrapper("copy of individual PNG"):
-        shutil.copy2(os.path.join(args.documentation_path, extra_png_src_path),
-                     os.path.join(args.output_path, "images"))
+        shutil.copy2(
+            os.path.join(args.documentation_path, extra_png_src_path),
+            os.path.join(args.output_path, "images"),
+        )
 
 
 if __name__ == "__main__":

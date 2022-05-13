@@ -1,24 +1,21 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import matplotlib
 import numpy as np
 import pytest
-from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
 from sklearn.utils import check_consistent_length
-from fairlearn.experimental.enable_metric_frame_plotting import (
-    plot_metric_frame,
-)
-import matplotlib
 
+from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 from fairlearn.metrics import MetricFrame
 from fairlearn.metrics._plotter import (
-    _METRIC_FRAME_INVALID_ERROR,
     _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR,
     _CONF_INTERVALS_MUST_BE_ARRAY,
+    _METRIC_FRAME_INVALID_ERROR,
 )
 
-from .data_for_test import y_t, y_p, g_1
-
+from .data_for_test import g_1, y_p, y_t
 
 # We aim to create a 95% confidence interval, so we use a :code:`z_score` of 1.959964
 z_score = 1.959964
@@ -44,11 +41,9 @@ def general_wilson(p, n, digits=digits_of_precision, z=z_score):
         np.ndarray
         Array of length 2 of form: [lower_bound, upper_bound]
     """
-    denominator = 1 + z ** 2 / n
+    denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
-    adjusted_standard_deviation = np.sqrt(
-        (p * (1 - p) + z * z / (4 * n))
-    ) / np.sqrt(n)
+    adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
     lower_bound = (
         centre_adjusted_probability - z * adjusted_standard_deviation
     ) / denominator
@@ -75,9 +70,7 @@ def recall_wilson(y_true, y_pred):
     """
     check_consistent_length(y_true, y_pred)
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    bounds = general_wilson(
-        tp / (tp + fn), tp + fn, digits_of_precision, z_score
-    )
+    bounds = general_wilson(tp / (tp + fn), tp + fn, digits_of_precision, z_score)
     return bounds
 
 

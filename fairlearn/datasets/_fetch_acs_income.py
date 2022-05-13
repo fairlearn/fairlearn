@@ -6,16 +6,19 @@ import pathlib
 import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_openml
+
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_acs_income(*, cache=True, data_home=None,
-                     as_frame=False, return_X_y=False,
-                     states=None,
-                     ):
+def fetch_acs_income(
+    *,
+    cache=True,
+    data_home=None,
+    as_frame=False,
+    return_X_y=False,
+    states=None,
+):
     """Load the ACS Income dataset (regression).
-
-    Read more in the :ref:`User Guide <acsincome_data>`.
 
     Download it if necessary.
 
@@ -29,7 +32,9 @@ def fetch_acs_income(*, cache=True, data_home=None,
     Source: Paper: Ding et al. (2021) [1]_
             and corresponding repository https://github.com/zykls/folktables/
 
-    .. versionadded:: 0.7.1
+    Read more in the :ref:`User Guide <acsincome_data>`.
+
+    .. versionadded:: 0.8.0
 
     Parameters
     ----------
@@ -94,17 +99,59 @@ def fetch_acs_income(*, cache=True, data_home=None,
 
     """
     # State Code based on 2010 Census definitions
-    _STATE_CODES = {'AL': '01', 'AK': '02', 'AZ': '04', 'AR': '05', 'CA': '06',
-                    'CO': '08', 'CT': '09', 'DE': '10', 'FL': '12', 'GA': '13',
-                    'HI': '15', 'ID': '16', 'IL': '17', 'IN': '18', 'IA': '19',
-                    'KS': '20', 'KY': '21', 'LA': '22', 'ME': '23', 'MD': '24',
-                    'MA': '25', 'MI': '26', 'MN': '27', 'MS': '28', 'MO': '29',
-                    'MT': '30', 'NE': '31', 'NV': '32', 'NH': '33', 'NJ': '34',
-                    'NM': '35', 'NY': '36', 'NC': '37', 'ND': '38', 'OH': '39',
-                    'OK': '40', 'OR': '41', 'PA': '42', 'RI': '44', 'SC': '45',
-                    'SD': '46', 'TN': '47', 'TX': '48', 'UT': '49', 'VT': '50',
-                    'VA': '51', 'WA': '53', 'WV': '54', 'WI': '55', 'WY': '56',
-                    'PR': '72'}
+    _STATE_CODES = {
+        "AL": "01",
+        "AK": "02",
+        "AZ": "04",
+        "AR": "05",
+        "CA": "06",
+        "CO": "08",
+        "CT": "09",
+        "DE": "10",
+        "FL": "12",
+        "GA": "13",
+        "HI": "15",
+        "ID": "16",
+        "IL": "17",
+        "IN": "18",
+        "IA": "19",
+        "KS": "20",
+        "KY": "21",
+        "LA": "22",
+        "ME": "23",
+        "MD": "24",
+        "MA": "25",
+        "MI": "26",
+        "MN": "27",
+        "MS": "28",
+        "MO": "29",
+        "MT": "30",
+        "NE": "31",
+        "NV": "32",
+        "NH": "33",
+        "NJ": "34",
+        "NM": "35",
+        "NY": "36",
+        "NC": "37",
+        "ND": "38",
+        "OH": "39",
+        "OK": "40",
+        "OR": "41",
+        "PA": "42",
+        "RI": "44",
+        "SC": "45",
+        "SD": "46",
+        "TN": "47",
+        "TX": "48",
+        "UT": "49",
+        "VT": "50",
+        "VA": "51",
+        "WA": "53",
+        "WV": "54",
+        "WI": "55",
+        "WY": "56",
+        "PR": "72",
+    }
     # number of features
     _NUM_FEATS = 10
 
@@ -115,11 +162,12 @@ def fetch_acs_income(*, cache=True, data_home=None,
             try:
                 _STATE_CODES[state]
             except KeyError:
-                raise KeyError(f'Error with state code: {state}\n'
-                               f'State code must be a two letter abbreviation'
-                               f'from the list {list(_STATE_CODES.keys())}\n'
-                               f'Note that PR is the abbreviation for Puerto Rico.'
-                               )
+                raise KeyError(
+                    f"Error with state code: {state}\n"
+                    "State code must be a two letter abbreviation"
+                    f"from the list {list(_STATE_CODES.keys())}\n"
+                    "Note that PR is the abbreviation for Puerto Rico."
+                )
     else:
         states = _STATE_CODES.keys()
 
@@ -136,28 +184,28 @@ def fetch_acs_income(*, cache=True, data_home=None,
     )
 
     # filter by state
-    df_all = data_dict['data'].copy(deep=True)
-    df_all['PINCP'] = data_dict['target']
+    df_all = data_dict["data"].copy(deep=True)
+    df_all["PINCP"] = data_dict["target"]
     cols = df_all.columns
     df = pd.DataFrame(np.zeros((0, len(cols))), columns=cols)
     for state in states:
         dfs = [df, df_all.query(f"ST == {int(_STATE_CODES[state])}")]
         df = pd.concat(dfs)
     # drop the state column since it is not a feature in the published ACSIncome dataset
-    df.drop('ST', axis=1, inplace=True)
+    df.drop("ST", axis=1, inplace=True)
 
     if as_frame:
-        data_dict['data'] = df.iloc[:, :_NUM_FEATS]
-        data_dict['frame'] = df
-        data_dict['target'] = df.iloc[:, _NUM_FEATS]
+        data_dict["data"] = df.iloc[:, :_NUM_FEATS]
+        data_dict["frame"] = df
+        data_dict["target"] = df.iloc[:, _NUM_FEATS]
     else:
-        data_dict['data'] = df.iloc[:, :_NUM_FEATS].values
-        data_dict['frame'] = None
-        data_dict['target'] = df.iloc[:, _NUM_FEATS].values
+        data_dict["data"] = df.iloc[:, :_NUM_FEATS].values
+        data_dict["frame"] = None
+        data_dict["target"] = df.iloc[:, _NUM_FEATS].values
 
     output = data_dict
 
     if return_X_y:
-        output = (data_dict['data'], data_dict['target'])
+        output = (data_dict["data"], data_dict["target"])
 
     return output
