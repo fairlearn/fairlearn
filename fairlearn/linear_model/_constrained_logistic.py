@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
 import numbers
@@ -25,7 +25,6 @@ from sklearn.utils.optimize import _check_optimize_result
 from sklearn.utils.validation import _check_sample_weight
 
 
-# Some helper check functions
 def _check_solver(solver, penalty):
     all_solvers = ["SLSQP"]
     if solver not in all_solvers:
@@ -52,16 +51,18 @@ def _check_multi_class(multi_class):
 
 def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
     """
-    Calculate the covariance bound.
+    Calculate the covariance threshold.
 
-    The covariance bound is calculated as described in
-    `Zafar et al. (2017) <https://proceedings.mlr.press/v54/zafar17a.html>`_.
+    Calculate the difference between the covariance threshold and the (absolute)
+    covariance between the sensitive feature and the (signed) distance between the
+    instances’ feature vectors and the decision boundary of the logistic regression
+    model.
 
     Parameters
     ----------
     model : numpy.ndarray
         Model weights.
-        
+
     X_train : numpy.ndarray or pandas.DataFrame
         Feature data.
 
@@ -69,13 +70,14 @@ def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
         Sensitive features.
 
     covariance_bound : float
-        The given covariance threshold that we optimize towards.
+        The covariance threshold, which specifies the upper bound on the (absolute)
+        covariance.
 
     Returns
     -------
     ans : float
-        The difference between the given threshold (covariance_bound) and covariance.
-        This will be optimized towards covariance_bound.
+        The difference between the given covariance_threshold and the absolute
+        covariance.
     """
     assert X_train.shape[0] == A_train.shape[0]
     if (
@@ -92,8 +94,8 @@ def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
         intercept = model[-1]
         model = model[:-1]
 
-    arr = np.dot(model, X_train.T) + intercept
     # the product with the weight vector -- the sign of this is the output label
+    arr = np.dot(model, X_train.T) + intercept
 
     arr = np.array(arr, dtype=np.float64)
     cov = np.dot(A_train - np.mean(A_train), arr) / float(len(A_train))
@@ -120,10 +122,10 @@ def _get_constraint_list_cov(
         Sensitive features.
 
     renamed_sensitive_feature_ids : list
-        The renamed sensitive feature ids, either as strings or as numbers
+        The renamed sensitive feature ids, either as strings or as numbers.
 
     categories : list
-        The categories from the encoder
+        The categories from the one-hot-encoder.
 
     covariance_bound : float
         The given covariance threshold that we optimize towards.
@@ -131,8 +133,7 @@ def _get_constraint_list_cov(
     Returns
     -------
     constraints : list
-        A list in which each element contains a correctly
-        formatted constraint per sensitive feature.
+        A list of the correctly formatted constraints, one for each sensitive feature.
     """
     # New covariance bound list such that it correctly handles the OHE sensitive features
     # Now we can have a separate covariance bound per sensitive feature
@@ -309,7 +310,7 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
     """
     One-hot-encode the sensitive features.
 
-    We one-hot-encode the sensitive features.such that they can be splitted
+    We one-hot-encode the sensitive features such that they can be splitted
     from X and that the constraints can be correctly coded per feature value.
 
     Parameters
@@ -356,51 +357,53 @@ def _ohe_sensitive_features(X, sensitive_feature_ids):
 
 
 class ConstrainedLogisticRegression(LogisticRegression):
-    r"""Constrained logistic regression.
+    r"""Logistic Regression subject to a fairness constraint.
 
     This implementation closely follows the implementation in
-    :class:`sklearn.linear_model.LogisticRegression`, and is constrained
-    via the same way as in
-    `Zafar et al. (2017) <https://proceedings.mlr.press/v54/zafar17a.html>`_ [1]_.
-
-    The constraint is defined as the covariance between the sensitive
-    features :math:`\left\{\mathbf{z}_{i}\right\}_{i=1}^{N}`, and the
-    signed distance from the users` feature vectors to the decision
-    boundary :math:`\left\{d_{\boldsymbol{\theta}}\left(\mathbf{x}_{i}\right)\right\}_{i=1}^{N}`.
-    This is mathemetically described as follows:
-
-    .. math::
-      \operatorname{Cov}\left(\mathbf{z}, d_{\boldsymbol{\theta}}(\mathbf{x})\right)
-      =\mathbb{E}\left[(\mathbf{z}-\overline{\mathbf{z}})
-        d_{\boldsymbol{\theta}}(\mathbf{x})\right]
-        -\mathbb{E}[(\mathbf{z}-\overline{\mathbf{z}})]
-        \bar{d}_{\boldsymbol{\theta}}(\mathbf{x})\\
-      \approx \frac{1}{N} \sum_{i=1}^{N}\left(\mathbf{z}_{i}-\overline{\mathbf{z}}\right)
-      d_{\boldsymbol{\theta}}\left(\mathbf{x}_{i}\right)
-
-    The reasoning behind this derivation is further explained in [1]_.
+    :class:`sklearn.linear_model.LogisticRegression`.
 
     Parameters
     ----------
-    constraints : {'demographic_parity', 'none'}, default='demographic_parity'
-        The constraints used in the logistic regression. Currently,
-        only the constraint as in [1]_ is implemented via the
-        `'demographic_parity'` parameter. `'none'` will fall back to
-        the LogisticRegression as in sklearn.
+    constraints : str, {'demographic_parity', 'none'}, default='demographic_parity'
+        The constraints used in the logistic regression:
 
-    penalty : {'l2', 'none'}, default='l2'
+        - `'demographic_parity'`:
+            This constraint is defined as the covariance between the sensitive
+            features :math:`\left\{\mathbf{z}_{i}\right\}_{i=1}^{N}`, and the
+            signed distance from the users` feature vectors to the decision boundary
+            :math:`\left\{d_{\boldsymbol{\theta}}\left(\mathbf{x}_{i}\right)\right\}_{i=1}^{N}`.
+            This is mathemetically described as follows:
+
+            .. math::
+                \operatorname{Cov}\left(\mathbf{z}, d_{\boldsymbol{\theta}}(\mathbf{x})\right)
+                =\mathbb{E}\left[(\mathbf{z}-\overline{\mathbf{z}})
+                d_{\boldsymbol{\theta}}(\mathbf{x})\right]
+                -\mathbb{E}[(\mathbf{z}-\overline{\mathbf{z}})]
+                \bar{d}_{\boldsymbol{\theta}}(\mathbf{x})\\
+                \approx \frac{1}{N} \sum_{i=1}^{N}\left(\mathbf{z}_{i}-\overline{\mathbf{z}}\right)
+                d_{\boldsymbol{\theta}}\left(\mathbf{x}_{i}\right)
+
+            The reasoning behind this derivation is further explained in
+            :footcite:`zafar2017fairness`.
+        - `'none'`: No constraint is used, resulting in a default sklearn
+          `LogisticRegression`.
+
+    penalty : str, {'l2', 'none'}, default='l2'
         Specify the norm of the penalty:
+
         - `'none'`: no penalty is added;
         - `'l2'`: add a L2 penalty term and it is the default choice;
 
-    covariance_bound : float, default=0
+    covariance_bound : float or list, default=0
         The covariance bound that the constraint optimizes towards.
         It can either be one of the following two:
+
         - A single float that will be used for all sensitive features.
         - A list of floats such that each sensitive feature has its own covariance bound.
+          The order in the list corresponds to the order of the passed sensitive features.
 
     dual : bool, default=False
-        Dual or primal formulation. This parameter is not used.
+        Dual or primal formulation. Dual formulation is currently not implemented.
         Only implemented for compatibility with sklearn.
 
     tol : float, default=1e-4
@@ -416,7 +419,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         added to the decision function.
 
     intercept_scaling : float, default=1
-        This parameter is not used.
+        Dual formulation is currently not implemented.
         Only implemented for compatibility with sklearn.
 
     class_weight : dict or 'balanced', default=None
@@ -429,7 +432,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         through the fit method) if sample_weight is specified.
 
     random_state : int, RandomState instance, default=None
-        This parameter is not used.
+        Dual formulation is currently not implemented.
         Only implemented for compatibility with sklearn.
 
     solver : str, default='SLSQP'
@@ -461,7 +464,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         for more details.
 
     l1_ratio : float, default=None
-        This parameter is not used.
+        Dual formulation is currently not implemented.
         Only implemented for compatibility with sklearn.
 
     Attributes
@@ -496,10 +499,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
     References
     ----------
 
-    .. [1] Zafar, Muhammad Bilal, et al.
-       "Fairness constraints: Mechanisms for fair classification."
-       Artificial Intelligence and Statistics. PMLR, 2017.
-       [Online]. Available: https://proceedings.mlr.press/v54/zafar17a.html.
+    .. footbibliography::
 
     """
 
@@ -609,8 +609,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
             If not provided, then each sample is given unit weight.
 
         sensitive_feature_ids : list
-
-        sensitive features in the data, either as strings (DataFrame) or numbers (numpy)
+            sensitive features in the data, either as strings (DataFrame) or numbers (numpy)
 
         Returns
         -------
