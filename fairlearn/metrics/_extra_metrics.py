@@ -9,13 +9,18 @@ These are metrics which are not part of `scikit-learn`.
 import numpy as np
 import sklearn.metrics as skm
 
-from ._balanced_root_mean_squared_error import _balanced_root_mean_squared_error  # noqa: F401
-from ._mean_predictions import mean_prediction, _mean_overprediction, _mean_underprediction  # noqa: F401,E501
-from ._selection_rate import selection_rate  # noqa: F401,E501
+from ._balanced_root_mean_squared_error import (  # noqa: F401
+    _balanced_root_mean_squared_error,
+)
+from ._mean_predictions import _mean_overprediction  # noqa: F401,E501
+from ._mean_predictions import _mean_underprediction, mean_prediction  # noqa: F401
 from ._metric_frame import check_consistent_length
+from ._selection_rate import selection_rate  # noqa: F401,E501
 
 _TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
-_RESTRICTED_VALS_IF_POS_LABEL_NONE = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"  # noqa: E501
+_RESTRICTED_VALS_IF_POS_LABEL_NONE = (
+    "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"  # noqa: E501
+)
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
 
@@ -77,11 +82,10 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
     return unique_labels
 
 
-def true_positive_rate(y_true,
-                       y_pred,
-                       sample_weight=None,
-                       pos_label=None) -> float:
+def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
+
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------
@@ -104,18 +108,23 @@ def true_positive_rate(y_true,
     float
         The true positive rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    unique_labels = _get_labels_for_confusion_matrix(
+        np.vstack((y_true, y_pred)), pos_label
+    )
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred,
-        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true,
+        y_pred,
+        sample_weight=sample_weight,
+        labels=unique_labels,
+        normalize="true",
+    ).ravel()
     return tpr
 
 
-def true_negative_rate(y_true,
-                       y_pred,
-                       sample_weight=None,
-                       pos_label=None) -> float:
+def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the true negative rate (also called specificity or selectivity).
+
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------
@@ -138,18 +147,23 @@ def true_negative_rate(y_true,
     float
         The true negative rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    unique_labels = _get_labels_for_confusion_matrix(
+        np.vstack((y_true, y_pred)), pos_label
+    )
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred,
-        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true,
+        y_pred,
+        sample_weight=sample_weight,
+        labels=unique_labels,
+        normalize="true",
+    ).ravel()
     return tnr
 
 
-def false_positive_rate(y_true,
-                        y_pred,
-                        sample_weight=None,
-                        pos_label=None) -> float:
+def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the false positive rate (also called fall-out).
+
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------
@@ -172,18 +186,23 @@ def false_positive_rate(y_true,
     float
         The false positive rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    unique_labels = _get_labels_for_confusion_matrix(
+        np.vstack((y_true, y_pred)), pos_label
+    )
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred,
-        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true,
+        y_pred,
+        sample_weight=sample_weight,
+        labels=unique_labels,
+        normalize="true",
+    ).ravel()
     return fpr
 
 
-def false_negative_rate(y_true,
-                        y_pred,
-                        sample_weight=None,
-                        pos_label=None) -> float:
+def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the false negative rate (also called miss rate).
+
+    Read more in the :ref:`User Guide <scalar_metric_results>`.
 
     Parameters
     ----------
@@ -206,10 +225,16 @@ def false_negative_rate(y_true,
     float
         The false negative rate for the data
     """
-    unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
+    unique_labels = _get_labels_for_confusion_matrix(
+        np.vstack((y_true, y_pred)), pos_label
+    )
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
-        y_true, y_pred,
-        sample_weight=sample_weight, labels=unique_labels, normalize="true").ravel()
+        y_true,
+        y_pred,
+        sample_weight=sample_weight,
+        labels=unique_labels,
+        normalize="true",
+    ).ravel()
     return fnr
 
 
@@ -223,6 +248,8 @@ def count(y_true, y_pred) -> int:
 
     The ``y_true`` argument is used to make this calculation. For consistency with
     other metric functions, the ``y_pred`` argument is required, but ignored.
+
+    Read more in the :ref:`User Guide <metrics_with_grouping>`.
 
     Parameters
     ----------

@@ -52,21 +52,19 @@ Metrics with Multiple Features
 # We start with some uncontroversial `import` statements:
 
 import functools
-import numpy as np
 
+import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
+from sklearn.compose import make_column_selector as selector
 from sklearn.datasets import fetch_openml
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate, count
-
+from fairlearn.metrics import MetricFrame, count, selection_rate
 
 # %%
 # Next, we import the data:
@@ -88,9 +86,7 @@ def race_transform(input_str):
     return result
 
 
-X_raw["race"] = (
-    X_raw["race"].map(race_transform).fillna("Other").astype("category")
-)
+X_raw["race"] = X_raw["race"].map(race_transform).fillna("Other").astype("category")
 print(np.unique(X_raw["race"]))
 
 # %%
@@ -168,13 +164,13 @@ numeric_transformer = Pipeline(
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore"))
+        ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ]
 )
 preprocessor = ColumnTransformer(
     transformers=[
         ("num", numeric_transformer, selector(dtype_exclude="category")),
-        ("cat", categorical_transformer, selector(dtype_include="category"))
+        ("cat", categorical_transformer, selector(dtype_include="category")),
     ]
 )
 
@@ -185,10 +181,7 @@ preprocessor = ColumnTransformer(
 unmitigated_predictor = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
-        (
-            "classifier",
-            LogisticRegression(solver="liblinear", fit_intercept=True)
-        )
+        ("classifier", LogisticRegression(solver="liblinear", fit_intercept=True)),
     ]
 )
 
@@ -232,17 +225,10 @@ print("fbeta:", skm.fbeta_score(y_test, y_pred, beta=0.6))
 
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6, zero_division=1)
 
-metric_fns = {
-    "selection_rate": selection_rate,
-    "fbeta_06": fbeta_06,
-    "count": count
-}
+metric_fns = {"selection_rate": selection_rate, "fbeta_06": fbeta_06, "count": count}
 
 grouped_on_sex = MetricFrame(
-    metrics=metric_fns,
-    y_true=y_test,
-    y_pred=y_pred,
-    sensitive_features=A_test["sex"]
+    metrics=metric_fns, y_true=y_test, y_pred=y_pred, sensitive_features=A_test["sex"]
 )
 
 # %%
@@ -268,12 +254,8 @@ grouped_on_sex = MetricFrame(
 # the metrics evaluated on the entire dataset. We see that this contains the
 # same values calculated above:
 
-assert grouped_on_sex.overall["selection_rate"] == selection_rate(
-    y_test, y_pred
-)
-assert grouped_on_sex.overall["fbeta_06"] == skm.fbeta_score(
-    y_test, y_pred, beta=0.6
-)
+assert grouped_on_sex.overall["selection_rate"] == selection_rate(y_test, y_pred)
+assert grouped_on_sex.overall["fbeta_06"] == skm.fbeta_score(y_test, y_pred, beta=0.6)
 print(grouped_on_sex.overall)
 
 # %%
@@ -293,10 +275,7 @@ grouped_on_sex.by_group
 # using race as the sensitive feature:
 
 grouped_on_race = MetricFrame(
-    metrics=metric_fns,
-    y_true=y_test,
-    y_pred=y_pred,
-    sensitive_features=A_test["race"]
+    metrics=metric_fns, y_true=y_test, y_pred=y_pred, sensitive_features=A_test["race"]
 )
 
 # %%
@@ -335,7 +314,7 @@ random_weights = np.random.rand(len(y_test))
 
 example_sample_params = {
     "selection_rate": {"sample_weight": random_weights},
-    "fbeta_06": {"sample_weight": random_weights}
+    "fbeta_06": {"sample_weight": random_weights},
 }
 
 
@@ -344,7 +323,7 @@ grouped_with_weights = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test["sex"],
-    sample_params=example_sample_params
+    sample_params=example_sample_params,
 )
 
 # %%
@@ -426,7 +405,7 @@ grouped_on_race_and_sex = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test[["race", "sex"]]
+    sensitive_features=A_test[["race", "sex"]],
 )
 
 # %%
@@ -469,7 +448,7 @@ cond_credit_score = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test["Credit Score"]
+    control_features=A_test["Credit Score"],
 )
 
 # %%
@@ -502,7 +481,7 @@ cond_both = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test[["Loan Size", "Credit Score"]]
+    control_features=A_test[["Loan Size", "Credit Score"]],
 )
 
 # %%
@@ -529,7 +508,7 @@ counts = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test[["Loan Size", "Credit Score"]]
+    control_features=A_test[["Loan Size", "Credit Score"]],
 )
 
 counts.by_group

@@ -1,16 +1,16 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import platform
+
 import numpy as np
 import pandas as pd
-import platform
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from fairlearn.postprocessing import ThresholdOptimizer
-
 
 _ESTIMATORS = [LogisticRegression, SVC, DecisionTreeClassifier]
 
@@ -22,9 +22,7 @@ if platform.system() != "Darwin":
 
 
 @pytest.mark.parametrize("Mitigator", [ThresholdOptimizer])
-@pytest.mark.parametrize(
-    "constraints", ["demographic_parity", "equalized_odds"]
-)
+@pytest.mark.parametrize("constraints", ["demographic_parity", "equalized_odds"])
 @pytest.mark.parametrize("Estimator", _ESTIMATORS)
 @pytest.mark.parametrize("prefit", [True, False])
 def test_smoke(Mitigator, constraints, Estimator, prefit):

@@ -1,14 +1,19 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import numpy as np
-import pandas as pd
 import random
 
+import numpy as np
+import pandas as pd
 
-def loan_scenario_generator(class_sizes, success_fractions,
-                            sensitive_feature_classes, control_feature_classes,
-                            seed=1632753):
+
+def loan_scenario_generator(
+    class_sizes,
+    success_fractions,
+    sensitive_feature_classes,
+    control_feature_classes,
+    seed=1632753,
+):
     random.seed(seed)
     IB = []
     SF = []
@@ -27,6 +32,8 @@ def loan_scenario_generator(class_sizes, success_fractions,
                 PLOAN.append(flip)
                 Y.append(1 if flip < f_curr else 0)
 
-    X = pd.DataFrame(data=np.transpose([IB, SF, PLOAN]), columns=["ctrl", "sens", "ploan"])
+    X = pd.DataFrame(
+        data=np.transpose([IB, SF, PLOAN]), columns=["ctrl", "sens", "ploan"]
+    )
 
     return X, Y

@@ -2,17 +2,19 @@
 # Licensed under the MIT License.
 
 import json
-import pytest
+from test.unit.input_convertors import conversions_for_1d
 
+import pytest
 import sklearn.metrics as skm
 
 from fairlearn.metrics import MetricFrame
-from fairlearn.metrics._group_metric_set import _process_predictions
-from fairlearn.metrics._group_metric_set import _process_sensitive_features
-from fairlearn.metrics._group_metric_set import _create_group_metric_set
+from fairlearn.metrics._group_metric_set import (
+    _create_group_metric_set,
+    _process_predictions,
+    _process_sensitive_features,
+)
 
 from .sample_loader import load_sample_dashboard
-from test.unit.input_convertors import conversions_for_1d
 
 _BC_1P_1F = "bc-1p-1f.json"
 _BC_2P_3F = "bc-2p-3f.json"
@@ -45,9 +47,7 @@ def validate_dashboard_dictionary(dashboard_dict):
         sf_classes = sf["binLabels"]
         assert len(sf_classes) == 1 + max(sf_vector)
 
-    expected_keys = sorted(
-        list(dashboard_dict["precomputedMetrics"][0][0].keys())
-    )
+    expected_keys = sorted(list(dashboard_dict["precomputedMetrics"][0][0].keys()))
     assert len(dashboard_dict["precomputedMetrics"]) == num_sf
     for metrics_arr in dashboard_dict["precomputedMetrics"]:
         assert len(metrics_arr) == num_y_pred
@@ -116,9 +116,7 @@ class TestProcessPredictions:
     @pytest.mark.parametrize("transform_y_1", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_2", conversions_for_1d)
     @pytest.mark.parametrize("transform_y_3", conversions_for_1d)
-    def test_results_are_sorted(
-        self, transform_y_1, transform_y_2, transform_y_3
-    ):
+    def test_results_are_sorted(self, transform_y_1, transform_y_2, transform_y_3):
         y_p1 = transform_y_1([0, 0, 1, 1])
         y_p2 = transform_y_2([0, 1, 0, 1])
         y_p3 = transform_y_3([1, 1, 0, 0])
@@ -213,9 +211,7 @@ class TestCreateGroupMetricSet:
         assert actual_acc["global"] == expected.overall["accuracy_score"]
         assert actual_acc["bins"] == list(expected.by_group["accuracy_score"])
 
-        actual_roc = actual["precomputedMetrics"][0][0][
-            "balanced_accuracy_score"
-        ]
+        actual_roc = actual["precomputedMetrics"][0][0]["balanced_accuracy_score"]
         assert actual_roc["global"] == expected.overall["roc_auc_score"]
         assert actual_roc["bins"] == list(expected.by_group["roc_auc_score"])
 
@@ -235,9 +231,7 @@ class TestCreateGroupMetricSet:
 
         # Check that the error case was intercepted for roc_auc_score
         validate_dashboard_dictionary(actual)
-        actual_roc = actual["precomputedMetrics"][0][0][
-            "balanced_accuracy_score"
-        ]
+        actual_roc = actual["precomputedMetrics"][0][0]["balanced_accuracy_score"]
         expected_all_roc = skm.roc_auc_score(y_t, y_p)
         assert actual_roc["global"] == expected_all_roc
         assert actual_roc["bins"] == [0, 0]  # We substituted zero

@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 
 
-def simple_binary_threshold_data(number_a0, number_a1,
-                                 a0_threshold, a1_threshold,
-                                 a0_label, a1_label):
+def simple_binary_threshold_data(
+    number_a0, number_a1, a0_threshold, a1_threshold, a0_label, a1_label
+):
     """Generate some simple (biased) thresholded data.
 
     This is based on a rigged credit scoring scenario, with two
@@ -61,6 +61,5 @@ def simple_binary_threshold_data(number_a0, number_a1,
 
     Y = np.concatenate((Y_a0, Y_a1), axis=None)
 
-    X = pd.DataFrame({"example_feature": score_feature,
-                      "example_sensitive_feature": A})
+    X = pd.DataFrame({"example_feature": score_feature, "example_sensitive_feature": A})
     return X, Y, A

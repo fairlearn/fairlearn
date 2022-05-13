@@ -30,19 +30,19 @@ Making Derived Metrics
 # We start with some uncontroversial `import` statements:
 
 import functools
-import numpy as np
 
+import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
+from sklearn.compose import make_column_selector as selector
 from sklearn.datasets import fetch_openml
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
-from fairlearn.metrics import MetricFrame, make_derived_metric
-from fairlearn.metrics import accuracy_score_group_min
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+from fairlearn.metrics import MetricFrame, accuracy_score_group_min, make_derived_metric
 
 # %%
 # Next, we import the data, dropping any rows which are missing data:
@@ -141,7 +141,7 @@ acc_frame = MetricFrame(
     metrics=skm.accuracy_score,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test["sex"]
+    sensitive_features=A_test["sex"],
 )
 print("Minimum accuracy_score: ", acc_frame.group_min())
 

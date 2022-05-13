@@ -20,16 +20,14 @@ class Moment:
     of :class:`Moment` objects to describe both the optimization objective
     and the fairness constraints
     imposed on the solution. This is an abstract class for all such objects.
+
+    Read more in the :ref:`User Guide <reductions>`.
     """
 
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self,
-                  X,
-                  y: pd.Series,
-                  *,
-                  sensitive_features: pd.Series = None):
+    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series = None):
         """Load a set of data for use by this object.
 
         Parameters
@@ -41,8 +39,7 @@ class Moment:
         sensitive_features : :class:`pandas.Series`
             The sensitive feature vector (default None)
         """
-        assert self.data_loaded is False, \
-            "data can be loaded only once"
+        assert self.data_loaded is False, "data can be loaded only once"
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)
         self.X = X

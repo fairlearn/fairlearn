@@ -11,10 +11,13 @@ logging.basicConfig(level=logging.INFO)
 def _ensure_cwd_is_fairlearn_root_dir():
     # To ensure we're in the right directory that there's a fairlearn directory inside the
     # current working directory as well as the presence of a README.rst file.
-    if not os.path.exists(os.path.join(os.getcwd(), "fairlearn")) or \
-            not os.path.exists(os.path.join(os.getcwd(), "README.rst")):
-        raise Exception("Please run this from the fairlearn root directory. "
-                        "Current directory: {}".format(os.getcwd()))
+    if not os.path.exists(os.path.join(os.getcwd(), "fairlearn")) or not os.path.exists(
+        os.path.join(os.getcwd(), "README.rst")
+    ):
+        raise Exception(
+            "Please run this from the fairlearn root directory. "
+            "Current directory: {}".format(os.getcwd())
+        )
 
 
 class _LogWrapper:

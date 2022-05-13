@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from test.unit.input_convertors import conversions_for_1d
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,9 +11,7 @@ import sklearn.metrics as skm
 import fairlearn.metrics as metrics
 
 # Bring in some pre-prepared input arrays
-from .data_for_test import y_t, y_p, g_1, g_2, g_3, g_4, s_w
-
-from test.unit.input_convertors import conversions_for_1d
+from .data_for_test import g_1, g_2, g_3, g_4, s_w, y_p, y_t
 
 
 @pytest.mark.parametrize("transform_y_p", conversions_for_1d)
@@ -290,7 +290,7 @@ def test_2m_1sf_sample_weights():
         """
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(some_param_name)
-        assert np.array_equal(some_param_name, y_t+y_p)
+        assert np.array_equal(some_param_name, y_t + y_p)
         assert isinstance(some_param_name, np.ndarray)
         return sum(some_param_name)
 
@@ -304,8 +304,7 @@ def test_2m_1sf_sample_weights():
         assert len(y_t) == len(y_p)
         assert len(y_t) == len(some_param_name)
         assert len(y_t) == len(some_other)
-        assert np.array_equal(some_other,
-                              y_t+y_p * some_param_name)
+        assert np.array_equal(some_other, y_t + y_p * some_param_name)
         assert isinstance(some_other, np.ndarray)
         return sum(some_other)
 

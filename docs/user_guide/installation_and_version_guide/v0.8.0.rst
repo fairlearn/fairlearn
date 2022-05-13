@@ -23,3 +23,6 @@ v0.8.0
   :class:`~fairlearn.reductions.ExponentiatedGradient`.
   Added support for cost sensitive classification in
   :class:`~fairlearn.reductions.ErrorRate`.
+* Internal performance improvements for :class:`~fairlearn.metrics.MetricFrame`.
+  Some results may now have a more appropriate type than :code:`object`, but otherwise
+  the only visible difference should be a substantial speed increase.

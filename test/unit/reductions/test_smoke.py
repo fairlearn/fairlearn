@@ -1,23 +1,28 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import platform
+
 import numpy as np
 import pandas as pd
-import platform
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from fairlearn.reductions import ExponentiatedGradient, GridSearch, DemographicParity, \
-    EqualizedOdds
-
+from fairlearn.reductions import (
+    DemographicParity,
+    EqualizedOdds,
+    ExponentiatedGradient,
+    GridSearch,
+)
 
 _ESTIMATORS = [LogisticRegression, SVC, DecisionTreeClassifier]
 
 if platform.system() != "Darwin":
     # MacOS requires extra steps to install lightgbm properly, skipping for now
     from lightgbm import LGBMClassifier
+
     _ESTIMATORS.append(LGBMClassifier)
 
 
@@ -36,7 +41,7 @@ def test_smoke(Mitigator, Constraints, Estimator, n_sensitive_feature_values):
     A = np.random.choice(list(range(n_sensitive_feature_values)), size=n)
     df = pd.DataFrame({"X0": X0, "X1": X1})
     # Set X1 as categorical
-    df['X1'] = df['X1'].astype('category')
+    df["X1"] = df["X1"].astype("category")
 
     mitigator = Mitigator(Estimator(), Constraints())
     mitigator.fit(df, Y, sensitive_features=A)

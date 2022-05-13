@@ -5,9 +5,8 @@ This script generates an html table of contributors, with names and avatars.
 The list is generated from Fairlearn's teams on GitHub.
 It's originally copied from scikit-learn and adapted for Fairlearn.
 """
-from pathlib import Path
 from os import path
-
+from pathlib import Path
 
 REPO_FOLDER = Path(path.abspath(__file__)).parent.parent
 
@@ -17,7 +16,7 @@ MAINTAINERS = {
     "mmadaio": "Michael Madaio",
     "MiroDudik": "Miro Dudik",
     "riedgar-ms": "Richard Edgar",
-    "romanlutz": "Roman Lutz"
+    "romanlutz": "Roman Lutz",
 }
 
 

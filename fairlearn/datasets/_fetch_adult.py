@@ -4,11 +4,11 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_adult(*, cache=True, data_home=None,
-                as_frame=False, return_X_y=False):
+def fetch_adult(*, cache=True, data_home=None, as_frame=False, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
 
     Read more in the :ref:`User Guide <boston_housing_data>`.
@@ -26,6 +26,8 @@ def fetch_adult(*, cache=True, data_home=None,
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
+
+    Read more in the :ref:`User Guide <adult_data>`.
 
     .. versionadded:: 0.5.0
 

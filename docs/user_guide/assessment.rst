@@ -1,20 +1,145 @@
 Assessment
 ==========
 
-Metrics
--------
+Introduction
+------------
+
+The goal of fairness assessment is to answer the question: Which groups of 
+people may be disproportionately negatively impacted by an AI system and in 
+what ways?
+
+The steps of the assesment are as follows:
+
+1. Identify types of harms 
+2. Identify the groups that might be harmed 
+3. Quantify harms 
+4. Compare quantified harms across the groups 
+
+We next examine these four steps in more detail.
+
+Identify types of harms
+^^^^^^^^^^^^^^^^^^^^^^^
+
+See :ref:`types_of_harms` for a guide to types of fairness-related harms. 
+For example, in a system for screening job applications, qualified candidates 
+that are automatically rejected experience an allocation harm. In a 
+speech-to-text transcription system, disparities in word error rates for 
+different groups may result in harms due to differences in the quality of service.
+Note that one system can lead to multiple harms, and different types of 
+harms are not mutually exclusive. For more information, review 
+Fairlearn's `2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
+
+Identify the groups that might be harmed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In most applications, we consider demographic groups including historically 
+marginalized groups (e.g., based on gender, race, ethnicity). We should also 
+consider groups that are relevant to a particular use case or deployment context. For example, for 
+speech-to-text transcription, this might include groups who speak a regional dialect or people who are a  
+native or a non-native speaker.
+
+It is also important to consider group intersections, for example, in addition
+to considering groups according to gender and groups according to race, it is 
+also important to consider their intersections (e.g., Black women, Latinx 
+nonbinary people, etc.). Kimberlé Crenshaw's work on intersectionality :footcite:p:`crenshaw1991intersectionality`
+offers a thorough background on this topic.
+
+Quantify harms
+^^^^^^^^^^^^^^
+
+Define metrics that quantify harms or benefits:
+
+* In a job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`
+
+* For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
+
+Note that in some cases, the outcome we seek to measure is not 
+directly available. 
+Occasionally, another variable in our dataset provides a close 
+approximation to the phenomenon we seek to measure. 
+In these cases, we might choose to use that closely related variable, 
+often called a "proxy", to stand in for the missing variable. 
+For example, suppose that in the job screening scenario, 
+we have data on whether the candidate passes the first two stages, 
+but not if they are ultimately recommended for the job. 
+
+As an alternative to the unobserved final recommendation, we could
+therefore measure the harm using the proxy variable indicating whether
+the candidate passes the first stage of the screen.
+If you choose to use a proxy variable to 
+represent the harm, check the proxy variable regularly to ensure it 
+remains useful over time. Our section on :ref:`construct_validity`
+describes how to determine whether a  
+proxy variable measures the intended construct in a meaningful 
+and useful way. It is important to ensure that the proxy is suitable 
+for the social context of the problem you seek to solve. 
+In particular, be careful of falling into one of the :ref:abstraction_traps. 
+
+Compare quantified harms across the groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
+which are metrics evaluated on slices of data. For example, to measure harms due to 
+errors, we would begin by evaluating the errors on each slice of the data that 
+corresponds to a group. If some of the groups are seeing much larger errors 
+than other groups, we would flag this as a fairness harm.
+
+To summarize the disparities in errors (or other metrics), we may want to 
+report quantities such as the difference or ratio of the metric values between 
+the best and the worst slice. In settings where the goal is to guarantee 
+certain minimum quality of service across all groups (such as speech recognition), 
+it is also meaningful to report the worst performance across all considered groups.
+
+For example, when comparing the false negative rate across groups defined by race, 
+we may summarize our findings with a table. Note that the these statistics must 
+be drawn from a large enough sample size to draw meaningful conclusions. 
+
+.. list-table::
+   :header-rows: 1
+   :widths: 7 30 30
+   :stub-columns: 1
+
+   *  - 
+      - false negative rate (FNR)
+      - sample size
+
+   *  - AfricanAmerican
+      - 0.43
+      - 126
+
+   *  - Caucasian
+      - 0.44
+      - 620
+
+   *  - Other
+      - 0.52
+      - 200
+
+   *  - Unknown
+      - 0.67
+      - 60
+
+   *  - largest difference
+      - 0.24 (best is 0.0)
+      - N/A
+
+   *  - smallest ratio
+      - 0.64 (best is 1.0)
+      - N/A
+
+   *  - maximum (worst-case) FNR
+      - 0.67
+      - N/A
+
+Disaggregated metrics
+---------------------
 
 .. currentmodule:: fairlearn.metrics
 
-The :py:mod:`fairlearn.metrics` module provides the means to assess fairness-related
-metrics for models. This applies for any kind of model that users may already
-use, but also for models created with mitigation techniques from the
-:ref:`mitigation` section. The :ref:`dashboard` provides a visual way to
-compare metrics between models as well as compare metrics for different groups
-on a single model.
-
-Ungrouped Metrics
-^^^^^^^^^^^^^^^^^
+The :py:mod:`fairlearn.metrics` module provides the means to assess 
+fairness-related metrics for models. This applies for any kind of model that 
+users may already use, but also for models created with mitigation techniques 
+from the :ref:`mitigation` section.
 
 At their simplest, metrics take a set of 'true' values :math:`Y_{true}` (from
 the input data) and predicted values :math:`Y_{pred}` (by applying the model
@@ -42,17 +167,31 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 
 .. _metrics_with_grouping:
 
-Metrics with Grouping
-^^^^^^^^^^^^^^^^^^^^^
+Disaggregated metrics using :code:`MetricFrame`
+--------------------------------------------------------
 
-When considering fairness, each row of input data will have an associated
+In a typical fairness assessment, each row of input data will have an associated
 group label :math:`g \in G`, and we will want to know how the metric behaves
-for each :math:`g`. To help with this, Fairlearn provides a class, which takes
-an existing (ungrouped) metric function, and applies it to each group within a
-set of data.
+for each group :math:`g`. To help with this, Fairlearn provides a class that takes
+an existing (disaggregated) metric function, like 
+:func:`sklearn.metrics.roc_auc_score` or :func:`fairlearn.metrics.false_positive_rate`, 
+and applies it to each group within a set of data.
 
-Suppose in addition to the :math:`Y_{true}` and :math:`Y_{pred}` above, we had
-the following set of labels:
+This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
+of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
+takes four arguments:
+
+* metric_function with signature :code:`metric_function(y_true, y_pred)`
+
+* y_true: array of labels
+
+* y_pred: array of predictions
+
+* sensitive_features: array of sensitive feature values
+
+The code chunk below displays a case where in addition to the :math:`Y_{true}` 
+and :math:`Y_{pred}` above, the dataset also contains the following set of 
+labels, denoted by the "group_membership_data" column:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -99,11 +238,12 @@ We then calculate a metric which shows the subgroups:
     >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
-Note that the overall recall is the same as that calculated above in the
-Ungrouped Metric section, while the 'by group' dictionary can be checked
-against the table above.
+The disaggregated metrics are stored in a :class:`pandas.Series` 
+:code:`grouped_metric.by_group`. Note that the overall recall is the same 
+as that calculated above in the Ungrouped Metric section, while the 'by_group'
+dictionary can be checked against the table above.
 
-In addition to these basic scores, Fairlearn also provides
+In addition to these basic scores, Fairlearn provides
 convenience functions to recover the maximum and minimum values of the metric
 across groups and also the difference and ratio between the maximum and minimum:
 
@@ -118,44 +258,14 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
-Multiclass metrics
-^^^^^^^^^^^^^^^^^^
-
-We may also be interested in multiclass classification. However, typical group
-fairness metrics such as equalized odds and demographic parity are only defined
-for binary classification. One way to measure fairness in the multiclass
-scenario is to define one-to-one or one-to-rest classifications for each group
-and calculate the metrics on this instead. Alternatively, we can use predefined
-metrics for multiclass classification. For example, accuracy is a multiclass
-metric that we can utilize through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
-in combination with a :code:`MetricFrame` as follows:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from sklearn.metrics import accuracy_score
-    >>> from fairlearn.metrics import MetricFrame
-    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
-    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
-    >>> mf = MetricFrame(metric=accuracy_score,
-    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
-    ...                  sensitive_features=group_membership_data)
-    >>> print(mf.by_group) # series with accuracy for each sensitive group
-    sensitive_feature_0
-    a         1.0...
-    b         0.5...
-    c         0.428...
-    d         1.0...
-    Name: accuracy_score, dtype: float64
-    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
-    0.5714285714285714
-
-Multiple metrics in one :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Multiple metrics in a single :code:`MetricFrame`
+------------------------------------------------
 
 A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously (note that :func:`fairlearn.metrics.count` can be used to
-show each group's size):
+metrics simultaneously by providing the `metrics` argument with a 
+dictionary of desired metrics. The disaggregated metrics are then stored in a 
+pandas DataFrame. Note that :class:`pandas.DataFrame` can 
+be used to show each group's size:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -178,8 +288,8 @@ show each group's size):
     c                          0.6    0.75    7.0
     d                          0.0    0.00    3.0
 
-If there are per-sample arguments (such as sample weights), these can also be provided
-in a dictionary via the ``sample_params`` argument.:
+If there are per-sample arguments (such as sample weights), these can also be 
+provided in a dictionary via the ``sample_params`` argument.:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -201,16 +311,16 @@ in a dictionary via the ``sample_params`` argument.:
     d    0...
     Name: recall_score, dtype: float64
 
-If multiple metrics are being evaluated, then ``sample_params`` becomes a dictionary of
-dictionaries, with the first key corresponding matching that in the dictionary holding
-the desired underlying metric functions.
+If multiple metrics are being evaluated, then ``sample_params`` becomes a 
+dictionary of dictionaries, with the first key corresponding matching that in 
+the dictionary holding the desired underlying metric functions.
 
 Non-sample parameters
 ^^^^^^^^^^^^^^^^^^^^^
 
-We do not support non-sample parameters at the current time. If these are required, then
-use :func:`functools.partial` to prebind the required arguments to the metric
-function:
+We do not support non-sample parameters at the current time. If these are 
+required, then use :func:`functools.partial` to prebind the required arguments 
+to the metric function:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -231,11 +341,43 @@ function:
     d    0...
     Name: metric, dtype: float64
 
+Multiclass metrics
+^^^^^^^^^^^^^^^^^^
+
+We may also be interested in multiclass classification. However, typical group
+fairness metrics such as equalized odds and demographic parity are only defined
+for binary classification. One way to measure fairness in the multiclass
+scenario is to define one-to-one or one-to-rest classifications for each group
+and calculate the metrics on this instead. Alternatively, we can use predefined
+metrics for multiclass classification. For example, accuracy is a multiclass
+metric that we can use through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
+in combination with a :code:`MetricFrame` as follows:
+
+.. doctest:: assessment_metrics
+
+    >>> from sklearn.metrics import accuracy_score
+    >>> from fairlearn.metrics import MetricFrame
+    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
+    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
+    >>> mf = MetricFrame(metric=accuracy_score,
+    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
+    ...                  sensitive_features=group_membership_data)
+    >>> print(mf.by_group) # series with accuracy for each sensitive group
+    sensitive_feature_0
+    a    1.000000
+    b    0.500000
+    c    0.428571
+    d    1.000000
+    Name: accuracy_score, dtype: float64
+    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
+    0.5714285714285714
+
+
 Multiple sensitive features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Finally, multiple sensitive features can be specified. The ``by_groups`` property then
-holds the intersections of these groups:
+Finally, multiple sensitive features can be specified. The ``by_groups`` 
+property then holds the intersections of these groups:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -449,6 +591,9 @@ see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 
 .. _plot:
 
+Plotting
+--------
+
 Plotting grouped metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -469,6 +614,7 @@ It is possible to customize the plots. Here are some common examples.
 
 Customize Plots: :code:`ylim`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The y-axis range is automatically set, which can be misleading, therefore it is
 sometimes useful to set the `ylim` argument to define the yaxis range.
 
@@ -483,6 +629,7 @@ sometimes useful to set the `ylim` argument to define the yaxis range.
 
 Customize Plots: :code:`colormap`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 To change the color scheme, we can use the `colormap` argument. A list of colorschemes
 can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.html>`_.
 
@@ -496,18 +643,27 @@ can be found `here <https://matplotlib.org/stable/tutorials/colors/colormaps.htm
 
 Customize Plots: :code:`kind`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 There are different types of charts (e.g. pie, bar, line) which can be defined by the `kind`
 argument. Here is an example of a pie chart.
 
 .. literalinclude:: ../auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Customize plots with kind
+    :end-before: # Saving plots
 
 .. figure:: ../auto_examples/images/sphx_glr_plot_quickstart_004.png
     :align: center
 
 There are many other customizations that can be done. More information can be found in
 :meth:`pandas.DataFrame.plot`.
+
+In order to save a plot, access the :class:`matplotlib.figure.Figure` as below and save it with your
+desired filename.
+
+.. literalinclude:: ../auto_examples/plot_quickstart.py
+    :language: python
+    :start-after: # Saving plots
 
 .. _dashboard:
 

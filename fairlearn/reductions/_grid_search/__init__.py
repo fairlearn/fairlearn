@@ -5,6 +5,4 @@
 
 from .grid_search import GridSearch  # noqa: F401
 
-__all__ = [
-    "GridSearch"
-]
+__all__ = ["GridSearch"]
