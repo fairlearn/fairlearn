@@ -32,23 +32,25 @@ single_categorical_sf = [
 
 @pytest.fixture
 def data_X():
-    return [
-        [0.0],
-        [1.0],
-        [2.0],
-        [3.0],
-        [4.0],
-        [5.0],
-        [6.0],
-        [7.0],
-        [8.0],
-        [9.0],
-    ]
+    return np.asarray(
+        [
+            [0.0],
+            [1.0],
+            [2.0],
+            [3.0],
+            [4.0],
+            [5.0],
+            [6.0],
+            [7.0],
+            [8.0],
+            [9.0],
+        ]
+    )
 
 
 @pytest.fixture
 def data_y():
-    return [1, 1, 1, 1, 0, 0, 1, 0, 0, 0]
+    return np.asarray([1, 1, 1, 1, 0, 0, 1, 0, 0, 0])
 
 
 @pytest.fixture(params=[single_binary_sf, single_categorical_sf])
@@ -58,6 +60,4 @@ def data_single_sf(request):
 
 @pytest.fixture
 def data_multiple_sf():
-    return np.hstack(
-        (np.array(single_binary_sf), np.array(single_categorical_sf))
-    )
+    return np.hstack((np.array(single_binary_sf), np.array(single_categorical_sf)))

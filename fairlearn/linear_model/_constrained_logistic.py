@@ -49,7 +49,7 @@ def _check_multi_class(multi_class):
     return multi_class
 
 
-def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
+def _sensitive_attr_constraint_cov(model, X, sensitive_features, covariance_bound):
     """
     Calculate the covariance threshold.
 
@@ -63,10 +63,10 @@ def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
     model : numpy.ndarray
         Model weights.
 
-    X_train : numpy.ndarray or pandas.DataFrame
+    X : numpy.ndarray or pandas.DataFrame
         Feature data.
 
-    A_train : numpy.ndarray or pandas.DataFrame
+    sensitive_features : numpy.ndarray or pandas.DataFrame
         Sensitive features.
 
     covariance_bound : float
@@ -79,34 +79,33 @@ def _sensitive_attr_constraint_cov(model, X_train, A_train, covariance_bound):
         The difference between the given covariance_threshold and the absolute
         covariance.
     """
-    assert X_train.shape[0] == A_train.shape[0]
+    assert X.shape[0] == sensitive_features.shape[0]
     if (
-        len(A_train.shape) > 1
+        len(sensitive_features.shape) > 1
     ):  # make sure we just have one column in the array
-        assert A_train.shape[1] == 1
+        assert sensitive_features.shape[1] == 1
 
     intercept = 0.0
 
-    num_features = X_train.shape[1]
-    if (
-        model.size == num_features + 1
-    ):  # True if the intercept needs to be fitted
+    num_features = X.shape[1]
+    if model.size == num_features + 1:  # True if the intercept needs to be fitted
         intercept = model[-1]
         model = model[:-1]
 
     # the product with the weight vector -- the sign of this is the output label
-    arr = np.dot(model, X_train.T) + intercept
+    arr = np.dot(model, X.T) + intercept
 
     arr = np.array(arr, dtype=np.float64)
-    cov = np.dot(A_train - np.mean(A_train), arr) / float(len(A_train))
+    cov = np.dot(sensitive_features - np.mean(sensitive_features), arr) / float(
+        len(sensitive_features)
+    )
     ans = covariance_bound - abs(cov)
     return ans
 
 
 def _get_constraint_list_cov(
-    X_train,
-    A_train,
-    renamed_sensitive_feature_ids,
+    X,
+    sensitive_features,
     categories,
     covariance_bound,
 ):
@@ -115,14 +114,11 @@ def _get_constraint_list_cov(
 
     Parameters
     ----------
-    X_train : numpy.ndarray or pandas.DataFrame
+    X : numpy.ndarray or pandas.DataFrame
         Feature data.
 
-    A_train : numpy.ndarray or pandas.DataFrame
+    sensitive_features : numpy.ndarray or pandas.DataFrame
         Sensitive features.
-
-    renamed_sensitive_feature_ids : list
-        The renamed sensitive feature ids, either as strings or as numbers.
 
     categories : list
         The categories from the one-hot-encoder.
@@ -143,14 +139,19 @@ def _get_constraint_list_cov(
 
     constraints = []
 
-    for index, attr in enumerate(renamed_sensitive_feature_ids):
-        if isinstance(A_train, pd.DataFrame):
+    if isinstance(sensitive_features, pd.DataFrame):
+        to_iterate = list(sensitive_features.columns)
+    else:  # Numpy array
+        to_iterate = list(range(sensitive_features.shape[1]))
+
+    for index, attr in enumerate(to_iterate):
+        if isinstance(sensitive_features, pd.DataFrame):
             c = {
                 "type": "ineq",
                 "fun": _sensitive_attr_constraint_cov,
                 "args": (
-                    X_train,
-                    A_train[attr].to_numpy(),
+                    X,
+                    sensitive_features[attr].to_numpy(),
                     cov_bound[index],
                 ),
             }
@@ -159,8 +160,8 @@ def _get_constraint_list_cov(
                 "type": "ineq",
                 "fun": _sensitive_attr_constraint_cov,
                 "args": (
-                    X_train,
-                    A_train[:, attr],
+                    X,
+                    sensitive_features[:, attr],
                     cov_bound[index],
                 ),
             }
@@ -231,18 +232,14 @@ def _logistic_regression_path(
     # If sample weights exist, convert them to array (support for lists)
     # and check length
     # Otherwise set them to 1 for all examples
-    sample_weight = _check_sample_weight(
-        sample_weight, X, dtype=X.dtype, copy=True
-    )
+    sample_weight = _check_sample_weight(sample_weight, X, dtype=X.dtype, copy=True)
 
     # If class_weights is a dict (provided by the user), the weights
     # are assigned to the original labels. If it is "balanced", then
     # the class_weights are assigned after masking the labels with a OvR.
     le = LabelEncoder()
     if isinstance(class_weight, dict):
-        class_weight_ = compute_class_weight(
-            class_weight, classes=classes, y=y
-        )
+        class_weight_ = compute_class_weight(class_weight, classes=classes, y=y)
         sample_weight *= class_weight_[le.fit_transform(y)]
 
     # For doing a ovr, we need to mask the labels first.
@@ -295,9 +292,7 @@ def _logistic_regression_path(
             w0, _ = opt_res.x, opt_res.fun
 
         else:
-            raise ValueError(
-                "solver must be {'SLSQP'}, got '%s' instead" % solver
-            )
+            raise ValueError("solver must be {'SLSQP'}, got '%s' instead" % solver)
 
         coefs.append(w0.copy())
 
@@ -306,54 +301,90 @@ def _logistic_regression_path(
     return np.array(coefs), np.array(Cs), n_iter
 
 
-def _ohe_sensitive_features(X, sensitive_feature_ids):
+def _ohe_sensitive_features(sensitive_features):
     """
     One-hot-encode the sensitive features.
 
-    We one-hot-encode the sensitive features such that they can be splitted
-    from X and that the constraints can be correctly coded per feature value.
+    We one-hot-encode the sensitive features such that the constraints
+    can be correctly coded per feature value.
 
     Parameters
     ----------
-    X : numpy.ndarray or pandas.DataFrame
-        Feature data
-
-    sensitive_feature_ids : list
-        columns to filter out, either as strings (DataFrame) or numbers (numpy)
+    sensitive_features : numpy.ndarray or pandas.DataFrame
+        Sensitive feature data.
 
     Returns
     -------
-    X : numpy.ndarray or pandas.DataFrame
-        Feature data with one-hot-encoded values
-
-    renamed_sensitive_feature_ids : list
-        The renamed sensitive feature ids, either as strings or as numbers
+    transformed : numpy.ndarray or pandas.DataFrame
+        Transformed sensitive feature data with one-hot-encoded values.
 
     categories : list
-        The categories from the encoder
+        The categories from the encoder.
     """
     enc = OneHotEncoder(handle_unknown="ignore")
-    if isinstance(X, pd.DataFrame):
-        transformed = enc.fit_transform(X[sensitive_feature_ids]).toarray()
-        renamed_sensitive_feature_ids = list(enc.get_feature_names_out())
+    if isinstance(sensitive_features, pd.DataFrame):
+        transformed = enc.fit_transform(sensitive_features).toarray()
+        renamed_sensitive_feature = list(enc.get_feature_names_out())
         # Create a Pandas DataFrame of the hot encoded column
-        ohe_df = pd.DataFrame(
-            transformed, columns=renamed_sensitive_feature_ids
-        )
-        # concat with original data, drop the original sensitive_feature_ids
-        X = pd.concat([X, ohe_df], axis=1).drop(sensitive_feature_ids, axis=1)
+        transformed = pd.DataFrame(transformed, columns=renamed_sensitive_feature)
+
     else:  # Numpy array
-        transformed = enc.fit_transform(X[:, sensitive_feature_ids]).toarray()
-        # Delete the old column and append the transformed columns
-        X_without_sensitive = np.delete(X, sensitive_feature_ids, axis=1)
-        X = np.append(X_without_sensitive, transformed, axis=1)
-        # Need to return the new transformed sensitive feature ids since there are more columns now
-        renamed_sensitive_feature_ids = list(
-            range(X_without_sensitive.shape[1], X.shape[1])
-        )
+        if len(sensitive_features.shape) == 1:  # 1-d array
+            sensitive_features = sensitive_features.reshape(-1, 1)
+        transformed = enc.fit_transform(sensitive_features).toarray()
+
     categories = enc.categories_
 
-    return X, renamed_sensitive_feature_ids, categories
+    return transformed, categories
+
+
+def _process_sensitive_features(sensitive_features):
+    """
+    Process the sensitive features.
+
+    We process the sensitive features such that we obtain the number
+    of sensitive features that are supplied, as well as making sure
+    that the sensitive features are stored in either a numpy array
+    or a Pandas DataFrame. When the sensitive features are supplied as
+    a list, we assume there is only one sensitive feature, and it is
+    transformed to a numpy array. Sensitive features supplied via a
+    pandas.Series are transformed to a pandas.DataFrame.
+
+    Parameters
+    ----------
+    sensitive_features : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+        The sensitive features. In the case of a list or pandas.Series,
+        we assume there is only one sensitive feature.
+
+    Returns
+    -------
+    sensitive_features : numpy.ndarray or pandas.DataFrame
+        Transformed sensitive feature data with one-hot-encoded values.
+
+    count : int
+        The number of sensitive features supplied.
+    """
+    if isinstance(sensitive_features, list):
+        sensitive_features = np.atleast_1d(np.squeeze(np.asarray(sensitive_features)))
+        assert len(sensitive_features.shape) == 1  # Sanity check
+        count = len(sensitive_features.shape)
+    elif isinstance(sensitive_features, pd.Series):
+        count = 1  # A series always represents a single sensitive feature
+        sensitive_features = pd.DataFrame(sensitive_features)
+    elif isinstance(sensitive_features, np.ndarray):
+        if len(sensitive_features.shape) > 1:  # If not a 1-d array
+            count = sensitive_features.shape[1]
+        else:
+            count = len(sensitive_features.shape)  # This should always be 1
+    elif isinstance(sensitive_features, pd.DataFrame):
+        count = len(sensitive_features.columns)
+    else:
+        raise TypeError(
+            "Sensitive features is of the wrong type."
+            f" Got {type(sensitive_features)}, but was expecting one of"
+            " (list, pd.Series, np.ndarrray, pd.DataFrame)."
+        )
+    return sensitive_features, count
 
 
 class ConstrainedLogisticRegression(LogisticRegression):
@@ -364,10 +395,11 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     Parameters
     ----------
-    constraints : str, {'demographic_parity', 'none'}, default='demographic_parity'
+    constraints : str, {'demographic_parity_covariance', none'},
+        default='demographic_parity_covariance'
         The constraints used in the logistic regression:
 
-        - `'demographic_parity'`:
+        - `'demographic_parity_covariance'`:
             This constraint is defined as the covariance between the sensitive
             features :math:`\left\{\mathbf{z}_{i}\right\}_{i=1}^{N}`, and the
             signed distance from the users` feature vectors to the decision boundary
@@ -505,7 +537,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     def __init__(
         self,
-        constraints="demographic_parity",
+        constraints="demographic_parity_covariance",
         penalty="l2",
         *,
         covariance_bound=0.0,
@@ -549,48 +581,12 @@ class ConstrainedLogisticRegression(LogisticRegression):
         if not isinstance(self.covariance_bound, list):
             self.covariance_bound = [self.covariance_bound]
 
-    # Below code is almost entirely reused from the CorrelationRemover,
-    # should this maybe be abstracted higher up?
-    # Also not sure if this should be a function of the ConstrainedLogisticRegression class,
-    # doesn't really feel like it.
-    # That is also why I feel like it is a good reason to abstract it higher up.
-    # Seems like something for utils maybe?
-    def _split_X(self, X, sensitive_feature_ids):
-        """Split up X into a sensitive and non-sensitive group."""
-        sensitive = [self.lookup_[i] for i in sensitive_feature_ids]
-        non_sensitive = [i for i in range(X.shape[1]) if i not in sensitive]
-        if isinstance(X, pd.DataFrame):
-            return (
-                X.iloc[:, non_sensitive],
-                X.iloc[:, sensitive],
-                sensitive_feature_ids,
-            )
-        else:  # Numpy arrays
-            # Sensitive_feature_ids are now in a different array with different indices
-            sensitive_feature_ids = list(range(X[:, sensitive].shape[1]))
-            return (
-                X[:, non_sensitive].astype("float"),
-                X[:, sensitive],
-                sensitive_feature_ids,
-            )
-
-    def _create_lookup(self, X):
-        """Create a lookup to handle column names correctly."""
-        if isinstance(X, pd.DataFrame):
-            self.lookup_ = {c: i for i, c in enumerate(X.columns)}
-            return X.values
-        # correctly handle a 1d input
-        if len(X.shape) == 1:
-            return {0: 0}
-        self.lookup_ = {i: i for i in range(X.shape[1])}
-        return X
-
     def fit(
         self,
         X,
         y,
         sample_weight=None,
-        sensitive_feature_ids=None,
+        sensitive_features=None,
     ):
         """
         Fit the model according to the given training data and sensitive features.
@@ -608,8 +604,9 @@ class ConstrainedLogisticRegression(LogisticRegression):
             Array of weights that are assigned to individual samples.
             If not provided, then each sample is given unit weight.
 
-        sensitive_feature_ids : list
-            sensitive features in the data, either as strings (DataFrame) or numbers (numpy)
+        sensitive_features : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+            The sensitive features. In the case of a list or pandas.Series,
+            we assume there is only one sensitive feature.
 
         Returns
         -------
@@ -641,48 +638,37 @@ class ConstrainedLogisticRegression(LogisticRegression):
             )
             return clf.fit(X, y)
 
-        if len(self.covariance_bound) > len(sensitive_feature_ids):
+        sensitive_features, num_sens_features = _process_sensitive_features(
+            sensitive_features
+        )
+
+        if len(self.covariance_bound) > num_sens_features:
             raise ValueError(
-                f"Number of covariance bound values can not exceed"
+                "Number of covariance bound values can not exceed"
                 f" the amount of sensitive features. Got {len(self.covariance_bound)}"
-                f" covariance bound values, got {len(sensitive_feature_ids)} sensitive features."
+                f" covariance bound values, got {num_sens_features} sensitive features."
             )
 
-        if len(sensitive_feature_ids) > len(self.covariance_bound):
+        if num_sens_features > len(self.covariance_bound):
             if len(self.covariance_bound) == 1:
-                self.covariance_bound = self.covariance_bound * len(
-                    sensitive_feature_ids
-                )
+                self.covariance_bound = self.covariance_bound * num_sens_features
             else:
                 raise ValueError(
-                    f"Number of covariance bound values is higher than 1 but lower than the"
-                    f" amount of sensitive features. Got {len(self.covariance_bound)}"
-                    f" covariance bound values, got {len(sensitive_feature_ids)} sensitive"
-                    f" features. Either pick a covariance bound value per sensitive feature,"
-                    f" or only one covariance bound value."
+                    "Number of covariance bound values is higher than 1 but lower than"
+                    " the amount of sensitive features. Got"
+                    f" {len(self.covariance_bound)} covariance bound values, got"
+                    f" {num_sens_features} sensitive features. Either pick a covariance"
+                    " bound value per sensitive feature, or only one covariance bound"
+                    " value."
                 )
 
-        # TODO: Maybe turn below code until constraints into a preprocessing function?
-
-        (
-            X_ohe,
-            renamed_sensitive_feature_ids,
-            categories,
-        ) = _ohe_sensitive_features(X, sensitive_feature_ids)
-        # Split the data similarly to how the CorrelationRemover does it
-        self._create_lookup(X_ohe)
-        (
-            X_train,
-            A_train,
-            renamed_sensitive_feature_ids,
-        ) = self._split_X(X_ohe, renamed_sensitive_feature_ids)
+        sensitive_features, categories = _ohe_sensitive_features(sensitive_features)
 
         # TODO: Think about whether the constraints should be
         #  implemented in `fit`, or in `_logistic_regression_path`
         constraints = _get_constraint_list_cov(
-            X_train,
-            A_train,
-            renamed_sensitive_feature_ids,
+            X,
+            sensitive_features,
             categories,
             self.covariance_bound,
         )
@@ -691,9 +677,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         solver = _check_solver(self.solver, self.penalty)
 
         if not isinstance(self.C, numbers.Number) or self.C < 0:
-            raise ValueError(
-                "Penalty term must be positive; got (C=%r)" % self.C
-            )
+            raise ValueError("Penalty term must be positive; got (C=%r)" % self.C)
         if self.penalty == "none":
             if self.C != 1.0:  # default values
                 warnings.warn(
@@ -721,8 +705,8 @@ class ConstrainedLogisticRegression(LogisticRegression):
         else:
             _dtype = [np.float64, np.float32]
 
-        X_train, y = self._validate_data(
-            X_train,
+        X, y = self._validate_data(
+            X,
             y,
             accept_sparse="csr",
             dtype=_dtype,
@@ -742,7 +726,8 @@ class ConstrainedLogisticRegression(LogisticRegression):
             raise ValueError(
                 "This solver needs samples of at least 2 classes"
                 " in the data, but the data contains only one"
-                " class: %r" % classes_[0]
+                " class: %r"
+                % classes_[0]
             )
 
         if len(self.classes_) == 2:
@@ -770,7 +755,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
             **_joblib_parallel_args(prefer=prefer),
         )(
             path_func(
-                X_train,  # Only use the nonsensitive features
+                X,
                 y,
                 pos_class=class_,
                 Cs=[C_],
@@ -796,12 +781,10 @@ class ConstrainedLogisticRegression(LogisticRegression):
         fold_coefs_, _, n_iter_ = zip(*fold_coefs_)
         self.n_iter_ = np.asarray(n_iter_, dtype=np.int32)[:, 0]
 
-        n_features = X_train.shape[1]
+        n_features = X.shape[1]
 
         self.coef_ = np.asarray(fold_coefs_)
-        self.coef_ = self.coef_.reshape(
-            n_classes, n_features + int(self.fit_intercept)
-        )
+        self.coef_ = self.coef_.reshape(n_classes, n_features + int(self.fit_intercept))
 
         if self.fit_intercept:
             self.intercept_ = self.coef_[:, -1]
