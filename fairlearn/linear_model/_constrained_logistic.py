@@ -509,7 +509,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     Attributes
     ----------
-
     classes_ : ndarray of shape (n_classes, )
         A list of class labels known to the classifier.
 
@@ -538,7 +537,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     References
     ----------
-
     .. footbibliography::
 
     """
