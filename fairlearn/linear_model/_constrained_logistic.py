@@ -79,11 +79,19 @@ def _sensitive_attr_constraint_cov(model, X, sensitive_features, covariance_boun
         The difference between the given covariance_threshold and the absolute
         covariance.
     """
-    assert X.shape[0] == sensitive_features.shape[0]
-    if (
-        len(sensitive_features.shape) > 1
-    ):  # make sure we just have one column in the array
-        assert sensitive_features.shape[1] == 1
+    if X.shape[0] != sensitive_features.shape[0]:
+        raise ValueError(
+            f"X has {X.shape[0]} instances while"
+            " the sensitive features consist of"
+            f" {sensitive_features.shape[0]} instances."
+            " These should be equal."
+        )
+    if len(sensitive_features.shape) > 1:
+        if sensitive_features.shape[1] != 1:
+            raise ValueError(
+                f"sensitive_features has {sensitive_features.shape[1]}"
+                " columns, while it should have only 1."
+            )
 
     intercept = 0.0
 
