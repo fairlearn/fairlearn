@@ -37,7 +37,7 @@ class BackendEngine:
         n_A_features = base._sf_transform.n_features_out_
 
         # Set up models
-        if base.warm_start and hasattr(base, 'backendEngine_'):
+        if base.warm_start and hasattr(base, "backendEngine_"):
             self.predictor_model = base.backendEngine_.predictor_model
             self.adversary_model = base.backendEngine_.adversary_model
         else:
@@ -60,12 +60,8 @@ class BackendEngine:
             self.__move_model__()
 
         # Set up losses
-        self.predictor_loss = self.__init_loss__(
-            base.predictor_loss_, "predictor"
-        )
-        self.adversary_loss = self.__init_loss__(
-            base.adversary_loss_, "adversary"
-        )
+        self.predictor_loss = self.__init_loss__(base.predictor_loss_, "predictor")
+        self.adversary_loss = self.__init_loss__(base.adversary_loss_, "adversary")
 
         # Set up optimizers
         self.predictor_optimizer = self.__init_optimizers__(
@@ -75,9 +71,7 @@ class BackendEngine:
             base.adversary_optimizer, self.adversary_model, "adversary"
         )
 
-    def __init_model__(
-        self, model_param, loss_param, X_features, y_features, name
-    ):
+    def __init_model__(self, model_param, loss_param, X_features, y_features, name):
         """
         Get an initialized model.
 
@@ -231,9 +225,7 @@ class BackendEngine:
         methods.
         """
         raise ValueError(
-            _DIST_TYPE_NOT_IMPLEMENTED.format(
-                self.__class__.__name__, dist_type
-            )
+            _DIST_TYPE_NOT_IMPLEMENTED.format(self.__class__.__name__, dist_type)
         )
 
     def get_model(self, list_nodes):

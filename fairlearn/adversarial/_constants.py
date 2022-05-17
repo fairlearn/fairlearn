@@ -1,9 +1,7 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-_IMPORT_ERROR_MESSAGE = (
-    "Please make sure to install {} in order to use this module."
-)
+_IMPORT_ERROR_MESSAGE = "Please make sure to install {} in order to use this module."
 _ARG_ERROR_MESSAGE = "Argument '{}' should be set to {}."
 _KWARG_ERROR_MESSAGE = "Key-word argument '{}' should be set to {}."
 _TYPE_CHECK_ERROR = "Data does not follow distribution assumption '{}'."

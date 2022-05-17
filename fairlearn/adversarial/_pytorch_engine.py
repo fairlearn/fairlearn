@@ -90,13 +90,10 @@ class PytorchEngine(BackendEngine):
 
         Y_hat = self.predictor_model(X)
         LP = self.predictor_loss(Y_hat, Y)
-        LP.backward(
-            retain_graph=True
-        )  # Check what this does at some point in time
+        LP.backward(retain_graph=True)  # Check what this does at some point in time
 
         dW_LP = [
-            torch.clone(p.grad.detach())
-            for p in self.predictor_model.parameters()
+            torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()
         ]
 
         self.predictor_optimizer.zero_grad()
@@ -111,21 +108,16 @@ class PytorchEngine(BackendEngine):
         LA.backward()
 
         dW_LA = [
-            torch.clone(p.grad.detach())
-            for p in self.predictor_model.parameters()
+            torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()
         ]
 
         for i, p in enumerate(self.predictor_model.parameters()):
             # Normalize dW_LA
-            unit_dW_LA = dW_LA[i] / (
-                torch.norm(dW_LA[i]) + torch.finfo(float).tiny
-            )
+            unit_dW_LA = dW_LA[i] / (torch.norm(dW_LA[i]) + torch.finfo(float).tiny)
             # Project
             proj = torch.sum(torch.inner(unit_dW_LA, dW_LP[i]))
             # Calculate dW
-            p.grad = (
-                dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
-            )
+            p.grad = dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
 
         self.predictor_optimizer.step()
         self.adversary_optimizer.step()
@@ -204,9 +196,7 @@ class PytorchEngine(BackendEngine):
                         elif item.lower() == "leaky_relu":
                             layers.append(torch.nn.LeakyReLU())
                         else:
-                            raise ValueError(
-                                _MODEL_UNRECOGNIZED_STR.format(item)
-                            )
+                            raise ValueError(_MODEL_UNRECOGNIZED_STR.format(item))
                         # TODO support more strings? Or better option?
                         # possibly gather all activation classes, get __name__,
                         # and do pattern matching.

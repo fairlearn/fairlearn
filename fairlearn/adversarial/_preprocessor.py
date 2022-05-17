@@ -104,9 +104,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             self.input_dim_ = X.ndim
         else:
             if X.ndim != self.input_dim_:
-                raise ValueError(
-                    "Dimension of data is inconsistent with previous call"
-                )
+                raise ValueError("Dimension of data is inconsistent with previous call")
         if X.ndim == 1:
             X = X.reshape(-1, 1)
 
@@ -241,10 +239,7 @@ def _get_type(data, assumption):
         "auto",
     ]:
         return "category"
-    elif inferred in [
-        "continuous",
-        "continuous-multioutput",
-    ] and assumption in [
+    elif inferred in ["continuous", "continuous-multioutput",] and assumption in [
         "continuous",
         "auto",
     ]:

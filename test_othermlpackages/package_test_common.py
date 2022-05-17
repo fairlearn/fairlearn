@@ -130,45 +130,41 @@ def run_AdversarialFairness_classification(estimator):
     X = X[non_NaN_rows]
     y = y[non_NaN_rows]
 
-    sensitive_feature = X['sex']
+    sensitive_feature = X["sex"]
 
     def preprocess(X):
         if isinstance(X, pd.Series):
             X = X.to_frame()
         """Make the Transformer for a single dataframe."""
         ct = make_column_transformer(
-            (StandardScaler(),
-             make_column_selector(dtype_include=number)),
-            (OneHotEncoder(drop='if_binary', sparse=False),
-             make_column_selector(dtype_include="category")))
+            (StandardScaler(), make_column_selector(dtype_include=number)),
+            (
+                OneHotEncoder(drop="if_binary", sparse=False),
+                make_column_selector(dtype_include="category"),
+            ),
+        )
         return ct.fit_transform(X)
 
     X = preprocess(X)
     y = preprocess(y)
     sensitive_feature = preprocess(sensitive_feature)
 
-    X_train, X_test, Y_train, Y_test, A_train, A_test = \
-        train_test_split(X, y, sensitive_feature,
-                         test_size=0.2,
-                         random_state=12345,
-                         stratify=y)
+    X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(
+        X, y, sensitive_feature, test_size=0.2, random_state=12345, stratify=y
+    )
 
     estimator.epochs = 100
-    estimator.batch_size = 2**9
+    estimator.batch_size = 2 ** 9
     estimator.shuffle = True
     estimator.progress_updates = None
 
-    estimator.fit(
-        X_train,
-        Y_train,
-        sensitive_features=A_train
-    )
+    estimator.fit(X_train, Y_train, sensitive_features=A_train)
 
     predictions = estimator.predict(X_test)
 
-    dp_diff = demographic_parity_difference(Y_test,
-                                            predictions,
-                                            sensitive_features=A_test)
+    dp_diff = demographic_parity_difference(
+        Y_test, predictions, sensitive_features=A_test
+    )
 
     accuracy = mean(predictions == Y_test)
 

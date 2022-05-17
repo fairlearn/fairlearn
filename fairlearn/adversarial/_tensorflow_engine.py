@@ -70,17 +70,11 @@ class TensorflowEngine(BackendEngine):
 
         for i in range(len(dW_LP)):
             # Normalize dW_LA
-            unit_dW_LA = dW_LA[i] / (
-                tensorflow.norm(dW_LA[i]) + finfo(float32).tiny
-            )
+            unit_dW_LA = dW_LA[i] / (tensorflow.norm(dW_LA[i]) + finfo(float32).tiny)
             # Project
-            proj = tensorflow.reduce_sum(
-                tensorflow.multiply(dW_LP[i], unit_dW_LA)
-            )
+            proj = tensorflow.reduce_sum(tensorflow.multiply(dW_LP[i], unit_dW_LA))
             # Calculate dW
-            dW_LP[i] = (
-                dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
-            )
+            dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
 
         self.predictor_optimizer.apply_gradients(
             zip(dW_LP, self.predictor_model.trainable_variables)
@@ -109,9 +103,7 @@ class TensorflowEngine(BackendEngine):
             return tensorflow.keras.losses.BinaryCrossentropy(from_logits=False)
         elif dist_type == "category":
             # User softmax as final layer
-            return tensorflow.keras.losses.CategoricalCrossentropy(
-                from_logits=False
-            )
+            return tensorflow.keras.losses.CategoricalCrossentropy(from_logits=False)
         elif dist_type == "continuous":
             return tensorflow.keras.losses.MeanSquaredError()
         super(TensorflowEngine, self).get_loss(dist_type)
@@ -162,9 +154,7 @@ class TensorflowEngine(BackendEngine):
                     elif callable(item):
                         layers.append(item)
                     elif isinstance(item, str):
-                        layers.append(
-                            tensorflow.keras.activations.deserialize(item)
-                        )
+                        layers.append(tensorflow.keras.activations.deserialize(item))
                 self.layers_ = layers
 
             def call(self, x):

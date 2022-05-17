@@ -36,9 +36,7 @@ def create_model():
         def __init__(self, *args, criterion__reduce=False, **kwargs):
             # make sure to set reduce=False in your criterion, since we need the loss
             # for each sample so that it can be weighted
-            super().__init__(
-                *args, criterion__reduce=criterion__reduce, **kwargs
-            )
+            super().__init__(*args, criterion__reduce=criterion__reduce, **kwargs)
 
         def fit(self, X, y, sample_weight=None):
             if isinstance(X, (pd.DataFrame, pd.Series)):
@@ -70,9 +68,7 @@ def create_model():
                 y_pred, y_true.float(), X, *args, **kwargs
             )
             sample_weight = X["sample_weight"]
-            sample_weight = sample_weight.to(loss_unreduced.device).unsqueeze(
-                -1
-            )
+            sample_weight = sample_weight.to(loss_unreduced.device).unsqueeze(-1)
             # Need to put the sample weights on GPU
             loss_reduced = (sample_weight * loss_unreduced).mean()
             return loss_reduced

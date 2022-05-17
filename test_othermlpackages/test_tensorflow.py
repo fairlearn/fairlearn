@@ -51,7 +51,7 @@ def test_adversarial_classification():
         backend="tensorflow",
         predictor_model=[50, "relu"],
         adversary_model=[3, "relu"],
-        random_state=123
+        random_state=123,
     )
 
     ptc.run_AdversarialFairness_classification(mitigator)

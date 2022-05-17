@@ -124,9 +124,7 @@ class fake_tensorflow:
             """Mock of tf.keras.losses."""
 
             BinaryCrossentropy = type("BinaryCrossentropy", (BCE,), {})
-            CategoricalCrossentropy = type(
-                "CategoricalCrossentropy", (CCE,), {}
-            )
+            CategoricalCrossentropy = type("CategoricalCrossentropy", (CCE,), {})
             MeanSquaredError = type("MeanSquaredError", (MSE,), {})
 
         class optimizers:
@@ -154,9 +152,7 @@ cols = 5
 Bin2d = np.random.choice([0.0, 1.0], size=(rows, cols))
 Bin1d = np.random.choice([0.0, 1.0], size=(rows, 1))
 Cat = np.zeros((rows, cols), dtype=float)
-Cat[
-    np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))
-] = 1.0
+Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.0
 Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(rows, 1)
 
@@ -211,9 +207,7 @@ class RemoveAll(BackendEngine):
         rows = len(X)
         y = []
         for row in range(rows):
-            rng = np.random.default_rng(
-                int(np.round(np.mean(X[row]) * (2 ** 32)))
-            )
+            rng = np.random.default_rng(int(np.round(np.mean(X[row]) * (2 ** 32))))
             y.append(rng.random(cols))
         return np.stack(y)
 

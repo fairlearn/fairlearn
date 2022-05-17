@@ -349,14 +349,10 @@ class _AdversarialFairness(BaseEstimator):
             (self.epochs, "epochs"),
             (self.max_iter, "max_iter"),
         ):
-            check_scalar(
-                kw, kwname, (int, float), min_val=-1, include_boundary="left"
-            )
+            check_scalar(kw, kwname, (int, float), min_val=-1, include_boundary="left")
             if kw <= 0.0 and kw != -1:
                 raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(
-                        kwname, "a positive number or -1"
-                    )
+                    _KWARG_ERROR_MESSAGE.format(kwname, "a positive number or -1")
                 )
 
         for kw, kwname in (
@@ -365,9 +361,7 @@ class _AdversarialFairness(BaseEstimator):
             (self.warm_start, "warm_start"),
         ):
             if not isinstance(kw, bool):
-                raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(kwname, "a boolean")
-                )
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(kwname, "a boolean"))
 
         self.callbacks_ = None
         if self.callbacks:
@@ -429,12 +423,8 @@ class _AdversarialFairness(BaseEstimator):
             else:
                 return kw_or_func
 
-        self.predictor_loss_ = read_kw(
-            Y, self.predictor_loss, "predictor_loss"
-        )
-        self.adversary_loss_ = read_kw(
-            A, self.adversary_loss, "adversary_loss"
-        )
+        self.predictor_loss_ = read_kw(Y, self.predictor_loss, "predictor_loss")
+        self.adversary_loss_ = read_kw(A, self.adversary_loss, "adversary_loss")
         self.predictor_function_ = read_kw(
             Y, self.predictor_function, "predictor_function"
         )
@@ -507,9 +497,7 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, Y, A = self._validate_input(
-            X, y, sensitive_features, reinitialize=True
-        )
+        X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -548,14 +536,11 @@ class _AdversarialFairness(BaseEstimator):
                 if self.progress_updates:
                     if (time() - last_update_time) > self.progress_updates:
                         last_update_time = time()
-                        progress = (epoch / epochs) + (
-                            batch / (batches * epochs)
-                        )
+                        progress = (epoch / epochs) + (batch / (batches * epochs))
                         logger.info(
                             _PROGRESS_UPDATE.format(  # noqa : G001
                                 "=" * round(20 * progress),
-                                " "
-                                * round(20 * (1 - progress)),  # noqa : G003
+                                " " * round(20 * (1 - progress)),  # noqa : G003
                                 epoch + 1,  # noqa : G003
                                 epochs,
                                 " "  # noqa : G003
@@ -616,9 +601,7 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive feature of the
             training data.
         """
-        X, Y, A = self._validate_input(
-            X, y, sensitive_features, reinitialize=False
-        )
+        X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=False)
         self.backendEngine_.train_step(X, Y, A)
 
         return self
@@ -729,9 +712,7 @@ class _AdversarialFairness(BaseEstimator):
         torch_installed = False
         tensorflow_installed = False
 
-        if isinstance(self.backend, type) and issubclass(
-            self.backend, BackendEngine
-        ):
+        if isinstance(self.backend, type) and issubclass(self.backend, BackendEngine):
             self.backend_ = self.backend
             return
         if self.backend == "torch" or self.backend == "auto":
@@ -740,9 +721,9 @@ class _AdversarialFairness(BaseEstimator):
                 from torch.nn import Module as model
 
                 torch_installed = True
-                if isinstance(
-                    self.predictor_model, (list, model)
-                ) and isinstance(self.adversary_model, (list, model)):
+                if isinstance(self.predictor_model, (list, model)) and isinstance(
+                    self.adversary_model, (list, model)
+                ):
                     select = True
                 elif self.backend == "torch":
                     raise ValueError(
@@ -763,9 +744,9 @@ class _AdversarialFairness(BaseEstimator):
                 from tensorflow.keras import Model as model
 
                 tensorflow_installed = True
-                if isinstance(
-                    self.predictor_model, (list, model)
-                ) and isinstance(self.adversary_model, (list, model)):
+                if isinstance(self.predictor_model, (list, model)) and isinstance(
+                    self.adversary_model, (list, model)
+                ):
                     select = True
                 elif self.backend == "tensorflow":
                     raise ValueError(
@@ -776,9 +757,7 @@ class _AdversarialFairness(BaseEstimator):
                     )
             except ImportError:
                 if self.backend == "tensorflow":
-                    raise RuntimeError(
-                        _IMPORT_ERROR_MESSAGE.format("tensorflow")
-                    )
+                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
             if select:
                 self.backend_ = TensorflowEngine
                 return
@@ -791,9 +770,7 @@ class _AdversarialFairness(BaseEstimator):
             )
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
-            raise RuntimeError(
-                _IMPORT_ERROR_MESSAGE.format("torch or tensorflow")
-            )
+            raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
         # Or all other cases, a mismatch between model model (and installation)
         raise ValueError(
             _KWARG_ERROR_MESSAGE.format(
