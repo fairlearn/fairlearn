@@ -239,7 +239,7 @@ def _get_type(data, assumption):
         "auto",
     ]:
         return "category"
-    elif inferred in ["continuous", "continuous-multioutput",] and assumption in [
+    elif inferred in ["continuous", "continuous-multioutput"] and assumption in [
         "continuous",
         "auto",
     ]:
