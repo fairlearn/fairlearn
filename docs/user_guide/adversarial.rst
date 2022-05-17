@@ -12,7 +12,7 @@ Adversarial Learning
 .. currentmodule:: fairlearn.adversarial
 
 Fairlearn provides an implementation of the adversarial
-learning method presented in [#4]_.
+learning method presented in :footcite:`zhang2018mitigating`.
 We assume we have data :math:`X, A, Y`, where we want to
 predict :math:`Y` from :math:`X` while being fair with respect to :math:`A`
 based on some fairness measure. We firstly create predictor and adversary neural
@@ -35,7 +35,7 @@ Moreover, this model can be trained for either *demographic parity* or
 *equalized odds*. If only the predictions are fed to the adversary, the
 predictor will learn to satisfy demographic parity. If also the true targets are
 fed to the adversary, the predictor will learn to satisfy equalized odds.
-For details, see [#4]_.
+For details, see :footcite:`zhang2018mitigating`.
 
 Firstly, we will dicuss the models that this implementation accepts in
 :ref:`models`.
@@ -148,7 +148,7 @@ models, it helps to scale every feature of the data to a similar range.
 Loss functions
 ~~~~~~~~~~~~~~
 
-In [#4]_, loss functions are not defined explicitely.
+In :footcite:`zhang2018mitigating`, loss functions are not defined explicitely.
 To accomodate and provide the most general interface, the user can pass their
 own loss functions. This can be either PyTorch or TensorFlow loss functions,
 depending on which module the neural networks are. For instance, in the
@@ -208,12 +208,12 @@ also be inferred from the data, if applicable.
 *Note: currently, all data needs to be passed to the model in the first call
 to fit.*
 
-Theoretical results of [#4]_ show that under some strong assumptions,
+Theoretical results of :footcite:`zhang2018mitigating` show that under some strong assumptions,
 including which loss we take,
 the predictor will satisfy the fairness constraint: demographic
 parity or equality of odds.
 
-In particular, to state the results of *Proposition 2* of [#4]_
+In particular, to state the results of *Proposition 2* of :footcite:`zhang2018mitigating`
 regarding demographic parity, if we assume: 
 
 #. The variables :math:`Y` and :math:`A` have underlying distributions 
@@ -261,7 +261,7 @@ Some pieces of advice regarding training with adversarial fairness:
    the constructor's keyword :code:`callbacks` (see :ref:`Example 2`).
    Optionally, have this function return :code:`True`
    to indicate early stoppings.
-#. The authors of [#4]_ have found it to be useful to maintain a global step
+#. The authors of :footcite:`zhang2018mitigating` have found it to be useful to maintain a global step
    count and gradually increase :math:`\alpha` while decreasing the learning
    rate :math:`\mu` and maintaing :math:`\alpha \cdot \mu \rightarrow 0`
    as the timestep grows. In particular, use a callback function to perform
