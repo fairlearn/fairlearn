@@ -172,7 +172,7 @@ Does Fairlearn work for image and text data?
     data it is operating on).
 
 Is Fairlearn available in languages other than Python?
-    For the moment, we only support Python >= 3.7
+    For the moment, we only support Python >= 3.8
 
 Can I contribute to Fairlearn?
     Absolutely! Please see our :ref:`contributor guide <contributor_guide>` to
@@ -180,3 +180,16 @@ Can I contribute to Fairlearn?
 
 What is the relationship between Fairlearn and Microsoft?
     Fairlearn has grown from a project at Microsoft Research in New York City.
+
+What happened to the :code:`FairlearnDashboard`?
+    The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
+    model's predictions impact different groups as defined by sensitive features, and
+    also for comparing multiple models in terms of various fairness and performance
+    metrics.
+
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn. Instead, it has found a new home at Microsoft with the name
+    :code:`FairnessDashboard`. For more information on how to use it refer to
+    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    Fairlearn provides some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.

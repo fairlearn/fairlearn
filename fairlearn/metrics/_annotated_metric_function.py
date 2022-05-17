@@ -1,10 +1,10 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import Callable, Dict, List, Optional
-import warnings
-
 import logging
+import warnings
+from typing import Callable, Dict, List, Optional
+
 import numpy as np
 import pandas as pd
 
@@ -49,7 +49,7 @@ class AnnotatedMetricFunction:
         func: Callable,
         name: Optional[str],
         postional_argument_names: List[str] = None,
-        kw_argument_mapping: Dict[str, str] = None
+        kw_argument_mapping: Dict[str, str] = None,
     ):
         if func is None:
             raise ValueError(_METRIC_FUNCTION_NONE)

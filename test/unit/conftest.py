@@ -7,16 +7,18 @@
 
 def pytest_configure(config):
     config.addinivalue_line(
-        "markers", "uncollect_if(*, func): function to unselect tests from parametrization")
+        "markers",
+        "uncollect_if(*, func): function to unselect tests from parametrization",
+    )
 
 
 def pytest_collection_modifyitems(config, items):
     removed = []
     kept = []
     for item in items:
-        marker = item.get_closest_marker('uncollect_if')
+        marker = item.get_closest_marker("uncollect_if")
         if marker:
-            func = marker.kwargs['func']
+            func = marker.kwargs["func"]
             if func(**item.callspec.params):
                 removed.append(item)
                 continue

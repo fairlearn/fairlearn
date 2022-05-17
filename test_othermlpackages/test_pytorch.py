@@ -62,7 +62,7 @@ def create_model():
                 X = X.to_numpy().astype("float32")
             # The base implementation uses np.argmax which works
             # for multiclass classification only.
-            return (super().predict_proba(X) > 0.5).astype(np.float)
+            return (super().predict_proba(X) > 0.5).astype(float)
 
         def get_loss(self, y_pred, y_true, X, *args, **kwargs):
             # override get_loss to use the sample_weight from X

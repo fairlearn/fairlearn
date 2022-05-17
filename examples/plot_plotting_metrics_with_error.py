@@ -6,25 +6,24 @@
 Plotting Metrics with Errors
 ============================
 """
+import numpy as np
+from sklearn.compose import ColumnTransformer
+from sklearn.compose import make_column_selector as selector
+from sklearn.datasets import fetch_openml
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.utils import check_consistent_length
+
 # %%
 # Load and preprocess the data set
 # ================================
 # We start by importing the various modules we're going to use:
-from fairlearn.experimental.enable_metric_frame_plotting import (
-    plot_metric_frame,
-)
+from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_frame
 from fairlearn.metrics import MetricFrame
-from sklearn.datasets import fetch_openml
-from sklearn.metrics import recall_score, accuracy_score, confusion_matrix
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector as selector
-from sklearn.pipeline import Pipeline
-from sklearn.utils import check_consistent_length
-import numpy as np
 
 # %%
 # We download the data set using :meth:`fetch_openml` function in :class:`sklearn.datasets`.
@@ -108,11 +107,9 @@ def general_wilson(p, n, digits=4, z=1.959964):
         np.ndarray
         Array of length 2 of form: [lower_bound, upper_bound]
     """
-    denominator = 1 + z ** 2 / n
+    denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
-    adjusted_standard_deviation = np.sqrt(
-        (p * (1 - p) + z * z / (4 * n))
-    ) / np.sqrt(n)
+    adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
     lower_bound = (
         centre_adjusted_probability - z * adjusted_standard_deviation
     ) / denominator
@@ -139,9 +136,7 @@ def recall_wilson(y_true, y_pred):
     """
     check_consistent_length(y_true, y_pred)
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    bounds = general_wilson(
-        tp / (tp + fn), tp + fn, digits_of_precision, z_score
-    )
+    bounds = general_wilson(tp / (tp + fn), tp + fn, digits_of_precision, z_score)
     return bounds
 
 
