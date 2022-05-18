@@ -31,7 +31,9 @@ class TestFairlearnDataset:
             if as_frame is True:
                 dataset = fetch_function()
             elif as_frame is False:
-                pytest.skip("Skipping the diabetes hospital dataset with as_frame False")
+                pytest.skip(
+                    "Skipping the diabetes hospital dataset with as_frame False"
+                )
         else:
             dataset = fetch_function(as_frame=as_frame)
         assert dataset is not None
@@ -59,7 +61,9 @@ class TestFairlearnDataset:
             if as_frame is True:
                 X, y = fetch_function(return_X_y=True)
             elif as_frame is False:
-                pytest.skip("Skipping the diabetes hospital dataset with as_frame False")
+                pytest.skip(
+                    "Skipping the diabetes hospital dataset with as_frame False"
+                )
         else:
             X, y = fetch_function(as_frame=as_frame, return_X_y=True)
         assert X is not None
