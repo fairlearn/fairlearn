@@ -8,7 +8,7 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_diabetes_hospital(
-    *, cache=True, data_home=None, as_frame=True, return_X_y=False
+    *, cache=True, data_home=None, return_X_y=False
 ):
     """Load the preprocessed Diabetes 130-Hospitals dataset (binary classification).
 
@@ -36,9 +36,16 @@ def fetch_diabetes_hospital(
     This version of the dataset was derived by the Fairlearn team for the SciPy
     2021 tutorial "Fairness in AI Systems: From social context to practice using
     Fairlearn". In this version, the target variable "readmitted" is binarized
-    into whether the patient was re-admitted within thirty days.
+    into whether the patient was re-admitted within thirty days. The full
+    pre-processing script is available
+    `here <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/preprocess.py>`_.
 
     Read more in the :ref:`User Guide <diabetes_hospital_data>`.
+
+    .. note::
+        The dataset is always returned as a pandas object, because string
+        attributes are not supported for array representation, resulting
+        in a `ValueError`.
 
     .. versionadded:: 0.8.0
 
@@ -51,15 +58,6 @@ def fetch_diabetes_hospital(
         Specify another download and cache folder for the datasets.
         By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
-
-    as_frame : bool, default=True
-        If True, the data is a pandas DataFrame including columns with
-        appropriate dtypes (numeric, string or categorical). The target is
-        a pandas DataFrame or Series depending on the number of target_columns.
-        The Bunch will contain a ``frame`` attribute with the target and the
-        data. If ``return_X_y`` is True, then ``(data, target)`` will be pandas
-        DataFrames or Series as describe above. If false, a ``ValueError`` is
-        returned because string attributes are not supported for array representation.
 
     return_X_y : bool, default=False
         If True, returns ``(data.data, data.target)`` instead of a Bunch
@@ -75,22 +73,17 @@ def fetch_diabetes_hospital(
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (101766,)
             Each value represents whether readmission of the patient
-            occurred within 30 days of the release. If ``as_frame``
-            is True, ``target`` is a pandas object.
+            occurred within 30 days of the release.
         feature_names : list of length 25
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the Diabetes 130-Hospitals dataset.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
-        if ``return_X_y`` is True and ``as_frame`` is False
-
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is True
+        if ``return_X_y`` is True
 
     References
     ----------
-
     .. footbibliography::
 
     """
@@ -101,6 +94,6 @@ def fetch_diabetes_hospital(
         data_id=43874,
         data_home=data_home,
         cache=cache,
-        as_frame=as_frame,
+        as_frame=True,
         return_X_y=return_X_y,
     )
