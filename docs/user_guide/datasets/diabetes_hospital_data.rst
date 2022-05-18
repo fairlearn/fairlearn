@@ -33,8 +33,8 @@ tutorial "Fairness in AI Systems: From social context to practice using Fairlear
 In this version, the target variable "readmitted" is binarized into whether the
 patient was readmitted within thirty days. The full dataset pre-processing script
 can be found on `GitHub <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/preprocess.py>`_.
-The dataset contains 101,766 rows. Each row describes a person and contains 25
-features, which we describe below:
+The dataset contains 101,766 rows. Each row describes a patient encounter and
+contains 25 features, which we describe below:
 
 .. list-table::
    :header-rows: 1
