@@ -445,7 +445,7 @@ the so-called "4/5ths rule" or "80% rule" used to assess whether a model
 Typically, the rule is implemented by using the demographic parity ratio introduced
 in the :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
 exceeds 80% for all identified subgroups.
-*Unthinking application of this threshold is wrong in many scenarios.*
+*Application of this threshold is wrong in many scenarios.*
 
 **What exactly does the rule mean?**
 Legally, the 80% threshold is a limit for
