@@ -447,16 +447,8 @@ in the :ref:`disparity_metrics` section, with a result considered 'fair' if the 
 exceeds 80% for all identified subgroups.
 *Unthinking application of this threshold is wrong in many scenarios.*
 
-There are three particular things which should be considered before applying
-the "4/5ths rule" to a particular scenario:
-
-1. What does the rule mean, legally?
-2. Where is the rule valid?
-3. Why 80%?
-
 **What exactly does the rule mean?**
-Legally, the 80% threshold (relevant to a chosen, relevant control population)
-is a limit for
+Legally, the 80% threshold is a limit for
 `prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
 that illegal discrimination has occurred relative to a chosen,
 relevant control population.
@@ -471,8 +463,8 @@ Conflating the *disparate impact metric* with the *legal finding of disparate im
 is a form of epistemic trespassing.
 
 **Where is the 4/5ths rule valid?**
-The answer is that it is only valid
-within a specific area of US federal employment law.
+The answer is that it is only valid within a specific area of US
+federal employment law.
 Outside this context, the rule has no particular claim to validity.
 
 Taken together, we see that applying the 4/5ths rule will
