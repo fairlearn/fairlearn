@@ -480,7 +480,11 @@ not be appropriate in most cases.
 Even in cases where it is appropriate, it does not automatically
 avoid legal jeopardy, much less ensure that results are fair.
 
-
+For a much deeper discussion of the issues involved, we suggest
+:footcite:ct:`watkins2022fourfifths`.
+A higher level look at how legal concepts of fairness can collide
+with mathematical measures of disparity, see
+:footcite:ct:`Xiang2019legalcompatibility`.
 
 References
 ----------
