@@ -475,9 +475,6 @@ The answer is that it is only valid
 within a specific area of US federal employment law.
 Outside this context, the rule has no particular claim to validity.
 
-**Why is the ratio set at 80%?**
-The reasoning for selecting 80% is unclear.
-
 Taken together, we see that applying the 4/5ths rule will
 not be appropriate in most cases.
 Even in cases where it is appropriate, it does not automatically
