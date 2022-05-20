@@ -33,6 +33,7 @@ bokeh
 pypandoc
 sphinx==4.2.0
 sphinx-gallery
+numpydoc
 git+https://github.com/Holzhaus/sphinx-multiversion.git
 pydata-sphinx-theme==0.6.3
 sphinx-autodoc-typehints
