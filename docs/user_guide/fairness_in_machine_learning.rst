@@ -237,6 +237,50 @@ between the maximum and the minimum values. For more information refer to the
 subpackage :mod:`fairlearn.metrics`.
 
 
+
+The 4/5ths Rule: Often Misapplied
+---------------------------------
+
+In the literature around fairness in machine learning, one will often find
+the so-called "4/5ths rule" or "80% rule" used to assess whether a model
+(or mitigation technique) has produced a 'fair' result.
+Typically, the rule is implemented by using the demographic parity ratio introduced
+in the :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
+exceeds 80% for all identified subgroups.
+*Application of this threshold is wrong in many scenarios.*
+
+**What exactly does the rule mean?**
+Legally, the 80% threshold is a limit for
+`prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
+that illegal discrimination has occurred relative to a 
+relevant control population.
+A causal link between the statistic and the alleged discrimination must also
+be demonstrated.
+However, the 'four-fifths rule' does not prove or disprove any case.
+It is possible to argue successfully that a demographic parity
+ratio of 50% is still fair.
+It is equally possible to argue that even at a 95% ratio, illegal
+discrimination has occurred.
+Conflating the *disparate impact metric* with the *legal finding of disparate impact*
+is a form of epistemic trespassing.
+
+**Where is the 4/5ths rule valid?**
+The answer is that it is only valid within a specific area of US
+federal employment law.
+Outside this context, the rule has no particular claim to validity.
+
+Taken together, we see that applying the 4/5ths rule will
+not be appropriate in most cases.
+Even in cases where it is appropriate, it does not automatically
+avoid legal jeopardy, much less ensure that results are fair.
+
+For a much deeper discussion of the issues involved, we suggest
+:footcite:ct:`watkins2022fourfifths`.
+A higher level look at how legal concepts of fairness can collide
+with mathematical measures of disparity, see
+:footcite:ct:`Xiang2019legalcompatibility`.
+
+
 .. _abstraction_traps:
 
 What traps can we fall into when modeling a social problem?
