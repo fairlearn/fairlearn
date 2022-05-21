@@ -260,7 +260,7 @@ Given the origin of the 'four-fifths rule' (which we will discuss next), its
 application may also give an unjustified feeling of legal invulnerability by
 conflating fairness with legality.
 In reality, 'fairness' is not always identical to 'legally allowable,' and
-the former may not even be a strict subset of the latter.[#f1]_
+the former may not even be a strict subset of the latter. [#f1]_
 
 The 'four fifths rule' has its origins in a specific area of US
 federal employment law.
@@ -280,7 +280,7 @@ not be appropriate in most cases.
 Even in cases where it is applicable, the rule does not automatically
 avoid legal jeopardy, much less ensure that results are fair.
 The use of the 'four fifths rule' in this manner is an indefensible
-example of epistemic trespassing.[#f2]_
+example of epistemic trespassing. [#f2]_
 It is for this reason that we try to avoid the use of legal
 terminology in our documentation.
 
