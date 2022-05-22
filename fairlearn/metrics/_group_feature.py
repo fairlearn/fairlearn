@@ -2,13 +2,11 @@
 # Licensed under the MIT License.
 
 from typing import Optional
+
 import numpy as np
 import pandas as pd
 
-
-_SERIES_NAME_NOT_STRING = (
-    "Series name must be a string. Value '{0}' was of type {1}"
-)
+_SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
 
 
 class GroupFeature:
@@ -48,9 +46,7 @@ class GroupFeature:
         Optional name for the feature
     """
 
-    def __init__(
-        self, base_name: str, feature_vector, index: int, name: Optional[str]
-    ):
+    def __init__(self, base_name: str, feature_vector, index: int, name: Optional[str]):
         """Help with the metrics."""
         self.classes_ = np.unique(feature_vector)
         self.raw_feature_ = feature_vector
