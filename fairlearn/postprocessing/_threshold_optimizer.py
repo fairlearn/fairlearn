@@ -28,15 +28,7 @@ from sklearn.utils import Bunch
 from sklearn.utils.validation import check_is_fitted
 
 from ..utils._common import _get_soft_predictions
-<<<<<<< HEAD
-from ..utils._input_validation import (
-    _validate_and_reformat_input,
-    _KW_CONTROL_FEATURES,
-)
-
-=======
 from ..utils._input_validation import _KW_CONTROL_FEATURES, _validate_and_reformat_input
->>>>>>> main
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING,

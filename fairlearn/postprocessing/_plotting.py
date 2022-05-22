@@ -3,27 +3,13 @@
 
 """Utilities for plotting curves."""
 
-<<<<<<< HEAD
 import math
 import pandas as pd
 import numpy as np
-=======
-from sklearn.utils.validation import check_is_fitted
-
->>>>>>> main
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._threshold_optimizer import ThresholdOptimizer
-<<<<<<< HEAD
-=======
 from ..utils._input_validation import _merge_columns
 from sklearn.utils.validation import check_is_fitted, check_array
-=======
-from sklearn.utils.validation import check_is_fitted
->>>>>>> reject_copy_copy
-
-from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
-from ._threshold_optimizer import ThresholdOptimizer
->>>>>>> main
 
 _debug_colors = None
 _debug_ncolors = 10
