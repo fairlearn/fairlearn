@@ -5,7 +5,7 @@
 
 <<<<<<< HEAD
 import math
-from copy import deepcopy
+import pandas as pd
 import numpy as np
 =======
 from sklearn.utils.validation import check_is_fitted
@@ -13,6 +13,17 @@ from sklearn.utils.validation import check_is_fitted
 >>>>>>> main
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._threshold_optimizer import ThresholdOptimizer
+<<<<<<< HEAD
+=======
+from ..utils._input_validation import _merge_columns
+from sklearn.utils.validation import check_is_fitted, check_array
+=======
+from sklearn.utils.validation import check_is_fitted
+>>>>>>> reject_copy_copy
+
+from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+from ._threshold_optimizer import ThresholdOptimizer
+>>>>>>> main
 
 _debug_colors = None
 _debug_ncolors = 10
@@ -142,111 +153,73 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
 
 
 def _check_sensitive_features(sensitive_features):
-    """Reformat sensitive_features if multiple sensitive features, create descriptive variables.
+    """Return in sensitive_features pd.Series format.
+
+    If there are multiple sensitive features, merge into a single column.
 
     Parameters
     ----------
-    sensitive_features : pandas.Series or pandas.DataFrame
+    sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
+        or pandas.Series
         Sensitive features to identify groups by
 
     Returns
     -------
-    sensitive_features : pandas.Series
-        Sensitive features to identify groups by. If there are multiple
-        sensitive features, these are combined into one string
-
-    all_sf : list
-        List with all sensitive feature (combinations) observed in sensitive_features
-
-    samples_each_sf : pandas.Series
-        The number of samples observed of each sensitive feature (combination)
-
-    n_test_samples : int
-        The number of rows in the data
+    pd.Series
+        The (merged) sensitive feature column
     """
+    sensitive_features = check_array(
+        sensitive_features, ensure_2d=False, dtype=None)
+
     if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-        cols = sensitive_features.columns
-        A_single_col = deepcopy(sensitive_features[cols[0]])
-        for i in range(1, len(cols)):
-            A_single_col += ',' + deepcopy(sensitive_features[cols[i]])
+        sensitive_features = _merge_columns(sensitive_features)
 
-        sensitive_features = A_single_col
-
-    all_sf = np.unique(sensitive_features).tolist()
-    samples_each_sf = sensitive_features.value_counts()
-    n_test_samples = len(sensitive_features)
-
-    return sensitive_features, all_sf, samples_each_sf, n_test_samples
+    return pd.Series(sensitive_features.squeeze())
 
 
-def _create_statistics_dict(sf_to_plot, value):
-    """Create dictionary to keep track of desired information.
-
-    The information that is desired differs, and is specified
-    by the value parameter
-
-    Parameters
-    ----------
-    sf_to_plot : numpy.ndarray or list
-        List with all sensitive features to be plotted. Will be the
-        keys of the returned dict.
-
-    value : numpy.ndarray or int
-        The values of the returned dict. The form this value takes
-        is dependent on the information needed to create the desired plot
-
-    Returns
-    -------
-    dict
-        Dictionary of the form {sf_to_plot[0]: value,
-        sf_to_plot[1]: value, ...}
-    """
-    statistics_dict = {}
-
-    for sf in sf_to_plot:
-        statistics_dict[sf] = deepcopy(value)
-
-    return statistics_dict
-
-
-def plot_proba_distribution(sensitive_features, Y_pred_proba, specified_sf_to_plot=None):
+def plot_proba_distribution(sensitive_features, y_prob, specified_groups_to_plot=None):
     """Create a stacked barplot showing the distribution of probabilities.
 
     The created plot is grouped by sensitive feature value.
 
     Parameters
     ----------
-    sensitive_features : pandas.Series or pandas.DataFrame
+    sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
+        or pandas.Series
         Sensitive features to identify groups by
 
-    Y_pred_proba : numpy.ndarray
+    y_prob : numpy.ndarray
         Probabilities returned by a classifier
 
-    specified_sf_to_plot : list or None, default=None
-        If None, plot information about all known sensitive features.
-        If list, plot information about sensitive features in list
+    specified_groups_to_plot : list or None, default=None
+        If None, plot information about all known sensitive groups.
+        If list, plot information about sensitive groups in list
     """
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    sensitive_features, all_sf, samples_each_sf, n_test_samples = \
-        _check_sensitive_features(sensitive_features)
+    sensitive_features = _check_sensitive_features(sensitive_features)
 
-    sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf
+    sf_to_plot = specified_groups_to_plot if specified_groups_to_plot else np.unique(
+        sensitive_features).tolist()
+
+    samples_each_sf = sensitive_features.value_counts()
+
+    n_rows = len(sensitive_features)
 
     # create dict to keep track of proba distribution for each sf, by creating array of the form
     # [#of probas in interval 0 - .1, ... , #of probas in interval .9 - 1]
-    statistics_dict = _create_statistics_dict(sf_to_plot, np.zeros(10))
+    statistics_dict = {name: np.zeros(10) for name in sf_to_plot}
 
-    # loop through A and Y_pred_proba simultaneously, and only once
-    for i in range(n_test_samples):
+    # loop through A and y_prob simultaneously, and only once
+    for i in range(n_rows):
         sf = sensitive_features.iloc[i]
         if sf in statistics_dict:
             stats_array = statistics_dict[sf]
             # append predict proba to correct interval
-            stats_array[math.floor(Y_pred_proba[i]*10)] += 1
+            stats_array[math.floor(y_prob[i]*10)] += 1
 
     # create arrays used for making the plot
     stats_arrays = statistics_dict.values()
@@ -290,42 +263,47 @@ def plot_proba_distribution(sensitive_features, Y_pred_proba, specified_sf_to_pl
     plt.show()
 
 
-def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=None):
+def plot_positive_predictions(sensitive_features, y_pred, specified_groups_to_plot=None):
     """Create barplot showing the percentage of positive predictions.
 
     The created plot is grouped by sensitive feature value.
 
     Parameters
     ----------
-    sensitive_features : pandas.Series or pandas.DataFrame
+    sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
+        or pandas.Series
         Sensitive features to identify groups by
 
-    Y_pred : numpy.ndarray
+    y_pred : numpy.ndarray
         Binary predictions returned by a classifier
 
-    specified_sf_to_plot : list or None, default=None
-        If None, plot information about all known sensitive features.
-        If list, plot information about sensitive features in list.
+    specified_groups_to_plot : list or None, default=None
+        If None, plot information about all known sensitive groups.
+        If list, plot information about sensitive groups in list.
     """
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    sensitive_features, all_sf, samples_each_sf, n_test_samples = _check_sensitive_features(
-        sensitive_features)
+    sensitive_features = _check_sensitive_features(sensitive_features)
 
-    sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf
+    sf_to_plot = specified_groups_to_plot if specified_groups_to_plot else np.unique(
+        sensitive_features).tolist()
+
+    samples_each_sf = sensitive_features.value_counts()
+
+    n_rows = len(sensitive_features)
 
     # get statistics_dict to keep track the amount of postive predictions of each group
-    statistics_dict = _create_statistics_dict(sf_to_plot, 0)
+    statistics_dict = {name: 0 for name in sf_to_plot}
 
     # Keep track of the number of postive predictions for all groups,
-    # by looping through Y_pred only once
-    for i in range(n_test_samples):
+    # by looping through y_pred only once
+    for i in range(n_rows):
         sf = sensitive_features.iloc[i]
         if sf in statistics_dict:
-            statistics_dict[sf] += Y_pred[i]
+            statistics_dict[sf] += y_pred[i]
 
     # calculate percentages
     percentages = np.array([round(statistics_dict[sf]/samples_each_sf[sf]*100, 1)
@@ -345,43 +323,47 @@ def plot_positive_predictions(sensitive_features, Y_pred, specified_sf_to_plot=N
     plt.show()
 
 
-def plot_histograms_per_group(sensitive_features, continuous_output, specified_sf_to_plot=None):
-    """Create hist of distribution of :code:`continuous_output` for each sensitive feature value.
+def plot_histograms_per_group(sensitive_features, y_pred, specified_groups_to_plot=None):
+    """Create hist of distribution of :code:`y_pred` for each sensitive feature value.
 
     Parameters
     ----------
-    sensitive_features : pandas.Series or pandas.DataFrame
+    sensitive_features : numpy.ndarray, list, pandas.DataFrame,\
+        or pandas.Series
         Sensitive features to identify groups by
 
-    continuous_output : numpy.ndarray
-        The continuous output returned by an estimator. This can be
+    y_pred : numpy.ndarray
+        Continuous output returned by an estimator. This can be
         regression output, probabilities obtained by calling
         :code:`predict_proba()`, or the decision function obtained by
         calling :code:`decision_function()`
 
-    specified_sf_to_plot : list or None, default=None
-        If None, plot information about all known sensitive features.
-        If list, plot information about sensitive features in list.
+    specified_groups_to_plot : list or None, default=None
+        If None, plot information about all known sensitive groups.
+        If list, plot information about sensitive groups in list.
     """
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    sensitive_features, all_sf, _, n_test_samples = _check_sensitive_features(sensitive_features)
+    sensitive_features = _check_sensitive_features(sensitive_features)
 
-    sf_to_plot = specified_sf_to_plot if specified_sf_to_plot else all_sf
+    sf_to_plot = specified_groups_to_plot if specified_groups_to_plot else np.unique(
+        sensitive_features).tolist()
     nmbr_sf_to_plot = len(sf_to_plot)
 
+    n_rows = len(sensitive_features)
+
     # Create statistics_dict to keep track of all values for each group
-    statistics_dict = _create_statistics_dict(sf_to_plot, np.array([]))
+    statistics_dict = {name: np.array([]) for name in sf_to_plot}
 
     # Keep track of all values for each group simultaneously,
-    # by looping through the continuous output only once
-    for i in range(n_test_samples):
+    # by looping through y_pred only once
+    for i in range(n_rows):
         sf = sensitive_features.iloc[i]
         if sf in statistics_dict:
-            statistics_dict[sf] = np.append(statistics_dict[sf], continuous_output[i])
+            statistics_dict[sf] = np.append(statistics_dict[sf], y_pred[i])
 
     # Depending on the number of sf to plot, create a figure with subplots
     if nmbr_sf_to_plot > 2:
