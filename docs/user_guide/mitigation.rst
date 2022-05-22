@@ -604,10 +604,10 @@ classifiers that predict using :code:`decision_function`.
     ...             y_pred=Y_pred, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.426641
+    AfricanAmerican    0.425676
     Asian              0.487805
-    Caucasian          0.453222
-    Hispanic           0.434783
+    Caucasian          0.453915
+    Hispanic           0.426087
     Other              0.437500
     Name: false_negative_rate, dtype: float64
 
@@ -635,10 +635,10 @@ classifiers that predict using :code:`decision_function`.
     ...             y_pred=Y_pred_thresholded, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.426641
+    AfricanAmerican    0.425676
     Asian              0.048780
-    Caucasian          0.453222
-    Hispanic           0.434783
+    Caucasian          0.453915
+    Hispanic           0.426087
     Other              0.437500
     Name: false_negative_rate, dtype: float64
 
