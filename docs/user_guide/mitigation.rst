@@ -32,14 +32,14 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - DP, EO, TPRP, FPRP, ERP, BGL
    *  - :class:`~fairlearn.postprocessing.Thresholder`
       - Postprocessing algorithm that outputs a binary prediction and allows
-        the user to manually specify group-specific thresholds.
+        the user to manually specify group-specific decision thresholds.
       - ✔
       - ✘
       - N/A
    *  - :class:`~fairlearn.postprocessing.RejectOptionClassifier`
       - Postprocessing algorithm based on the paper *Decision Theory for
-        Discrimination-aware Classification* [#4]_. This algorithm 
-        alters decisions made with low certainty in favor of the deprived group.
+        Discrimination-aware Classification* :footcite:`kamiran2012rejectoptionclassifier`.
+        This algorithm alters decisions made with low certainty in favor of the group to upselect.
       - ✔
       - ✘
       - N/A
@@ -94,14 +94,14 @@ Postprocessing
 
 .. currentmodule:: fairlearn.postprocessing
 
-What is a threshold?
-~~~~~~~~~~~~~~~~~~~~~
+What is a decision threshold?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Many postprocessing algorithms make decisions based on thresholds. But what
-is a threshold? 
+is a decision threshold?
 
-A threshold is a number which represents the border between positive and
-negative predictions. For most classification algorithms, the default
-threshold is 0.5, which means that a sample with a probability to get 1
+In binary classification, the decision threshold is a number which represents the border between
+positive and negative predictions. In many implementations of classification algorithms, the
+default decision threshold is 0.5, which means that a sample with a probability to get 1
 (obtained by calling :code:`estimator.predict_proba()[:,1]`) of 0.6 will be classified
 as 1, and a sample with probability to get 1 of 0.4 will be classified as 0.
 If this threshold would be changed to 0.7, both samples would be classified
@@ -114,25 +114,27 @@ What it does
 ^^^^^^^^^^^^
 :class:`fairlearn.postprocessing.Thresholder` is a post processing technique
 which outputs a binary prediction based on group-specific thresholds. The
-specified thresholds can work in two directions (positive/negative), and can
+specified thresholds can work in two directions
+(:ref:`positive<pos_thresholds>`/:ref:`negative<negative_thresholds>`), and can
 be applied to the output of the :code:`predict()` function of a regressor,
-:code:`predict_proba()[:,1]` of a classifier, or on
-:code:`decision_function()` of SVC/LogisticRegression. Examples of these
-different applications can be found below. 
+the second element of each prediction obtained from :code:`predict_proba()` of a classifier, or on
+:code:`decision_function()` of, for example, :class:`sklearn.svm.SVC` or
+:class:`sklearn.linear_model.LogisticRegression`. Examples of these different applications
+are presented below.
 
 Why use it
 ^^^^^^^^^^^^
-:class:`Thresholder` is an easy to interpret tool, that can help explore different
-trade-offs. Where an algorithm like 
+:class:`Thresholder` is an easy to interpret tool, that can help explore
+trade-offs between fairness metrics and predictive performance. Where an algorithm like
 :class:`ThresholdOptimizer` “blindly” satisfies
 a specific constraint, :class:`Thresholder` aids the user in manually exploring
-different trade-offs, which can help gain more insight into the data. Also,
+different trade-offs, which can help gain more insight into the problem. Also,
 since :class:`Thresholder` is a post-processing technique, it is not necessary to alter
 an already trained estimator, which might be the only feasible unfairness
 mitigation approach when developers cannot influence training, due to
 practical reasons or security or privacy.
 
-In the next section, we will consider all ways of specifying thresholds, and
+In the next section, we will explain the different ways in which thresholds can be specified, and
 show how to investigate the effect of different thresholds. 
 
 How to use it
@@ -153,18 +155,16 @@ this example, unless specified otherwise, we will be using the
 Classifier: Default predictions
 ********************************
 The classifier we will be using throughout this example is a
-`RandomForestClassifier <https://
-scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html>`_. 
+:class:`sklearn.ensemble.RandomForestClassifier`.
 We first investigate the output when we call predict
 on this estimator, without using :class:`Thresholder`. This means all groups
-are thresholded at 0.5 (this is the default threshold used by most
-classification algorithms). 
+are thresholded at 0.5 (this is the default threshold used in most implementations of
+classification algorithms in scikit-learn).
 
 Considering the nature of the problem at hand, important aspects of our model
 to investigate are:
-
-- How many patients are recommended for care (selection rate = what % of predictions are positive) 
-- Reducing false negative rate (we don't want people that need extra care not receiving it)
+the selection rate (due to capacity constraints not all patients can be selected), and
+the false negative rate (we don't want people that need extra care not receiving it).
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -174,20 +174,26 @@ to investigate are:
     >>> import pandas as pd
     >>> import numpy as np
     >>> from sklearn.model_selection import train_test_split
+    >>> from sklearn.datasets import fetch_openml
     
     >>> #Get dataset, drop columns with unknown sf values
-    >>> df = pd.read_csv("https://raw.githubusercontent.com/fairlearn/talks/main/2021_scipy_tutorial/data/diabetic_preprocessed.csv")
+    >>> data = fetch_openml(data_id=43874)
+
+    >>> df = data.data
+    >>> Y = data.target
 
     >>> df = df[df['gender'] != 'Unknown/Invalid']
     >>> df = df[df['race'] != 'Unknown']
 
-    >>> Y, sensitive_features = df.loc[:, 'readmit_30_days'], df.loc[:, 'race']
+    >>> Y = Y[df.index]
 
-    >>> #Create dummy's, drop A from X, drop columns that correlate with Y 
-    >>> X = pd.get_dummies(df.drop(columns=["race", "discharge_disposition_id",
+    >>> sensitive_features =  df.loc[:, 'race']
+
+    >>> #Create dummy's, drop sf from X, drop columns that correlate with Y 
+    >>> X = pd.get_dummies(df.drop(columns=["race", 
+    ...                                     "discharge_disposition_id",
     ...                                     "readmitted",
-    ...                                     "readmit_binary",
-    ...                                     "readmit_30_days"]))
+    ...                                     "readmit_binary"]))
 
     >>> X_train, X_test, Y_train, Y_test, sf_train, sf_test, df_train, df_test = train_test_split(
     ...        X,
@@ -199,6 +205,7 @@ to investigate are:
     ...        random_state=445)
 
     >>> # Resample dataset such that training data has same number of positive and negative samples
+    >>> # Done to prevent overfitting towards the overrepresented class
     
     >>> def resample_dataset(X_train, Y_train, sf_train):
     ...   negative_ids = Y_train[Y_train == 0].index
@@ -233,11 +240,11 @@ to investigate are:
     ...             y_pred=Y_pred_clf, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.381274
-    Asian              0.439024
-    Caucasian          0.399399
-    Hispanic           0.365217
-    Other              0.421875
+    AfricanAmerican    0.383205
+    Asian              0.414634
+    Caucasian          0.401478
+    Hispanic           0.391304
+    Other              0.359375
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_clf)    
@@ -258,19 +265,24 @@ predictions.
 .. figure:: ../auto_examples/images/user_guide_thresholder_proba_distr.png
     :align: center
 
+.. _pos_thresholds:
 
 Two ways of specifying positive thresholds
 *******************************************
 Say, you want to change the threshold of a specific group to 0.4 (all 
-probabilities above 0.4 will be predicted as 1). There are two ways to
-specify this threshold in the :code:`threshold_dict`: 
+probabilities greater than 0.4 will be predicted as 1). By default,
+:class:`Thresholder` assumes a provided threshold to be positive, which
+means that there are two ways to specify this threshold in the
+:code:`threshold_dict`: 
 
     - 0.4
     - ('>', 0.4)
 
 Changing this threshold for groups 'Asian' and 'Other' shows the impact a
 change in threshold of just 0.1 can have on the false negative rates and the
-amount of positive predictions.
+amount of positive predictions. Note that the purpose of this user guide is
+solely to show functionality, and that it is very much debatable whether these
+are the most appropriate changes to make given the problem at hand.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -292,11 +304,11 @@ amount of positive predictions.
     ...             y_pred=Y_pred_thresholded, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.381274
-    Asian              0.121951
-    Caucasian          0.399399
-    Hispanic           0.365217
-    Other              0.125000
+    AfricanAmerican    0.383205
+    Asian              0.097561
+    Caucasian          0.401478
+    Hispanic           0.391304
+    Other              0.140625
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,Y_pred_thresholded)
@@ -304,20 +316,21 @@ amount of positive predictions.
 .. figure:: ../auto_examples/images/user_guide_thresholder_two_ways_pos_threshold.png
     :align: center
 
+.. _negative_thresholds:
+
 Specifying a negative threshold
 ********************************
 It is also possible to specify a negative threshold. This means that all
-instances with a probability less than the specified threshold will be
-predicted as 1. This is done by switching the sign in the threshold. Doing
-this for 'Asian' and 'Other' shows that this flips the false negative rate and
-percentage of positive predictions compared to the previous example. Note that
-we have to take a threshold just above 0.4 to make sure all the predictions
-are switched, as there might be instances with a probability of exaclty 0.4. 
+instances with a probability *less than* the specified threshold will be
+predicted as 1. This is done by adjusting the sign in the threshold. 
+Again, the purpose of this example is simply to show the different
+functionalities of :class:`Thresholder`, and is not necessarily the right course
+of action for this particular model/dataset. 
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> threshold_dict = {'Asian': ('<' , 0.400001), 'Other': ('<' , 0.400001)}
+    >>> threshold_dict = {'Asian': ('<' , 0.4), 'Other': ('<' , 0.4)}
 
     >>> thresholder = Thresholder(estimator=classifier,
     ...                           threshold_dict=threshold_dict,
@@ -332,10 +345,10 @@ are switched, as there might be instances with a probability of exaclty 0.4.
     ...             y_pred=Y_pred_switched_threshold, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.381274
-    Asian              0.878049
-    Caucasian          0.399399
-    Hispanic           0.365217
+    AfricanAmerican    0.383205
+    Asian              0.926829
+    Caucasian          0.401478
+    Hispanic           0.391304
     Other              0.875000
     Name: false_negative_rate, dtype: float64
 
@@ -350,8 +363,8 @@ In the previous examples, the threshold used for the groups that were not
 specified in the :code:`threshold_dict` was the default threshold of 0.5 (if
 :code:`predict_method` is either :code:`predict_proba` or :code:`predict`). It
 is possible to specify a different default threshold using the
-:code:`default_threshold` parameter. This threshold can be specified using all
-ways shown above.
+:code:`default_threshold` parameter. Similar as before, the default threshold
+can be specified either as a float or tuple.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -371,11 +384,11 @@ ways shown above.
     ...             y_pred=default_thresholded_pred, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.672780
-    Asian              0.121951
-    Caucasian          0.673135
-    Hispanic           0.704348
-    Other              0.125000
+    AfricanAmerican    0.637066
+    Asian              0.097561
+    Caucasian          0.664588
+    Hispanic           0.643478
+    Other              0.140625
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test,default_thresholded_pred)
@@ -383,52 +396,14 @@ ways shown above.
 .. figure:: ../auto_examples/images/user_guide_thresholder_default_threshold_0_6.png
     :align: center
 
-Dealing with the Prefit parameter
-**********************************
-In all examples above, the :code:`prefit` parameter was set to :code:`True`.
-This parameter indicates whether or not fit has been called on the supplied
-estimator. If :code:`Prefit==False`, the :code:`Thresholder.fit()` function
-will fit the estimator. For the final predictions it does not
-matter whether or the estimator is fit beforehand or in the 
-:code:`Thresholder.fit()` call:
-
-.. doctest:: mitigation
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> threshold_dict = {'Asian': 0.4, 'Other': ('>', 0.4)}
-
-    >>> #Prefit = False
-    >>> classifier_no_prefit = RandomForestClassifier(random_state=1)
-
-    >>> thresholder_no_prefit = Thresholder(estimator=classifier_no_prefit,
-    ...                                     threshold_dict=threshold_dict,
-    ...                                     prefit=False,
-    ...                                     predict_method='predict_proba')\
-    ...                                     .fit(X_train,Y_train,sensitive_features=sf_train)
-
-    >>> Y_pred_no_prefit = thresholder_no_prefit.predict(X_test,sensitive_features=sf_test)
-
-    >>> #Prefit = True
-    >>> classifier_prefit = RandomForestClassifier(random_state=1).fit(X_train,Y_train)
-
-    >>> thresholder_prefit = Thresholder(estimator=classifier_prefit,
-    ...                                  threshold_dict=threshold_dict,
-    ...                                  prefit=True,
-    ...                                  predict_method='predict_proba')\
-    ...                                  .fit(X_train,Y_train,sensitive_features=sf_train)
-     
-    >>> Y_pred_prefit = thresholder_prefit.predict(X_test,sensitive_features=sf_test)
-
-    >>> #Results are the same
-    >>> print(np.array_equal(Y_pred_no_prefit,Y_pred_prefit))    
-    True
+.. _regressor:
 
 Specify thresholds for a regressor
 ***********************************
 It is also possible to threshold the predicted output of a regressor.
 This can be useful if it is desired to transform the continuous output
 of a regressor into a binary prediction. To illustrate how this could work,
-consider a simple LinearRegression example on the
+consider a simple :class:`sklearn.linear_model.LinearRegression` example on the
 :ref:`boston housing dataset<boston_dataset>`, where the sensitive feature
 is the LSTAT variable categorized into four groups. 
 
@@ -486,7 +461,8 @@ If the classifier you are using is either
 on the output of the decision function. Syntax-wise, this works exactly the
 same as specifying a threshold as in the previous examples. Note that
 if :code:`predict_method` is set to :code:`decision_function`, the default
-threshold will automatically be set to 0.
+threshold will automatically be set to 0, as that is the value used by
+classifiers that predict using :code:`decision_function`.
 
 
 .. doctest:: mitigation
@@ -515,9 +491,9 @@ threshold will automatically be set to 0.
     ...             y_pred=Y_pred, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.423745
-    Asian              0.463415
-    Caucasian          0.452529
+    AfricanAmerican    0.426641
+    Asian              0.487805
+    Caucasian          0.453222
     Hispanic           0.434783
     Other              0.437500
     Name: false_negative_rate, dtype: float64
@@ -546,9 +522,9 @@ threshold will automatically be set to 0.
     ...             y_pred=Y_pred_thresholded, 
     ...             sensitive_features=sf_test).by_group
     race
-    AfricanAmerican    0.423745
+    AfricanAmerican    0.426641
     Asian              0.048780
-    Caucasian          0.452529
+    Caucasian          0.453222
     Hispanic           0.434783
     Other              0.437500
     Name: false_negative_rate, dtype: float64
@@ -573,7 +549,7 @@ of only considering 'race' as a sensitive feature (as was done in the
 classification examples above), we will now also include 'gender'. This means
 that when we want to specify the threshold for a specific sub-group, we will
 have to specify both the race and gender. For example, the subgroup of Asian
-women will be specified as ('Asian','Female').
+women will be specified as :code:`('Asian','Female')`.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -592,22 +568,22 @@ women will be specified as ('Asian','Female').
     
     >>> Y_pred_clf_multiple = classifier_multiple.predict(X_test_multiple_sf)
 
-    >>> #Inspect information about predictions
+    >>> #Inspect disaggregated metrics
     >>> MetricFrame(metrics=false_negative_rate, 
     ...             y_true=Y_test,
     ...             y_pred=Y_pred_clf_multiple, 
     ...             sensitive_features=A_multiple_test).by_group
     race             gender
-    AfricanAmerican  Female    0.409236
-                     Male      0.372549
-    Asian            Female    0.461538
-                     Male      0.392857
-    Caucasian        Female    0.382533
-                     Male      0.411967
-    Hispanic         Female    0.366667
-                     Male      0.381818
-    Other            Female    0.483871
-                     Male      0.272727
+    AfricanAmerican  Female    0.404459
+                    Male      0.370098
+    Asian            Female    0.384615
+                    Male      0.464286
+    Caucasian        Female    0.389956
+                    Male      0.412948
+    Hispanic         Female    0.483333
+                    Male      0.363636
+    Other            Female    0.451613
+                    Male      0.303030
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(A_multiple_test,Y_pred_clf_multiple)   
@@ -632,16 +608,16 @@ women will be specified as ('Asian','Female').
     ...             y_pred=Y_pred_multiple_sf_thresholded, 
     ...             sensitive_features=A_multiple_test).by_group
     race             gender
-    AfricanAmerican  Female    0.409236
-                     Male      0.372549
+    AfricanAmerican  Female    0.404459
+                     Male      0.370098
     Asian            Female    0.384615
-                     Male      0.392857
-    Caucasian        Female    0.382533
-                     Male      0.411967
-    Hispanic         Female    0.366667
-                     Male      0.381818
-    Other            Female    0.483871
-                     Male      0.272727
+                     Male      0.464286
+    Caucasian        Female    0.389956
+                     Male      0.412948
+    Hispanic         Female    0.483333
+                     Male      0.363636
+    Other            Female    0.451613
+                     Male      0.303030
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(A_multiple_test,Y_pred_multiple_sf_thresholded)
@@ -652,23 +628,24 @@ women will be specified as ('Asian','Female').
 RejectOptionClassifier
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-What it does 
+What it does
 ^^^^^^^^^^^^^^
 :class:`RejectOptionClassifier` is a postprocessing technique that is
-based on the intuitive hypothesis that biased decisions are more likely to be made close
+based on the hypothesis that "biased" decisions are more likely to be made close
 to the decision boundary. Translating this hypothesis to a relatable context: a decision you have
-made is more likely to be wrong if you are not very certain that this decision is the correct one. 
-Therefore, :class:`RejectOptionClassifier` splits all predictions into two categories: predictions
-made with sufficient certainty, and predictions made with insufficient certainty. The latter
-category is also called the **critical region**. It is hypothesized that in this area of low
-certainty, one group will, unfairly, be selected more often than another group (in our hospital
-example, this refers to being selected for the primary care program (=receive label 1)).
-:class:`RejectOptionClassifier` tries to counter this by labeling all instances inside the
-critical region based on the group to which they belong. All instances from the group hypothesized
-to be selected less (set with the parameter :code:`group_to_upselect`) will be selected,
-whilst all instances from the other group (set with the parameter :code:`group_to_downselect`)
-will not be selected. Outside the critical region, the result of the classification remains
-unchanged. Because of this split into two groups, the sensitive feature is expected to be binary.
+made is more likely to be wrong if you are not very certain that this decision is the correct one.
+:class:`RejectOptionClassifier` implements this idea by splitting all predictions into two
+categories: predictions made with sufficient certainty, and predictions made with insufficient
+certainty. The latter category is also called the **critical region**. It is hypothesized that
+in this area of low certainty, one group will, unfairly, be selected more often than another
+group. In our hospital example, this refers to being selected for the primary care program
+(=receive label 1). :class:`RejectOptionClassifier` tries to counter this by labeling all
+instances inside the critical region based on the group to which they belong. All instances from
+the group hypothesized to be selected less (set with the parameter :code:`group_to_upselect`)
+will be selected, whilst all instances from the other group
+(set with the parameter :code:`group_to_downselect`) will not be selected. Outside the critical
+region, the result of the classification remains unchanged. Note that the sensitive feature is
+expected to be binary.
 
 The size of the critical region is regulated by the parameter :code:`critical_width`
 (0 <= :code:`critical_width` <= 1); it contains all instances that have a probability to get 1
@@ -689,10 +666,9 @@ As mentioned above, :class:`RejectOptionClassifier` assumes that the sensitive f
 Of course, it can happen that there are multiple sensitive features, or that the sensitive feature
 is not binary (just like in our previous example). In this case it is easiest to create a new
 sensitive feature column which is binary. To see how this, and using
-:class:`RejectOptionClassifier` itself, works, consider the same `classifier <https://
-scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html>`_
-and :ref:`data <hospital_readmissions_dataset>` as in the section on
-:ref:`Thresholder<default_predictions>`.
+:class:`RejectOptionClassifier` itself, works, consider the same 
+:class:`sklearn.ensemble.RandomForestClassifier` and :ref:`data <hospital_readmissions_dataset>`
+as in the section on :ref:`Thresholder<default_predictions>`.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -712,8 +688,8 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     ...             y_pred=Y_pred_clf, 
     ...             sensitive_features=sf_test_reject_clf).by_group 
     race
-    downselect    0.395255
-    upselect      0.428571
+    downselect    0.397810
+    upselect      0.380952
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test_reject_clf,Y_pred_clf)
@@ -743,7 +719,7 @@ and :ref:`data <hospital_readmissions_dataset>` as in the section on
     ...             y_pred=Y_pred_reject_clf, 
     ...             sensitive_features=sf_test_reject_clf).by_group
     race
-    downselect    0.673723
+    downselect    0.658942
     upselect      0.123810
     Name: false_negative_rate, dtype: float64
 
@@ -760,6 +736,7 @@ parameter :code:`selection_label` to 0 is the only thing that needs to be change
 configuration of :class:`RejectOptionClassifier`. The critical region itself remains the same,
 whilst the thing that changes is the label each instance inside it receives; the
 :code:`group_to_upselect` receives the label 0, while the :code:`group_to_downselect` receives 1.
+Outside of the critical region, the labels do not change.
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
@@ -779,8 +756,8 @@ whilst the thing that changes is the label each instance inside it receives; the
     ...             y_pred=Y_pred_reject_clf, 
     ...             sensitive_features=sf_test_reject_clf).by_group 
     race
-    downselect    0.183759
-    upselect      0.647619
+    downselect    0.188686
+    upselect      0.685714
     Name: false_negative_rate, dtype: float64
 
     >>> plot_positive_predictions(sf_test_reject_clf, Y_pred_reject_clf)
@@ -1378,9 +1355,6 @@ Grid Search
       <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
       NeurIPS, 2016.
 
-   .. [#4] Kamiran, Karim, Zhang `"Decision Theory for Discrimination-aware Classification"
-      <https://ieeexplore.ieee.org/document/6413831>`_,
-      IEEE ICDM, 2012
 References
 ~~~~~~~~~~
 
