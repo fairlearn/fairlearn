@@ -1,0 +1,62 @@
+name: build-test
+
+on: [push, pull_request]
+
+concurrency: 
+  # this ensures after each commit the old jobs are cancelled and the new ones
+  # run instead.
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  all-deps:
+    # this job installs all dependencies and runs most tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.8", "3.9", "3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install .
+      - run: pip install -r requirements-dev.txt
+      - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml -m "not notebooks" test/
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
+
+  minimal-deps:
+    # this job installs minimal dependencies and runs tests for the minimal
+    # dependency cases.
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.8", "3.9", "3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install .
+      - run: pip install pytest pytest-cov
+      - run: pytest --cov=fairlearn --cov-report=xml test/install
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true
