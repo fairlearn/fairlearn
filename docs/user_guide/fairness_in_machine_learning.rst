@@ -272,8 +272,11 @@ A violation of the rule is still not sufficient to demonstrate that
 illegal discrimination has occurred - a causal link between the
 statistic and alleged discrimination must still be shown, and the
 court would examine the particulars of each case.
+For an example of the subtleties involved, see
+`Ricci v. Stefano <https://en.wikipedia.org/wiki/Ricci_v._DeStefano>`_
+which resulted from an attempt to 'correct' for disparate impact.
 *Outside* its particular context in US federal employment law,
-the 'four fifths rule' has no particular validity.
+the 'four fifths rule' has no validity.
 
 Taken together, we see that applying the 'four fifths rule' will
 not be appropriate in most cases.
@@ -501,6 +504,6 @@ References
 
 .. [#f2] Epistemic trespassing is the process of taking expertise in one field and
          applying it to another. This is not an intrinsically bad thing - one could
-         declare all interdisciplinary research to be a form of epistemic trespassing.
+         label all interdisciplinary research a form of epistemic trespassing.
          However, doing so successfully requires a willingness to learn the subtleties
          of the new field.
