@@ -340,7 +340,7 @@ class _AdversarialFairness(BaseEstimator):
                     kwname,
                     (int, float),
                     min_val=0.0,
-                    include_boundary="left",
+                    include_boundaries="left",
                 )
 
         # Positive or -1 numbers
@@ -349,7 +349,7 @@ class _AdversarialFairness(BaseEstimator):
             (self.epochs, "epochs"),
             (self.max_iter, "max_iter"),
         ):
-            check_scalar(kw, kwname, (int, float), min_val=-1, include_boundary="left")
+            check_scalar(kw, kwname, (int, float), min_val=-1, include_boundaries="left")
             if kw <= 0.0 and kw != -1:
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(kwname, "a positive number or -1")
