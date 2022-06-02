@@ -16,7 +16,7 @@ jobs:
       # check out PR branch
       - checkout
 
-      - run: ./build_tools/circle/checkout_merge_commit.sh
+      - run: bash devops/circle/checkout_merge_commit.sh
 
       - run:
           name: Show Python version
@@ -64,7 +64,7 @@ jobs:
       # check out PR branch
       - checkout
 
-      - run: ./build_tools/circle/checkout_merge_commit.sh
+      - run: bash devops/circle/checkout_merge_commit.sh
 
       - run:
           name: Show Python version
@@ -100,7 +100,7 @@ jobs:
       - image: cimg/python:3.8.12
     steps:
       - checkout
-      - run: ./build_tools/circle/checkout_merge_commit.sh
+      - run: bash devops/circle/checkout_merge_commit.sh
       - add_ssh_keys:
           # To generate a new key:
           # ssh-keygen -t ed25519 -C "ci-build@fairlearn.org" -f output_key_file
