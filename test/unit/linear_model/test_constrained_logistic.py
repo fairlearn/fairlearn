@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from sklearn.datasets import fetch_openml
@@ -9,6 +10,9 @@ from sklearn.linear_model import LogisticRegression
 
 from fairlearn.linear_model._constrained_logistic import (
     ConstrainedLogisticRegression,
+    _process_sensitive_features,
+    _ohe_sensitive_features,
+    _get_constraint_list_cov
 )
 
 
@@ -78,7 +82,7 @@ def test_multinomial_classification():
 
 
 def test_too_many_cov_bound_values(data_X, data_y, data_multiple_sf):
-    num_sens_features = data_multiple_sf.shape[0]
+    num_sens_features = data_multiple_sf.shape[1]
     covariance_bound = [0] * (num_sens_features + 1)
     clf = ConstrainedLogisticRegression(
         constraints="demographic_parity", covariance_bound=covariance_bound, n_jobs=-1
@@ -87,6 +91,20 @@ def test_too_many_cov_bound_values(data_X, data_y, data_multiple_sf):
         ValueError, match="^Number of covariance bound values can not exceed"
     ):
         clf.fit(data_X, data_y, sensitive_features=data_multiple_sf)
+
+
+def test_too_little_cov_bound_values(data_X, data_y, data_multiple_sf):
+    sensitive_features = np.hstack((data_multiple_sf, data_multiple_sf))
+    num_sens_features = sensitive_features.shape[1]
+    covariance_bound = [0] * (num_sens_features - 1)
+    clf = ConstrainedLogisticRegression(
+        constraints="demographic_parity", covariance_bound=covariance_bound, n_jobs=-1
+    )
+    with pytest.raises(
+        ValueError,
+        match="^Number of covariance bound values is higher than 1 but lower than",
+    ):
+        clf.fit(data_X, data_y, sensitive_features=sensitive_features)
 
 
 def test_wrong_solver(data_X, data_y, data_multiple_sf):
@@ -99,6 +117,27 @@ def test_wrong_solver(data_X, data_y, data_multiple_sf):
         clf.fit(data_X, data_y, sensitive_features=data_multiple_sf)
 
 
+def test_wrong_penalty(data_X, data_y, data_multiple_sf):
+    clf = ConstrainedLogisticRegression(
+        constraints="demographic_parity", penalty="l1", covariance_bound=0, n_jobs=-1
+    )
+    with pytest.raises(
+        ValueError, match="^Constrained Logistic Regression supports only penalties in"
+    ):
+        clf.fit(data_X, data_y, sensitive_features=data_multiple_sf)
+
+
+def test_wrong_multi_class(data_X, data_y, data_multiple_sf):
+    clf = ConstrainedLogisticRegression(
+        constraints="demographic_parity",
+        multi_class="auto",
+        covariance_bound=0,
+        n_jobs=-1,
+    )
+    with pytest.raises(ValueError, match="^multi_class should be 'ovr'"):
+        clf.fit(data_X, data_y, sensitive_features=data_multiple_sf)
+
+
 def test_mismatch_X_sf_rows(data_X, data_y, data_multiple_sf):
     data_multiple_sf = data_multiple_sf[:-1, :]
     clf = ConstrainedLogisticRegression(
@@ -106,6 +145,46 @@ def test_mismatch_X_sf_rows(data_X, data_y, data_multiple_sf):
     )
     with pytest.raises(ValueError, match="^X has [0-9]+ instances while"):
         clf.fit(data_X, data_y, sensitive_features=data_multiple_sf)
+
+
+def test_process_sensitive_features(data_multiple_sf):
+    sensitive_features, num_sens_features = _process_sensitive_features(
+        data_multiple_sf
+    )
+    assert type(sensitive_features) is np.ndarray or pd.DataFrame
+    assert type(num_sens_features) is int
+
+
+def test_ohe_sensitive_features(data_single_sf):
+    sensitive_features, num_sens_features = _process_sensitive_features(data_single_sf)
+    sensitive_features, categories = _ohe_sensitive_features(sensitive_features)
+
+    # First assert is to check if the data is one-hot-encoded
+    assert (
+        sensitive_features.sum(axis=1) - np.ones(sensitive_features.shape[0])
+    ).sum() == 0
+    assert type(categories) is list
+
+
+def test_get_constraint_list_cov(
+    data_X,
+    data_multiple_sf,
+):
+    sensitive_features, num_sens_features = _process_sensitive_features(
+        data_multiple_sf
+    )
+    sensitive_features, categories = _ohe_sensitive_features(sensitive_features)
+    covariance_bound = [0] * num_sens_features
+    constraints = _get_constraint_list_cov(
+        data_X,
+        sensitive_features,
+        categories,
+        covariance_bound,
+    )
+    for constraint in constraints:
+        assert "type" in constraint
+        assert "fun" in constraint
+        assert "args" in constraint
 
 
 def test_sf_wrong_type(data_X, data_y, data_multiple_sf):
