@@ -16,6 +16,8 @@ jobs:
       # check out PR branch
       - checkout
 
+      - run: ./build_tools/circle/checkout_merge_commit.sh
+
       - run:
           name: Show Python version
           command: python --version
@@ -35,7 +37,7 @@ jobs:
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
           command: python -m pip install --upgrade pip setuptools wheel
-      
+
       - run:
           name: 'Install required packages'
           command: python scripts/install_requirements.py --pinned False
@@ -48,7 +50,7 @@ jobs:
       - persist_to_workspace:
           root: docs/_build
           paths: html
-      
+
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
           path: docs/_build/html
@@ -62,6 +64,8 @@ jobs:
       # check out PR branch
       - checkout
 
+      - run: ./build_tools/circle/checkout_merge_commit.sh
+
       - run:
           name: Show Python version
           command: python --version
@@ -81,21 +85,22 @@ jobs:
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
           command: python -m pip install --upgrade pip setuptools wheel
-      
+
       - run:
           name: 'Install required packages'
           command: python scripts/install_requirements.py --pinned False
-      
+
       - run:
           name: 'Build doctest'
           command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
-      
+
   deploy-doc:
     docker:
       - image: cimg/python:3.8.12
     steps:
       - checkout
+      - run: ./build_tools/circle/checkout_merge_commit.sh
       - add_ssh_keys:
           # To generate a new key:
           # ssh-keygen -t ed25519 -C "ci-build@fairlearn.org" -f output_key_file
