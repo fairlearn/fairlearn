@@ -12,7 +12,14 @@ from fairlearn.linear_model._constrained_logistic import (
     ConstrainedLogisticRegression,
     _process_sensitive_features,
     _ohe_sensitive_features,
-    _get_constraint_list_cov
+    _get_constraint_list_cov,
+    _process_covariance_bound_dict,
+)
+from .conftest import (
+    cov_bound_dict_right,
+    cov_bound_dict_wrong,
+    mulitple_sf,
+    mulitple_sf_dataframe,
 )
 
 
@@ -107,6 +114,27 @@ def test_too_little_cov_bound_values(data_X, data_y, data_multiple_sf):
         clf.fit(data_X, data_y, sensitive_features=sensitive_features)
 
 
+@pytest.mark.parametrize("cov_bound", [cov_bound_dict_right, cov_bound_dict_wrong])
+@pytest.mark.parametrize("sensitive_features", [mulitple_sf, mulitple_sf_dataframe])
+def test_cov_bound_dict(cov_bound, sensitive_features):
+    if isinstance(sensitive_features, np.ndarray):
+        with pytest.raises(
+            ValueError,
+            match="^The sensitive features are of type",
+        ):
+            _process_covariance_bound_dict(cov_bound, sensitive_features)
+    elif isinstance(sensitive_features, pd.DataFrame):
+        if not sorted(sensitive_features.columns) == sorted(cov_bound.keys()):
+            with pytest.raises(
+                ValueError,
+                match="^The keys in the covariance bound dictionary do not match",
+            ):
+                _process_covariance_bound_dict(cov_bound, sensitive_features)
+    else:
+        cov_bound = _process_covariance_bound_dict(cov_bound, sensitive_features)
+        assert isinstance(cov_bound, list)
+
+
 def test_wrong_solver(data_X, data_y, data_multiple_sf):
     clf = ConstrainedLogisticRegression(
         constraints="demographic_parity", solver="lbfgs", covariance_bound=0, n_jobs=-1
@@ -151,8 +179,8 @@ def test_process_sensitive_features(data_multiple_sf):
     sensitive_features, num_sens_features = _process_sensitive_features(
         data_multiple_sf
     )
-    assert type(sensitive_features) is np.ndarray or pd.DataFrame
-    assert type(num_sens_features) is int
+    assert isinstance(sensitive_features, (np.ndarray, pd.DataFrame))
+    assert isinstance(num_sens_features, int)
 
 
 def test_ohe_sensitive_features(data_single_sf):
@@ -163,7 +191,7 @@ def test_ohe_sensitive_features(data_single_sf):
     assert (
         sensitive_features.sum(axis=1) - np.ones(sensitive_features.shape[0])
     ).sum() == 0
-    assert type(categories) is list
+    assert isinstance(categories, list)
 
 
 def test_get_constraint_list_cov(

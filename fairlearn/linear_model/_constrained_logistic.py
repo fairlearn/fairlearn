@@ -340,6 +340,29 @@ def _ohe_sensitive_features(sensitive_features):
     return transformed, categories
 
 
+def _process_covariance_bound_dict(covariance_bound, sensitive_features):
+    if not isinstance(sensitive_features, pd.DataFrame):
+        raise ValueError(
+            f"The sensitive features are of type {type(sensitive_features)},"
+            " while they should be supplied as a pd.DataFrame since the"
+            " covariance bound values are supplied as a dictionary."
+        )
+
+    if not sorted(sensitive_features.columns) == sorted(covariance_bound.keys()):
+        raise ValueError(
+            "The keys in the covariance bound dictionary do not match"
+            " the column names in the sensitive features DataFrame."
+            f" Covariance bound keys: {covariance_bound.keys()},"
+            f" sensitive features column names: {sensitive_features.columns}."
+        )
+
+    covariance_bound_list = []
+    for column in sensitive_features.columns:
+        covariance_bound_list.append(covariance_bound[column])
+
+    return covariance_bound_list
+
+
 def _process_sensitive_features(sensitive_features):
     """
     Process the sensitive features.
@@ -428,13 +451,16 @@ class ConstrainedLogisticRegression(LogisticRegression):
         - `'none'`: no penalty is added;
         - `'l2'`: add a L2 penalty term and it is the default choice;
 
-    covariance_bound : float or list, default=0
+    covariance_bound : float or list or dict, default=0
         The covariance bound that the constraint optimizes towards.
         It can either be one of the following two:
 
         - A single float that will be used for all sensitive features.
         - A list of floats such that each sensitive feature has its own covariance bound.
           The order in the list corresponds to the order of the passed sensitive features.
+        - A dictionary containing the column names and covariance bound values as
+          key-value pairs in the case when the sensitive features are supplied in a
+          Pandas DataFrame.
 
     dual : bool, default=False
         Dual or primal formulation. Dual formulation is currently not implemented.
@@ -635,8 +661,12 @@ class ConstrainedLogisticRegression(LogisticRegression):
             return clf.fit(X, y)
 
         # The covariance_bound needs to be in a list for _get_constraint_list_cov
-        if not isinstance(self.covariance_bound, list):
+        if isinstance(self.covariance_bound, (float, int)):
             self.covariance_bound = [self.covariance_bound]
+        elif isinstance(self.covariance_bound, dict):
+            self.covariance_bound = _process_covariance_bound_dict(
+                self.covariance_bound, sensitive_features
+            )
 
         sensitive_features, num_sens_features = _process_sensitive_features(
             sensitive_features

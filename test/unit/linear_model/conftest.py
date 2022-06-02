@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 import pytest
 
 single_binary_sf = [
@@ -61,3 +62,16 @@ def data_single_sf(request):
 @pytest.fixture
 def data_multiple_sf():
     return np.hstack((np.array(single_binary_sf), np.array(single_categorical_sf)))
+
+
+@pytest.fixture
+def data_mulitple_sf_dataframe():
+    array = np.hstack((np.array(single_binary_sf), np.array(single_categorical_sf)))
+    return pd.DataFrame(array, columns=["a", "b"])
+
+
+cov_bound_dict_right = {"b": 0, "a": 1}
+cov_bound_dict_wrong = {"c": 0, "a": 1}
+
+mulitple_sf = np.hstack((np.array(single_binary_sf), np.array(single_categorical_sf)))
+mulitple_sf_dataframe = pd.DataFrame(mulitple_sf, columns=["a", "b"])
