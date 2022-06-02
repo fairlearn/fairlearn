@@ -86,12 +86,6 @@ def _sensitive_attr_constraint_cov(model, X, sensitive_features, covariance_boun
             f" {sensitive_features.shape[0]} instances."
             " These should be equal."
         )
-    if len(sensitive_features.shape) > 1:
-        if sensitive_features.shape[1] != 1:
-            raise ValueError(
-                f"sensitive_features has {sensitive_features.shape[1]}"
-                " columns, while it should have only 1."
-            )
 
     intercept = 0.0
 
@@ -367,7 +361,7 @@ def _process_sensitive_features(sensitive_features):
     Returns
     -------
     sensitive_features : numpy.ndarray or pandas.DataFrame
-        Transformed sensitive feature data with one-hot-encoded values.
+        Transformed sensitive feature data.
 
     count : int
         The number of sensitive features supplied.
@@ -583,10 +577,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
         self.constraints = constraints
         self.covariance_bound = covariance_bound
 
-        # The covariance_bound needs to be in a list for _get_constraint_list_cov
-        if not isinstance(self.covariance_bound, list):
-            self.covariance_bound = [self.covariance_bound]
-
     def fit(
         self,
         X,
@@ -610,7 +600,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
             Array of weights that are assigned to individual samples.
             If not provided, then each sample is given unit weight.
 
-        sensitive_features : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+        sensitive_features : list, pandas.Series, numpy.ndarray, pandas.DataFrame
             The sensitive features. In the case of a list or pandas.Series,
             we assume there is only one sensitive feature.
 
@@ -644,6 +634,10 @@ class ConstrainedLogisticRegression(LogisticRegression):
             )
             return clf.fit(X, y)
 
+        # The covariance_bound needs to be in a list for _get_constraint_list_cov
+        if not isinstance(self.covariance_bound, list):
+            self.covariance_bound = [self.covariance_bound]
+
         sensitive_features, num_sens_features = _process_sensitive_features(
             sensitive_features
         )
@@ -670,8 +664,6 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
         sensitive_features, categories = _ohe_sensitive_features(sensitive_features)
 
-        # TODO: Think about whether the constraints should be
-        #  implemented in `fit`, or in `_logistic_regression_path`
         constraints = _get_constraint_list_cov(
             X,
             sensitive_features,
