@@ -1,5 +1,5 @@
-Table of Contents Modified
-==========================
+Table of Contents
+=================
 
 .. Define an order for the Table of Contents:
 

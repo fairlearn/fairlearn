@@ -1,7 +1,7 @@
 .. _api_reference:
 
-API Docs
-========
+API Docs Test
+=============
 
 .. toctree::
    :maxdepth: 1
