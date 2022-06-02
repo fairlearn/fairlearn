@@ -79,6 +79,7 @@ extensions = [
     "sphinx_gallery.gen_gallery",
     "sphinx_multiversion",
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
+    "numpydoc",
 ]
 
 source_suffix = [".rst"]
