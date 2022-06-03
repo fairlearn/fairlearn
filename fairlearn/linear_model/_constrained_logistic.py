@@ -308,7 +308,7 @@ def _ohe_sensitive_features(sensitive_features):
     One-hot-encode the sensitive features.
 
     We one-hot-encode the sensitive features such that the constraints
-    can be correctly coded per feature value.
+    can be correctly coded.
 
     Parameters
     ----------
