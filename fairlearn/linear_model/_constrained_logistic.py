@@ -341,6 +341,27 @@ def _ohe_sensitive_features(sensitive_features):
 
 
 def _process_covariance_bound_dict(covariance_bound, sensitive_features):
+    """
+    Process the covariance bound when it is supplied as a dictionary.
+
+    We transform the supplied dictionary to a list, adhering to the
+    order of the columns in the sensitive_features DataFrame.
+
+    Parameters
+    ----------
+    sensitive_features : pandas.DataFrame
+        The sensitive features.
+        Will raise a TypeError if not supplied as a Pandas DataFrame.
+
+    covariance_bound : dictionary
+        A dictionary containing the column names and covariance bound values as
+        key-value pairs.
+
+    Returns
+    -------
+    covariance_bound_list : list
+        The covariance bound values transformed to a list.
+    """
     if not isinstance(sensitive_features, pd.DataFrame):
         raise ValueError(
             f"The sensitive features are of type {type(sensitive_features)},"
