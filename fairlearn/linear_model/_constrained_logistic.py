@@ -125,8 +125,8 @@ def _get_constraint_list_cov(
     categories : list
         The categories from the one-hot-encoder.
 
-    covariance_bound : float
-        The given covariance threshold that we optimize towards.
+    covariance_bound : list
+        The maximum covariance bound for every sensitive feature.
 
     Returns
     -------
@@ -473,7 +473,8 @@ class ConstrainedLogisticRegression(LogisticRegression):
         - `'l2'`: add a L2 penalty term and it is the default choice;
 
     covariance_bound : float or list or dict, default=0
-        The covariance bound that the constraint optimizes towards.
+        The maximum covariance as a hard constraint.
+        The loss is optimized subject to this value.
         It can either be one of the following two:
 
         - A single float that will be used for all sensitive features.
