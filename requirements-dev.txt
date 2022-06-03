@@ -31,7 +31,7 @@ nbval
 # Required for documentation
 bokeh
 pypandoc
-sphinx
+sphinx==4.5.0
 sphinx-gallery
 numpydoc
 pydata-sphinx-theme==0.8.1
