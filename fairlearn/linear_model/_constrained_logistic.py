@@ -363,7 +363,7 @@ def _process_covariance_bound_dict(covariance_bound, sensitive_features):
         The covariance bound values transformed to a list.
     """
     if not isinstance(sensitive_features, pd.DataFrame):
-        raise ValueError(
+        raise TypeError(
             f"The sensitive features are of type {type(sensitive_features)},"
             " while they should be supplied as a pd.DataFrame since the"
             " covariance bound values are supplied as a dictionary."

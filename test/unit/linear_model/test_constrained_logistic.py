@@ -119,7 +119,7 @@ def test_too_little_cov_bound_values(data_X, data_y, data_multiple_sf):
 def test_cov_bound_dict(cov_bound, sensitive_features):
     if isinstance(sensitive_features, np.ndarray):
         with pytest.raises(
-            ValueError,
+            TypeError,
             match="^The sensitive features are of type",
         ):
             _process_covariance_bound_dict(cov_bound, sensitive_features)
