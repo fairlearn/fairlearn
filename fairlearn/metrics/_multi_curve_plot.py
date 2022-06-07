@@ -31,7 +31,7 @@ def plot_model_comparison(
     point_labels=False,
     legend=False,
     legend_kwargs={},
-    plot=False,
+    show_plot=False,
     **kwargs,
 ):
     r"""
@@ -90,7 +90,7 @@ def plot_model_comparison(
         will create a legend to the right of the Axes (subfigure), or
         :code:`legend_kwargs={'ncol': 2}` will create two columns in the legend.
 
-    plot : bool
+    show_plot : bool
         If true, call pyplot.plot.
 
     Returns
@@ -190,7 +190,7 @@ def plot_model_comparison(
 
     for (kwarg, name) in (
         (legend, "legend"),
-        (plot, "plot"),
+        (show_plot, "show_plot"),
     ):
         if not isinstance(kwarg, bool):
             raise ValueError(
@@ -300,7 +300,7 @@ def plot_model_comparison(
         ax.legend(**legend_kwargs)
 
     # User may want to draw in an ax but not plot it yet.
-    if plot:
+    if show_plot:
         plt.show()
 
     return ax
