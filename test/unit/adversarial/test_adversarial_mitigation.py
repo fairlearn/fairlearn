@@ -80,6 +80,7 @@ def test_estimator_checks(test_fn):
     instance = get_instance(
         _AdversarialFairness, torch=True, tensorflow=False, fake_mixin=True
     )
+
     test_fn(
         _AdversarialFairness.__name__,
         instance,

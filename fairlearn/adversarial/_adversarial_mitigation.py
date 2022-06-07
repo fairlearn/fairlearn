@@ -670,7 +670,9 @@ class _AdversarialFairness(BaseEstimator):
             is_fitted = False
 
         if A is None:
-            raise ValueError("No sensitive_features provided")
+            logger.warning("No sensitive_features provided")
+            logger.warning("Setting sensitive_features to zeros")
+            A = zeros(len(Y))
 
         if (not is_fitted) or (reinitialize):
             self.__setup(X, Y, A)
