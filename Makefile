@@ -23,4 +23,4 @@ test-deprecation:
 	$(PYTEST) -Werror::DeprecationWarning -Werror::FutureWarning ./test/unit
 
 doc:
-	python -m sphinx -v -b html -n -j auto docs docs/_build/html
+	python -m sphinx -v -b html -n -j auto docs docs/_build/html -D smv_tag_whitelist=None -D smv_branch_whitelist=None
