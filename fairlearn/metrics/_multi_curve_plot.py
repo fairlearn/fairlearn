@@ -12,22 +12,26 @@ from typing import Callable, Union
 from numpy import amax, amin, array
 from sklearn.utils.validation import check_array
 from numpy import zeros
+import logging
+
+logger = logging.getLogger(__name__)
+
+context_state = None
 
 
 def plot_model_comparison(
     *,
-    x_axis_metric: Callable[..., Union[float, int]],
-    y_axis_metric: Callable[..., Union[float, int]],
-    y_true,
     y_preds,
-    sensitive_features,
+    y_true=None,
+    sensitive_features=None,
+    x_axis_metric: Callable[..., Union[float, int]] = None,
+    y_axis_metric: Callable[..., Union[float, int]] = None,
     ax=None,
     axis_labels=True,
-    point_labels=None,
-    model_kwargs=None,
+    point_labels=False,
     legend=False,
     legend_kwargs={},
-    plot=True,
+    plot=False,
     **kwargs,
 ):
     r"""
@@ -35,6 +39,21 @@ def plot_model_comparison(
 
     Parameters
     ----------
+    y_preds : array-like, dict of array-like
+        An array-like containing predictions per model. Hence, predictions of
+        model :code:`i` should be in :code:`y_preds[i]`.
+
+    y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+        The ground-truth labels (for classification) or target values (for regression).
+
+    sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, optional
+        The sensitive features which should be used to create the subgroups.
+        At least one sensitive feature must be provided.
+        All names (whether on pandas objects or dictionary keys) must be strings.
+        We also forbid DataFrames with column names of ``None``.
+        For cases where no names are provided
+        we generate names ``sensitive_feature_[n]``.
+
     x_axis_metric : Callable
         The (aggregating) metric function for the x-axis
         The passed metric function must take `y_true, y_pred`, and optionally `sensitive_features`.
@@ -47,42 +66,23 @@ def plot_model_comparison(
         The passed metric function must take `y_true, y_pred`, and optionally `sensitive_features`.
         If the metric is grouped, it must aggregate results.
 
-    y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
-        The ground-truth labels (for classification) or target values (for regression).
-
-    y_preds : array-like
-        An array-like containing predictions per model. Hence, predictions of
-        model :code:`i` should be in :code:`y_preds[i]`.
-
-    sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, optional
-        The sensitive features which should be used to create the subgroups.
-        At least one sensitive feature must be provided.
-        All names (whether on pandas objects or dictionary keys) must be strings.
-        We also forbid DataFrames with column names of ``None``.
-        For cases where no names are provided
-        we generate names ``sensitive_feature_[n]``.
-
     ax : matplotlib.axes.Axes, optional
         If supplied, the scatter plot is drawn on this Axes object.
         Else, a new figure with Axes is created.
 
-    axis_labels : bool
-        If true, add the names of x and y axis metrics
+    axis_labels : bool, tuple
+        If true, add the names of x and y axis metrics. You can also pass a
+        two-tuple of strings to use as axis labels instead.
 
-    point_labels : list
-        Add textual label :code:`point_labels[i]` to the position
-        of model :code:`i`.
-
-    model_kwargs : list[dict], optional
-        For a model at index :code:`i` (same order as in :code:`y_preds`),
-        :code:`model_kwargs[i]` are passed along to matplotlib's scatter
-        plotting. If models have the same `model_kwargs`, they are passed
-        in one call to :py:func:`Axes.scatter`, so they become one entry in
-        the legend.
+    point_labels : bool, list
+        If true, annotate text with inferred point labels. These labels are
+        the keys of y_preds if y_preds is a dictionary, else simply the integers
+        0...number of points - 1. You can specify point_labels as a list of
+        labels as well.
 
     legend : bool
-        If True, add a legend. Must set
-        :code:`model_kwargs[i]['label']` for every prediction :code:`i`.
+        If True, add a legend. Legend entries are created by passing the
+        key word argument :code:`label` to calls to this function.
 
     legend_kwargs : dict
         Keyword arguments passed to :py:func:`Axes.legend`. For instance,
@@ -91,7 +91,7 @@ def plot_model_comparison(
         :code:`legend_kwargs={'ncol': 2}` will create two columns in the legend.
 
     plot : bool
-        If true, call pyplot.plot. In any case, return axis
+        If true, call pyplot.plot.
 
     Returns
     -------
@@ -116,23 +116,79 @@ def plot_model_comparison(
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
+    # --- SET OR LOAD CONTEXT STATE ---
+    global context_state
+    context_kws = (y_true, sensitive_features, x_axis_metric, y_axis_metric)
+    if all(kw is None for kw in context_kws):
+        if context_state is None:
+            raise ValueError(
+                "Must provide the following key word arguments on first call: "
+                + "y_true, sensitive_features, x_axis_metric, y_axis_metric."
+            )
+        (
+            y_true,
+            sensitive_features,
+            x_axis_metric,
+            y_axis_metric,
+        ) = context_state
+    elif any(kw is None for kw in context_kws):
+        raise ValueError(
+            "Either provide all or none of the following key word arguments: "
+            + "y_true, sensitive_features, x_axis_metric, y_axis_metric."
+        )
+    else:
+        _, y_true, sensitive_features, _ = _validate_and_reformat_input(
+            zeros((len(y_true), 1)),  # Dummy values for X
+            y=y_true,
+            sensitive_features=sensitive_features,
+        )
+        y_true = y_true.values
+        sensitive_features = sensitive_features.values
+
+        context_state = (
+            y_true,
+            sensitive_features,
+            x_axis_metric,
+            y_axis_metric,
+        )
+
     # --- VALIDATE INPUT ---
+    if isinstance(y_preds, dict):
+        inferred_point_labels = []
+        y_preds_list = []
+        for key, value in y_preds.items():
+            inferred_point_labels.append(key)
+            y_preds_list.append(value)
+        y_preds = array(y_preds_list)
+    else:
+        inferred_point_labels = range(len(y_preds))
+
+    if len(y_preds.shape) == 1:
+        y_preds = y_preds.reshape(1, -1)
     y_preds = check_array(y_preds)
-    _, y_true, sensitive_features, _ = _validate_and_reformat_input(
-        zeros((len(y_true), 1)),  # Dummy values for X
-        y=y_true,
-        sensitive_features=sensitive_features,
-    )
-    y_true = y_true.values
-    sensitive_features = sensitive_features.values
 
     if not len(y_true) == y_preds.shape[1]:
         raise ValueError(
             _INCONSISTENT_ARRAY_LENGTH.format("y_true and the rows of y_preds")
         )
 
+    if isinstance(axis_labels, tuple):
+        if len(axis_labels) != 2:
+            raise ValueError(
+                "Key word argument axis_labels should be a tuple of two strings."
+            )
+    elif isinstance(axis_labels, bool):
+        pass
+    else:
+        raise ValueError(
+            _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                axis_labels,
+                "boolean or tuple of two strings",
+                type(kwarg).__name__,
+            )
+        )
+
     for (kwarg, name) in (
-        (axis_labels, "axis_labels"),
         (legend, "legend"),
         (plot, "plot"),
     ):
@@ -143,30 +199,22 @@ def plot_model_comparison(
                 )
             )
 
-    for (kwarg, name) in (
-        (point_labels, "point_labels"),
-        (model_kwargs, "model_kwargs"),
-    ):
-        if kwarg is not None:
-            if not isinstance(kwarg, list):
-                raise ValueError(
-                    _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                        name, "list", type(kwarg).__name__
-                    )
-                )
-            if not len(kwarg) == y_preds.shape[0]:
-                raise ValueError(
-                    _INCONSISTENT_ARRAY_LENGTH.format(f"{name} and y_preds")
-                )
-
-    if model_kwargs is not None:
-        for item in model_kwargs:
-            if not isinstance(item, dict):
-                raise ValueError(
-                    _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                        "items of model_kwargs", "dict", type(item).__name__
-                    )
-                )
+    if isinstance(point_labels, list):
+        if not len(point_labels) == y_preds.shape[0]:
+            raise ValueError(
+                _INCONSISTENT_ARRAY_LENGTH.format("point_labels and y_preds")
+            )
+    elif isinstance(point_labels, bool):
+        if point_labels:
+            point_labels = inferred_point_labels
+        else:
+            point_labels = None
+    else:
+        raise ValueError(
+            _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
+                name, "boolean or list of labels", type(kwarg).__name__
+            )
+        )
 
     if not isinstance(legend_kwargs, dict):
         raise ValueError(
@@ -207,10 +255,13 @@ def plot_model_comparison(
 
     # Init ax
     if not ax_supplied_:
+        logger.warning(
+            "No matplotlib.Axes object was provided to draw on, so we create a new one"
+        )
         ax = plt.axes()
 
     # Add axis labels
-    if axis_labels:
+    if isinstance(axis_labels, bool):
         for f, m in (
             (ax.set_xlabel, x_axis_metric),
             (ax.set_ylabel, y_axis_metric),
@@ -224,6 +275,9 @@ def plot_model_comparison(
             else:
                 name = m.__repr__
             f(name.replace("_", " "))
+    elif isinstance(axis_labels, tuple):
+        ax.set_xlabel(axis_labels[0])
+        ax.set_ylabel(axis_labels[1])
 
     # Add point labels
     # This could be nicer, but we rather not add a dependency on other packages.
@@ -232,40 +286,18 @@ def plot_model_comparison(
             ax.text(x[i], y[i], label)
 
     # Add actual points
-    try:
-        if model_kwargs is None:
-            ax.scatter(x, y, **kwargs)
-        else:
-            # Find the models with the same model_kwargs, and pass them into
-            # a single call to scatter.
-            is_first = [True for _ in model_kwargs]
-            equivalence = [[i] for i in range(len(model_kwargs))]
-            for i, mkws1 in enumerate(model_kwargs):
-                if not is_first[i]:
-                    continue
-                for j, mkws2 in enumerate(model_kwargs[i + 1:], start=i + 1):
-                    if mkws1 == mkws2:
-                        is_first[j] = False
-                        equivalence[i].append(j)
+    ax.scatter(x, y, **kwargs)
 
-            # FIXME: @hildeweerts Do we need to set xlim/ylim separately?
-            # NOTE: If so, I think matplotlib automatically has 5% margin
-            x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
-            x_margin, y_margin = (x_max - x_min) * 0.05, (y_max - y_min) * 0.05
-            ax.set_xlim(left=x_min - x_margin, right=x_max + x_margin)
-            ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
+    # FIXME: @hildeweerts Do we need to set xlim/ylim separately?
+    # NOTE: If so, I think matplotlib automatically has 5% margin
+    # Also, we need to store extremas of previous calls to scatter
+    # x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
+    # x_margin, y_margin = (x_max - x_min) * 0.05, (y_max - y_min) * 0.05
+    # ax.set_xlim(left=x_min - x_margin, right=x_max + x_margin)
+    # ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
 
-            for i, this_model_kwargs in enumerate(model_kwargs):
-                if is_first[i]:
-                    index = equivalence[i]
-                    kws = kwargs.copy()
-                    kws.update(this_model_kwargs)
-                    ax.scatter(x[index], y[index], **kws)
-        if legend:
-            ax.legend(**legend_kwargs)
-    except AttributeError as e:
-        # FIXME: Add some info, as this is probably because of wrong kwargs.
-        raise e
+    if legend:
+        ax.legend(**legend_kwargs)
 
     # User may want to draw in an ax but not plot it yet.
     if plot:
