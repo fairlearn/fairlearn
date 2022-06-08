@@ -18,7 +18,7 @@ from sklearn.utils import (
     check_consistent_length,
     compute_class_weight,
 )
-from sklearn.utils.fixes import delayed, _joblib_parallel_args
+from sklearn.utils.fixes import delayed
 from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.optimize import _check_optimize_result
 from sklearn.utils.validation import _check_sample_weight
@@ -807,7 +807,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         fold_coefs_ = Parallel(
             n_jobs=self.n_jobs,
             verbose=self.verbose,
-            **_joblib_parallel_args(prefer=prefer),
+            prefer=prefer,
         )(
             path_func(
                 X,
