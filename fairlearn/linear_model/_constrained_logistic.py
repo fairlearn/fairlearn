@@ -9,10 +9,9 @@ import pandas as pd
 from scipy import optimize
 from joblib import Parallel
 
+from fairlearn.utils.fixes import logistic_loss
+
 from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model._logistic import (
-    _logistic_loss,
-)
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.utils import (
     check_array,
@@ -268,7 +267,7 @@ def _logistic_regression_path(
         w0[: coef.size] = coef
 
     target = y_bin
-    func = _logistic_loss
+    func = logistic_loss(fit_intercept)
 
     coefs = list()
     n_iter = np.zeros(len(Cs), dtype=np.int32)
