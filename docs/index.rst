@@ -11,7 +11,7 @@ Table of Contents
    user_guide/index
 
    api_reference/index
-   
+
    auto_examples/index
 
    contributor_guide/index
