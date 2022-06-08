@@ -267,11 +267,17 @@ def _logistic_regression_path(
         w0[: coef.size] = coef
 
     target = y_bin
-    func = logistic_loss(fit_intercept)
+    func, old_new_loss = logistic_loss(fit_intercept)
 
     coefs = list()
     n_iter = np.zeros(len(Cs), dtype=np.int32)
     for i, C in enumerate(Cs):
+        if old_new_loss == "new":
+            l2_reg_strength = 1.0 / C
+            args = (X, target, sample_weight, l2_reg_strength, 1)
+            # sklearn always has 1 for n_threads
+        else:  # old version of args
+            args = (X, target, 1.0 / C, sample_weight)
         if solver == "SLSQP":
             iprint = [-1, 50, 1, 100, 101][
                 np.searchsorted(np.array([0, 1, 2, 3]), verbose)
@@ -281,7 +287,7 @@ def _logistic_regression_path(
                 x0=w0,
                 method="SLSQP",
                 # jac=True,  # Commented because it is not used by the authors of the paper
-                args=(X, target, 1.0 / C, sample_weight),
+                args=args,
                 options={"iprint": iprint, "maxiter": max_iter},
                 constraints=constraints,
             )

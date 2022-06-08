@@ -15,11 +15,11 @@ def logistic_loss(fit_intercept):
         loss = LinearModelLoss(
             base_loss=HalfBinomialLoss(), fit_intercept=fit_intercept
         )
-        return loss.loss
+        return loss.loss, "new"
     else:
         # We can import logistic loss in the old way
         from sklearn.linear_model._logistic import (
             _logistic_loss,
         )
 
-        return _logistic_loss
+        return _logistic_loss, "old"
