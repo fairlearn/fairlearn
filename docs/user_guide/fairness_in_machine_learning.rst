@@ -23,6 +23,9 @@ terms of intent, such as prejudice.
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 
+
+.. _types_of_harms:
+
 Types of harms
 --------------
 
@@ -46,9 +49,15 @@ The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
-In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
+In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task.
+Which target variable do we intend to predict?
+What features will be included?
+What (fairness) constraints do we consider?
+Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness [#4]_ . This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in :footcite:cts:`jacobs2021measurement`.
+This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
+In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
 Key Terms 
 ~~~~~~~~~
@@ -72,26 +81,32 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See [#5]_ for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example. 
 
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
+**Note:**
+We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
+Please reference :footcite:cts:`jacobs2021measurement` for more detailed examples.
  
+ 
+.. _construct_validity:
+
 What is construct validity? 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness [#4]_ paper explores both construct reliability and construct validity, we focus our 
-exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
-is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
-can serve as a framework for analyzing an AI task and attempting to establish construct validity:
+Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our 
+exploration below on construct Validity.
+We note that both play an important role in understanding fairness in sociotechnical contexts.
+With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that 
+is helpful in thinking about fairness in sociotechnical contexts.
+We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
 1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
 
 2. **Content validity** – This has three subcomponents:
 
-   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
-   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
-   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
+   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context dependent).
+   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
+   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
 
 3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
    measurement models for which construct validity has been established? 
@@ -144,6 +159,9 @@ sense as sensitive feature. The term is based on anti-discrimination laws
 that define specific *protected classes*. Since we seek to apply group
 fairness in a wider range of settings, we avoid this term.
 
+
+.. _parity_constraints:
+
 Parity constraints
 ^^^^^^^^^^^^^^^^^^
 
@@ -164,18 +182,18 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#2]_
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.  :footcite:`agarwal2018reductions`
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  [#2]_
+  :footcite:`agarwal2018reductions`
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  [#1]_
+  :footcite:`hardt2016equality`
 
 *Regression*:
 
@@ -183,16 +201,19 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  [#0]_
+  :footcite:`agarwal2019fair`
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#0]_
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. :footcite:`agarwal2019fair`
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
 odds and equal opportunity can be used as a diagnostic for both allocation
 harms as well as quality-of-service harms.
+
+
+.. _disparity_metrics:
 
 Disparity metrics, group metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -215,6 +236,66 @@ which groups these values were observed, as well as the difference and ratio
 between the maximum and the minimum values. For more information refer to the
 subpackage :mod:`fairlearn.metrics`.
 
+
+
+The Four Fifths Rule: Often Misapplied
+--------------------------------------
+
+In the literature around fairness in machine learning, one will often find
+the so-called "four fifths rule" or "80% rule" used to assess whether a model
+(or mitigation technique) has produced a 'fair' result.
+Typically, the rule is implemented by using the demographic parity ratio introduced
+in the :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
+exceeds 80% for all identified subgroups.
+*Application of this threshold is wrong in many scenarios.*
+
+As we note in many other places in the Fairlearn documentation, 'fairness'
+must be assessed by examining the entire sociotechnical context of a machine
+learning system.
+In particular, it is important to start from the harms which can occur to real
+people, and work inwards towards the model.
+The demographic parity ratio is simply a metric by which a particular model
+may be measured (on a particular dataset).
+Given the origin of the 'four-fifths rule' (which we will discuss next), its
+application may also give an unjustified feeling of legal invulnerability by
+conflating fairness with legality.
+In reality, 'fairness' is not always identical to 'legally allowable,' and
+the former may not even be a strict subset of the latter. [#f1]_
+
+The 'four fifths rule' has its origins in a specific area of US
+federal employment law.
+It is a limit for
+`prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
+that illegal discrimination has occurred relative to a 
+relevant control population.
+A violation of the rule is still not sufficient to demonstrate that
+illegal discrimination has occurred - a causal link between the
+statistic and alleged discrimination must still be shown, and the
+court would examine the particulars of each case.
+For an example of the subtleties involved, see
+`Ricci v. Stefano <https://en.wikipedia.org/wiki/Ricci_v._DeStefano>`_
+which resulted from an attempt to 'correct' for disparate impact.
+*Outside* its particular context in US federal employment law,
+the 'four fifths rule' has no validity.
+
+Taken together, we see that applying the 'four fifths rule' will
+not be appropriate in most cases.
+Even in cases where it is applicable, the rule does not automatically
+avoid legal jeopardy, much less ensure that results are fair.
+The use of the 'four fifths rule' in this manner is an indefensible
+example of epistemic trespassing. [#f2]_
+It is for this reason that we try to avoid the use of legal
+terminology in our documentation.
+
+For a much deeper discussion of the issues involved, we suggest
+:footcite:ct:`watkins2022fourfifths`.
+A higher level look at how legal concepts of fairness can collide
+with mathematical measures of disparity, see
+:footcite:ct:`Xiang2019legalcompatibility`.
+
+
+.. _abstraction_traps:
+
 What traps can we fall into when modeling a social problem?
 --------------------------------------------------------------
 
@@ -230,7 +311,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#3]_
+In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`selbst2019fairness`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
@@ -247,6 +328,9 @@ when modeling. They identify them as:
 We provide some definitions and examples of these traps to help Fairlearn
 users think about how choices they make in their work can lead to or avoid
 these common pitfalls.
+
+
+.. _solutionism_trap:
 
 The Solutionism Trap
 ^^^^^^^^^^^^^^^^^^^^
@@ -266,6 +350,9 @@ a community, for example with education, infrastructure, information
 technology, or health services, then an algorithmic solution purely
 focused on internet speed may fail to meaningfully address the needs of
 the community.
+
+
+.. _ripple_effect_trap:
 
 The Ripple Effect Trap
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -292,6 +379,9 @@ adopt "what if" scenarios to envision how the social context might change
 after introducing a model, including how it may change the power dynamics of
 existing groups in that context, or how actors might change their behaviors to
 game the model.
+
+
+.. _formalism_trap:
 
 The Formalism Trap
 ^^^^^^^^^^^^^^^^^^
@@ -336,6 +426,9 @@ them mathematically); and procedurality (for example, how do judges
 and police officers determine whether bail, counselling, probation, or
 incarceration is appropriate);
 
+
+.. _portability_trap:
+
 The Portability Trap
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -355,6 +448,9 @@ differences (in terms of gender) of employees in each of these industries,
 which may result from wording in job postings, social constructs on gender
 and societal roles, and the percentages of successful applicants in
 each field per (gender) group.
+
+
+.. _framing_trap:
 
 The Framing Trap
 ^^^^^^^^^^^^^^^^
@@ -396,28 +492,18 @@ incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
 
-.. topic:: References:
+References
+----------
 
-   .. [#0] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
-      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
-      ICML, 2019.
-   
-   .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
-      Learning"
-      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NIPS, 2016.
-   
-   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
-      Approach to Fair Classification"
-      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
-	  
-   .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
-      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
-      (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
-      (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
+.. footbibliography::
 
-   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
-      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
+.. rubric:: Footnotes
 
-   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
-      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
+.. [#f1] For a related example, see the discussion on 'law' and 'justice' in
+         *The Caves of Steel* (Asimov, 1953)
+
+.. [#f2] Epistemic trespassing is the process of taking expertise in one field and
+         applying it to another. This is not an intrinsically bad thing - one could
+         label all interdisciplinary research a form of epistemic trespassing.
+         However, doing so successfully requires a willingness to learn the subtleties
+         of the new field.

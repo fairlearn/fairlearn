@@ -14,10 +14,10 @@
 # three parameters
 
 parameters:
-  platforms: { Linux: ubuntu-latest, Windows: vs2017-win2016 }
+  platforms: { Linux: ubuntu-latest, Windows: windows-latest }
   testRunTypes: ['Unit', 'Notebooks']
   installationType:
-  pyVersions: [3.6, 3.7, 3.8, 3.9]
+  pyVersions: ["3.8", "3.9", "3.10"]
   pinRequirements: False
   freezeArtifactStem: 
   freezeFileStem:

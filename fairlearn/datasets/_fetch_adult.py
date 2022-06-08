@@ -4,26 +4,32 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_adult(*, cache=True, data_home=None,
-                as_frame=False, return_X_y=False):
+def fetch_adult(*, cache=True, data_home=None, as_frame=False, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
+
+    Read more in the :ref:`User Guide <boston_housing_data>`.
 
     Download it if necessary.
 
-    ==============   ==============
-    Samples total             48842
-    Dimensionality               14
-    Features                   real
-    Classes                       2
-    ==============   ==============
+    ==============   ====================
+    Samples total                   48842
+    Dimensionality                     14
+    Features         numeric, categorical
+    Classes                             2
+    ==============   ====================
 
     Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
+
+    Read more in the :ref:`User Guide <adult_data>`.
+
+    .. versionadded:: 0.5.0
 
     Parameters
     ----------
@@ -32,7 +38,7 @@ def fetch_adult(*, cache=True, data_home=None,
 
     data_home : str, default=None
         Specify another download and cache folder for the datasets.
-        By default, all scikit-learn data is stored in '~/.fairlearn-data'
+        By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
     as_frame : bool, default=False
@@ -64,7 +70,7 @@ def fetch_adult(*, cache=True, data_home=None,
         DESCR : string
             Description of the UCI Adult dataset.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
+    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
         if ``return_X_y`` is True and ``as_frame`` is False
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
