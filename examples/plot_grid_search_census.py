@@ -245,6 +245,6 @@ plot_model_comparison(
     y_preds=predictions,
     sensitive_features=A_test,
     point_labels=True,
-    plot=True
+    show_plot=True
 )
 # End model comparison
