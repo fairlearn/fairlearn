@@ -29,6 +29,7 @@ def plot_model_comparison(
     ax=None,
     axis_labels=True,
     point_labels=False,
+    point_labels_position=(0, 0),
     legend=False,
     legend_kwargs={},
     show_plot=False,
@@ -79,6 +80,11 @@ def plot_model_comparison(
         the keys of y_preds if y_preds is a dictionary, else simply the integers
         0...number of points - 1. You can specify point_labels as a list of
         labels as well.
+
+    point_labels_position : tuple
+        a two-tuple of numbers that define the offset of the point labels in the
+        x and y direction respectively. The offset value is in data coordinates,
+        not pixels.
 
     legend : bool
         If True, add a legend. Legend entries are created by passing the
@@ -216,6 +222,21 @@ def plot_model_comparison(
             )
         )
 
+    if (
+        isinstance(point_labels_position, tuple)
+        and len(point_labels_position) == 2
+    ):
+        for item in point_labels_position:
+            if not isinstance(item, (int, float)):
+                raise ValueError(
+                    "Key word argument point_labels_position is not a two-tuple"
+                    + " containing only numbers."
+                )
+    else:
+        raise ValueError(
+            "Key word argument point_labels_position is not a two-tuple."
+        )
+
     if not isinstance(legend_kwargs, dict):
         raise ValueError(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
@@ -282,8 +303,9 @@ def plot_model_comparison(
     # Add point labels
     # This could be nicer, but we rather not add a dependency on other packages.
     if point_labels is not None:
+        x_offset, y_offset = point_labels_position
         for i, label in enumerate(point_labels):
-            ax.text(x[i], y[i], label)
+            ax.text(x[i] + x_offset, y[i] + y_offset, label)
 
     # Add actual points
     ax.scatter(x, y, **kwargs)
