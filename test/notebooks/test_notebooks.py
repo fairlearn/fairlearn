@@ -114,3 +114,18 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
         True
     )
     assay_one_notebook(nb_name, test_values)
+
+@pytest.mark.notebooks
+def test_credit_loan_ey():
+    nb_name = "Credit Loan Example.ipynb"
+    test_values = {}
+    test_values["Contains_ThresholdOptimizer"] = ScrapSpec(
+        "metricframe_postprocess is not None",
+        True
+    )
+
+    test_values["Contains_ExponentiatedGradient"] = ScrapSpec(
+        "metricframe_inprocess is not None",
+        True
+    )
+    assay_one_notebook(nb_name, test_values) 
