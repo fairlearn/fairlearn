@@ -9,7 +9,7 @@ from ..utils._input_validation import (
 from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
 from typing import Callable, Union
-from numpy import amax, amin, array
+from numpy import array
 from sklearn.utils.validation import check_array
 from numpy import zeros
 import logging
