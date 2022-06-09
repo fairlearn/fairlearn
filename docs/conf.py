@@ -40,6 +40,10 @@ author = "Fairlearn contributors"
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
+if "dev" in fairlearn.__version__:
+    tag_or_branch = "main"
+else:
+    tag_or_branch = fairlearn.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -104,7 +108,9 @@ html_theme = "pydata_sphinx_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "logo_link": "https://fairlearn.org",
+    "logo": {
+        "link": "https://fairlearn.org",
+    },
     "icon_links": [
         {
             "name": "GitHub",
@@ -128,6 +134,11 @@ html_theme_options = {
         },
     ],
     "show_prev_next": False,
+    "switcher": {
+        "json_url": "https://fairlearn.org/main/_static/versions.json",
+        "version_match": tag_or_branch,
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -213,10 +224,6 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
-    if "dev" in fairlearn.__version__:
-        tag_or_branch = "main"
-    else:
-        tag_or_branch = fairlearn.__version__
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
         os.sep, "/"
     )
