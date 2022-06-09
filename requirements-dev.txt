@@ -34,7 +34,7 @@ pypandoc
 sphinx==4.5.0
 sphinx-gallery
 numpydoc
-pydata-sphinx-theme==0.8.1
+pydata-sphinx-theme==0.9
 sphinx-autodoc-typehints
 sphinxcontrib-bibtex
 packaging
