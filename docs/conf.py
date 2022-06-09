@@ -135,7 +135,7 @@ html_theme_options = {
     ],
     "show_prev_next": False,
     "switcher": {
-        "json_url": "https://github.com/fairlearn/fairlearn/blob/12bf019eeb439206ead92734fa38dbae38a39e62/docs/_static/versions.json",
+        "json_url": "https://github.com/adrinjalali/fairlearn/blob/doc/version/linkfix/docs/_static/versions.json",
         "version_match": tag_or_branch,
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
