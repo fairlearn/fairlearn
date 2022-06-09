@@ -42,12 +42,7 @@ jobs:
 
       - run:
           name: "Build Documentation"
-          command: |
-            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              bash python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
-            else
-              make doc
-            fi
+          command: make doc
           no_output_timeout: 30m
 
       - persist_to_workspace:
