@@ -254,15 +254,15 @@ the accuracy.
     >>> import pandas as pd
     >>> from sklearn.datasets import fetch_openml
     >>> data = fetch_openml(data_id=43874, as_frame=True)
-    >>> X = data.data[["had_inpatient_days" ,"time_in_hospital"
+    >>> X = data.data[["had_inpatient_days" ,"time_in_hospital"]]
     >>> X = pd.get_dummies(X)
     >>> y = data.data[["readmit_binary"]]
     >>> sens = data.data[["race"]]
     >>> clr_zero = ConstrainedLogisticRegression(covariance_bound=0).fit(X, y, sensitive_features=sens)
     >>> clr_one = ConstrainedLogisticRegression(covariance_bound=1).fit(X, y, sensitive_features=sens)
-    >>> clr_zero.score(X, y)
+    >>> clr_zero.score(X, y)  # doctest: +SKIP
     0.5391191557101586
-    >>> clr_one.score(X, y)
+    >>> clr_one.score(X, y)  # doctest: +SKIP
     0.6138002869327673
 
 In the case of a single sensitive feature, the covariance bound can be provided by a
@@ -301,9 +301,9 @@ has the classes "NO", "<30", ">30".
     >>> sens = data.data[["race"]]
     >>> clr_zero = ConstrainedLogisticRegression(covariance_bound=0).fit(X, y, sensitive_features=sens)
     >>> clr_one = ConstrainedLogisticRegression(covariance_bound=1).fit(X, y, sensitive_features=sens)
-    >>> clr_zero.score(X, y)
+    >>> clr_zero.score(X, y)  # doctest: +SKIP
     0.5391191557101586
-    >>> clr_one.score(X, y)
+    >>> clr_one.score(X, y)  # doctest: +SKIP
     0.558270935282904
 
 .. _postprocessing:
