@@ -443,6 +443,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
 
     This implementation closely follows the implementation in
     :class:`sklearn.linear_model.LogisticRegression`.
+    For more information refer to the :ref:`user guide <constrained_logistic_regression>`.
 
     Parameters
     ----------
@@ -506,7 +507,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         added to the decision function.
 
     intercept_scaling : float, default=1
-        Dual formulation is currently not implemented.
+        Intercept scaling is currently not used in the code.
         Only implemented for compatibility with sklearn.
 
     class_weight : dict or 'balanced', default=None
@@ -519,7 +520,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
         through the fit method) if sample_weight is specified.
 
     random_state : int, RandomState instance, default=None
-        Dual formulation is currently not implemented.
+        Random state is currently not used.
         Only implemented for compatibility with sklearn.
 
     solver : str, default='SLSQP'
@@ -541,17 +542,17 @@ class ConstrainedLogisticRegression(LogisticRegression):
     warm_start : bool, default=False
         When set to True, reuse the solution of the previous call to fit as
         initialization, otherwise, just erase the previous solution.
-        See `the glossary <https://scikit-learn.org/stable/glossary.html#term-warm_start>`.
+        See `the glossary <https://scikit-learn.org/stable/glossary.html#term-warm_start>`_.
 
     n_jobs : int, default=None
         Number of CPU cores used when parallelizing over classes if
         multi_class='ovr'". ``None`` means 1 unless in a :obj:`joblib.parallel_backend`
         context. ``-1`` means using all processors.
-        See `the glossary <https://scikit-learn.org/stable/glossary.html#term-n_jobs>`
+        See `the glossary <https://scikit-learn.org/stable/glossary.html#term-n_jobs>`_
         for more details.
 
     l1_ratio : float, default=None
-        Dual formulation is currently not implemented.
+        L1 ratio is currently not implemented.
         Only implemented for compatibility with sklearn.
 
     Attributes
