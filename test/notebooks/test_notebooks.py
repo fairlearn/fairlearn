@@ -115,6 +115,7 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
     )
     assay_one_notebook(nb_name, test_values)
 
+
 @pytest.mark.notebooks
 def test_credit_loan_ey():
     nb_name = "Credit Loan Example.ipynb"
