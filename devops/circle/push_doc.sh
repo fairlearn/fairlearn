@@ -23,7 +23,15 @@ fi
 # Absolute path needed because we use cd further down in this script
 GENERATED_DOC_DIR=$(readlink -f $GENERATED_DOC_DIR)
 
-MSG="Pushing the docs to . for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    dir=main
+else
+    # Strip off .X
+    dir="${CIRCLE_BRANCH::-2}"
+fi
+
+MSG="Pushing the docs to $dir/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
 
 cd $HOME
 if [ ! -d $DOC_REPO ];
@@ -31,13 +39,29 @@ then git clone --depth 1 --no-checkout "git@github.com:fairlearn/"$DOC_REPO".git
 fi
 cd $DOC_REPO
 
-cp -R "$GENERATED_DOC_DIR"/* .
+# check if it's a new branch
+
+echo $dir > .git/info/sparse-checkout
+if ! git show HEAD:$dir >/dev/null
+then
+	# directory does not exist. Need to make it so sparse checkout works
+	mkdir $dir
+	touch $dir/index.html
+	git add $dir
+fi
+git checkout main
+git reset --hard origin/main
+if [ -d $dir ]
+then
+	git rm -rf $dir/ && rm -rf $dir/
+fi
+cp -R $GENERATED_DOC_DIR $dir
 touch .nojekyll
 echo "fairlearn.org" > CNAME
 git config user.email "ci-build@fairlearn.org"
 git config user.name $USERNAME
 git config push.default matching
-git add -f .
+git add -f $dir/
 git commit -m "$MSG" $dir
 git push
 echo $MSG
