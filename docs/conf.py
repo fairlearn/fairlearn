@@ -21,9 +21,7 @@ from datetime import datetime
 
 from packaging.version import parse
 
-rootdir = os.path.join(
-    os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), ".."
-)
+rootdir = os.path.join(os.getcwd(), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
@@ -42,24 +40,10 @@ author = "Fairlearn contributors"
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
-
-
-def check_if_v046():
-    """Check to see if current version being built is v0.4.6."""
-    result = False
-
-    if fairlearn.__version__ == "0.4.6":
-        print("Detected 0.4.6 in fairlearn.__version__")
-        result = True
-
-    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
-    if smv_name is not None:
-        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
-        result = smv_name == "v0.4.6"
-    else:
-        print("SPHINX_MULTIVERSION_NAME not in environment")
-
-    return result
+if "dev" in fairlearn.__version__:
+    tag_or_branch = "main"
+else:
+    tag_or_branch = fairlearn.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -77,7 +61,6 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
-    "sphinx_multiversion",
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
     "numpydoc",
 ]
@@ -110,13 +93,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.rst"]
 
 master_doc = "index"
 
-# Multiversion settings
-# Show only the highest patch versions of each minor version.
-# Example: include 0.4.6, but not 0.4.0 to 0.4.5
-smv_tag_whitelist = r"^v0\.4\.6|^v0\.5\.0|^v0\.6\.2|^v0\.7\.0+$"
-smv_branch_whitelist = r"^main$"
-
-if check_if_v046():
+if fairlearn.__version__ == "0.4.6":
     print("Current version is v0.4.6, will apply overrides")
     master_doc = "index"
 
@@ -131,7 +108,9 @@ html_theme = "pydata_sphinx_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "logo_link": "https://fairlearn.org",
+    "logo": {
+        "link": "https://fairlearn.org",
+    },
     "icon_links": [
         {
             "name": "GitHub",
@@ -155,6 +134,11 @@ html_theme_options = {
         },
     ],
     "show_prev_next": False,
+    "switcher": {
+        "json_url": "https://fairlearn.org/main/_static/versions.json",
+        "version_match": tag_or_branch,
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -189,7 +173,7 @@ sphinx_gallery_conf = {
 }
 
 html_sidebars = {
-    "**": ["version-sidebar.html", "search-field.html", "sidebar-nav-bs.html"],
+    "**": ["search-field.html", "sidebar-nav-bs.html"],
 }
 
 # Auto-Doc Options
@@ -240,7 +224,6 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
-    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="main")
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
         os.sep, "/"
     )
