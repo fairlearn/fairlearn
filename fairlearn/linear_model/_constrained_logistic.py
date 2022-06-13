@@ -20,8 +20,8 @@ from sklearn.utils import (
 )
 from sklearn.utils.fixes import delayed
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.optimize import _check_optimize_result
 from sklearn.utils.validation import _check_sample_weight
+from sklearn.exceptions import ConvergenceWarning
 
 
 def _check_solver(solver, penalty):
@@ -46,6 +46,54 @@ def _check_multi_class(multi_class):
     if multi_class not in ("ovr"):
         raise ValueError("multi_class should be 'ovr'. Got %s." % multi_class)
     return multi_class
+
+
+def _check_optimize_result(solver, result, max_iter=None, extra_warning_msg=None):
+    """Check the OptimizeResult for successful convergence
+
+    Parameters
+    ----------
+    solver : str
+       Solver name.
+
+    result : OptimizeResult
+       Result of the scipy.optimize.minimize function.
+
+    max_iter : int, default=None
+       Expected maximum number of iterations.
+
+    extra_warning_msg : str, default=None
+        Extra warning message.
+
+    Returns
+    -------
+    n_iter : int
+       Number of iterations.
+    """
+    if result.status != 0:
+        try:
+            # The message is already decoded in scipy>=1.6.0
+            result_message = result.message.decode("latin1")
+        except AttributeError:
+            result_message = result.message
+        warning_msg = (
+            "{} failed to converge (status={}):\n{}.\n\n"
+            "Increase the number of iterations (max_iter) "
+            "or scale the data as shown in:\n"
+            "    https://scikit-learn.org/stable/modules/"
+            "preprocessing.html"
+        ).format(solver, result.status, result_message)
+        if extra_warning_msg is not None:
+            warning_msg += "\n" + extra_warning_msg
+        warnings.warn(warning_msg, ConvergenceWarning, stacklevel=2)
+    if max_iter is not None:
+        # In scipy <= 1.0.0, nit may exceed maxiter for lbfgs.
+        # See https://github.com/scipy/scipy/issues/7854
+        n_iter_i = min(result.nit, max_iter)
+    else:
+        n_iter_i = result.nit
+
+    return n_iter_i
 
 
 def _sensitive_attr_constraint_cov(model, X, sensitive_features, covariance_bound):
@@ -292,7 +340,7 @@ def _logistic_regression_path(
                 constraints=constraints,
             )
             n_iter_i = _check_optimize_result(
-                solver="lbfgs",  # Not the actual solver we are using, but it works fine like this
+                solver=solver,
                 result=opt_res,
                 max_iter=max_iter,
             )
