@@ -115,17 +115,17 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
     )
     assay_one_notebook(nb_name, test_values)
 
-# @pytest.mark.notebooks
-# def test_credit_loan_ey():
-#    nb_name = "Credit Loan Example.ipynb"
-#    test_values = {}
-#    test_values["Contains_ThresholdOptimizer"] = ScrapSpec(
-#        "metricframe_postprocess is not None",
-#        True
-#    )
-#
-#    test_values["Contains_ExponentiatedGradient"] = ScrapSpec(
-#        "metricframe_inprocess is not None",
-#        True
-#    )
-#    assay_one_notebook(nb_name, test_values) 
+@pytest.mark.notebooks
+def test_credit_loan_ey():
+    nb_name = "Credit Loan Example.ipynb"
+    test_values = {}
+    test_values["Balanced_accuracy_unmitigated"] = ScrapSpec(
+        "balanced_accuracy_unmitigated",
+        pytest.approx(0.80168)
+    )
+
+    test_values["Balanced_accuracy_inprocess"] = ScrapSpec(
+        "bal_acc_inprocess",
+        pytest.approx(0.78842)
+    )
+    assay_one_notebook(nb_name, test_values)
