@@ -118,7 +118,7 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
 
 @pytest.mark.notebooks
 def test_credit_loan_ey():
-    nb_name = "Credit Loan Example.ipynb"
+    nb_name = "Credit Loan Decisions.ipynb"
     test_values = {}
     test_values["Balanced_accuracy_unmitigated"] = ScrapSpec(
         "balanced_accuracy_unmitigated",
