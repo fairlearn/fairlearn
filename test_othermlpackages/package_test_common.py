@@ -18,7 +18,9 @@ from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
 
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def fetch_adult():
     """Grab dataset for testing."""
@@ -173,9 +175,10 @@ def run_AdversarialFairness_classification(estimator):
     # This might give problems as it is a bit random (though we set a seed,
     # it may depend on other factors such as version).
     if not (accuracy > 0.6 and dp_diff < 0.3):
-        logger.warning(f"Training of AdversarialFairness is worse than usual."
-            + f"Accuracy {str(accuracy)} with a disparity difference of"
-            + f"{str(dp_diff)}."
+        logger.warning(
+            "Training of AdversarialFairness is worse than usual."  # noqa
+            + f"Accuracy {str(accuracy)} with a disparity difference of"  # noqa
+            + f"{str(dp_diff)}."  # noqa
         )
 
     assert estimator is not None
