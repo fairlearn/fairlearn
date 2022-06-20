@@ -655,7 +655,12 @@ class MetricFrame:
         else:
             mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
 
-        return (mf - subtrahend).abs().max(level=self.control_levels)
+        if self.control_levels is None:
+            result = (mf - subtrahend).abs().max()
+        else:
+            result = (mf - subtrahend).abs().groupby(level=self.control_levels).max()
+
+        return result
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
