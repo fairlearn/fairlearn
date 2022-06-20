@@ -350,7 +350,9 @@ class MetricFrame:
             nameset.add(name)
 
         # Create the 'overall' results
-        self._overall = self._build_overall_frame(all_data, annotated_funcs, cf_list, self._cf_names)
+        self._overall = self._build_overall_frame(
+            all_data, annotated_funcs, cf_list, self._cf_names
+        )
 
         grouping_features = copy.deepcopy(sf_list)
         if cf_list is not None:
@@ -358,7 +360,9 @@ class MetricFrame:
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
         # Create the 'by group' results
-        self._by_group = self._build_by_group_frame(all_data, annotated_funcs, grouping_features)
+        self._by_group = self._build_by_group_frame(
+            all_data, annotated_funcs, grouping_features
+        )
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -711,7 +715,11 @@ class MetricFrame:
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
                 if self.control_levels:
-                    result = tmp.transform(lambda x: min(x, 1 / x)).groupby(level=self.control_levels).min()
+                    result = (
+                        tmp.transform(lambda x: min(x, 1 / x))
+                        .groupby(level=self.control_levels)
+                        .min()
+                    )
                 else:
                     result = tmp.transform(lambda x: min(x, 1 / x)).min()
             else:
@@ -872,18 +880,16 @@ class MetricFrame:
     def _build_overall_frame(self, data, metric_funcs, cf_list, cf_names):
         """Build the 'overall' result during construction."""
         if cf_names is None:
-            return apply_to_dataframe(
-                data,
-                metric_functions=metric_funcs)
+            return apply_to_dataframe(data, metric_functions=metric_funcs)
         else:
             temp = data.groupby(by=cf_names).apply(
-                apply_to_dataframe,
-                metric_functions=metric_funcs
+                apply_to_dataframe, metric_functions=metric_funcs
             )
             # If there are multiple control features, might have missing combinations
             if len(cf_names) > 1:
-                all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
-                                                         names=[x.name_ for x in cf_list])
+                all_indices = pd.MultiIndex.from_product(
+                    [x.classes_ for x in cf_list], names=[x.name_ for x in cf_list]
+                )
 
                 return temp.reindex(index=all_indices)
             else:
@@ -892,12 +898,14 @@ class MetricFrame:
     def _build_by_group_frame(self, data, metric_funcs, grouping_features):
         """Build the 'by_group' result during construction."""
         temp = data.groupby([x.name_ for x in grouping_features]).apply(
-            apply_to_dataframe,
-            metric_functions=metric_funcs)
+            apply_to_dataframe, metric_functions=metric_funcs
+        )
         if len(grouping_features) > 1:
             # We might have missing combinations in the input, so expand to fill
-            all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
-                                                     names=[x.name_ for x in grouping_features])
+            all_indices = pd.MultiIndex.from_product(
+                [x.classes_ for x in grouping_features],
+                names=[x.name_ for x in grouping_features],
+            )
 
             return temp.reindex(index=all_indices)
         else:
