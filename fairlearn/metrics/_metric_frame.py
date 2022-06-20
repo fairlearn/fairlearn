@@ -18,7 +18,6 @@ from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
 
-_SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 _VALID_ERROR_STRING = ["raise", "coerce"]
 _VALID_GROUPING_FUNCTION = ["min", "max"]
 
@@ -27,8 +26,6 @@ _SF_DICT_CONVERSION_FAILURE = (
     "Please ensure each array is strictly 1-D. "
     "The __cause__ field of this exception may contain further information."
 )
-_BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
-_SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = (
     "DataFrame column names must be strings. Name '{0}' is of type {1}"
