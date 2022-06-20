@@ -357,18 +357,8 @@ class MetricFrame:
             # Prepend the conditional features, so they are 'higher'
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
-        temp = all_data.groupby([x.name_ for x in grouping_features]).apply(
-            apply_to_dataframe, metric_functions=annotated_funcs
-        )
-        if len(grouping_features) > 1:
-            all_indices = pd.MultiIndex.from_product(
-                [x.classes_ for x in grouping_features],
-                names=[x.name_ for x in grouping_features],
-            )
-
-            self._by_group = temp.reindex(index=all_indices)
-        else:
-            self._by_group = temp
+        # Create the 'by group' results
+        self._by_group = self._build_by_group_frame(all_data, annotated_funcs, grouping_features)
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -874,7 +864,7 @@ class MetricFrame:
         return result
 
     def _build_overall_frame(self, data, metric_funcs, cf_list, cf_names):
-        """Builds the 'overall' result during initialisation."""
+        """Build the 'overall' result during construction."""
         if cf_names is None:
             return apply_to_dataframe(
                 data,
@@ -887,8 +877,22 @@ class MetricFrame:
             # If there are multiple control features, might have missing combinations
             if len(cf_names) > 1:
                 all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
-                                                        names=[x.name_ for x in cf_list])
+                                                         names=[x.name_ for x in cf_list])
 
                 return temp.reindex(index=all_indices)
             else:
                 return temp
+
+    def _build_by_group_frame(self, data, metric_funcs, grouping_features):
+        """Build the 'by_group' result during construction."""
+        temp = data.groupby([x.name_ for x in grouping_features]).apply(
+            apply_to_dataframe,
+            metric_functions=metric_funcs)
+        if len(grouping_features) > 1:
+            # We might have missing combinations in the input, so expand to fill
+            all_indices = pd.MultiIndex.from_product([x.classes_ for x in grouping_features],
+                                                     names=[x.name_ for x in grouping_features])
+
+            return temp.reindex(index=all_indices)
+        else:
+            return temp
