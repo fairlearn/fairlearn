@@ -705,9 +705,10 @@ class MetricFrame:
         elif method == "to_overall":
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1 / x)).min(
-                    level=self.control_levels
-                )
+                if self.control_levels:
+                    result = tmp.transform(lambda x: min(x, 1 / x)).groupby(level=self.control_levels).min()
+                else:
+                    result = tmp.transform(lambda x: min(x, 1 / x)).min()
             else:
                 ratios = None
 
