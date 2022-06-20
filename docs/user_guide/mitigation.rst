@@ -267,7 +267,9 @@ the accuracy.
 
 In the case of a single sensitive feature, the covariance bound can be provided by a
 single number. It can be any positive number (or zero), and zero will always have
-the lowest accuracy, as seen in the example above.
+the lowest accuracy, as seen in the example above. We advise users to try out multiple
+covariance values to get an idea of the covariance-accuracy trade-off, as well as how
+the covariance value relates to the demographic parity metric.
 
 In the case of multiple sensitive features, there are multiple ways of providing
 the covariance bound value(s), either via a single value, a list, or a dictionary
