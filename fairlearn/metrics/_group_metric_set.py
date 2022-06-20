@@ -79,6 +79,7 @@ class _func_wrapper:
 
     def __init__(self, metric_function):
         self.metric_function = metric_function
+        self.__name__ = f"{metric_function.__name__}_wrapped"
 
     def __call__(self, y_true, y_pred):
         result = 0
@@ -88,10 +89,6 @@ class _func_wrapper:
             msg = "Evaluation of {0} failed. Substituting 0"
             warnings.warn(msg.format(self.metric_function.__name__))
         return result
-
-    def __name__(self):
-        return f"{self.metric__function.__name__}_wrapped"
-
 
 BINARY_CLASSIFICATION_METRICS = {}
 BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE] = skm.accuracy_score
