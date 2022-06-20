@@ -90,6 +90,7 @@ class _func_wrapper:
             warnings.warn(msg.format(self.metric_function.__name__))
         return result
 
+
 BINARY_CLASSIFICATION_METRICS = {}
 BINARY_CLASSIFICATION_METRICS[ACCURACY_SCORE] = skm.accuracy_score
 BINARY_CLASSIFICATION_METRICS[COUNT] = count
