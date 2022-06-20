@@ -349,24 +349,8 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        if self._cf_names is None:
-            self._overall = apply_to_dataframe(
-                all_data, metric_functions=annotated_funcs
-            )
-        else:
-            temp = all_data.groupby(by=self._cf_names).apply(
-                apply_to_dataframe, metric_functions=annotated_funcs
-            )
-            # If there are multiple control features, might have missing combinations
-            if len(self._cf_names) > 1:
-                all_indices = pd.MultiIndex.from_product(
-                    [x.classes_ for x in cf_list],
-                    names=[x.name_ for x in cf_list],
-                )
-
-                self._overall = temp.reindex(index=all_indices)
-            else:
-                self._overall = temp
+        # Create the 'overall' results
+        self._overall = self._build_overall_frame(all_data, annotated_funcs, cf_list, self._cf_names)
 
         grouping_features = copy.deepcopy(sf_list)
         if cf_list is not None:
@@ -888,3 +872,23 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    def _build_overall_frame(self, data, metric_funcs, cf_list, cf_names):
+        """Builds the 'overall' result during initialisation."""
+        if cf_names is None:
+            return apply_to_dataframe(
+                data,
+                metric_functions=metric_funcs)
+        else:
+            temp = data.groupby(by=cf_names).apply(
+                apply_to_dataframe,
+                metric_functions=metric_funcs
+            )
+            # If there are multiple control features, might have missing combinations
+            if len(cf_names) > 1:
+                all_indices = pd.MultiIndex.from_product([x.classes_ for x in cf_list],
+                                                        names=[x.name_ for x in cf_list])
+
+                return temp.reindex(index=all_indices)
+            else:
+                return temp
