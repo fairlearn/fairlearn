@@ -78,6 +78,7 @@ def test_multid_input_output():
     # In this, both y_t and y_p are 2d arrays
     # The metric results are also arrays
     metric_fn = functools.partial(skm.r2_score, multioutput="raw_values")
+    metric_fn.__name__ = "multid_metric"
 
     y_t_2 = np.random.rand(len(g_1), 2)
     y_p_2 = np.random.rand(len(g_1), 2)
