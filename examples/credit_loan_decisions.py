@@ -459,7 +459,7 @@ lgb.plot_importance(
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # %%
-#  A secondary harm that is somewhat unique to credit lending decisions is the
+# A secondary harm that is somewhat unique to credit lending decisions is the
 # long-term impact on an individual's credit score. In the United States, a
 # `FICO credit score <https://www.investopedia.com/terms/c/credit_score.asp>`_
 # is a number between 300 and 850 that represents a customer's
@@ -622,7 +622,7 @@ def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
     """
     Plots the disaggregated `metric` for each group with an associated
     error bar. Both metric and the error bar are provided as columns in the
-    provided metricframe.
+    provided :code:`MetricFrame`.
 
     Parameters:
     - metricframe: The metricframe containing the metrics and their associated uncertainty quantification.
@@ -673,7 +673,7 @@ metricframe_unmitigated.by_group[metrics_to_report].plot.bar(
 )
 
 # %% Finally, let's compute the `equalized_odds_difference` for this unmitigated
-# model. The *equalized_odds_difference* is the maximum of the
+# model. The :code:`equalized_odds_difference` is the maximum of the
 # `false_positive_rate_difference` and `false_negative_rate_difference`. In our
 # lending context, both *false_negative_rate_disparities* and
 # *false_positive_rate_disparities* result in fairness-related harms. Therefore,
@@ -718,7 +718,7 @@ equalized_odds_unmitigated = equalized_odds_difference(
 #   afterwards.
 
 # %%
-# Post-processing mitigations: ThresholdOptimizer
+# Postprocessing mitigations: ThresholdOptimizer
 # -------------------------------------------------
 
 # %%
@@ -779,13 +779,13 @@ def compare_metricframe_results(mframe_1, mframe_2, metrics, names):
     Concatenates the results of two MetricFrames along a subset of metrics.
 
     Parameters:
-    - mframe_1: First metricframe for comparison
-    - mframe_2: Second metricframe for comparison
+    - mframe_1: First MetricFrame for comparison
+    - mframe_2: Second MetricFrame for comparison
     - metrics: The subset of metrics for comparison
     - names: The names of the selected metrics
 
     Returns:
-        Metricframe: The concatenation of the two MetricFrame, resricted to the metrics specified.
+        Metricframe: The concatenation of the two MetricFrames, restricted to the metrics specified.
 
     """
     return pd.concat(
@@ -1135,7 +1135,7 @@ plt.legend(bbox_to_anchor=(1.85, 1))
 # - 3.) Choose the model with smallest `equalized_odds` difference.
 
 # %%
-#  Within the context of fair lending in the United States, if a financial
+# Within the context of fair lending in the United States, if a financial
 # institution is found to be engaging in discriminatory behavior, they must
 # produce documentation that demonstrates the model chosen is the least
 # discriminatory model while satisfying profitability and other business needs.
@@ -1346,7 +1346,7 @@ metricframe_postprocess.overall[metrics_to_report]
 # <https://colab.research.google.com/github/LeJit/talks/blob/pycon_2022/2022_pycon/pycon-2022-students.ipynb>`_.
 
 # %%
-# Fairness Under Unawareness
+# Fairness under unawareness
 # --------------------------
 
 # %%
