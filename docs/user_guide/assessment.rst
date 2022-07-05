@@ -258,6 +258,121 @@ across groups and also the difference and ratio between the maximum and minimum:
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
 
+
+Common predefined fairness metrics
+----------------------------------
+In the sections below, we review the most common fairness metrics, as well
+as their underlying assumptions and suggestions for use. Each metric requires
+that some aspects of the predictor behavior be comparable across groups. In 
+the mathematical definitions below, let :math:`X` denote a feature vector 
+used for predictions, :math:`A` be a single sensitive feature (such as age 
+or race), and :math:`Y` be the true label. Parity metrics are phrased in 
+terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
+
+Demographic parity
+^^^^^^^^^^^^^^^^^^
+Demographic parity is also known as *statistical parity*. A classifier
+:math:`h` satisfies demographic parity under a distribution over
+:math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
+independent of the sensitive feature :math:`A`. This is equivalent to
+:math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. :footcite:`agarwal2018reductions`
+In the case of regression, a predictor :math:`f` satisfies demographic parity
+under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
+of the sensitive feature :math:`A`. This is equivalent to
+:math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
+:footcite:`agarwal2019fair`
+
+Demographic parity can be used to assess the extent of allocation harms, as it 
+reflects an assumption that resources should be allocated proportionally 
+across groups. Of the metrics described in this section, it can be the easiest 
+to implement. However, operationalizing fairness using demographic parity 
+rests on assumptions: that either the dataset is not a good representation of 
+what the world actually looks like (e.g., a resume assessment system that is 
+more likely to filter out qualified female applicants due to an organizational 
+bias towards male applicants, regardless of skill level), or that the dataset 
+is an accurate representation of the world, but the world is unjust. 
+
+It's worth considering whether the assumptions underlying this measurement 
+model maintain construct validity (see :ref:`construct_validity`). 
+Consequential validity, for example, asks how the world shaped by using the 
+measurement model; in this case, the relevant question would be whether 
+demographic parity meets the criteria for establishing "fairness", itself 
+an unobservable theoretical construct, and whether satisfying demographic 
+parity brings us closer to the world we'd like to see. 
+
+Equalized odds
+^^^^^^^^^^^^^^
+A classifier :math:`h` satisfies equalized odds under a
+distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
+conditionally independent of the sensitive feature :math:`A` given the label
+:math:`Y`. This is equivalent to
+:math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
+:footcite:`agarwal2018reductions` Equalized odds requires that the true 
+positive rate, :math:`\P(h(X)=1 | Y=1`, and the false positive rate, 
+:math:`\P(h(X)=1 | Y=0`, be equal across groups. 
+
+The inclusion of false positive rates acknowledges that different groups 
+experience different costs from misclassification. For example, in the case of 
+a model predicting a negative outcome (e.g., probability of recidivating) 
+that already disproportionately affects members of minority communities, 
+false positive predictions reflect preexisting disparities in outcomes 
+across minority and majority groups. Equalized odds further enforces that the 
+accuracy is equally high across all groups, punishing models that only 
+perform well on majority groups.
+
+Equalized odds and can be used to diagnose both allocation harms as well as 
+quality-of-service harms. It can be useful for diagnosing allocation harms 
+because its goal is to ensure that a machine learning model works equally 
+well for different groups. However, equalized odds makes the assumption 
+that the target variable :math:`Y` is a good measurement of the phenomena 
+being modeled, but that assumption may not hold if the measurement does not 
+satisfy the requirements of construct validity.
+
+Equal opportunity
+^^^^^^^^^^^^^^^^^
+Equal opportunity is a relaxed version of equalized odds that only considers
+conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
+:footcite:`hardt2016equality` Another way of thinking about this metric is 
+requiring equal outcomes only within the subset of records belonging to the 
+positive class. For example, in the hiring example, equal opportunity 
+requires that the individuals who are actually hired have an equal opportunity 
+of being hired in the first place. However, by not considering whether false 
+positive rates are equivalent across groups, equal opportunity does not 
+capture the costs of missclassification disparities.
+
+Considerations for conditional group fairness
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In some cases, we may observe a trend in several groups of data, but that 
+trend may disappear or reverse when groups are combined. Known as  
+`Simpson's Paradox<https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
+outcome may appear when observing disparate outcomes across groups. A 
+famous example of Simpson's Paradox is a study of 1973 graduate school 
+admissions to the University of California, Berkley :footcite:`bickel1975biasinadmissions`. 
+The study showed that when observing admissions by gender, men applying were 
+more likely than women to be accepted. However, drilling down into admissions 
+by department revealed that women tended to apply to departments with more 
+competitive admissions requirements, whereas men tended to apply to less 
+competitive depoartments. The more granular analysis showed only four out of 
+85 departments exhibited bias against women, and six departments exhibited 
+bias towards men. In general, the data indicated departments exhibited a bias 
+in favor of minority-gendered applicants, which is opposite from the trend 
+observed in the aggregate data.
+
+This phenomenon is important to fairness evaluation because metrics like 
+demographic parity may be different when calculated at an aggregate level and  
+within more granular categories. In the case of demographic parity, we might 
+need to review 
+:math:`\E[h(X) \given A=a, D=d] = \E[h(X) \given D=d] \quad \forall a` 
+where D represents the feature(s) within X across which members of the groups 
+within A are distributed. :footcite:`xu2020conditionalfairness` 
+Demographic parity would then require that the prediction of the target  
+variable is statistically independent of sensitive attributes conditional 
+on D. Simply aggregating outcomes across high-level categories can be 
+misleading when the data can be further disaggregated. It's important to 
+review metrics across these more graular categories, if they exist, 
+to verify that disparate outcomes persist across all levels of aggregation.
+
+
 Multiple metrics in a single :code:`MetricFrame`
 ------------------------------------------------
 
