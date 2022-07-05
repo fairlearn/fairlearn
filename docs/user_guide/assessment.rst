@@ -259,8 +259,11 @@ across groups and also the difference and ratio between the maximum and minimum:
     ratio in recall =  0.0
 
 
-Common predefined fairness metrics
-----------------------------------
+Fairness metrics
+----------------
+
+Parity constraints
+^^^^^^^^^^^^^^^^^^
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups. In 
@@ -270,7 +273,7 @@ or race), and :math:`Y` be the true label. Parity metrics are phrased in
 terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
 
 Demographic parity
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 Demographic parity is also known as *statistical parity*. A classifier
 :math:`h` satisfies demographic parity under a distribution over
 :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
@@ -301,7 +304,7 @@ an unobservable theoretical construct, and whether satisfying demographic
 parity brings us closer to the world we'd like to see. 
 
 Equalized odds
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 A classifier :math:`h` satisfies equalized odds under a
 distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
 conditionally independent of the sensitive feature :math:`A` given the label
@@ -329,7 +332,7 @@ being modeled, but that assumption may not hold if the measurement does not
 satisfy the requirements of construct validity.
 
 Equal opportunity
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 Equal opportunity is a relaxed version of equalized odds that only considers
 conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
 :footcite:`hardt2016equality` Another way of thinking about this metric is 
@@ -341,10 +344,10 @@ positive rates are equivalent across groups, equal opportunity does not
 capture the costs of missclassification disparities.
 
 Considerations for conditional group fairness
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In some cases, we may observe a trend in several groups of data, but that 
 trend may disappear or reverse when groups are combined. Known as  
-`Simpson's Paradox<https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
+`Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
 outcome may appear when observing disparate outcomes across groups. A 
 famous example of Simpson's Paradox is a study of 1973 graduate school 
 admissions to the University of California, Berkley :footcite:`bickel1975biasinadmissions`. 
