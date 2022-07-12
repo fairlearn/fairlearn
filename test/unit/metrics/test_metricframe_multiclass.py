@@ -38,6 +38,7 @@ s_f = np.array(
 
 def test_roc_auc():
     ras = functools.partial(skm.roc_auc_score, multi_class="ovr", labels=[0, 1, 2])
+    ras.__name__ = "roc_auc_metric"
     target = metrics.MetricFrame(
         metrics=ras, y_true=y_true, y_pred=y_pred, sensitive_features=s_f
     )
