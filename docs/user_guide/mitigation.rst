@@ -282,7 +282,7 @@ the false negative rate (we don't want people that need extra care not receiving
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> #Import dataset, do train_test_split, balance positive/negative samples
+    >>> # Import dataset, do train_test_split, balance positive/negative samples
     
     >>> import pandas as pd
     >>> import numpy as np
