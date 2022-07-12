@@ -242,7 +242,7 @@ trade-offs between fairness metrics and predictive performance. Where an algorit
 :class:`ThresholdOptimizer` “blindly” satisfies
 a specific constraint, :class:`Thresholder` aids the user in manually exploring
 different trade-offs, which can help gain more insight into the problem. Also,
-since :class:`Thresholder` is a post-processing technique, it is not necessary to alter
+since :class:`Thresholder` is a postprocessing technique, it is not necessary to alter
 an already trained estimator, which might be the only feasible unfairness
 mitigation approach when developers cannot influence training, due to
 practical reasons or security or privacy.
