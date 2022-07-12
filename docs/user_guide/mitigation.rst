@@ -217,7 +217,7 @@ positive and negative predictions. In many implementations of classification alg
 default decision threshold is 0.5, which means that a sample with a probability to get 1
 (obtained by calling :code:`estimator.predict_proba()[:,1]`) of 0.6 will be classified
 as 1, and a sample with probability to get 1 of 0.4 will be classified as 0.
-If this threshold would be changed to 0.7, both samples would be classified
+If we change this threshold to 0.7, both samples will be classified
 as 0.
 
 Thresholder
