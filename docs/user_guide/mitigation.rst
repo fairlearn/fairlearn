@@ -225,7 +225,7 @@ Thresholder
 
 What it does
 ^^^^^^^^^^^^
-:class:`fairlearn.postprocessing.Thresholder` is a post processing technique
+:class:`fairlearn.postprocessing.Thresholder` is a postprocessing technique
 which outputs a binary prediction based on group-specific thresholds. The
 specified thresholds can work in two directions
 (:ref:`positive<pos_thresholds>`/:ref:`negative<negative_thresholds>`), and can
