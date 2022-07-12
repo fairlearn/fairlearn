@@ -289,7 +289,7 @@ the false negative rate (we don't want people that need extra care not receiving
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.datasets import fetch_openml
     
-    >>> #Get dataset, drop columns with unknown sf values
+    >>> # Get dataset, drop columns with unknown sensitive features
     >>> data = fetch_openml(data_id=43874)
 
     >>> df = data.data
