@@ -20,14 +20,14 @@ from ._constants import (
 class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     r"""A classifier that produces group specific classifications inside a critical region.
 
-    :code:`RejectOptionClassifier` looks at the certainty by which binary classification
-    decisions are made. For decisions made with high certainty (= with a probability to get 1
-    close to 0 or 1), the result of the classification remains the same.
-    For decisions with low certainty (= with a probability to get 1 close to 0.5), the
-    result is disregarded and instances from the :code:`group_to_upselect` receive the
+    :code:`RejectOptionClassifier` considers the certainty of binary classification predictions
+    decisions are made. Predictions made with high certainty (i.e., with a probability close to
+    0 or 1), the result of the classification remains the same.
+    For decisions with low certainty (i.e., with a probability close to 0.5),
+    instances from the :code:`group_to_upselect` receive the
     :code:`selection_label`, whilst instances from the :code:`group_to_downselect` receive
-    the opposite label. The exact range of decisions considered to have low certainty
-    is specified by the critical region.
+    the opposite label. The critical region defines the range of probabilities in which
+    predictions are considered to be of low certainty.
 
     Parameters
     ----------
@@ -83,8 +83,7 @@ class RejectOptionClassifier(BaseEstimator, MetaEstimatorMixin):
     >>> estimator = RandomForestClassifier(random_state=1)
     >>> estimator.fit(X_train, y_train)  # doctest: +SKIP
     >>> X_test = pd.DataFrame([[0, 5], [-1, 6], [2, 2], [8, -11]])
-    >>> sensitive_features_test = pd.DataFrame(
-    ...                 [['A'], ['A'], ['B'], ['B']], columns=['SF1'])
+    >>> sensitive_features_test = ['A', 'A', 'B', 'B']
     >>> estimator.predict_proba(X_test)[:, 1]
     array([0.77, 0.58, 0.44, 0.12])
     >>> estimator.predict(X_test)

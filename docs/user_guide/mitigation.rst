@@ -217,15 +217,14 @@ positive and negative predictions. In many implementations of classification alg
 default decision threshold is 0.5, which means that a sample with a probability to get 1
 (obtained by calling :code:`estimator.predict_proba()[:,1]`) of 0.6 will be classified
 as 1, and a sample with probability to get 1 of 0.4 will be classified as 0.
-If this threshold would be changed to 0.7, both samples would be classified
-as 0.
+If we change this threshold to 0.7, both samples will be classified as 0.
 
 Thresholder
 ~~~~~~~~~~~~
 
 What it does
 ^^^^^^^^^^^^
-:class:`fairlearn.postprocessing.Thresholder` is a post processing technique
+:class:`fairlearn.postprocessing.Thresholder` is a postprocessing technique
 which outputs a binary prediction based on group-specific thresholds. The
 specified thresholds can work in two directions
 (:ref:`positive<pos_thresholds>`/:ref:`negative<negative_thresholds>`), and can
@@ -242,10 +241,10 @@ trade-offs between fairness metrics and predictive performance. Where an algorit
 :class:`ThresholdOptimizer` “blindly” satisfies
 a specific constraint, :class:`Thresholder` aids the user in manually exploring
 different trade-offs, which can help gain more insight into the problem. Also,
-since :class:`Thresholder` is a post-processing technique, it is not necessary to alter
+since :class:`Thresholder` is a postprocessing technique, it is not necessary to alter
 an already trained estimator, which might be the only feasible unfairness
 mitigation approach when developers cannot influence training, due to
-practical reasons or security or privacy.
+practical reasons, security or privacy.
 
 In the next section, we will explain the different ways in which thresholds can be specified, and
 show how to investigate the effect of different thresholds. 
@@ -276,20 +275,21 @@ classification algorithms in scikit-learn).
 
 Considering the nature of the problem at hand, important aspects of our model
 to investigate are:
-the selection rate (due to capacity constraints not all patients can be selected), and
-the false negative rate (we don't want people that need extra care not receiving it).
+
+- the selection rate (due to capacity constraints not all patients can be selected), and
+- the false negative rate (we don't want people that need extra care not receiving it).
 
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> #Import dataset, do train_test_split, balance positive/negative samples
+    >>> # Import dataset, do train_test_split, balance positive/negative samples
     
     >>> import pandas as pd
     >>> import numpy as np
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.datasets import fetch_openml
     
-    >>> #Get dataset, drop columns with unknown sf values
+    >>> # Get dataset, drop columns with unknown sensitive features
     >>> data = fetch_openml(data_id=43874)
 
     >>> df = data.data
@@ -302,7 +302,7 @@ the false negative rate (we don't want people that need extra care not receiving
 
     >>> sensitive_features =  df.loc[:, 'race']
 
-    >>> #Create dummy's, drop sf from X, drop columns that correlate with Y 
+    >>> # Create dummy's, drop sf from X, drop columns that correlate with Y
     >>> X = pd.get_dummies(df.drop(columns=["race", 
     ...                                     "discharge_disposition_id",
     ...                                     "readmitted",
@@ -338,7 +338,7 @@ the false negative rate (we don't want people that need extra care not receiving
 .. doctest:: mitigation
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> #Train classifier, make and inspect default predictions
+    >>> # Train classifier, create and inspect default predictions
 
     >>> from sklearn.ensemble import RandomForestClassifier
     >>> from fairlearn.metrics import MetricFrame, false_negative_rate
@@ -764,11 +764,15 @@ The size of the critical region is regulated by the parameter :code:`critical_wi
 (0 <= :code:`critical_width` <= 1); it contains all instances that have a probability to get 1
 in the range [0.5 - :code:`critical_width`/2, 0.5 + :code:`critical_width`/2].
 
-Why use it
-^^^^^^^^^^
+Why (not) use it
+^^^^^^^^^^^^^^^^
 Like :class:`Thresholder`, :class:`RejectOptionClassifier` is an easy to interpret tool, which can
 be used to explore different trade-offs, without blindly satisfying a constraint, where
 :class:`RejectOptionClassifier` specifically focusses on decisions made with low certainty.
+
+The approach can be interpreted as group-specific decision thresholds, centered around 0.5.
+As such, the approach is less appropriate for prediction tasks in which a default decision
+threshold of 0.5 is undesirable (e.g., in imbalanced classification problems).
 
 How to use it (and deal with multiple sensitive features)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
