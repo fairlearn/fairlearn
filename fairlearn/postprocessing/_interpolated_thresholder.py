@@ -12,6 +12,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ..utils._common import _get_soft_predictions
 from ..utils._input_validation import _validate_and_reformat_input
+
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING,

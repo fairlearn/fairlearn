@@ -4,7 +4,6 @@ Revisiting the Boston Housing Dataset
 
 Introduction
 ^^^^^^^^^^^^^^^^^
-
 The Boston Housing dataset is one of the datasets currently callable in :mod:`fairlearn.datasets` module.
 In the past, it has commonly been used for benchmarking in popular machine learning libraries, 
 including `scikit-learn <https://scikit-learn.org/>`_ and `OpenML <https://www.openml.org/>`_. 
@@ -447,3 +446,16 @@ you pause about using it in the future.
   
   .. [#11] Kinmberlé Crenshaw, Mapping the margins: Intersectionality, identity politics, and violence against women of color, 
       Stanford Law Review, 1993, 43(6), 1241-1299.
+
+.. _hospital_readmissions_dataset:
+
+Hospital readmissions dataset
+------------------------------
+This is a clincial dataset of hospital readmissions over a ten-year period (1998-2008)
+for diabetic patients across 130 different hospitals in the US. Each record
+represents the hospital admission records for a patient diagnosed with
+diabetes whose stay lasted one to fourteen days. We would like to develop a
+classification model, which decides whether the patients should be suggested
+to their primary care physicians for an enrollment into the high-risk care
+management program. The positive prediction will mean recommendation into the
+care program.
