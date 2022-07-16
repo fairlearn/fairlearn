@@ -259,11 +259,8 @@ across groups and also the difference and ratio between the maximum and minimum:
     ratio in recall =  0.0
 
 
-Fairness metrics
-----------------
-
-Parity constraints
-^^^^^^^^^^^^^^^^^^
+Common fairness metrics
+-----------------------
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups. In 
@@ -274,34 +271,83 @@ terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
 
 Demographic parity
 ~~~~~~~~~~~~~~~~~~
-Demographic parity is also known as *statistical parity*. A classifier
-:math:`h` satisfies demographic parity under a distribution over
-:math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
+A classifier :math:`h` satisfies demographic parity under a distribution 
+over :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
 independent of the sensitive feature :math:`A`. This is equivalent to
 :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. :footcite:`agarwal2018reductions`
+
 In the case of regression, a predictor :math:`f` satisfies demographic parity
 under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
 of the sensitive feature :math:`A`. This is equivalent to
 :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-:footcite:`agarwal2019fair`
+:footcite:`agarwal2019fair` Another way to think of demographic parity in a 
+regression scenario is computing the `mean_prediction()` accross groups 
+and determining how different mean predictions are for different groups. 
+Note that in the Faiurlearn API, :method:`demographic_parity_difference` 
+is only defined for classification. 
+
+.. note::
+   Demographic parity is also sometimes referred to as *independence*, *group fairness*, *statistical parity*, and *disparate impact*.
 
 Demographic parity can be used to assess the extent of allocation harms, as it 
 reflects an assumption that resources should be allocated proportionally 
 across groups. Of the metrics described in this section, it can be the easiest 
 to implement. However, operationalizing fairness using demographic parity 
-rests on assumptions: that either the dataset is not a good representation of 
-what the world actually looks like (e.g., a resume assessment system that is 
+rests on a few assumptions: that either the dataset is not a good representation  
+of what the world actually looks like (e.g., a resume assessment system that is 
 more likely to filter out qualified female applicants due to an organizational 
 bias towards male applicants, regardless of skill level), or that the dataset 
 is an accurate representation of the world, but the world is unjust. 
 
-It's worth considering whether the assumptions underlying this measurement 
-model maintain construct validity (see :ref:`construct_validity`). 
-Consequential validity, for example, asks how the world shaped by using the 
-measurement model; in this case, the relevant question would be whether 
-demographic parity meets the criteria for establishing "fairness", itself 
-an unobservable theoretical construct, and whether satisfying demographic 
-parity brings us closer to the world we'd like to see. 
+Fairness metrics like demographic parity can also be used as optimization 
+constraints during the machine learning model training process. However, 
+demographic parity is not well-suited for this purpose because 
+it does not place requirements on the exact distribution of predictions with 
+respect to other important variables. To understand this concept further, 
+consider an example from the Fairness in Machine Learning textbook :footcite:`fairml_book`. 
+Suppose a company wishes to hire 
+applicants from group A and B at the same rate. It carefully selects 
+applicants from group A, but carelessly selects applicants from group B. 
+In this scenario, even though members from both groups are selected at 
+the same rate, it's likely that underqualified or unqualified applicants 
+are chosen more frequently for one group (group B) than another. 
+If applicants from group B consequently perform worse in 
+comparison to applicants from group A, negative perceptions of their 
+performance may form. If group B experiences higher levels of prejudice 
+or discrimination, then these perceptions may reinforce existing 
+negative stereotypes. 
+
+It's also worth considering whether the assumptions underlying demographic
+parity maintain construct validity (see :ref:`construct_validity`). 
+Construct validity is a concept in the social sciences that assess the 
+extent to which the ways we choose to measure abstract 
+phenomena is valid. Unlike physical processes that can be measured directly 
+(for instance, the amount of rainfall in a city on a given day), 
+abstract phenomena are real-world processes or concepts that 
+cannot be directly measured. Examples of these phenomena are determining 
+the best candidate for a role, or determining how likely an individual 
+is to commit a crime. These concepts can be inferred through observable 
+measurements defined in a measurement model.
+Construct validity determines whether that 
+measurement model measures the phenomena under consideration in 
+a way that is meaningful and useful. 
+
+For all fairness metrics, the first question relevant to construct 
+validity is whether the target variable itself is a meaningful and 
+userful measurement model of the phenomena under consideration. 
+If the target variable itself is not a useful or meaningful measurement 
+model, then evaluating fairness metrics on that measurement model will  
+not reveal harms generated by the mismatch between the measurement 
+model or the problem formulation and the model's real-world context.
+Construct validity has a number of subcategories that assess  
+different aspects of the way we formulate a measurement model.
+Consequential validity, for example, asks how the world shaped by using a 
+measurement model. For demographic parity, one relevant question would be 
+whether demographic parity meets the criteria for establishing "fairness", 
+itself an unobservable theoretical construct. Further, it's important 
+to ask whether satisfying demographic parity actually brings us closer 
+to the world we'd like to see. 
+
 
 Equalized odds
 ~~~~~~~~~~~~~~
@@ -324,9 +370,23 @@ accuracy is equally high across all groups, punishing models that only
 perform well on majority groups.
 
 Equalized odds and can be used to diagnose both allocation harms as well as 
-quality-of-service harms. It can be useful for diagnosing allocation harms 
+quality-of-service harms. Allocation harms occur when AI systems allocate 
+opportunities, resources, or information differently across different 
+groups (for example, an AI hiring system that is more likely to advance resumes 
+of male applicants than resumes of female applicants regardless of qualification). 
+Quality-of-service harms occur when an AI system does not work as well for one 
+group versus another (for example, facial recognition systems that are more likely 
+to fail for dark-skinned individuals). For more information on AI harms, see 
+:ref:`types_of_harms`. 
+
+Equalized odds can be useful for diagnosing allocation harms 
 because its goal is to ensure that a machine learning model works equally 
-well for different groups. However, equalized odds makes the assumption 
+well for different groups. Another way to think about equalized odds is to 
+contrast it with demographic parity. While demographic parity assesses the 
+allocation of resources generally, equalized odds focuses on the allocation 
+of resources that were actually distributed to 
+members of that group (indicated by the positive target variable Y=1). 
+However, equalized odds makes the assumption 
 that the target variable :math:`Y` is a good measurement of the phenomena 
 being modeled, but that assumption may not hold if the measurement does not 
 satisfy the requirements of construct validity.
@@ -367,13 +427,27 @@ within more granular categories. In the case of demographic parity, we might
 need to review 
 :math:`\E[h(X) \given A=a, D=d] = \E[h(X) \given D=d] \quad \forall a` 
 where D represents the feature(s) within X across which members of the groups 
-within A are distributed. :footcite:`xu2020conditionalfairness` 
+within A are distributed. 
 Demographic parity would then require that the prediction of the target  
 variable is statistically independent of sensitive attributes conditional 
 on D. Simply aggregating outcomes across high-level categories can be 
-misleading when the data can be further disaggregated. It's important to 
-review metrics across these more graular categories, if they exist, 
-to verify that disparate outcomes persist across all levels of aggregation.
+misleading when the data can be further disaggregated. 
+More granular categories generally contain smaller sample sizes, and 
+it can be more difficult to establish that trends seen in very small 
+samples are not due to random chance. 
+It's important to review metrics across these more graular categories, 
+if they exist, to verify that disparate outcomes persist across all levels 
+of aggregation. 
+
+We also recommend watching out for the multiple comparisons problem, 
+which states that the more statistical inferences are made, the 
+more erroneous those inferences will become. For example, in the case 
+of evaluating fairness metrics on multiple groups, as we break the 
+groups down into more granular categories and evaluate those smaller 
+groups, it will become more likely that these subgroups will 
+differ enough to fail one of the metrics. For dealing with the multiple 
+comparisons problem, we recommend investigating statistical techniques 
+meant to correct the errors produced by individual statistical tests. 
 
 
 Multiple metrics in a single :code:`MetricFrame`
