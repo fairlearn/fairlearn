@@ -269,8 +269,21 @@ used for predictions, :math:`A` be a single sensitive feature (such as age
 or race), and :math:`Y` be the true label. Parity metrics are phrased in 
 terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
 
+.. _demographic_parity:
+
 Demographic parity
 ~~~~~~~~~~~~~~~~~~
+Demographic parity is a fairness metric whose goal is to ensure a machine 
+learning model's predictions are independent of membership in a sensitive 
+group. In other words, demographic parity is achieved when the probability 
+of a certain prediction is not dependent on sensitive group membership. In 
+the binary classification scenario, demographic parity refers to equal 
+selection rates across groups. For example, in the context of a resume 
+screening model, equal selection would mean that the proportion of 
+applicants selected for a job interview should be equal across groups.
+
+We mathematically define demographic parity using the following 
+set of equations.
 A classifier :math:`h` satisfies demographic parity under a distribution 
 over :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
 independent of the sensitive feature :math:`A`. This is equivalent to
@@ -289,7 +302,12 @@ is only defined for classification.
 .. note::
    Demographic parity is also sometimes referred to as *independence*, *group fairness*, *statistical parity*, and *disparate impact*.
 
-Demographic parity can be used to assess the extent of allocation harms, as it 
+Failing to achieve demographic parity could generate allocation harms. 
+Allocation harms occur when AI systems allocate 
+opportunities, resources, or information differently across different 
+groups (for example, an AI hiring system that is more likely to advance resumes 
+of male applicants than resumes of female applicants regardless of qualification). 
+Demographic parity can be used to assess the extent of allocation harms because it 
 reflects an assumption that resources should be allocated proportionally 
 across groups. Of the metrics described in this section, it can be the easiest 
 to implement. However, operationalizing fairness using demographic parity 
@@ -298,6 +316,10 @@ of what the world actually looks like (e.g., a resume assessment system that is
 more likely to filter out qualified female applicants due to an organizational 
 bias towards male applicants, regardless of skill level), or that the dataset 
 is an accurate representation of the world, but the world is unjust. 
+In reality, this may not be the case. The dataset might be an accurate representation 
+of what the world actually looks like, or the phenomena being modeled may not be 
+unjust. If either assumption is not true, then demographic parity may not provide 
+a meaningful or useful measurement of the fairness of a model's predictions. 
 
 Fairness metrics like demographic parity can also be used as optimization 
 constraints during the machine learning model training process. However, 
@@ -305,9 +327,9 @@ demographic parity is not well-suited for this purpose because
 it does not place requirements on the exact distribution of predictions with 
 respect to other important variables. To understand this concept further, 
 consider an example from the Fairness in Machine Learning textbook :footcite:`fairml_book`. 
-Suppose a company wishes to hire 
-applicants from group A and B at the same rate. It carefully selects 
-applicants from group A, but carelessly selects applicants from group B. 
+Suppose a company wishes to hire applicants from group A and B at the 
+same rate. It carefully selects applicants from group A, but carelessly 
+selects applicants from group B. 
 In this scenario, even though members from both groups are selected at 
 the same rate, it's likely that underqualified or unqualified applicants 
 are chosen more frequently for one group (group B) than another. 
@@ -348,11 +370,29 @@ itself an unobservable theoretical construct. Further, it's important
 to ask whether satisfying demographic parity actually brings us closer 
 to the world we'd like to see. 
 
+.. _equalized_odds:
 
 Equalized odds
 ~~~~~~~~~~~~~~
-A classifier :math:`h` satisfies equalized odds under a
-distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
+The goal of the equalized odds fairness metric is to ensure a machine 
+learning model performs equally well for different groups. It is stricter 
+than demographic parity because it requires that the machine learning 
+model's predictions are not only independent of sensitive group membership, 
+but that groups have the same false positive rates and and true positive 
+rates. This distinction is important because a model could achieve 
+demographic parity (i.e., its predictions could be independent of 
+sensitive group membership), but still generate more false positive 
+predictions for one group versus others. Equalized odds does not create 
+the selection issue discussed in the demographic parity section above. 
+For example, in the hiring scenario where the goal is to choose applicants 
+from group A and group B, ensuring the model performs equally well at 
+choosing applicants from group A and B can circumvent the issue of the model 
+optimizing by selecting applicants from one group at random.
+
+We mathematically define equalized odds using the following 
+set of equations. A classifier :math:`h` satisfies equalized 
+odds under a distribution over :math:`(X, A, Y)` if its 
+prediction :math:`h(X)` is
 conditionally independent of the sensitive feature :math:`A` given the label
 :math:`Y`. This is equivalent to
 :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
@@ -369,15 +409,14 @@ across minority and majority groups. Equalized odds further enforces that the
 accuracy is equally high across all groups, punishing models that only 
 perform well on majority groups.
 
+If a machine learning model does not perform equally well for all groups, 
+then it could generate allocation or quality-of-service harms.
 Equalized odds and can be used to diagnose both allocation harms as well as 
-quality-of-service harms. Allocation harms occur when AI systems allocate 
-opportunities, resources, or information differently across different 
-groups (for example, an AI hiring system that is more likely to advance resumes 
-of male applicants than resumes of female applicants regardless of qualification). 
-Quality-of-service harms occur when an AI system does not work as well for one 
-group versus another (for example, facial recognition systems that are more likely 
-to fail for dark-skinned individuals). For more information on AI harms, see 
-:ref:`types_of_harms`. 
+quality-of-service harms. Allocation harms are discussed in detail in the 
+demographic parity section above. Quality-of-service harms occur when an 
+AI system does not work as well for one group versus another (for example, 
+facial recognition systems that are more likely to fail for dark-skinned 
+individuals). For more information on AI harms, see :ref:`types_of_harms`. 
 
 Equalized odds can be useful for diagnosing allocation harms 
 because its goal is to ensure that a machine learning model works equally 
@@ -391,6 +430,8 @@ that the target variable :math:`Y` is a good measurement of the phenomena
 being modeled, but that assumption may not hold if the measurement does not 
 satisfy the requirements of construct validity.
 
+.. _equal_opportunity:
+
 Equal opportunity
 ~~~~~~~~~~~~~~~~~
 Equal opportunity is a relaxed version of equalized odds that only considers
@@ -402,6 +443,8 @@ requires that the individuals who are actually hired have an equal opportunity
 of being hired in the first place. However, by not considering whether false 
 positive rates are equivalent across groups, equal opportunity does not 
 capture the costs of missclassification disparities.
+
+.. _group_fairness:
 
 Considerations for conditional group fairness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
