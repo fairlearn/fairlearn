@@ -869,16 +869,23 @@ class MetricFrame:
         return self.__difference(self.by_group, subtrahend)
 
     def _calc_ratio_overall(self, by_group_frame, overall_frame):
+
+        def ratio_sub_one(x):
+            if x > 1:
+                return 1 / x
+            else:
+                return x
+
         if self._user_supplied_callable:
             tmp = by_group_frame / overall_frame
             if self.control_levels:
                 result = (
-                    tmp.transform(lambda x: min(x, 1 / x))
+                    tmp.transform(ratio_sub_one)
                     .groupby(level=self.control_levels)
                     .min()
                 )
             else:
-                result = tmp.transform(lambda x: min(x, 1 / x)).min()
+                result = tmp.transform(ratio_sub_one).min()
         else:
             if self.control_levels:
                 # It's easiest to give in to the DataFrame columns preference
@@ -887,12 +894,6 @@ class MetricFrame:
                 ) / self.overall.unstack(level=self.control_levels)
             else:
                 ratios = self.by_group / self.overall
-
-            def ratio_sub_one(x):
-                if x > 1:
-                    return 1 / x
-                else:
-                    return x
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
             if not self.control_levels:

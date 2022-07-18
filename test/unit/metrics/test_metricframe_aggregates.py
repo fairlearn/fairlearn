@@ -125,6 +125,20 @@ class Test1m1sf0cf:
             expected_ratio_overall, rel=1e-10, abs=1e-16
         )
 
+    def test_ratio_zero_divide(self):
+        # Simple test to check on zero division
+        my_prec = functools.partial(skm.precision_score, zero_division=0)
+        my_prec.__name__ = "precision_score_zero_div"
+
+        mf = metrics.MetricFrame(
+            metrics=my_prec,
+            y_true = [1, 0],
+            y_pred = [1, 0],
+            sensitive_features=['a', 'b']
+        )
+
+        assert mf.ratio(method='to_overall') == 0
+
 
 class Test1m1sf0cfFnDict:
     # Key difference is that the function is supplied as a dict
