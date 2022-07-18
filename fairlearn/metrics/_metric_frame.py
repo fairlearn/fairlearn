@@ -585,7 +585,7 @@ class MetricFrame:
         return self._sf_names
 
     def __group(
-        self, grouping_function: str, errors: str = "raise"
+        self, by_group_frame: pd.DataFrame, grouping_function: str, errors: str = "raise"
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -613,20 +613,20 @@ class MetricFrame:
         if not self.control_levels:
             if errors == "raise":
                 try:
-                    mf = self._by_group
+                    mf = by_group_frame
                     if grouping_function == "min":
                         vals = [mf[m].min() for m in mf.columns]
                     else:
                         vals = [mf[m].max() for m in mf.columns]
 
                     result = pd.Series(
-                        vals, index=self._by_group.columns, dtype="object"
+                        vals, index=mf.columns, dtype="object"
                     )
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 if not self.control_levels:
-                    mf = self._by_group
+                    mf = by_group_frame
                     # Fill in the possible min/max values, else np.nan
                     if grouping_function == "min":
                         vals = [
@@ -644,14 +644,14 @@ class MetricFrame:
             if errors == "raise":
                 try:
                     if grouping_function == "min":
-                        result = self._by_group.groupby(level=self.control_levels).min()
+                        result = by_group_frame.groupby(level=self.control_levels).min()
                     else:
-                        result = self._by_group.groupby(level=self.control_levels).max()
+                        result = by_group_frame .groupby(level=self.control_levels).max()
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self._by_group.copy()
+                mf = by_group_frame.copy()
                 mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
                 if grouping_function == "min":
                     result = mf.groupby(level=self.control_levels).min()
@@ -690,7 +690,7 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("max", errors)
+        return self.__group(self._by_group, "max", errors)
 
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -716,7 +716,20 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("min", errors)
+        return self.__group(self._by_group, "min", errors)
+
+    def __difference(self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame) \
+            -> Union[Any, pd.Series, pd.DataFrame]:
+
+        mf = by_group_frame.copy()
+        if isinstance(mf, pd.Series):
+            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
+        else:
+            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+
+        if self.control_levels:
+            return (mf - subtrahend).abs().groupby(level=self.control_levels).max()
+        return (mf - subtrahend).abs().max()
 
     def difference(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -767,19 +780,34 @@ class MetricFrame:
                 "Unrecognised method '{0}' in difference() call".format(method)
             )
 
-        mf = self.by_group.copy()
-        # Can assume errors='coerce', else error would already have been raised in .group_min
-        # Fill all non-scalar values with NaN
-        if isinstance(mf, pd.Series):
-            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
-        else:
-            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+        return self.__difference(self.by_group, subtrahend)
 
-        if self.control_levels is None:
-            result = (mf - subtrahend).abs().max()
+    def _calc_ratio_overall(self, by_group_frame, overall_frame):
+        if self._user_supplied_callable:
+            tmp = by_group_frame / overall_frame
+            if self.control_levels:
+                result = tmp.transform(lambda x: min(x, 1/x)).groupby(level=self.control_levels).min()
+            else:
+                result = tmp.transform(lambda x: min(x, 1/x)).min()
         else:
-            result = (mf - subtrahend).abs().groupby(level=self.control_levels).max()
+            if self.control_levels:
+                # It's easiest to give in to the DataFrame columns preference
+                ratios = self.by_group.unstack(level=self.control_levels) /  \
+                    self.overall.unstack(level=self.control_levels)
+            else:
+                ratios = self.by_group / self.overall
 
+            def ratio_sub_one(x):
+                if x > 1:
+                    return 1/x
+                else:
+                    return x
+
+            ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+            if not self.control_levels:
+                result = ratios.min()
+            else:
+                result = ratios.min().unstack(0)
         return result
 
     def ratio(
@@ -825,41 +853,11 @@ class MetricFrame:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         result = None
-        if method == "between_groups":
+        
+        if method == 'between_groups':
             result = self.group_min(errors=errors) / self.group_max(errors=errors)
-        elif method == "to_overall":
-            if self._user_supplied_callable:
-                tmp = self.by_group / self.overall
-                if self.control_levels:
-                    result = (
-                        tmp.transform(lambda x: min(x, 1 / x))
-                        .groupby(level=self.control_levels)
-                        .min()
-                    )
-                else:
-                    result = tmp.transform(lambda x: min(x, 1 / x)).min()
-            else:
-                ratios = None
-
-                if self.control_levels:
-                    # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(
-                        level=self.control_levels
-                    ) / self.overall.unstack(level=self.control_levels)
-                else:
-                    ratios = self.by_group / self.overall
-
-                def ratio_sub_one(x):
-                    if x > 1:
-                        return 1 / x
-                    else:
-                        return x
-
-                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-                if not self.control_levels:
-                    result = ratios.min()
-                else:
-                    result = ratios.min().unstack(0)
+        elif method == 'to_overall':
+            result = self._calc_ratio_overall(self.by_group, self.overall)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
 
