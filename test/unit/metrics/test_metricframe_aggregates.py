@@ -131,13 +131,10 @@ class Test1m1sf0cf:
         my_prec.__name__ = "precision_score_zero_div"
 
         mf = metrics.MetricFrame(
-            metrics=my_prec,
-            y_true = [1, 0],
-            y_pred = [1, 0],
-            sensitive_features=['a', 'b']
+            metrics=my_prec, y_true=[1, 0], y_pred=[1, 0], sensitive_features=["a", "b"]
         )
 
-        assert mf.ratio(method='to_overall') == 0
+        assert mf.ratio(method="to_overall") == 0
 
 
 class Test1m1sf0cfFnDict:

@@ -456,9 +456,9 @@ class MetricFrame:
                 )
             except Exception as e:
                 raise ValueError(
-                    "Bootstrap calculation failed. See inner exception for more details."
-                    " This is often caused by one or more of the supplied metric functions"
-                    " having a non-scalar return value."
+                    "Bootstrap calculation failed. See inner exception for more"
+                    " details. This is often caused by one or more of the supplied"
+                    " metric functions having a non-scalar return value."
                 ) from e
 
             ci = process_ci_bounds(ci, ci_method)
@@ -869,7 +869,6 @@ class MetricFrame:
         return self.__difference(self.by_group, subtrahend)
 
     def _calc_ratio_overall(self, by_group_frame, overall_frame):
-
         def ratio_sub_one(x):
             if x > 1:
                 return 1 / x
