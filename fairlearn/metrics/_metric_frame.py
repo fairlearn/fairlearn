@@ -454,12 +454,12 @@ class MetricFrame:
                 ratio_overall_output = self._calc_ratio_overall(
                     self.by_group, self.overall
                 )
-            except:
+            except Exception as e:
                 raise ValueError(
-                    "Metrics with non-scalar outputs do not currently support"
-                    " confidence intervals.                     Set n_boot=None to"
-                    " disable confidence interval calculation."
-                )
+                    "Bootstrap calculation failed. See inner exception for more details."
+                    " This is often caused by one or more of the supplied metric functions"
+                    " having a non-scalar return value."
+                ) from e
 
             ci = process_ci_bounds(ci, ci_method)
             parallel_output = Parallel(n_jobs=n_jobs)(
