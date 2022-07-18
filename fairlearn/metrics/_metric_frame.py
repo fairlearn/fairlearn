@@ -230,22 +230,22 @@ class MetricFrame:
         Used to produce confidence intervals. This parameter controls the number of
         bootstrap iterations MetricFrame runs to estimate uncertainty in each metric.
         For best results, it is recommended to set this to 100 or more. Setting to None
-        disables confidence interval functionality. Confidence intervals are currently 
+        disables confidence interval functionality. Confidence intervals are currently
         not supported on complex metrics that yield multiple outputs.
     ci : float, list, tuple
         Determines the quantiles reported for confidence intervals. All entries must
-        be in the range [0, 1]. A single float is interpreted as the width of the 
+        be in the range [0, 1]. A single float is interpreted as the width of the
         desired confidence interval (e.g. 0.95 is a 95% interval), while a List or Tuple
-        reports exact quantiles from the empirical bootstrap distribution 
+        reports exact quantiles from the empirical bootstrap distribution
         (e.g. (0, 0.33, 0.5, 0.66, 1) will calculate the min, 33rd, 50th, 66th, and max quantiles).
     ci_method: str
-        One of {'percentile', 'bias-corrected'}. This method determines the algorithm used to 
+        One of {'percentile', 'bias-corrected'}. This method determines the algorithm used to
         produce valid confidence intervals from the bootstrap distribution. 'percentine' returns
-        quantiles directly from the empirical bootstrap distribution. 'bias-corrected' estimates 
+        quantiles directly from the empirical bootstrap distribution. 'bias-corrected' estimates
         the statistical bias in the bootstrap estimates of each metric and adjusts the interval.
     n_jobs : int
         The number of jobs to run in parallel. Only used for confidence interval calculations.
-        None means 1 unless in a joblib.parallel_backend context. -1 means using all processors. 
+        None means 1 unless in a joblib.parallel_backend context. -1 means using all processors.
 
     Examples
     --------
@@ -335,8 +335,8 @@ class MetricFrame:
         ] = None,
         n_boot: Optional[int] = None,
         ci: Union[float, List[float], Tuple[float]] = 0.95,
-        ci_method: str = 'percentile',
-        n_jobs: int = 1
+        ci_method: str = "percentile",
+        n_jobs: int = 1,
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -394,27 +394,44 @@ class MetricFrame:
 
         # Calculate uncertainty intervals using bootstrapped versions of data
         def _bootstrap_metrics_calc(data):
-            overall_frame = self._build_overall_frame(data, annotated_funcs, cf_list, self._cf_names)
-            by_group_frame = self._build_by_group_frame(data, annotated_funcs, grouping_features)
-            group_min_frame = self.__group(by_group_frame, 'min', errors='coerce')
-            group_max_frame = self.__group(by_group_frame, 'max', errors='coerce')
+            overall_frame = self._build_overall_frame(
+                data, annotated_funcs, cf_list, self._cf_names
+            )
+            by_group_frame = self._build_by_group_frame(
+                data, annotated_funcs, grouping_features
+            )
+            group_min_frame = self.__group(by_group_frame, "min", errors="coerce")
+            group_max_frame = self.__group(by_group_frame, "max", errors="coerce")
 
             overall_calc_frame, by_group_calc_frame = overall_frame, by_group_frame
-            if self._user_supplied_callable: # This logic is borrowed from .overall/.by_group -- refactor?
+            if (
+                self._user_supplied_callable
+            ):  # This logic is borrowed from .overall/.by_group -- refactor?
                 by_group_calc_frame = by_group_frame.iloc[:, 0]
                 if self.control_levels:
                     overall_calc_frame = overall_frame.iloc[:, 0]
                 else:
                     overall_calc_frame = overall_frame.iloc[0]
 
-            diff_overall_frame = self.__difference(by_group_calc_frame, overall_calc_frame)
+            diff_overall_frame = self.__difference(
+                by_group_calc_frame, overall_calc_frame
+            )
             diff_group_frame = self.__difference(by_group_calc_frame, group_min_frame)
-            ratio_overall_frame = self._calc_ratio_overall(by_group_calc_frame, overall_calc_frame)
+            ratio_overall_frame = self._calc_ratio_overall(
+                by_group_calc_frame, overall_calc_frame
+            )
             ratio_group_frame = group_min_frame / group_max_frame
 
-
-            return overall_frame, by_group_frame, group_min_frame, group_max_frame, \
-                diff_group_frame, diff_overall_frame, ratio_group_frame, ratio_overall_frame
+            return (
+                overall_frame,
+                by_group_frame,
+                group_min_frame,
+                group_max_frame,
+                diff_group_frame,
+                diff_overall_frame,
+                ratio_group_frame,
+                ratio_overall_frame,
+            )
 
         self._overall_ci, self._by_group_ci = None, None
         self.difference_overall_ci, self.difference_group_ci = None, None
@@ -424,34 +441,88 @@ class MetricFrame:
         if n_boot is not None:
             # Calculate all outputs across entire data sample to assist bootstrap bias calculations
             # NOTE: Consider caching these results for on-demand regular calls?
-            try: # TODO: Find a better way of checking for functions with non-scalar return types.
-                group_min_output = self.__group(self._by_group, 'min')
-                group_max_output = self.__group(self._by_group, 'max')
-                difference_group_output = self.__difference(self.by_group, group_min_output)
-                difference_overall_output = self.__difference(self.by_group, self.overall)
+            try:  # TODO: Find a better way of checking for functions with non-scalar return types.
+                group_min_output = self.__group(self._by_group, "min")
+                group_max_output = self.__group(self._by_group, "max")
+                difference_group_output = self.__difference(
+                    self.by_group, group_min_output
+                )
+                difference_overall_output = self.__difference(
+                    self.by_group, self.overall
+                )
                 ratio_group_output = group_min_output / group_max_output
-                ratio_overall_output = self._calc_ratio_overall(self.by_group, self.overall)
+                ratio_overall_output = self._calc_ratio_overall(
+                    self.by_group, self.overall
+                )
             except:
-                raise ValueError("Metrics with non-scalar outputs do not currently support confidence intervals. \
-                    Set n_boot=None to disable confidence interval calculation.")
+                raise ValueError(
+                    "Metrics with non-scalar outputs do not currently support"
+                    " confidence intervals.                     Set n_boot=None to"
+                    " disable confidence interval calculation."
+                )
 
             ci = process_ci_bounds(ci, ci_method)
             parallel_output = Parallel(n_jobs=n_jobs)(
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
                 for _ in range(n_boot)
             )
-            overall_runs, by_group_runs, group_min_runs, group_max_runs, \
-                diff_group_runs, diff_overall_runs, ratio_group_runs, ratio_overall_runs = list(zip(*parallel_output))
+            (
+                overall_runs,
+                by_group_runs,
+                group_min_runs,
+                group_max_runs,
+                diff_group_runs,
+                diff_overall_runs,
+                ratio_group_runs,
+                ratio_overall_runs,
+            ) = list(zip(*parallel_output))
 
             # Summarize results, using main output as a prototype to provide appropriate index/columns.
-            self._overall_ci = create_ci_output(overall_runs, ci, sample_estimate=self._overall, interval_type=ci_method)
-            self._by_group_ci = create_ci_output(by_group_runs, ci, sample_estimate=self._by_group, interval_type=ci_method)
-            self.group_min_ci = create_ci_output(group_min_runs, ci, sample_estimate=group_min_output, interval_type=ci_method)
-            self.group_max_ci = create_ci_output(group_max_runs, ci, sample_estimate=group_max_output, interval_type=ci_method)
-            self.difference_group_ci = create_ci_output(diff_group_runs, ci, sample_estimate=difference_group_output, interval_type=ci_method)
-            self.difference_overall_ci = create_ci_output(diff_overall_runs, ci, sample_estimate=difference_overall_output, interval_type=ci_method)
-            self.ratio_group_ci = create_ci_output(ratio_group_runs, ci, sample_estimate=ratio_group_output, interval_type=ci_method)
-            self.ratio_overall_ci = create_ci_output(ratio_overall_runs, ci, sample_estimate=ratio_overall_output, interval_type=ci_method)
+            self._overall_ci = create_ci_output(
+                overall_runs, ci, sample_estimate=self._overall, interval_type=ci_method
+            )
+            self._by_group_ci = create_ci_output(
+                by_group_runs,
+                ci,
+                sample_estimate=self._by_group,
+                interval_type=ci_method,
+            )
+            self.group_min_ci = create_ci_output(
+                group_min_runs,
+                ci,
+                sample_estimate=group_min_output,
+                interval_type=ci_method,
+            )
+            self.group_max_ci = create_ci_output(
+                group_max_runs,
+                ci,
+                sample_estimate=group_max_output,
+                interval_type=ci_method,
+            )
+            self.difference_group_ci = create_ci_output(
+                diff_group_runs,
+                ci,
+                sample_estimate=difference_group_output,
+                interval_type=ci_method,
+            )
+            self.difference_overall_ci = create_ci_output(
+                diff_overall_runs,
+                ci,
+                sample_estimate=difference_overall_output,
+                interval_type=ci_method,
+            )
+            self.ratio_group_ci = create_ci_output(
+                ratio_group_runs,
+                ci,
+                sample_estimate=ratio_group_output,
+                interval_type=ci_method,
+            )
+            self.ratio_overall_ci = create_ci_output(
+                ratio_overall_runs,
+                ci,
+                sample_estimate=ratio_overall_output,
+                interval_type=ci_method,
+            )
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -495,15 +566,23 @@ class MetricFrame:
             return self._overall
 
     @property
-    def overall_ci(self) -> Optional[List[Tuple[float, Union[pd.Series, pd.DataFrame]]]]:
-        '''Return estimates of overall confidence intervals calculated via bootstrap.'''
+    def overall_ci(
+        self,
+    ) -> Optional[List[Tuple[float, Union[pd.Series, pd.DataFrame]]]]:
+        """Return estimates of overall confidence intervals calculated via bootstrap."""
 
         if self._overall_ci:
             if self._user_supplied_callable:
                 if self.control_levels:
-                    return [(quantile, output.iloc[:, 0]) for quantile, output in self._overall_ci]
+                    return [
+                        (quantile, output.iloc[:, 0])
+                        for quantile, output in self._overall_ci
+                    ]
                 else:
-                    return [(quantile, output.iloc[0]) for quantile, output in self._overall_ci]
+                    return [
+                        (quantile, output.iloc[0])
+                        for quantile, output in self._overall_ci
+                    ]
             else:
                 return self._overall_ci
 
@@ -542,12 +621,17 @@ class MetricFrame:
             return self._by_group
 
     @property
-    def by_group_ci(self) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
-        '''Return estimates of by_group confidence intervals calculated via bootstrap.'''
+    def by_group_ci(
+        self,
+    ) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
+        """Return estimates of by_group confidence intervals calculated via bootstrap."""
 
         if self._by_group_ci:
             if self._user_supplied_callable:
-                return [(quantile, output.iloc[:, 0]) for quantile, output in self._by_group_ci]
+                return [
+                    (quantile, output.iloc[:, 0])
+                    for quantile, output in self._by_group_ci
+                ]
             else:
                 return self._by_group_ci
 
@@ -585,7 +669,10 @@ class MetricFrame:
         return self._sf_names
 
     def __group(
-        self, by_group_frame: pd.DataFrame, grouping_function: str, errors: str = "raise"
+        self,
+        by_group_frame: pd.DataFrame,
+        grouping_function: str,
+        errors: str = "raise",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -619,9 +706,7 @@ class MetricFrame:
                     else:
                         vals = [mf[m].max() for m in mf.columns]
 
-                    result = pd.Series(
-                        vals, index=mf.columns, dtype="object"
-                    )
+                    result = pd.Series(vals, index=mf.columns, dtype="object")
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
@@ -646,7 +731,7 @@ class MetricFrame:
                     if grouping_function == "min":
                         result = by_group_frame.groupby(level=self.control_levels).min()
                     else:
-                        result = by_group_frame .groupby(level=self.control_levels).max()
+                        result = by_group_frame.groupby(level=self.control_levels).max()
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
@@ -718,8 +803,9 @@ class MetricFrame:
         """
         return self.__group(self._by_group, "min", errors)
 
-    def __difference(self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame) \
-            -> Union[Any, pd.Series, pd.DataFrame]:
+    def __difference(
+        self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
 
         mf = by_group_frame.copy()
         if isinstance(mf, pd.Series):
@@ -786,20 +872,25 @@ class MetricFrame:
         if self._user_supplied_callable:
             tmp = by_group_frame / overall_frame
             if self.control_levels:
-                result = tmp.transform(lambda x: min(x, 1/x)).groupby(level=self.control_levels).min()
+                result = (
+                    tmp.transform(lambda x: min(x, 1 / x))
+                    .groupby(level=self.control_levels)
+                    .min()
+                )
             else:
-                result = tmp.transform(lambda x: min(x, 1/x)).min()
+                result = tmp.transform(lambda x: min(x, 1 / x)).min()
         else:
             if self.control_levels:
                 # It's easiest to give in to the DataFrame columns preference
-                ratios = self.by_group.unstack(level=self.control_levels) /  \
-                    self.overall.unstack(level=self.control_levels)
+                ratios = self.by_group.unstack(
+                    level=self.control_levels
+                ) / self.overall.unstack(level=self.control_levels)
             else:
                 ratios = self.by_group / self.overall
 
             def ratio_sub_one(x):
                 if x > 1:
-                    return 1/x
+                    return 1 / x
                 else:
                     return x
 
@@ -853,10 +944,10 @@ class MetricFrame:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         result = None
-        
-        if method == 'between_groups':
+
+        if method == "between_groups":
             result = self.group_min(errors=errors) / self.group_max(errors=errors)
-        elif method == 'to_overall':
+        elif method == "to_overall":
             result = self._calc_ratio_overall(self.by_group, self.overall)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
