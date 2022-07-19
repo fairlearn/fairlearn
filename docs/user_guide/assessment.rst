@@ -589,6 +589,57 @@ For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
+.. _bootstrap:
+
+Confidence Intervals with Bootstrapping
+---------------------------------------
+
+It is a truth universally acknowledged, that a person in possession of
+a statistic, must be in want of an error bar.
+The only question is whether or not the person is aware of their want.
+Two aspects of fairness metrics make this particularly acute:
+
+1. Some of the subgroups defined by the sensitive features may be much
+   smaller than the overall sample size, leading to high levels of
+   random noise
+2. We often then wish to measure the disparity between two such subgroups.
+   While this means taking a difference or a ratio of the metrics,
+   the errors will always add (in quadrature)
+
+To address the need for error estimates, :class:`MetricFrame` provides
+a means of estimating confidence intervals for scalar metrics by using
+a process known as bootstrapping.
+This avoids the need for an analytic form for the error to be provided
+for each metric computed.
+
+Bootstrapping works as follows:
+
+1. Generate a large number of synthetic datasets by sampling the
+   target dataset *with replacement* (i.e. a given sample from the target
+   dataset may appear more than once in a synthetic dataset)
+2. Compute the metric value for each of these synthetic datasets
+3. Fit a distribution to this set of metric values
+4. Obtain the desired confidence intervals from that distribution
+
+Let us look at an example:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> # Enable bootstrapping with the n_boot parameter
+    >>> metric_ci = MetricFrame(metrics=skm.accuracy_score,
+    ...                         y_true=decision,
+    ...                         y_pred=prediction,
+    ...                         sensitive_features={'SF' : sensitive_feature},
+    ...                         n_boot=100)
+    >>> metric_ci.overall
+    0.1
+    >>> metric_ci.overall_ci
+    0.1
+
+
+
+
 .. _plot:
 
 Plotting
