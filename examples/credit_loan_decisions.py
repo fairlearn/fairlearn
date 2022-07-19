@@ -98,15 +98,15 @@ np.random.seed(rand_seed)
 # rather than compliance with financial anti-discrimination regulations.
 
 # %%
-# *EY* case study
-# ==================
+# Ernst & Young (EY) case study
+# =============================
 
 # %%
 # In this case study, we aim to replicate the work done in a `white paper
 # <https://www.microsoft.com/en-us/research/uploads/prod/2020/09/Fairlearn-EY_WhitePaper-2020-09-22.pdf>`_,
-# co-authored by _Microsoft_ and _EY_, on mitigating gender-related performance
-# disparities in financial lending decisions. In their analysis, _Microsoft_ and
-# _EY_ demonstrated how _Fairlearn_ could be used to measure and mitigate
+# co-authored by *Microsoft* and *EY*, on mitigating gender-related performance
+# disparities in financial lending decisions. In their analysis, *Microsoft* and
+# *EY* demonstrated how *Fairlearn* could be used to measure and mitigate
 # unfairness in the loan adjudication process.
 #
 # Using a dataset of credit loan outcomes (whether an individual defaulted on
@@ -121,7 +121,7 @@ np.random.seed(rand_seed)
 # dataset to replicate the outcome disparity found in the original dataset.
 
 # %%
-# Credit Decisions Dataset
+# Credit decisions dataset
 # -------------------------
 
 # %%
@@ -208,8 +208,8 @@ X = pd.get_dummies(dataset.drop(columns=["default", "SEX"]))
 A_str = A.map({1: "male", 2: "female"})
 
 # %%
-# Dataset Imbalances
-# ----------------------
+# Dataset imbalances
+# ------------------
 
 # %% Before we start training a classifier model, we want to explore the dataset
 # for any characteristics that may lead to fairness-related harms later on in
@@ -220,9 +220,6 @@ A_str = A.map({1: "male", 2: "female"})
 # our sensitive feature `SEX`. We see that 60% of loan applicants were labeled
 # as `female` and 40% as `male`, so we do not need to worry about imbalance in
 # this feature.
-
-# %%
-A_str.value_counts()
 
 # %%
 A_str.value_counts(normalize=True)
@@ -237,9 +234,6 @@ A_str.value_counts(normalize=True)
 # classifier that predicts an applicant will not default would achieve an
 # accuracy of 78%, so we will use the `balanced_accuracy` score as our
 # evaluation metric to counteract the label imbalance.
-
-# %%
-Y.value_counts()
 
 # %%
 Y.value_counts(normalize=True)
@@ -346,7 +340,6 @@ X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
     X, Y, A_str, test_size=0.35, stratify=Y
 )
 
-# %%
 X_train, y_train, A_train = resample_training_data(X_train, y_train, A_train)
 
 # %%
@@ -364,7 +357,6 @@ lgb_params = {
     "random_state": rand_seed,
 }
 
-# %%
 estimator = Pipeline(
     steps=[
         ("preprocessing", StandardScaler()),
@@ -372,7 +364,6 @@ estimator = Pipeline(
     ]
 )
 
-# %%
 estimator.fit(X_train, y_train)
 
 # %% We compute the *binary predictions* and the *prediction probabilities* for
@@ -412,7 +403,7 @@ lgb.plot_importance(
 
 
 # %%
-# Fairness Assessment of Unmitigated Model
+# Fairness assessment of unmitigated model
 # ==========================================
 
 # %%
@@ -610,10 +601,8 @@ metricframe_unmitigated = MetricFrame(
 # %%
 metricframe_unmitigated.by_group[metrics_to_report]
 
-# %%
 metricframe_unmitigated.difference()[metrics_to_report]
 
-# %%
 metricframe_unmitigated.overall[metrics_to_report]
 
 
@@ -731,8 +720,7 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # metric (in our case, `balanced_accuracy`) subject to some fairness constraint
 # (`equalized_odds`), resulting in a thresholded version of the underlying
 # machine learning model.
-
-# %%
+#
 # To instantiate our `ThresholdOptimizer`, we need to specify our fairness
 # constraint as a model parameter. Because both `false_negative_rate`
 # disparities and `false_positive_rate` disparities translate into real-world
@@ -760,10 +748,8 @@ postprocess_est = ThresholdOptimizer(
 # %%
 postprocess_est.fit(X=X_train, y=y_train, sensitive_features=A_train)
 
-# %%
 postprocess_pred = postprocess_est.predict(X_test, sensitive_features=A_test)
 
-# %%
 postprocess_pred_proba = postprocess_est._pmf_predict(
     X_test, sensitive_features=A_test
 )
@@ -801,7 +787,6 @@ eq_odds_postprocess = equalized_odds_difference(
     y_test, postprocess_pred, sensitive_features=A_test
 )
 
-# %%
 metricframe_postprocess = MetricFrame(
     metrics=fairness_metrics,
     y_true=y_test,
@@ -809,10 +794,8 @@ metricframe_postprocess = MetricFrame(
     sensitive_features=A_test,
 )
 
-# %%
 metricframe_postprocess.overall[metrics_to_report]
 
-# %%
 metricframe_postprocess.difference()[metrics_to_report]
 
 # %%
@@ -827,7 +810,6 @@ compare_metricframe_results(
     names=["Unmitigated", "PostProcess"],
 )
 
-# %%
 metricframe_postprocess.by_group[metrics_to_report].plot.bar(
     subplots=True, layout=[3, 1], figsize=[12, 18]
 )
@@ -847,9 +829,8 @@ metricframe_postprocess.by_group[metrics_to_report].plot.bar(
 # In the previous section, we took a fairness-unaware model and used the
 # `ThresholdOptimizer` to transform the model's decision boundary to satisfy our
 # fairness constraints. One key limitation of the `ThresholdOptimizer` is
-# needing access to our *sensitive_feature* during prediction time.
+3  # needing access to our *sensitive_feature* during prediction time.
 
-# %%
 # In this section, we will use the *reductions* approach of `Agarwal et. al
 # (2018) <https://arxiv.org/pdf/1803.02453.pdf>`_ to produce models that satisfy
 # the fairness constraint without needing access to the sensitive features at
@@ -867,7 +848,7 @@ metricframe_postprocess.by_group[metrics_to_report].plot.bar(
 # %%
 # To instantiate an `ExponentiatedGradient` model, we pass in two parameters:
 # - a base `estimator` (object that supports training)
-# - fairness `constraints` (object of type `fairlearn.reductions.Moment`)
+# - fairness `constraints` (object of type :class:fairlearn.reductions.Moment)
 
 # %%
 # When passing in a fairness *constraint* as a `Moment`, we can specify an
@@ -883,7 +864,7 @@ def get_expgrad_models_per_epsilon(
     estimator, epsilon, X_train, y_train, A_train
 ):
     """
-    Instantiate and trains an ExponentiatedGradient model on the
+    Instantiates and trains an :class:ExponentiatedGradient model on the
     balanced training dataset.
 
     Parameters:
@@ -891,8 +872,8 @@ def get_expgrad_models_per_epsilon(
         - Epsilon: Float representing maximum difference bound for the fairness Moment constraint
 
     Returns:
-        - Predictors: List of inner model predictors learned by the ExponentiatedModel
-        during the training process.
+        - Predictors: List of inner model predictors learned by the
+        ExponentiatedGradient model during the training process.
 
     """
     exp_grad_est = ExponentiatedGradient(
@@ -912,8 +893,7 @@ def get_expgrad_models_per_epsilon(
 # potential values. Here, we will train two `ExponentiatedGradient` models, one
 # with `epsilon=0.01` and the second with `epsilon=0.02`, and store the inner
 # models learned through each of the training processes.
-
-# %%
+#
 # In practice, we recommend choosing smaller values of :param:`epsilon` on
 # the order of the _square root_ of the number of samples in the training
 # dataset: $$\dfrac{1}{\sqrt{numberSamples}} \approx \dfrac{1}{\sqrt{25000}}
@@ -1081,7 +1061,6 @@ performance_subset = performance_df.loc[
 # %%
 mask, pareto_subset = filter_dominated_rows(performance_subset)
 
-# %%
 performance_df_masked = performance_df.loc[mask, :]
 
 # %%
@@ -1133,8 +1112,7 @@ plt.legend(bbox_to_anchor=(1.85, 1))
 # - 1.) Create threshold based on `balanced_error` of the unmitigated model.
 # - 2.) Filter only models whose `balanced_error` are below the threshold.
 # - 3.) Choose the model with smallest `equalized_odds` difference.
-
-# %%
+#
 # Within the context of fair lending in the United States, if a financial
 # institution is found to be engaging in discriminatory behavior, they must
 # produce documentation that demonstrates the model chosen is the least
@@ -1187,7 +1165,6 @@ best_model = filter_models_by_unmitigiated_score(
     threshold=0.015,
 )
 
-# %%
 print(
     f"Epsilon for best model: {best_model.get('epsilon')}, Index number: {best_model.get('index')}"
 )
@@ -1200,7 +1177,6 @@ inprocess_model = best_model.get("model")
 # %%
 y_pred_inprocess = inprocess_model.predict(X_test)
 
-# %%
 bal_acc_inprocess = balanced_accuracy_score(y_test, y_pred_inprocess)
 eq_odds_inprocess = equalized_odds_difference(
     y_test, y_pred_inprocess, sensitive_features=A_test
@@ -1217,10 +1193,8 @@ metricframe_inprocess = MetricFrame(
 # %%
 metricframe_inprocess.difference()[metrics_to_report]
 
-# %%
 metricframe_inprocess.overall[metrics_to_report]
 
-# %%
 metricframe_inprocess.by_group[metrics_to_report].plot.bar(
     subplots=True, layout=[3, 1], figsize=[12, 18]
 )
@@ -1242,7 +1216,6 @@ metric_error_pairs = [
 ]
 
 
-# %%
 def create_metricframe_w_errors(mframe, metrics_to_report, metric_error_pair):
     mframe_by_group = mframe.by_group.copy()
     for (metric_name, error_name) in metric_error_pair:
@@ -1270,7 +1243,6 @@ create_metricframe_w_errors(
     metricframe_unmitigated, metrics_to_report, metric_error_pairs
 )
 
-# %%
 metricframe_unmitigated.overall[metrics_to_report]
 
 # %%
@@ -1287,22 +1259,20 @@ create_metricframe_w_errors(
 # %%
 metricframe_inprocess.overall[metrics_to_report]
 
-# %%
 create_metricframe_w_errors(
     metricframe_postprocess, metrics_to_report, metric_error_pairs
 )
 
-# %%
 metricframe_postprocess.overall[metrics_to_report]
 
 # %%
 # We see both of our fairness-aware models yield a slight decrease in the
 # *balanced_accuracy* for *male applicants* compared to our fairness-unaware
-# model. In the *reductions* model, we see a decrease in the *false positive
-# rate* for *female applicants*. This is accompanied by an increase in the
-# *false negative rate* for *male applicants*. However, overall, the *equalized
-# odds difference* for the *reductions* models is lower than that of the
-# original fairness-unaware model.
+# model. In the *reductions* model, we see a decrease in the
+# *false positive rate* for *female applicants*. This is accompanied by an increase
+# in the *false negative rate* for *male applicants*. However overall, the
+# *equalized odds difference* for the *reductions* models is lower
+# than that of the original fairness-unaware model.
 
 
 # %%
@@ -1342,8 +1312,8 @@ metricframe_postprocess.overall[metrics_to_report]
 # In practice, we would ideally create a model card for our model before
 # deploying it in production. Although we will not be producing a model card in
 # this case study, interested readers can learn more about creating model cards
-# using the *Model Card Toolkit* from the `Fairlearn PyCon 2022 tutorial
-# <https://colab.research.google.com/github/LeJit/talks/blob/pycon_2022/2022_pycon/pycon-2022-students.ipynb>`_.
+# using the *Model Card Toolkit* from the
+# `Fairlearn PyCon tutorial <https://github.com/fairlearn/talks/tree/main/2022_pycon>`_.
 
 # %%
 # Fairness under unawareness
