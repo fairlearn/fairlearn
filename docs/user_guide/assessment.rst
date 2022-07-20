@@ -633,9 +633,46 @@ Let us look at an example:
     ...                         sensitive_features={'SF' : sensitive_feature},
     ...                         n_boot=100)
     >>> metric_ci.overall
-    0.1
+    0.4
     >>> metric_ci.overall_ci
-    0.1
+    [(0.025, 0.23333333333333334), (0.975, 0.6)]
+
+We have turned on bootstrapping by setting the :code:`n_boot` parameter;
+in this case, we have requested that 100 synthetic datasets be generated
+to create the statistics.
+We see that the :attr:`MetricFrame.overall` property is unchanged.
+However, we can also access the :attr:`MetricFrame.overall_ci` property
+which contains estimates of the confidence interval.
+By default, the bootstrapping algorithm computes the 95% confidence
+interval, which ranges from the 25th millile to the 975th millile.
+The :attr:`MetricFrame.overall_ci` has returned a list of binary tuples.
+The first entry in each tuple indicates the position within the distribution
+(which are 0.025 and 0.975 for the default confidence interval), while
+the second entry in each tuple is the metric value.
+For this case, we see that we can be 95% certain that the overall
+accuracy lies between 0.23 and 0.6 (and has a nominal value of 0.4).
+We can also examine the statistics for each group, and their confidence
+intervals:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> metric_ci.by_group
+    SF
+    A    0.300000
+    B    0.333333
+    C    0.625000
+    Name: accuracy_score, dtype: float64
+    >>> metric_ci.by_group_ci
+    [(0.025, SF
+    A    0.000000
+    B    0.090909
+    C    0.285714
+    Name: accuracy_score, dtype: float64), (0.975, SF
+    A    0.600
+    B    0.625
+    C    1.000
+    Name: accuracy_score, dtype: float64)]
 
 
 
