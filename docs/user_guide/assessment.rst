@@ -664,17 +664,39 @@ intervals:
     C    0.625000
     Name: accuracy_score, dtype: float64
     >>> metric_ci.by_group_ci
-    [(0.025, SF
+    [(0.025,
+    SF
     A    0.000000
-    B    0.090909
-    C    0.285714
-    Name: accuracy_score, dtype: float64), (0.975, SF
-    A    0.600
-    B    0.625
-    C    1.000
+    B    0.105278
+    C    0.333333
+    Name: accuracy_score, dtype: float64),
+    (0.975,
+    SF
+    A    0.621429
+    B    0.608077
+    C    0.952500
     Name: accuracy_score, dtype: float64)]
 
+So here, we see that group 'B' has a nominal value of 0.333, with its 95% confidence
+interval running from 0.105 to 0.608.
+Finally, confidence intervals are also provided for the :method:`MetricFrame.difference`
+and :method:`MetricFrame.ratio` methods.
+For example:
 
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> metric_ci.difference(method='between_groups')
+    0.325
+    >>> metric_ci.difference_group_ci
+    [(0.025, 0.10214826839826842), (0.975, 0.7585227272727271)]
+
+What we see here is that the largest difference between any two of the groups
+marked by the sensitive feature is nominally 0.325, but the 95% confidence interval
+ranges from 0.102 to 0.759. This is quite a range, but not unexpected when
+we have such a small number of samples in our original dataset and we are taking
+a difference between two similar values.
 
 
 .. _plot:
