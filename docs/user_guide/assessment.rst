@@ -621,6 +621,10 @@ Bootstrapping works as follows:
 3. Fit a distribution to this set of metric values
 4. Obtain the desired confidence intervals from that distribution
 
+Since bootstrapping involves random resampling, results will not
+be precisely reproducible between runs.
+However, as :code:`n_boot` is increased, the values found should
+converge.
 Let us look at an example:
 
 .. doctest:: assessment_metrics
