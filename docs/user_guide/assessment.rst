@@ -264,9 +264,9 @@ Common fairness metrics
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups. In 
-the mathematical definitions below, let :math:`X` denote a feature vector 
+the mathematical definitions below, :math:`X` denotes a feature vector 
 used for predictions, :math:`A` be a single sensitive feature (such as age 
-or race), and :math:`Y` be the true label. Parity metrics are phrased in 
+or race), and :math:`Y` be the true label. Fairness metrics are phrased in 
 terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
 
 .. _demographic_parity:
@@ -296,7 +296,7 @@ of the sensitive feature :math:`A`. This is equivalent to
 :footcite:`agarwal2019fair` Another way to think of demographic parity in a 
 regression scenario is computing the `mean_prediction()` accross groups 
 and determining how different mean predictions are for different groups. 
-Note that in the Faiurlearn API, :method:`demographic_parity_difference` 
+Note that in the Faiurlearn API, :method:`fairlearn.metrics.demographic_parity_difference` 
 is only defined for classification. 
 
 .. note::
@@ -315,10 +315,11 @@ rests on a few assumptions: that either the dataset is not a good representation
 of what the world actually looks like (e.g., a resume assessment system that is 
 more likely to filter out qualified female applicants due to an organizational 
 bias towards male applicants, regardless of skill level), or that the dataset 
-is an accurate representation of the world, but the world is unjust. 
-In reality, this may not be the case. The dataset might be an accurate representation 
-of what the world actually looks like, or the phenomena being modeled may not be 
-unjust. If either assumption is not true, then demographic parity may not provide 
+is an accurate representation of the phenomena being modeled, but the 
+phenomena itself is unjust. In reality, this may not be the case. The
+dataset might be an accurate representation of the phenomena itself, 
+or the phenomena being modeled may not be unjust. 
+If either assumption is not true, then demographic parity may not provide 
 a meaningful or useful measurement of the fairness of a model's predictions. 
 
 Fairness metrics like demographic parity can also be used as optimization 
@@ -327,48 +328,78 @@ demographic parity is not well-suited for this purpose because
 it does not place requirements on the exact distribution of predictions with 
 respect to other important variables. To understand this concept further, 
 consider an example from the Fairness in Machine Learning textbook :footcite:`fairml_book`. 
-Suppose a company wishes to hire applicants from group A and B at the 
-same rate. It carefully selects applicants from group A, but carelessly 
-selects applicants from group B. 
-In this scenario, even though members from both groups are selected at 
-the same rate, it's likely that underqualified or unqualified applicants 
-are chosen more frequently for one group (group B) than another. 
-If applicants from group B consequently perform worse in 
-comparison to applicants from group A, negative perceptions of their 
-performance may form. If group B experiences higher levels of prejudice 
-or discrimination, then these perceptions may reinforce existing 
-negative stereotypes. 
+
+    "However, decisions based on a classifier that satisfies independence can 
+    have undesirable properties (and similar arguments apply to other 
+    statistical critiera). Here is one way in which this can happen, 
+    which is easiest to illustrate if we imagine a callous or ill-intentioned 
+    decision maker. Imagine a company that in group a hires diligently 
+    selected applicants at some rate p>0. In group bbb, the company 
+    hires carelessly selected applicants at the same rate p. Even though 
+    the acceptance rates in both groups are identical, it is far more likely 
+    that unqualified applicants are selected in one group than in the other. 
+    As a result, it will appear in hindsight that members of group b 
+    performed worse than members of group a, thus establishing a negative 
+    track record for group b."
 
 It's also worth considering whether the assumptions underlying demographic
 parity maintain construct validity (see :ref:`construct_validity`). 
 Construct validity is a concept in the social sciences that assess the 
 extent to which the ways we choose to measure abstract 
-phenomena is valid. Unlike physical processes that can be measured directly 
-(for instance, the amount of rainfall in a city on a given day), 
-abstract phenomena are real-world processes or concepts that 
-cannot be directly measured. Examples of these phenomena are determining 
-the best candidate for a role, or determining how likely an individual 
-is to commit a crime. These concepts can be inferred through observable 
-measurements defined in a measurement model.
-Construct validity determines whether that 
-measurement model measures the phenomena under consideration in 
-a way that is meaningful and useful. 
-
-For all fairness metrics, the first question relevant to construct 
-validity is whether the target variable itself is a meaningful and 
-userful measurement model of the phenomena under consideration. 
-If the target variable itself is not a useful or meaningful measurement 
-model, then evaluating fairness metrics on that measurement model will  
-not reveal harms generated by the mismatch between the measurement 
-model or the problem formulation and the model's real-world context.
-Construct validity has a number of subcategories that assess  
-different aspects of the way we formulate a measurement model.
-Consequential validity, for example, asks how the world shaped by using a 
-measurement model. For demographic parity, one relevant question would be 
+phenomena is valid. For demographic parity, one relevant question would be 
 whether demographic parity meets the criteria for establishing "fairness", 
 itself an unobservable theoretical construct. Further, it's important 
 to ask whether satisfying demographic parity actually brings us closer 
 to the world we'd like to see. 
+
+
+.. _conditional_group_fairness:
+
+In some cases, we may observe a trend in several groups of data, but that 
+trend may disappear or reverse when groups are combined. Known as  
+`Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
+outcome may appear when observing disparate outcomes across groups. A 
+famous example of Simpson's Paradox is a study of 1973 graduate school 
+admissions to the University of California, Berkley :footcite:`bickel1975biasinadmissions`. 
+The study showed that when observing admissions by gender, men applying were 
+more likely than women to be accepted. However, drilling down into admissions 
+by department revealed that women tended to apply to departments with more 
+competitive admissions requirements, whereas men tended to apply to less 
+competitive depoartments. The more granular analysis showed only four out of 
+85 departments exhibited bias against women, and six departments exhibited 
+bias towards men. In general, the data indicated departments exhibited a bias 
+in favor of minority-gendered applicants, which is opposite from the trend 
+observed in the aggregate data.
+
+This phenomenon is important to fairness evaluation because metrics like 
+demographic parity may be different when calculated at an aggregate level and  
+within more granular categories. In the case of demographic parity, we might 
+need to review 
+:math:`\E[h(X) \given A=a, D=d] = \E[h(X) \given D=d] \quad \forall a` 
+where D represents the feature(s) within X across which members of the groups 
+within A are distributed. 
+Demographic parity would then require that the prediction of the target  
+variable is statistically independent of sensitive attributes conditional 
+on D. Simply aggregating outcomes across high-level categories can be 
+misleading when the data can be further disaggregated. 
+More granular categories generally contain smaller sample sizes, and 
+it can be more difficult to establish that trends seen in very small 
+samples are not due to random chance. 
+It's important to review metrics across these more graular categories, 
+if they exist, to verify that disparate outcomes persist across all levels 
+of aggregation. 
+
+We also recommend watching out for the `multiple comparisons problem <https://stats.libretexts.org/Bookshelves/Applied_Statistics/Book%3A_Biological_Statistics_(McDonald)/06%3A_Multiple_Tests/6.01%3A_Multiple_Comparisons>`_, 
+which states that the more statistical inferences are made, the 
+more erroneous those inferences will become. For example, in the case 
+of evaluating fairness metrics on multiple groups, as we break the 
+groups down into more granular categories and evaluate those smaller 
+groups, it will become more likely that these subgroups will 
+differ enough to fail one of the metrics. For dealing with the multiple 
+comparisons problem, we recommend investigating `statistical techniques <https://www.statology.org/bonferroni-correction/>`_ 
+meant to correct the errors produced by individual statistical tests. 
+
+
 
 .. _equalized_odds:
 
@@ -443,54 +474,6 @@ requires that the individuals who are actually hired have an equal opportunity
 of being hired in the first place. However, by not considering whether false 
 positive rates are equivalent across groups, equal opportunity does not 
 capture the costs of missclassification disparities.
-
-.. _group_fairness:
-
-Considerations for conditional group fairness
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In some cases, we may observe a trend in several groups of data, but that 
-trend may disappear or reverse when groups are combined. Known as  
-`Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
-outcome may appear when observing disparate outcomes across groups. A 
-famous example of Simpson's Paradox is a study of 1973 graduate school 
-admissions to the University of California, Berkley :footcite:`bickel1975biasinadmissions`. 
-The study showed that when observing admissions by gender, men applying were 
-more likely than women to be accepted. However, drilling down into admissions 
-by department revealed that women tended to apply to departments with more 
-competitive admissions requirements, whereas men tended to apply to less 
-competitive depoartments. The more granular analysis showed only four out of 
-85 departments exhibited bias against women, and six departments exhibited 
-bias towards men. In general, the data indicated departments exhibited a bias 
-in favor of minority-gendered applicants, which is opposite from the trend 
-observed in the aggregate data.
-
-This phenomenon is important to fairness evaluation because metrics like 
-demographic parity may be different when calculated at an aggregate level and  
-within more granular categories. In the case of demographic parity, we might 
-need to review 
-:math:`\E[h(X) \given A=a, D=d] = \E[h(X) \given D=d] \quad \forall a` 
-where D represents the feature(s) within X across which members of the groups 
-within A are distributed. 
-Demographic parity would then require that the prediction of the target  
-variable is statistically independent of sensitive attributes conditional 
-on D. Simply aggregating outcomes across high-level categories can be 
-misleading when the data can be further disaggregated. 
-More granular categories generally contain smaller sample sizes, and 
-it can be more difficult to establish that trends seen in very small 
-samples are not due to random chance. 
-It's important to review metrics across these more graular categories, 
-if they exist, to verify that disparate outcomes persist across all levels 
-of aggregation. 
-
-We also recommend watching out for the multiple comparisons problem, 
-which states that the more statistical inferences are made, the 
-more erroneous those inferences will become. For example, in the case 
-of evaluating fairness metrics on multiple groups, as we break the 
-groups down into more granular categories and evaluate those smaller 
-groups, it will become more likely that these subgroups will 
-differ enough to fail one of the metrics. For dealing with the multiple 
-comparisons problem, we recommend investigating statistical techniques 
-meant to correct the errors produced by individual statistical tests. 
 
 
 Multiple metrics in a single :code:`MetricFrame`
