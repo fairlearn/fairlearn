@@ -323,7 +323,7 @@ a meaningful or useful measurement of the fairness of a model's predictions.
 
 Fairness metrics like demographic parity can also be used as optimization 
 constraints during the machine learning model training process. However, 
-demographic parity is not well-suited for this purpose because 
+demographic parity may not be well-suited for this purpose because 
 it does not place requirements on the exact distribution of predictions with 
 respect to other important variables. To understand this concept further, 
 consider an example from the Fairness in Machine Learning textbook :footcite:`fairml_book`. 
