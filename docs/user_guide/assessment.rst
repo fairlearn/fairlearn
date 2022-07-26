@@ -295,7 +295,7 @@ of the sensitive feature :math:`A`. This is equivalent to
 :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
 :footcite:`agarwal2019fair` Another way to think of demographic parity in a 
 regression scenario is to compare the average predicted value across groups.
-Note that in the Faiurlearn API, :method:`fairlearn.metrics.demographic_parity_difference` 
+Note that in the Faiurlearn API, :func:`fairlearn.metrics.demographic_parity_difference` 
 is only defined for classification. 
 
 .. note::
