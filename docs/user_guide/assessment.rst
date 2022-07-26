@@ -272,7 +272,7 @@ terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
 .. _demographic_parity:
 
 Demographic parity
-~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^
 Demographic parity is a fairness metric whose goal is to ensure a machine 
 learning model's predictions are independent of membership in a sensitive 
 group. In other words, demographic parity is achieved when the probability 
@@ -403,7 +403,7 @@ meant to correct the errors produced by individual statistical tests.
 .. _equalized_odds:
 
 Equalized odds
-~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^
 The goal of the equalized odds fairness metric is to ensure a machine 
 learning model performs equally well for different groups. It is stricter 
 than demographic parity because it requires that the machine learning 
@@ -463,7 +463,7 @@ satisfy the requirements of construct validity.
 .. _equal_opportunity:
 
 Equal opportunity
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 Equal opportunity is a relaxed version of equalized odds that only considers
 conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
 :footcite:`hardt2016equality` Another way of thinking about this metric is 
