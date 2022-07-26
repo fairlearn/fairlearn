@@ -18,7 +18,6 @@ from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
 
-_SUBGROUP_COUNT_WARNING_THRESHOLD = 20
 _VALID_ERROR_STRING = ["raise", "coerce"]
 _VALID_GROUPING_FUNCTION = ["min", "max"]
 
@@ -27,8 +26,6 @@ _SF_DICT_CONVERSION_FAILURE = (
     "Please ensure each array is strictly 1-D. "
     "The __cause__ field of this exception may contain further information."
 )
-_BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
-_SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = (
     "DataFrame column names must be strings. Name '{0}' is of type {1}"
@@ -352,42 +349,20 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        if self._cf_names is None:
-            self._overall = apply_to_dataframe(
-                all_data, metric_functions=annotated_funcs
-            )
-        else:
-            temp = all_data.groupby(by=self._cf_names).apply(
-                apply_to_dataframe, metric_functions=annotated_funcs
-            )
-            # If there are multiple control features, might have missing combinations
-            if len(self._cf_names) > 1:
-                all_indices = pd.MultiIndex.from_product(
-                    [x.classes_ for x in cf_list],
-                    names=[x.name_ for x in cf_list],
-                )
-
-                self._overall = temp.reindex(index=all_indices)
-            else:
-                self._overall = temp
+        # Create the 'overall' results
+        self._overall = self._build_overall_frame(
+            all_data, annotated_funcs, cf_list, self._cf_names
+        )
 
         grouping_features = copy.deepcopy(sf_list)
         if cf_list is not None:
             # Prepend the conditional features, so they are 'higher'
             grouping_features = copy.deepcopy(cf_list) + grouping_features
 
-        temp = all_data.groupby([x.name_ for x in grouping_features]).apply(
-            apply_to_dataframe, metric_functions=annotated_funcs
+        # Create the 'by group' results
+        self._by_group = self._build_by_group_frame(
+            all_data, annotated_funcs, grouping_features
         )
-        if len(grouping_features) > 1:
-            all_indices = pd.MultiIndex.from_product(
-                [x.classes_ for x in grouping_features],
-                names=[x.name_ for x in grouping_features],
-            )
-
-            self._by_group = temp.reindex(index=all_indices)
-        else:
-            self._by_group = temp
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -684,7 +659,12 @@ class MetricFrame:
         else:
             mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
 
-        return (mf - subtrahend).abs().max(level=self.control_levels)
+        if self.control_levels is None:
+            result = (mf - subtrahend).abs().max()
+        else:
+            result = (mf - subtrahend).abs().groupby(level=self.control_levels).max()
+
+        return result
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -734,9 +714,14 @@ class MetricFrame:
         elif method == "to_overall":
             if self._user_supplied_callable:
                 tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1 / x)).min(
-                    level=self.control_levels
-                )
+                if self.control_levels:
+                    result = (
+                        tmp.transform(lambda x: min(x, 1 / x))
+                        .groupby(level=self.control_levels)
+                        .min()
+                    )
+                else:
+                    result = tmp.transform(lambda x: min(x, 1 / x)).min()
             else:
                 ratios = None
 
@@ -891,3 +876,37 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    def _build_overall_frame(self, data, metric_funcs, cf_list, cf_names):
+        """Build the 'overall' result during construction."""
+        if cf_names is None:
+            return apply_to_dataframe(data, metric_functions=metric_funcs)
+        else:
+            temp = data.groupby(by=cf_names).apply(
+                apply_to_dataframe, metric_functions=metric_funcs
+            )
+            # If there are multiple control features, might have missing combinations
+            if len(cf_names) > 1:
+                all_indices = pd.MultiIndex.from_product(
+                    [x.classes_ for x in cf_list], names=[x.name_ for x in cf_list]
+                )
+
+                return temp.reindex(index=all_indices)
+            else:
+                return temp
+
+    def _build_by_group_frame(self, data, metric_funcs, grouping_features):
+        """Build the 'by_group' result during construction."""
+        temp = data.groupby([x.name_ for x in grouping_features]).apply(
+            apply_to_dataframe, metric_functions=metric_funcs
+        )
+        if len(grouping_features) > 1:
+            # We might have missing combinations in the input, so expand to fill
+            all_indices = pd.MultiIndex.from_product(
+                [x.classes_ for x in grouping_features],
+                names=[x.name_ for x in grouping_features],
+            )
+
+            return temp.reindex(index=all_indices)
+        else:
+            return temp

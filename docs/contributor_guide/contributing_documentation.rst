@@ -10,7 +10,7 @@ allow users to check the documentation of the version of the package that they
 are using.
 
 To contribute, make sure to install sphinx and its
-add-ons by running 
+add-ons by running
 
 .. code-block::
 
@@ -32,7 +32,7 @@ directory:
 or use the shortcut
 
 .. code-block::
-    
+
         make doc
 
 This will generate the website in the directory mentioned at the end of the
@@ -40,7 +40,7 @@ command. Rerunning this after making changes to individual files only
 rebuilds the changed pages, so the build time should be a lot shorter.
 
 You can check that the document(s) render properly by inspecting the HTML with
-the following commands: 
+the following commands:
 
 .. code-block::
 
@@ -61,7 +61,7 @@ For Linux users, use :code: `xdg-open docs/_build/html/index.html`
 :code:`plot_*` can be replaced with any of the notebooks in the
 :code:`auto_examples` folder. To view your changes, simply navigate to the
 relevant part of the website and check that your updates render properly
-and links work as expected. 
+and links work as expected.
 
 Note that some changes to documentation may involve modifying several files
 (i.e: index files, other documents in which the current one should be linked).
@@ -85,13 +85,7 @@ To fully build the website for all versions use the following script:
 
 .. code-block::
 
-    python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
-
-or the shortcut
-
-.. code-block::
-
-    make doc-multiversion
+    make doc
 
 The comprehensive set of commands to build the website is in our CircleCI
 configuration file in the `.circleci` directory of the repository.
