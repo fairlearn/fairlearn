@@ -343,7 +343,7 @@ consider an example from the Fairness in Machine Learning textbook :footcite:`fa
 
 It's also worth considering whether the assumptions underlying demographic
 parity maintain construct validity (see :ref:`construct_validity`). 
-Construct validity is a concept in the social sciences that assess the 
+Construct validity is a concept in the social sciences that assesses the 
 extent to which the ways we choose to measure abstract 
 phenomena are valid. For demographic parity, one relevant question would be 
 whether demographic parity meets the criteria for establishing "fairness", 
