@@ -441,7 +441,7 @@ perform well on majority groups.
 
 If a machine learning model does not perform equally well for all groups, 
 then it could generate allocation or quality-of-service harms.
-Equalized odds and can be used to diagnose both allocation harms as well as 
+Equalized odds can be used to diagnose both allocation harms as well as 
 quality-of-service harms. Allocation harms are discussed in detail in the 
 demographic parity section above. Quality-of-service harms occur when an 
 AI system does not work as well for one group versus another (for example, 
