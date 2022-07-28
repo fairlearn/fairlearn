@@ -345,7 +345,7 @@ It's also worth considering whether the assumptions underlying demographic
 parity maintain construct validity (see :ref:`construct_validity`). 
 Construct validity is a concept in the social sciences that assess the 
 extent to which the ways we choose to measure abstract 
-phenomena is valid. For demographic parity, one relevant question would be 
+phenomena are valid. For demographic parity, one relevant question would be 
 whether demographic parity meets the criteria for establishing "fairness", 
 itself an unobservable theoretical construct. Further, it's important 
 to ask whether satisfying demographic parity actually brings us closer 
