@@ -434,7 +434,7 @@ The inclusion of false positive rates acknowledges that different groups
 experience different costs from misclassification. For example, in the case of 
 a model predicting a negative outcome (e.g., probability of recidivating) 
 that already disproportionately affects members of minority communities, 
-false positive predictions reflect preexisting disparities in outcomes 
+false positive predictions reflect pre-existing disparities in outcomes 
 across minority and majority groups. Equalized odds further enforces that the 
 accuracy is equally high across all groups, punishing models that only 
 perform well on majority groups.
