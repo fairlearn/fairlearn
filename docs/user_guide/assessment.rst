@@ -315,7 +315,11 @@ of what the world actually looks like (e.g., a resume assessment system that is
 more likely to filter out qualified female applicants due to an organizational 
 bias towards male applicants, regardless of skill level), or that the dataset 
 is an accurate representation of the phenomena being modeled, but the 
-phenomena itself is unjust. In reality, this may not be the case. The
+phenomena itself is unjust (e.g., consider the case of predictive policing, 
+where a system created to predict crime rates may correctly predict higher crime 
+rates for certain areas, but simultaneously fail to consider that those higher 
+rates may be caused by disproportionate policing and overcriminimalization of those areas). 
+In reality, these assumptions may not be the true. The
 dataset might be an accurate representation of the phenomena itself, 
 or the phenomena being modeled may not be unjust. 
 If either assumption is not true, then demographic parity may not provide 
@@ -332,14 +336,14 @@ consider an example from the Fairness in Machine Learning textbook :footcite:`fa
     have undesirable properties (and similar arguments apply to other 
     statistical critiera). Here is one way in which this can happen, 
     which is easiest to illustrate if we imagine a callous or ill-intentioned 
-    decision maker. Imagine a company that in group a hires diligently 
-    selected applicants at some rate p>0. In group bbb, the company 
+    decision maker. Imagine a company that in *group A* hires diligently 
+    selected applicants at some rate p>0. In *group B*, the company 
     hires carelessly selected applicants at the same rate p. Even though 
     the acceptance rates in both groups are identical, it is far more likely 
     that unqualified applicants are selected in one group than in the other. 
-    As a result, it will appear in hindsight that members of group b 
-    performed worse than members of group a, thus establishing a negative 
-    track record for group b."
+    As a result, it will appear in hindsight that members of *group B* 
+    performed worse than members of *group A*, thus establishing a negative 
+    track record for group B."
 
 It's also worth considering whether the assumptions underlying demographic
 parity maintain construct validity (see :ref:`construct_validity`). 
@@ -354,8 +358,8 @@ to the world we'd like to see.
 
 .. _conditional_group_fairness:
 
-In some cases, we may observe a trend in several groups of data, but that 
-trend may disappear or reverse when groups are combined. Known as  
+In some cases, we may observe a trend in data from multiple demographic groups, 
+but that trend may disappear or reverse when groups are combined. Known as  
 `Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
 outcome may appear when observing disparate outcomes across groups. A 
 famous example of Simpson's Paradox is a study of 1973 graduate school 
@@ -381,13 +385,13 @@ Demographic parity would then require that the prediction of the target
 variable is statistically independent of sensitive attributes conditional 
 on D. Simply aggregating outcomes across high-level categories can be 
 misleading when the data can be further disaggregated. 
-More granular categories generally contain smaller sample sizes, and 
-it can be more difficult to establish that trends seen in very small 
-samples are not due to random chance. 
 It's important to review metrics across these more graular categories, 
 if they exist, to verify that disparate outcomes persist across all levels 
 of aggregation. 
 
+However, more granular categories generally contain smaller sample sizes, and 
+it can be more difficult to establish that trends seen in very small 
+samples are not due to random chance. 
 We also recommend watching out for the `multiple comparisons problem <https://stats.libretexts.org/Bookshelves/Applied_Statistics/Book%3A_Biological_Statistics_(McDonald)/06%3A_Multiple_Tests/6.01%3A_Multiple_Comparisons>`_, 
 which states that the more statistical inferences are made, the 
 more erroneous those inferences will become. For example, in the case 
@@ -415,9 +419,9 @@ sensitive group membership), but still generate more false positive
 predictions for one group versus others. Equalized odds does not create 
 the selection issue discussed in the demographic parity section above. 
 For example, in the hiring scenario where the goal is to choose applicants 
-from group A and group B, ensuring the model performs equally well at 
-choosing applicants from group A and B can circumvent the issue of the model 
-optimizing by selecting applicants from one group at random.
+from *group A* and *group B*, ensuring the model performs equally well at 
+choosing applicants from *group A* and *group B* can circumvent the issue of 
+the model optimizing by selecting applicants from one group at random.
 
 We mathematically define equalized odds using the following 
 set of equations. A classifier :math:`h` satisfies equalized 
