@@ -363,12 +363,12 @@ but that trend may disappear or reverse when groups are combined. Known as
 `Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
 outcome may appear when observing disparate outcomes across groups. A 
 famous example of Simpson's Paradox is a study of 1973 graduate school 
-admissions to the University of California, Berkley :footcite:`bickel1975biasinadmissions`. 
+admissions to the University of California, Berkley :footcite:ps:`bickel1975biasinadmissions`. 
 The study showed that when observing admissions by gender, men applying were 
 more likely than women to be accepted. However, drilling down into admissions 
 by department revealed that women tended to apply to departments with more 
 competitive admissions requirements, whereas men tended to apply to less 
-competitive depoartments. The more granular analysis showed only four out of 
+competitive departments. The more granular analysis showed only four out of 
 85 departments exhibited bias against women, and six departments exhibited 
 bias towards men. In general, the data indicated departments exhibited a bias 
 in favor of minority-gendered applicants, which is opposite from the trend 
