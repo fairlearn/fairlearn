@@ -904,3 +904,9 @@ metrics.
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
     Fairlearn provides some of the existing functionality through
     :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
+
+
+References
+----------
+
+.. footbibliography::
