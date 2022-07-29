@@ -41,8 +41,8 @@ native or a non-native speaker.
 It is also important to consider group intersections, for example, in addition
 to considering groups according to gender and groups according to race, it is 
 also important to consider their intersections (e.g., Black women, Latinx 
-nonbinary people, etc.). Kimberlé Crenshaw's work on intersectionality :footcite:p:`crenshaw1991intersectionality`
-offers a thorough background on this topic.
+nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
+offers a thorough background on the topic of intersectionality.
 
 Quantify harms
 ^^^^^^^^^^^^^^
