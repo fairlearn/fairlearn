@@ -286,14 +286,16 @@ We mathematically define demographic parity using the following
 set of equations.
 A classifier :math:`h` satisfies demographic parity under a distribution 
 over :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
-independent of the sensitive feature :math:`A`. This is equivalent to
-:math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. :footcite:`agarwal2018reductions`
+independent of the sensitive feature :math:`A`.
+:footcite:cts:`agarwal2018reductions` show that this is equivalent to
+:math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.
 
 In the case of regression, a predictor :math:`f` satisfies demographic parity
 under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
-of the sensitive feature :math:`A`. This is equivalent to
+of the sensitive feature :math:`A`.
+:footcite:cts:`agarwal2019fair` show that this is equivalent to
 :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-:footcite:`agarwal2019fair` Another way to think of demographic parity in a 
+Another way to think of demographic parity in a 
 regression scenario is to compare the average predicted value across groups.
 Note that in the Fairlearn API, :func:`fairlearn.metrics.demographic_parity_difference` 
 is only defined for classification. 
@@ -428,9 +430,10 @@ set of equations. A classifier :math:`h` satisfies equalized
 odds under a distribution over :math:`(X, A, Y)` if its 
 prediction :math:`h(X)` is
 conditionally independent of the sensitive feature :math:`A` given the label
-:math:`Y`. This is equivalent to
+:math:`Y`.
+:footcite:cts:`agarwal2018reductions` show that this is equivalent to
 :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-:footcite:`agarwal2018reductions` Equalized odds requires that the true 
+Equalized odds requires that the true 
 positive rate, :math:`\P(h(X)=1 | Y=1`, and the false positive rate, 
 :math:`\P(h(X)=1 | Y=0`, be equal across groups. 
 
@@ -470,7 +473,8 @@ Equal opportunity
 ^^^^^^^^^^^^^^^^^
 Equal opportunity is a relaxed version of equalized odds that only considers
 conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-:footcite:`hardt2016equality` Another way of thinking about this metric is 
+:footcite:p:`hardt2016equality`
+Another way of thinking about this metric is 
 requiring equal outcomes only within the subset of records belonging to the 
 positive class. For example, in the hiring example, equal opportunity 
 requires that the individuals who are actually hired have an equal opportunity 
