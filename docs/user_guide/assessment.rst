@@ -332,7 +332,8 @@ constraints during the machine learning model training process. However,
 demographic parity may not be well-suited for this purpose because 
 it does not place requirements on the exact distribution of predictions with 
 respect to other important variables. To understand this concept further, 
-consider an example from the Fairness in Machine Learning textbook :footcite:`fairml_book`. 
+consider an example from the Fairness in Machine Learning textbook 
+by :footcite:cts:`barocas2019fairness`:
 
     "However, decisions based on a classifier that satisfies independence can 
     have undesirable properties (and similar arguments apply to other 
