@@ -413,13 +413,13 @@ demographic parity may be different when calculated at an aggregate level and
 within more granular categories. In the case of demographic parity, we might 
 need to review 
 :math:`\E[h(X) \given A=a, D=d] = \E[h(X) \given D=d] \quad \forall a` 
-where D represents the feature(s) within X across which members of the groups 
-within A are distributed. 
+where :math:`D` represents the feature(s) within :math:`X`` across which
+members of the groups within :math:`A` are distributed. 
 Demographic parity would then require that the prediction of the target  
 variable is statistically independent of sensitive attributes conditional 
 on D. Simply aggregating outcomes across high-level categories can be 
 misleading when the data can be further disaggregated. 
-It's important to review metrics across these more graular categories, 
+It's important to review metrics across these more granular categories, 
 if they exist, to verify that disparate outcomes persist across all levels 
 of aggregation. 
 
@@ -436,6 +436,31 @@ differ enough to fail one of the metrics. For dealing with the multiple
 comparisons problem, we recommend investigating `statistical techniques <https://www.statology.org/bonferroni-correction/>`_ 
 meant to correct the errors produced by individual statistical tests. 
 
+Fairlearn provides the :func:`demographic_parity_difference` and
+:func:`demographic_parity_ratio` functions for computing demographic
+parity measures for binary classification data, both of which return
+a scalar result
+The first reports the absolute difference between the highest and
+lowest selection rates :math:`a \in A` so a result of 0 indicates
+that demographic parity has been achieved (this does *not* automatically
+mean that the classifier is fair!).
+The second reports the ratio of the lowest and highest selection rates,
+so a result of 1 means there is demographic parity.
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import demographic_parity_difference
+    >>> print(demographic_parity_difference(y_true,
+    ...                                     y_pred,
+    ...                                     sensitive_features=group_membership_data))
+    SOMETHING
+    >>> from fairlearn.metrics import demographic_parity_ratio
+    >>> print(demographic_parity_ratio(y_true,
+    ...                                y_pred,
+    ...                                sensitive_features=group_membership_data))
+    SOMETHINGELSE
 
 
 .. _equalized_odds:
