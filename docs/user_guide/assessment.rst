@@ -41,8 +41,8 @@ native or a non-native speaker.
 It is also important to consider group intersections, for example, in addition
 to considering groups according to gender and groups according to race, it is 
 also important to consider their intersections (e.g., Black women, Latinx 
-nonbinary people, etc.). Kimberlé Crenshaw's work on intersectionality :footcite:p:`crenshaw1991intersectionality`
-offers a thorough background on this topic.
+nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
+offers a thorough background on the topic of intersectionality.
 
 Quantify harms
 ^^^^^^^^^^^^^^
@@ -286,14 +286,16 @@ We mathematically define demographic parity using the following
 set of equations.
 A classifier :math:`h` satisfies demographic parity under a distribution 
 over :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
-independent of the sensitive feature :math:`A`. This is equivalent to
-:math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. :footcite:`agarwal2018reductions`
+independent of the sensitive feature :math:`A`.
+:footcite:cts:`agarwal2018reductions` show that this is equivalent to
+:math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.
 
 In the case of regression, a predictor :math:`f` satisfies demographic parity
 under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
-of the sensitive feature :math:`A`. This is equivalent to
+of the sensitive feature :math:`A`.
+:footcite:cts:`agarwal2019fair` show that this is equivalent to
 :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-:footcite:`agarwal2019fair` Another way to think of demographic parity in a 
+Another way to think of demographic parity in a 
 regression scenario is to compare the average predicted value across groups.
 Note that in the Fairlearn API, :func:`fairlearn.metrics.demographic_parity_difference` 
 is only defined for classification. 
@@ -330,7 +332,8 @@ constraints during the machine learning model training process. However,
 demographic parity may not be well-suited for this purpose because 
 it does not place requirements on the exact distribution of predictions with 
 respect to other important variables. To understand this concept further, 
-consider an example from the Fairness in Machine Learning textbook :footcite:`fairml_book`. 
+consider an example from the Fairness in Machine Learning textbook 
+by :footcite:cts:`barocas2019fairness`:
 
     "However, decisions based on a classifier that satisfies independence can 
     have undesirable properties (and similar arguments apply to other 
@@ -363,12 +366,12 @@ but that trend may disappear or reverse when groups are combined. Known as
 `Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
 outcome may appear when observing disparate outcomes across groups. A 
 famous example of Simpson's Paradox is a study of 1973 graduate school 
-admissions to the University of California, Berkley :footcite:`bickel1975biasinadmissions`. 
+admissions to the University of California, Berkley :footcite:ps:`bickel1975biasinadmissions`. 
 The study showed that when observing admissions by gender, men applying were 
 more likely than women to be accepted. However, drilling down into admissions 
 by department revealed that women tended to apply to departments with more 
 competitive admissions requirements, whereas men tended to apply to less 
-competitive depoartments. The more granular analysis showed only four out of 
+competitive departments. The more granular analysis showed only four out of 
 85 departments exhibited bias against women, and six departments exhibited 
 bias towards men. In general, the data indicated departments exhibited a bias 
 in favor of minority-gendered applicants, which is opposite from the trend 
@@ -428,9 +431,10 @@ set of equations. A classifier :math:`h` satisfies equalized
 odds under a distribution over :math:`(X, A, Y)` if its 
 prediction :math:`h(X)` is
 conditionally independent of the sensitive feature :math:`A` given the label
-:math:`Y`. This is equivalent to
+:math:`Y`.
+:footcite:cts:`agarwal2018reductions` show that this is equivalent to
 :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-:footcite:`agarwal2018reductions` Equalized odds requires that the true 
+Equalized odds requires that the true 
 positive rate, :math:`\P(h(X)=1 | Y=1`, and the false positive rate, 
 :math:`\P(h(X)=1 | Y=0`, be equal across groups. 
 
@@ -470,7 +474,8 @@ Equal opportunity
 ^^^^^^^^^^^^^^^^^
 Equal opportunity is a relaxed version of equalized odds that only considers
 conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-:footcite:`hardt2016equality` Another way of thinking about this metric is 
+:footcite:p:`hardt2016equality`
+Another way of thinking about this metric is 
 requiring equal outcomes only within the subset of records belonging to the 
 positive class. For example, in the hiring example, equal opportunity 
 requires that the individuals who are actually hired have an equal opportunity 
@@ -904,3 +909,9 @@ metrics.
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
     Fairlearn provides some of the existing functionality through
     :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
+
+
+References
+----------
+
+.. footbibliography::
