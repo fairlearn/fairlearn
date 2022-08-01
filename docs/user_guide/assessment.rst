@@ -1,14 +1,18 @@
 Assessment
 ==========
 
-Introduction
-------------
+In this section, we will describe the steps involved in performing a fairness
+assessment, and show how :class:`fairlearn.metrics.MetricFrame` can be
+used to assist in this process.
+
+Performing a Fairness Assessment
+--------------------------------
 
 The goal of fairness assessment is to answer the question: Which groups of 
 people may be disproportionately negatively impacted by an AI system and in 
 what ways?
 
-The steps of the assesment are as follows:
+The steps of the assessment are as follows:
 
 1. Identify types of harms 
 2. Identify the groups that might be harmed 
@@ -43,6 +47,17 @@ to considering groups according to gender and groups according to race, it is
 also important to consider their intersections (e.g., Black women, Latinx 
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
+
+One important thing to note here: we have assumed that every sensitive
+feature is representable by a discrete variable.
+This is not always the case: for example, the melanin content of a
+person's skin (important for tasks such as facial recognition) will
+not be taken from a small number of fixed values.
+For now, features like this have to be binned.
+To minimise the risk of harms being blurred out by the binning,
+analyses should be repeated with the number of bins changed and/or
+the bin edges moved.
+
 
 Quantify harms
 ^^^^^^^^^^^^^^
