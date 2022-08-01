@@ -1,8 +1,10 @@
 Assessment
 ==========
 
+.. currentmodule:: fairlearn.metrics
+
 In this section, we will describe the steps involved in performing a fairness
-assessment, and show how :class:`fairlearn.metrics.MetricFrame` can be
+assessment, and show how :class:`MetricFrame` can be
 used to assist in this process.
 
 Performing a Fairness Assessment
@@ -54,7 +56,7 @@ This is not always the case: for example, the melanin content of a
 person's skin (important for tasks such as facial recognition) will
 not be taken from a small number of fixed values.
 For now, features like this have to be binned.
-To minimise the risk of harms being blurred out by the binning,
+To reduce the risk of harms being blurred out by the binning,
 analyses should be repeated with the number of bins changed and/or
 the bin edges moved.
 
@@ -146,20 +148,39 @@ be drawn from a large enough sample size to draw meaningful conclusions.
       - 0.67
       - N/A
 
-Disaggregated metrics
----------------------
+Metrics & Disaggregated metrics
+-------------------------------
 
-.. currentmodule:: fairlearn.metrics
+Now that we have defined the steps of a fairness analysis, we can look at how
+the :py:mod:`fairlearn.metrics` module can help.
+Obviously, it can only help with the last two steps - quantifying harms and
+comparing those harms between groups.
 
-The :py:mod:`fairlearn.metrics` module provides the means to assess 
-fairness-related metrics for models. This applies for any kind of model that 
-users may already use, but also for models created with mitigation techniques 
-from the :ref:`mitigation` section.
+In the mathematical definitions below, :math:`X` denotes a feature vector 
+used for predictions, :math:`A` will be a single sensitive feature (such as age 
+or race), and :math:`Y` will be the true label.
+Fairness metrics are phrased in terms of expectations with respect to the
+distribution over :math:`(X,A,Y)`.
+Note that :math:`X` and :math:`A` may or may not share columns, dependent on
+whether the model is allowed to 'see' the sensitive features.
+When we need to refer to particular values, we will use lower case letters;
+since we are going to be comparing between groups identified by the
+sensitive feature, :math:`\forall a \in A` will be appearing regularly to
+indicate that a property holds for all identified groups.
 
-At their simplest, metrics take a set of 'true' values :math:`Y_{true}` (from
-the input data) and predicted values :math:`Y_{pred}` (by applying the model
-to the input data), and use these to compute a measure. For example, the
-*recall* or *true positive rate* is given by
+At their simplest, metrics take a vector of 'true objects' :math:`Y_{true}` (from
+the input data) and 'predicted objects' :math:`Y_{pred}` (by applying the model
+to the input data), and use these to compute a measure.
+*We are being deliberately vague* as to what constitutes a 'true object' or a
+'measure' at this point.
+
+For the sake of concreteness, we shall assume for the time being that we
+are working on a binary classification problem, where the two classes have
+labels of 0 and 1.
+We can then use a number of conventional metrics to illustrate the basic
+usage of :class:`MetricFrame`.
+However, we will return to more complex cases later in this discussion.
+For now, the *recall* or *true positive rate* is given by
 
 .. math::
 
@@ -180,14 +201,10 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
     >>> skm.recall_score(y_true, y_pred)
     0.5
 
-.. _metrics_with_grouping:
-
-Disaggregated metrics using :code:`MetricFrame`
---------------------------------------------------------
-
 In a typical fairness assessment, each row of input data will have an associated
-group label :math:`g \in G`, and we will want to know how the metric behaves
-for each group :math:`g`. To help with this, Fairlearn provides a class that takes
+group label :math:`a \in A`, and we will want to know how the metric behaves
+for each group :math:`a`.
+To help with this, Fairlearn provides a class that takes
 an existing (disaggregated) metric function, like 
 :func:`sklearn.metrics.roc_auc_score` or :func:`fairlearn.metrics.false_positive_rate`, 
 and applies it to each group within a set of data.
@@ -254,9 +271,12 @@ We then calculate a metric which shows the subgroups:
     recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
 
 The disaggregated metrics are stored in a :class:`pandas.Series` 
-:code:`grouped_metric.by_group`. Note that the overall recall is the same 
-as that calculated above in the Ungrouped Metric section, while the 'by_group'
-dictionary can be checked against the table above.
+:code:`grouped_metric.by_group`.
+Note that the :meth:`MetricFrame.overall` property has the value of 0.5, as
+we obtained above by applying :py:func:`sklearn.metrics.recall_score` to the
+whole dataset.
+The :meth:`MetricFrame.by_group` property (which we turned into a dictionary
+for display purposes) can be checked against the table above.
 
 In addition to these basic scores, Fairlearn provides
 convenience functions to recover the maximum and minimum values of the metric
