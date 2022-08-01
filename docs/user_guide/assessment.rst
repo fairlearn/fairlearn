@@ -455,12 +455,12 @@ so a result of 1 means there is demographic parity.
     >>> print(demographic_parity_difference(y_true,
     ...                                     y_pred,
     ...                                     sensitive_features=group_membership_data))
-    SOMETHING
+    0.38095...
     >>> from fairlearn.metrics import demographic_parity_ratio
     >>> print(demographic_parity_ratio(y_true,
     ...                                y_pred,
     ...                                sensitive_features=group_membership_data))
-    SOMETHINGELSE
+    0.46666...
 
 
 .. _equalized_odds:
