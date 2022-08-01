@@ -298,11 +298,7 @@ Common fairness metrics
 -----------------------
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
-that some aspects of the predictor behavior be comparable across groups. In 
-the mathematical definitions below, :math:`X` denotes a feature vector 
-used for predictions, :math:`A` be a single sensitive feature (such as age 
-or race), and :math:`Y` be the true label. Fairness metrics are phrased in 
-terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
+that some aspects of the predictor behavior be comparable across groups.
 
 .. _demographic_parity:
 
