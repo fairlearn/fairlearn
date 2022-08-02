@@ -1030,9 +1030,25 @@ entry.
 Inputs are Arrays of Objects
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+:class:`MetricFrame` can also handle cases when the :math:`Y_{true}` and/or :math:`Y_{pred}` vectors
+are not vectors of scalars.
+It is the metric function(s) which gives meaning to these values - :class:`MetricFrame` itself
+just slices the vectors up acorrding to the sensitive feature(s) and the control feature(s).
+
+For a concrete example, consider an image recognition algorithm which draws a bounding box
+around some region of interest.
+We will want to compare the 'true' bounding boxes (perhaps from human annotators) with the
+ones predicted by our model.
+A straightforward metric for this purpose is the IoU or 'intersection divided by union.'
+As the name implies, this metric takes two rectangles, and computes the area of their intersection
+and divides it by the area of their union.
+If the two rectangles are disjoint, then the IoU will be zero.
+If the two rectangles are identical, then the IoU will be one.
+
+See this in the examples gallery.....
 
 
-.. _plot:
+.. _plot_metricframe:
 
 Plotting
 --------
