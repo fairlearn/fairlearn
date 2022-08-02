@@ -688,9 +688,69 @@ Intersecting Groups
 The :class:`MetricFrame` class supports intersectional fairness in two ways:
 multiple sensitive features, and control features.
 Both of these can be used simultaneously.
+One important point to bear in mind when performing an intersectional analysis
+is that some of the intersections may have very few members (or even be empty).
+This can affect the confidence interval associated with the computed metrics.
 
 Multiple Sensitive Features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Multiple sensitive features can be specified when the :class:`MetricFrame`
+is constructed.
+The ``by_groups`` property then holds the intersections of these groups:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6,6,6 ]
+    >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
+    ...                          columns=['SF 0', 'SF 1'])
+    >>> metric_2sf = MetricFrame(metrics=skm.recall_score,
+    ...                          y_true=y_true,
+    ...                          y_pred=y_pred,
+    ...                          sensitive_features=s_f_frame)
+    >>> metric_2sf.overall  # Same as before
+    0.5
+    >>> metric_2sf.by_group
+    SF 0  SF 1
+    a     6       0.000000
+          8       1.000000
+    b     6       0.666667
+          8       0.500000
+    c     6       0.500000
+          8       0.000000
+    Name: recall_score, dtype: float64
+
+If a particular intersection of the sensitive features had no members, then
+the metric would be shown as :code:`NaN` for that intersection.
+Multiple metrics can also be computed at the same time:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> metric_2sf_multi = MetricFrame(
+    ...     metrics={'precision':skm.precision_score,
+    ...              'recall':skm.recall_score,
+    ...              'count': count},
+    ...     y_true=y_true,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=s_f_frame
+    ... )
+    >>> metric_2sf_multi.overall
+    precision     0.6
+    recall        0.5
+    count        18.0
+    dtype: float64
+    >>> metric_2sf_multi.by_group
+               precision    recall  count
+    SF 0 SF 1
+    a    6      0.000000  0.000000    2.0
+         8      0.500000  1.000000    2.0
+    b    6      1.000000  0.666667    3.0
+         8      1.000000  0.500000    3.0
+    c    6      0.666667  0.500000    6.0
+         8      0.000000  0.000000    2.0
+
 
 Control Features
 ^^^^^^^^^^^^^^^^
@@ -800,6 +860,9 @@ each value of the control feature.
 For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
+
+Finally, a :class:`MetricFrame` can use multiple control features, multiple
+sensitive features and multiple metric functions simultaneously.
 
 
 Extra Arguments to Metric functions
@@ -954,37 +1017,6 @@ in combination with a :code:`MetricFrame` as follows:
 Multiple sensitive features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Finally, multiple sensitive features can be specified. The ``by_groups`` 
-property then holds the intersections of these groups:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
-    >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
-    ...                          columns=['SF 0', 'SF 1'])
-    >>> metric_2sf = MetricFrame(metrics=skm.recall_score,
-    ...                          y_true=y_true,
-    ...                          y_pred=y_pred,
-    ...                          sensitive_features=s_f_frame)
-    >>> metric_2sf.overall  # Same as before
-    0.5
-    >>> metric_2sf.by_group
-    SF 0  SF 1
-    a     6       0.0
-          8       NaN
-    b     6       0.5
-          8       0.5
-    c     6       1.0
-          8       0.5
-    d     6       0.0
-          8       0.0
-    Name: recall_score, dtype: float64
-
-With such a small number of samples, we are obviously running into cases where
-there are no members in a particular combination of sensitive features. In this
-case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
-that there were no samples in it.
 
 .. _control_features_metrics:
 
