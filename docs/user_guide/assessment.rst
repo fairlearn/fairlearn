@@ -180,7 +180,7 @@ labels of 0 and 1.
 We can then use a number of conventional metrics to illustrate the basic
 usage of :class:`MetricFrame`.
 However, we will return to more complex cases later in this discussion.
-For now, the *recall* or *true positive rate* is given by
+For now, consider the *recall* or *true positive rate*, which is given by
 
 .. math::
 
@@ -205,7 +205,7 @@ In a typical fairness assessment, each row of input data will have an associated
 group label :math:`a \in A`, and we will want to know how the metric behaves
 for each group :math:`a`.
 To help with this, Fairlearn provides a class that takes
-an existing (disaggregated) metric function, like 
+an existing metric function, like 
 :func:`sklearn.metrics.roc_auc_score` or :func:`fairlearn.metrics.false_positive_rate`, 
 and applies it to each group within a set of data.
 
@@ -292,6 +292,17 @@ across groups and also the difference and ratio between the maximum and minimum:
     difference in recall =  0.75
     >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
     ratio in recall =  0.0
+
+The difference and ratio calculations can also be made relative to the
+overall value, rather than the largest and smallest values of
+:meth:`MetricFrame.by_group`.
+We simply change the value of the :code:`method` argument:
+
+.. doctest:: assessment_metrics
+    >>> print(grouped_metric.difference(method='to_overall'))
+    TBD
+    >>> print(grouped_metric.ratio(method='to_overall'))    
+    TBD
 
 
 Common fairness metrics
@@ -523,6 +534,13 @@ However, equalized odds makes the assumption
 that the target variable :math:`Y` is a good measurement of the phenomena 
 being modeled, but that assumption may not hold if the measurement does not 
 satisfy the requirements of construct validity.
+
+Similar to the demographic parity case, Fairlearn provides
+:func:`equalized_odds_difference` and :func:`equalized_odds_ratio`
+to help with these calculations.
+However, since equalized odds is based on both the true positive and
+false positive rates, there is an extra step in order to return
+a single scalar result.
 
 .. _equal_opportunity:
 
