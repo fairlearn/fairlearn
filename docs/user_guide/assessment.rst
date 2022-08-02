@@ -1045,7 +1045,7 @@ and divides it by the area of their union.
 If the two rectangles are disjoint, then the IoU will be zero.
 If the two rectangles are identical, then the IoU will be one.
 
-See this in the examples gallery.....
+See our `example notebook <../auto_examples/plot_metricframe_beyond_binary_classification.html#non-scalar-inputs>`_.
 
 
 .. _plot_metricframe:
