@@ -978,52 +978,6 @@ Inputs are Arrays of Objects
 
 
 
-End of Edits
-============
-
-
-Multiclass metrics
-^^^^^^^^^^^^^^^^^^
-
-We may also be interested in multiclass classification. However, typical group
-fairness metrics such as equalized odds and demographic parity are only defined
-for binary classification. One way to measure fairness in the multiclass
-scenario is to define one-to-one or one-to-rest classifications for each group
-and calculate the metrics on this instead. Alternatively, we can use predefined
-metrics for multiclass classification. For example, accuracy is a multiclass
-metric that we can use through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
-in combination with a :code:`MetricFrame` as follows:
-
-.. doctest:: assessment_metrics
-
-    >>> from sklearn.metrics import accuracy_score
-    >>> from fairlearn.metrics import MetricFrame
-    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
-    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
-    >>> mf = MetricFrame(metric=accuracy_score,
-    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
-    ...                  sensitive_features=group_membership_data)
-    >>> print(mf.by_group) # series with accuracy for each sensitive group
-    sensitive_feature_0
-    a    1.000000
-    b    0.500000
-    c    0.428571
-    d    1.000000
-    Name: accuracy_score, dtype: float64
-    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
-    0.5714285714285714
-
-
-Multiple sensitive features
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-.. _control_features_metrics:
-
-Control features for grouped metrics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
 .. _plot:
 
 Plotting
