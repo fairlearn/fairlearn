@@ -299,9 +299,10 @@ overall value, rather than the largest and smallest values of
 We simply change the value of the :code:`method` argument:
 
 .. doctest:: assessment_metrics
-    >>> print(grouped_metric.difference(method='to_overall'))
+
+    >>> grouped_metric.difference(method='to_overall')
     TBD
-    >>> print(grouped_metric.ratio(method='to_overall'))    
+    >>> grouped_metric.ratio(method='to_overall')
     TBD
 
 
@@ -647,9 +648,6 @@ For example :code:`fairlearn.metrics.accuracy_score_difference` and
 :code:`fairlearn.metrics.precision_score_group_min`.
 
 
-
-
-
 Multiple metrics in a single :code:`MetricFrame`
 ------------------------------------------------
 
@@ -671,6 +669,7 @@ be used to show each group's size:
     >>> multi_metric.overall
     precision    0.5555...
     recall       0.5...
+    count        10
     dtype: float64
     >>> multi_metric.by_group
                          precision  recall  count
@@ -680,8 +679,49 @@ be used to show each group's size:
     c                          0.6    0.75    7.0
     d                          0.0    0.00    3.0
 
+
+
+Extra Arguments to Metric functions
+-----------------------------------
+
+The metric functions supplied to :class:`MetricFrame` might require additional
+arguments.
+These fall into two categories: 'scalar' arguments (which affect the operation
+of the metric function), and 'per-sample' arguments (such as sample weights).
+Different approaches are required to use each of these.
+
+Scalar Arguments
+^^^^^^^^^^^^^^^^
+
+We do not directly support scalar arguments for the metric functions.
+If these are required, then use :func:`functools.partial` to prebind the
+required arguments to the metric function:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> import functools
+    >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
+    >>> metric_beta = MetricFrame(metrics=fbeta_06,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
+    ...                           sensitive_features=group_membership_data)
+    >>> metric_beta.overall
+    0.5396825396825397
+    >>> metric_beta.by_group
+    sensitive_feature_0
+    a    0...
+    b    0.7906...
+    c    0.6335...
+    d    0...
+    Name: metric, dtype: float64
+
+
+Per-Sample Arguments
+^^^^^^^^^^^^^^^^^^^^
+
 If there are per-sample arguments (such as sample weights), these can also be 
-provided in a dictionary via the ``sample_params`` argument.:
+provided in a dictionary via the ``sample_params`` argument:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -706,32 +746,32 @@ provided in a dictionary via the ``sample_params`` argument.:
 If multiple metrics are being evaluated, then ``sample_params`` becomes a 
 dictionary of dictionaries, with the first key corresponding matching that in 
 the dictionary holding the desired underlying metric functions.
-
-Non-sample parameters
-^^^^^^^^^^^^^^^^^^^^^
-
-We do not support non-sample parameters at the current time. If these are 
-required, then use :func:`functools.partial` to prebind the required arguments 
-to the metric function:
+For example:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> import functools
-    >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
-    >>> metric_beta = MetricFrame(metrics=fbeta_06,
-    ...                           y_true=y_true,
-    ...                           y_pred=y_pred,
-    ...                           sensitive_features=group_membership_data)
-    >>> metric_beta.overall
-    0.5396825396825397
-    >>> metric_beta.by_group
-    sensitive_feature_0
-    a    0...
-    b    0.7906...
-    c    0.6335...
-    d    0...
-    Name: metric, dtype: float64
+    >>> s_w_2 = [3, 1, 2, 3, 2, 3, 1, 4, 1, 2, 3, 1, 2, 1, 4, 2]
+    >>> metrics = {
+    ...    'recall' : skm.recall_score,
+    ...    'recall_weighted' : skm.recall_score,
+    ...    'recall_weight_2' : skm.recall_score
+    ... }
+    >>> s_p = {
+    ...     'recall_weighted' : { 'sample_weight':s_w },
+    ...     'recall_weight_2' : { 'sample_weight':s_w_2 }
+    ... }
+    >>> weighted = MetricFrame(metrics=metrics,
+    ...                        y_true=y_true,
+    ...                        y_pred=y_pred,
+    ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
+    ...                        sample_params=s_p)
+    >>> weighted.overall
+    TBD
+    >>> weighted.by_group
+    TBD
+
+
 
 Multiclass metrics
 ^^^^^^^^^^^^^^^^^^
