@@ -681,6 +681,22 @@ be used to show each group's size:
 
 
 
+Intersecting Groups
+-------------------
+
+The :class:`MetricFrame` class supports intersectional fairness in two ways:
+multiple sensitive features, and control features.
+Both of these can be used simultaneously.
+
+Multiple Sensitive Features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Control Features
+^^^^^^^^^^^^^^^^
+
+
+
+
 Extra Arguments to Metric functions
 -----------------------------------
 
@@ -771,6 +787,26 @@ For example:
     >>> weighted.by_group
     TBD
 
+
+More Complex Metrics
+--------------------
+
+So far, we have stuck to relatively simple cases, where the inputs are 1-D vectors of scalars,
+and the metric functions return scalar values.
+However, this need not be the case - we noted above that we were going to be vague as to the
+contents of the input vectors and the return value of the metric function.
+
+Metric Function Returns Non-Scalar
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Inputs are Arrays of Objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+End of Edits
+============
 
 
 Multiclass metrics
