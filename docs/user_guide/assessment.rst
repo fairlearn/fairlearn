@@ -196,8 +196,8 @@ of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
 .. doctest:: assessment_metrics
 
     >>> import sklearn.metrics as skm
-    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
-    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
     >>> skm.recall_score(y_true, y_pred)
     0.5
 
@@ -230,30 +230,32 @@ labels, denoted by the "group_membership_data" column:
 
     >>> import numpy as np
     >>> import pandas as pd
-    >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c',
-    ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
+    >>> group_membership_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...                          'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
     >>> pd.set_option('display.max_columns', 20)
     >>> pd.set_option('display.width', 80)
     >>> pd.DataFrame({ 'y_true': y_true,
     ...                'y_pred': y_pred,
     ...                'group_membership_data': group_membership_data})
         y_true  y_pred group_membership_data
-    0        0       0                     d
-    1        1       0                     a
-    2        1       1                     c
+    0        0       0                     b
+    1        1       0                     b
+    2        1       1                     a
     3        1       0                     b
     4        1       1                     b
     5        0       1                     c
     6        1       1                     c
     7        0       0                     c
-    8        1       0                     b
-    9        0       1                     d
+    8        1       0                     a
+    9        0       1                     a
     10       0       1                     c
     11       0       1                     a
     12       1       1                     b
-    13       1       0                     d
+    13       1       0                     c
     14       1       0                     c
-    15       1       1                     c
+    15       1       1                     b
+    16       1       1                     c
+    17       1       0                     c
     <BLANKLINE>
 
 We then calculate a metric which shows the subgroups:
@@ -268,7 +270,7 @@ We then calculate a metric which shows the subgroups:
     >>> print("Overall recall = ", grouped_metric.overall)
     Overall recall =  0.5
     >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
-    recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
+    recall by groups =  {'a': 0.5, 'b': 0.6, 'c': 0.4}
 
 The disaggregated metrics are stored in a :class:`pandas.Series` 
 :code:`grouped_metric.by_group`.
@@ -285,13 +287,13 @@ across groups and also the difference and ratio between the maximum and minimum:
 .. doctest:: assessment_metrics
 
     >>> print("min recall over groups = ", grouped_metric.group_min())
-    min recall over groups =  0.0
+    min recall over groups =  0.4
     >>> print("max recall over groups = ", grouped_metric.group_max())
-    max recall over groups =  0.75
-    >>> print("difference in recall = ", grouped_metric.difference(method='between_groups'))
-    difference in recall =  0.75
-    >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
-    ratio in recall =  0.0
+    max recall over groups =  0.6
+    >>> print("difference in recall = {:3f}".format(grouped_metric.difference(method='between_groups')))
+    difference in recall = 0.200000
+    >>> print("ratio in recall = {:3f}".format(grouped_metric.ratio(method='between_groups')))    
+    ratio in recall = 0.666667
 
 The difference and ratio calculations can also be made relative to the
 overall value, rather than the largest and smallest values of
@@ -300,10 +302,10 @@ We simply change the value of the :code:`method` argument:
 
 .. doctest:: assessment_metrics
 
-    >>> grouped_metric.difference(method='to_overall')
-    TBD
-    >>> grouped_metric.ratio(method='to_overall')
-    TBD
+    >>> print('{:3f}'.format(grouped_metric.difference(method='to_overall')))
+    0.100000
+    >>> print('{:3f}'.format(grouped_metric.ratio(method='to_overall')))
+    0.800000
 
 
 Common fairness metrics
@@ -467,12 +469,12 @@ so a result of 1 means there is demographic parity.
     >>> print(demographic_parity_difference(y_true,
     ...                                     y_pred,
     ...                                     sensitive_features=group_membership_data))
-    0.38095...
+    0.25
     >>> from fairlearn.metrics import demographic_parity_ratio
     >>> print(demographic_parity_ratio(y_true,
     ...                                y_pred,
     ...                                sensitive_features=group_membership_data))
-    0.46666...
+    0.66666...
 
 
 .. _equalized_odds:
@@ -556,12 +558,12 @@ We then return the larger of these two differences.
     >>> print(equalized_odds_difference(y_true,
     ...                                 y_pred,
     ...                                 sensitive_features=group_membership_data))
-    TBD
+    1.0
     >>> from fairlearn.metrics import equalized_odds_ratio
     >>> print(equalized_odds_ratio(y_true,
     ...                            y_pred,
     ...                            sensitive_features=group_membership_data))
-    TBD
+    0.0
 
 
 
@@ -611,12 +613,12 @@ the requested aggregation. For example:
     ...                                        transform='difference')
     >>> recall_difference(y_true, y_pred,
     ...                   sensitive_features=group_membership_data)
-    0.752525...
+    0.19999...
     >>> MetricFrame(metrics=skm.recall_score,
     ...             y_true=y_true,
     ...             y_pred=y_pred,
     ...             sensitive_features=group_membership_data).difference()
-    0.752525...
+    0.19999...
 
 We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
 of such functions which will be commonly used:
@@ -667,17 +669,16 @@ be used to show each group's size:
     ...                             y_true, y_pred,
     ...                             sensitive_features=group_membership_data)
     >>> multi_metric.overall
-    precision    0.5555...
-    recall       0.5...
-    count        10
+    precision     0.6
+    recall        0.5
+    count        18.0
     dtype: float64
     >>> multi_metric.by_group
                          precision  recall  count
     sensitive_feature_0
-    a                          0.0    0.00    2.0
-    b                          1.0    0.50    4.0
-    c                          0.6    0.75    7.0
-    d                          0.0    0.00    3.0
+    a                     0.333333     0.5    4.0
+    b                     1.000000     0.6    6.0
+    c                     0.500000     0.4    8.0
 
 
 
@@ -694,7 +695,111 @@ Multiple Sensitive Features
 Control Features
 ^^^^^^^^^^^^^^^^
 
+Control features (sometimes called 'conditional' features) enable more detailed
+fairness insights by providing a further means of splitting the data into
+subgroups.
+When the data are split into subgroups, control features (if provided) act
+similarly to sensitive features.
+However, the 'overall' value for the metric is now computed for each subgroup
+of the control feature(s).
+Similarly, the aggregation functions (such as :code:`MetricFrame.group_max`) are
+performed for each subgroup in the conditional feature(s), rather than across
+them (as happens with the sensitive features).
 
+Control features are useful for cases where there is some expected variation with
+a feature, so we need to compute disparities while controlling for that feature.
+For example, in a loan scenario we would expect people of differing incomes to
+be approved at different rates, but within each income band we would still
+want to measure disparities between different sensitive features.
+**However**, it should be borne in mind that due to historic discrimination, the
+income band might be correlated with various sensitive features.
+Because of this, control features should be used with particular caution.
+
+The :class:`MetricFrame` constructor allows us to specify control features in
+a manner similar to sensitive features, using a :code:`control_features=`
+parameter:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> decision = [
+    ...    0,0,0,1,1,0,1,1,0,1,
+    ...    0,1,0,1,0,1,0,1,0,1,
+    ...    0,1,1,0,1,1,1,1,1,0
+    ... ]
+    >>> prediction = [
+    ...    1,1,0,1,1,0,1,0,1,0,
+    ...    1,0,1,0,1,1,1,0,0,0,
+    ...    1,1,1,0,0,1,1,0,0,1
+    ... ]
+    >>> control_feature = [
+    ...    'H','L','H','L','H','L','L','H','H','L',
+    ...    'L','H','H','L','L','H','L','L','H','H',
+    ...    'L','H','L','L','H','H','L','L','H','L'
+    ... ]
+    >>> sensitive_feature = [
+    ...    'A','B','B','C','C','B','A','A','B','A',
+    ...    'C','B','C','A','C','C','B','B','C','A',
+    ...    'B','B','C','A','B','A','B','B','A','A'
+    ... ]
+    >>> metric_c_f = MetricFrame(metrics=skm.accuracy_score,
+    ...                          y_true=decision,
+    ...                          y_pred=prediction,
+    ...                          sensitive_features={'SF' : sensitive_feature},
+    ...                          control_features={'CF' : control_feature})
+    >>> # The 'overall' property is now split based on the control feature
+    >>> metric_c_f.overall
+    CF
+    H    0.4285...
+    L    0.375...
+    Name: accuracy_score, dtype: float64
+    >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
+    >>> metric_c_f.by_group
+    CF  SF
+    H   A     0.2...
+        B     0.4...
+        C     0.75...
+    L   A     0.4...
+        B     0.2857...
+        C     0.5...
+    Name: accuracy_score, dtype: float64
+
+Note how the :attr:`MetricFrame.overall` property is stratified based on the
+supplied control feature. The :attr:`MetricFrame.by_group` property allows
+us to see disparities between the groups in the sensitive feature for each
+group in the control feature.
+When displayed like this, :attr:`MetricFrame.by_group` looks similar to
+how it would if we had specified two sensitive features (although the
+control features will always be at the top level of the hierarchy).
+
+With the :class:`MetricFrame` computed, we can perform aggregations:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> # See the maximum accuracy for each value of the control feature
+    >>> metric_c_f.group_max()
+    CF
+    H    0.75
+    L    0.50
+    Name: accuracy_score, dtype: float64
+    >>> # See the maximum difference in accuracy for each value of the control feature
+    >>> metric_c_f.difference(method='between_groups')
+    CF
+    H    0.55...
+    L    0.2142...
+    Name: accuracy_score, dtype: float64
+
+In each case, rather than a single scalar, we receive one result for each
+subgroup identified by the conditional feature. The call
+:code:`metric_c_f.group_max()` call shows the maximum value of the metric across
+the subgroups of the sensitive feature within each value of the control feature.
+Similarly, :code:`metric_c_f.difference(method='between_groups')` call shows the
+maximum difference between the subgroups of the sensitive feature within
+each value of the control feature.
+For more examples, please
+see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
+:ref:`examples`.
 
 
 Extra Arguments to Metric functions
@@ -723,13 +828,12 @@ required arguments to the metric function:
     ...                           y_pred=y_pred,
     ...                           sensitive_features=group_membership_data)
     >>> metric_beta.overall
-    0.5396825396825397
+    0.56983...
     >>> metric_beta.by_group
     sensitive_feature_0
-    a    0...
-    b    0.7906...
-    c    0.6335...
-    d    0...
+    a    0.365591
+    b    0.850000
+    c    0.468966
     Name: metric, dtype: float64
 
 
@@ -742,7 +846,7 @@ provided in a dictionary via the ``sample_params`` argument:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
+    >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3, 1, 1]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(metrics=skm.recall_score,
     ...                        y_true=y_true,
@@ -750,13 +854,12 @@ provided in a dictionary via the ``sample_params`` argument:
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
-    0.45
+    0.45...
     >>> weighted.by_group
     SF 0
-    a    0...
-    b    0.5...
-    c    0.7142...
-    d    0...
+    a    0.500000
+    b    0.583333
+    c    0.250000
     Name: recall_score, dtype: float64
 
 If multiple metrics are being evaluated, then ``sample_params`` becomes a 
@@ -767,7 +870,7 @@ For example:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> s_w_2 = [3, 1, 2, 3, 2, 3, 1, 4, 1, 2, 3, 1, 2, 1, 4, 2]
+    >>> s_w_2 = [3, 1, 2, 3, 2, 3, 1, 4, 1, 2, 3, 1, 2, 1, 4, 2, 2, 3]
     >>> metrics = {
     ...    'recall' : skm.recall_score,
     ...    'recall_weighted' : skm.recall_score,
@@ -783,9 +886,16 @@ For example:
     ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
-    TBD
+    recall             0.500000
+    recall_weighted    0.454545
+    recall_weight_2    0.458333
+    dtype: float64
     >>> weighted.by_group
-    TBD
+          recall  recall_weighted  recall_weight_2
+    SF 0
+    a        0.5         0.500000         0.666667
+    b        0.6         0.583333         0.600000
+    c        0.4         0.250000         0.272727
 
 
 More Complex Metrics
@@ -881,111 +991,6 @@ that there were no samples in it.
 Control features for grouped metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Control features (sometimes called 'conditional' features) enable more detailed
-fairness insights by providing a further means of splitting the data into
-subgroups.
-When the data are split into subgroups, control features (if provided) act
-similarly to sensitive features.
-However, the 'overall' value for the metric is now computed for each subgroup
-of the control feature(s).
-Similarly, the aggregation functions (such as :code:`MetricFrame.group_max`) are
-performed for each subgroup in the conditional feature(s), rather than across
-them (as happens with the sensitive features).
-
-Control features are useful for cases where there is some expected variation with
-a feature, so we need to compute disparities while controlling for that feature.
-For example, in a loan scenario we would expect people of differing incomes to
-be approved at different rates, but within each income band we would still
-want to measure disparities between different sensitive features. However, it
-should be borne in mind that due to historic discrimination, the income band
-might be correlated with various sensitive features. Because of this, control
-features should be used with particular caution.
-
-The :class:`MetricFrame` constructor allows us to specify control features in
-a manner similar to sensitive features, using a :code:`control_features=`
-parameter:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> decision = [
-    ...    0,0,0,1,1,0,1,1,0,1,
-    ...    0,1,0,1,0,1,0,1,0,1,
-    ...    0,1,1,0,1,1,1,1,1,0
-    ... ]
-    >>> prediction = [
-    ...    1,1,0,1,1,0,1,0,1,0,
-    ...    1,0,1,0,1,1,1,0,0,0,
-    ...    1,1,1,0,0,1,1,0,0,1
-    ... ]
-    >>> control_feature = [
-    ...    'H','L','H','L','H','L','L','H','H','L',
-    ...    'L','H','H','L','L','H','L','L','H','H',
-    ...    'L','H','L','L','H','H','L','L','H','L'
-    ... ]
-    >>> sensitive_feature = [
-    ...    'A','B','B','C','C','B','A','A','B','A',
-    ...    'C','B','C','A','C','C','B','B','C','A',
-    ...    'B','B','C','A','B','A','B','B','A','A'
-    ... ]
-    >>> metric_c_f = MetricFrame(metrics=skm.accuracy_score,
-    ...                          y_true=decision,
-    ...                          y_pred=prediction,
-    ...                          sensitive_features={'SF' : sensitive_feature},
-    ...                          control_features={'CF' : control_feature})
-    >>> # The 'overall' property is now split based on the control feature
-    >>> metric_c_f.overall
-    CF
-    H    0.4285...
-    L    0.375...
-    Name: accuracy_score, dtype: float64
-    >>> # The 'by_group' property looks similar to how it would if we had two sensitive features
-    >>> metric_c_f.by_group
-    CF  SF
-    H   A     0.2...
-        B     0.4...
-        C     0.75...
-    L   A     0.4...
-        B     0.2857...
-        C     0.5...
-    Name: accuracy_score, dtype: float64
-
-Note how the :attr:`MetricFrame.overall` property is stratified based on the
-supplied control feature. The :attr:`MetricFrame.by_group` property allows
-us to see disparities between the groups in the sensitive feature for each
-group in the control feature.
-When displayed like this, :attr:`MetricFrame.by_group` looks similar to
-how it would if we had specified two sensitive features (although the
-control features will always be at the top level of the hierarchy).
-
-With the :class:`MetricFrame` computed, we can perform aggregations:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> # See the maximum accuracy for each value of the control feature
-    >>> metric_c_f.group_max()
-    CF
-    H    0.75
-    L    0.50
-    Name: accuracy_score, dtype: float64
-    >>> # See the maximum difference in accuracy for each value of the control feature
-    >>> metric_c_f.difference(method='between_groups')
-    CF
-    H    0.55...
-    L    0.2142...
-    Name: accuracy_score, dtype: float64
-
-In each case, rather than a single scalar, we receive one result for each
-subgroup identified by the conditional feature. The call
-:code:`metric_c_f.group_max()` call shows the maximum value of the metric across
-the subgroups of the sensitive feature within each value of the control feature.
-Similarly, :code:`metric_c_f.difference(method='between_groups')` call shows the
-maximum difference between the subgroups of the sensitive feature within
-each value of the control feature.
-For more examples, please
-see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
-:ref:`examples`.
 
 .. _plot:
 
