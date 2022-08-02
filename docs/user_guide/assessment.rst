@@ -581,6 +581,72 @@ capture the costs of missclassification disparities.
 
 
 
+.. _scalar_metric_results:
+
+Scalar results from :code:`MetricFrame`
+---------------------------------------
+
+Higher level machine learning algorithms (such as hyperparameter tuners) often
+make use of metric functions to guide their optimisations.
+Such algorithms generally work with scalar results, so if we want the tuning
+to be done on the basis of our fairness metrics, we need to perform aggregations
+over the :class:`MetricFrame`.
+
+We provide a convenience function, :func:`fairlearn.metrics.make_derived_metric`,
+to generate scalar-producing metric functions based on the aggregation methods
+mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
+:meth:`MetricFrame.difference`, and :meth:`MetricFrame.ratio`).
+This takes an underlying metric function, the name of the desired transformation, and
+optionally a list of parameter names which should be treated as sample aligned parameters
+(such as `sample_weight`).
+The result is a function which builds the :class:`MetricFrame` internally and performs
+the requested aggregation. For example:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import make_derived_metric
+    >>> recall_difference = make_derived_metric(metric=skm.recall_score,
+    ...                                        transform='difference')
+    >>> recall_difference(y_true, y_pred,
+    ...                   sensitive_features=group_membership_data)
+    0.752525...
+    >>> MetricFrame(metrics=skm.recall_score,
+    ...             y_true=y_true,
+    ...             y_pred=y_pred,
+    ...             sensitive_features=group_membership_data).difference()
+    0.752525...
+
+We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
+of such functions which will be commonly used:
+
+=============================================== ================= ================= ================== =============
+Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
+=============================================== ================= ================= ================== =============
+:func:`.false_negative_rate`                    .                 .                 Y                  Y
+:func:`.false_positive_rate`                    .                 .                 Y                  Y
+:func:`.selection_rate`                         .                 .                 Y                  Y
+:func:`.true_negative_rate`                     .                 .                 Y                  Y
+:func:`.true_positive_rate`                     .                 .                 Y                  Y
+:func:`sklearn.metrics.accuracy_score`          Y                 .                 Y                  Y
+:func:`sklearn.metrics.balanced_accuracy_score` Y                 .                 .                  .
+:func:`sklearn.metrics.f1_score`                Y                 .                 .                  .
+:func:`sklearn.metrics.log_loss`                .                 Y                 .                  .
+:func:`sklearn.metrics.mean_absolute_error`     .                 Y                 .                  .
+:func:`sklearn.metrics.mean_squared_error`      .                 Y                 .                  .
+:func:`sklearn.metrics.precision_score`         Y                 .                 .                  .
+:func:`sklearn.metrics.r2_score`                Y                 .                 .                  .
+:func:`sklearn.metrics.recall_score`            Y                 .                 .                  .
+:func:`sklearn.metrics.roc_auc_score`           Y                 .                 .                  .
+:func:`sklearn.metrics.zero_one_loss`           .                 Y                 Y                  Y
+=============================================== ================= ================= ================== =============
+
+The names of the generated functions are of the form
+:code:`fairlearn.metrics.<base_metric>_<transformation>`.
+For example :code:`fairlearn.metrics.accuracy_score_difference` and
+:code:`fairlearn.metrics.precision_score_group_min`.
+
+
 
 
 
@@ -733,76 +799,6 @@ With such a small number of samples, we are obviously running into cases where
 there are no members in a particular combination of sensitive features. In this
 case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
 that there were no samples in it.
-
-.. _scalar_metric_results:
-
-Scalar results from :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Higher level machine learning algorithms (such as hyperparameter tuners) often
-make use of metric functions to guide their optimisations.
-Such algorithms generally work with scalar results, so if we want the tuning
-to be done on the basis of our fairness metrics, we need to perform aggregations
-over the :class:`MetricFrame`.
-
-We provide a convenience function, :func:`fairlearn.metrics.make_derived_metric`,
-to generate scalar-producing metric functions based on the aggregation methods
-mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
-:meth:`MetricFrame.difference`, and :meth:`MetricFrame.ratio`).
-This takes an underlying metric function, the name of the desired transformation, and
-optionally a list of parameter names which should be treated as sample aligned parameters
-(such as `sample_weight`).
-Other parameters will be passed to the underlying metric function normally (unlike
-:class:`MetricFrame` where :func:`functools.partial` must be used, as noted above).
-The result is a function which builds the :class:`MetricFrame` internally and performs
-the requested aggregation. For example:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from fairlearn.metrics import make_derived_metric
-    >>> fbeta_difference = make_derived_metric(metric=skm.fbeta_score,
-    ...                                        transform='difference')
-    >>> # Don't need functools.partial for make_derived_metric
-    >>> fbeta_difference(y_true, y_pred, beta=0.7,
-    ...                  sensitive_features=group_membership_data)
-    0.752525...
-    >>> # But as noted above, functools.partial is needed for MetricFrame
-    >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
-    >>> MetricFrame(metrics=fbeta_07,
-    ...             y_true=y_true,
-    ...             y_pred=y_pred,
-    ...             sensitive_features=group_membership_data).difference()
-    0.752525...
-
-We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
-of such functions which will be commonly used:
-
-=============================================== ================= ================= ================== =============
-Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
-=============================================== ================= ================= ================== =============
-:func:`.false_negative_rate`                    .                 .                 Y                  Y
-:func:`.false_positive_rate`                    .                 .                 Y                  Y
-:func:`.selection_rate`                         .                 .                 Y                  Y
-:func:`.true_negative_rate`                     .                 .                 Y                  Y
-:func:`.true_positive_rate`                     .                 .                 Y                  Y
-:func:`sklearn.metrics.accuracy_score`          Y                 .                 Y                  Y
-:func:`sklearn.metrics.balanced_accuracy_score` Y                 .                 .                  .
-:func:`sklearn.metrics.f1_score`                Y                 .                 .                  .
-:func:`sklearn.metrics.log_loss`                .                 Y                 .                  .
-:func:`sklearn.metrics.mean_absolute_error`     .                 Y                 .                  .
-:func:`sklearn.metrics.mean_squared_error`      .                 Y                 .                  .
-:func:`sklearn.metrics.precision_score`         Y                 .                 .                  .
-:func:`sklearn.metrics.r2_score`                Y                 .                 .                  .
-:func:`sklearn.metrics.recall_score`            Y                 .                 .                  .
-:func:`sklearn.metrics.roc_auc_score`           Y                 .                 .                  .
-:func:`sklearn.metrics.zero_one_loss`           .                 Y                 Y                  Y
-=============================================== ================= ================= ================== =============
-
-The names of the generated functions are of the form
-:code:`fairlearn.metrics.<base_metric>_<transformation>`.
-For example :code:`fairlearn.metrics.accuracy_score_difference` and
-:code:`fairlearn.metrics.precision_score_group_min`.
 
 .. _control_features_metrics:
 
