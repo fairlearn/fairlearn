@@ -972,6 +972,60 @@ contents of the input vectors and the return value of the metric function.
 Metric Function Returns Non-Scalar
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Metric functions need not return a scalar value.
+A straightforward example of this is the confusion matrix.
+Such return values are fully supported by :class:`MetricFrame`:
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf_conf = MetricFrame(
+    ...    metrics=skm.confusion_matrix,
+    ...    y_true=y_true,
+    ...    y_pred=y_pred,
+    ...    sensitive_features=group_membership_data
+    ... )
+    >>> mf_conf.overall
+    array([[2, 4],
+           [6, 6]], dtype=int64)
+    >>> mf_conf.by_group
+    sensitive_feature_0
+    a    [[0, 2], [1, 1]]
+    b    [[1, 0], [2, 3]]
+    c    [[1, 2], [3, 2]]
+    Name: confusion_matrix, dtype: object
+
+Obviously for such cases, operations such as :meth:`MetricFrame.difference` have no meaning.
+However, if scalar-returning metrics are also present, they will still be calculated:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf_conf_recall = MetricFrame(
+    ...    metrics={ 'conf_mat':skm.confusion_matrix, 'recall':skm.recall_score },
+    ...    y_true=y_true,
+    ...    y_pred=y_pred,
+    ...    sensitive_features=group_membership_data
+    ... )
+    >>> mf_conf_recall.overall
+    conf_mat    [[2, 4], [6, 6]]
+    recall                   0.5
+    dtype: object
+    >>> mf_conf_recall.by_group
+                                 conf_mat  recall
+    sensitive_feature_0
+    a                    [[0, 2], [1, 1]]     0.5
+    b                    [[1, 0], [2, 3]]     0.6
+    c                    [[1, 2], [3, 2]]     0.4
+    >>> mf_conf_recall.difference()
+    conf_mat    None
+    recall       0.2
+    dtype: object
+
+We see that the difference between group recall scores has been calculated, while a value of
+:code:`None` has been returned for the meaningless 'maximum difference between two confusion matrices'
+entry.
 
 Inputs are Arrays of Objects
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
