@@ -529,7 +529,7 @@ well for different groups. Another way to think about equalized odds is to
 contrast it with demographic parity. While demographic parity assesses the 
 allocation of resources generally, equalized odds focuses on the allocation 
 of resources that were actually distributed to 
-members of that group (indicated by the positive target variable Y=1). 
+members of that group (indicated by the positive target variable :math:`Y=1``). 
 However, equalized odds makes the assumption 
 that the target variable :math:`Y` is a good measurement of the phenomena 
 being modeled, but that assumption may not hold if the measurement does not 
@@ -541,6 +541,28 @@ to help with these calculations.
 However, since equalized odds is based on both the true positive and
 false positive rates, there is an extra step in order to return
 a single scalar result.
+For :func:`equalized_odds_difference`, we first calculate the
+true positive rate difference and the true negative rate difference
+separately.
+We then return the larger of these two differences.
+*Mutatis mutandis*, :func:`equalized_odds_ratio` works similarly.
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import equalized_odds_difference
+    >>> print(equalized_odds_difference(y_true,
+    ...                                 y_pred,
+    ...                                 sensitive_features=group_membership_data))
+    TBD
+    >>> from fairlearn.metrics import equalized_odds_ratio
+    >>> print(equalized_odds_ratio(y_true,
+    ...                            y_pred,
+    ...                            sensitive_features=group_membership_data))
+    TBD
+
+
 
 .. _equal_opportunity:
 
@@ -556,6 +578,10 @@ requires that the individuals who are actually hired have an equal opportunity
 of being hired in the first place. However, by not considering whether false 
 positive rates are equivalent across groups, equal opportunity does not 
 capture the costs of missclassification disparities.
+
+
+
+
 
 
 Multiple metrics in a single :code:`MetricFrame`
