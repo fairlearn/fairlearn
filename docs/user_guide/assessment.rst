@@ -90,10 +90,7 @@ describes how to determine whether a
 proxy variable measures the intended construct in a meaningful 
 and useful way. It is important to ensure that the proxy is suitable 
 for the social context of the problem you seek to solve. 
-In particular, be careful of falling into one of the :ref:abstraction_traps. 
-
-Compare quantified harms across the groups
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In particular, be careful of falling into one of the :ref:abstraction_traps.
 
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
 which are metrics evaluated on slices of data. For example, to measure harms due to 
@@ -101,52 +98,156 @@ errors, we would begin by evaluating the errors on each slice of the data that
 corresponds to a group. If some of the groups are seeing much larger errors 
 than other groups, we would flag this as a fairness harm.
 
+Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
+with this quantification.
+Suppose we have some 'true' values, some predictions from a model, and also
+a sensitive feature recorded for each:
+
+.. doctest:: assessment_metrics
+
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...            'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
+
+
+Now, suppose we have determined that the metrics we are interested in are the
+selection rate (:func:`selection_rate`), recall (a.k.a. true positive rate
+:func:`sklearn.metrics.recall_score`) and false positive rate
+(:func:`false_positive_rate`).
+For completeness (and to help note places where random noise might be
+significant), we should also include the counts (:func:`count`).
+We can use :class:`MetricFrame` to evaluate these metrics on our data:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import MetricFrame
+    >>> from fairlearn.metrics import count, \
+    ...                               false_positive_rate, \
+    ...                               selection_rate
+    >>> from sklearn.metrics import recall_score
+    >>> # Construct a function dictionary
+    >>> my_metrics = {
+    ...     'tpr' : recall_score,
+    ...     'fpr' : false_positive_rate,
+    ...     'sel' : selection_rate,
+    ...     'count' : count
+    ... }
+    >>> # Construct a MetricFrame
+    >>> mf = MetricFrame(
+    ...     metrics=my_metrics,
+    ...     y_true=y_true,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=sf_data
+    ... )
+
+We can now interrogate this :class:`MetricFrame` to find the values for
+our chosen metrics.
+First, the metrics evaluated on the entire dataset (disregarding the
+sensitive feature), accessed via the :meth:`MetricFrame.overall`
+property:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.overall
+    tpr       0.500000
+    fpr       0.666667
+    sel       0.555556
+    count    18.000000
+    dtype: float64
+
+Next, we can see the metrics evaluated on each of the groups identified by
+the :code:`sf_data` column.
+These are accessed through the :meth:`MetricFrame.by_group` property:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.by_group
+                         tpr       fpr   sel  count
+    sensitive_feature_0
+    a                    0.5  1.000000  0.75    4.0
+    b                    0.6  0.000000  0.50    6.0
+    c                    0.4  0.666667  0.50    8.0
+
+All of these values can be checked against the original arrays above.
+
+
+Compare quantified harms across the groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 To summarize the disparities in errors (or other metrics), we may want to 
 report quantities such as the difference or ratio of the metric values between 
 the best and the worst slice. In settings where the goal is to guarantee 
 certain minimum quality of service across all groups (such as speech recognition), 
 it is also meaningful to report the worst performance across all considered groups.
 
-For example, when comparing the false negative rate across groups defined by race, 
-we may summarize our findings with a table. Note that the these statistics must 
-be drawn from a large enough sample size to draw meaningful conclusions. 
+The :class:`MetricFrame` class provides several methods for comparing
+the computed metrics.
+For example, the :meth:`MetricFrame.group_min` and :meth:`MetricFrame.group_max`
+methods show the smallest and largest values for each metric:
 
-.. list-table::
-   :header-rows: 1
-   :widths: 7 30 30
-   :stub-columns: 1
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
 
-   *  - 
-      - false negative rate (FNR)
-      - sample size
+    >>> mf.group_min()
+    tpr      0.4
+    fpr      0.0
+    sel      0.5
+    count    4.0
+    dtype: object
+    >>> mf.group_max()
+    tpr       0.6
+    fpr       1.0
+    sel      0.75
+    count     8.0
+    dtype: object
 
-   *  - AfricanAmerican
-      - 0.43
-      - 126
+We can also compute differences and ratios between groups for all of the
+metrics.
+The absolute difference will always be returned, and the ratios will be chosen
+to be less than one.
+By default, the computations are done between the maximum and minimum
+values for the groups:
 
-   *  - Caucasian
-      - 0.44
-      - 620
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
 
-   *  - Other
-      - 0.52
-      - 200
+    >>> mf.difference()
+    tpr       0.2
+    fpr       1.0
+    sel      0.25
+    count     4.0
+    dtype: object
+    >>> mf.ratio()
+    tpr      0.666667
+    fpr           0.0
+    sel      0.666667
+    count         0.5
+    dtype: object
 
-   *  - Unknown
-      - 0.67
-      - 60
+However, the differences and ratios can also be computed relative to the
+overall values for the data:
 
-   *  - largest difference
-      - 0.24 (best is 0.0)
-      - N/A
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
 
-   *  - smallest ratio
-      - 0.64 (best is 1.0)
-      - N/A
+    >>> mf.difference(method='to_overall')
+    tpr       0.100000
+    fpr       0.666667
+    sel       0.194444
+    count    14.000000
+    dtype: float64
+    >>> mf.ratio(method='to_overall')
+    tpr      0.800000
+    fpr      0.000000
+    sel      0.740741
+    count    0.222222
+    dtype: float64
 
-   *  - maximum (worst-case) FNR
-      - 0.67
-      - N/A
+In every case, the *largest* difference and *smallest* ratio are returned.
 
 Metrics & Disaggregated metrics
 -------------------------------
