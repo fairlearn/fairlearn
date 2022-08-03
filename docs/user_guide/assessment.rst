@@ -423,12 +423,12 @@ so a result of 1 means there is demographic parity.
     >>> from fairlearn.metrics import demographic_parity_difference
     >>> print(demographic_parity_difference(y_true,
     ...                                     y_pred,
-    ...                                     sensitive_features=group_membership_data))
+    ...                                     sensitive_features=sf_data))
     0.25
     >>> from fairlearn.metrics import demographic_parity_ratio
     >>> print(demographic_parity_ratio(y_true,
     ...                                y_pred,
-    ...                                sensitive_features=group_membership_data))
+    ...                                sensitive_features=sf_data))
     0.66666...
 
 
@@ -512,12 +512,12 @@ We then return the larger of these two differences.
     >>> from fairlearn.metrics import equalized_odds_difference
     >>> print(equalized_odds_difference(y_true,
     ...                                 y_pred,
-    ...                                 sensitive_features=group_membership_data))
+    ...                                 sensitive_features=sf_data))
     1.0
     >>> from fairlearn.metrics import equalized_odds_ratio
     >>> print(equalized_odds_ratio(y_true,
     ...                            y_pred,
-    ...                            sensitive_features=group_membership_data))
+    ...                            sensitive_features=sf_data))
     0.0
 
 
@@ -564,15 +564,15 @@ the requested aggregation. For example:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import make_derived_metric
-    >>> recall_difference = make_derived_metric(metric=skm.recall_score,
+    >>> recall_difference = make_derived_metric(metric=recall_score,
     ...                                        transform='difference')
     >>> recall_difference(y_true, y_pred,
-    ...                   sensitive_features=group_membership_data)
+    ...                   sensitive_features=sf_data)
     0.19999...
-    >>> MetricFrame(metrics=skm.recall_score,
+    >>> MetricFrame(metrics=recall_score,
     ...             y_true=y_true,
     ...             y_pred=y_pred,
-    ...             sensitive_features=group_membership_data).difference()
+    ...             sensitive_features=sf_data).difference()
     0.19999...
 
 We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
@@ -625,10 +625,12 @@ The ``by_groups`` property then holds the intersections of these groups:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> import numpy as np
+    >>> import pandas as pd
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6,6,6 ]
-    >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
+    >>> s_f_frame = pd.DataFrame(np.stack([sf_data, g_2], axis=1),
     ...                          columns=['SF 0', 'SF 1'])
-    >>> metric_2sf = MetricFrame(metrics=skm.recall_score,
+    >>> metric_2sf = MetricFrame(metrics=recall_score,
     ...                          y_true=y_true,
     ...                          y_pred=y_pred,
     ...                          sensitive_features=s_f_frame)
@@ -651,9 +653,10 @@ Multiple metrics can also be computed at the same time:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> from sklearn.metrics import precision_score
     >>> metric_2sf_multi = MetricFrame(
-    ...     metrics={'precision':skm.precision_score,
-    ...              'recall':skm.recall_score,
+    ...     metrics={'precision':precision_score,
+    ...              'recall':recall_score,
     ...              'count': count},
     ...     y_true=y_true,
     ...     y_pred=y_pred,
@@ -725,7 +728,8 @@ parameter:
     ...    'C','B','C','A','C','C','B','B','C','A',
     ...    'B','B','C','A','B','A','B','B','A','A'
     ... ]
-    >>> metric_c_f = MetricFrame(metrics=skm.accuracy_score,
+    >>> from sklearn.metrics import accuracy_score
+    >>> metric_c_f = MetricFrame(metrics=accuracy_score,
     ...                          y_true=decision,
     ...                          y_pred=prediction,
     ...                          sensitive_features={'SF' : sensitive_feature},
@@ -808,11 +812,12 @@ required arguments to the metric function:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> import functools
-    >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
+    >>> from sklearn.metrics import fbeta_score
+    >>> fbeta_06 = functools.partial(fbeta_score, beta=0.6)
     >>> metric_beta = MetricFrame(metrics=fbeta_06,
     ...                           y_true=y_true,
     ...                           y_pred=y_pred,
-    ...                           sensitive_features=group_membership_data)
+    ...                           sensitive_features=sf_data)
     >>> metric_beta.overall
     0.56983...
     >>> metric_beta.by_group
@@ -834,10 +839,10 @@ provided in a dictionary via the ``sample_params`` argument:
 
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3, 1, 1]
     >>> s_p = { 'sample_weight':s_w }
-    >>> weighted = MetricFrame(metrics=skm.recall_score,
+    >>> weighted = MetricFrame(metrics=recall_score,
     ...                        y_true=y_true,
     ...                        y_pred=y_pred,
-    ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
+    ...                        sensitive_features=pd.Series(sf_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
     0.45...
@@ -858,9 +863,9 @@ For example:
 
     >>> s_w_2 = [3, 1, 2, 3, 2, 3, 1, 4, 1, 2, 3, 1, 2, 1, 4, 2, 2, 3]
     >>> metrics = {
-    ...    'recall' : skm.recall_score,
-    ...    'recall_weighted' : skm.recall_score,
-    ...    'recall_weight_2' : skm.recall_score
+    ...    'recall' : recall_score,
+    ...    'recall_weighted' : recall_score,
+    ...    'recall_weight_2' : recall_score
     ... }
     >>> s_p = {
     ...     'recall_weighted' : { 'sample_weight':s_w },
@@ -869,7 +874,7 @@ For example:
     >>> weighted = MetricFrame(metrics=metrics,
     ...                        y_true=y_true,
     ...                        y_pred=y_pred,
-    ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
+    ...                        sensitive_features=pd.Series(sf_data, name='SF 0'),
     ...                        sample_params=s_p)
     >>> weighted.overall
     recall             0.500000
@@ -903,11 +908,12 @@ Such return values are fully supported by :class:`MetricFrame`:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> from sklearn.metrics import confusion_matrix
     >>> mf_conf = MetricFrame(
-    ...    metrics=skm.confusion_matrix,
+    ...    metrics=confusion_matrix,
     ...    y_true=y_true,
     ...    y_pred=y_pred,
-    ...    sensitive_features=group_membership_data
+    ...    sensitive_features=sf_data
     ... )
     >>> mf_conf.overall
     array([[2, 4],
@@ -926,10 +932,10 @@ However, if scalar-returning metrics are also present, they will still be calcul
     :options:  +NORMALIZE_WHITESPACE
 
     >>> mf_conf_recall = MetricFrame(
-    ...    metrics={ 'conf_mat':skm.confusion_matrix, 'recall':skm.recall_score },
+    ...    metrics={ 'conf_mat':confusion_matrix, 'recall':recall_score },
     ...    y_true=y_true,
     ...    y_pred=y_pred,
-    ...    sensitive_features=group_membership_data
+    ...    sensitive_features=sf_data
     ... )
     >>> mf_conf_recall.overall
     conf_mat    [[2, 4], [6, 6]]
