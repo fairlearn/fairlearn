@@ -7,6 +7,19 @@ In this section, we will describe the steps involved in performing a fairness
 assessment, and show how :class:`MetricFrame` can be
 used to assist in this process.
 
+In the mathematical definitions below, :math:`X` denotes a feature vector 
+used for predictions, :math:`A` will be a single sensitive feature (such as age 
+or race), and :math:`Y` will be the true label.
+Fairness metrics are phrased in terms of expectations with respect to the
+distribution over :math:`(X,A,Y)`.
+Note that :math:`X` and :math:`A` may or may not share columns, dependent on
+whether the model is allowed to 'see' the sensitive features.
+When we need to refer to particular values, we will use lower case letters;
+since we are going to be comparing between groups identified by the
+sensitive feature, :math:`\forall a \in A` will be appearing regularly to
+indicate that a property holds for all identified groups.
+
+
 Performing a Fairness Assessment
 --------------------------------
 
@@ -248,165 +261,6 @@ overall values for the data:
     dtype: float64
 
 In every case, the *largest* difference and *smallest* ratio are returned.
-
-Metrics & Disaggregated metrics
--------------------------------
-
-Now that we have defined the steps of a fairness analysis, we can look at how
-the :py:mod:`fairlearn.metrics` module can help.
-Obviously, it can only help with the last two steps - quantifying harms and
-comparing those harms between groups.
-
-In the mathematical definitions below, :math:`X` denotes a feature vector 
-used for predictions, :math:`A` will be a single sensitive feature (such as age 
-or race), and :math:`Y` will be the true label.
-Fairness metrics are phrased in terms of expectations with respect to the
-distribution over :math:`(X,A,Y)`.
-Note that :math:`X` and :math:`A` may or may not share columns, dependent on
-whether the model is allowed to 'see' the sensitive features.
-When we need to refer to particular values, we will use lower case letters;
-since we are going to be comparing between groups identified by the
-sensitive feature, :math:`\forall a \in A` will be appearing regularly to
-indicate that a property holds for all identified groups.
-
-At their simplest, metrics take a vector of 'true objects' :math:`Y_{true}` (from
-the input data) and 'predicted objects' :math:`Y_{pred}` (by applying the model
-to the input data), and use these to compute a measure.
-*We are being deliberately vague* as to what constitutes a 'true object' or a
-'measure' at this point.
-
-For the sake of concreteness, we shall assume for the time being that we
-are working on a binary classification problem, where the two classes have
-labels of 0 and 1.
-We can then use a number of conventional metrics to illustrate the basic
-usage of :class:`MetricFrame`.
-However, we will return to more complex cases later in this discussion.
-For now, consider the *recall* or *true positive rate*, which is given by
-
-.. math::
-
-   P( Y_{pred}=1 \given Y_{true}=1 )
-
-That is, a measure of whether the model finds all the positive cases in the
-input data. The `scikit-learn` package implements this in
-:py:func:`sklearn.metrics.recall_score`.
-
-Suppose we have the following data we can see that the prediction is `1` in five
-of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
-
-.. doctest:: assessment_metrics
-
-    >>> import sklearn.metrics as skm
-    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
-    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
-    >>> skm.recall_score(y_true, y_pred)
-    0.5
-
-In a typical fairness assessment, each row of input data will have an associated
-group label :math:`a \in A`, and we will want to know how the metric behaves
-for each group :math:`a`.
-To help with this, Fairlearn provides a class that takes
-an existing metric function, like 
-:func:`sklearn.metrics.roc_auc_score` or :func:`fairlearn.metrics.false_positive_rate`, 
-and applies it to each group within a set of data.
-
-This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
-of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
-takes four arguments:
-
-* metric_function with signature :code:`metric_function(y_true, y_pred)`
-
-* y_true: array of labels
-
-* y_pred: array of predictions
-
-* sensitive_features: array of sensitive feature values
-
-The code chunk below displays a case where in addition to the :math:`Y_{true}` 
-and :math:`Y_{pred}` above, the dataset also contains the following set of 
-labels, denoted by the "group_membership_data" column:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> import numpy as np
-    >>> import pandas as pd
-    >>> group_membership_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
-    ...                          'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
-    >>> pd.set_option('display.max_columns', 20)
-    >>> pd.set_option('display.width', 80)
-    >>> pd.DataFrame({ 'y_true': y_true,
-    ...                'y_pred': y_pred,
-    ...                'group_membership_data': group_membership_data})
-        y_true  y_pred group_membership_data
-    0        0       0                     b
-    1        1       0                     b
-    2        1       1                     a
-    3        1       0                     b
-    4        1       1                     b
-    5        0       1                     c
-    6        1       1                     c
-    7        0       0                     c
-    8        1       0                     a
-    9        0       1                     a
-    10       0       1                     c
-    11       0       1                     a
-    12       1       1                     b
-    13       1       0                     c
-    14       1       0                     c
-    15       1       1                     b
-    16       1       1                     c
-    17       1       0                     c
-    <BLANKLINE>
-
-We then calculate a metric which shows the subgroups:
-
-.. doctest:: assessment_metrics
-
-    >>> from fairlearn.metrics import MetricFrame
-    >>> grouped_metric = MetricFrame(metrics=skm.recall_score,
-    ...                              y_true=y_true,
-    ...                              y_pred=y_pred,
-    ...                              sensitive_features=group_membership_data)
-    >>> print("Overall recall = ", grouped_metric.overall)
-    Overall recall =  0.5
-    >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
-    recall by groups =  {'a': 0.5, 'b': 0.6, 'c': 0.4}
-
-The disaggregated metrics are stored in a :class:`pandas.Series` 
-:code:`grouped_metric.by_group`.
-Note that the :meth:`MetricFrame.overall` property has the value of 0.5, as
-we obtained above by applying :py:func:`sklearn.metrics.recall_score` to the
-whole dataset.
-The :meth:`MetricFrame.by_group` property (which we turned into a dictionary
-for display purposes) can be checked against the table above.
-
-In addition to these basic scores, Fairlearn provides
-convenience functions to recover the maximum and minimum values of the metric
-across groups and also the difference and ratio between the maximum and minimum:
-
-.. doctest:: assessment_metrics
-
-    >>> print("min recall over groups = ", grouped_metric.group_min())
-    min recall over groups =  0.4
-    >>> print("max recall over groups = ", grouped_metric.group_max())
-    max recall over groups =  0.6
-    >>> print("difference in recall = {:3f}".format(grouped_metric.difference(method='between_groups')))
-    difference in recall = 0.200000
-    >>> print("ratio in recall = {:3f}".format(grouped_metric.ratio(method='between_groups')))    
-    ratio in recall = 0.666667
-
-The difference and ratio calculations can also be made relative to the
-overall value, rather than the largest and smallest values of
-:meth:`MetricFrame.by_group`.
-We simply change the value of the :code:`method` argument:
-
-.. doctest:: assessment_metrics
-
-    >>> print('{:3f}'.format(grouped_metric.difference(method='to_overall')))
-    0.100000
-    >>> print('{:3f}'.format(grouped_metric.ratio(method='to_overall')))
-    0.800000
 
 
 Common fairness metrics
@@ -749,38 +603,6 @@ The names of the generated functions are of the form
 :code:`fairlearn.metrics.<base_metric>_<transformation>`.
 For example :code:`fairlearn.metrics.accuracy_score_difference` and
 :code:`fairlearn.metrics.precision_score_group_min`.
-
-
-Multiple metrics in a single :code:`MetricFrame`
-------------------------------------------------
-
-A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously by providing the `metrics` argument with a 
-dictionary of desired metrics. The disaggregated metrics are then stored in a 
-pandas DataFrame. Note that :class:`pandas.DataFrame` can 
-be used to show each group's size:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from fairlearn.metrics import count
-    >>> multi_metric = MetricFrame({'precision':skm.precision_score,
-    ...                             'recall':skm.recall_score,
-    ...                             'count': count},
-    ...                             y_true, y_pred,
-    ...                             sensitive_features=group_membership_data)
-    >>> multi_metric.overall
-    precision     0.6
-    recall        0.5
-    count        18.0
-    dtype: float64
-    >>> multi_metric.by_group
-                         precision  recall  count
-    sensitive_feature_0
-    a                     0.333333     0.5    4.0
-    b                     1.000000     0.6    6.0
-    c                     0.500000     0.4    8.0
-
 
 
 Intersecting Groups
@@ -1242,7 +1064,7 @@ metrics.
     For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
     Fairlearn provides some of the existing functionality through
-    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot_metricframe` section.
 
 
 References
