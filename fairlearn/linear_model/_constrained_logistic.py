@@ -49,7 +49,7 @@ def _check_multi_class(multi_class):
 
 
 def _check_optimize_result(solver, result, max_iter=None, extra_warning_msg=None):
-    """Check the OptimizeResult for successful convergence
+    """Check the OptimizeResult for successful convergence.
 
     Parameters
     ----------
@@ -590,7 +590,7 @@ class ConstrainedLogisticRegression(LogisticRegression):
     warm_start : bool, default=False
         When set to True, reuse the solution of the previous call to fit as
         initialization, otherwise, just erase the previous solution.
-        See `the glossary <https://scikit-learn.org/stable/glossary.html#term-warm_start>`_.
+        See the `glossary <https://scikit-learn.org/stable/glossary.html#term-warm_start>`_.
 
     n_jobs : int, default=None
         Number of CPU cores used when parallelizing over classes if
