@@ -884,25 +884,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_function : str, callable, default = 'auto'
-        Either a keyword, such as:
-        :code:`'auto'`, :code:`'argmax'`, :code:`'threshold'`,
-        or a callable. The string
-        :code:`'auto'` indicates to infer the predictor function
-        from the distribution type of :code:`y`
-        Currently, we do not apply one-hot-encoding to binary data, so you
-        will get an error if you use argmax if :code:`y` is binary. However,
-        if binary data was already passed one-hot-encoded, then :code:`'argmax'`
-        should be used and will be inferred nonetheless. A callable should be a
-        function that maps the continuous output of the predictor model to
-        a discrete prediction.
-
-    threshold_value : number
-        If the predictor function is 'threshold', the predictor function maps
-        :math:`y` to 1 if :math:`y \geq ` :code:`threshold_value`, else 0. This
-        is intended for sigmoidal outputs, in which case only a number between
-        0 and 1 makes sense.
-
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
@@ -990,7 +971,9 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         self._estimator_type = "classifier"
         kwargs["y_transform"] = "classification"
         kwargs["predictor_loss"] = "classification"
+        kwargs["adversary_loss"] = "auto"  # Removed choice for now.
         kwargs["predictor_function"] = "classification"
+        kwargs["threshold_value"] = 0.5  # Removed choice for now.
         super(AdversarialFairnessClassifier, self).__init__(**kwargs)
 
 
@@ -1051,12 +1034,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         The adversary model to train. Defined similarly as predictor_model.
         Must be the same type as the
         :code:`predictor_model`.
-
-    threshold_value : number
-        If the predictor function is 'threshold', the predictor function maps
-        :math:`y` to 1 if :math:`y \geq ` :code:`threshold_value`, else 0. This
-        is intended for sigmoidal outputs, in which case only a number between
-        0 and 1 makes sense.
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
@@ -1145,6 +1122,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         self._estimator_type = "regressor"
         kwargs["y_transform"] = None
         kwargs["predictor_loss"] = "continuous"
+        kwargs["adversary_loss"] = "auto"  # Removed choice for now.
         kwargs["predictor_function"] = None
         super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
 
