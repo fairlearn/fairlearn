@@ -265,7 +265,7 @@ def plot_model_comparison(
             elif isinstance(m, _DerivedMetric):
                 name = f"{m._metric_fn.__name__}, {m._transform}"
             else:
-                name = m.__repr__
+                name = repr(m)
             f(name.replace("_", " "))
     elif isinstance(axis_labels, tuple):
         ax.set_xlabel(axis_labels[0])
