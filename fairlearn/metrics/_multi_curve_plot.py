@@ -16,6 +16,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def plot_model_comparison(
     *,
     y_preds,
@@ -160,7 +161,7 @@ def plot_model_comparison(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
                 axis_labels,
                 "boolean or tuple of two strings",
-                type(kwarg).__name__,
+                type(axis_labels).__name__,
             )
         )
 
