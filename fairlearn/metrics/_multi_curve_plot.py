@@ -137,6 +137,7 @@ def plot_model_comparison(
         y_preds = array(y_preds_list)
     else:
         inferred_point_labels = range(len(y_preds))
+        y_preds = array(y_preds)
 
     if len(y_preds.shape) == 1:
         y_preds = y_preds.reshape(1, -1)
