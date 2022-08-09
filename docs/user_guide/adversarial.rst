@@ -42,7 +42,7 @@ Firstly, we will dicuss the models that this implementation accepts in
 Secondly, in :ref:`data_preprocessing`, we discuss the required
 data preprocessing, as :math:`X` must be an array of
 floats. Then, in :ref:`loss_functions`,
-we describe what are good choices of :math:`L_P` and :math:`L_A`.
+we describe how the loss functions :math:`L_P` and :math:`L_A` are chosen.
 Lastly, in :ref:`training` we give some
 useful tips to keep in mind when training this model, as
 adversarial methods such as these
@@ -149,35 +149,14 @@ Loss functions
 ~~~~~~~~~~~~~~
 
 In :footcite:`zhang2018mitigating`, loss functions are not defined explicitely.
-To accomodate and provide the most general interface, the user can pass their
-own loss functions. This can be either PyTorch or TensorFlow loss functions,
-depending on which module the neural networks are. For instance, in the
-following example we set the :code:`predictor_loss` to a PyTorch-implemented
-binary cross-entropy, and the :code:`adversary_loss` to the mean squared error.
-Additionally, we explicitely specify how the **discrete predictions** are
-computed, by providing a :code:`predictor_function`. In this case,
-the predictor function maps sigmoid logits to the discrete prediction.::
+In the public API
+(:code:`AdversarialFairnessClassifier` and :code:`AdversarialFairnessRegressor`)
+we do not allow user-specified loss functions and instead automatically infer
+whether the data is binary, categorical, or continuous, and set the loss as
+binary cross entropy, categorical cross entropy, or mean squared error
+respectively. Hence, the user will not have to deal with these choices.
 
-    mitigator = AdversarialFairnessClassifier(
-        backend="torch",
-        predictor_model=[50, "relu"],
-        adversary_model=[3, "relu"]
-        predictor_loss=torch.nn.BCEWithLogitsLoss(),
-        adversary_loss=torch.nn.MSELoss(),
-        predictor_function=lambda pred: (pred >= 0.).astype(float)
-    )
-
-*Note that the PyTorch and TensorFlow modules switch the order of arguments in
-their loss functions, so be extra careful when defining custom loss functions
-so that you adhere to the module-specific argument order*
-
-We do, however, attempt to infer an appropriate loss function for the data.
-For instance, if the data appears categorical, categorical cross
-entropy loss is used, along with a softmax on the output layer of the model,
-and an argmax for the discrete prediction function. 
-
-Below are some natural choices of parameters to construct models. These will
-also be inferred from the data, if applicable.
+The following loss functions are inferred from data.
 
 .. list-table::
    :header-rows: 1

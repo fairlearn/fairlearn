@@ -72,11 +72,8 @@ class _AdversarialFairness(BaseEstimator):
     you can pass :code:`"one_hot_encoder"` or :code:`None` en choose a
     preprocessing technique.
     Loss functions and decision functions
-    for the target and sensitive features are also predefined for keywords such
-    as "auto", "cross_entropy_loss",
-    "logistic_loss", "squared_loss", "binary", "category", and "continuous".
-    The :code:`predictor_function` parameter can be automatically interpreted
-    as well, or set to :code:`"argmax"` or :code:`"threshold"`.
+    for the target and sensitive features are also predefined for inferred data
+    types, and are hence automatically inferred.
 
     Parameters
     ----------
@@ -107,48 +104,6 @@ class _AdversarialFairness(BaseEstimator):
         The adversary model to train. Defined similarly as predictor_model.
         Must be the same type as the
         :code:`predictor_model`.
-
-    predictor_loss : str, callable, default = 'auto'
-        Either a keyword, such as:
-        :code:`'auto'`, :code:`'logistic_loss'`, :code:`'cross_entropy_loss'`,
-        :code:`'multinomial_logistic_loss'`, :code:`'square_loss'`.
-        Or, a callable. The string
-        :code:`'auto'` indicates to infer the loss
-        from the distribution type of :code:`y`
-        A callable should be a
-        loss function with an API that follows the chosen backend (torch or
-        tensorflow). Note that torch and tensorflow loss functions don't agree
-        on parameter order, as in Pytorch it is :math:`l(\hat y, y)` while in
-        Tensorflow it is :math:`l(y, \hat y)`.
-
-    adversary_loss : str, callable, default = 'auto'
-        Either a keyword, such as:
-        :code:`'auto'`, :code:`'logistic_loss'`, :code:`'cross_entropy_loss'`,
-        :code:`'multinomial_logistic_loss'`, :code:`'square_loss'`.
-        Or, a callable. The string
-        :code:`'auto'` indicates to infer the loss
-        from the distribution type of :code:`sensitive_features`
-        A callable should be a
-        loss function with an API that follows the chosen backend (torch or
-        tensorflow).
-
-    predictor_function : str, callable, default = 'auto'
-        Either a keyword, such as:
-        :code:`'auto'`, :code:`'argmax'`, :code:`'threshold'`,
-        or a callable. The string
-        :code:`'auto'` indicates to infer the predictor function
-        from the distribution type of :code:`y`
-        Currently, we do not apply one-hot-encoding to binary data, so you
-        will get an error if you use argmax if :code:`y` is binary.
-        A callable should be a
-        function that maps the continuous output of the predictor model to
-        a discrete prediction.
-
-    threshold_value : number
-        If the predictor function is 'threshold', the predictor function maps
-        :math:`y` to 1 if :math:`y \geq ` :code:`threshold_value`, else 0. This
-        is intended for sigmoidal outputs, in which case only a number between
-        0 and 1 makes sense.
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
