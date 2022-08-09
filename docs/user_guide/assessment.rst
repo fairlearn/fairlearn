@@ -114,7 +114,9 @@ than other groups, we would flag this as a fairness harm.
 Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
 with this quantification.
 Suppose we have some 'true' values, some predictions from a model, and also
-a sensitive feature recorded for each:
+a sensitive feature recorded for each.
+The sensitive feature, denoted by :code:`sf_data`, can take on one of
+three values:
 
 .. doctest:: assessment_metrics
 
