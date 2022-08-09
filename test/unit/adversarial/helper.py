@@ -62,22 +62,46 @@ layer_class = type("Layer", (object,), {})
 class fake_torch:
     """Mock of the PyTorch module."""
 
+    def randperm(X):
+        return np.random.choice(range(X), size=X, replace=False)
+
     class nn:
         """Mock of torch.nn."""
 
-        Module = type(
-            "Module",
-            (model_class,),
-            {
-                "forward": lambda self, x: x,
-                "parameters": lambda self: (i for i in [1, 2]),
-                "train": lambda self: None,
-                "__call__": lambda self, X: self.forward(X),
-            },
-        )
+        class Module(model_class):
+            w = 0
+            def forward(self, x):
+                return x
+            
+            def parameters(self):
+                return self.w
+
+            def train(self):
+                return None
+        
+            def __call__(self, X):
+                return self.forward(X)
+
+            def apply(self, weights):
+                self.w = weights
+
         BCELoss = type("BCELoss", (BCE,), {})
         NLLLoss = type("NLLLoss", (CCE,), {})
         MSELoss = type("MSELoss", (MSE,), {})
+
+        class Linear:
+            def __init__(self, a, b):
+                self.a = a
+                self.b = b
+        
+        ReLU = lambda : type("ReLU", (), {"__call__": lambda x : np.max(x, 0)})
+        LeakyReLU = lambda : type("LeakyReLU", (), {"__call__": lambda x : np.max(x, 0.1 * x)})
+        Sigmoid = lambda : type("Sigmoid", (), {"__call__": lambda x: x})
+        Softmax = lambda : type("Softmax", (), {"__call__": lambda x: x})
+
+        class ModuleList:
+            def __init__(self, layers):
+                self.layers = layers
 
     class optim:
         """Mock of torch.optim."""
@@ -117,6 +141,18 @@ class fake_tensorflow:
 
     class keras:
         """Mock of tf.keras."""
+        class activations:
+            def deserialize(item):
+                return type(item, (), {'__call__': lambda x : x})
+
+        class layers:
+            class Dense:
+                def __init__(self, units, kernel_initializer, bias_initializer):
+                    self.b = units
+
+        class initializers:
+            class GlorotNormal:
+                pass
 
         Model = type("Model", (model_class,), {})
 
@@ -224,6 +260,9 @@ class RemoveAll(BackendEngine):
 class RemoveTrainStepPytorch(PytorchEngine):
     """Mock train_step only, then we can still perform Backend inits."""
 
+    def shuffle(self, X, Y, A):
+        return X, Y, A
+
     def train_step(self, X, Y, Z):  # noqa: D102
         return (0, 0)
 
@@ -241,6 +280,7 @@ def get_instance(
     fake_training=False,
     torch=True,
     tensorflow=False,
+    **kwargs,
 ):
     """
     Shared set up of test cases that create an instance of the model.
@@ -271,14 +311,17 @@ def get_instance(
     else:
         sys.modules["tensorflow"] = None
 
-    if torch:
-        predictor = fake_torch.nn.Module()
-        adversary = fake_torch.nn.Module()
-    elif tensorflow:
-        predictor = fake_tensorflow.keras.Model()
-        adversary = fake_tensorflow.keras.Model()
+    default_kwargs = dict()
 
-    mitigator = cls(predictor_model=predictor, adversary_model=adversary)
+    if torch:
+        default_kwargs['predictor_model'] = fake_torch.nn.Module()
+        default_kwargs['adversary_model'] = fake_torch.nn.Module()
+    elif tensorflow:
+        default_kwargs['predictor_model'] = fake_tensorflow.keras.Model()
+        default_kwargs['adversary_model'] = fake_tensorflow.keras.Model()
+
+    default_kwargs.update(kwargs)
+    mitigator = cls(**default_kwargs)
 
     if fake_mixin:
         mitigator.backend = RemoveAll
