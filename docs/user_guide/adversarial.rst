@@ -29,7 +29,7 @@ trains the predictor with gradient:
 
 If this model converges properly,
 the adversary will attain a loss equal to the entropy, so the adversary
-can not
+cannot
 predict the sensitive features from the predictions.
 Moreover, this model can be trained for either *demographic parity* or
 *equalized odds*. If only the predictions are fed to the adversary, the
