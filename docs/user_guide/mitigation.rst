@@ -46,7 +46,7 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✘
    *  - :class:`~fairlearn.adversarial.AdversarialFairness`
-      - Inprocessing algorithm based on the paper *Mitigating Unwanted Biases*
+      - An optimization algorithm based on the paper *Mitigating Unwanted Biases*
         *with Adversarial Learning* :footcite:`zhang2018mitigating`. This algorithm uses a predictor and an adversarial neural network, defined either as a `PyTorch module
         <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
         `Tensorflow2 model 

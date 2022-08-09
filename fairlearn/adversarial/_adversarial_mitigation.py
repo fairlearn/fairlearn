@@ -829,16 +829,16 @@ class _AdversarialFairness(BaseEstimator):
 class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     r"""Train PyTorch or Tensorflow classifiers while mitigating unfairness.
 
-    This model implements the supervised learning method proposed in
+    This estimator implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
     <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
-    This algorithm takes as input two neural network
+    The training algorithm takes as input two neural network
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
     `Tensorflow2 model
-    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
-    predictor using an API that is similar to estimators in `sklearn`.
+    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. The API
+    follows conventions of `sklearn` estimators.
 
     As per [1]_, the neural network models :code:`predictor_model` and
     :code:`adversary_model` should not have a discrete prediction at the end of the
@@ -969,7 +969,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         Normally, when set to False, a call to fit triggers reinitialization,
         which discards the models and intializes them again. Setting to
         True triggers reuse of these models. Note: if pre-initialized models
-        were passed, the model (and its parameters) are never discard.
+        were passed, the models (and their parameters) are never discarded.
 
     random_state : int, RandomState instance, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
@@ -997,16 +997,16 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     r"""Train PyTorch or Tensorflow regressors while mitigating unfairness.
 
-    This model implements the supervised learning method proposed in
+    This estimator implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
     <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
-    This algorithm takes as input two neural network
+    The training algorithm takes as input two neural network
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
     `Tensorflow2 model
-    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
-    predictor using an API that is similar to estimators in `sklearn`.
+    <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. The API
+    follows conventions of `sklearn` estimators.
 
     As per [1]_, the neural network models :code:`predictor_model` and
     :code:`adversary_model` should not have a discrete prediction at the end of the
@@ -1124,7 +1124,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         Normally, when set to False, a call to fit triggers reinitialization,
         which discards the models and intializes them again. Setting to
         True triggers reuse of these models. Note: if pre-initialized models
-        were passed, the model (and its parameters) are never discard.
+        were passed, the models (and their parameters) are never discarded.
 
     random_state : int, RandomState instance, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
