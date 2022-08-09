@@ -410,7 +410,7 @@ meant to correct the errors produced by individual statistical tests.
 Fairlearn provides the :func:`demographic_parity_difference` and
 :func:`demographic_parity_ratio` functions for computing demographic
 parity measures for binary classification data, both of which return
-a scalar result
+a scalar result.
 The first reports the absolute difference between the highest and
 lowest selection rates :math:`a \in A` so a result of 0 indicates
 that demographic parity has been achieved (this does *not* automatically
