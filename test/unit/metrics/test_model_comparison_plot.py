@@ -3,7 +3,7 @@
 
 from fairlearn.metrics import plot_model_comparison, make_derived_metric, selection_rate
 from sklearn.metrics import accuracy_score
-
+import numpy as np
 from .data_for_test import g_1, y_p, y_t
 import pytest
 
@@ -61,6 +61,21 @@ def test_wrong_shape():
             y_true=y_t,
             y_preds=y_p + [1],
             sensitive_features=g_1,
+            point_labels=True,
+            show_plot=False,
+        )
+
+
+def test_wrong_shape2():
+    with pytest.raises(Exception):
+        plot_model_comparison(
+            x_axis_metric=accuracy_score,
+            y_axis_metric=make_derived_metric(
+                metric=selection_rate, transform="difference"
+            ),
+            y_true=y_t + [1],
+            y_preds=[y_p, y_t],
+            sensitive_features=g_1 + [1],
             point_labels=True,
             show_plot=False,
         )
@@ -189,6 +204,41 @@ def test_other_order():
         y_preds=y_p,
         sensitive_features=g_1,
     )
+
+
+def random_metric1(yp, yt):
+    return np.mean(yp == yt)
+
+
+def random_metric2(yp, yt):
+    return np.mean(yp == yt) ** 2
+
+
+def test_named():
+    ax = plot_model_comparison(
+        x_axis_metric=random_metric1,
+        y_axis_metric=random_metric2,
+        y_true=y_t,
+        y_preds=y_p,
+        sensitive_features=g_1,
+    )
+
+    assert ax.get_xlabel() == "random metric1"
+    assert ax.get_ylabel() == "random metric2"
+
+
+def test_custom_name():
+    ax = plot_model_comparison(
+        x_axis_metric=random_metric1,
+        y_axis_metric=random_metric2,
+        y_true=y_t,
+        y_preds=y_p,
+        sensitive_features=g_1,
+        axis_labels=("a", "b"),
+    )
+
+    assert ax.get_xlabel() == "a"
+    assert ax.get_ylabel() == "b"
 
 
 def test_multiple_calls():
