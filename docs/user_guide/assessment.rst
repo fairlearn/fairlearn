@@ -904,8 +904,8 @@ and the metric functions return scalar values.
 However, this need not be the case - we noted above that we were going to be vague as to the
 contents of the input vectors and the return value of the metric function.
 
-Metric Function Returns Non-Scalar
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Non-Scalar Results from Metric Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Metric functions need not return a scalar value.
 A straightforward example of this is the confusion matrix.
