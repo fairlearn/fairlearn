@@ -121,10 +121,11 @@ def test_model_equalized_odds_model_setup():
         fake_training=True,
         predictor_model=[10, "ReLU"],
         adversary_model=[3, "ReLU"],
-        constraints="equalized_odds"
+        constraints="equalized_odds",
     )
     mitigator.fit(X, Y, sensitive_features=Z)
     assert mitigator.backendEngine_.adversary_model.layers_.layers[0].a == 2
+
 
 def test_model_kw_error_constraint():
     """Test kw error."""
@@ -137,7 +138,7 @@ def test_model_kw_error_constraint():
             fake_training=True,
             predictor_model=[10, "ReLU"],
             adversary_model=[3, "ReLU"],
-            constraints="hihi"
+            constraints="hihi",
         )
         mitigator.fit(X, Y, sensitive_features=Z)
 
@@ -154,7 +155,7 @@ def test_model_kw_error_ints():
             predictor_model=[10, "ReLU"],
             adversary_model=[3, "ReLU"],
             batch_size=-2,
-            max_iter = -3
+            max_iter=-3,
         )
         mitigator.fit(X, Y, sensitive_features=Z)
 
@@ -170,11 +171,11 @@ def test_model_kw_error_bools():
             fake_training=True,
             predictor_model=[10, "ReLU"],
             adversary_model=[3, "ReLU"],
-            shuffle="true"
+            shuffle="true",
         )
         mitigator.fit(X, Y, sensitive_features=Z)
 
-    
+
 def test_model_kw_error_callback():
     """Test kw error."""
     with pytest.raises(ValueError):
@@ -186,9 +187,10 @@ def test_model_kw_error_callback():
             fake_training=True,
             predictor_model=[10, "ReLU"],
             adversary_model=[3, "ReLU"],
-            callbacks="hi"
+            callbacks="hi",
         )
         mitigator.fit(X, Y, sensitive_features=Z)
+
 
 def test_model_kw_error_callbacks():
     """Test kw error."""
@@ -201,7 +203,7 @@ def test_model_kw_error_callbacks():
             fake_training=True,
             predictor_model=[10, "ReLU"],
             adversary_model=[3, "ReLU"],
-            callbacks=[lambda x : x, "bye"]
+            callbacks=[lambda x: x, "bye"],
         )
         mitigator.fit(X, Y, sensitive_features=Z)
 
