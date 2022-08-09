@@ -413,10 +413,11 @@ parity measures for binary classification data, both of which return
 a scalar result.
 The first reports the absolute difference between the highest and
 lowest selection rates :math:`a \in A` so a result of 0 indicates
-that demographic parity has been achieved (this does *not* automatically
-mean that the classifier is fair!).
+that demographic parity has been achieved.
 The second reports the ratio of the lowest and highest selection rates,
 so a result of 1 means there is demographic parity.
+However, achieving demographic parity does *not* automatically mean
+that the classifier is fair!
 
 
 .. doctest:: assessment_metrics
@@ -578,7 +579,9 @@ the requested aggregation. For example:
     0.19999...
 
 We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
-of such functions which will be commonly used:
+of such functions which are commonly used.
+The table below displays the aggregations that we have created for each
+base metric:
 
 =============================================== ================= ================= ================== =============
 Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
@@ -615,14 +618,16 @@ multiple sensitive features, and control features.
 Both of these can be used simultaneously.
 One important point to bear in mind when performing an intersectional analysis
 is that some of the intersections may have very few members (or even be empty).
-This can affect the confidence interval associated with the computed metrics.
+This will affect the confidence interval associated with the computed metrics;
+random noise has a greater effect on smaller groups.
 
 Multiple Sensitive Features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Multiple sensitive features can be specified when the :class:`MetricFrame`
 is constructed.
-The ``by_groups`` property then holds the intersections of these groups:
+The :meth:`MetricFrame.by_groups` property then holds the intersections
+of these groups:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
