@@ -17,7 +17,6 @@ from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 from .helper import (
     get_instance,
     generate_data_combinations,
-    rows,
     cols,
     Bin2d,
     Bin1d,
@@ -84,6 +83,7 @@ def test_model_params(torch):
         callbacks=lambda *args: False,
     )
     mitigator.fit(X, Y, sensitive_features=Z)
+
 
 @pytest.mark.parametrize("torch", [True, False])
 def test_model_early_stop(torch):

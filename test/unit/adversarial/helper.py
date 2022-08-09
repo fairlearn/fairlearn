@@ -68,17 +68,18 @@ class fake_torch:
     class nn:
         """Mock of torch.nn."""
 
-        class Module(model_class):
+        class Module(model_class):  # noqa: D106
             w = 0
+
             def forward(self, x):
                 return x
-            
+
             def parameters(self):
                 return self.w
 
             def train(self):
                 return None
-        
+
             def __call__(self, X):
                 return self.forward(X)
 
@@ -89,17 +90,22 @@ class fake_torch:
         NLLLoss = type("NLLLoss", (CCE,), {})
         MSELoss = type("MSELoss", (MSE,), {})
 
-        class Linear:
+        class Linear:  # noqa: D106
             def __init__(self, a, b):
                 self.a = a
                 self.b = b
-        
-        ReLU = lambda : type("ReLU", (), {"__call__": lambda x : np.max(x, 0)})
-        LeakyReLU = lambda : type("LeakyReLU", (), {"__call__": lambda x : np.max(x, 0.1 * x)})
-        Sigmoid = lambda : type("Sigmoid", (), {"__call__": lambda x: x})
-        Softmax = lambda : type("Softmax", (), {"__call__": lambda x: x})
 
-        class ModuleList:
+        ReLU = lambda: type("ReLU", (), {"__call__": lambda x: np.max(x, 0)})  # noqa: E731
+
+        def LeakyReLU():
+            return type(
+                "LeakyReLU", (), {"__call__": lambda x: np.max(x, 0.1 * x)}
+            )
+
+        Sigmoid = lambda: type("Sigmoid", (), {"__call__": lambda x: x})  # noqa: E731
+        Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
+
+        class ModuleList:  # noqa: D106
             def __init__(self, layers):
                 self.layers = layers
 
@@ -141,17 +147,18 @@ class fake_tensorflow:
 
     class keras:
         """Mock of tf.keras."""
-        class activations:
-            def deserialize(item):
-                return type(item, (), {'__call__': lambda x : x})
 
-        class layers:
-            class Dense:
+        class activations:  # noqa: D106
+            def deserialize(item):
+                return type(item, (), {"__call__": lambda x: x})
+
+        class layers:  # noqa: D106
+            class Dense:  # noqa: D106
                 def __init__(self, units, kernel_initializer, bias_initializer):
                     self.b = units
 
-        class initializers:
-            class GlorotNormal:
+        class initializers:  # noqa: D106
+            class GlorotNormal:  # noqa: D106
                 pass
 
         Model = type("Model", (model_class,), {})
@@ -314,11 +321,11 @@ def get_instance(
     default_kwargs = dict()
 
     if torch:
-        default_kwargs['predictor_model'] = fake_torch.nn.Module()
-        default_kwargs['adversary_model'] = fake_torch.nn.Module()
+        default_kwargs["predictor_model"] = fake_torch.nn.Module()
+        default_kwargs["adversary_model"] = fake_torch.nn.Module()
     elif tensorflow:
-        default_kwargs['predictor_model'] = fake_tensorflow.keras.Model()
-        default_kwargs['adversary_model'] = fake_tensorflow.keras.Model()
+        default_kwargs["predictor_model"] = fake_tensorflow.keras.Model()
+        default_kwargs["adversary_model"] = fake_tensorflow.keras.Model()
 
     default_kwargs.update(kwargs)
     mitigator = cls(**default_kwargs)
