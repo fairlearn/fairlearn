@@ -16,9 +16,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-context_state = None
-
-
 def plot_model_comparison(
     *,
     y_preds,
@@ -122,41 +119,13 @@ def plot_model_comparison(
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    # --- SET OR LOAD CONTEXT STATE ---
-    global context_state
-    context_kws = (y_true, sensitive_features, x_axis_metric, y_axis_metric)
-    if all(kw is None for kw in context_kws):
-        if context_state is None:
-            raise ValueError(
-                "Must provide the following key word arguments on first call: "
-                + "y_true, sensitive_features, x_axis_metric, y_axis_metric."
-            )
-        (
-            y_true,
-            sensitive_features,
-            x_axis_metric,
-            y_axis_metric,
-        ) = context_state
-    elif any(kw is None for kw in context_kws):
-        raise ValueError(
-            "Either provide all or none of the following key word arguments: "
-            + "y_true, sensitive_features, x_axis_metric, y_axis_metric."
-        )
-    else:
-        _, y_true, sensitive_features, _ = _validate_and_reformat_input(
-            zeros((len(y_true), 1)),  # Dummy values for X
-            y=y_true,
-            sensitive_features=sensitive_features,
-        )
-        y_true = y_true.values
-        sensitive_features = sensitive_features.values
-
-        context_state = (
-            y_true,
-            sensitive_features,
-            x_axis_metric,
-            y_axis_metric,
-        )
+    _, y_true, sensitive_features, _ = _validate_and_reformat_input(
+        zeros((len(y_true), 1)),  # Dummy values for X
+        y=y_true,
+        sensitive_features=sensitive_features,
+    )
+    y_true = y_true.values
+    sensitive_features = sensitive_features.values
 
     # --- VALIDATE INPUT ---
     if isinstance(y_preds, dict):
