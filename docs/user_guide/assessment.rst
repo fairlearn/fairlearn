@@ -160,7 +160,7 @@ We can use :class:`MetricFrame` to evaluate these metrics on our data:
 We can now interrogate this :class:`MetricFrame` to find the values for
 our chosen metrics.
 First, the metrics evaluated on the entire dataset (disregarding the
-sensitive feature), accessed via the :meth:`MetricFrame.overall`
+sensitive feature), accessed via the :atrr:`MetricFrame.overall`
 property:
 
 .. doctest:: assessment_metrics
@@ -175,7 +175,7 @@ property:
 
 Next, we can see the metrics evaluated on each of the groups identified by
 the :code:`sf_data` column.
-These are accessed through the :meth:`MetricFrame.by_group` property:
+These are accessed through the :attr:`MetricFrame.by_group` property:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -626,7 +626,7 @@ Multiple Sensitive Features
 
 Multiple sensitive features can be specified when the :class:`MetricFrame`
 is constructed.
-The :meth:`MetricFrame.by_groups` property then holds the intersections
+The :attr:`MetricFrame.by_group` property then holds the intersections
 of these groups:
 
 .. doctest:: assessment_metrics
@@ -695,7 +695,7 @@ When the data are split into subgroups, control features (if provided) act
 similarly to sensitive features.
 However, the 'overall' value for the metric is now computed for each subgroup
 of the control feature(s).
-Similarly, the aggregation functions (such as :code:`MetricFrame.group_max`) are
+Similarly, the aggregation functions (such as :func:`MetricFrame.group_max`) are
 performed for each subgroup in the conditional feature(s), rather than across
 them (as happens with the sensitive features).
 
