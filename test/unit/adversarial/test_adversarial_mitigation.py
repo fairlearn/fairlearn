@@ -80,7 +80,7 @@ def test_model_params(torch):
         batch_size=3,
         max_iter=10,
         random_state=1,
-        progress_updates=0,
+        progress_updates=0.0000001,
         callbacks=[lambda *args: False, lambda *args: False],
     )
     mitigator.fit(X, Y, sensitive_features=Z)
@@ -104,7 +104,7 @@ def test_model_early_stop(torch):
         batch_size=3,
         max_iter=10,
         random_state=1,
-        progress_updates=0,
+        progress_updates=0.0000001,
         callbacks=lambda object, step: step > 5,
     )
     mitigator.fit(X, Y, sensitive_features=Z)
@@ -154,8 +154,8 @@ def test_model_kw_error_ints():
             fake_training=True,
             predictor_model=[10, "ReLU"],
             adversary_model=[3, "ReLU"],
-            batch_size=-2,
-            max_iter=-3,
+            batch_size=-0.5,
+            max_iter=-0.1,
         )
         mitigator.fit(X, Y, sensitive_features=Z)
 
@@ -527,6 +527,35 @@ def test_validate_data_df_inputs():
         )
         for x in (X, Y, Z):
             check_2dnp(x)
+
+
+@pytest.mark.parametrize("backend", ["torch", "tensorflow"])
+def test_backend(backend):
+    """Test if validate_data properly preprocesses dataframes to ndarray."""
+    mitigator = get_instance(
+        torch=backend == "torch", tensorflow=backend == "tensorflow", backend=backend
+    )
+    mitigator._validate_backend()
+
+
+@pytest.mark.parametrize("backend", ["torch", "tensorflow"])
+def test_backend(backend):
+    """Test if validate_data properly preprocesses dataframes to ndarray."""
+    with pytest.raises(RuntimeError):
+        mitigator = get_instance(
+            torch=backend != "torch", tensorflow=backend != "tensorflow", backend=backend
+        )
+        mitigator._validate_backend()
+
+
+@pytest.mark.parametrize("backend", ["torch", "tensorflow"])
+def test_backend(backend):
+    """Test if validate_data properly preprocesses dataframes to ndarray."""
+    with pytest.raises(RuntimeError):
+        mitigator = get_instance(
+            torch=False, tensorflow=False, backend=backend
+        )
+        mitigator._validate_backend()
 
 
 def test_validate_data_ambiguous_rows():
