@@ -85,18 +85,18 @@ def _validate_and_reformat_input(
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
     else:
-        X = check_array(X)
+        X = check_array(X, dtype=None, force_all_finite=False)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
-    if sensitive_features is None:
-        raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
+    if sensitive_features is not None:
+        check_consistent_length(X, sensitive_features)
+        sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
 
-    check_consistent_length(X, sensitive_features)
-    sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
-
-    # compress multiple sensitive features into a single column
-    if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-        sensitive_features = _merge_columns(sensitive_features)
+        # compress multiple sensitive features into a single column
+        if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
+            sensitive_features = _merge_columns(sensitive_features)
+        
+        sensitive_features = pd.Series(sensitive_features.squeeze())
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
@@ -120,7 +120,7 @@ def _validate_and_reformat_input(
     return (
         pd.DataFrame(X),
         result_y,
-        pd.Series(sensitive_features.squeeze()),
+        sensitive_features,
         control_features,
     )
 
