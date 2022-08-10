@@ -52,7 +52,7 @@ def test_reshape():
 
 
 def test_wrong_shape():
-    with pytest.raises(Exception):
+    with pytest.raises(IndexError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -67,22 +67,22 @@ def test_wrong_shape():
 
 
 def test_wrong_shape2():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
                 metric=selection_rate, transform="difference"
             ),
-            y_true=y_t + [1],
+            y_true=y_t.reshape(-1).tolist() + [1],
             y_preds=[y_p, y_t],
-            sensitive_features=g_1 + [1],
+            sensitive_features=g_1.reshape(-1).tolist() + [1],
             point_labels=True,
             show_plot=False,
         )
 
 
 def test_kw_error_labels1():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -96,7 +96,7 @@ def test_kw_error_labels1():
 
 
 def test_kw_error_labels2():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -110,7 +110,7 @@ def test_kw_error_labels2():
 
 
 def test_kw_error_bools():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -125,7 +125,7 @@ def test_kw_error_bools():
 
 
 def test_kw_error_point_labels1():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -139,7 +139,7 @@ def test_kw_error_point_labels1():
 
 
 def test_kw_error_point_labels2():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -153,7 +153,7 @@ def test_kw_error_point_labels2():
 
 
 def test_kw_error_point_label_position():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -167,7 +167,7 @@ def test_kw_error_point_label_position():
 
 
 def test_kw_error_point_label_position2():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
@@ -181,7 +181,7 @@ def test_kw_error_point_label_position2():
 
 
 def test_kw_error_point_legend_kws():
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(
