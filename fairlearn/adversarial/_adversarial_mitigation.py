@@ -499,6 +499,11 @@ class _AdversarialFairness(BaseEstimator):
                             and len(predictor_losses) >= 1
                             and len(adversary_losses) >= 1
                         ):
+                            ETA = (
+                                (last_update_time - start_time + 1e-6)
+                                / (progress + 1e-6)
+                            ) * (1 - progress)
+                            # + 1e-6 for numerical stability
                             logger.info(
                                 _PROGRESS_UPDATE.format(  # noqa : G001
                                     "=" * round(20 * progress),
@@ -512,12 +517,7 @@ class _AdversarialFairness(BaseEstimator):
                                     ),  # noqa : G003
                                     batch + 1,  # noqa : G003
                                     batches,
-                                    # + 1e-6 for numerical stability
-                                    (
-                                        (last_update_time - start_time + 1e-6)
-                                        / (progress + 1e-6)
-                                    )
-                                    * (1 - progress),
+                                    ETA,
                                     predictor_losses[-1],
                                     adversary_losses[-1],
                                 )
