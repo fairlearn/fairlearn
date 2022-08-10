@@ -90,12 +90,14 @@ def _validate_and_reformat_input(
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
         check_consistent_length(X, sensitive_features)
-        sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
+        sensitive_features = check_array(
+            sensitive_features, ensure_2d=False, dtype=None
+        )
 
         # compress multiple sensitive features into a single column
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
             sensitive_features = _merge_columns(sensitive_features)
-        
+
         sensitive_features = pd.Series(sensitive_features.squeeze())
 
     # Handle the control features

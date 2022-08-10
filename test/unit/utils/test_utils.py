@@ -25,14 +25,12 @@ class TestValidateAndReformatInput:
         assert np.array_equal(X, X_update)
         assert np.array_equal(y, y_update)
         assert np.array_equal(sf, sf_update)
-    
+
     def test_only_X(self):
         # Regression test for Issue #898
         X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
 
-        X_update, _, _, _ = iv._validate_and_reformat_input(
-            X=X, expect_y=False
-        )
+        X_update, _, _, _ = iv._validate_and_reformat_input(X=X, expect_y=False)
         assert isinstance(X_update, pd.DataFrame)
 
     def test_cf(self):
