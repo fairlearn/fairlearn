@@ -494,29 +494,34 @@ class _AdversarialFairness(BaseEstimator):
                     if (time() - last_update_time) > self.progress_updates:
                         last_update_time = time()
                         progress = (epoch / epochs) + (batch / (batches * epochs))
-                        logger.info(
-                            _PROGRESS_UPDATE.format(  # noqa : G001
-                                "=" * round(20 * progress),
-                                " " * round(20 * (1 - progress)),  # noqa : G003
-                                epoch + 1,  # noqa : G003
-                                epochs,
-                                " "  # noqa : G003
-                                * (
-                                    len(str(batch + 1))  # noqa : G003
-                                    - len(str(batches))  # noqa : G003
-                                ),  # noqa : G003
-                                batch + 1,  # noqa : G003
-                                batches,
-                                # + 1e-6 for numerical stability
-                                (
-                                    (last_update_time - start_time + 1e-6)
-                                    / (progress + 1e-6)
+                        if (
+                            progress > 0
+                            and len(predictor_losses) >= 1
+                            and len(adversary_losses) >= 1
+                        ):
+                            logger.info(
+                                _PROGRESS_UPDATE.format(  # noqa : G001
+                                    "=" * round(20 * progress),
+                                    " " * round(20 * (1 - progress)),  # noqa : G003
+                                    epoch + 1,  # noqa : G003
+                                    epochs,
+                                    " "  # noqa : G003
+                                    * (
+                                        len(str(batch + 1))  # noqa : G003
+                                        - len(str(batches))  # noqa : G003
+                                    ),  # noqa : G003
+                                    batch + 1,  # noqa : G003
+                                    batches,
+                                    # + 1e-6 for numerical stability
+                                    (
+                                        (last_update_time - start_time + 1e-6)
+                                        / (progress + 1e-6)
+                                    )
+                                    * (1 - progress),
+                                    predictor_losses[-1],
+                                    adversary_losses[-1],
                                 )
-                                * (1 - progress),
-                                predictor_losses[-1],
-                                adversary_losses[-1],
                             )
-                        )
                 batch_slice = slice(
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
