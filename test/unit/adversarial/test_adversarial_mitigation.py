@@ -530,31 +530,22 @@ def test_validate_data_df_inputs():
 
 
 @pytest.mark.parametrize("backend", ["torch", "tensorflow"])
-def test_backend(backend):
+def test_not_correct_backend(backend):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
     mitigator = get_instance(
-        torch=backend == "torch", tensorflow=backend == "tensorflow", backend=backend
+        torch=backend != "torch",
+        tensorflow=backend != "tensorflow",
+        backend=backend,
     )
-    mitigator._validate_backend()
-
-
-@pytest.mark.parametrize("backend", ["torch", "tensorflow"])
-def test_backend(backend):
-    """Test if validate_data properly preprocesses dataframes to ndarray."""
     with pytest.raises(RuntimeError):
-        mitigator = get_instance(
-            torch=backend != "torch", tensorflow=backend != "tensorflow", backend=backend
-        )
         mitigator._validate_backend()
 
 
 @pytest.mark.parametrize("backend", ["torch", "tensorflow"])
-def test_backend(backend):
+def test_no_backend(backend):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
+    mitigator = get_instance(torch=False, tensorflow=False, backend=backend)
     with pytest.raises(RuntimeError):
-        mitigator = get_instance(
-            torch=False, tensorflow=False, backend=backend
-        )
         mitigator._validate_backend()
 
 
