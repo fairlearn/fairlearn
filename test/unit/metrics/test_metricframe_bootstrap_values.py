@@ -159,8 +159,9 @@ class TestBootstrapValues:
         # Only check the one sigma values here
 
         # Start by checking the nominal value
+        bootstrap_result = mf.difference_ci(method="between_groups")
         assert mf.difference(method="between_groups") == pytest.approx(
-            mf.difference_group_ci[2][1], rel=1 / math.sqrt(n_samples)
+            bootstrap_result[2], rel=1 / math.sqrt(n_samples)
         )
 
         # Do the error calculation
@@ -179,8 +180,8 @@ class TestBootstrapValues:
 
         # Check the one sigma values in the output
         assert nominal_acc_AB - acc_sigma_AB == pytest.approx(
-            mf.difference_group_ci[1][1], rel=1 / math.sqrt(n_samples)
+            bootstrap_result[1], rel=1 / math.sqrt(n_samples)
         )
         assert nominal_acc_AB + acc_sigma_AB == pytest.approx(
-            mf.difference_group_ci[3][1], rel=1 / math.sqrt(n_samples)
+            bootstrap_result[3], rel=1 / math.sqrt(n_samples)
         )
