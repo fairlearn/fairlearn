@@ -436,7 +436,7 @@ class MetricFrame:
         self._overall_ci, self._by_group_ci = None, None
         self.difference_overall_ci, self.difference_group_ci = None, None
         self.ratio_overall_ci, self.ratio_groups_ci = None, None
-        self.group_min_ci, self.group_max_ci = None, None
+        self._group_min_ci, self._group_max_ci = None, None
 
         self._quantiles = None
         if n_boot is not None:
@@ -488,13 +488,13 @@ class MetricFrame:
                 sample_estimate=self._by_group,
                 interval_type=ci_method,
             )
-            self.group_min_ci = create_ci_output(
+            self._group_min_ci = create_ci_output(
                 group_min_runs,
                 self._quantiles,
                 sample_estimate=group_min_output,
                 interval_type=ci_method,
             )
-            self.group_max_ci = create_ci_output(
+            self._group_max_ci = create_ci_output(
                 group_max_runs,
                 self._quantiles,
                 sample_estimate=group_max_output,
@@ -817,6 +817,25 @@ class MetricFrame:
             follows the table in :attr:`.MetricFrame.overall`.
         """
         return self.__group(self._by_group, "min", errors)
+
+    
+    @property
+    def group_max_ci(self):
+        if self._group_max_ci:
+            return [
+                output for _, output in self._group_max_ci
+            ]
+
+        return None
+
+    @property
+    def group_min_ci(self):
+        if self._group_min_ci:
+            return [
+                output for _, output in self._group_min_ci
+            ]
+
+        return None
 
     def __difference(
         self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame

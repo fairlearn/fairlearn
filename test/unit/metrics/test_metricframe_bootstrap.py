@@ -33,12 +33,12 @@ def check_all_bootstrap_output_shapes(mf):
         assert mf.overall.shape == ci_output.shape
     for ci_output in mf.by_group_ci:
         assert mf.by_group.shape == ci_output.shape
-    assert all(
-        mf.group_min().shape == ci_output.shape for _, ci_output in mf.group_min_ci
-    )
-    assert all(
-        mf.group_max().shape == ci_output.shape for _, ci_output in mf.group_max_ci
-    )
+
+    for ci_output in mf.group_min_ci:
+        assert mf.group_min().shape == ci_output.shape
+    for ci_output in mf.group_max_ci:
+        assert mf.group_max().shape == ci_output.shape
+
     assert all(
         mf.difference(method="to_overall").shape == ci_output.shape
         for _, ci_output in mf.difference_overall_ci
