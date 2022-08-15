@@ -16,9 +16,9 @@ from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3, g_4
 
 metric = [
     skm.recall_score,
-    skm.precision_score,
-    skm.accuracy_score,
-    skm.balanced_accuracy_score,
+    #skm.precision_score,
+    #skm.accuracy_score,
+    #skm.balanced_accuracy_score,
 ]
 
 ci_options = [0.95, 0.05, [0.2, 0.4, 0.6, 0.8]]
@@ -29,8 +29,10 @@ ci_methods = ["percentile", "bias-corrected"]
 
 def check_all_bootstrap_output_shapes(mf):
     # Check if all .*_ci outputs are same shape as regular outputs
-    assert all(mf.overall.shape == ci_output.shape for _, ci_output in mf.overall_ci)
-    assert all(mf.by_group.shape == ci_output.shape for _, ci_output in mf.by_group_ci)
+    for ci_output in mf.overall_ci:
+        assert mf.overall.shape == ci_output.shape
+    for ci_output in mf.by_group_ci:
+        assert mf.by_group.shape == ci_output.shape
     assert all(
         mf.group_min().shape == ci_output.shape for _, ci_output in mf.group_min_ci
     )

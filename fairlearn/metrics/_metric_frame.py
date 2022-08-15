@@ -528,7 +528,7 @@ class MetricFrame:
     @property
     def quantiles_(self) -> Optional[Tuple]:
         """Return the bootstrap confidence intervals.
-        
+
         This will be :code:`None` if :code:`n_boot` was :code:`None`.
         Otherwise it will be a tuple listing the quantiles
         for which all confidence intervals have been calculated
@@ -595,7 +595,9 @@ class MetricFrame:
                         for _, output in self._overall_ci
                     ]
             else:
-                return self._overall_ci
+                return [
+                    output for _, output in self._overall_ci
+                ]
 
         return None
 
@@ -644,7 +646,9 @@ class MetricFrame:
                     for _, output in self._by_group_ci
                 ]
             else:
-                return self._by_group_ci
+                return [
+                    output for _, output in self._by_group_ci
+                ]
 
         return None
 
