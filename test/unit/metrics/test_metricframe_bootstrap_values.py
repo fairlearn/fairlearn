@@ -128,7 +128,7 @@ class TestBootstrapValues:
             value = mean + (sigma_vals[i] * sigma)
             value_frac = value / n_samples
 
-            assert mf.overall_ci[i][1] == pytest.approx(
+            assert mf.overall_ci[i] == pytest.approx(
                 value_frac, rel=1 / math.sqrt(n_samples)
             )
 

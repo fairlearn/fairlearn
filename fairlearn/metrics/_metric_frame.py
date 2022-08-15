@@ -586,13 +586,13 @@ class MetricFrame:
             if self._user_supplied_callable:
                 if self.control_levels:
                     return [
-                        (quantile, output.iloc[:, 0])
-                        for quantile, output in self._overall_ci
+                        output.iloc[:, 0]
+                        for _, output in self._overall_ci
                     ]
                 else:
                     return [
-                        (quantile, output.iloc[0])
-                        for quantile, output in self._overall_ci
+                        output.iloc[0]
+                        for _, output in self._overall_ci
                     ]
             else:
                 return self._overall_ci
