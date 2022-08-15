@@ -160,7 +160,7 @@ We can use :class:`MetricFrame` to evaluate these metrics on our data:
 We can now interrogate this :class:`MetricFrame` to find the values for
 our chosen metrics.
 First, the metrics evaluated on the entire dataset (disregarding the
-sensitive feature), accessed via the :atrr:`MetricFrame.overall`
+sensitive feature), accessed via the :attr:`MetricFrame.overall`
 property:
 
 .. doctest:: assessment_metrics
@@ -393,6 +393,8 @@ misleading when the data can be further disaggregated.
 It's important to review metrics across these more granular categories, 
 if they exist, to verify that disparate outcomes persist across all levels 
 of aggregation. 
+See :ref:`intersecting_groups` below to see how :class:`MetricFrame` can
+help with this.
 
 However, more granular categories generally contain smaller sample sizes, and 
 it can be more difficult to establish that trends seen in very small 
@@ -609,6 +611,8 @@ The names of the generated functions are of the form
 For example :code:`fairlearn.metrics.accuracy_score_difference` and
 :code:`fairlearn.metrics.precision_score_group_min`.
 
+
+.. _intersecting_groups:
 
 Intersecting Groups
 -------------------
