@@ -640,8 +640,8 @@ class MetricFrame:
         if self._by_group_ci:
             if self._user_supplied_callable:
                 return [
-                    (quantile, output.iloc[:, 0])
-                    for quantile, output in self._by_group_ci
+                    output.iloc[:, 0]
+                    for _, output in self._by_group_ci
                 ]
             else:
                 return self._by_group_ci
