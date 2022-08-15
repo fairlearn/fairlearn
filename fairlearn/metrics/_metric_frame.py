@@ -392,7 +392,7 @@ class MetricFrame:
             all_data, annotated_funcs, grouping_features
         )
 
-        # Calculate uncertainty intervals using bootstrapped versions of data
+        # Calculate quantiles using bootstrapped versions of data
         def _bootstrap_metrics_calc(data):
             overall_frame = self._build_overall_frame(
                 data, annotated_funcs, cf_list, self._cf_names
