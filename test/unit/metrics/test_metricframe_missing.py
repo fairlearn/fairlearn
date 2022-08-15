@@ -24,7 +24,6 @@ g_B = np.asarray([group_gen(x, 1 + int(n / 3), ["x", "y", "z"]) for x in range(n
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_missing_sensitive_feature_combinations(metric_fn):
-
     target = metrics.MetricFrame(
         metrics=metric_fn,
         y_true=y_t,

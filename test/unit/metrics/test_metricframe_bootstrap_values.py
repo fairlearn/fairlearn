@@ -150,12 +150,8 @@ class TestBootstrapValues:
             vf_B = v_B / n_B
 
             # Slightly wider tolerance here.... not sure if this should be required
-            assert mf.by_group_ci[i]["A"] == pytest.approx(
-                vf_A, rel=2 / math.sqrt(n_A)
-            )
-            assert mf.by_group_ci[i]["B"] == pytest.approx(
-                vf_B, rel=2 / math.sqrt(n_B)
-            )
+            assert mf.by_group_ci[i]["A"] == pytest.approx(vf_A, rel=2 / math.sqrt(n_A))
+            assert mf.by_group_ci[i]["B"] == pytest.approx(vf_B, rel=2 / math.sqrt(n_B))
 
     def test_difference_between_groups(self, mf):
         # When adding or subtracting, absolute errors

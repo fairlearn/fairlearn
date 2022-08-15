@@ -435,7 +435,7 @@ class MetricFrame:
 
         self._overall_ci, self._by_group_ci = None, None
         self._difference_overall_ci, self._difference_group_ci = None, None
-        self.ratio_overall_ci, self.ratio_groups_ci = None, None
+        self._ratio_overall_ci, self._ratio_group_ci = None, None
         self._group_min_ci, self._group_max_ci = None, None
 
         self._quantiles = None
@@ -515,13 +515,13 @@ class MetricFrame:
                 sample_estimate=difference_overall_output,
                 interval_type=ci_method,
             )
-            self.ratio_group_ci = create_ci_output(
+            self._ratio_group_ci = create_ci_output(
                 ratio_group_runs,
                 self._quantiles,
                 sample_estimate=ratio_group_output,
                 interval_type=ci_method,
             )
-            self.ratio_overall_ci = create_ci_output(
+            self._ratio_overall_ci = create_ci_output(
                 ratio_overall_runs,
                 self._quantiles,
                 sample_estimate=ratio_overall_output,
@@ -985,6 +985,21 @@ class MetricFrame:
             result = self._calc_ratio_overall(self.by_group, self.overall)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
+
+        return result
+
+    def ratio_ci(self, method="between_groups"):
+        result = None
+        if method == "between_groups":
+            if self._ratio_group_ci:
+                result = [output for _, output in self._ratio_group_ci]
+        elif method == "to_overall":
+            if self._ratio_overall_ci:
+                result = [output for _, output in self._ratio_overall_ci]
+        else:
+            raise ValueError(
+                "Unrecognised method '{0}' in ratio_ci() call".format(method)
+            )
 
         return result
 

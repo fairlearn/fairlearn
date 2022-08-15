@@ -16,9 +16,9 @@ from .data_for_test import y_t, y_p, s_w, g_1, g_2, g_3, g_4
 
 metric = [
     skm.recall_score,
-    #skm.precision_score,
-    #skm.accuracy_score,
-    #skm.balanced_accuracy_score,
+    # skm.precision_score,
+    # skm.accuracy_score,
+    # skm.balanced_accuracy_score,
 ]
 
 ci_options = [0.95, 0.05, [0.2, 0.4, 0.6, 0.8]]
@@ -39,18 +39,11 @@ def check_all_bootstrap_output_shapes(mf):
     for ci_output in mf.group_max_ci:
         assert mf.group_max().shape == ci_output.shape
 
-    for method in ['to_overall', 'between_groups']:
+    for method in ["to_overall", "between_groups"]:
         for ci_output in mf.difference_ci(method=method):
             assert mf.difference(method=method).shape == ci_output.shape
-
-    assert all(
-        mf.ratio(method="to_overall").shape == ci_output.shape
-        for _, ci_output in mf.ratio_overall_ci
-    )
-    assert all(
-        mf.ratio(method="between_groups").shape == ci_output.shape
-        for _, ci_output in mf.ratio_group_ci
-    )
+        for ci_output in mf.ratio_ci(method=method):
+            assert mf.ratio(method=method).shape == ci_output.shape
 
 
 def check_all_bootstrap_directions(mf):
@@ -64,8 +57,8 @@ def check_all_bootstrap_directions(mf):
     assert check_direction(mf.group_max_ci)
     assert check_direction(mf.difference_ci(method="to_overall"))
     assert check_direction(mf.difference_ci(method="between_groups"))
-    assert check_direction(mf.ratio_overall_ci)
-    assert check_direction(mf.ratio_group_ci)
+    assert check_direction(mf.ratio_ci(method="to_overall"))
+    assert check_direction(mf.ratio_ci(method="between_groups"))
 
 
 @pytest.mark.parametrize("metric_fn", metric)
