@@ -691,14 +691,6 @@ Control Features
 Control features (sometimes called 'conditional' features) enable more detailed
 fairness insights by providing a further means of splitting the data into
 subgroups.
-When the data are split into subgroups, control features (if provided) act
-similarly to sensitive features.
-However, the 'overall' value for the metric is now computed for each subgroup
-of the control feature(s).
-Similarly, the aggregation functions (such as :func:`MetricFrame.group_max`) are
-performed for each subgroup in the conditional feature(s), rather than across
-them (as happens with the sensitive features).
-
 Control features are useful for cases where there is some expected variation with
 a feature, so we need to compute disparities while controlling for that feature.
 For example, in a loan scenario we would expect people of differing incomes to
@@ -707,6 +699,14 @@ want to measure disparities between different sensitive features.
 **However**, it should be borne in mind that due to historic discrimination, the
 income band might be correlated with various sensitive features.
 Because of this, control features should be used with particular caution.
+
+When the data are split into subgroups, control features (if provided) act
+similarly to sensitive features.
+However, the 'overall' value for the metric is now computed for each subgroup
+of the control feature(s).
+Similarly, the aggregation functions (such as :func:`MetricFrame.group_max`) are
+performed for each subgroup in the conditional feature(s), rather than across
+them (as happens with the sensitive features).
 
 The :class:`MetricFrame` constructor allows us to specify control features in
 a manner similar to sensitive features, using a :code:`control_features=`
@@ -839,7 +839,9 @@ Per-Sample Arguments
 ^^^^^^^^^^^^^^^^^^^^
 
 If there are per-sample arguments (such as sample weights), these can also be 
-provided in a dictionary via the ``sample_params`` argument:
+provided in a dictionary via the ``sample_params`` argument.
+The keys of this dictionary are the argument names, and the values are 1-D
+arrays equal in length to ``y_true`` etc.:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -861,8 +863,11 @@ provided in a dictionary via the ``sample_params`` argument:
     Name: recall_score, dtype: float64
 
 If multiple metrics are being evaluated, then ``sample_params`` becomes a 
-dictionary of dictionaries, with the first key corresponding matching that in 
-the dictionary holding the desired underlying metric functions.
+dictionary of dictionaries.
+The first key to this dictionary is the name of the metric as specified
+in the ``metrics`` argument.
+The keys of the inner dictionary are the argument names, and the values
+are the 1-D arrays of sample parameters for that metric.
 For example:
 
 .. doctest:: assessment_metrics
@@ -894,6 +899,11 @@ For example:
     a        0.5         0.500000         0.666667
     b        0.6         0.583333         0.600000
     c        0.4         0.250000         0.272727
+
+Note that there is no concept of a 'global' sample parameter (e.g. a set
+of sample weights to be applied for all metric functions).
+In such a case, the sample parameter in question must be repeated in
+the nested dictionary for each metric function.
 
 
 More Complex Metrics
@@ -969,7 +979,7 @@ Inputs are Arrays of Objects
 :class:`MetricFrame` can also handle cases when the :math:`Y_{true}` and/or :math:`Y_{pred}` vectors
 are not vectors of scalars.
 It is the metric function(s) which gives meaning to these values - :class:`MetricFrame` itself
-just slices the vectors up acorrding to the sensitive feature(s) and the control feature(s).
+just slices the vectors up according to the sensitive feature(s) and the control feature(s).
 
 For a concrete example, consider an image recognition algorithm which draws a bounding box
 around some region of interest.
