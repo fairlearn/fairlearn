@@ -107,6 +107,16 @@ class TestBootstrapValues:
         assert mf.by_group["A"] == p_A
         assert mf.by_group["B"] == p_B
 
+    def test_quantiles_(self, mf):
+        expected_quantiles = (
+            0.025,
+            0.1587,
+            0.5,
+            0.8413,
+            0.975,
+        )
+        assert mf.quantiles_ == expected_quantiles
+
     def test_overall_ci(self, mf):
         mean = p * n_samples
         sigma = math.sqrt(n_samples * p * (1 - p))

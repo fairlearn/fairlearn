@@ -438,6 +438,7 @@ class MetricFrame:
         self.ratio_overall_ci, self.ratio_groups_ci = None, None
         self.group_min_ci, self.group_max_ci = None, None
 
+        self._quantiles = None
         if n_boot is not None:
             # Calculate all outputs across entire data sample to assist bootstrap bias calculations
             # NOTE: Consider caching these results for on-demand regular calls?
@@ -461,7 +462,7 @@ class MetricFrame:
                     " metric functions having a non-scalar return value."
                 ) from e
 
-            ci = process_ci_bounds(ci, ci_method)
+            self._quantiles = process_ci_bounds(ci, ci_method)
             parallel_output = Parallel(n_jobs=n_jobs)(
                 delayed(_bootstrap_metrics_calc)(all_data.sample(frac=1, replace=True))
                 for _ in range(n_boot)
@@ -479,50 +480,60 @@ class MetricFrame:
 
             # Summarize results, using main output as a prototype to provide appropriate index/columns.
             self._overall_ci = create_ci_output(
-                overall_runs, ci, sample_estimate=self._overall, interval_type=ci_method
+                overall_runs, self._quantiles, sample_estimate=self._overall, interval_type=ci_method
             )
             self._by_group_ci = create_ci_output(
                 by_group_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=self._by_group,
                 interval_type=ci_method,
             )
             self.group_min_ci = create_ci_output(
                 group_min_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=group_min_output,
                 interval_type=ci_method,
             )
             self.group_max_ci = create_ci_output(
                 group_max_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=group_max_output,
                 interval_type=ci_method,
             )
             self.difference_group_ci = create_ci_output(
                 diff_group_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=difference_group_output,
                 interval_type=ci_method,
             )
             self.difference_overall_ci = create_ci_output(
                 diff_overall_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=difference_overall_output,
                 interval_type=ci_method,
             )
             self.ratio_group_ci = create_ci_output(
                 ratio_group_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=ratio_group_output,
                 interval_type=ci_method,
             )
             self.ratio_overall_ci = create_ci_output(
                 ratio_overall_runs,
-                ci,
+                self._quantiles,
                 sample_estimate=ratio_overall_output,
                 interval_type=ci_method,
             )
+
+    @property
+    def quantiles_(self) -> Optional[Tuple]:
+        """Return the bootstrap confidence intervals.
+        
+        This will be :code:`None` if :code:`n_boot` was :code:`None`.
+        Otherwise it will be a tuple listing the quantiles
+        for which all confidence intervals have been calculated
+        """
+        return self._quantiles
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:

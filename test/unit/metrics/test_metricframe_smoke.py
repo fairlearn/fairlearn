@@ -30,6 +30,7 @@ def test_basic(transform_y_t, transform_y_p):
     assert target.control_levels is None
     assert isinstance(target.sensitive_levels, list)
     assert target.sensitive_levels == ["My feature"]
+    assert target.quantiles_ is None
 
     # Check we have correct return types
     assert isinstance(target.overall, float)
@@ -74,6 +75,7 @@ def test_basic_metric_dict(transform_y_t, transform_y_p):
     assert target.control_levels is None
     assert isinstance(target.sensitive_levels, list)
     assert target.sensitive_levels == ["My feature"]
+    assert target.quantiles_ is None
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.Series)
@@ -122,6 +124,7 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
     assert target.control_levels == ["control_feature_0"]
     assert isinstance(target.sensitive_levels, list)
     assert target.sensitive_levels == ["sensitive_feature_0"]
+    assert target.quantiles_ is None
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.Series)
@@ -187,6 +190,7 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
     assert target.control_levels == ["control_feature_0"]
     assert isinstance(target.sensitive_levels, list)
     assert target.sensitive_levels == ["sensitive_feature_0"]
+    assert target.quantiles_ is None
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.DataFrame)
