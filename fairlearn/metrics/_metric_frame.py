@@ -705,6 +705,7 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+
         def ratio_sub_one(x):
             if x > 1:
                 return 1 / x
@@ -752,7 +753,8 @@ class MetricFrame:
     def _process_functions(
         self, metric, sample_params, all_data: pd.DataFrame
     ) -> Dict[str, AnnotatedMetricFunction]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""  # noqa: E501
+        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects.
+        """  # noqa: E501
         self._user_supplied_callable = True
         func_dict = dict()
 
