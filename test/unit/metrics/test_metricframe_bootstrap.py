@@ -39,14 +39,10 @@ def check_all_bootstrap_output_shapes(mf):
     for ci_output in mf.group_max_ci:
         assert mf.group_max().shape == ci_output.shape
 
-    assert all(
-        mf.difference(method="to_overall").shape == ci_output.shape
-        for _, ci_output in mf.difference_overall_ci
-    )
-    assert all(
-        mf.difference(method="between_groups").shape == ci_output.shape
-        for _, ci_output in mf.difference_group_ci
-    )
+    for method in ['to_overall', 'between_groups']:
+        for ci_output in mf.difference_ci(method=method):
+            assert mf.difference(method=method).shape == ci_output.shape
+
     assert all(
         mf.ratio(method="to_overall").shape == ci_output.shape
         for _, ci_output in mf.ratio_overall_ci
@@ -66,8 +62,8 @@ def check_all_bootstrap_directions(mf):
     assert check_direction(mf.by_group_ci)
     assert check_direction(mf.group_min_ci)
     assert check_direction(mf.group_max_ci)
-    assert check_direction(mf.difference_overall_ci)
-    assert check_direction(mf.difference_group_ci)
+    assert check_direction(mf.difference_ci(method="to_overall"))
+    assert check_direction(mf.difference_ci(method="between_groups"))
     assert check_direction(mf.ratio_overall_ci)
     assert check_direction(mf.ratio_group_ci)
 

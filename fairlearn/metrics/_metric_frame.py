@@ -434,7 +434,7 @@ class MetricFrame:
             )
 
         self._overall_ci, self._by_group_ci = None, None
-        self.difference_overall_ci, self.difference_group_ci = None, None
+        self._difference_overall_ci, self._difference_group_ci = None, None
         self.ratio_overall_ci, self.ratio_groups_ci = None, None
         self._group_min_ci, self._group_max_ci = None, None
 
@@ -500,13 +500,13 @@ class MetricFrame:
                 sample_estimate=group_max_output,
                 interval_type=ci_method,
             )
-            self.difference_group_ci = create_ci_output(
+            self._difference_group_ci = create_ci_output(
                 diff_group_runs,
                 self._quantiles,
                 sample_estimate=difference_group_output,
                 interval_type=ci_method,
             )
-            self.difference_overall_ci = create_ci_output(
+            self._difference_overall_ci = create_ci_output(
                 diff_overall_runs,
                 self._quantiles,
                 sample_estimate=difference_overall_output,
@@ -818,7 +818,6 @@ class MetricFrame:
         """
         return self.__group(self._by_group, "min", errors)
 
-    
     @property
     def group_max_ci(self):
         if self._group_max_ci:
@@ -901,6 +900,23 @@ class MetricFrame:
             )
 
         return self.__difference(self.by_group, subtrahend)
+
+    def difference_ci(self, method='between_groups'):
+        result = None
+        if method == 'between_groups':
+            if self._difference_group_ci:
+                result = [
+                    output for _, output in self._difference_group_ci
+                ]
+        elif method == 'to_overall':
+            if self._difference_overall_ci:
+                result = [output for _, output in self._difference_overall_ci]
+        else:
+            raise ValueError(
+                "Unrecognised method '{0}' in difference_ci() call".format(method)
+            )
+
+        return result
 
     def _calc_ratio_overall(self, by_group_frame, overall_frame):
         def ratio_sub_one(x):
