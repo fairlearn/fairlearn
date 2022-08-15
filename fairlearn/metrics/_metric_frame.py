@@ -480,7 +480,10 @@ class MetricFrame:
 
             # Summarize results, using main output as a prototype to provide appropriate index/columns.
             self._overall_ci = create_ci_output(
-                overall_runs, self._quantiles, sample_estimate=self._overall, interval_type=ci_method
+                overall_runs,
+                self._quantiles,
+                sample_estimate=self._overall,
+                interval_type=ci_method,
             )
             self._by_group_ci = create_ci_output(
                 by_group_runs,
@@ -585,19 +588,11 @@ class MetricFrame:
         if self._overall_ci:
             if self._user_supplied_callable:
                 if self.control_levels:
-                    return [
-                        output.iloc[:, 0]
-                        for _, output in self._overall_ci
-                    ]
+                    return [output.iloc[:, 0] for _, output in self._overall_ci]
                 else:
-                    return [
-                        output.iloc[0]
-                        for _, output in self._overall_ci
-                    ]
+                    return [output.iloc[0] for _, output in self._overall_ci]
             else:
-                return [
-                    output for _, output in self._overall_ci
-                ]
+                return [output for _, output in self._overall_ci]
 
         return None
 
@@ -637,18 +632,14 @@ class MetricFrame:
     def by_group_ci(
         self,
     ) -> Optional[List[Dict[float, Union[pd.Series, pd.DataFrame]]]]:
-        """Return estimates of by_group confidence intervals calculated via bootstrap."""
+        """Return estimates of by_group confidence intervals calculated via bootstrap.
+        """
 
         if self._by_group_ci:
             if self._user_supplied_callable:
-                return [
-                    output.iloc[:, 0]
-                    for _, output in self._by_group_ci
-                ]
+                return [output.iloc[:, 0] for _, output in self._by_group_ci]
             else:
-                return [
-                    output for _, output in self._by_group_ci
-                ]
+                return [output for _, output in self._by_group_ci]
 
         return None
 
@@ -821,25 +812,20 @@ class MetricFrame:
     @property
     def group_max_ci(self):
         if self._group_max_ci:
-            return [
-                output for _, output in self._group_max_ci
-            ]
+            return [output for _, output in self._group_max_ci]
 
         return None
 
     @property
     def group_min_ci(self):
         if self._group_min_ci:
-            return [
-                output for _, output in self._group_min_ci
-            ]
+            return [output for _, output in self._group_min_ci]
 
         return None
 
     def __difference(
         self, by_group_frame: Union[pd.Series, pd.DataFrame], subtrahend: pd.DataFrame
     ) -> Union[Any, pd.Series, pd.DataFrame]:
-
         mf = by_group_frame.copy()
         if isinstance(mf, pd.Series):
             mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
@@ -901,14 +887,12 @@ class MetricFrame:
 
         return self.__difference(self.by_group, subtrahend)
 
-    def difference_ci(self, method='between_groups'):
+    def difference_ci(self, method="between_groups"):
         result = None
-        if method == 'between_groups':
+        if method == "between_groups":
             if self._difference_group_ci:
-                result = [
-                    output for _, output in self._difference_group_ci
-                ]
-        elif method == 'to_overall':
+                result = [output for _, output in self._difference_group_ci]
+        elif method == "to_overall":
             if self._difference_overall_ci:
                 result = [output for _, output in self._difference_overall_ci]
         else:
@@ -1007,7 +991,8 @@ class MetricFrame:
     def _process_functions(
         self, metric, sample_params, all_data: pd.DataFrame
     ) -> Dict[str, AnnotatedMetricFunction]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""  # noqa: E501
+        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects.
+        """  # noqa: E501
         self._user_supplied_callable = True
         func_dict = dict()
 
