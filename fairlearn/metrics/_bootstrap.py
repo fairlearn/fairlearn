@@ -90,7 +90,7 @@ def create_ci_output(bootstrap_runs, ci, sample_estimate, interval_type="percent
         prop_less = (num_less + num_equal / 2) / len(bootstrap_runs)
         z0 = norm.ppf(prop_less)
         z_alphas = norm.ppf(ci)
-        adjusted_ci = [norm.cdf(2 * z0 + alpha) for alpha in z_alphas]
+        adjusted_ci = [norm.cdf(2 * z0 + z_alpha) for z_alpha in z_alphas]
     else:
         # Match bias adjusted ci datastructures for downstream code
         adjusted_ci = np.repeat(ci, np.prod(sample_estimate.shape)).reshape(
