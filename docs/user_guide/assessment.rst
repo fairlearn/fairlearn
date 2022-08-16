@@ -938,7 +938,7 @@ Such return values are fully supported by :class:`MetricFrame`:
     ... )
     >>> mf_conf.overall
     array([[2, 4],
-           [6, 6]], dtype=int64)
+           [6, 6]]...)
     >>> mf_conf.by_group
     sensitive_feature_0
     a    [[0, 2], [1, 1]]
