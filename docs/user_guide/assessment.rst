@@ -985,17 +985,61 @@ are not vectors of scalars.
 It is the metric function(s) which gives meaning to these values - :class:`MetricFrame` itself
 just slices the vectors up according to the sensitive feature(s) and the control feature(s).
 
-For a concrete example, consider an image recognition algorithm which draws a bounding box
+As a toy example, suppose that our ``y`` values (both true and predicted) are tuples representing
+the dimensions of a rectangle.
+For some reason known only to our fevered imagination (although it might possibly be due to a
+desire for a *really* simple example), we are interested in the areas of these rectangles.
+In particular, we want to calculate the mean of the area ratios. That is:
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> def area_metric(y_true, y_pred):
+    ...     def calc_area(a):
+    ...         return a[0] * a[1]
+    ...
+    ...     y_ts = np.asarray([calc_area(x) for x in y_true])
+    ...     y_ps = np.asarray([calc_area(x) for x in y_pred])
+    ...
+    ...     return np.mean(y_ts / y_ps)
+
+
+This is a perfectly good metric for :class:`MetricFrame`, provided we supply appropriate
+inputs.
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> y_rect_true = [(4,9), (3,8), (2,10)]
+    >>> y_rect_pred = [(1,12), (2,1), (5, 2)]
+    >>> rect_groups = { 'sf_0':['a', 'a', 'b'] }
+    >>>
+    >>> mf_non_scalar = MetricFrame(
+    ...      metrics=area_metric,
+    ...      y_true=y_rect_true,
+    ...      y_pred=y_rect_pred,
+    ...      sensitive_features=rect_groups  
+    ... )
+    >>> print(mf_non_scalar.overall)
+    5.6666...
+    >>> print(mf_non_scalar.by_group)
+    sf_0
+    a    7.5
+    b    2.0
+    Name: area_metric, dtype: float64
+
+For a more concrete example, consider an image recognition algorithm which draws a bounding box
 around some region of interest.
 We will want to compare the 'true' bounding boxes (perhaps from human annotators) with the
 ones predicted by our model.
-A straightforward metric for this purpose is the IoU or 'intersection divided by union.'
+A straightforward metric for this purpose is the IoU or 'intersection over union.'
 As the name implies, this metric takes two rectangles, and computes the area of their intersection
 and divides it by the area of their union.
 If the two rectangles are disjoint, then the IoU will be zero.
 If the two rectangles are identical, then the IoU will be one.
-
-See our `example notebook <../auto_examples/plot_metricframe_beyond_binary_classification.html#non-scalar-inputs>`_.
+This is presented in full in our 
+`example notebook <../auto_examples/plot_metricframe_beyond_binary_classification.html#non-scalar-inputs>`_.
 
 
 .. _plot_metricframe:
