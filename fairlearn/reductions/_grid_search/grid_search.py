@@ -236,7 +236,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         return self.predictors_[self.best_idx_].predict(X)
 
     def predict_proba(self, X):
-        """Return :code:`predict_proba()` from the best model found by the grid search.
+        """Return probability estimates from the best model found by the grid search.
 
         The underlying estimator must support :code:`predict_proba(X)` for this
         to work. The return type is determined by this method.
