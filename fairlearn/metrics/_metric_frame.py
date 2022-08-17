@@ -554,32 +554,16 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        if method == "between_groups":
-            subtrahend = self.group_min(errors=errors)
-        elif method == "to_overall":
-            subtrahend = self.overall
+        result = self._result.difference(self.control_levels, method=method, errors=errors)
+
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return result.iloc[:, 0]
+            else:
+                return result.iloc[0]
         else:
-            raise ValueError(
-                "Unrecognised method '{0}' in difference() call".format(method)
-            )
-
-        mf = self.by_group.copy()
-        # Can assume errors='coerce', else error would already have been raised in .group_min
-        # Fill all non-scalar values with NaN
-        if isinstance(mf, pd.Series):
-            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
-        else:
-            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
-
-        if self.control_levels is None:
-            result = (mf - subtrahend).abs().max()
-        else:
-            result = (mf - subtrahend).abs().groupby(level=self.control_levels).max()
-
-        return result
+            return result
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"

@@ -66,10 +66,12 @@ class DisaggregatedResult:
         """Return the metrics by group."""
         return self._by_group
 
-    def apply_grouping(self, grouping_function: str,
-                       control_feature_names: Optional[List[str]],
-                       errors: str = "raise"
-                       ) -> Union[pd.Series, pd.DataFrame]:
+    def apply_grouping(
+        self,
+        grouping_function: str,
+        control_feature_names: Optional[List[str]],
+        errors: str = "raise",
+    ) -> Union[pd.Series, pd.DataFrame]:
         """Compute mins or maxes."""
         if grouping_function not in _VALID_GROUPING_FUNCTION:
             raise ValueError(_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE)
@@ -128,11 +130,54 @@ class DisaggregatedResult:
                     result = mf.groupby(level=control_feature_names).min()
                 else:
                     result = mf.groupby(level=control_feature_names).max()
+                    
+        assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
+
+        return result
+
+    def difference(
+        self,
+        control_feature_names: List[str],
+        method: str = "between_groups",
+        errors: str = "coerce",
+    ) -> Union[pd.Series, pd.DataFrame]:
+        """Compute differences."""
+
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        if method == "between_groups":
+            subtrahend = self.apply_grouping(
+                "min", control_feature_names, errors=errors
+            )
+        elif method == "to_overall":
+            subtrahend = self.overall
+        else:
+            raise ValueError(
+                "Unrecognised method '{0}' in difference() call".format(method)
+            )
+
+        mf = self.by_group.copy()
+        # Can assume errors='coerce', else error would already have been raised in .group_min
+        # Fill all non-scalar values with NaN
+        if isinstance(mf, pd.Series):
+            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
+        else:
+            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+
+        if control_feature_names is None:
+            result = (mf - subtrahend).abs().max()
+        else:
+            result = (mf - subtrahend).abs().groupby(level=control_feature_names).max()
+
+        assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
 
         return result
 
 
-def extract_unique_classes(data: pd.DataFrame, feature_list: List[str]) -> Dict[str, np.ndarray]:
+def extract_unique_classes(
+    data: pd.DataFrame, feature_list: List[str]
+) -> Dict[str, np.ndarray]:
     """Compute unique values in a given set of columns."""
     result = dict()
     for feature in feature_list:
