@@ -705,6 +705,13 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
+
+        def ratio_sub_one(x):
+            if x > 1:
+                return 1 / x
+            else:
+                return x
+
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
@@ -716,12 +723,12 @@ class MetricFrame:
                 tmp = self.by_group / self.overall
                 if self.control_levels:
                     result = (
-                        tmp.transform(lambda x: min(x, 1 / x))
+                        tmp.transform(ratio_sub_one)
                         .groupby(level=self.control_levels)
                         .min()
                     )
                 else:
-                    result = tmp.transform(lambda x: min(x, 1 / x)).min()
+                    result = tmp.transform(ratio_sub_one).min()
             else:
                 ratios = None
 
@@ -732,12 +739,6 @@ class MetricFrame:
                     ) / self.overall.unstack(level=self.control_levels)
                 else:
                     ratios = self.by_group / self.overall
-
-                def ratio_sub_one(x):
-                    if x > 1:
-                        return 1 / x
-                    else:
-                        return x
 
                 ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
                 if not self.control_levels:
@@ -752,7 +753,7 @@ class MetricFrame:
     def _process_functions(
         self, metric, sample_params, all_data: pd.DataFrame
     ) -> Dict[str, AnnotatedMetricFunction]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction` objects."""  # noqa: E501
+        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
         self._user_supplied_callable = True
         func_dict = dict()
 
