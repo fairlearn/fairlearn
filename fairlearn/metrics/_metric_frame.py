@@ -454,7 +454,9 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        result = self._result.apply_grouping(grouping_function, self.control_levels, errors=errors)
+        result = self._result.apply_grouping(
+            grouping_function, self.control_levels, errors=errors
+        )
 
         if self._user_supplied_callable:
             if self.control_levels:
