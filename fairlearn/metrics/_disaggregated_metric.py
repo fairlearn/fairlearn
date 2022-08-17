@@ -130,7 +130,7 @@ class DisaggregatedResult:
                     result = mf.groupby(level=control_feature_names).min()
                 else:
                     result = mf.groupby(level=control_feature_names).max()
-                    
+
         assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
 
         return result
