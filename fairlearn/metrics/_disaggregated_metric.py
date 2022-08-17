@@ -142,7 +142,6 @@ class DisaggregatedResult:
         errors: str = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
         """Compute differences."""
-
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
