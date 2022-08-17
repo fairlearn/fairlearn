@@ -213,7 +213,7 @@ class DisaggregatedResult:
                 result = ratios.min().unstack(0)
         else:
             raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
-        
+
         assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
 
         return result

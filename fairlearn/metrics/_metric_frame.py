@@ -18,9 +18,6 @@ from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
 
-_VALID_ERROR_STRING = ["raise", "coerce"]
-_VALID_GROUPING_FUNCTION = ["min", "max"]
-
 _SF_DICT_CONVERSION_FAILURE = (
     "DataFrame.from_dict() failed on sensitive features. "
     "Please ensure each array is strictly 1-D. "
@@ -35,9 +32,6 @@ _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
     "Keys in 'sample_params' do not match those in 'metric'"
-)
-_INVALID_ERRORS_VALUE_ERROR_MESSAGE = (
-    "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
 )
 
 
