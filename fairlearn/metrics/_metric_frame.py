@@ -51,7 +51,6 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
 )
 
 
-
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
 
@@ -336,8 +335,9 @@ class MetricFrame:
             nameset.add(name)
 
         # Create the 'overall' results
-        self._result = calculate_disaggregated_metrics(all_data, annotated_funcs, self._sf_names, self._cf_names)
-
+        self._result = calculate_disaggregated_metrics(
+            all_data, annotated_funcs, self._sf_names, self._cf_names
+        )
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -472,20 +472,20 @@ class MetricFrame:
         if not self.control_levels:
             if errors == "raise":
                 try:
-                    mf = self._by_group
+                    mf = self._result.by_group
                     if grouping_function == "min":
                         vals = [mf[m].min() for m in mf.columns]
                     else:
                         vals = [mf[m].max() for m in mf.columns]
 
                     result = pd.Series(
-                        vals, index=self._by_group.columns, dtype="object"
+                        vals, index=self._result.by_group.columns, dtype="object"
                     )
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 if not self.control_levels:
-                    mf = self._by_group
+                    mf = self._result.by_group
                     # Fill in the possible min/max values, else np.nan
                     if grouping_function == "min":
                         vals = [
@@ -503,14 +503,18 @@ class MetricFrame:
             if errors == "raise":
                 try:
                     if grouping_function == "min":
-                        result = self._by_group.groupby(level=self.control_levels).min()
+                        result = self._result.by_group.groupby(
+                            level=self.control_levels
+                        ).min()
                     else:
-                        result = self._by_group.groupby(level=self.control_levels).max()
+                        result = self._result.by_group.groupby(
+                            level=self.control_levels
+                        ).max()
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self._by_group.copy()
+                mf = self._result.by_group.copy()
                 mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
                 if grouping_function == "min":
                     result = mf.groupby(level=self.control_levels).min()
