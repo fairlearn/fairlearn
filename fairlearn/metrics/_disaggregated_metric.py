@@ -45,26 +45,32 @@ def apply_to_dataframe(
 
 
 class DisaggregatedResult:
+    """Pickier version of MetricFrame."""
+
     def __init__(
         self,
         overall: Union[pd.Series, pd.DataFrame],
         by_group: Union[pd.Series, pd.DataFrame],
     ):
+        """Construct an object."""
         self._overall = overall
         self._by_group = by_group
 
     @property
     def overall(self) -> Union[pd.Series, pd.DataFrame]:
+        """Return overall metrics."""
         return self._overall
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
+        """Return the metrics by group."""
         return self._by_group
 
     def apply_grouping(self, grouping_function: str,
                        control_feature_names: Optional[List[str]],
                        errors: str = "raise"
                        ) -> Union[pd.Series, pd.DataFrame]:
+        """Compute mins or maxes."""
         if grouping_function not in _VALID_GROUPING_FUNCTION:
             raise ValueError(_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE)
 
@@ -126,7 +132,8 @@ class DisaggregatedResult:
         return result
 
 
-def extract_unique_classes(data: pd.DataFrame, feature_list: List[str]):
+def extract_unique_classes(data: pd.DataFrame, feature_list: List[str]) -> Dict[str, np.ndarray]:
+    """Compute unique values in a given set of columns."""
     result = dict()
     for feature in feature_list:
         result[feature] = np.unique(data[feature])
@@ -139,6 +146,7 @@ def calculate_disaggregated_metrics(
     sensitive_feature_names: List[str],
     control_feature_names: Optional[List[str]],
 ) -> DisaggregatedResult:
+    """Manufacture a DisaggregatedResult."""
     # Calculate the 'overall' values
     if control_feature_names is None:
         overall = apply_to_dataframe(data, metric_functions=annotated_functions)
