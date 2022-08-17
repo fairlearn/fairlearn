@@ -14,7 +14,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_metric import apply_grouping_to_disaggregated_metrics, calculate_disaggregated_metrics
+from ._disaggregated_metric import calculate_disaggregated_metrics
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -39,15 +39,6 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
 )
 _INVALID_ERRORS_VALUE_ERROR_MESSAGE = (
     "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
-)
-_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = (
-    "Invalid grouping function specified. Valid values are {0}".format(
-        _VALID_GROUPING_FUNCTION
-    )
-)
-_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
-    "Metric frame contains non-scalar cells. Please remove non-scalar columns from your"
-    " metric frame or use parameter errors='coerce'."
 )
 
 
@@ -463,7 +454,7 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        result = apply_grouping_to_disaggregated_metrics(self._result, grouping_function, self.control_levels, errors=errors)
+        result = self._result.apply_grouping(grouping_function, self.control_levels, errors=errors)
 
         if self._user_supplied_callable:
             if self.control_levels:
