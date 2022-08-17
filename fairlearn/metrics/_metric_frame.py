@@ -608,7 +608,6 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-
         tmp = self._result.ratio(self.control_levels, method=method, errors=errors)
 
         if isinstance(tmp, pd.Series):
