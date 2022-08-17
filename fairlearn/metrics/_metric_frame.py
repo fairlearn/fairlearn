@@ -252,7 +252,7 @@ class MetricFrame:
     >>> mf2.difference()
     accuracy          0.2
     selection_rate    0.4
-    dtype: object
+    dtype: float64
 
     You'll probably want to view them transposed
 
