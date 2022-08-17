@@ -555,7 +555,12 @@ class MetricFrame:
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
 
-        result = self._result.difference(self.control_levels, method=method, errors=errors)
+        tmp = self._result.difference(self.control_levels, method=method, errors=errors)
+
+        if isinstance(tmp, pd.Series):
+            result = tmp.map(lambda x: x if x is not None else np.nan)
+        else:
+            result = tmp.applymap(lambda x: x if x is not None else np.nan)
 
         if self._user_supplied_callable:
             if self.control_levels:
