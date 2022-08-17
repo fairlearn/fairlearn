@@ -14,6 +14,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
+from ._disaggregated_metric import calculate_disaggregated_metrics
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -49,21 +50,6 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
     " metric frame or use parameter errors='coerce'."
 )
 
-
-def apply_to_dataframe(
-    data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
-) -> pd.Series:
-    """Apply metric functions to a DataFrame.
-
-    The incoming DataFrame may have been sliced via `groupby()`.
-    This function applies each annotated function in turn to the
-    supplied DataFrame.
-    """
-    values = dict()
-    for function_name, metric_function in metric_functions.items():
-        values[function_name] = metric_function(data)
-    result = pd.Series(data=values.values(), index=values.keys())
-    return result
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -350,19 +336,8 @@ class MetricFrame:
             nameset.add(name)
 
         # Create the 'overall' results
-        self._overall = self._build_overall_frame(
-            all_data, annotated_funcs, cf_list, self._cf_names
-        )
+        self._result = calculate_disaggregated_metrics(all_data, annotated_funcs, self._sf_names, self._cf_names)
 
-        grouping_features = copy.deepcopy(sf_list)
-        if cf_list is not None:
-            # Prepend the conditional features, so they are 'higher'
-            grouping_features = copy.deepcopy(cf_list) + grouping_features
-
-        # Create the 'by group' results
-        self._by_group = self._build_by_group_frame(
-            all_data, annotated_funcs, grouping_features
-        )
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -399,11 +374,11 @@ class MetricFrame:
         """
         if self._user_supplied_callable:
             if self.control_levels:
-                return self._overall.iloc[:, 0]
+                return self._result.overall.iloc[:, 0]
             else:
-                return self._overall.iloc[0]
+                return self._result.overall.iloc[0]
         else:
-            return self._overall
+            return self._result.overall
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
@@ -433,9 +408,9 @@ class MetricFrame:
             are specified), then the corresponding entry will be NaN.
         """
         if self._user_supplied_callable:
-            return self._by_group.iloc[:, 0]
+            return self._result.by_group.iloc[:, 0]
         else:
-            return self._by_group
+            return self._result.by_group
 
     @property
     def control_levels(self) -> List[str]:
@@ -877,37 +852,3 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
-
-    def _build_overall_frame(self, data, metric_funcs, cf_list, cf_names):
-        """Build the 'overall' result during construction."""
-        if cf_names is None:
-            return apply_to_dataframe(data, metric_functions=metric_funcs)
-        else:
-            temp = data.groupby(by=cf_names).apply(
-                apply_to_dataframe, metric_functions=metric_funcs
-            )
-            # If there are multiple control features, might have missing combinations
-            if len(cf_names) > 1:
-                all_indices = pd.MultiIndex.from_product(
-                    [x.classes_ for x in cf_list], names=[x.name_ for x in cf_list]
-                )
-
-                return temp.reindex(index=all_indices)
-            else:
-                return temp
-
-    def _build_by_group_frame(self, data, metric_funcs, grouping_features):
-        """Build the 'by_group' result during construction."""
-        temp = data.groupby([x.name_ for x in grouping_features]).apply(
-            apply_to_dataframe, metric_functions=metric_funcs
-        )
-        if len(grouping_features) > 1:
-            # We might have missing combinations in the input, so expand to fill
-            all_indices = pd.MultiIndex.from_product(
-                [x.classes_ for x in grouping_features],
-                names=[x.name_ for x in grouping_features],
-            )
-
-            return temp.reindex(index=all_indices)
-        else:
-            return temp
