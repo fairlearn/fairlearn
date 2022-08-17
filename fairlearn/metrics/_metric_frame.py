@@ -609,47 +609,18 @@ class MetricFrame:
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
 
-        def ratio_sub_one(x):
-            if x > 1:
-                return 1 / x
-            else:
-                return x
+        tmp = self._result.ratio(self.control_levels, method=method, errors=errors)
 
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
-
-        result = None
-        if method == "between_groups":
-            result = self.group_min(errors=errors) / self.group_max(errors=errors)
-        elif method == "to_overall":
-            if self._user_supplied_callable:
-                tmp = self.by_group / self.overall
-                if self.control_levels:
-                    result = (
-                        tmp.transform(ratio_sub_one)
-                        .groupby(level=self.control_levels)
-                        .min()
-                    )
-                else:
-                    result = tmp.transform(ratio_sub_one).min()
-            else:
-                ratios = None
-
-                if self.control_levels:
-                    # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(
-                        level=self.control_levels
-                    ) / self.overall.unstack(level=self.control_levels)
-                else:
-                    ratios = self.by_group / self.overall
-
-                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-                if not self.control_levels:
-                    result = ratios.min()
-                else:
-                    result = ratios.min().unstack(0)
+        if isinstance(tmp, pd.Series):
+            result = tmp.map(lambda x: x if x is not None else np.nan)
         else:
-            raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
+            result = tmp.applymap(lambda x: x if x is not None else np.nan)
+
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return result.iloc[:, 0]
+            else:
+                return result.iloc[0]
 
         return result
 

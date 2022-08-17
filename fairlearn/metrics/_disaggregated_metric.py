@@ -173,6 +173,49 @@ class DisaggregatedResult:
 
         return result
 
+    def ratio(
+        self,
+        control_feature_names: List[str],
+        method: str = "between_groups",
+        errors: str = "coerce",
+    ) -> Union[pd.Series, pd.DataFrame]:
+        """Compute ratios."""
+
+        def ratio_sub_one(x):
+            if x > 1:
+                return 1 / x
+            else:
+                return x
+
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        result = None
+        if method == "between_groups":
+            result = self.apply_grouping(
+                "min", control_feature_names, errors=errors
+            ) / self.apply_grouping("max", control_feature_names, errors=errors)
+        elif method == "to_overall":
+            ratios = None
+
+            if control_feature_names is not None:
+                # It's easiest to give in to the DataFrame columns preference
+                ratios = self.by_group.unstack(
+                    level=control_feature_names
+                ) / self.overall.unstack(level=control_feature_names)
+            else:
+                ratios = self.by_group / self.overall
+
+            ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
+            if not control_feature_names:
+                result = ratios.min()
+            else:
+                result = ratios.min().unstack(0)
+        else:
+            raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
+
+        return result
+
 
 def extract_unique_classes(
     data: pd.DataFrame, feature_list: List[str]
