@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import logging
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -8,6 +9,23 @@ import pandas as pd
 
 from ._annotated_metric_function import AnnotatedMetricFunction
 
+logger = logging.getLogger(__name__)
+
+_VALID_ERROR_STRING = ["raise", "coerce"]
+_VALID_GROUPING_FUNCTION = ["min", "max"]
+
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = (
+    "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
+)
+_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = (
+    "Invalid grouping function specified. Valid values are {0}".format(
+        _VALID_GROUPING_FUNCTION
+    )
+)
+_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
+    "Metric frame contains non-scalar cells. Please remove non-scalar columns from your"
+    " metric frame or use parameter errors='coerce'."
+)
 
 def apply_to_dataframe(
     data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
@@ -96,3 +114,71 @@ def calculate_disaggregated_metrics(
         by_group = temp
 
     return DisaggregatedResult(overall, by_group)
+
+
+def apply_grouping_to_disaggregated_metrics(
+    target: DisaggregatedResult,
+    grouping_function: str,
+    control_feature_names: Optional[List[str]],
+     errors: str = "raise"
+    ) -> Union[pd.Series, pd.DataFrame]:
+
+    if grouping_function not in _VALID_GROUPING_FUNCTION:
+            raise ValueError(_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE)
+
+    if errors not in _VALID_ERROR_STRING:
+        raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+    if not control_feature_names:
+        if errors == "raise":
+            try:
+                mf = target.by_group
+                if grouping_function == "min":
+                    vals = [mf[m].min() for m in mf.columns]
+                else:
+                    vals = [mf[m].max() for m in mf.columns]
+
+                result = pd.Series(
+                    vals, index=target.by_group.columns, dtype="object"
+                )
+            except ValueError as ve:
+                raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
+        elif errors == "coerce":
+            if not control_feature_names:
+                mf = target.by_group
+                # Fill in the possible min/max values, else np.nan
+                if grouping_function == "min":
+                    vals = [
+                        mf[m].min() if np.isscalar(mf[m].values[0]) else np.nan
+                        for m in mf.columns
+                    ]
+                else:
+                    vals = [
+                        mf[m].max() if np.isscalar(mf[m].values[0]) else np.nan
+                        for m in mf.columns
+                    ]
+
+                result = pd.Series(vals, index=mf.columns, dtype="object")
+    else:
+        if errors == "raise":
+            try:
+                if grouping_function == "min":
+                    result = target.by_group.groupby(
+                        level=control_feature_names
+                    ).min()
+                else:
+                    result = target.by_group.groupby(
+                        level=control_feature_names
+                    ).max()
+            except ValueError as ve:
+                raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
+        elif errors == "coerce":
+            # Fill all impossible columns with NaN before grouping metric frame
+            mf = target.by_group.copy()
+            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+            if grouping_function == "min":
+                result = mf.groupby(level=control_feature_names).min()
+            else:
+                result = mf.groupby(level=control_feature_names).max()
+
+    return result

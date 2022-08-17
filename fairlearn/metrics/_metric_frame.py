@@ -14,7 +14,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_metric import calculate_disaggregated_metrics
+from ._disaggregated_metric import apply_grouping_to_disaggregated_metrics, calculate_disaggregated_metrics
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -463,63 +463,7 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if grouping_function not in _VALID_GROUPING_FUNCTION:
-            raise ValueError(_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE)
-
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
-
-        if not self.control_levels:
-            if errors == "raise":
-                try:
-                    mf = self._result.by_group
-                    if grouping_function == "min":
-                        vals = [mf[m].min() for m in mf.columns]
-                    else:
-                        vals = [mf[m].max() for m in mf.columns]
-
-                    result = pd.Series(
-                        vals, index=self._result.by_group.columns, dtype="object"
-                    )
-                except ValueError as ve:
-                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
-            elif errors == "coerce":
-                if not self.control_levels:
-                    mf = self._result.by_group
-                    # Fill in the possible min/max values, else np.nan
-                    if grouping_function == "min":
-                        vals = [
-                            mf[m].min() if np.isscalar(mf[m].values[0]) else np.nan
-                            for m in mf.columns
-                        ]
-                    else:
-                        vals = [
-                            mf[m].max() if np.isscalar(mf[m].values[0]) else np.nan
-                            for m in mf.columns
-                        ]
-
-                    result = pd.Series(vals, index=mf.columns, dtype="object")
-        else:
-            if errors == "raise":
-                try:
-                    if grouping_function == "min":
-                        result = self._result.by_group.groupby(
-                            level=self.control_levels
-                        ).min()
-                    else:
-                        result = self._result.by_group.groupby(
-                            level=self.control_levels
-                        ).max()
-                except ValueError as ve:
-                    raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
-            elif errors == "coerce":
-                # Fill all impossible columns with NaN before grouping metric frame
-                mf = self._result.by_group.copy()
-                mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
-                if grouping_function == "min":
-                    result = mf.groupby(level=self.control_levels).min()
-                else:
-                    result = mf.groupby(level=self.control_levels).max()
+        result = apply_grouping_to_disaggregated_metrics(self._result, grouping_function, self.control_levels, errors=errors)
 
         if self._user_supplied_callable:
             if self.control_levels:
