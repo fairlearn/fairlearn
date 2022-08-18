@@ -547,10 +547,10 @@ positive rates are equivalent across groups, equal opportunity does not
 capture the costs of missclassification disparities.
 
 
-.. _custom_metrics_with_metricframe :
+.. _custom_metrics_fairness_metrics :
 
-Defining custom metrics using MetricFrame
------------------------------------------
+Defining custom fairness metrics
+--------------------------------
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often
 make use of metric functions to guide their optimisations.

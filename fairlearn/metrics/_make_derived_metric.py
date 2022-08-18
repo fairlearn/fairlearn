@@ -122,7 +122,7 @@ def make_derived_metric(
     by the :code:`transform=` argument (with the :code:`method=` argument, if
     required).
 
-    See the :ref:`custom_metrics_with_metricframe` section in the :ref:`user_guide` for more
+    See the :ref:`custom_metrics_fairness_metrics` section in the :ref:`user_guide` for more
     details.
     A :ref:`sample notebook <sphx_glr_auto_examples_plot_make_derived_metric.py>` is
     also available.
