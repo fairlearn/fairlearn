@@ -103,7 +103,7 @@ describes how to determine whether a
 proxy variable measures the intended construct in a meaningful 
 and useful way. It is important to ensure that the proxy is suitable 
 for the social context of the problem you seek to solve. 
-In particular, be careful of falling into one of the :ref:abstraction_traps.
+In particular, be careful of falling into one of the :ref:`abstraction_traps`.
 
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
 which are metrics evaluated on slices of data. For example, to measure harms due to 
@@ -130,7 +130,7 @@ Now, suppose we have determined that the metrics we are interested in are the
 selection rate (:func:`selection_rate`), recall (a.k.a. true positive rate
 :func:`sklearn.metrics.recall_score`) and false positive rate
 (:func:`false_positive_rate`).
-For completeness (and to help note places where random noise might be
+For completeness (and to help identify subgroups for which random noise might be
 significant), we should also include the counts (:func:`count`).
 We can use :class:`MetricFrame` to evaluate these metrics on our data:
 
@@ -418,7 +418,7 @@ lowest selection rates :math:`a \in A` so a result of 0 indicates
 that demographic parity has been achieved.
 The second reports the ratio of the lowest and highest selection rates,
 so a result of 1 means there is demographic parity.
-However, achieving demographic parity does *not* automatically mean
+As with any fairness metric, achieving demographic parity does *not* automatically mean
 that the classifier is fair!
 
 
@@ -617,7 +617,7 @@ For example :code:`fairlearn.metrics.accuracy_score_difference` and
 Intersecting Groups
 -------------------
 
-The :class:`MetricFrame` class supports intersectional fairness in two ways:
+The :class:`MetricFrame` class supports fairness assessment of intersecting groups in two ways:
 multiple sensitive features, and control features.
 Both of these can be used simultaneously.
 One important point to bear in mind when performing an intersectional analysis
