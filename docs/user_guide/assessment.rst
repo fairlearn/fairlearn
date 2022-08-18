@@ -4,8 +4,10 @@ Assessment
 .. currentmodule:: fairlearn.metrics
 
 In this section, we will describe the steps involved in performing a fairness
-assessment, and show how :class:`MetricFrame` can be
-used to assist in this process.
+assessment, and introduce some widely (if occasionally incautiously) used
+fairness metrics, such as demographic parity and equalized odds.
+We will show how :class:`MetricFrame` can be used to evaluate the metrics
+identified during the course of a fairness assessment.
 
 In the mathematical definitions below, :math:`X` denotes a feature vector 
 used for predictions, :math:`A` will be a single sensitive feature (such as age 
@@ -63,16 +65,16 @@ also important to consider their intersections (e.g., Black women, Latinx
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
 
-One important thing to note here: we have assumed that every sensitive
-feature is representable by a discrete variable.
-This is not always the case: for example, the melanin content of a
-person's skin (important for tasks such as facial recognition) will
-not be taken from a small number of fixed values.
-For now, features like this have to be binned.
-To reduce the risk of harms being blurred out by the binning,
-analyses should be repeated with the number of bins changed and/or
-the bin edges moved.
 
+.. note::
+
+    We have assumed that every sensitive feature is representable by a
+    discrete variable.
+    This is not always the case: for example, the melanin content of a
+    person's skin (important for tasks such as facial recognition) will
+    not be taken from a small number of fixed values.
+    Features like this have to be binned, and the choice of bins
+    could obscure fairness issues.
 
 Quantify harms
 ^^^^^^^^^^^^^^
@@ -98,12 +100,14 @@ therefore measure the harm using the proxy variable indicating whether
 the candidate passes the first stage of the screen.
 If you choose to use a proxy variable to 
 represent the harm, check the proxy variable regularly to ensure it 
-remains useful over time. Our section on :ref:`construct_validity`
+remains useful over time. Our section on
+:ref:`construct validity <construct_validity>`
 describes how to determine whether a  
 proxy variable measures the intended construct in a meaningful 
 and useful way. It is important to ensure that the proxy is suitable 
 for the social context of the problem you seek to solve. 
-In particular, be careful of falling into one of the :ref:`abstraction_traps`.
+In particular, be careful of falling into one of the
+:ref:`abstraction traps <abstraction_traps>`.
 
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
 which are metrics evaluated on slices of data. For example, to measure harms due to 
@@ -543,11 +547,10 @@ positive rates are equivalent across groups, equal opportunity does not
 capture the costs of missclassification disparities.
 
 
+.. _custom_metrics_with_metricframe :
 
-.. _scalar_metric_results:
-
-Scalar results from :code:`MetricFrame`
----------------------------------------
+Defining custom metrics using MetricFrame
+-----------------------------------------
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often
 make use of metric functions to guide their optimisations.
