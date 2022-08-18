@@ -85,7 +85,7 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
 def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
-    Read more in the :ref:`User Guide <custom_metrics_fairness_metrics>`.
+    Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
     Parameters
     ----------
@@ -124,7 +124,7 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
 def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the true negative rate (also called specificity or selectivity).
 
-    Read more in the :ref:`User Guide <custom_metrics_fairness_metrics>`.
+    Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
     Parameters
     ----------
@@ -163,7 +163,7 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
 def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the false positive rate (also called fall-out).
 
-    Read more in the :ref:`User Guide <custom_metrics_fairness_metrics>`.
+    Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
     Parameters
     ----------
@@ -202,7 +202,7 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
 def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the false negative rate (also called miss rate).
 
-    Read more in the :ref:`User Guide <custom_metrics_fairness_metrics>`.
+    Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
     Parameters
     ----------

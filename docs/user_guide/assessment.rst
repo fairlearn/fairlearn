@@ -549,7 +549,7 @@ positive rates are equivalent across groups, equal opportunity does not
 capture the costs of missclassification disparities.
 
 
-.. _custom_metrics_fairness_metrics :
+.. _custom_fairness_metrics :
 
 Defining custom fairness metrics
 --------------------------------

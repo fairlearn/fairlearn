@@ -18,7 +18,7 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
     The argument `pos_label` specifies the 'good' outcome. For consistency with
     other metric functions, the ``y_true`` argument is required, but ignored.
 
-    Read more in the :ref:`User Guide <custom_metrics_fairness_metrics>`.
+    Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
     Parameters
     ----------
