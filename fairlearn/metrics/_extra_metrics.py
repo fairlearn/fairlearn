@@ -249,7 +249,7 @@ def count(y_true, y_pred) -> int:
     The ``y_true`` argument is used to make this calculation. For consistency with
     other metric functions, the ``y_pred`` argument is required, but ignored.
 
-    Read more in the :ref:`User Guide <metrics_with_grouping>`.
+    Read more in the :ref:`User Guide <assessment>`.
 
     Parameters
     ----------

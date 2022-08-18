@@ -158,7 +158,7 @@ class MetricFrame:
     feature(s). The name 'control features' refers to the statistical practice
     of 'controlling' for a variable.
 
-    Read more in the :ref:`User Guide <metrics_with_grouping>`.
+    Read more in the :ref:`User Guide <assessment>`.
 
     Parameters
     ----------
@@ -560,7 +560,7 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
-        Read more in the :ref:`User Guide <metrics_with_grouping>`.
+        Read more in the :ref:`User Guide <assessment>`.
 
         Parameters
         ----------
@@ -586,7 +586,7 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
-        Read more in the :ref:`User Guide <metrics_with_grouping>`.
+        Read more in the :ref:`User Guide <assessment>`.
 
         Parameters
         ----------
@@ -690,7 +690,7 @@ class MetricFrame:
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
 
-        Read more in the :ref:`User Guide <metrics_with_grouping>`.
+        Read more in the :ref:`User Guide <assessment>`.
 
         Parameters
         ----------
