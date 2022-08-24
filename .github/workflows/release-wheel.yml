@@ -58,5 +58,4 @@ jobs:
     - name: DEBUG
       run: ls
     - name: Install Fairlearn from wheel
-      run: |
-        pip install "fairlearn[customplots] @ file://$CWD/fairlearn*.whl"
+      run: python scripts/install_fairlearn_from_wheel.py --wheel-dir=.
