@@ -58,4 +58,4 @@ jobs:
     - name: DEBUG
       run: ls
     - name: Install Fairlearn from wheel
-      run: pip install 'fairlearn*.whl[customplots]'
+      run: pip install fairlearn*.whl '[customplots]'
