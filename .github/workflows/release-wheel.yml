@@ -1,0 +1,24 @@
+name: release-wheel
+
+on: [push, pull_request]
+
+concurrency: 
+  # this ensures after each commit the old jobs are cancelled and the new ones
+  # run instead.
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+
+jobs:
+  build-wheel:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+    - name: Update pip and setuptools
+      run: |
+        pip install --upgrade pip
+        pip install --upgrade setuptools wheel
