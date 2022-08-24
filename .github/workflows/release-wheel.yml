@@ -11,6 +11,7 @@ concurrency:
 
 env:
   VERSION_FILE_NAME: version.txt
+  WHEEL_ARTIFACT: fairlearn-wheels
 
 jobs:
   build-wheel:
@@ -30,5 +31,29 @@ jobs:
     - name: Save wheels to artifact
       uses: actions/upload-artifact@v3
       with:
-        name: fairlearn-wheels
+        name: env.WHEEL_ARTIFACT
         path: dist/
+
+  test-wheel:
+    needs: build-wheel
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Remove Fairlearn source directory
+      uses: JesseTG/rm@v1.0.3
+      with:
+        path: fairlearn
+    - name: Download wheel artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: env.WHEEL_ARTIFACT
+    - name: Install Fairlearn from wheel
+      run: pip install 'fairlearn*.whl[customplots]'
