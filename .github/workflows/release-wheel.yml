@@ -55,5 +55,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: env.WHEEL_ARTIFACT
+    - name: DEBUG
+      run: ls
     - name: Install Fairlearn from wheel
       run: pip install 'fairlearn*.whl[customplots]'
