@@ -55,7 +55,9 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: env.WHEEL_ARTIFACT
-    - name: DEBUG
-      run: ls
     - name: Install Fairlearn from wheel
       run: python scripts/install_fairlearn_from_wheel.py --wheel-dir=.
+    - name: Install testing requirements
+      run: pip install pytest==7.1.1 pytest-mock pytest-mpl>=0.11
+    - name: Run tests
+      run: pytest --ignore=test/install -m "not notebooks" test/
