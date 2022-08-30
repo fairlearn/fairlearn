@@ -1,4 +1,4 @@
-name: release-wheel
+name: Release Wheel
 
 # Following will be changed in due course
 on:
@@ -67,3 +67,20 @@ jobs:
       run: pip install pytest==7.1.1 pytest-mock pytest-mpl>=0.11 lightgbm
     - name: Run tests
       run: pytest --ignore=test/install --ignore=test/notebooks test/
+
+  release-wheel:
+    needs: test-wheel
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download wheel artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: env.WHEEL_ARTIFACT
+    - name: DEBUG
+      run: ls
+    - name: Release to Test-PyPI
+      if: ${{ inputs.use_test_pypi }} == true
+      run: echo "Releasing to Test-PyPI"
+    - name: Release to PyPI
+      if: ${{ inputs.use_test_pypi }} == false
+      run: echo "Releasing to PyPI"
