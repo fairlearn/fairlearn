@@ -1,14 +1,37 @@
+.. _assessment:
+
 Assessment
 ==========
 
-Introduction
-------------
+.. currentmodule:: fairlearn.metrics
+
+In this section, we will describe the steps involved in performing a fairness
+assessment, and introduce some widely (if occasionally incautiously) used
+fairness metrics, such as demographic parity and equalized odds.
+We will show how :class:`MetricFrame` can be used to evaluate the metrics
+identified during the course of a fairness assessment.
+
+In the mathematical definitions below, :math:`X` denotes a feature vector 
+used for predictions, :math:`A` will be a single sensitive feature (such as age 
+or race), and :math:`Y` will be the true label.
+Fairness metrics are phrased in terms of expectations with respect to the
+distribution over :math:`(X,A,Y)`.
+Note that :math:`X` and :math:`A` may or may not share columns, dependent on
+whether the model is allowed to 'see' the sensitive features.
+When we need to refer to particular values, we will use lower case letters;
+since we are going to be comparing between groups identified by the
+sensitive feature, :math:`\forall a \in A` will be appearing regularly to
+indicate that a property holds for all identified groups.
+
+
+Performing a Fairness Assessment
+--------------------------------
 
 The goal of fairness assessment is to answer the question: Which groups of 
 people may be disproportionately negatively impacted by an AI system and in 
 what ways?
 
-The steps of the assesment are as follows:
+The steps of the assessment are as follows:
 
 1. Identify types of harms 
 2. Identify the groups that might be harmed 
@@ -44,6 +67,17 @@ also important to consider their intersections (e.g., Black women, Latinx
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
 
+
+.. note::
+
+    We have assumed that every sensitive feature is representable by a
+    discrete variable.
+    This is not always the case: for example, the melanin content of a
+    person's skin (important for tasks such as facial recognition) will
+    not be taken from a small number of fixed values.
+    Features like this have to be binned, and the choice of bins
+    could obscure fairness issues.
+
 Quantify harms
 ^^^^^^^^^^^^^^
 
@@ -68,15 +102,14 @@ therefore measure the harm using the proxy variable indicating whether
 the candidate passes the first stage of the screen.
 If you choose to use a proxy variable to 
 represent the harm, check the proxy variable regularly to ensure it 
-remains useful over time. Our section on :ref:`construct_validity`
+remains useful over time. Our section on
+:ref:`construct validity <construct_validity>`
 describes how to determine whether a  
 proxy variable measures the intended construct in a meaningful 
 and useful way. It is important to ensure that the proxy is suitable 
 for the social context of the problem you seek to solve. 
-In particular, be careful of falling into one of the :ref:abstraction_traps. 
-
-Compare quantified harms across the groups
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In particular, be careful of falling into one of the
+:ref:`abstraction traps <abstraction_traps>`.
 
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
 which are metrics evaluated on slices of data. For example, to measure harms due to 
@@ -84,190 +117,165 @@ errors, we would begin by evaluating the errors on each slice of the data that
 corresponds to a group. If some of the groups are seeing much larger errors 
 than other groups, we would flag this as a fairness harm.
 
+Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
+with this quantification.
+Suppose we have some 'true' values, some predictions from a model, and also
+a sensitive feature recorded for each.
+The sensitive feature, denoted by :code:`sf_data`, can take on one of
+three values:
+
+.. doctest:: assessment_metrics
+
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...            'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
+
+
+Now, suppose we have determined that the metrics we are interested in are the
+selection rate (:func:`selection_rate`), recall (a.k.a. true positive rate
+:func:`sklearn.metrics.recall_score`) and false positive rate
+(:func:`false_positive_rate`).
+For completeness (and to help identify subgroups for which random noise might be
+significant), we should also include the counts (:func:`count`).
+We can use :class:`MetricFrame` to evaluate these metrics on our data:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import MetricFrame
+    >>> from fairlearn.metrics import count, \
+    ...                               false_positive_rate, \
+    ...                               selection_rate
+    >>> from sklearn.metrics import recall_score
+    >>> # Construct a function dictionary
+    >>> my_metrics = {
+    ...     'tpr' : recall_score,
+    ...     'fpr' : false_positive_rate,
+    ...     'sel' : selection_rate,
+    ...     'count' : count
+    ... }
+    >>> # Construct a MetricFrame
+    >>> mf = MetricFrame(
+    ...     metrics=my_metrics,
+    ...     y_true=y_true,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=sf_data
+    ... )
+
+We can now interrogate this :class:`MetricFrame` to find the values for
+our chosen metrics.
+First, the metrics evaluated on the entire dataset (disregarding the
+sensitive feature), accessed via the :attr:`MetricFrame.overall`
+property:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.overall
+    tpr       0.500000
+    fpr       0.666667
+    sel       0.555556
+    count    18.000000
+    dtype: float64
+
+Next, we can see the metrics evaluated on each of the groups identified by
+the :code:`sf_data` column.
+These are accessed through the :attr:`MetricFrame.by_group` property:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.by_group
+                         tpr       fpr   sel  count
+    sensitive_feature_0
+    a                    0.5  1.000000  0.75    4.0
+    b                    0.6  0.000000  0.50    6.0
+    c                    0.4  0.666667  0.50    8.0
+
+All of these values can be checked against the original arrays above.
+
+
+Compare quantified harms across the groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 To summarize the disparities in errors (or other metrics), we may want to 
 report quantities such as the difference or ratio of the metric values between 
 the best and the worst slice. In settings where the goal is to guarantee 
 certain minimum quality of service across all groups (such as speech recognition), 
 it is also meaningful to report the worst performance across all considered groups.
 
-For example, when comparing the false negative rate across groups defined by race, 
-we may summarize our findings with a table. Note that the these statistics must 
-be drawn from a large enough sample size to draw meaningful conclusions. 
-
-.. list-table::
-   :header-rows: 1
-   :widths: 7 30 30
-   :stub-columns: 1
-
-   *  - 
-      - false negative rate (FNR)
-      - sample size
-
-   *  - AfricanAmerican
-      - 0.43
-      - 126
-
-   *  - Caucasian
-      - 0.44
-      - 620
-
-   *  - Other
-      - 0.52
-      - 200
-
-   *  - Unknown
-      - 0.67
-      - 60
-
-   *  - largest difference
-      - 0.24 (best is 0.0)
-      - N/A
-
-   *  - smallest ratio
-      - 0.64 (best is 1.0)
-      - N/A
-
-   *  - maximum (worst-case) FNR
-      - 0.67
-      - N/A
-
-Disaggregated metrics
----------------------
-
-.. currentmodule:: fairlearn.metrics
-
-The :py:mod:`fairlearn.metrics` module provides the means to assess 
-fairness-related metrics for models. This applies for any kind of model that 
-users may already use, but also for models created with mitigation techniques 
-from the :ref:`mitigation` section.
-
-At their simplest, metrics take a set of 'true' values :math:`Y_{true}` (from
-the input data) and predicted values :math:`Y_{pred}` (by applying the model
-to the input data), and use these to compute a measure. For example, the
-*recall* or *true positive rate* is given by
-
-.. math::
-
-   P( Y_{pred}=1 \given Y_{true}=1 )
-
-That is, a measure of whether the model finds all the positive cases in the
-input data. The `scikit-learn` package implements this in
-:py:func:`sklearn.metrics.recall_score`.
-
-Suppose we have the following data we can see that the prediction is `1` in five
-of the ten cases where the true value is `1`, so we expect the recall to be 0.5:
-
-.. doctest:: assessment_metrics
-
-    >>> import sklearn.metrics as skm
-    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1]
-    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1]
-    >>> skm.recall_score(y_true, y_pred)
-    0.5
-
-.. _metrics_with_grouping:
-
-Disaggregated metrics using :code:`MetricFrame`
---------------------------------------------------------
-
-In a typical fairness assessment, each row of input data will have an associated
-group label :math:`g \in G`, and we will want to know how the metric behaves
-for each group :math:`g`. To help with this, Fairlearn provides a class that takes
-an existing (disaggregated) metric function, like 
-:func:`sklearn.metrics.roc_auc_score` or :func:`fairlearn.metrics.false_positive_rate`, 
-and applies it to each group within a set of data.
-
-This data structure, :class:`fairlearn.metrics.MetricFrame`, enables evaluation 
-of disaggregated metrics. In its simplest form :class:`fairlearn.metrics.MetricFrame` 
-takes four arguments:
-
-* metric_function with signature :code:`metric_function(y_true, y_pred)`
-
-* y_true: array of labels
-
-* y_pred: array of predictions
-
-* sensitive_features: array of sensitive feature values
-
-The code chunk below displays a case where in addition to the :math:`Y_{true}` 
-and :math:`Y_{pred}` above, the dataset also contains the following set of 
-labels, denoted by the "group_membership_data" column:
+The :class:`MetricFrame` class provides several methods for comparing
+the computed metrics.
+For example, the :meth:`MetricFrame.group_min` and :meth:`MetricFrame.group_max`
+methods show the smallest and largest values for each metric:
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> import numpy as np
-    >>> import pandas as pd
-    >>> group_membership_data = ['d', 'a', 'c', 'b', 'b', 'c', 'c', 'c',
-    ...                          'b', 'd', 'c', 'a', 'b', 'd', 'c', 'c']
-    >>> pd.set_option('display.max_columns', 20)
-    >>> pd.set_option('display.width', 80)
-    >>> pd.DataFrame({ 'y_true': y_true,
-    ...                'y_pred': y_pred,
-    ...                'group_membership_data': group_membership_data})
-        y_true  y_pred group_membership_data
-    0        0       0                     d
-    1        1       0                     a
-    2        1       1                     c
-    3        1       0                     b
-    4        1       1                     b
-    5        0       1                     c
-    6        1       1                     c
-    7        0       0                     c
-    8        1       0                     b
-    9        0       1                     d
-    10       0       1                     c
-    11       0       1                     a
-    12       1       1                     b
-    13       1       0                     d
-    14       1       0                     c
-    15       1       1                     c
-    <BLANKLINE>
+    >>> mf.group_min()
+    tpr      0.4
+    fpr      0.0
+    sel      0.5
+    count    4.0
+    dtype: object
+    >>> mf.group_max()
+    tpr       0.6
+    fpr       1.0
+    sel      0.75
+    count     8.0
+    dtype: object
 
-We then calculate a metric which shows the subgroups:
+We can also compute differences and ratios between groups for all of the
+metrics.
+The absolute difference will always be returned, and the ratios will be chosen
+to be less than one.
+By default, the computations are done between the maximum and minimum
+values for the groups:
 
 .. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import MetricFrame
-    >>> grouped_metric = MetricFrame(metrics=skm.recall_score,
-    ...                              y_true=y_true,
-    ...                              y_pred=y_pred,
-    ...                              sensitive_features=group_membership_data)
-    >>> print("Overall recall = ", grouped_metric.overall)
-    Overall recall =  0.5
-    >>> print("recall by groups = ", grouped_metric.by_group.to_dict())
-    recall by groups =  {'a': 0.0, 'b': 0.5, 'c': 0.75, 'd': 0.0}
+    >>> mf.difference()
+    tpr       0.2
+    fpr       1.0
+    sel      0.25
+    count     4.0
+    dtype: object
+    >>> mf.ratio()
+    tpr      0.666667
+    fpr           0.0
+    sel      0.666667
+    count         0.5
+    dtype: object
 
-The disaggregated metrics are stored in a :class:`pandas.Series` 
-:code:`grouped_metric.by_group`. Note that the overall recall is the same 
-as that calculated above in the Ungrouped Metric section, while the 'by_group'
-dictionary can be checked against the table above.
-
-In addition to these basic scores, Fairlearn provides
-convenience functions to recover the maximum and minimum values of the metric
-across groups and also the difference and ratio between the maximum and minimum:
+However, the differences and ratios can also be computed relative to the
+overall values for the data:
 
 .. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> print("min recall over groups = ", grouped_metric.group_min())
-    min recall over groups =  0.0
-    >>> print("max recall over groups = ", grouped_metric.group_max())
-    max recall over groups =  0.75
-    >>> print("difference in recall = ", grouped_metric.difference(method='between_groups'))
-    difference in recall =  0.75
-    >>> print("ratio in recall = ", grouped_metric.ratio(method='between_groups'))    
-    ratio in recall =  0.0
+    >>> mf.difference(method='to_overall')
+    tpr       0.100000
+    fpr       0.666667
+    sel       0.194444
+    count    14.000000
+    dtype: float64
+    >>> mf.ratio(method='to_overall')
+    tpr      0.800000
+    fpr      0.000000
+    sel      0.740741
+    count    0.222222
+    dtype: float64
+
+In every case, the *largest* difference and *smallest* ratio are returned.
 
 
 Common fairness metrics
 -----------------------
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
-that some aspects of the predictor behavior be comparable across groups. In 
-the mathematical definitions below, :math:`X` denotes a feature vector 
-used for predictions, :math:`A` be a single sensitive feature (such as age 
-or race), and :math:`Y` be the true label. Fairness metrics are phrased in 
-terms of expectations with respect to the distribution over :math:`(X,A,Y)`.
+that some aspects of the predictor behavior be comparable across groups.
 
 .. _demographic_parity:
 
@@ -382,15 +390,17 @@ demographic parity may be different when calculated at an aggregate level and
 within more granular categories. In the case of demographic parity, we might 
 need to review 
 :math:`\E[h(X) \given A=a, D=d] = \E[h(X) \given D=d] \quad \forall a` 
-where D represents the feature(s) within X across which members of the groups 
-within A are distributed. 
+where :math:`D` represents the feature(s) within :math:`X`` across which
+members of the groups within :math:`A` are distributed. 
 Demographic parity would then require that the prediction of the target  
 variable is statistically independent of sensitive attributes conditional 
 on D. Simply aggregating outcomes across high-level categories can be 
 misleading when the data can be further disaggregated. 
-It's important to review metrics across these more graular categories, 
+It's important to review metrics across these more granular categories, 
 if they exist, to verify that disparate outcomes persist across all levels 
 of aggregation. 
+See :ref:`intersecting_groups` below to see how :class:`MetricFrame` can
+help with this.
 
 However, more granular categories generally contain smaller sample sizes, and 
 it can be more difficult to establish that trends seen in very small 
@@ -405,6 +415,32 @@ differ enough to fail one of the metrics. For dealing with the multiple
 comparisons problem, we recommend investigating `statistical techniques <https://www.statology.org/bonferroni-correction/>`_ 
 meant to correct the errors produced by individual statistical tests. 
 
+Fairlearn provides the :func:`demographic_parity_difference` and
+:func:`demographic_parity_ratio` functions for computing demographic
+parity measures for binary classification data, both of which return
+a scalar result.
+The first reports the absolute difference between the highest and
+lowest selection rates :math:`a \in A` so a result of 0 indicates
+that demographic parity has been achieved.
+The second reports the ratio of the lowest and highest selection rates,
+so a result of 1 means there is demographic parity.
+As with any fairness metric, achieving demographic parity does *not* automatically mean
+that the classifier is fair!
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import demographic_parity_difference
+    >>> print(demographic_parity_difference(y_true,
+    ...                                     y_pred,
+    ...                                     sensitive_features=sf_data))
+    0.25
+    >>> from fairlearn.metrics import demographic_parity_ratio
+    >>> print(demographic_parity_ratio(y_true,
+    ...                                y_pred,
+    ...                                sensitive_features=sf_data))
+    0.66666...
 
 
 .. _equalized_odds:
@@ -462,11 +498,40 @@ well for different groups. Another way to think about equalized odds is to
 contrast it with demographic parity. While demographic parity assesses the 
 allocation of resources generally, equalized odds focuses on the allocation 
 of resources that were actually distributed to 
-members of that group (indicated by the positive target variable Y=1). 
+members of that group (indicated by the positive target variable :math:`Y=1``). 
 However, equalized odds makes the assumption 
 that the target variable :math:`Y` is a good measurement of the phenomena 
 being modeled, but that assumption may not hold if the measurement does not 
 satisfy the requirements of construct validity.
+
+Similar to the demographic parity case, Fairlearn provides
+:func:`equalized_odds_difference` and :func:`equalized_odds_ratio`
+to help with these calculations.
+However, since equalized odds is based on both the true positive and
+false positive rates, there is an extra step in order to return
+a single scalar result.
+For :func:`equalized_odds_difference`, we first calculate the
+true positive rate difference and the true negative rate difference
+separately.
+We then return the larger of these two differences.
+*Mutatis mutandis*, :func:`equalized_odds_ratio` works similarly.
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import equalized_odds_difference
+    >>> print(equalized_odds_difference(y_true,
+    ...                                 y_pred,
+    ...                                 sensitive_features=sf_data))
+    1.0
+    >>> from fairlearn.metrics import equalized_odds_ratio
+    >>> print(equalized_odds_ratio(y_true,
+    ...                            y_pred,
+    ...                            sensitive_features=sf_data))
+    0.0
+
+
 
 .. _equal_opportunity:
 
@@ -484,160 +549,10 @@ positive rates are equivalent across groups, equal opportunity does not
 capture the costs of missclassification disparities.
 
 
-Multiple metrics in a single :code:`MetricFrame`
-------------------------------------------------
+.. _custom_fairness_metrics :
 
-A single instance of :class:`fairlearn.metrics.MetricFrame` can evaluate multiple
-metrics simultaneously by providing the `metrics` argument with a 
-dictionary of desired metrics. The disaggregated metrics are then stored in a 
-pandas DataFrame. Note that :class:`pandas.DataFrame` can 
-be used to show each group's size:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from fairlearn.metrics import count
-    >>> multi_metric = MetricFrame({'precision':skm.precision_score,
-    ...                             'recall':skm.recall_score,
-    ...                             'count': count},
-    ...                             y_true, y_pred,
-    ...                             sensitive_features=group_membership_data)
-    >>> multi_metric.overall
-    precision    0.5555...
-    recall       0.5...
-    dtype: float64
-    >>> multi_metric.by_group
-                         precision  recall  count
-    sensitive_feature_0
-    a                          0.0    0.00    2.0
-    b                          1.0    0.50    4.0
-    c                          0.6    0.75    7.0
-    d                          0.0    0.00    3.0
-
-If there are per-sample arguments (such as sample weights), these can also be 
-provided in a dictionary via the ``sample_params`` argument.:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3]
-    >>> s_p = { 'sample_weight':s_w }
-    >>> weighted = MetricFrame(metrics=skm.recall_score,
-    ...                        y_true=y_true,
-    ...                        y_pred=y_pred,
-    ...                        sensitive_features=pd.Series(group_membership_data, name='SF 0'),
-    ...                        sample_params=s_p)
-    >>> weighted.overall
-    0.45
-    >>> weighted.by_group
-    SF 0
-    a    0...
-    b    0.5...
-    c    0.7142...
-    d    0...
-    Name: recall_score, dtype: float64
-
-If multiple metrics are being evaluated, then ``sample_params`` becomes a 
-dictionary of dictionaries, with the first key corresponding matching that in 
-the dictionary holding the desired underlying metric functions.
-
-Non-sample parameters
-^^^^^^^^^^^^^^^^^^^^^
-
-We do not support non-sample parameters at the current time. If these are 
-required, then use :func:`functools.partial` to prebind the required arguments 
-to the metric function:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> import functools
-    >>> fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6)
-    >>> metric_beta = MetricFrame(metrics=fbeta_06,
-    ...                           y_true=y_true,
-    ...                           y_pred=y_pred,
-    ...                           sensitive_features=group_membership_data)
-    >>> metric_beta.overall
-    0.5396825396825397
-    >>> metric_beta.by_group
-    sensitive_feature_0
-    a    0...
-    b    0.7906...
-    c    0.6335...
-    d    0...
-    Name: metric, dtype: float64
-
-Multiclass metrics
-^^^^^^^^^^^^^^^^^^
-
-We may also be interested in multiclass classification. However, typical group
-fairness metrics such as equalized odds and demographic parity are only defined
-for binary classification. One way to measure fairness in the multiclass
-scenario is to define one-to-one or one-to-rest classifications for each group
-and calculate the metrics on this instead. Alternatively, we can use predefined
-metrics for multiclass classification. For example, accuracy is a multiclass
-metric that we can use through scikit-learn's :py:func:`sklearn.metrics.accuracy_score`
-in combination with a :code:`MetricFrame` as follows:
-
-.. doctest:: assessment_metrics
-
-    >>> from sklearn.metrics import accuracy_score
-    >>> from fairlearn.metrics import MetricFrame
-    >>> y_mult_true = [0,1,2,1,3,0,1,3,0,2,1,2,0,0,1,3]
-    >>> y_mult_pred = [0,1,1,2,3,0,1,0,0,2,1,2,3,0,0,2]
-    >>> mf = MetricFrame(metric=accuracy_score,
-    ...                  y_true=y_mult_true, y_pred=y_mult_pred,
-    ...                  sensitive_features=group_membership_data)
-    >>> print(mf.by_group) # series with accuracy for each sensitive group
-    sensitive_feature_0
-    a    1.000000
-    b    0.500000
-    c    0.428571
-    d    1.000000
-    Name: accuracy_score, dtype: float64
-    >>> print(mf.difference()) # difference in accuracy between the max and min of all groups
-    0.5714285714285714
-
-
-Multiple sensitive features
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Finally, multiple sensitive features can be specified. The ``by_groups`` 
-property then holds the intersections of these groups:
-
-.. doctest:: assessment_metrics
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6]
-    >>> s_f_frame = pd.DataFrame(np.stack([group_membership_data, g_2], axis=1),
-    ...                          columns=['SF 0', 'SF 1'])
-    >>> metric_2sf = MetricFrame(metrics=skm.recall_score,
-    ...                          y_true=y_true,
-    ...                          y_pred=y_pred,
-    ...                          sensitive_features=s_f_frame)
-    >>> metric_2sf.overall  # Same as before
-    0.5
-    >>> metric_2sf.by_group
-    SF 0  SF 1
-    a     6       0.0
-          8       NaN
-    b     6       0.5
-          8       0.5
-    c     6       1.0
-          8       0.5
-    d     6       0.0
-          8       0.0
-    Name: recall_score, dtype: float64
-
-With such a small number of samples, we are obviously running into cases where
-there are no members in a particular combination of sensitive features. In this
-case we see that the subgroup ``(a, 8)`` has a result of ``NaN``, indicating
-that there were no samples in it.
-
-.. _scalar_metric_results:
-
-Scalar results from :code:`MetricFrame`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Defining custom fairness metrics
+--------------------------------
 
 Higher level machine learning algorithms (such as hyperparameter tuners) often
 make use of metric functions to guide their optimisations.
@@ -652,8 +567,6 @@ mentioned above (:meth:`MetricFrame.group_min`, :meth:`MetricFrame.group_max`,
 This takes an underlying metric function, the name of the desired transformation, and
 optionally a list of parameter names which should be treated as sample aligned parameters
 (such as `sample_weight`).
-Other parameters will be passed to the underlying metric function normally (unlike
-:class:`MetricFrame` where :func:`functools.partial` must be used, as noted above).
 The result is a function which builds the :class:`MetricFrame` internally and performs
 the requested aggregation. For example:
 
@@ -661,22 +574,21 @@ the requested aggregation. For example:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import make_derived_metric
-    >>> fbeta_difference = make_derived_metric(metric=skm.fbeta_score,
+    >>> recall_difference = make_derived_metric(metric=recall_score,
     ...                                        transform='difference')
-    >>> # Don't need functools.partial for make_derived_metric
-    >>> fbeta_difference(y_true, y_pred, beta=0.7,
-    ...                  sensitive_features=group_membership_data)
-    0.752525...
-    >>> # But as noted above, functools.partial is needed for MetricFrame
-    >>> fbeta_07 = functools.partial(skm.fbeta_score, beta=0.7)
-    >>> MetricFrame(metrics=fbeta_07,
+    >>> recall_difference(y_true, y_pred,
+    ...                   sensitive_features=sf_data)
+    0.19999...
+    >>> MetricFrame(metrics=recall_score,
     ...             y_true=y_true,
     ...             y_pred=y_pred,
-    ...             sensitive_features=group_membership_data).difference()
-    0.752525...
+    ...             sensitive_features=sf_data).difference()
+    0.19999...
 
 We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number
-of such functions which will be commonly used:
+of such functions which are commonly used.
+The table below displays the aggregations that we have created for each
+base metric:
 
 =============================================== ================= ================= ================== =============
 Base metric                                     :code:`group_min` :code:`group_max` :code:`difference` :code:`ratio`
@@ -704,30 +616,106 @@ The names of the generated functions are of the form
 For example :code:`fairlearn.metrics.accuracy_score_difference` and
 :code:`fairlearn.metrics.precision_score_group_min`.
 
-.. _control_features_metrics:
 
-Control features for grouped metrics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _intersecting_groups:
+
+Intersecting Groups
+-------------------
+
+The :class:`MetricFrame` class supports fairness assessment of intersecting groups in two ways:
+multiple sensitive features, and control features.
+Both of these can be used simultaneously.
+One important point to bear in mind when performing an intersectional analysis
+is that some of the intersections may have very few members (or even be empty).
+This will affect the confidence interval associated with the computed metrics;
+random noise has a greater effect on smaller groups.
+
+Multiple Sensitive Features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Multiple sensitive features can be specified when the :class:`MetricFrame`
+is constructed.
+The :attr:`MetricFrame.by_group` property then holds the intersections
+of these groups:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6,6,6 ]
+    >>> s_f_frame = pd.DataFrame(np.stack([sf_data, g_2], axis=1),
+    ...                          columns=['SF 0', 'SF 1'])
+    >>> metric_2sf = MetricFrame(metrics=recall_score,
+    ...                          y_true=y_true,
+    ...                          y_pred=y_pred,
+    ...                          sensitive_features=s_f_frame)
+    >>> metric_2sf.overall  # Same as before
+    0.5
+    >>> metric_2sf.by_group
+    SF 0  SF 1
+    a     6       0.000000
+          8       1.000000
+    b     6       0.666667
+          8       0.500000
+    c     6       0.500000
+          8       0.000000
+    Name: recall_score, dtype: float64
+
+If a particular intersection of the sensitive features had no members, then
+the metric would be shown as :code:`NaN` for that intersection.
+Multiple metrics can also be computed at the same time:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from sklearn.metrics import precision_score
+    >>> metric_2sf_multi = MetricFrame(
+    ...     metrics={'precision':precision_score,
+    ...              'recall':recall_score,
+    ...              'count': count},
+    ...     y_true=y_true,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=s_f_frame
+    ... )
+    >>> metric_2sf_multi.overall
+    precision     0.6
+    recall        0.5
+    count        18.0
+    dtype: float64
+    >>> metric_2sf_multi.by_group
+               precision    recall  count
+    SF 0 SF 1
+    a    6      0.000000  0.000000    2.0
+         8      0.500000  1.000000    2.0
+    b    6      1.000000  0.666667    3.0
+         8      1.000000  0.500000    3.0
+    c    6      0.666667  0.500000    6.0
+         8      0.000000  0.000000    2.0
+
+
+Control Features
+^^^^^^^^^^^^^^^^
 
 Control features (sometimes called 'conditional' features) enable more detailed
 fairness insights by providing a further means of splitting the data into
 subgroups.
-When the data are split into subgroups, control features (if provided) act
-similarly to sensitive features.
-However, the 'overall' value for the metric is now computed for each subgroup
-of the control feature(s).
-Similarly, the aggregation functions (such as :code:`MetricFrame.group_max`) are
-performed for each subgroup in the conditional feature(s), rather than across
-them (as happens with the sensitive features).
-
 Control features are useful for cases where there is some expected variation with
 a feature, so we need to compute disparities while controlling for that feature.
 For example, in a loan scenario we would expect people of differing incomes to
 be approved at different rates, but within each income band we would still
-want to measure disparities between different sensitive features. However, it
-should be borne in mind that due to historic discrimination, the income band
-might be correlated with various sensitive features. Because of this, control
-features should be used with particular caution.
+want to measure disparities between different sensitive features.
+**However**, it should be borne in mind that due to historic discrimination, the
+income band might be correlated with various sensitive features.
+Because of this, control features should be used with particular caution.
+
+When the data are split into subgroups, control features (if provided) act
+similarly to sensitive features.
+However, the 'overall' value for the metric is now computed for each subgroup
+of the control feature(s).
+Similarly, the aggregation functions (such as :func:`MetricFrame.group_max`) are
+performed for each subgroup in the conditional feature(s), rather than across
+them (as happens with the sensitive features).
 
 The :class:`MetricFrame` constructor allows us to specify control features in
 a manner similar to sensitive features, using a :code:`control_features=`
@@ -756,7 +744,8 @@ parameter:
     ...    'C','B','C','A','C','C','B','B','C','A',
     ...    'B','B','C','A','B','A','B','B','A','A'
     ... ]
-    >>> metric_c_f = MetricFrame(metrics=skm.accuracy_score,
+    >>> from sklearn.metrics import accuracy_score
+    >>> metric_c_f = MetricFrame(metrics=accuracy_score,
     ...                          y_true=decision,
     ...                          y_pred=prediction,
     ...                          sensitive_features={'SF' : sensitive_feature},
@@ -815,7 +804,250 @@ For more examples, please
 see the :ref:`sphx_glr_auto_examples_plot_new_metrics.py` notebook in the
 :ref:`examples`.
 
-.. _plot:
+Finally, a :class:`MetricFrame` can use multiple control features, multiple
+sensitive features and multiple metric functions simultaneously.
+
+
+Extra Arguments to Metric functions
+-----------------------------------
+
+The metric functions supplied to :class:`MetricFrame` might require additional
+arguments.
+These fall into two categories: 'scalar' arguments (which affect the operation
+of the metric function), and 'per-sample' arguments (such as sample weights).
+Different approaches are required to use each of these.
+
+Scalar Arguments
+^^^^^^^^^^^^^^^^
+
+We do not directly support scalar arguments for the metric functions.
+If these are required, then use :func:`functools.partial` to prebind the
+required arguments to the metric function:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> import functools
+    >>> from sklearn.metrics import fbeta_score
+    >>> fbeta_06 = functools.partial(fbeta_score, beta=0.6)
+    >>> metric_beta = MetricFrame(metrics=fbeta_06,
+    ...                           y_true=y_true,
+    ...                           y_pred=y_pred,
+    ...                           sensitive_features=sf_data)
+    >>> metric_beta.overall
+    0.56983...
+    >>> metric_beta.by_group
+    sensitive_feature_0
+    a    0.365591
+    b    0.850000
+    c    0.468966
+    Name: metric, dtype: float64
+
+
+Per-Sample Arguments
+^^^^^^^^^^^^^^^^^^^^
+
+If there are per-sample arguments (such as sample weights), these can also be 
+provided in a dictionary via the ``sample_params`` argument.
+The keys of this dictionary are the argument names, and the values are 1-D
+arrays equal in length to ``y_true`` etc.:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3, 1, 1]
+    >>> s_p = { 'sample_weight':s_w }
+    >>> weighted = MetricFrame(metrics=recall_score,
+    ...                        y_true=y_true,
+    ...                        y_pred=y_pred,
+    ...                        sensitive_features=pd.Series(sf_data, name='SF 0'),
+    ...                        sample_params=s_p)
+    >>> weighted.overall
+    0.45...
+    >>> weighted.by_group
+    SF 0
+    a    0.500000
+    b    0.583333
+    c    0.250000
+    Name: recall_score, dtype: float64
+
+If multiple metrics are being evaluated, then ``sample_params`` becomes a 
+dictionary of dictionaries.
+The first key to this dictionary is the name of the metric as specified
+in the ``metrics`` argument.
+The keys of the inner dictionary are the argument names, and the values
+are the 1-D arrays of sample parameters for that metric.
+For example:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> s_w_2 = [3, 1, 2, 3, 2, 3, 1, 4, 1, 2, 3, 1, 2, 1, 4, 2, 2, 3]
+    >>> metrics = {
+    ...    'recall' : recall_score,
+    ...    'recall_weighted' : recall_score,
+    ...    'recall_weight_2' : recall_score
+    ... }
+    >>> s_p = {
+    ...     'recall_weighted' : { 'sample_weight':s_w },
+    ...     'recall_weight_2' : { 'sample_weight':s_w_2 }
+    ... }
+    >>> weighted = MetricFrame(metrics=metrics,
+    ...                        y_true=y_true,
+    ...                        y_pred=y_pred,
+    ...                        sensitive_features=pd.Series(sf_data, name='SF 0'),
+    ...                        sample_params=s_p)
+    >>> weighted.overall
+    recall             0.500000
+    recall_weighted    0.454545
+    recall_weight_2    0.458333
+    dtype: float64
+    >>> weighted.by_group
+          recall  recall_weighted  recall_weight_2
+    SF 0
+    a        0.5         0.500000         0.666667
+    b        0.6         0.583333         0.600000
+    c        0.4         0.250000         0.272727
+
+Note that there is no concept of a 'global' sample parameter (e.g. a set
+of sample weights to be applied for all metric functions).
+In such a case, the sample parameter in question must be repeated in
+the nested dictionary for each metric function.
+
+
+More Complex Metrics
+--------------------
+
+So far, we have stuck to relatively simple cases, where the inputs are 1-D vectors of scalars,
+and the metric functions return scalar values.
+However, this need not be the case - we noted above that we were going to be vague as to the
+contents of the input vectors and the return value of the metric function.
+
+Non-Scalar Results from Metric Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Metric functions need not return a scalar value.
+A straightforward example of this is the confusion matrix.
+Such return values are fully supported by :class:`MetricFrame`:
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from sklearn.metrics import confusion_matrix
+    >>> mf_conf = MetricFrame(
+    ...    metrics=confusion_matrix,
+    ...    y_true=y_true,
+    ...    y_pred=y_pred,
+    ...    sensitive_features=sf_data
+    ... )
+    >>> mf_conf.overall
+    array([[2, 4],
+           [6, 6]]...)
+    >>> mf_conf.by_group
+    sensitive_feature_0
+    a    [[0, 2], [1, 1]]
+    b    [[1, 0], [2, 3]]
+    c    [[1, 2], [3, 2]]
+    Name: confusion_matrix, dtype: object
+
+Obviously for such cases, operations such as :meth:`MetricFrame.difference` have no meaning.
+However, if scalar-returning metrics are also present, they will still be calculated:
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf_conf_recall = MetricFrame(
+    ...    metrics={ 'conf_mat':confusion_matrix, 'recall':recall_score },
+    ...    y_true=y_true,
+    ...    y_pred=y_pred,
+    ...    sensitive_features=sf_data
+    ... )
+    >>> mf_conf_recall.overall
+    conf_mat    [[2, 4], [6, 6]]
+    recall                   0.5
+    dtype: object
+    >>> mf_conf_recall.by_group
+                                 conf_mat  recall
+    sensitive_feature_0
+    a                    [[0, 2], [1, 1]]     0.5
+    b                    [[1, 0], [2, 3]]     0.6
+    c                    [[1, 2], [3, 2]]     0.4
+    >>> mf_conf_recall.difference()
+    conf_mat    None
+    recall       0.2
+    dtype: object
+
+We see that the difference between group recall scores has been calculated, while a value of
+:code:`None` has been returned for the meaningless 'maximum difference between two confusion matrices'
+entry.
+
+Inputs are Arrays of Objects
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:class:`MetricFrame` can also handle cases when the :math:`Y_{true}` and/or :math:`Y_{pred}` vectors
+are not vectors of scalars.
+It is the metric function(s) which gives meaning to these values - :class:`MetricFrame` itself
+just slices the vectors up according to the sensitive feature(s) and the control feature(s).
+
+As a toy example, suppose that our ``y`` values (both true and predicted) are tuples representing
+the dimensions of a rectangle.
+For some reason known only to our fevered imagination (although it might possibly be due to a
+desire for a *really* simple example), we are interested in the areas of these rectangles.
+In particular, we want to calculate the mean of the area ratios. That is:
+
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> def area_metric(y_true, y_pred):
+    ...     def calc_area(a):
+    ...         return a[0] * a[1]
+    ...
+    ...     y_ts = np.asarray([calc_area(x) for x in y_true])
+    ...     y_ps = np.asarray([calc_area(x) for x in y_pred])
+    ...
+    ...     return np.mean(y_ts / y_ps)
+
+
+This is a perfectly good metric for :class:`MetricFrame`, provided we supply appropriate
+inputs.
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> y_rect_true = [(4,9), (3,8), (2,10)]
+    >>> y_rect_pred = [(1,12), (2,1), (5, 2)]
+    >>> rect_groups = { 'sf_0':['a', 'a', 'b'] }
+    >>>
+    >>> mf_non_scalar = MetricFrame(
+    ...      metrics=area_metric,
+    ...      y_true=y_rect_true,
+    ...      y_pred=y_rect_pred,
+    ...      sensitive_features=rect_groups  
+    ... )
+    >>> print(mf_non_scalar.overall)
+    5.6666...
+    >>> print(mf_non_scalar.by_group)
+    sf_0
+    a    7.5
+    b    2.0
+    Name: area_metric, dtype: float64
+
+For a more concrete example, consider an image recognition algorithm which draws a bounding box
+around some region of interest.
+We will want to compare the 'true' bounding boxes (perhaps from human annotators) with the
+ones predicted by our model.
+A straightforward metric for this purpose is the IoU or 'intersection over union.'
+As the name implies, this metric takes two rectangles, and computes the area of their intersection
+and divides it by the area of their union.
+If the two rectangles are disjoint, then the IoU will be zero.
+If the two rectangles are identical, then the IoU will be one.
+This is presented in full in our 
+`example notebook <../auto_examples/plot_metricframe_beyond_binary_classification.html#non-scalar-inputs>`_.
+
+
+.. _plot_metricframe:
 
 Plotting
 --------
@@ -908,7 +1140,7 @@ metrics.
     For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
     Fairlearn provides some of the existing functionality through
-    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot_metricframe` section.
 
 
 References
