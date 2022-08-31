@@ -36,7 +36,8 @@ def main(argv):
         wheel_list = list(target_dir.glob("fairlearn*.whl"))
         assert len(wheel_list) == 1, f"Bad wheel_list: {wheel_list}"
         wheel_path = wheel_list[0].resolve()
-        _logger.info(f"Path to wheel: {wheel_path}")
+        msg = f"Path to wheel: {wheel_path}"
+        _logger.info(msg)
 
     with _LogWrapper("Installing wheel"):
         fairlearn_spec = f"fairlearn[customplots] @ {wheel_path.as_uri()}"
