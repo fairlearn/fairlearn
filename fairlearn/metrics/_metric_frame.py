@@ -13,7 +13,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_metric import calculate_disaggregated_metrics
+from ._disaggregated_metric import DisaggregatedResult
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -319,7 +319,7 @@ class MetricFrame:
             nameset.add(name)
 
         # Create the 'overall' results
-        self._result = calculate_disaggregated_metrics(
+        self._result = DisaggregatedResult.create(
             all_data, annotated_funcs, self._sf_names, self._cf_names
         )
 

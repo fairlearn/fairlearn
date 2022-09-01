@@ -28,6 +28,16 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
 )
 
 
+def extract_unique_classes(
+    data: pd.DataFrame, feature_list: List[str]
+) -> Dict[str, np.ndarray]:
+    """Compute unique values in a given set of columns."""
+    result = dict()
+    for feature in feature_list:
+        result[feature] = np.unique(data[feature])
+    return result
+
+
 def apply_to_dataframe(
     data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
 ) -> pd.Series:
@@ -45,7 +55,17 @@ def apply_to_dataframe(
 
 
 class DisaggregatedResult:
-    """Pickier version of MetricFrame."""
+    """Pickier version of MetricFrame.
+
+    This holds the internal result from a disaggregated metric
+    computation, and provides `apply_grouping()` (to cover min
+    and max), `difference()` and `ratio()` methods.
+
+    The main difference to the results computed by MetricFrame
+    is that no account is made of whether the user supplied
+    a bare function or a dictionary. Hence the results are
+    always Series or DataFrame
+    """
 
     def __init__(
         self,
@@ -218,61 +238,64 @@ class DisaggregatedResult:
 
         return result
 
+    @staticmethod
+    def create(
+        data: pd.DataFrame,
+        annotated_functions: Dict[str, AnnotatedMetricFunction],
+        sensitive_feature_names: List[str],
+        control_feature_names: Optional[List[str]],
+    ) -> 'DisaggregatedResult':
+        """Manufacture a DisaggregatedResult.
+        
+        This is essentially a more restricted version of the MetricFrame
+        constructor.
 
-def extract_unique_classes(
-    data: pd.DataFrame, feature_list: List[str]
-) -> Dict[str, np.ndarray]:
-    """Compute unique values in a given set of columns."""
-    result = dict()
-    for feature in feature_list:
-        result[feature] = np.unique(data[feature])
-    return result
+        All of the `data` have to be supplied as a DataFrame.
+        The metric functions have to be supplied as a dictionary of
+        AnnotatedMetricFunction.
+        The latter class contains the metric function itself, and
+        mappings between the metric function arguments and the columns
+        of the `data` DataFrame.
+        The sensitive and (optional) control features are lists of
+        column names in `data`.
+        """
+        # Calculate the 'overall' values
+        if control_feature_names is None:
+            overall = apply_to_dataframe(data, metric_functions=annotated_functions)
+        else:
+            temp = data.groupby(by=control_feature_names).apply(
+                apply_to_dataframe, metric_functions=annotated_functions
+            )
+            # If there are multiple control features, might have missing combinations
+            if len(control_feature_names) > 1:
+                cf_classes = extract_unique_classes(data, control_feature_names)
+                all_indices = pd.MultiIndex.from_product(
+                    cf_classes.values(), names=cf_classes.keys()
+                )
 
+                overall = temp.reindex(index=all_indices)
+            else:
+                overall = temp
 
-def calculate_disaggregated_metrics(
-    data: pd.DataFrame,
-    annotated_functions: Dict[str, AnnotatedMetricFunction],
-    sensitive_feature_names: List[str],
-    control_feature_names: Optional[List[str]],
-) -> DisaggregatedResult:
-    """Manufacture a DisaggregatedResult."""
-    # Calculate the 'overall' values
-    if control_feature_names is None:
-        overall = apply_to_dataframe(data, metric_functions=annotated_functions)
-    else:
-        temp = data.groupby(by=control_feature_names).apply(
+        # Calculate the 'by_group' values
+        all_grouping_names = [x for x in sensitive_feature_names]
+        if control_feature_names is not None:
+            # Note that we prepend the control feature names
+            all_grouping_names = control_feature_names + all_grouping_names
+
+        temp = data.groupby(all_grouping_names).apply(
             apply_to_dataframe, metric_functions=annotated_functions
         )
-        # If there are multiple control features, might have missing combinations
-        if len(control_feature_names) > 1:
-            cf_classes = extract_unique_classes(data, control_feature_names)
+        if len(all_grouping_names) > 1:
+            # We might have missing combinations in the input, so expand to fill
+            all_classes = extract_unique_classes(data, all_grouping_names)
             all_indices = pd.MultiIndex.from_product(
-                cf_classes.values(), names=cf_classes.keys()
+                all_classes.values(),
+                names=all_classes.keys(),
             )
 
-            overall = temp.reindex(index=all_indices)
+            by_group = temp.reindex(index=all_indices)
         else:
-            overall = temp
+            by_group = temp
 
-    # Calculate the 'by_group' values
-    all_grouping_names = [x for x in sensitive_feature_names]
-    if control_feature_names is not None:
-        # Note that we prepend the control feature names
-        all_grouping_names = control_feature_names + all_grouping_names
-
-    temp = data.groupby(all_grouping_names).apply(
-        apply_to_dataframe, metric_functions=annotated_functions
-    )
-    if len(all_grouping_names) > 1:
-        # We might have missing combinations in the input, so expand to fill
-        all_classes = extract_unique_classes(data, all_grouping_names)
-        all_indices = pd.MultiIndex.from_product(
-            all_classes.values(),
-            names=all_classes.keys(),
-        )
-
-        by_group = temp.reindex(index=all_indices)
-    else:
-        by_group = temp
-
-    return DisaggregatedResult(overall, by_group)
+        return DisaggregatedResult(overall, by_group)
