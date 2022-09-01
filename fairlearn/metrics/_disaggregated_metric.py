@@ -244,9 +244,9 @@ class DisaggregatedResult:
         annotated_functions: Dict[str, AnnotatedMetricFunction],
         sensitive_feature_names: List[str],
         control_feature_names: Optional[List[str]],
-    ) -> 'DisaggregatedResult':
+    ) -> "DisaggregatedResult":
         """Manufacture a DisaggregatedResult.
-        
+
         This is essentially a more restricted version of the MetricFrame
         constructor.
 
