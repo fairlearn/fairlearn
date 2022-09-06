@@ -79,6 +79,7 @@ class _func_wrapper:
 
     def __init__(self, metric_function):
         self.metric_function = metric_function
+        self.__name__ = f"{metric_function.__name__}_wrapped"
 
     def __call__(self, y_true, y_pred):
         result = 0

@@ -10,3 +10,4 @@ In this section, we dive deeper into various datasets that have fairness-related
 
    adult_data
    boston_housing_data
+   diabetes_hospital_data

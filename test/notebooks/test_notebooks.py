@@ -93,17 +93,6 @@ def test_grid_search_for_binary_classification():
 
 
 @pytest.mark.notebooks
-def test_mitigating_disparities_in_ranking_from_binary_data():
-    nb_name = "Mitigating Disparities in Ranking from Binary Data"
-    test_values = {}
-    # Needs wider bound due to randomness in ExponentiatedGradient
-    test_values["sel_eg_X_alt_disparity"] = ScrapSpec(
-        "sel_expgrad_X_alt.loc[ 'disparity', :][0]", pytest.approx(0.35, abs=0.08)
-    )
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
 def test_binary_classification_with_the_uci_credit_card_default_dataset():
     nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}

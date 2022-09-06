@@ -237,6 +237,63 @@ between the maximum and the minimum values. For more information refer to the
 subpackage :mod:`fairlearn.metrics`.
 
 
+
+The Four Fifths Rule: Often Misapplied
+--------------------------------------
+
+In the literature around fairness in machine learning, one will often find
+the so-called "four fifths rule" or "80% rule" used to assess whether a model
+(or mitigation technique) has produced a 'fair' result.
+Typically, the rule is implemented by using the demographic parity ratio introduced
+in the :ref:`disparity_metrics` section, with a result considered 'fair' if the ratio
+exceeds 80% for all identified subgroups.
+*Application of this threshold is wrong in many scenarios.*
+
+As we note in many other places in the Fairlearn documentation, 'fairness'
+must be assessed by examining the entire sociotechnical context of a machine
+learning system.
+In particular, it is important to start from the harms which can occur to real
+people, and work inwards towards the model.
+The demographic parity ratio is simply a metric by which a particular model
+may be measured (on a particular dataset).
+Given the origin of the 'four-fifths rule' (which we will discuss next), its
+application may also give an unjustified feeling of legal invulnerability by
+conflating fairness with legality.
+In reality, 'fairness' is not always identical to 'legally allowable,' and
+the former may not even be a strict subset of the latter. [#f1]_
+
+The 'four fifths rule' has its origins in a specific area of US
+federal employment law.
+It is a limit for
+`prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
+that illegal discrimination has occurred relative to a 
+relevant control population.
+A violation of the rule is still not sufficient to demonstrate that
+illegal discrimination has occurred - a causal link between the
+statistic and alleged discrimination must still be shown, and the
+court would examine the particulars of each case.
+For an example of the subtleties involved, see
+`Ricci v. Stefano <https://en.wikipedia.org/wiki/Ricci_v._DeStefano>`_
+which resulted from an attempt to 'correct' for disparate impact.
+*Outside* its particular context in US federal employment law,
+the 'four fifths rule' has no validity.
+
+Taken together, we see that applying the 'four fifths rule' will
+not be appropriate in most cases.
+Even in cases where it is applicable, the rule does not automatically
+avoid legal jeopardy, much less ensure that results are fair.
+The use of the 'four fifths rule' in this manner is an indefensible
+example of epistemic trespassing. [#f2]_
+It is for this reason that we try to avoid the use of legal
+terminology in our documentation.
+
+For a much deeper discussion of the issues involved, we suggest
+:footcite:ct:`watkins2022fourfifths`.
+A higher level look at how legal concepts of fairness can collide
+with mathematical measures of disparity, see
+:footcite:ct:`Xiang2019legalcompatibility`.
+
+
 .. _abstraction_traps:
 
 What traps can we fall into when modeling a social problem?
@@ -439,3 +496,14 @@ References
 ----------
 
 .. footbibliography::
+
+.. rubric:: Footnotes
+
+.. [#f1] For a related example, see the discussion on 'law' and 'justice' in
+         *The Caves of Steel* (Asimov, 1953)
+
+.. [#f2] Epistemic trespassing is the process of taking expertise in one field and
+         applying it to another. This is not an intrinsically bad thing - one could
+         label all interdisciplinary research a form of epistemic trespassing.
+         However, doing so successfully requires a willingness to learn the subtleties
+         of the new field.

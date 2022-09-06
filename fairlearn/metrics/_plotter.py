@@ -16,8 +16,10 @@ _METRIC_FRAME_INVALID_ERROR = "Input metric_frame should be of type MetricFrame.
 _METRIC_LENGTH_ZERO_ERROR = (
     "No metrics were provided to plot. A nonzero number of metrics is required."
 )
-_METRICS_NOT_LIST_OR_STR_ERROR = """Metric should be a string of a single metric or a list of the metrics
-     in provided MetricFrame, but {0} was provided"""
+_METRICS_NOT_LIST_OR_STR_ERROR = (
+    "Metric should be a string of a single metric or a list of the metrics"
+    "in provided MetricFrame, but {0} was provided"
+)
 _CONF_INTERVALS_MUST_BE_ARRAY = "Calculated conf_intervals must be array of length 2"
 _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = (
     "Calculated conf_intervals' upper bound cannot be less than lower bound"

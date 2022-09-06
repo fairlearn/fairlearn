@@ -140,7 +140,7 @@ Does Fairlearn support multiclass classification?
     :py:func:`sklearn.metrics.accuracy_score` or
     :py:func:`sklearn.metrics.confusion_matrix` as the metric functions, and
     supply multiclass data for :code:`y_true` and :code:`y_pred`.
-    We give an example with multiclass data in the :ref:`user guide <metrics_with_grouping>`.
+    We give an example with multiclass data in the :ref:`user guide <assessment>`.
     There are
     `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
     to add more extensive support to Fairlearn's assessment capabilities.
@@ -156,7 +156,7 @@ Does Fairlearn support multiclass classification?
 Does Fairlearn support multiple and non-binary sensitive features?
     Fairlearn's assessment capabilities support sensitive features with more
     than two values as well as multiple sensitive features.
-    Our :ref:`user guide <metrics_with_grouping>` has examples for both of
+    Our :ref:`user guide <assessment>` has examples for both of
     these cases.
     The mitigation techniques all support mitigation with non-binary and
     multiple sensitive features as well. For a full list of techniques

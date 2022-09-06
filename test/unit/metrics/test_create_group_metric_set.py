@@ -236,13 +236,12 @@ class TestCreateGroupMetricSet:
         assert actual_roc["global"] == expected_all_roc
         assert actual_roc["bins"] == [0, 0]  # We substituted zero
         # Check that the right warnings were issued
-        assert len(recwarn) == 4
+        assert len(recwarn) == 3
         msgs = sorted([str(x.message) for x in recwarn])
         # We get the message from roc_auc_score once for each subgroup
         assert msgs[0] == "Evaluation of roc_auc_score failed. Substituting 0"
         assert msgs[1] == "Evaluation of roc_auc_score failed. Substituting 0"
         assert msgs[2].startswith("Recall is ill-defined and being set to 0.0")
-        assert msgs[3] == "Supplied 'func' had no __name__ attribute"
 
     def test_json_serializable(self):
         y_t = [0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1]
