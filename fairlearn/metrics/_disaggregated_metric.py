@@ -64,7 +64,16 @@ class DisaggregatedResult:
     The main difference to the results computed by MetricFrame
     is that no account is made of whether the user supplied
     a bare function or a dictionary. Hence the results are
-    always Series or DataFrame
+    always Series or DataFrame.
+
+    Parameters
+    ----------
+    overall: Series or DataFrame
+        The metric function(s) computed on the entire dataset, split by
+        control features if supplied
+    by_group: Series or DataFrame
+        The metric function(s) computed on each subgroup identified by
+        the sensitive and control features
     """
 
     def __init__(
@@ -92,7 +101,24 @@ class DisaggregatedResult:
         control_feature_names: Optional[List[str]],
         errors: str = "raise",
     ) -> Union[pd.Series, pd.DataFrame]:
-        """Compute mins or maxes."""
+        """Compute mins or maxes.
+        
+        Parameters
+        ----------
+        grouping_function: string
+            Must be 'min' or 'max'
+        control_feature_names: Optional[List[str]]
+            Names of the control features. Must appear in the index of the `overall`
+            and `by_group` properties
+        errors: string {'raise', 'coerce'}, default 'raise'
+            How to deal with any errors. Either coerce to `np.nan` or wrap the
+            exception and reraise
+
+        Returns
+        -------
+        Series or DataFrame
+            Contains the desired mins or maxes
+        """
         if grouping_function not in _VALID_GROUPING_FUNCTION:
             raise ValueError(_INVALID_GROUPING_FUNCTION_ERROR_MESSAGE)
 
@@ -161,7 +187,33 @@ class DisaggregatedResult:
         method: str = "between_groups",
         errors: str = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
-        """Compute differences."""
+        """Return the maximum absolute difference between groups for each metric.
+
+        This method calculates a scalar value for each underlying metric by
+        finding the maximum absolute difference between the entries in each
+        combination of sensitive features in the :attr:`.by_group` property.
+
+        There are two allowed values for the ``method=`` parameter. The
+        value ``between_groups`` computes the maximum difference between
+        any two pairs of groups in the :attr:`.by_group` property (i.e.
+        ``group_max() - group_min()``). Alternatively, ``to_overall``
+        computes the difference between each subgroup and the
+        corresponding value from :attr:`.overall` (if there are control
+        features, then :attr:`.overall` is multivalued for each metric).
+        The result is the absolute maximum of these values.
+
+        Parameters
+        ----------
+        method : str
+            How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'raise', 'coerce'}, default 'coerce'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+
+        Returns
+        -------
+        pandas.Series or pandas.DataFrame
+        """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
@@ -199,7 +251,35 @@ class DisaggregatedResult:
         method: str = "between_groups",
         errors: str = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
-        """Compute ratios."""
+        """Return the minimum ratio between groups for each metric.
+
+        This method calculates a scalar value for each underlying metric by
+        finding the minimum ratio (that is, the ratio is forced to be
+        less than unity) between the entries in each
+        column of the :attr:`.by_group` property.
+
+        There are two allowed values for the ``method=`` parameter. The
+        value ``between_groups`` computes the minimum ratio between
+        any two pairs of groups in the :attr:`.by_group` property (i.e.
+        ``group_min() / group_max()``). Alternatively, ``to_overall``
+        computes the ratio between each subgroup and the
+        corresponding value from :attr:`.overall` (if there are control
+        features, then :attr:`.overall` is multivalued for each metric),
+        expressing the ratio as a number less than 1.
+        The result is the minimum of these values.
+
+        Parameters
+        ----------
+        method : str
+            How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'raise', 'coerce'}, default 'coerce'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+
+        Returns
+        -------
+        typing.Any or pandas.Series or pandas.DataFrame
+        """
 
         def ratio_sub_one(x):
             if x > 1:
@@ -258,6 +338,24 @@ class DisaggregatedResult:
         of the `data` DataFrame.
         The sensitive and (optional) control features are lists of
         column names in `data`.
+
+        Parameters
+        ----------
+        data : DataFrame
+            A DataFrame containing all of the columns required to compute the metrics
+        annotated_functions: Dict[str, AnnotatedMetricFunction]
+            A dictionary of metric functions, each of which is annotated with the
+            mapping of columns in `data` to argument names in the function
+        sensitive_feature_names: List[str]
+            The list of columns in `data` which correspond to the sensitive feature(s)
+        control_feature_names: Optional[List[str]]
+            Optional list of columns in `data` which correspond to the control features,
+            if any
+
+        Returns
+        -------
+        DisaggregatedResult
+            Freshly constructed instance of this class
         """
         # Calculate the 'overall' values
         if control_feature_names is None:
