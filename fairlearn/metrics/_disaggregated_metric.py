@@ -102,7 +102,7 @@ class DisaggregatedResult:
         errors: str = "raise",
     ) -> Union[pd.Series, pd.DataFrame]:
         """Compute mins or maxes.
-        
+
         Parameters
         ----------
         grouping_function: string
