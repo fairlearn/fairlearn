@@ -143,6 +143,8 @@ We can use :class:`MetricFrame` to evaluate these metrics on our data:
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> import pandas as pd
+    >>> pd.set_option('display.width', 80)
     >>> from fairlearn.metrics import MetricFrame
     >>> from fairlearn.metrics import count, \
     ...                               false_positive_rate, \
