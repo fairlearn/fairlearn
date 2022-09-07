@@ -320,7 +320,10 @@ class MetricFrame:
 
         # Create the 'overall' results
         self._result = DisaggregatedResult.create(
-            all_data, annotated_funcs, self._sf_names, self._cf_names
+            data=all_data,
+            annotated_functions=annotated_funcs,
+            sensitive_feature_names=self._sf_names,
+            control_feature_names=self._cf_names
         )
 
     @property

@@ -98,7 +98,7 @@ class DisaggregatedResult:
     def apply_grouping(
         self,
         grouping_function: str,
-        control_feature_names: Optional[List[str]],
+        control_feature_names: Optional[List[str]] = None,
         errors: str = "raise",
     ) -> Union[pd.Series, pd.DataFrame]:
         """Compute mins or maxes.
@@ -319,7 +319,7 @@ class DisaggregatedResult:
         return result
 
     @staticmethod
-    def create(
+    def create(*,
         data: pd.DataFrame,
         annotated_functions: Dict[str, AnnotatedMetricFunction],
         sensitive_feature_names: List[str],
