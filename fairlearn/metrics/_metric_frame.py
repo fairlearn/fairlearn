@@ -323,7 +323,7 @@ class MetricFrame:
             data=all_data,
             annotated_functions=annotated_funcs,
             sensitive_feature_names=self._sf_names,
-            control_feature_names=self._cf_names
+            control_feature_names=self._cf_names,
         )
 
     @property

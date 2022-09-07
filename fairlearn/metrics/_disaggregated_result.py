@@ -319,7 +319,8 @@ class DisaggregatedResult:
         return result
 
     @staticmethod
-    def create(*,
+    def create(
+        *,
         data: pd.DataFrame,
         annotated_functions: Dict[str, AnnotatedMetricFunction],
         sensitive_feature_names: List[str],

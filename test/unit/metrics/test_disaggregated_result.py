@@ -11,9 +11,14 @@ from fairlearn.metrics._disaggregated_result import DisaggregatedResult
 
 from .data_for_test import g_1, y_p, y_t
 
-basic_data = pd.DataFrame(data={'g_1': g_1, 'y_pred': y_p, 'y_true': y_t})
-metric_dict = {'recall': AnnotatedMetricFunction(
-    func=skm.recall_score, name='recall_score', postional_argument_names=['y_true', 'y_pred'])}
+basic_data = pd.DataFrame(data={"g_1": g_1, "y_pred": y_p, "y_true": y_t})
+metric_dict = {
+    "recall": AnnotatedMetricFunction(
+        func=skm.recall_score,
+        name="recall_score",
+        postional_argument_names=["y_true", "y_pred"],
+    )
+}
 
 # This is not a comprehensive set of tests for DisaggregatedResult; those are mainly
 # covered through the MetricFrame tests (DisaggregatedResult having been extracted
@@ -23,17 +28,25 @@ metric_dict = {'recall': AnnotatedMetricFunction(
 class TestErrorMessages:
     def test_bad_grouping(self):
         target = DisaggregatedResult.create(
-            data=basic_data, annotated_functions=metric_dict, sensitive_feature_names=['g_1'], control_feature_names=None)
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
         with pytest.raises(ValueError) as e0:
-            _ = target.apply_grouping('bad_func')
-        assert str(
-            e0.value) == "Invalid grouping function specified. Valid values are ['min', 'max']"
+            _ = target.apply_grouping("bad_func")
+        assert (
+            str(e0.value)
+            == "Invalid grouping function specified. Valid values are ['min', 'max']"
+        )
 
     def test_bad_difference_method(self):
         target = DisaggregatedResult.create(
-            data=basic_data, annotated_functions=metric_dict, sensitive_feature_names=['g_1'], control_feature_names=None)
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
         with pytest.raises(ValueError) as e0:
-            _ = target.difference(control_feature_names=None,
-                                  method='bad_func')
-        assert str(
-            e0.value) == "Unrecognised method 'bad_func' in difference() call"
+            _ = target.difference(control_feature_names=None, method="bad_func")
+        assert str(e0.value) == "Unrecognised method 'bad_func' in difference() call"
