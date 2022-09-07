@@ -8,7 +8,7 @@ import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
-from fairlearn.metrics._disaggregated_metric import (
+from fairlearn.metrics._disaggregated_result import (
     _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
     _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE,
 )

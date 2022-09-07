@@ -13,7 +13,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_metric import DisaggregatedResult
+from ._disaggregated_result import DisaggregatedResult
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)

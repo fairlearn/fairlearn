@@ -7,7 +7,7 @@ import sklearn.metrics as skm
 
 from fairlearn.metrics._annotated_metric_function import AnnotatedMetricFunction
 
-from fairlearn.metrics._disaggregated_metric import DisaggregatedResult
+from fairlearn.metrics._disaggregated_result import DisaggregatedResult
 
 from .data_for_test import g_1, y_p, y_t
 
