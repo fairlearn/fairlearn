@@ -76,13 +76,10 @@ class DisaggregatedResult:
         the sensitive and control features
     """
 
-    def __init__(
-        self,
-        overall: Union[pd.Series, pd.DataFrame],
-        by_group: Union[pd.Series, pd.DataFrame],
-    ):
+    def __init__(self, overall: Union[pd.Series, pd.DataFrame], by_group: pd.DataFrame):
         """Construct an object."""
         self._overall = overall
+        assert isinstance(by_group, pd.DataFrame)
         self._by_group = by_group
 
     @property
@@ -93,7 +90,6 @@ class DisaggregatedResult:
     @property
     def by_group(self) -> pd.DataFrame:
         """Return the metrics by group."""
-        assert isinstance(self._by_group, pd.DataFrame)
         return self._by_group
 
     def apply_grouping(
