@@ -91,8 +91,9 @@ class DisaggregatedResult:
         return self._overall
 
     @property
-    def by_group(self) -> Union[pd.Series, pd.DataFrame]:
+    def by_group(self) -> pd.DataFrame:
         """Return the metrics by group."""
+        assert isinstance(self._by_group, pd.DataFrame)
         return self._by_group
 
     def apply_grouping(
@@ -231,10 +232,7 @@ class DisaggregatedResult:
         mf = self.by_group.copy()
         # Can assume errors='coerce', else error would already have been raised in .group_min
         # Fill all non-scalar values with NaN
-        if isinstance(mf, pd.Series):
-            mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
-        else:
-            mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+        mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
 
         if control_feature_names is None:
             result = (mf - subtrahend).abs().max()
