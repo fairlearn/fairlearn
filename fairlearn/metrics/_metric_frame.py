@@ -816,7 +816,7 @@ class MetricFrame:
         amf = AnnotatedMetricFunction(
             func=func,
             name=name,
-            postional_argument_names=["y_true", "y_pred"],
+            positional_argument_names=["y_true", "y_pred"],
             kw_argument_mapping=kwarg_dict,
         )
 
