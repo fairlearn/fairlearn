@@ -9,7 +9,7 @@ In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups.
 
-.. _demographic_parity:
+.. _assessment_demographic_parity:
 
 Demographic parity
 ------------------
@@ -176,7 +176,7 @@ that the classifier is fair!
     0.66666...
 
 
-.. _equalized_odds:
+.. _assessment_equalized_odds:
 
 Equalized odds
 --------------
@@ -267,7 +267,7 @@ We then return the larger of these two differences.
 
 
 
-.. _equal_opportunity:
+.. _assessment_equal_opportunity:
 
 Equal opportunity
 -----------------
