@@ -3,6 +3,8 @@
 Performing a Fairness Assessment
 ================================
 
+.. currentmodule:: fairlearn.metrics
+
 The goal of fairness assessment is to answer the question: Which groups of 
 people may be disproportionately negatively impacted by an AI system and in 
 what ways?
