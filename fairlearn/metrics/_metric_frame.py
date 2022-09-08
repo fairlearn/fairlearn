@@ -400,7 +400,7 @@ class MetricFrame:
             return self._result.by_group
 
     @property
-    def control_levels(self) -> List[str]:
+    def control_levels(self) -> Optional[List[str]]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the :attr:`.by_group`
@@ -621,7 +621,10 @@ class MetricFrame:
         return result
 
     def _process_functions(
-        self, metric, sample_params, all_data: pd.DataFrame
+        self,
+        metric: Union[Callable, Dict[str, Callable]],
+        sample_params,
+        all_data: pd.DataFrame,
     ) -> Dict[str, AnnotatedMetricFunction]:
         """Get the metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
         self._user_supplied_callable = True
@@ -661,8 +664,8 @@ class MetricFrame:
     def _process_one_function(
         self,
         func: Callable,
-        name: str,
-        sample_parameters: Dict[str, Any],
+        name: Optional[str],
+        sample_parameters: Optional[Dict[str, Any]],
         all_data: pd.DataFrame,
     ) -> AnnotatedMetricFunction:
         # Deal with the sample parameters
@@ -686,7 +689,7 @@ class MetricFrame:
         amf = AnnotatedMetricFunction(
             func=func,
             name=name,
-            postional_argument_names=["y_true", "y_pred"],
+            positional_argument_names=["y_true", "y_pred"],
             kw_argument_mapping=kwarg_dict,
         )
 

@@ -144,6 +144,7 @@ We can use :class:`MetricFrame` to evaluate these metrics on our data:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> import pandas as pd
+    >>> pd.set_option('display.max_columns', 20)
     >>> pd.set_option('display.width', 80)
     >>> from fairlearn.metrics import MetricFrame
     >>> from fairlearn.metrics import count, \
