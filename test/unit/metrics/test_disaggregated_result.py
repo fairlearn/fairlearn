@@ -51,7 +51,6 @@ class TestErrorMessages:
             _ = target.difference(control_feature_names=None, method="bad_func")
         assert str(e0.value) == "Unrecognised method 'bad_func' in difference() call"
 
-    
     def test_bad_ratio_method(self):
         target = DisaggregatedResult.create(
             data=basic_data,
