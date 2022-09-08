@@ -28,3 +28,4 @@ indicate that a property holds for all identified groups.
 
    perform_fairness_assessment
    common_fairness_metrics
+   custom_fairness_metrics
