@@ -7,7 +7,7 @@ User Guide
    :maxdepth: 3
 
    fairness_in_machine_learning
-   assessment
+   assessment/index
    mitigation
    datasets/index
    installation_and_version_guide/index

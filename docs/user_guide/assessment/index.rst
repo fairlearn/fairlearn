@@ -26,4 +26,4 @@ indicate that a property holds for all identified groups.
 .. toctree::
    :maxdepth: 2
 
-    perform_fairness_assessment
+   perform_fairness_assessment
