@@ -438,7 +438,7 @@ class MetricFrame:
             return self._by_group
 
     @property
-    def control_levels(self) -> List[str]:
+    def control_levels(self) -> Optional[List[str]]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the :attr:`.by_group`
