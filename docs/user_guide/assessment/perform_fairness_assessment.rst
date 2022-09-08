@@ -1,4 +1,4 @@
-.. _perform_fairness_assessment::
+.. _perform_fairness_assessment:
 
 Performing a Fairness Assessment
 ================================

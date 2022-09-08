@@ -1,4 +1,4 @@
-.. _common_fairness_metrics::
+.. _common_fairness_metrics:
 
 Common fairness metrics
 =======================
