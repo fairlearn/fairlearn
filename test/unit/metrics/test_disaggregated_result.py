@@ -50,3 +50,15 @@ class TestErrorMessages:
         with pytest.raises(ValueError) as e0:
             _ = target.difference(control_feature_names=None, method="bad_func")
         assert str(e0.value) == "Unrecognised method 'bad_func' in difference() call"
+
+    
+    def test_bad_ratio_method(self):
+        target = DisaggregatedResult.create(
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
+        with pytest.raises(ValueError) as e0:
+            _ = target.ratio(control_feature_names=None, method="bad_func")
+        assert str(e0.value) == "Unrecognised method 'bad_func' in ratio() call"
