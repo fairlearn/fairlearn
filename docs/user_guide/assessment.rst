@@ -240,17 +240,17 @@ values for the groups:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> mf.difference()
-    tpr       0.2
-    fpr       1.0
+    tpr      0.20
+    fpr      1.00
     sel      0.25
-    count     4.0
-    dtype: object
+    count    4.00
+    dtype: float64
     >>> mf.ratio()
     tpr      0.666667
-    fpr           0.0
+    fpr      0.000000
     sel      0.666667
-    count         0.5
-    dtype: object
+    count    0.500000
+    dtype: float64
 
 However, the differences and ratios can also be computed relative to the
 overall values for the data:
@@ -977,9 +977,9 @@ However, if scalar-returning metrics are also present, they will still be calcul
     b                    [[1, 0], [2, 3]]     0.6
     c                    [[1, 2], [3, 2]]     0.4
     >>> mf_conf_recall.difference()
-    conf_mat    None
-    recall       0.2
-    dtype: object
+    conf_mat    NaN
+    recall      0.2
+    dtype: float64
 
 We see that the difference between group recall scores has been calculated, while a value of
 :code:`None` has been returned for the meaningless 'maximum difference between two confusion matrices'
