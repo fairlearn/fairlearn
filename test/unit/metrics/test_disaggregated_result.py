@@ -16,7 +16,7 @@ metric_dict = {
     "recall": AnnotatedMetricFunction(
         func=skm.recall_score,
         name="recall_score",
-        postional_argument_names=["y_true", "y_pred"],
+        positional_argument_names=["y_true", "y_pred"],
     )
 }
 
