@@ -27,3 +27,4 @@ indicate that a property holds for all identified groups.
    :maxdepth: 2
 
    perform_fairness_assessment
+   common_fairness_metrics
