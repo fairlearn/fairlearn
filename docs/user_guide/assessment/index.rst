@@ -32,3 +32,24 @@ indicate that a property holds for all identified groups.
    intersecting_groups
    extra_arguments_metric_functions
    more_complex_metrics
+   plot_metricframe
+
+
+.. _dashboard:
+
+Fairlearn dashboard
+-------------------
+
+The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
+model's predictions impact different groups (e.g., different ethnicities), and
+also for comparing multiple models along different fairness and performance
+metrics.
+
+.. note::
+
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn.
+    For more information on how to use it refer to
+    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    Fairlearn provides some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot_metricframe` section.
