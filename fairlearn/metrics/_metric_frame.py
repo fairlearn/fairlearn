@@ -756,8 +756,7 @@ class MetricFrame:
         sample_params,
         all_data: pd.DataFrame,
     ) -> Dict[str, AnnotatedMetricFunction]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`.
-        """
+        """Get the metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
         self._user_supplied_callable = True
         func_dict = dict()
 
