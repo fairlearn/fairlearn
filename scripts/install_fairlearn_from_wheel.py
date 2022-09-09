@@ -17,6 +17,7 @@ from _utils import _LogWrapper
 _logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
 
+
 def build_argument_parser():
     desc = "Installs Fairlearn wheel from specified directory"
 
