@@ -65,7 +65,7 @@ jobs:
       # Do this in three steps to make sure that fairlearn wasn't pulled from PyPI
       run: |
         pip install --pre --find-links . "fairlearn[customplots]"
-        pip uninstall fairlearn
+        pip uninstall fairlearn --yes
         pip install --no-index --find-links . "fairlearn[customplots]"
     - name: Install testing requirements
       run: pip install pytest==7.1.1 pytest-mock pytest-mpl>=0.11 lightgbm
