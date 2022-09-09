@@ -1,6 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+# The purpose of this script is to find a fairlearn wheel file
+# in a specified directory and install it.
+# Filename globbing within the shell is not reliable cross-platform
+# on the build machines, so this script fills in.
 
 import argparse
 import logging
@@ -13,9 +17,8 @@ from _utils import _LogWrapper
 _logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
 
-
 def build_argument_parser():
-    desc = "Build wheels for fairlearn"
+    desc = "Installs Fairlearn wheel from specified directory"
 
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
@@ -40,6 +43,7 @@ def main(argv):
         _logger.info(msg)
 
     with _LogWrapper("Installing wheel"):
+        # The main purpose of this script is to build the following string
         fairlearn_spec = f"fairlearn[customplots] @ {wheel_path.as_uri()}"
         subprocess.run(["pip", "install", f"{fairlearn_spec}"], check=True)
 
