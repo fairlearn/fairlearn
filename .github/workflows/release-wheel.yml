@@ -62,7 +62,7 @@ jobs:
       with:
         name: env.WHEEL_ARTIFACT
     - name: Install Fairlearn from wheel
-      run: python scripts/install_fairlearn_from_wheel.py --wheel-dir=.
+      run: pip install --no-index --find-links dist fairlearn[customplots]
     - name: Install testing requirements
       run: pip install pytest==7.1.1 pytest-mock pytest-mpl>=0.11 lightgbm
     - name: Run tests
