@@ -1,13 +1,14 @@
 name: Release Wheel
 
 # Following will be changed in due course
-on:
-  workflow_dispatch:
-    inputs:
-      use_test_pypi:
-        description: 'Release to Test-PyPI'
-        required: true
-        default: true
+#on:
+#  workflow_dispatch:
+#    inputs:
+#      use_test_pypi:
+#        description: 'Release to Test-PyPI'
+#        required: true
+#        default: true
+on: [push, pull_request]
 
 concurrency: 
   # this ensures after each commit the old jobs are cancelled and the new ones
