@@ -1,0 +1,94 @@
+name: Release Wheel
+
+# Following will be changed in due course
+on: # [push, pull_request]
+  workflow_dispatch:
+    inputs:
+      use_test_pypi:
+        description: 'Release to Test-PyPI'
+        required: true
+        default: true
+
+concurrency: 
+  # this ensures after each commit the old jobs are cancelled and the new ones
+  # run instead.
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  VERSION_FILE_NAME: version.txt
+  WHEEL_ARTIFACT: fairlearn-wheels
+
+jobs:
+  build-wheel:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.10"
+    - name: Update pip and setuptools
+      run: |
+        pip install --upgrade pip
+        pip install --upgrade setuptools wheel
+    - name: Build wheels
+      run: python ./scripts/build_wheels.py --version-filename $VERSION_FILE_NAME
+    - name: Save wheels to artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: env.WHEEL_ARTIFACT
+        path: dist/
+
+  test-wheel:
+    needs: build-wheel
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Remove Fairlearn source directory
+      uses: JesseTG/rm@v1.0.3
+      with:
+        path: fairlearn
+    - name: Download wheel artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: env.WHEEL_ARTIFACT
+    - name: Install Fairlearn from wheel
+      # Do this in three steps to make sure that fairlearn wasn't pulled from PyPI
+      run: |
+        pip install --pre --find-links . "fairlearn[customplots]"
+        pip uninstall fairlearn --yes
+        pip install --no-index --find-links . "fairlearn[customplots]"
+    - name: Install testing requirements
+      run: pip install pytest==7.1.1 pytest-mock pytest-mpl>=0.11 lightgbm
+    - name: Run tests
+      run: pytest --ignore=test/install --ignore=test/notebooks test/
+
+  release-wheel:
+    needs: test-wheel
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download wheel artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: env.WHEEL_ARTIFACT
+    - name: DEBUG
+      run: ls
+    - name: Release to Test-PyPI
+      if: ${{ inputs.use_test_pypi }} == true
+      run: echo "Releasing to Test-PyPI"
+    - name: Release to PyPI
+      if: ${{ inputs.use_test_pypi }} == false
+      run: echo "Releasing to PyPI"
+    - name: Tag repo
+      run: echo "Use an appropriate Action to lay down the tag"
+    - name: Create GitHub Release
+      run: echo "Use another GitHub Action based on the tag and artifact"
