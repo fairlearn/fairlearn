@@ -5,10 +5,14 @@ More Complex Metrics
 
 .. currentmodule:: fairlearn.metrics
 
-So far, we have stuck to relatively simple cases, where the inputs are 1-D vectors of scalars,
-and the metric functions return scalar values.
-However, this need not be the case - we noted above that we were going to be vague as to the
+Metric functions often return a single scalar value based on arguments which are vectors of
+scalars.
+This is how :class:`MetricFrame` was introduced in the :ref:`perform_fairness_assessment`
+section above.
+However, this need not be the case - indeed, we were rather vague about the
 contents of the input vectors and the return value of the metric function.
+We will now show how to use :class:`MetricFrame` in cases where the result is not
+a scalar, and when the inputs are not vectors of scalars.
 
 Non-Scalar Results from Metric Functions
 ----------------------------------------
