@@ -36,6 +36,8 @@ of these groups:
 
     >>> import numpy as np
     >>> import pandas as pd
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
     >>> from sklearn.metrics import recall_score
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6,6,6 ]
     >>> s_f_frame = pd.DataFrame(np.stack([sf_data, g_2], axis=1),
