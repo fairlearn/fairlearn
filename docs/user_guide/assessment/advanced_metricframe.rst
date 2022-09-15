@@ -7,6 +7,17 @@ Advanced Usage of MetricFrame
 
 In this section, we will discuss how :class:`MetricFrame` can
 be used in more sophisticated scenarios.
+All of these will use the following definitions:
+
+
+.. doctest:: advanced_metricframe_code
+
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...            'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
+    >>> from fairlearn.metrics import MetricFrame
+
 
 
 .. _extra_arguments_metric_functions:
@@ -27,7 +38,7 @@ We do not directly support scalar arguments for the metric functions.
 If these are required, then use :func:`functools.partial` to prebind the
 required arguments to the metric function:
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> import functools
@@ -55,9 +66,11 @@ provided in a dictionary via the ``sample_params`` argument.
 The keys of this dictionary are the argument names, and the values are 1-D
 arrays equal in length to ``y_true`` etc.:
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> from sklearn.metrics import recall_score
+    >>> import pandas as pd
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3, 1, 1]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(metrics=recall_score,
@@ -82,7 +95,7 @@ The keys of the inner dictionary are the argument names, and the values
 are the 1-D arrays of sample parameters for that metric.
 For example:
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> s_w_2 = [3, 1, 2, 3, 2, 3, 1, 4, 1, 2, 3, 1, 2, 1, 4, 2, 2, 3]
@@ -140,7 +153,7 @@ A straightforward example of this is the confusion matrix.
 Such return values are fully supported by :class:`MetricFrame`:
 
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from sklearn.metrics import confusion_matrix
@@ -163,7 +176,7 @@ Such return values are fully supported by :class:`MetricFrame`:
 Obviously for such cases, operations such as :meth:`MetricFrame.difference` have no meaning.
 However, if scalar-returning metrics are also present, they will still be calculated:
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> mf_conf_recall = MetricFrame(
@@ -206,9 +219,10 @@ desire for a *really* simple example), we are interested in the areas of these r
 In particular, we want to calculate the mean of the area ratios. That is:
 
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> import numpy as np
     >>> def area_metric(y_true, y_pred):
     ...     def calc_area(a):
     ...         return a[0] * a[1]
@@ -222,7 +236,7 @@ In particular, we want to calculate the mean of the area ratios. That is:
 This is a perfectly good metric for :class:`MetricFrame`, provided we supply appropriate
 inputs.
 
-.. doctest:: assessment_metrics
+.. doctest:: advanced_metricframe_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> y_rect_true = [(4,9), (3,8), (2,10)]

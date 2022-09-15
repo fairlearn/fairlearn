@@ -12,6 +12,16 @@ One important point to bear in mind when performing an intersectional analysis
 is that some of the intersections may have very few members (or even be empty).
 This will affect the confidence interval associated with the computed metrics;
 random noise has a greater effect on smaller groups.
+All of these will use the following definitions:
+
+
+.. doctest:: intersecting_groups_code
+
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...            'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
+    >>> from fairlearn.metrics import MetricFrame
 
 Multiple Sensitive Features
 ---------------------------
@@ -21,11 +31,12 @@ is constructed.
 The :attr:`MetricFrame.by_group` property then holds the intersections
 of these groups:
 
-.. doctest:: assessment_metrics
+.. doctest:: intersecting_groups_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> import numpy as np
     >>> import pandas as pd
+    >>> from sklearn.metrics import recall_score
     >>> g_2 = [ 8,6,8,8,8,8,6,6,6,8,6,6,6,6,8,6,6,6 ]
     >>> s_f_frame = pd.DataFrame(np.stack([sf_data, g_2], axis=1),
     ...                          columns=['SF 0', 'SF 1'])
@@ -49,10 +60,11 @@ If a particular intersection of the sensitive features had no members, then
 the metric would be shown as :code:`NaN` for that intersection.
 Multiple metrics can also be computed at the same time:
 
-.. doctest:: assessment_metrics
+.. doctest:: intersecting_groups_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from sklearn.metrics import precision_score
+    >>> from fairlearn.metrics import count
     >>> metric_2sf_multi = MetricFrame(
     ...     metrics={'precision':precision_score,
     ...              'recall':recall_score,
@@ -104,7 +116,7 @@ The :class:`MetricFrame` constructor allows us to specify control features in
 a manner similar to sensitive features, using a :code:`control_features=`
 parameter:
 
-.. doctest:: assessment_metrics
+.. doctest:: intersecting_groups_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> decision = [
@@ -160,7 +172,7 @@ control features will always be at the top level of the hierarchy).
 
 With the :class:`MetricFrame` computed, we can perform aggregations:
 
-.. doctest:: assessment_metrics
+.. doctest:: intersecting_groups_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> # See the maximum accuracy for each value of the control feature

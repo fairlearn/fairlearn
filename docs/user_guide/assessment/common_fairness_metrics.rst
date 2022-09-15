@@ -8,6 +8,17 @@ Common fairness metrics
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups.
+In code examples, we will use the following input arrays:
+
+
+.. doctest:: common_fairness_metrics_code
+
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...            'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
+
+
 
 .. _assessment_demographic_parity:
 
@@ -161,7 +172,7 @@ As with any fairness metric, achieving demographic parity does *not* automatical
 that the classifier is fair!
 
 
-.. doctest:: assessment_metrics
+.. doctest:: common_fairness_metrics_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import demographic_parity_difference
@@ -251,7 +262,7 @@ We then return the larger of these two differences.
 *Mutatis mutandis*, :func:`equalized_odds_ratio` works similarly.
 
 
-.. doctest:: assessment_metrics
+.. doctest:: common_fairness_metrics_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import equalized_odds_difference

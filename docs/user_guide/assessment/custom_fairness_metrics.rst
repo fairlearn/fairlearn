@@ -22,10 +22,15 @@ optionally a list of parameter names which should be treated as sample aligned p
 The result is a function which builds the :class:`MetricFrame` internally and performs
 the requested aggregation. For example:
 
-.. doctest:: assessment_metrics
+.. doctest:: custom_fairness_metrics_code
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import make_derived_metric
+    >>> from fairlearn.metrics import make_derived_metric, MetricFrame
+    >>> from sklearn.metrics import recall_score
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'c', 'c', 'c', 'a',
+    ...            'a', 'c', 'a', 'b', 'c', 'c', 'b', 'c', 'c']
     >>> recall_difference = make_derived_metric(metric=recall_score,
     ...                                        transform='difference')
     >>> recall_difference(y_true, y_pred,
