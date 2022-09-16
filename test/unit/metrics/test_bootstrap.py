@@ -8,7 +8,7 @@ import sklearn.metrics as skm
 from fairlearn.metrics._annotated_metric_function import AnnotatedMetricFunction
 
 from fairlearn.metrics._disaggregated_result import DisaggregatedResult
-from fairlearn.metrics._bootstrap import generate_single_bootstrap_sample
+from fairlearn.metrics._bootstrap import generate_single_bootstrap_sample, generate_bootstrap_samples
 
 from .data_for_test import g_1, g_2, y_p, y_t
 
@@ -44,7 +44,7 @@ class TestSingleSample:
         )
 
         target = generate_single_bootstrap_sample(
-            random_state=128,
+            random_state=185363,
             data=basic_data,
             annotated_functions=metric_dict,
             sensitive_feature_names=["g_1"],
@@ -53,10 +53,13 @@ class TestSingleSample:
 
         assert da.overall.shape == target.overall.shape
         assert da.by_group.shape == target.by_group.shape
+        # Hard to check values, but should make sure something changed
+        assert any(da.overall != target.overall)
+        assert any(da.by_group != target.by_group)
 
     def test_randomstate_stable(self):
         reference = generate_single_bootstrap_sample(
-            random_state=128,
+            random_state=124729,
             data=basic_data,
             annotated_functions=metric_dict,
             sensitive_feature_names=["g_1"],
@@ -64,13 +67,14 @@ class TestSingleSample:
         )
 
         comparison = generate_single_bootstrap_sample(
-            random_state=128,
+            random_state=124729,
             data=basic_data,
             annotated_functions=metric_dict,
             sensitive_feature_names=["g_1"],
             control_feature_names=None,
         )
 
+        # Should match exactly with same seed
         assert all(reference.overall == comparison.overall)
         assert all(reference.by_group == comparison.by_group)
 
@@ -83,7 +87,7 @@ class TestSingleSample:
         )
 
         target = generate_single_bootstrap_sample(
-            random_state=128,
+            random_state=723548,
             data=basic_data,
             annotated_functions=metric2_dict,
             sensitive_feature_names=["g_1"],
@@ -92,3 +96,57 @@ class TestSingleSample:
 
         assert da.overall.shape == target.overall.shape
         assert da.by_group.shape == target.by_group.shape
+        # Hard to check values, but should make sure something changed
+        assert any(da.overall != target.overall)
+        assert any(da.by_group != target.by_group)
+
+
+class TestGenerateSamples:
+    def test_smoke(self):
+        da = DisaggregatedResult.create(
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
+
+        n_samples_wanted = 10
+        target = generate_bootstrap_samples(
+            random_state=142,
+            n_samples=n_samples_wanted,
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
+
+        assert isinstance(target, list)
+        assert len(target) == n_samples_wanted
+
+        for t in target:
+            assert isinstance(t, DisaggregatedResult)
+            assert da.overall.shape == t.overall.shape
+            assert da.by_group.shape == t.by_group.shape
+            # Make sure something changed
+            assert any(da.overall != t.overall)
+            assert any(da.by_group != t.by_group)
+
+    def test_random_control(self):
+        n_samples_wanted = 10
+        seeds = [724435 for _ in range(n_samples_wanted)]
+
+        target = generate_bootstrap_samples(
+            random_state=seeds,
+            n_samples=n_samples_wanted,
+            data=basic_data,
+            annotated_functions=metric2_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=["g_2"],
+        )
+
+        assert len(target) == n_samples_wanted
+        for t in target:
+            assert isinstance(t, DisaggregatedResult)
+            # Make sure seed has been stable
+            assert all(t.overall == target[0].overall)
+            assert all(t.by_group == target[0].by_group)
