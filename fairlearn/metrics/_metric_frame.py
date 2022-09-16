@@ -536,7 +536,7 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
-        Read more in the :ref:`User Guide <control_features_metrics>`.
+        Read more in the :ref:`User Guide <assessment>`.
 
         Parameters
         ----------
