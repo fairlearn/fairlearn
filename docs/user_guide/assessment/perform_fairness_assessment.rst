@@ -44,6 +44,8 @@ to considering groups according to gender and groups according to race, it is
 also important to consider their intersections (e.g., Black women, Latinx 
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
+See the :ref:`appropriate section later in this guide <intersecting_groups>` for
+details of how Fairlearn can compute metrics for intersections.
 
 
 .. note::
