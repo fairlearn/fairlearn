@@ -63,9 +63,17 @@ Quantify harms
 
 Define metrics that quantify harms or benefits:
 
-* In a job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`
+* In a job screening scenario, we need to quantify the number of candidates
+  that are classified as "negative" (not recommended for the job), but whose
+  true label is "positive" (they are "qualified"). One possible metric is
+  the false negative rate: fraction of qualified candidates that are
+  screened out. Note that before we attempt to classify candidates, we need
+  to determine the construct validity of the "qualified" status; more
+  information on construct validity can be found in :ref:`construct_validity`
 
-* For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
+* For a speech-to-text application, the harm could be measured by disparities
+  in the word error rate for different group, measured by the number of
+  mistakes in a transcript divided by the overall number of words.
 
 Note that in some cases, the outcome we seek to measure is not 
 directly available. 
