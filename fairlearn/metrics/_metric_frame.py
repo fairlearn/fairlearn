@@ -13,6 +13,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
+from ._bootstrap import calculate_pandas_quantiles, generate_bootstrap_samples
 from ._disaggregated_result import DisaggregatedResult
 from ._group_feature import GroupFeature
 
@@ -278,6 +279,8 @@ class MetricFrame:
         sample_params: Optional[
             Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
         ] = None,
+        n_bootstrap_samples: Optional[int] = None,
+        bootstrap_random_state: Optional[int] = None
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -326,6 +329,19 @@ class MetricFrame:
             control_feature_names=self._cf_names,
         )
 
+        # Create bootstrap samples
+        self._bootstrap_samples = None
+        if n_bootstrap_samples is not None:
+            self._bootstrap_samples = generate_bootstrap_samples(
+                n_samples = n_bootstrap_samples,
+                random_state=bootstrap_random_state,
+                data=all_data,
+                annotated_functions=annotated_funcs,
+                sensitive_feature_names=self._sf_names,
+                control_feature_names=self._cf_names
+            )
+
+
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
@@ -366,6 +382,18 @@ class MetricFrame:
                 return self._result.overall.iloc[0]
         else:
             return self._result.overall
+
+    def overall_ci(self, quantiles:List[float]):
+        samples = [r.overall for r in self._bootstrap_samples]
+
+        result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=samples)
+        if self._user_supplied_callable:
+            if self.control_levels:
+                return result.iloc[:, 0]
+            else:
+                return result.iloc[0]
+        else:
+            return result
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
