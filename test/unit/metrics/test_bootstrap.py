@@ -155,10 +155,11 @@ class TestGenerateSamples:
             assert all(t.overall == target[0].overall)
             assert all(t.by_group == target[0].by_group)
 
+
 class TestPandasQuantiles:
     def test_smoke_series(self):
-        n_elements=11
-        name='My Series'
+        n_elements = 11
+        name = 'My Series'
         index_val = 'My Value'
 
         # Create uniformly spaced data
@@ -167,6 +168,22 @@ class TestPandasQuantiles:
 
         result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=data)
         assert isinstance(result, pd.Series)
-        assert result.name==name
-        assert result.shape==(1,)
-        assert np.array_equal(result[0], [4, 5, 6])
+        assert result.name == name
+        assert result.shape == (1,)
+        assert np.array_equal(result[index_val], [4, 5, 6])
+
+    def test_smoke_series2(self):
+        n_elements = 11
+        name = 'My Series'
+        idx = ['a', 'b']
+
+        # Create uniformly spaced data
+        data = [pd.Series(data=[x, 2*x], name=name, index=idx) for x in range(n_elements)]
+        quantiles = [0.4, 0.5, 0.6]
+
+        result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=data)
+        assert isinstance(result, pd.Series)
+        assert result.name == name
+        assert result.shape == (2,)
+        assert np.array_equal(result['a'], [4, 5, 6])
+        assert np.array_equal(result['b'], [8, 10, 12])
