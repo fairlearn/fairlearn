@@ -193,24 +193,25 @@ class TestPandasQuantiles:
         assert np.array_equal(result["b"], [8, 10, 12])
 
     def test_smoke_dataframe(self):
-        n_elements=11
+        n_elements = 11
         idx = ["a", "b", "c"]
 
         data = []
         for i in range(n_elements):
-            raw_data = {
-                "first": [i, 2*i, 3*i],
-                "second": [4*i, 5*i, 6*i]
-            }
+            raw_data = {"first": [i, 2 * i, 3 * i], "second": [4 * i, 5 * i, 6 * i]}
             nxt = pd.DataFrame(data=raw_data, index=idx)
             data.append(nxt)
-        
-        quantiles =  [0.2, 0.5, 0.7]
+
+        quantiles = [0.2, 0.5, 0.7, 0.9]
 
         result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=data)
         assert isinstance(result, pd.DataFrame)
         assert np.array_equal(result.columns, ["first", "second"])
         assert list(result.index) == idx
-        assert result.shape == (2,23)
-        assert np.array_equal(result["first"]["a"], [2, 5, 7])
-        assert np.array_equal(result["second"]["c"], [12, 30, 42])
+        assert result.shape == (3, 2)
+        assert np.array_equal(result["first"]["a"], [2, 5, 7, 9])
+        assert np.array_equal(result["first"]["b"], [4, 10, 14, 18])
+        assert np.array_equal(result["first"]["c"], [6, 15, 21, 27])
+        assert np.array_equal(result["second"]["a"], [8, 20, 28, 36])
+        assert np.array_equal(result["second"]["b"], [10, 25, 35, 45])
+        assert np.array_equal(result["second"]["c"], [12, 30, 42, 54])

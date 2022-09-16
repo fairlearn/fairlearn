@@ -90,27 +90,56 @@ def generate_bootstrap_samples(
     return result
 
 
+def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]):
+    for s in samples:
+        assert isinstance(s, pd.Series)
+        assert s.name == samples[0].name
+        assert all(s.index == samples[0].index)
+
+    result_np = np.quantile(samples, q=quantiles, axis=0)
+    result = pd.Series(
+        name=samples[0].name,
+        index=samples[0].index,
+        data=[result_np[:, i] for i in range(result_np.shape[1])],
+    )
+    return result
+
+
+def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFrame]):
+    for s in samples:
+        assert isinstance(s, pd.DataFrame)
+        assert all(s.columns == samples[0].columns)
+        assert all(s.index == samples[0].index)
+
+    result_np = np.quantile(samples, q=quantiles, axis=0)
+
+    result_data = dict()
+    for i_c, c in enumerate(samples[0].columns):
+        nxt = []
+        for r in range(len(samples[0].index)):
+            qs = result_np[:, r, i_c]
+            nxt.append(qs)
+        result_data[c] = nxt
+    result = pd.DataFrame(
+        columns=samples[0].columns,
+        index=samples[0].index,
+        data=result_data,
+    )
+
+    return result
+
+
 def calculate_pandas_quantiles(
     quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
 ) -> Union[pd.Series, pd.DataFrame]:
-    for b in bootstrap_samples:
-        assert isinstance(b, pd.Series) or isinstance(
-            b, pd.DataFrame)
-    idx = bootstrap_samples[0].index
-    result_np = np.quantile(bootstrap_samples, q=quantiles, axis=0)
+    """Calculate quantiles for a list of pandas objects"""
 
     if isinstance(bootstrap_samples[0], pd.Series):
-        result = pd.Series(
-            name=bootstrap_samples[0].name,
-            index=idx,
-            data=[result_np[:, i] for i in range(result_np.shape[1])],
-        )
+        result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)
     elif isinstance(bootstrap_samples[0], pd.DataFrame):
-        result = pd.DataFrame(
-            columns=bootstrap_samples[0].columns,
-            index=bootstrap_samples[0].index,
-            data=[result_np[:, :, i] for i in range(result_np.shape[2])]
+        result = _calc_dataframe_quantiles(
+            quantiles=quantiles, samples=bootstrap_samples
         )
     else:
-        result = None
+        assert False
     return result
