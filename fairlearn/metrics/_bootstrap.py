@@ -14,7 +14,7 @@ from ._disaggregated_result import DisaggregatedResult
 logger = logging.getLogger(__name__)
 
 
-def generate_bootstrapped_metrics(
+def generate_single_bootstrap_sample(
     *,
     random_state: Union[int, np.random.RandomState],
     data: pd.DataFrame,
