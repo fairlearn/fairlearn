@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import logging
-from re import A
 
 from typing import Dict, List, Optional, Union
 
@@ -132,8 +131,7 @@ def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFr
 def calculate_pandas_quantiles(
     quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
 ) -> Union[pd.Series, pd.DataFrame]:
-    """Calculate quantiles for a list of pandas objects"""
-
+    """Calculate quantiles for a list of pandas objects."""
     if isinstance(bootstrap_samples[0], pd.Series):
         result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)
     elif isinstance(bootstrap_samples[0], pd.DataFrame):
