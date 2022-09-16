@@ -12,6 +12,8 @@ One important point to bear in mind when performing an intersectional analysis
 is that some of the intersections may have very few members (or even be empty).
 This will affect the confidence interval associated with the computed metrics;
 random noise has a greater effect on smaller groups.
+For this reason, we strongly suggest that :meth:`count` be included as a metric
+whenever using intersecting groups.
 All of these will use the following definitions:
 
 
