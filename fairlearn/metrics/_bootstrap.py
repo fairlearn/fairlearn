@@ -87,3 +87,14 @@ def generate_bootstrap_samples(
         result.append(nxt)
 
     return result
+
+
+def calculate_pandas_quantiles(
+    quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
+) -> Union[pd.Series, pd.DataFrame]:
+    name = bootstrap_samples[0].name
+    idx = bootstrap_samples[0].index
+    result_np = np.quantile(bootstrap_samples, q=quantiles, axis=0)
+
+    result = pd.Series(name=name, index=idx, data=[result_np[:,i] for i in range(result_np.shape[1])])
+    return result

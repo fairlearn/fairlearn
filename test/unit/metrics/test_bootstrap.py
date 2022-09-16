@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import numpy as np
 import pandas as pd
 import sklearn.metrics as skm
 
@@ -10,6 +11,7 @@ from fairlearn.metrics._disaggregated_result import DisaggregatedResult
 from fairlearn.metrics._bootstrap import (
     generate_single_bootstrap_sample,
     generate_bootstrap_samples,
+    calculate_pandas_quantiles,
 )
 
 from .data_for_test import g_1, g_2, y_p, y_t
@@ -152,3 +154,19 @@ class TestGenerateSamples:
             # Make sure seed has been stable
             assert all(t.overall == target[0].overall)
             assert all(t.by_group == target[0].by_group)
+
+class TestPandasQuantiles:
+    def test_smoke_series(self):
+        n_elements=11
+        name='My Series'
+        index_val = 'My Value'
+
+        # Create uniformly spaced data
+        data = [pd.Series(data=x, name=name, index=[index_val]) for x in range(n_elements)]
+        quantiles = [0.4, 0.5, 0.6]
+
+        result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=data)
+        assert isinstance(result, pd.Series)
+        assert result.name==name
+        assert result.shape==(1,)
+        assert np.array_equal(result[0], [4, 5, 6])
