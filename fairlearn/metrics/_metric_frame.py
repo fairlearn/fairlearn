@@ -383,7 +383,7 @@ class MetricFrame:
         else:
             return self._result.overall
 
-    def overall_ci(self, quantiles:List[float]):
+    def overall_quantiles(self, quantiles:List[float]):
         samples = [r.overall for r in self._bootstrap_samples]
 
         result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=samples)
