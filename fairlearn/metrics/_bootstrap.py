@@ -22,6 +22,7 @@ def generate_single_bootstrap_sample(
     sensitive_feature_names: List[str],
     control_feature_names: Optional[List[str]],
 ) -> DisaggregatedResult:
+    """Create a single bootstrapped DisaggregatedResult."""
     assert random_state is not None, "Must specify random_state"
 
     sampled_data = data.sample(
@@ -48,6 +49,18 @@ def generate_bootstrap_samples(
     sensitive_feature_names: List[str],
     control_feature_names: Optional[List[str]],
 ) -> List[DisaggregatedResult]:
+    """Create a list of bootstrapped DisaggregatedResults.
+
+    The list will contain n_samples, and a random_state must be supplied.
+
+    If random_state is a list (assumed to be of integers of numpy generators),
+    then it must be of length n_samples, and each will be used for the corresponding
+    sample.
+
+    If random_state is an integer or a numpy generator, it will be used to
+    create a list of num_samples random integers, which will then be used as
+    the seeds for each bootstrap sample
+    """
     assert n_samples >= 1
     assert random_state is not None, "Must specify random_state"
     if isinstance(random_state, list):
