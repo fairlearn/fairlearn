@@ -159,11 +159,13 @@ class TestGenerateSamples:
 class TestPandasQuantiles:
     def test_smoke_series(self):
         n_elements = 11
-        name = 'My Series'
-        index_val = 'My Value'
+        name = "My Series"
+        index_val = "My Value"
 
         # Create uniformly spaced data
-        data = [pd.Series(data=x, name=name, index=[index_val]) for x in range(n_elements)]
+        data = [
+            pd.Series(data=x, name=name, index=[index_val]) for x in range(n_elements)
+        ]
         quantiles = [0.4, 0.5, 0.6]
 
         result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=data)
@@ -174,16 +176,18 @@ class TestPandasQuantiles:
 
     def test_smoke_series2(self):
         n_elements = 11
-        name = 'My Series'
-        idx = ['a', 'b']
+        name = "My Series"
+        idx = ["a", "b"]
 
         # Create uniformly spaced data
-        data = [pd.Series(data=[x, 2*x], name=name, index=idx) for x in range(n_elements)]
+        data = [
+            pd.Series(data=[x, 2 * x], name=name, index=idx) for x in range(n_elements)
+        ]
         quantiles = [0.4, 0.5, 0.6]
 
         result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=data)
         assert isinstance(result, pd.Series)
         assert result.name == name
         assert result.shape == (2,)
-        assert np.array_equal(result['a'], [4, 5, 6])
-        assert np.array_equal(result['b'], [8, 10, 12])
+        assert np.array_equal(result["a"], [4, 5, 6])
+        assert np.array_equal(result["b"], [8, 10, 12])

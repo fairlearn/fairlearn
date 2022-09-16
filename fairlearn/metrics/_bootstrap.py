@@ -97,5 +97,9 @@ def calculate_pandas_quantiles(
     result_np = np.quantile(bootstrap_samples, q=quantiles, axis=0)
 
     if isinstance(bootstrap_samples[0], pd.Series):
-        result = pd.Series(name=name, index=idx, data=[result_np[:,i] for i in range(result_np.shape[1])])
+        result = pd.Series(
+            name=name,
+            index=idx,
+            data=[result_np[:, i] for i in range(result_np.shape[1])],
+        )
     return result
