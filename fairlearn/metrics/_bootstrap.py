@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import logging
+from re import A
 
 from typing import Dict, List, Optional, Union
 
@@ -92,14 +93,24 @@ def generate_bootstrap_samples(
 def calculate_pandas_quantiles(
     quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
 ) -> Union[pd.Series, pd.DataFrame]:
-    name = bootstrap_samples[0].name
+    for b in bootstrap_samples:
+        assert isinstance(b, pd.Series) or isinstance(
+            b, pd.DataFrame)
     idx = bootstrap_samples[0].index
     result_np = np.quantile(bootstrap_samples, q=quantiles, axis=0)
 
     if isinstance(bootstrap_samples[0], pd.Series):
         result = pd.Series(
-            name=name,
+            name=bootstrap_samples[0].name,
             index=idx,
             data=[result_np[:, i] for i in range(result_np.shape[1])],
         )
+    elif isinstance(bootstrap_samples[0], pd.DataFrame):
+        result = pd.DataFrame(
+            columns=bootstrap_samples[0].columns,
+            index=bootstrap_samples[0].index,
+            data=[result_np[:, :, i] for i in range(result_np.shape[2])]
+        )
+    else:
+        result = None
     return result
