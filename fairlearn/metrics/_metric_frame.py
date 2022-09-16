@@ -280,7 +280,7 @@ class MetricFrame:
             Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
         ] = None,
         n_bootstrap_samples: Optional[int] = None,
-        bootstrap_random_state: Optional[int] = None
+        bootstrap_random_state: Optional[int] = None,
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -333,14 +333,13 @@ class MetricFrame:
         self._bootstrap_samples = None
         if n_bootstrap_samples is not None:
             self._bootstrap_samples = generate_bootstrap_samples(
-                n_samples = n_bootstrap_samples,
+                n_samples=n_bootstrap_samples,
                 random_state=bootstrap_random_state,
                 data=all_data,
                 annotated_functions=annotated_funcs,
                 sensitive_feature_names=self._sf_names,
-                control_feature_names=self._cf_names
+                control_feature_names=self._cf_names,
             )
-
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -383,10 +382,12 @@ class MetricFrame:
         else:
             return self._result.overall
 
-    def overall_quantiles(self, quantiles:List[float]):
+    def overall_quantiles(self, quantiles: List[float]):
         samples = [r.overall for r in self._bootstrap_samples]
 
-        result = calculate_pandas_quantiles(quantiles=quantiles, bootstrap_samples=samples)
+        result = calculate_pandas_quantiles(
+            quantiles=quantiles, bootstrap_samples=samples
+        )
         if self._user_supplied_callable:
             if self.control_levels:
                 return result.iloc[:, 0]
@@ -459,7 +460,10 @@ class MetricFrame:
         return self._sf_names
 
     def __group(
-        self, grouping_function: str, errors: str = "raise"
+        self,
+        grouping_function: str,
+        errors: str = "raise",
+        quantiles: Optional[List[float]] = None,
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -478,9 +482,19 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        result = self._result.apply_grouping(
-            grouping_function, self.control_levels, errors=errors
-        )
+        if quantiles is None:
+            result = self._result.apply_grouping(
+                grouping_function, self.control_levels, errors=errors
+            )
+        else:
+            samples = [
+                r.apply_grouping(grouping_function, self.control_levels, errors=errors)
+                for r in self._bootstrap_samples
+            ]
+
+            result = calculate_pandas_quantiles(
+                quantiles=quantiles, bootstrap_samples=samples
+            )
 
         if self._user_supplied_callable:
             if self.control_levels:
@@ -490,7 +504,9 @@ class MetricFrame:
         else:
             return result
 
-    def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_max(
+        self, errors: str = "raise", quantiles: Optional[List[float]] = None
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -514,7 +530,8 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("max", errors)
+
+        return self.__group("max", errors, quantiles=quantiles)
 
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
