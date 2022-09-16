@@ -25,7 +25,7 @@ class TestOverallQuantiles:
         )
         overall_quantiles = target.overall_quantiles(quantiles)
         assert isinstance(overall_quantiles, np.ndarray)
-        assert overall_quantiles.shape==(len(quantiles),)
+        assert overall_quantiles.shape == (len(quantiles),)
         # Overall value should be close to quantile 0.5
         assert target.overall == pytest.approx(overall_quantiles[1], abs=0.05)
 
@@ -43,11 +43,11 @@ class TestOverallQuantiles:
         )
         overall_quantiles = target.overall_quantiles(quantiles)
         assert isinstance(overall_quantiles, pd.Series)
-        assert overall_quantiles.name == 'recall_score'
-        assert overall_quantiles.shape==(2,)
+        assert overall_quantiles.name == "recall_score"
+        assert overall_quantiles.shape == (2,)
         # Overall value should be close to quantile 0.5
-        assert target.overall['f'] == pytest.approx(overall_quantiles['f'][1], abs=0.05)
-        assert target.overall['g'] == pytest.approx(overall_quantiles['g'][1], abs=0.05)
+        assert target.overall["f"] == pytest.approx(overall_quantiles["f"][1], abs=0.05)
+        assert target.overall["g"] == pytest.approx(overall_quantiles["g"][1], abs=0.05)
 
 
 class TestGroupMax:
@@ -66,7 +66,7 @@ class TestGroupMax:
         baseline = target.group_max()
         ci_vals = target.group_max(quantiles=quantiles)
         assert isinstance(ci_vals, np.ndarray)
-        assert ci_vals.shape==(len(quantiles),)
+        assert ci_vals.shape == (len(quantiles),)
         # Median should be close to baseline
         assert baseline == pytest.approx(ci_vals[1], abs=0.05)
         assert ci_vals[0] < ci_vals[1]
@@ -88,7 +88,7 @@ class TestGroupMax:
         baseline = target.group_max()
         ci_vals = target.group_max(quantiles=quantiles)
         assert isinstance(ci_vals, pd.Series)
-        assert ci_vals.shape==(2,)
+        assert ci_vals.shape == (2,)
         # Median should be close to baseline in each case
         for g in np.unique(g_2):
             assert baseline[g] == pytest.approx(ci_vals[g][1], abs=0.1)
