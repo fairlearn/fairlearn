@@ -48,7 +48,7 @@ class AnnotatedMetricFunction:
         *,
         func: Callable,
         name: Optional[str],
-        postional_argument_names: List[str] = None,
+        positional_argument_names: List[str] = None,
         kw_argument_mapping: Dict[str, str] = None,
     ):
         if func is None:
@@ -68,8 +68,8 @@ class AnnotatedMetricFunction:
 
         self.func = func
         self.postional_argument_names = ["y_true", "y_pred"]
-        if postional_argument_names is not None:
-            self.postional_argument_names = postional_argument_names
+        if positional_argument_names is not None:
+            self.postional_argument_names = positional_argument_names
         self.kw_argument_mapping = dict()
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
