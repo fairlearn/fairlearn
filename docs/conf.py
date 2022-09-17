@@ -166,6 +166,7 @@ pygments_style = "sphinx"
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
+    "reference_url": {"fairlearn": None},
     "examples_dirs": "../examples",
     "gallery_dirs": "auto_examples",
     # pypandoc enables rst to md conversion in downloadable notebooks

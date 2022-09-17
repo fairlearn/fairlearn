@@ -8,7 +8,7 @@ import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
-from fairlearn.metrics._metric_frame import (
+from fairlearn.metrics._disaggregated_result import (
     _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
     _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE,
 )
@@ -124,6 +124,17 @@ class Test1m1sf0cf:
         assert target_ratio_overall == pytest.approx(
             expected_ratio_overall, rel=1e-10, abs=1e-16
         )
+
+    def test_ratio_zero_divide(self):
+        # Simple test to check on zero division
+        my_prec = functools.partial(skm.precision_score, zero_division=0)
+        my_prec.__name__ = "precision_score_zero_div"
+
+        mf = metrics.MetricFrame(
+            metrics=my_prec, y_true=[1, 0], y_pred=[1, 0], sensitive_features=["a", "b"]
+        )
+
+        assert mf.ratio(method="to_overall") == 0
 
 
 class Test1m1sf0cfFnDict:
