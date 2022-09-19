@@ -65,9 +65,17 @@ bootstrapping is a reasonable approach.
 
 We then need to determine how many bootstrap samples are required.
 Bootstrapping is a Monte Carlo approach, so it introduces its own
-noise and reducing this will require more bootstrap samples.
+noise and reducing this will require more bootstrap samples
+(assuming that a poor random number generator does not render
+the exercise futile).
 In practice, it has been found that around 100 bootstrap samples
 can give reasonable estimates.
+While the number of bootstrap samples is trivial to increase,
+always remember that while this may make the answers more
+*precise* (by reducing the noise due to the bootstrap sampling),
+it will not necessarily make them more *accurate*.
+This is because tne accuracy of the bootstrapped error estimates
+*depends on how well the data sample reflects the underlying population*.
 
 
 Bootstrapping :code:`MetricFrame`
@@ -329,3 +337,22 @@ For example, the :meth:`MetricFrame.group_max` function:
     dtype: object
 
 These are as expected from the results shown above.
+
+
+Summary
+-------
+
+Bootstrapping is a powerful and simple technique, but its
+limitations must be borne in mind:
+
+* As a Monte-Carlo technique, it can only be as good as the
+  underlying random number generator
+
+* Increasing the number of bootstrap samples will make the
+  results more precise, but not necessarily more accurate
+
+* Bootstrapping **assumes the data sample is representative
+  of the population**
+
+The last of these limitations is likely to give the most
+trouble in practice.
