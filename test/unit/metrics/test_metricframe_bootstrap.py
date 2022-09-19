@@ -8,7 +8,7 @@ import sklearn.metrics as skm
 
 from fairlearn.metrics import MetricFrame
 
-from .data_for_test import g_1, g_2, g_3, s_w, y_p, y_t
+from .data_for_test import g_1, g_2, y_p, y_t
 
 
 class TestOverallQuantiles:

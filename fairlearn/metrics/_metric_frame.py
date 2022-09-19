@@ -429,7 +429,6 @@ class MetricFrame:
         else:
             return self._result.by_group
 
-    
     def by_group_quantiles(self, quantiles: List[float]):
         """Get quantiles for by_group."""
         samples = [r.by_group for r in self._bootstrap_samples]
@@ -544,7 +543,6 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-
         return self.__group("max", errors, quantiles=quantiles)
 
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
