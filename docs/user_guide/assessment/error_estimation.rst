@@ -184,3 +184,40 @@ feature:
     >>> # Show the sum
     >>> bootstrap_sum(y_true, y_true)
     500.0
+
+With our data in place, we can create our :class:`MetricFrame`
+object.
+In order to use bootstrapping, we specify the
+:code:`n_bootstrap_samples` and :code:`bootstrap_random_state`
+constructor arguments.
+The first determines the number of bootstrap samples, while
+the second allows us to reproduce our results.
+
+.. doctest:: error_estimation_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import MetricFrame, count
+    >>> metrics = {
+    ...         'bootstrap_sum': bootstrap_sum,
+    ...         'count': count
+    ... }
+    >>> mf = MetricFrame(
+    ...         metrics=metrics,
+    ...         y_true=y_true,
+    ...         y_pred=y_true,
+    ...         sensitive_features={ 'SF0': s_f },
+    ...         n_bootstrap_samples=100,
+    ...         bootstrap_random_state=13489623,
+    ...     )
+    >>> # Show what we have:
+    >>> mf.overall
+        bootstrap_um     500.0
+        count           1000.0
+    dtype: float64
+    >>> mf.by_group
+            bootstrap_sum  count
+        SF0
+        A           480.0  600.0
+        B            20.0  400.0
+
+The underlying metrics have exactly those values expected from above.
