@@ -30,6 +30,7 @@ indicate that a property holds for all identified groups.
    common_fairness_metrics
    custom_fairness_metrics
    intersecting_groups
+   error_estimation
    advanced_metricframe
    plotting
 
