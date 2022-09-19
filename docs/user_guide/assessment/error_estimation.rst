@@ -198,26 +198,79 @@ the second allows us to reproduce our results.
 
     >>> from fairlearn.metrics import MetricFrame, count
     >>> metrics = {
-    ...         'bootstrap_sum': bootstrap_sum,
-    ...         'count': count
+    ...         'bootstrap_sum' : bootstrap_sum,
+    ...         'count' : count
     ... }
     >>> mf = MetricFrame(
     ...         metrics=metrics,
     ...         y_true=y_true,
     ...         y_pred=y_true,
-    ...         sensitive_features={ 'SF0': s_f },
+    ...         sensitive_features={ 'SF0' : s_f },
     ...         n_bootstrap_samples=100,
     ...         bootstrap_random_state=13489623,
     ...     )
     >>> # Show what we have:
     >>> mf.overall
-        bootstrap_um     500.0
-        count           1000.0
+    bootstrap_sum     500.0
+    count            1000.0
     dtype: float64
     >>> mf.by_group
-            bootstrap_sum  count
-        SF0
-        A           480.0  600.0
-        B            20.0  400.0
+        bootstrap_sum  count
+    SF0
+    A           480.0  600.0
+    B            20.0  400.0
 
-The underlying metrics have exactly those values expected from above.
+The underlying metrics have the nominal values we expecte from above.
+
+Now on to the bootstrap results themselves.
+We access the bootstrapped values for the overall values via
+:meth:`MetricFrame.overall_quantiles`.
+This method takes a single argument, :code:`quantiles`,
+which is a list of the quantiles we want extracted, each
+in the range :math:`[0, 1]`.
+We are going to look at the bootstrapped mean and standard
+deviation, so the quantiles we want are 0.159, 0.5 and 0.841
+(we happen to know that the usual approximation will hold for
+our data):
+
+.. doctest:: error_estimation_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> my_quantiles = [0.159, 0.5, 0.841]
+    >>> mf.overall_quantiles(quantiles=my_quantiles)
+    bootstrap_sum    [483.48..., 501.0, 513.518]
+    count            [1000.0, 1000.0, 1000.0]
+    dtype: object
+
+Rather than single floats, the resultant :class:`pandas.Series`
+contains arrays of results.
+Each entry corresponds to one of the quantiles we specified
+in the call to :meth:`MetricFrame.overall_quantiles`.
+The results for 'count' are not particularly interesting, since
+each resampling was always the same size as the original.
+However, we can check that the results for :code:`bootstrap_sum`
+are in line with our expectations.
+The value for the median (which is also the mean for this
+symmetric distribution) is 501; we know that theoretically
+it should be 500, so this estimate is correct to two
+significant figures.
+This is well within expectations for 100 bootstrap samples
+(applying a :math:`\sqrt{N}` rule-of-thumb).
+We also know that
+:math:`\sigma = \sqrt{n p q} = \sqrt{1000 \times 0.5 \times 0.5} \approx  15.8`,
+so we would expect the other two quantiles to be at
+:math:`500-15.8=484.2` and :math:`500+15.8=515.8`,
+which are again well within expectations for 100 bootstrap samples.
+
+
+
+Moving on.... have to write more text, but the other functions just get
+a :code:`quantiles` argument:
+
+.. doctest:: error_estimation_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.group_max(quantiles=my_quantiles)
+    bootstrap_sum      [465.0, 480.0, 495.0]
+    count            [582.741, 600.5, 615.0]
+    dtype: object
