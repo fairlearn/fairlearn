@@ -262,14 +262,52 @@ so we would expect the other two quantiles to be at
 :math:`500-15.8=484.2` and :math:`500+15.8=515.8`,
 which are again well within expectations for 100 bootstrap samples.
 
-
-
-Moving on.... have to write more text, but the other functions just get
-a :code:`quantiles` argument:
+Similarly, we have a :meth:`MetricFrame.by_group_quantiles`
+to go with the :attr:`MetricFrame.by_group` property:
 
 .. doctest:: error_estimation_code
     :options:  +NORMALIZE_WHITESPACE
 
+    >>> mf.by_group
+         bootstrap_sum  count
+    SF0
+    A            480.0  600.0
+    B             20.0  400.0
+    >>> mf.by_group_quantiles(quantiles=my_quantiles)
+                 bootstrap_sum                    count
+    SF0
+    A    [465.0, 480.0, 495.0]  [582.741, 600.5, 615.0]
+    B       [16.0, 19.5, 23.0]  [385.0, 399.5, 417.259]
+
+We can see that the nominal values from :attr:`MetricFrame.by_group`
+are as expected, given how we constructed our dataset.
+The :meth:`MetricFrame.by_group_quantiles` method has
+returned a similarly shaped :class:`pandas.DataFrame`, but instead
+of a scalar value in each cell, we have a list of three values,
+corresponding to the specified quantiles.
+In each case, the value for quantile 0.5 (the second value in each
+triplet) is close to the nominal value.
+
+Next, let us consider the 'count' metric.
+This is effectively considering a different binomial distribution
+on the 1000 samples, but based on :math:`f_A = 0.6` and
+:math:`f_B = 0.4`.
+The corresponding standard deviation is
+:math:`\sqrt{1000  \times0.6 \times 0.4} = 15.5`, and we can see
+that the other two quantiles calculated for the 'count' are
+close to the nominal value :math:`\pm 15.5`.
+
+
+Now, let us consider the various methods on :class:`MetricFrame`.
+Rather than 
+
+.. doctest:: error_estimation_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.group_max()
+    bootstrap_sum    480.0
+    count            600.0
+    dtype: object
     >>> mf.group_max(quantiles=my_quantiles)
     bootstrap_sum      [465.0, 480.0, 495.0]
     count            [582.741, 600.5, 615.0]

@@ -383,6 +383,7 @@ class MetricFrame:
             return self._result.overall
 
     def overall_quantiles(self, quantiles: List[float]):
+        """Get quantiles for overall."""
         samples = [r.overall for r in self._bootstrap_samples]
 
         result = calculate_pandas_quantiles(
@@ -427,6 +428,19 @@ class MetricFrame:
             return self._result.by_group.iloc[:, 0]
         else:
             return self._result.by_group
+
+    
+    def by_group_quantiles(self, quantiles: List[float]):
+        """Get quantiles for by_group."""
+        samples = [r.by_group for r in self._bootstrap_samples]
+
+        result = calculate_pandas_quantiles(
+            quantiles=quantiles, bootstrap_samples=samples
+        )
+        if self._user_supplied_callable:
+            return result.iloc[:, 0]
+        else:
+            return result
 
     @property
     def control_levels(self) -> Optional[List[str]]:
