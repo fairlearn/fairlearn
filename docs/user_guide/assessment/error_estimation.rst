@@ -87,6 +87,9 @@ values will be correct (so :math:`p_A = 0.8`).
 From these, we can readily compute the corresponding values
 for subgroup 'B'.
 
+Constructing the DataFrame
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Let us start with some useful declarations:
 
 .. doctest:: error_estimation_code
@@ -185,6 +188,9 @@ feature:
     >>> bootstrap_sum(y_true, y_true)
     500.0
 
+Activating Bootstrapping in :code:`MetricFrame`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 With our data in place, we can create our :class:`MetricFrame`
 object.
 In order to use bootstrapping, we specify the
@@ -220,7 +226,11 @@ the second allows us to reproduce our results.
     A           480.0  600.0
     B            20.0  400.0
 
-The underlying metrics have the nominal values we expecte from above.
+The underlying metrics have the nominal values we expect from above.
+
+
+Accessing the Bootstrapped Results
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Now on to the bootstrap results themselves.
 We access the bootstrapped values for the overall values via
@@ -297,9 +307,14 @@ The corresponding standard deviation is
 that the other two quantiles calculated for the 'count' are
 close to the nominal value :math:`\pm 15.5`.
 
+*Need to figure out the estimate on the bootstrap_sum, since*
+:math:`\sqrt{600 \times 0.8 \times 0.2} = 9.8`
+*which is smaller than the range seen.*
 
 Now, let us consider the various methods on :class:`MetricFrame`.
-Rather than 
+Rather than using a different method, we have a :code:`quantiles`
+argument on each.
+For example, the :meth:`MetricFrame.group_max` function:
 
 .. doctest:: error_estimation_code
     :options:  +NORMALIZE_WHITESPACE
@@ -312,3 +327,5 @@ Rather than
     bootstrap_sum      [465.0, 480.0, 495.0]
     count            [582.741, 600.5, 615.0]
     dtype: object
+
+These are as expected from the results shown above.
