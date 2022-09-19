@@ -330,7 +330,7 @@ class MetricFrame:
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
-           Read more in the :ref:`User Guide <control_features_metrics>`.
+        Read more in the :ref:`User Guide <assessment>`.
 
         Returns
         -------
@@ -375,7 +375,7 @@ class MetricFrame:
         sensitive and control features. The exact type depends on
         the specification of the metric function.
 
-        Read more in the :ref:`User Guide <control_features_metrics>`.
+        Read more in the :ref:`User Guide <assessment>`.
 
         Returns
         -------
@@ -421,6 +421,8 @@ class MetricFrame:
 
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
         index, this identifies which elements of the index are sensitive features.
+
+        Read more in the :ref:`User Guide <assessment>`.
 
         Returns
         -------
