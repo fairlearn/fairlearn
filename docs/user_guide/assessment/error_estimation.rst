@@ -135,8 +135,52 @@ These will be used later.
     >>> n_A_incorrect = n_A - n_A_correct
     >>> n_B_incorrect = n_B - n_B_correct
     >>> print(f"n_A_incorrect={n_A_incorrect}")
-    
-    >>> print(f"n_B_incorrect={n_B_incorrect}")
+    n_A_incorrect=120
 
+    >>> print(f"n_B_incorrect={n_B_incorrect}")
+    n_B_incorrect=380
+
+    >>> # And one more pair of sanity checks
     >>> assert n_A == n_A_correct + n_A_incorrect
     >>> assert n_B == n_B_correct + n_B_incorrect
+
+For simplicity, we will use 'sum' as our metric.
+Since this only requires one vector of values, but
+:class:`MetricFrame` requires metrics have the
+signature :code:`f(y_true, y_pred)`, we create a
+wrapper.
+We will ignore :code:`y_pred` in this case:
+
+
+.. doctest:: error_estimation_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> import numpy as np
+    >>> def bootstrap_sum(y_true, y_pred):
+    ...     return np.sum(y_true)
+
+Now, we generate the data itself.
+We need a column of 0s and 1s for the 'true' values
+(which we will also supply to :class:`MetricFrame`
+as the 'predicted' values - our metic will ignore them),
+and a column of labels 'A' and 'B' for the sensitive
+feature:
+
+.. doctest:: error_estimation_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> y_true = np.concatenate(
+    ...     (np.ones(int(n_samples * p)), np.zeros(int(n_samples * (1 - p))))
+    ... )
+    >>> s_f = np.concatenate(
+    ...     (
+    ...         np.full(n_A_correct, "A"),
+    ...         np.full(n_B_correct, "B"),
+    ...         np.full(n_A_incorrect, "A"),
+    ...         np.full(n_B_incorrect, "B"),
+    ...     )
+    ... )
+    
+    >>> # Show the sum
+    >>> bootstrap_sum(y_true, y_true)
+    500.0
