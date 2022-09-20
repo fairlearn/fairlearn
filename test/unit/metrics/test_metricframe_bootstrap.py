@@ -67,6 +67,19 @@ class TestOverallQuantiles:
         )
 
 
+class TestByGroupQuantiles:
+    def test_1m_0cf(self, mf_1m_0cf):
+        quantiles = [0.2, 0.5, 0.9]
+        by_group_quantiles = mf_1m_0cf.by_group_quantiles(quantiles)
+        assert isinstance(by_group_quantiles, pd.Series)
+        for g in np.unique(g_1):
+            curr = by_group_quantiles[g]
+            assert isinstance(curr, np.ndarray)
+            assert curr.shape == (3,)
+            # Check median close to nominal
+            assert curr[1] == pytest.approx(mf_1m_0cf.by_group[g], abs=0.05)
+
+
 class TestGroupMax:
     def test_1m_0cf(self, mf_1m_0cf):
         quantiles = [0.2, 0.5, 0.9]
