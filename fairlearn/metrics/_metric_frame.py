@@ -193,6 +193,14 @@ class MetricFrame:
         .. deprecated:: 0.7.0
             `metric` will be removed in version 0.10.0, use `metrics` instead.
 
+    n_bootstrap_samples: Optional[int]
+        The number of bootstrap samplings to perform. If :code:`None` then
+        no bootstrapping is done
+
+    bootstrap_random_state: Optional[int]
+        If :code:`n_bootstrap_samples` is set, this value is used to seed the random
+        number generator
+
     Examples
     --------
     >>> from fairlearn.metrics import MetricFrame, selection_rate
@@ -526,8 +534,9 @@ class MetricFrame:
         sensitive features for each underlying metric function in the :attr:`.by_group`
         property (it will only succeed if all the underlying metric
         functions return scalar values). The exact return type depends on
-        whether control features are present, and whether the metric functions
-        were specified as a single callable or a dictionary.
+        whether control features are present, whether the metric functions
+        were specified as a single callable or a dictionary, and whether
+        bootstrap quantiles are extracted
 
         Read more in the :ref:`User Guide <assessment>`.
 
@@ -536,6 +545,14 @@ class MetricFrame:
         errors: {'raise', 'coerce'}, default 'raise'
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
+
+        quantiles: Optional[List[float]]
+            A list of the desired quantiles, each in the range
+            :math:`[0, 1]`.
+            If :code:`None` then the nominal values are returned,
+            otherwise a :class:`numpy.ndarray` equal in length
+            to this array will be returned in place of each
+            nominal value.
 
         Returns
         -------
