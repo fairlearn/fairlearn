@@ -105,6 +105,17 @@ class TestByGroupQuantiles:
             # Check median close to nominal
             assert curr[1] == pytest.approx(mf_1m_0cf.by_group[g], abs=0.05)
 
+    def test_1mdict_0cf(self, mf_1mdict_0cf):
+        quantiles = [0.2, 0.5, 0.9]
+        by_group_quantiles = mf_1mdict_0cf.by_group_quantiles(quantiles)
+        assert isinstance(by_group_quantiles, pd.DataFrame)
+        for g in np.unique(g_1):
+            curr = by_group_quantiles['recall'][g]
+            assert isinstance(curr, np.ndarray)
+            assert curr.shape == (3,)
+            # Check median close to nominal
+            assert curr[1] == pytest.approx(mf_1mdict_0cf.by_group['recall'][g], abs=0.05)
+
     def test_1m_1cf(self, mf_1m_1cf):
         quantiles = [0.2, 0.5, 0.9]
         by_group_quantiles = mf_1m_1cf.by_group_quantiles(quantiles)
