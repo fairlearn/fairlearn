@@ -110,11 +110,13 @@ class TestByGroupQuantiles:
         by_group_quantiles = mf_1mdict_0cf.by_group_quantiles(quantiles)
         assert isinstance(by_group_quantiles, pd.DataFrame)
         for g in np.unique(g_1):
-            curr = by_group_quantiles['recall'][g]
+            curr = by_group_quantiles["recall"][g]
             assert isinstance(curr, np.ndarray)
             assert curr.shape == (3,)
             # Check median close to nominal
-            assert curr[1] == pytest.approx(mf_1mdict_0cf.by_group['recall'][g], abs=0.05)
+            assert curr[1] == pytest.approx(
+                mf_1mdict_0cf.by_group["recall"][g], abs=0.05
+            )
 
     def test_1m_1cf(self, mf_1m_1cf):
         quantiles = [0.2, 0.5, 0.9]
@@ -141,6 +143,20 @@ class TestGroupMax:
         assert baseline == pytest.approx(ci_vals[1], abs=0.05)
         assert ci_vals[0] < ci_vals[1]
         assert ci_vals[1] < ci_vals[2]
+
+    def test_1mdict_0cf(self, mf_1mdict_0cf):
+        quantiles = [0.2, 0.5, 0.9]
+
+        baseline = mf_1mdict_0cf.group_max()
+        ci_vals = mf_1mdict_0cf.group_max(quantiles=quantiles)
+        assert isinstance(ci_vals, pd.Series)
+        assert len(ci_vals) == 1
+        assert isinstance(ci_vals["recall"], np.ndarray)
+        assert ci_vals["recall"].shape == (len(quantiles),)
+        # Median should be close to baseline
+        assert baseline["recall"] == pytest.approx(ci_vals["recall"][1], abs=0.05)
+        assert ci_vals["recall"][0] < ci_vals["recall"][1]
+        assert ci_vals["recall"][1] < ci_vals["recall"][2]
 
     def test_1m_1cf(self, mf_1m_1cf):
         quantiles = [0.2, 0.5, 0.9]
