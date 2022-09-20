@@ -92,7 +92,6 @@ class TestByGroupQuantiles:
                 assert curr[1] == pytest.approx(mf_1m_1cf.by_group[cf][g], abs=0.05)
 
 
-
 class TestGroupMax:
     def test_1m_0cf(self, mf_1m_0cf):
         quantiles = [0.2, 0.5, 0.9]
