@@ -13,7 +13,8 @@ from .data_for_test import g_1, g_2, y_p, y_t
 # Have fixtures so that tests can be specific without
 # constantly recomputing the same bootstrapping
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def mf_1m_0cf():
     n_samples = 100
     target = MetricFrame(
@@ -26,7 +27,8 @@ def mf_1m_0cf():
     )
     return target
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(scope="session")
 def mf_1m_1_cf():
     n_samples = 100
     target = MetricFrame(
@@ -57,8 +59,12 @@ class TestOverallQuantiles:
         assert overall_quantiles.name == "recall_score"
         assert overall_quantiles.shape == (2,)
         # Overall value should be close to quantile 0.5
-        assert mf_1m_1_cf.overall["f"] == pytest.approx(overall_quantiles["f"][1], abs=0.05)
-        assert mf_1m_1_cf.overall["g"] == pytest.approx(overall_quantiles["g"][1], abs=0.05)
+        assert mf_1m_1_cf.overall["f"] == pytest.approx(
+            overall_quantiles["f"][1], abs=0.05
+        )
+        assert mf_1m_1_cf.overall["g"] == pytest.approx(
+            overall_quantiles["g"][1], abs=0.05
+        )
 
 
 class TestGroupMax:
