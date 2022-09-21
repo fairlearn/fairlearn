@@ -194,6 +194,8 @@ class MetricFrame:
 
     Examples
     --------
+    We will now go through some simple examples (see the :ref:`User Guide <assessment>` for
+    a more in-depth discussion):
 
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> from sklearn.metrics import accuracy_score
@@ -260,7 +262,8 @@ class MetricFrame:
     group_min       0.6            0.4
     group_max       0.8            0.8
 
-    More information about plotting metrics can be found in the following section: :ref:`plot_metricframe`
+    More information about plotting metrics can be found in the
+    :ref:`plotting section <plot_metricframe>` of the User Guide.
     """
 
     # The deprecation decorator does two things:
