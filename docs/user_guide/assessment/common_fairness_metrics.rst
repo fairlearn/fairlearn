@@ -144,7 +144,7 @@ misleading when the data can be further disaggregated.
 It's important to review metrics across these more granular categories, 
 if they exist, to verify that disparate outcomes persist across all levels 
 of aggregation. 
-See :ref:`intersecting_groups` below to see how :class:`MetricFrame` can
+See :ref:`assessment_intersecting_groups` below to see how :class:`MetricFrame` can
 help with this.
 
 However, more granular categories generally contain smaller sample sizes, and 

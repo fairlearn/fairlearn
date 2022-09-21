@@ -44,7 +44,7 @@ to considering groups according to gender and groups according to race, it is
 also important to consider their intersections (e.g., Black women, Latinx 
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
-See :ref:`this section <intersecting_groups>` of our user guide for
+See :ref:`this section <assessment_intersecting_groups>` of our user guide for
 details of how Fairlearn can compute metrics for intersections.
 
 
@@ -57,6 +57,8 @@ details of how Fairlearn can compute metrics for intersections.
     not be taken from a small number of fixed values.
     Features like this have to be binned, and the choice of bins
     could obscure fairness issues.
+
+.. _assessment_quantify_harms:
 
 Quantify harms
 --------------
@@ -186,6 +188,7 @@ These are accessed through the :attr:`MetricFrame.by_group` property:
 
 All of these values can be checked against the original arrays above.
 
+.. _assessment_compare_harms:
 
 Compare quantified harms across the groups
 ------------------------------------------
@@ -219,6 +222,8 @@ methods show the smallest and largest values for each metric:
 
 We can also compute differences and ratios between groups for all of the
 metrics.
+These are available via the :meth:`MetricFrame.difference` and
+:meth:`MetricFrame.ratio` methods respectively.
 The absolute difference will always be returned, and the ratios will be chosen
 to be less than one.
 By default, the computations are done between the maximum and minimum

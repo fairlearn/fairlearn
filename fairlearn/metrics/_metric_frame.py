@@ -330,7 +330,7 @@ class MetricFrame:
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -375,7 +375,7 @@ class MetricFrame:
         sensitive and control features. The exact type depends on
         the specification of the metric function.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -407,6 +407,9 @@ class MetricFrame:
         property have a :class:`pandas.MultiIndex` index. This property
         identifies which elements of that index are control features.
 
+        See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
+        in the User Guide to learn how to use control levels.
+
         Returns
         -------
         List[str] or None
@@ -422,7 +425,7 @@ class MetricFrame:
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
         index, this identifies which elements of the index are sensitive features.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -474,7 +477,7 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
@@ -500,7 +503,7 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
@@ -538,7 +541,7 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
@@ -592,7 +595,7 @@ class MetricFrame:
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------

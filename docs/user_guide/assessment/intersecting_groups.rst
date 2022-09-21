@@ -1,4 +1,4 @@
-.. _intersecting_groups:
+.. _assessment_intersecting_groups:
 
 Intersecting Groups
 ===================
