@@ -71,6 +71,8 @@ arrays equal in length to ``y_true`` etc.:
 
     >>> from sklearn.metrics import recall_score
     >>> import pandas as pd
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3, 1, 1]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(metrics=recall_score,
