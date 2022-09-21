@@ -194,6 +194,7 @@ class MetricFrame:
 
     Examples
     --------
+
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> from sklearn.metrics import accuracy_score
     >>> import pandas as pd
@@ -217,11 +218,10 @@ class MetricFrame:
 
     Access the largest difference, smallest ratio, and worst case performance
 
-    >>> print(f"difference: {mf1.difference()[0]:.3}\t"
-    ...      f"ratio: {mf1.ratio()[0]:.3}\t"
+    >>> print(f"difference: {mf1.difference()[0]:.3}   "
+    ...      f"ratio: {mf1.ratio()[0]:.3}   "
     ...      f"max across groups: {mf1.group_max()[0]:.3}")
-    ...# doctest: +NORMALIZE_WHITESPACE
-    difference: 0.4     ratio: 0.5      max across groups: 0.8
+    difference: 0.4   ratio: 0.5   max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
 
@@ -260,7 +260,7 @@ class MetricFrame:
     group_min       0.6            0.4
     group_max       0.8            0.8
 
-    More information about plotting metrics can be found in the following section: :ref:`plot`
+    More information about plotting metrics can be found in the following section: :ref:`plot_metricframe`
     """
 
     # The deprecation decorator does two things:
