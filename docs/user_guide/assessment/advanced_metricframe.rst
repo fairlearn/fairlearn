@@ -7,7 +7,7 @@ Advanced Usage of MetricFrame
 
 In this section, we will discuss how :class:`MetricFrame` can
 be used in more sophisticated scenarios.
-All of code examples will use the following definitions:
+All code examples will use the following definitions:
 
 
 .. doctest:: advanced_metricframe_code
@@ -140,7 +140,7 @@ One example of this is the selection rate metric, which only considers
 the `y_pred` values (selection rate is used when computing
 :ref:`demographic parity <assessment_demographic_parity>`).
 However, :class:`MetricFrame` requires all supplied metric functions to
-conform to the SciKit-Learn metric paradigm, where the first two arguments
+conform to the scikit-learn metric paradigm, where the first two arguments
 to the metric function are the `y_true` and `y_pred` arrays.
 The workaround in this case is to supply a dummy argument.
 This is the approach we use in :meth:`selection_rate`, which simply ignores
