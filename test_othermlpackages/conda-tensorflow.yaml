@@ -6,6 +6,6 @@ dependencies:
 - python==3.8
 - pip>=19.1.1
 - pytest
-- tensorflow
 - pip:
-   - scikeras
+   - scikeras[tensorflow-cpu]
+   - tensorflow # Recommended by https://www.tensorflow.org/install
