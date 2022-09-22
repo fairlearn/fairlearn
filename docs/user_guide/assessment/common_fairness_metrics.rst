@@ -114,11 +114,6 @@ itself an unobservable theoretical construct. Further, it's important
 to ask whether satisfying demographic parity actually brings us closer 
 to the world we'd like to see.
 
-Finally, note that demographic parity underlies the 'Four-Fifths' rule.
-This is a common metric used to assess datasets but
-:ref:`as we discuss below <assessment_four_fifths>`, it is often misapplied.
-
-
 .. _conditional_group_fairness:
 
 In some cases, we may observe a trend in data from multiple demographic groups, 
@@ -178,6 +173,8 @@ lowest selection rates :math:`a \in A` so a result of 0 indicates
 that demographic parity has been achieved.
 The second reports the ratio of the lowest and highest selection rates,
 so a result of 1 means there is demographic parity.
+This can potentially be used to implement the 'Four-Fifths' Rule,
+but :ref:`read our discussion below <assessment_four_fifths>`.
 As with any fairness metric, achieving demographic parity does *not* automatically mean
 that the classifier is fair!
 
@@ -341,7 +338,7 @@ relevant control population.
 A violation of the rule is still not sufficient to demonstrate that
 illegal discrimination has occurred - a causal link between the
 statistic and alleged discrimination must still be shown, and the
-court would examine the particulars of each case.
+(US) court would examine the particulars of each case.
 For an example of the subtleties involved, see
 `Ricci v. Stefano <https://en.wikipedia.org/wiki/Ricci_v._DeStefano>`_
 which resulted from an attempt to 'correct' for disparate impact.
@@ -364,6 +361,49 @@ with mathematical measures of disparity, see
 :footcite:ct:`Xiang2019legalcompatibility`.
 
 
+Summary
+-------
+
+We have introduced three commonly used fairness metrics in this section,
+which can be summed up as follows:
+
+* Demographic Parity
+
+    * *What it compares:* Predictions between different groups
+      (true values are ignored)
+
+    * *Reason to use:* If the input data are known to contain historical
+      biases, demographic parity may be appropriate
+
+    * *Caveats:* By only using the predicted values, information is thrown
+      away
+
+* Equalized Odds
+
+    * *What it compares:* True and False Positive rates between different groups
+
+    * *Reason to use:* If historical data are useful, and true and false positives
+      have roughly equal weight, equalized odds may be useful
+
+    * *Caveats:* If there are historical biases in the data, then the original labels
+      may hold little value. Also, large label imbalances (e.g. 95% of the data have 
+      a positive label) may make equalized odds an inappropriate measure
+
+* Equal opportunity
+
+    * *What it compares:* True Positive rates between different groups
+
+    * *Reason to use:* If historical data are useful, and false positive rates
+      are much less important, equal opportunity may be useful
+
+    * *Caveats:* If there are historical biases in the data, then the original labels
+      may hold little value. If there are large label imbalances, then equal
+      opportunity may also be misleading.
+
+
+However, the fact these are common metrics does not make them applicable to any given
+situation.
+In particular, :ref:`demographic parity is often misapplied <assessment_four_fifths>`.
 
 
 References
