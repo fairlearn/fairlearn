@@ -8,4 +8,4 @@ dependencies:
 - pytest
 - pip:
    - scikeras
-   - tensorflow # Latest TF not on conda-forge
+   - tensorflow  # Latest TF not on conda-forge
