@@ -9,4 +9,3 @@ dependencies:
 - tensorflow
 - pip:
    - scikeras[tensorflow-cpu]
-   #- tensorflow # Recommended by https://www.tensorflow.org/install
