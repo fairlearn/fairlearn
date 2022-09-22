@@ -168,6 +168,8 @@ class MetricFrame:
         Control features can be specified similarly to the sensitive features.
         However, their default names (if none can be identified in the
         input values) are of the format ``control_feature_[n]``.
+        See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
+        in the User Guide to learn how to use control levels.
 
         **Note** the types returned by members of the class vary based on whether
         control features are present.
@@ -409,9 +411,6 @@ class MetricFrame:
         If control features are present, then the rows of the :attr:`.by_group`
         property have a :class:`pandas.MultiIndex` index. This property
         identifies which elements of that index are control features.
-
-        See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
-        in the User Guide to learn how to use control levels.
 
         Returns
         -------
