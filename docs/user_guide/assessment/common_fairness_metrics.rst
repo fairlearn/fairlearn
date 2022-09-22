@@ -8,6 +8,9 @@ Common fairness metrics
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups.
+Note that *common* usage does not imply *correct* usage; we discuss
+one very common misue in the
+:ref:`section on the Four-Fifths Rule <assessment_four_fifths>`.
 In code examples, we will use the following input arrays:
 
 
