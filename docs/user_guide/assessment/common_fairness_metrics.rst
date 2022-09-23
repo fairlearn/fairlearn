@@ -173,8 +173,8 @@ lowest selection rates :math:`a \in A` so a result of 0 indicates
 that demographic parity has been achieved.
 The second reports the ratio of the lowest and highest selection rates,
 so a result of 1 means there is demographic parity.
-This can potentially be used to implement the 'Four-Fifths' Rule,
-but :ref:`read our discussion below <assessment_four_fifths>`.
+This metric can potentially be used to implement the 'Four-Fifths' Rule,
+but :ref:`read our discussion below <assessment_four_fifths>` to understand whether this is an appropriate metric for your use case.
 As with any fairness metric, achieving demographic parity does *not* automatically mean
 that the classifier is fair!
 
@@ -372,8 +372,8 @@ which can be summed up as follows:
     * *What it compares:* Predictions between different groups
       (true values are ignored)
 
-    * *Reason to use:* If the input data are known to contain historical
-      biases, demographic parity may be appropriate
+    * *Reason to use:* If the input data are known to contain
+      biases, demographic parity may be appropriate to measure fairness
 
     * *Caveats:* By only using the predicted values, information is thrown
       away
@@ -382,8 +382,8 @@ which can be summed up as follows:
 
     * *What it compares:* True and False Positive rates between different groups
 
-    * *Reason to use:* If historical data are useful, and true and false positives
-      have roughly equal weight, equalized odds may be useful
+    * *Reason to use:* If historical data does not contain measurement bias or historical bias we want to account for, and true and false positives
+      are considered to be (roughly) of the same importance, equalized odds may be useful
 
     * *Caveats:* If there are historical biases in the data, then the original labels
       may hold little value. Also, large label imbalances (e.g. 95% of the data have 
