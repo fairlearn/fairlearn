@@ -8,11 +8,13 @@ Common fairness metrics
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups.
-Note that *common* usage does not imply *correct* usage; we discuss
-one very common misuse in the
-:ref:`section on the Four-Fifths Rule <assessment_four_fifths>`.
-In code examples, we will use the following input arrays:
 
+.. note::
+  Note that *common* usage does not imply *correct* usage; we discuss
+  one very common misuse in the
+  :ref:`section on the Four-Fifths Rule <assessment_four_fifths>`
+
+In the code examples presented below, we will use the following input arrays:
 
 .. doctest:: common_fairness_metrics_code
 
@@ -376,29 +378,35 @@ which can be summed up as follows:
       biases, demographic parity may be appropriate to measure fairness
 
     * *Caveats:* By only using the predicted values, information is thrown
-      away
+      away. The selection rate is also a very coarse measure of the
+      distribution between groups, making it tricky to use as an optimization
+      constraint
 
 * Equalized Odds
 
     * *What it compares:* True and False Positive rates between different groups
 
-    * *Reason to use:* If historical data does not contain measurement bias or historical bias we want to account for, and true and false positives
+    * *Reason to use:* If historical data does not contain measurement bias or historical
+      bias that we need to take into account, and true and false positives
       are considered to be (roughly) of the same importance, equalized odds may be useful
 
     * *Caveats:* If there are historical biases in the data, then the original labels
-      may hold little value. Also, large label imbalances (e.g. 95% of the data have 
-      a positive label) may make equalized odds an inappropriate measure
+      may hold little value. A large imbalance between the positive and negative classes
+      will also accentuate any statistical issues related to sensitive groups with low
+      membership
 
 * Equal opportunity
 
     * *What it compares:* True Positive rates between different groups
 
-    * *Reason to use:* If historical data are useful, and false positive rates
-      are much less important, equal opportunity may be useful
+    * *Reason to use:* If historical data are useful, and extra false positives
+      are much less likely to cause harm than missed true positives, equal
+      opportunity may be useful
 
     * *Caveats:* If there are historical biases in the data, then the original labels
-      may hold little value. If there are large label imbalances, then equal
-      opportunity may also be misleading.
+      may hold little value. A large imbalance between the positive and negative classes
+      will also accentuate any statistical issues related to sensitive groups with low
+      membership
 
 
 However, the fact these are common metrics does not make them applicable to any given
