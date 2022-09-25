@@ -7,7 +7,7 @@ Advanced Usage of MetricFrame
 
 In this section, we will discuss how :class:`MetricFrame` can
 be used in more sophisticated scenarios.
-All of these will use the following definitions:
+All code examples will use the following definitions:
 
 
 .. doctest:: advanced_metricframe_code
@@ -71,6 +71,8 @@ arrays equal in length to ``y_true`` etc.:
 
     >>> from sklearn.metrics import recall_score
     >>> import pandas as pd
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
     >>> s_w = [1, 2, 1, 3, 2, 3, 1, 2, 1, 2, 3, 1, 2, 3, 2, 3, 1, 1]
     >>> s_p = { 'sample_weight':s_w }
     >>> weighted = MetricFrame(metrics=recall_score,
@@ -129,6 +131,44 @@ Note that there is no concept of a 'global' sample parameter (e.g. a set
 of sample weights to be applied for all metric functions).
 In such a case, the sample parameter in question must be repeated in
 the nested dictionary for each metric function.
+
+
+No `y_true` or `y_pred`
+^^^^^^^^^^^^^^^^^^^^^^^
+
+In some cases, a metric may not have `y_true` or `y_pred` arguments, or even
+either of them.
+One example of this is the selection rate metric, which only considers
+the `y_pred` values (selection rate is used when computing
+:ref:`demographic parity <assessment_demographic_parity>`).
+However, :class:`MetricFrame` requires all supplied metric functions to
+conform to the scikit-learn metric paradigm, where the first two arguments
+to the metric function are the `y_true` and `y_pred` arrays.
+The workaround in this case is to supply a dummy argument.
+This is the approach we use in :meth:`selection_rate`, which simply ignores
+the supplied `y_true` argument.
+When invoking `MetricFrame`, a `y_true` array of the appropriate length
+must still be supplied.
+For example:
+
+.. doctest:: advanced_metricframe_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import selection_rate
+    >>> dummy_y_true = [x for x in range(len(y_pred))]
+    >>> sel_rate_frame = MetricFrame(metrics=selection_rate,
+    ...                              y_true=dummy_y_true,
+    ...                              y_pred=y_pred,
+    ...                              sensitive_features=pd.Series(sf_data, name='SF 0'))
+    >>> sel_rate_frame.overall
+    0.55555...
+    >>> sel_rate_frame.by_group
+    SF 0
+    a    0.75
+    b    0.50
+    c    0.50
+    Name: selection_rate, dtype: float64
+
 
 .. _more_complex_metrics:
 

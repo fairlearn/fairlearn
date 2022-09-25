@@ -168,6 +168,8 @@ class MetricFrame:
         Control features can be specified similarly to the sensitive features.
         However, their default names (if none can be identified in the
         input values) are of the format ``control_feature_[n]``.
+        See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
+        in the User Guide to learn how to use control levels.
 
         **Note** the types returned by members of the class vary based on whether
         control features are present.
@@ -194,6 +196,9 @@ class MetricFrame:
 
     Examples
     --------
+    We will now go through some simple examples (see the :ref:`User Guide <assessment>` for
+    a more in-depth discussion):
+
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> from sklearn.metrics import accuracy_score
     >>> import pandas as pd
@@ -217,11 +222,10 @@ class MetricFrame:
 
     Access the largest difference, smallest ratio, and worst case performance
 
-    >>> print(f"difference: {mf1.difference()[0]:.3}\t"
-    ...      f"ratio: {mf1.ratio()[0]:.3}\t"
+    >>> print(f"difference: {mf1.difference()[0]:.3}   "
+    ...      f"ratio: {mf1.ratio()[0]:.3}   "
     ...      f"max across groups: {mf1.group_max()[0]:.3}")
-    ...# doctest: +NORMALIZE_WHITESPACE
-    difference: 0.4     ratio: 0.5      max across groups: 0.8
+    difference: 0.4   ratio: 0.5   max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
 
@@ -260,7 +264,8 @@ class MetricFrame:
     group_min       0.6            0.4
     group_max       0.8            0.8
 
-    More information about plotting metrics can be found in the following section: :ref:`plot`
+    More information about plotting metrics can be found in the
+    :ref:`plotting section <plot_metricframe>` of the User Guide.
     """
 
     # The deprecation decorator does two things:
@@ -330,7 +335,7 @@ class MetricFrame:
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
 
-           Read more in the :ref:`User Guide <control_features_metrics>`.
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -375,7 +380,7 @@ class MetricFrame:
         sensitive and control features. The exact type depends on
         the specification of the metric function.
 
-        Read more in the :ref:`User Guide <control_features_metrics>`.
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -421,6 +426,8 @@ class MetricFrame:
 
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
         index, this identifies which elements of the index are sensitive features.
+
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -472,7 +479,7 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
@@ -498,7 +505,7 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
@@ -536,7 +543,7 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
-        Read more in the :ref:`User Guide <control_features_metrics>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
@@ -590,7 +597,7 @@ class MetricFrame:
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
 
-        Read more in the :ref:`User Guide <assessment>`.
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
 
         Parameters
         ----------
