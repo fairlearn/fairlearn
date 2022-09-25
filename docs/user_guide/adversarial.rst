@@ -39,9 +39,9 @@ For details, see :footcite:`zhang2018mitigating`.
 
 Firstly, we will dicuss the models that this implementation accepts in
 :ref:`models`.
-Secondly, in :ref:`data_preprocessing`, we discuss the required
-data preprocessing, as :math:`X` must be an array of
-floats. Then, in :ref:`loss_functions`,
+Secondly, in :ref:`data_preprocessing`, we discuss the
+data preprocessing, as :math:`X` must be translated into an array of
+floats when working with neural networks. Then, in :ref:`loss_functions`,
 we describe how the loss functions :math:`L_P` and :math:`L_A` are chosen.
 Lastly, in :ref:`training` we give some
 useful tips to keep in mind when training this model, as
@@ -105,42 +105,20 @@ hot encoded :math:`Y` and sigmoid for binary :math:`Y`.::
 Data Preprocessing
 ~~~~~~~~~~~~~~~~~~
 
-In contrast to other mitigation techniques, we require the user to
-preprocess their data :math:`X`
-to matrices (2d array-like) of floats. It is very typical to be dealing
-with data other than numbers,
-such as categorical data, and in those cases we leave it to the
-user to preprocess this
-to numbers. The user can make the decision on how to encode this column,
-for instance
-using a one-hot-encoding or by mapping the values to an integer range.
-Another reason
-that we do not provide such a data preprocessor out of the box,
-is that scikit-learn makes
-preprocessing easy. For instance, say we
-want to encode the categorical data using one-hot encodings,
-and we want to scale the other features to a standard range.
-An easy way to do this, using sci-kit learn, is
-to create a :py:class:`ColumnTransform` with column selectors that apply
-:py:class:`OneHotEncoding`and :py:class:`StandardScalar`
-transforms.::
+We require the data :math:`X` to be preprocessed (translated)
+to matrices (2d array-like) of floats, as we are feeding data through a neural
+network model model. 
 
-    >>> from sklearn.compose import make_column_transformer, make_column_selector
-    >>> from sklearn.preprocessing import OneHotEncoder, StandardScaler
-    >>> ct = make_column_transformer(
-    ...     (StandardScaler(),
-    ...      make_column_selector(dtype_include='number')),
-    ...     (OneHotEncoder(drop='if_binary', sparse=False),
-    ...      make_column_selector(dtype_include="category")))
-    >>> X_transformed = ct.fit_transform(X)
-
-Similarly to other methods, there are more common
-aspects to preprocessing besides
-encoding everything with numbers. In particular, one needs to
-take care in handling NaN's,
-as NaN's are not supported by PyTorch or TensorFlow. Also,
-as for other neural network
-models, it helps to scale every feature of the data to a similar range.
+For Adversarial Fairness, we created an algorithm
+(:py:mod:`fairlearn.adversarial.FloatTransformer`) that contains different
+preprocessing techniques for different types of data, and infers which of these
+it should apply to the given data. This algorithm is automatically triggered
+(by instantiating with :code:`y_transform="auto"`), so you need not worry about
+preprocessing in most cases. Alternatively, you could provide your own
+transformer.
+To summarize the current preprocessing algorithms: binary data will be binary
+encoded, categorical data will be one-hot encoded, and non-binary numbers
+are passed through unchanged.
 
 
 .. _loss_functions:
