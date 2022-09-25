@@ -63,9 +63,9 @@ def plot_model_comparison(
         If supplied, the scatter plot is drawn on this Axes object.
         Else, a new figure with Axes is created.
 
-    axis_labels : bool, tuple
+    axis_labels : bool, list
         If true, add the names of x and y axis metrics. You can also pass a
-        two-tuple of strings to use as axis labels instead.
+        list of size two (or a two-tuple) of strings to use as axis labels instead.
 
     point_labels : bool, list
         If true, annotate text with inferred point labels. These labels are
@@ -73,10 +73,10 @@ def plot_model_comparison(
         0...number of points - 1. You can specify point_labels as a list of
         labels as well.
 
-    point_labels_position : tuple
-        a two-tuple of numbers that define the offset of the point labels in the
-        x and y direction respectively. The offset value is in data coordinates,
-        not pixels.
+    point_labels_position : list
+        a list (or a two-tuple) containing precisely two numbers that define the
+        offset of the point labels in the x and y direction respectively.
+        The offset value is in data coordinates, not pixels.
 
     legend : bool
         If True, add a legend. Legend entries are created by passing the
@@ -143,10 +143,10 @@ def plot_model_comparison(
             _INCONSISTENT_ARRAY_LENGTH.format("y_true and the rows of y_preds")
         )
 
-    if isinstance(axis_labels, tuple):
+    if isinstance(axis_labels, (list, tuple)):
         if len(axis_labels) != 2:
             raise ValueError(
-                "Key word argument axis_labels should be a tuple of two strings."
+                "Key word argument axis_labels should be a list or tuple of two strings."
             )
     elif isinstance(axis_labels, bool):
         pass
@@ -188,19 +188,17 @@ def plot_model_comparison(
         )
 
     if (
-        isinstance(point_labels_position, tuple)
+        isinstance(point_labels_position, (list, tuple))
         and len(point_labels_position) == 2
     ):
         for item in point_labels_position:
             if not isinstance(item, (int, float)):
                 raise ValueError(
-                    "Key word argument point_labels_position is not a two-tuple"
-                    + " containing only numbers."
+                    "Key word argument point_labels_position is not a list or"
+                    + " two-tuple containing only numbers."
                 )
     else:
-        raise ValueError(
-            "Key word argument point_labels_position is not a two-tuple."
-        )
+        raise ValueError("Key word argument point_labels_position is not a two-tuple.")
 
     if not isinstance(legend_kwargs, dict):
         raise ValueError(
@@ -215,9 +213,7 @@ def plot_model_comparison(
     try:
         x = array(
             [
-                x_axis_metric(
-                    y_true, y_pred, sensitive_features=sensitive_features
-                )
+                x_axis_metric(y_true, y_pred, sensitive_features=sensitive_features)
                 for y_pred in y_preds
             ]
         )
@@ -227,9 +223,7 @@ def plot_model_comparison(
     try:
         y = array(
             [
-                y_axis_metric(
-                    y_true, y_pred, sensitive_features=sensitive_features
-                )
+                y_axis_metric(y_true, y_pred, sensitive_features=sensitive_features)
                 for y_pred in y_preds
             ]
         )
@@ -261,7 +255,7 @@ def plot_model_comparison(
             else:
                 name = repr(m)
             f(name.replace("_", " "))
-    elif isinstance(axis_labels, tuple):
+    elif isinstance(axis_labels, (tuple, list)):
         ax.set_xlabel(axis_labels[0])
         ax.set_ylabel(axis_labels[1])
 
