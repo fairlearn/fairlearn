@@ -1,4 +1,4 @@
-.. _intersecting_groups:
+.. _assessment_intersecting_groups:
 
 Intersecting Groups
 ===================
@@ -12,6 +12,8 @@ One important point to bear in mind when performing an intersectional analysis
 is that some of the intersections may have very few members (or even be empty).
 This will affect the confidence interval associated with the computed metrics;
 random noise has a greater effect on smaller groups.
+To identify such cases, we strongly suggest that :func:`count` be included as a metric
+whenever using intersecting groups.
 All of these will use the following definitions:
 
 

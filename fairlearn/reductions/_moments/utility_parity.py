@@ -196,7 +196,7 @@ class UtilityParity(ClassificationMoment):
             predictions = np.squeeze(predictions)
         pred = utility_diff.T * predictions + self.utilities[:, 0]
         self.tags[_PREDICTION] = pred
-        expect_event = self.tags.groupby(_EVENT).mean()
+        expect_event = self.tags.groupby(_EVENT).mean(numeric_only=True)
         expect_group_event = self.tags.groupby([_EVENT, _GROUP_ID]).mean()
         expect_group_event[_UPPER_BOUND_DIFF] = (
             self.ratio * expect_group_event[_PREDICTION] - expect_event[_PREDICTION]

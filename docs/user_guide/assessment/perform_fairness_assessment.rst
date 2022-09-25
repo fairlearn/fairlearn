@@ -44,6 +44,8 @@ to considering groups according to gender and groups according to race, it is
 also important to consider their intersections (e.g., Black women, Latinx 
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
+See :ref:`this section <assessment_intersecting_groups>` of our user guide for
+details of how Fairlearn can compute metrics for intersections.
 
 
 .. note::
@@ -56,14 +58,24 @@ offers a thorough background on the topic of intersectionality.
     Features like this have to be binned, and the choice of bins
     could obscure fairness issues.
 
+.. _assessment_quantify_harms:
+
 Quantify harms
 --------------
 
 Define metrics that quantify harms or benefits:
 
-* In a job screening scenario, we need to quantify the number of candidates that are classified as "negative" (not recommended for the job), but whose true label is "positive" (they are "qualified"). One possible metric is the false negative rate: fraction of qualified candidates that are screened out. Note that before we attempt to classify candidates, we need to determine the construct validity of the "qualified" status; more information on construct validity can be found in :ref:`construct_validity`
+* In a job screening scenario, we need to quantify the number of candidates
+  that are classified as "negative" (not recommended for the job), but whose
+  true label is "positive" (they are "qualified"). One possible metric is
+  the false negative rate: fraction of qualified candidates that are
+  screened out. Note that before we attempt to classify candidates, we need
+  to determine the construct validity of the "qualified" status; more
+  information on construct validity can be found in :ref:`construct_validity`
 
-* For a speech-to-text application, the harm could be measured by disparities in the word error rate for different group, measured by the number of mistakes in a transcript divided by the overall number of words.
+* For a speech-to-text application, the harm could be measured by disparities
+  in the word error rate for different group, measured by the number of
+  mistakes in a transcript divided by the overall number of words.
 
 Note that in some cases, the outcome we seek to measure is not 
 directly available. 
@@ -176,6 +188,7 @@ These are accessed through the :attr:`MetricFrame.by_group` property:
 
 All of these values can be checked against the original arrays above.
 
+.. _assessment_compare_harms:
 
 Compare quantified harms across the groups
 ------------------------------------------
@@ -209,6 +222,8 @@ methods show the smallest and largest values for each metric:
 
 We can also compute differences and ratios between groups for all of the
 metrics.
+These are available via the :meth:`MetricFrame.difference` and
+:meth:`MetricFrame.ratio` methods respectively.
 The absolute difference will always be returned, and the ratios will be chosen
 to be less than one.
 By default, the computations are done between the maximum and minimum

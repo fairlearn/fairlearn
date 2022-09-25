@@ -53,7 +53,8 @@ Note that in the Fairlearn API, :func:`fairlearn.metrics.demographic_parity_diff
 is only defined for classification. 
 
 .. note::
-   Demographic parity is also sometimes referred to as *independence*, *group fairness*, *statistical parity*, and *disparate impact*.
+   Demographic parity is also sometimes referred to as *independence*,
+   *group fairness*, *statistical parity*, and *disparate impact*.
 
 Failing to achieve demographic parity could generate allocation harms. 
 Allocation harms occur when AI systems allocate 
@@ -143,20 +144,22 @@ misleading when the data can be further disaggregated.
 It's important to review metrics across these more granular categories, 
 if they exist, to verify that disparate outcomes persist across all levels 
 of aggregation. 
-See :ref:`intersecting_groups` below to see how :class:`MetricFrame` can
+See :ref:`assessment_intersecting_groups` below to see how :class:`MetricFrame` can
 help with this.
 
 However, more granular categories generally contain smaller sample sizes, and 
 it can be more difficult to establish that trends seen in very small 
 samples are not due to random chance. 
-We also recommend watching out for the `multiple comparisons problem <https://stats.libretexts.org/Bookshelves/Applied_Statistics/Book%3A_Biological_Statistics_(McDonald)/06%3A_Multiple_Tests/6.01%3A_Multiple_Comparisons>`_, 
+We also recommend watching out for the
+`multiple comparisons problem <https://stats.libretexts.org/Bookshelves/Applied_Statistics/Book%3A_Biological_Statistics_(McDonald)/06%3A_Multiple_Tests/6.01%3A_Multiple_Comparisons>`_, 
 which states that the more statistical inferences are made, the 
 more erroneous those inferences will become. For example, in the case 
 of evaluating fairness metrics on multiple groups, as we break the 
 groups down into more granular categories and evaluate those smaller 
 groups, it will become more likely that these subgroups will 
 differ enough to fail one of the metrics. For dealing with the multiple 
-comparisons problem, we recommend investigating `statistical techniques <https://www.statology.org/bonferroni-correction/>`_ 
+comparisons problem, we recommend investigating
+`statistical techniques <https://www.statology.org/bonferroni-correction/>`_ 
 meant to correct the errors produced by individual statistical tests. 
 
 Fairlearn provides the :func:`demographic_parity_difference` and
