@@ -41,7 +41,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 from fairlearn.metrics import (
-    MetricFrame, selection_rate, count, plot_model_comparison, make_derived_metric
+    MetricFrame, selection_rate, count, plot_model_comparison, selection_rate_difference
 )
 
 # %%
@@ -257,7 +257,7 @@ plt.ylabel("selection rate difference")
 # Plot model comparison
 plot_model_comparison(
     x_axis_metric=skm.accuracy_score,
-    y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
+    y_axis_metric=selection_rate_difference,
     y_true=Y_test,
     y_preds=predictions,
     sensitive_features=A_test,
