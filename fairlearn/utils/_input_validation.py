@@ -42,7 +42,12 @@ _MERGE_COLUMN_SEPARATOR = ","
 
 
 def _validate_and_reformat_input(
-    X, y=None, expect_y=True, enforce_binary_labels=False, **kwargs
+    X,
+    y=None,
+    expect_y=True,
+    expect_sensitive_features=True,
+    enforce_binary_labels=False,
+    **kwargs,
 ):
     """Validate input data and return the data in an appropriate format.
 
@@ -57,6 +62,9 @@ def _validate_and_reformat_input(
         The label vector
     expect_y : bool
         If True y needs to be provided, otherwise ignores the argument; default True
+    expect_sensitive_features : bool
+        If true, sensitive_features must be provided to the call to this function.
+        This is the default setting.
     enforce_binary_labels : bool
         If True raise exception if there are more than two distinct
         values in the `y` data; default False
@@ -99,6 +107,8 @@ def _validate_and_reformat_input(
             sensitive_features = _merge_columns(sensitive_features)
 
         sensitive_features = pd.Series(sensitive_features.squeeze())
+    elif expect_sensitive_features:
+        raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
