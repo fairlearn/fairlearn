@@ -46,24 +46,18 @@ def plot_model_comparison(
         The ground-truth labels (for classification) or target values (for regression).
 
     sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, optional
-        The sensitive features which should be used to create the subgroups.
-        At least one sensitive feature must be provided.
-        All names (whether on pandas objects or dictionary keys) must be strings.
-        We also forbid DataFrames with column names of ``None``.
-        For cases where no names are provided
-        we generate names ``sensitive_feature_[n]``.
+        Sensitive features for the fairness metrics (if a fairness metric is
+        specified for the x-axis or the y-axis).
 
     x_axis_metric : Callable
-        The (aggregating) metric function for the x-axis
-        The passed metric function must take `y_true, y_pred`, and optionally `sensitive_features`.
-        If the metric is grouped, it must aggregate results. For instance, use
-        `make_derived_metric(metric=balanced_accuracy_score, transform='group_min')`
-        to aggregate the `balanced_accuracy_score`.
+        The metric function for the x-axis.
+        The metric function must take `y_true`, `y_pred`, and optionally `sensitive_features`
+        as arguments, and return a scalar value.
 
     y_axis_metric : Callable
-        The (aggregating) metric function for the y-axis, similar to x_axis_metric.
-        The passed metric function must take `y_true, y_pred`, and optionally `sensitive_features`.
-        If the metric is grouped, it must aggregate results.
+        The metric function for the y-axis, similar to x_axis_metric.
+        The metric function must take `y_true`, `y_pred`, and optionally `sensitive_features`
+        as arguments, and return a scalar value.
 
     ax : matplotlib.axes.Axes, optional
         If supplied, the scatter plot is drawn on this Axes object.
