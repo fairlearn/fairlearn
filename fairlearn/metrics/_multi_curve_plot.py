@@ -29,7 +29,6 @@ def plot_model_comparison(
     point_labels=False,
     point_labels_position=(0, 0),
     legend=False,
-    legend_kwargs={},
     show_plot=False,
     **kwargs,
 ):
@@ -81,12 +80,8 @@ def plot_model_comparison(
     legend : bool
         If True, add a legend. Legend entries are created by passing the
         key word argument :code:`label` to calls to this function.
-
-    legend_kwargs : dict
-        Keyword arguments passed to :py:func:`Axes.legend`. For instance,
-        :code:`legend_kwargs={'bbox_to_anchor': (1.03,1), 'loc': 'upper left'}`
-        will create a legend to the right of the Axes (subfigure), or
-        :code:`legend_kwargs={'ncol': 2}` will create two columns in the legend.
+        If you want to customize the legend, you should manually call
+        ax.legend (where ax is the Axes object) with your customization params
 
     show_plot : bool
         If true, call pyplot.plot.
@@ -200,13 +195,6 @@ def plot_model_comparison(
     else:
         raise ValueError("Key word argument point_labels_position is not a two-tuple.")
 
-    if not isinstance(legend_kwargs, dict):
-        raise ValueError(
-            _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                "legend_kwargs", "dict", type(legend_kwargs).__name__
-            )
-        )
-
     # --- COMPUTE METRICS ---
     # try-except structure because we expect: metric(y_true, y_pred, sensitive_attribute)
     # but we have as fallback: metric(y_true, y_pred)
@@ -278,7 +266,7 @@ def plot_model_comparison(
     # ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
 
     if legend:
-        ax.legend(**legend_kwargs)
+        ax.legend()
 
     # User may want to draw in an ax but not plot it yet.
     if show_plot:
