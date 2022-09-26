@@ -26,7 +26,7 @@ jobs:
           python-version: 3.8
       - run: |
           conda init bash
-          source .bashrc
+          source $HOME/.bashrc
         name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
