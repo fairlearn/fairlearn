@@ -26,14 +26,15 @@ jobs:
           python-version: 3.8
       - run: |
           conda init bash
+          source $HOME/.bashrc
         name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
       - run: |
-          source activate $condaEnv
+          conda activate $condaEnv
           pip install .
         name: Install Fairlearn
       - run: |
-          source activate $condaEnv
+          conda activate $condaEnv
           python -m pytest $baseDir/test_${{matrix.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
