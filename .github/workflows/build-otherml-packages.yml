@@ -9,7 +9,7 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-defaults:
+env:
   baseDir: test_othermlpackages
   condaEnv: test-conda-env
   envInfoArtifactBase: Environment
@@ -23,14 +23,14 @@ jobs:
   other-ml:
     strategy:
       matrix:
-        mlpackage: ${{ defaults.packages }}
-    runs-on: ${{ defaults.poolImage }}
+        mlpackage: ${{ env.packages }}
+    runs-on: ${{ env.poolImage }}
     env:
-      CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', defaults.baseDir, matrix.mlpackage) }}"
+      CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', env.baseDir, matrix.mlpackage) }}"
       CONDA_ENV: my-conda
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: ${{ defaults.PythonVersion }}
+          python-version: ${{ env.PythonVersion }}
       - run: conda env create --name ${{env.CONDA_ENV}} --file=${{env.CONDA_FILENAME}}
