@@ -341,7 +341,7 @@ relevant control population.
 The four-fifths rule is one of many test statistics that can be used
 to establish a *prima facie* case, but it is generally only used
 within the context of
-:ref:`US Federal employment regulation <https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1607>`_. 
+`US Federal employment regulation <https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1607>`_. 
 A violation of the rule is still not sufficient to demonstrate that
 illegal discrimination has occurred - a causal link between the
 statistic and alleged discrimination must still be shown, and the
