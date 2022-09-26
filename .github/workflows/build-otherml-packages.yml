@@ -12,10 +12,6 @@ concurrency:
 env:
   baseDir: test_othermlpackages
   condaEnv: test-conda-env
-  envInfoArtifactBase: Environment
-  envInfoDir: environment
-  envInfoFileBase: env
-  packages: [ lightgbm, xgboost, tensorflow, pytorch]
   poolImage: ubuntu-latest
   pythonVersion: 3.8
 
@@ -23,14 +19,13 @@ jobs:
   other-ml:
     strategy:
       matrix:
-        mlpackage: ${{ env.packages }}
+        mlpackage: [ lightgbm, xgboost, tensorflow, pytorch]
     runs-on: ${{ env.poolImage }}
     env:
       CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', env.baseDir, matrix.mlpackage) }}"
-      CONDA_ENV: my-conda
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ env.PythonVersion }}
-      - run: conda env create --name ${{env.CONDA_ENV}} --file=${{env.CONDA_FILENAME}}
+      - run: conda env create --name ${{env.condaEnv}} --file=${{env.CONDA_FILENAME}}
