@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         mlpackage: [ lightgbm, xgboost, tensorflow, pytorch]
-    runs-on: ${{ env.poolImage }}
+    runs-on: ubuntu-latest
     env:
       CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', env.baseDir, matrix.mlpackage) }}"
     steps:
