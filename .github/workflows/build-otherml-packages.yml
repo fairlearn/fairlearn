@@ -26,4 +26,4 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ pythonVersion }}
-      - run: conda env create --name ${{condaEnv}} --file=${{baseDir}}/${{matrix.mlpackage}}
+      - run: conda env create --name ${{condaEnv}} --file=${{baseDir}}/conda-${{matrix.mlpackage}}.yml
