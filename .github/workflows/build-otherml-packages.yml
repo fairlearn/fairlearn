@@ -9,11 +9,13 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+defaults:
+  pythonVersion: 3.8
+
 env:
   baseDir: test_othermlpackages
   condaEnv: test-conda-env
   poolImage: ubuntu-latest
-  pythonVersion: 3.8
 
 jobs:
   other-ml:
@@ -25,5 +27,5 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: ${{ pythonVersion }}
+          python-version: ${{ defaults.pythonVersion }}
       - run: conda env create --name ${{condaEnv}} --file=${{baseDir}}/conda-${{matrix.mlpackage}}.yml
