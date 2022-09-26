@@ -314,8 +314,9 @@ In the literature around fairness in machine learning, one will often find
 the so-called "four fifths rule" or "80% rule" used to assess whether a model
 (or mitigation technique) has produced a 'fair' result.
 Typically, the rule is implemented by using the demographic parity ratio introduced
-in the :ref:`assessment_demographic_parity` section above, with a result considered
-'fair' if the ratio exceeds 80% for all identified subgroups.
+in the :ref:`assessment_demographic_parity` section above
+(within Fairlearn, one can use :func:`demographic_parity_ratio`), with a result
+considered 'fair' if the ratio exceeds 80% for all identified subgroups.
 *Application of this threshold is wrong in many scenarios.*
 
 As we note in many other places in the Fairlearn documentation, 'fairness'
@@ -337,6 +338,10 @@ It is a limit for
 `prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
 that illegal discrimination has occurred relative to a 
 relevant control population.
+The four-fifths rule is one of many test statistics that can be used
+to establish a *prima facie* case, but it is generally only used
+within the context of
+:ref:`US Federal employment regulation <https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1607>`_. 
 A violation of the rule is still not sufficient to demonstrate that
 illegal discrimination has occurred - a causal link between the
 statistic and alleged discrimination must still be shown, and the
@@ -345,7 +350,8 @@ For an example of the subtleties involved, see
 `Ricci v. Stefano <https://en.wikipedia.org/wiki/Ricci_v._DeStefano>`_
 which resulted from an attempt to 'correct' for disparate impact.
 *Outside* its particular context in US federal employment law,
-the 'four fifths rule' has no validity.
+the 'four fifths rule' has no validity and its misapplication
+is an example of the :ref:`portability trap <portability_trap>`.
 
 Taken together, we see that applying the 'four fifths rule' will
 not be appropriate in most cases.
@@ -426,7 +432,9 @@ References
          *The Caves of Steel* (Asimov, 1953)
 
 .. [#f2] Epistemic trespassing is the process of taking expertise in one field and
-         applying it to another. This is not an intrinsically bad thing - one could
-         label all interdisciplinary research a form of epistemic trespassing.
+         applying it to another in which one does not have an equivalent (or any)
+         competence.
+         This is not an intrinsically bad thing - one could label all
+         interdisciplinary research a form of epistemic trespassing.
          However, doing so successfully requires a willingness to learn the subtleties
          of the new field.
