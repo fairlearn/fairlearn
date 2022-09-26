@@ -24,7 +24,9 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: 3.8
-      - run: conda init bash
+      - run: |
+          conda init bash
+          source .bashrc
         name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
@@ -35,3 +37,4 @@ jobs:
       - run: |
           conda activate $condaEnv
           python -m pytest $baseDir/test_${{matrix.mlpackage}}.py 
+        name: Run ${{matrix.mlpackage}} tests
