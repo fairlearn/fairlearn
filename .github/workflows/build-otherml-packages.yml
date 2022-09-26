@@ -27,7 +27,9 @@ jobs:
       - run: |
           conda update -n base -c defaults conda
           conda init bash
-          source $HOME/.bashrc
+        name: Update and initialise conda
+      - run: |
+          /bin/bash
         name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
