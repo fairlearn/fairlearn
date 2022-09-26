@@ -25,3 +25,8 @@ jobs:
         with:
           python-version: 3.8
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yml
+        name: Create conda environment
+      - run: |
+          conda activate $condaEnv
+          pip install .
+        name: Install Fairlearn
