@@ -32,3 +32,6 @@ jobs:
           conda activate $condaEnv
           pip install .
         name: Install Fairlearn
+      - run: |
+          conda activate $condaEnv
+          python -m pytest $baseDir/test_${{matrix.mlpackage}}.py 
