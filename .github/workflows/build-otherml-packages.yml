@@ -12,7 +12,6 @@ concurrency:
 env:
   baseDir: test_othermlpackages
   condaEnv: test-conda-env
-  poolImage: ubuntu-latest
 
 jobs:
   other-ml:
@@ -25,4 +24,4 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: 3.8
-      - run: conda env create --name ${{condaEnv}} --file=${{baseDir}}/conda-${{matrix.mlpackage}}.yml
+      - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yml
