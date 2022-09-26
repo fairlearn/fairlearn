@@ -1,0 +1,36 @@
+name: Test with Other ML Packages
+
+
+on: [push, pull_request]
+
+concurrency: 
+  # this ensures after each commit the old jobs are cancelled and the new ones
+  # run instead.
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  baseDir: test_othermlpackages
+  condaEnv: test-conda-env
+  envInfoArtifactBase: Environment
+  envInfoDir: environment
+  envInfoFileBase: env
+  packages: [ lightgbm, xgboost, tensorflow, pytorch]
+  poolImage: ubuntu-latest
+  pythonVersion: 3.8
+
+jobs:
+  other-ml:
+    strategy:
+      matrix:
+        mlpackage: ${{ defaults.packages }}
+    runs-on: ${{ defaults.poolImage }}
+    env:
+      CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', defaults.baseDir, matrix.mlpackage) }}"
+      CONDA_ENV: my-conda
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ defaults.PythonVersion }}
+      - run: conda env create --name ${{env.CONDA_ENV}} --file=${{env.CONDA_FILENAME}}
