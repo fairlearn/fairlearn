@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: 3.8
       - run: |
+          conda update -n base -c defaults conda
           conda init bash
           source $HOME/.bashrc
         name: Ensure conda will work
