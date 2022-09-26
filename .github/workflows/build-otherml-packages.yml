@@ -22,10 +22,10 @@ jobs:
         mlpackage: [ lightgbm, xgboost, tensorflow, pytorch]
     runs-on: ubuntu-latest
     env:
-      CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', env.baseDir, matrix.mlpackage) }}"
+      CONDA_FILENAME: "${{ format('{0}/conda-{1}.yaml', baseDir, matrix.mlpackage) }}"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
-          python-version: ${{ env.PythonVersion }}
-      - run: conda env create --name ${{env.condaEnv}} --file=${{env.CONDA_FILENAME}}
+          python-version: ${{ pythonVersion }}
+      - run: conda env create --name ${{condaEnv}} --file=${{CONDA_FILENAME}}
