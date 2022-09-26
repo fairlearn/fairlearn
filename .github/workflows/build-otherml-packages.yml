@@ -24,7 +24,8 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: 3.8
-      - run: ls $baseDir
+      - run: conda init $SHELL
+        name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
       - run: |
