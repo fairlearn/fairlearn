@@ -29,7 +29,9 @@ jobs:
           conda init bash
         name: Update and initialise conda
       - run: |
-          /bin/bash
+          cat ~/.bashrc
+          echo " ========================================="
+          cat ~/.bash_profile
         name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
