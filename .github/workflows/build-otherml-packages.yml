@@ -34,6 +34,7 @@ jobs:
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
       - run: |
+          source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
           pip install .
         name: Install Fairlearn
