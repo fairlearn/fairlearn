@@ -28,9 +28,6 @@ jobs:
           conda update -n base -c defaults conda
           conda init bash
         name: Update and initialise conda
-      - run: |
-          source /usr/share/miniconda/etc/profile.d/conda.sh
-        name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
       - run: |
@@ -39,6 +36,7 @@ jobs:
           pip install .
         name: Install Fairlearn
       - run: |
+          source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
           python -m pytest $baseDir/test_${{matrix.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
