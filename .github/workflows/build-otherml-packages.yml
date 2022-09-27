@@ -29,9 +29,7 @@ jobs:
           conda init bash
         name: Update and initialise conda
       - run: |
-          cat ~/.bashrc
-          echo " ========================================="
-          cat ~/.bash_profile
+          source /usr/share/miniconda/etc/profile.d/conda.sh
         name: Ensure conda will work
       - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
