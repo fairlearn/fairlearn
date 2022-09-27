@@ -26,11 +26,13 @@ jobs:
           python-version: 3.8
       - run: |
           conda update -n base -c defaults conda
-          conda init bash
         name: Update and initialise conda
-      - run: conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
+      - run: |
+          conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
         name: Create conda environment
       - run: |
+          # For some reason, 'conda init bash' doesn't stick so
+          # We have to keep doing the following
           source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
           pip install .
