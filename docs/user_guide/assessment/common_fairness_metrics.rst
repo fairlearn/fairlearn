@@ -8,8 +8,13 @@ Common fairness metrics
 In the sections below, we review the most common fairness metrics, as well
 as their underlying assumptions and suggestions for use. Each metric requires
 that some aspects of the predictor behavior be comparable across groups.
-In code examples, we will use the following input arrays:
 
+.. note::
+  Note that *common* usage does not imply *correct* usage; we discuss
+  one very common misuse in the
+  :ref:`section on the Four-Fifths Rule <assessment_four_fifths>`
+
+In the code examples presented below, we will use the following input arrays:
 
 .. doctest:: common_fairness_metrics_code
 
@@ -109,8 +114,7 @@ phenomena are valid. For demographic parity, one relevant question would be
 whether demographic parity meets the criteria for establishing "fairness", 
 itself an unobservable theoretical construct. Further, it's important 
 to ask whether satisfying demographic parity actually brings us closer 
-to the world we'd like to see. 
-
+to the world we'd like to see.
 
 .. _conditional_group_fairness:
 
@@ -171,6 +175,8 @@ lowest selection rates :math:`a \in A` so a result of 0 indicates
 that demographic parity has been achieved.
 The second reports the ratio of the lowest and highest selection rates,
 so a result of 1 means there is demographic parity.
+This metric can potentially be used to implement the 'Four-Fifths' Rule,
+but :ref:`read our discussion below <assessment_four_fifths>` to understand whether this is an appropriate metric for your use case.
 As with any fairness metric, achieving demographic parity does *not* automatically mean
 that the classifier is fair!
 
@@ -299,7 +305,136 @@ capture the costs of missclassification disparities.
 
 
 
+.. _assessment_four_fifths:
+
+The Four Fifths Rule: Often Misapplied
+--------------------------------------
+
+In the literature around fairness in machine learning, one will often find
+the so-called "four fifths rule" or "80% rule" used to assess whether a model
+(or mitigation technique) has produced a 'fair' result.
+Typically, the rule is implemented by using the demographic parity ratio introduced
+in the :ref:`assessment_demographic_parity` section above
+(within Fairlearn, one can use :func:`demographic_parity_ratio`), with a result
+considered 'fair' if the ratio exceeds 80% for all identified subgroups.
+*Application of this threshold is wrong in many scenarios.*
+
+As we note in many other places in the Fairlearn documentation, 'fairness'
+must be assessed by examining the entire sociotechnical context of a machine
+learning system.
+In particular, it is important to start from the harms which can occur to real
+people, and work inwards towards the model.
+The demographic parity ratio is simply a metric by which a particular model
+may be measured (on a particular dataset).
+Given the origin of the 'four-fifths rule' (which we will discuss next), its
+application may also give an unjustified feeling of legal invulnerability by
+conflating fairness with legality.
+In reality, 'fairness' is not always identical to 'legally allowable,' and
+the former may not even be a strict subset of the latter. [#f1]_
+
+The 'four fifths rule' has its origins in a specific area of US
+federal employment law.
+It is a limit for
+`prima facie evidence <https://en.wikipedia.org/wiki/Prima_facie>`_
+that illegal discrimination has occurred relative to a 
+relevant control population.
+The four-fifths rule is one of many test statistics that can be used
+to establish a *prima facie* case, but it is generally only used
+within the context of
+`US Federal employment regulation <https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1607>`_. 
+A violation of the rule is still not sufficient to demonstrate that
+illegal discrimination has occurred - a causal link between the
+statistic and alleged discrimination must still be shown, and the
+(US) court would examine the particulars of each case.
+For an example of the subtleties involved, see
+`Ricci v. Stefano <https://en.wikipedia.org/wiki/Ricci_v._DeStefano>`_
+which resulted from an attempt to 'correct' for disparate impact.
+*Outside* its particular context in US federal employment law,
+the 'four fifths rule' has no validity and its misapplication
+is an example of the :ref:`portability trap <portability_trap>`.
+
+Taken together, we see that applying the 'four fifths rule' will
+not be appropriate in most cases.
+Even in cases where it is applicable, the rule does not automatically
+avoid legal jeopardy, much less ensure that results are fair.
+The use of the 'four fifths rule' in this manner is an indefensible
+example of epistemic trespassing. [#f2]_
+It is for this reason that we try to avoid the use of legal
+terminology in our documentation.
+
+For a much deeper discussion of the issues involved, we suggest
+:footcite:ct:`watkins2022fourfifths`.
+A higher level look at how legal concepts of fairness can collide
+with mathematical measures of disparity, see
+:footcite:ct:`Xiang2019legalcompatibility`.
+
+
+Summary
+-------
+
+We have introduced three commonly used fairness metrics in this section,
+which can be summed up as follows:
+
+* Demographic Parity
+
+    * *What it compares:* Predictions between different groups
+      (true values are ignored)
+
+    * *Reason to use:* If the input data are known to contain
+      biases, demographic parity may be appropriate to measure fairness
+
+    * *Caveats:* By only using the predicted values, information is thrown
+      away. The selection rate is also a very coarse measure of the
+      distribution between groups, making it tricky to use as an optimization
+      constraint
+
+* Equalized Odds
+
+    * *What it compares:* True and False Positive rates between different groups
+
+    * *Reason to use:* If historical data does not contain measurement bias or historical
+      bias that we need to take into account, and true and false positives
+      are considered to be (roughly) of the same importance, equalized odds may be useful
+
+    * *Caveats:* If there are historical biases in the data, then the original labels
+      may hold little value. A large imbalance between the positive and negative classes
+      will also accentuate any statistical issues related to sensitive groups with low
+      membership
+
+* Equal opportunity
+
+    * *What it compares:* True Positive rates between different groups
+
+    * *Reason to use:* If historical data are useful, and extra false positives
+      are much less likely to cause harm than missed true positives, equal
+      opportunity may be useful
+
+    * *Caveats:* If there are historical biases in the data, then the original labels
+      may hold little value. A large imbalance between the positive and negative classes
+      will also accentuate any statistical issues related to sensitive groups with low
+      membership
+
+
+However, the fact these are common metrics does not make them applicable to any given
+situation.
+In particular, :ref:`demographic parity is often misapplied <assessment_four_fifths>`.
+
+
 References
 ----------
 
 .. footbibliography::
+
+
+.. rubric:: Footnotes
+
+.. [#f1] For a related example, see the discussion on 'law' and 'justice' in
+         *The Caves of Steel* (Asimov, 1953)
+
+.. [#f2] Epistemic trespassing is the process of taking expertise in one field and
+         applying it to another in which one does not have an equivalent (or any)
+         competence.
+         This is not an intrinsically bad thing - one could label all
+         interdisciplinary research a form of epistemic trespassing.
+         However, doing so successfully requires a willingness to learn the subtleties
+         of the new field.
