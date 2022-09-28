@@ -102,10 +102,12 @@ In particular, be careful of falling into one of the
 :ref:`abstraction traps <abstraction_traps>`.
 
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
-which are metrics evaluated on slices of data. For example, to measure harms due to 
-errors, we would begin by evaluating the errors on each slice of the data that 
-corresponds to a group. If some of the groups are seeing much larger errors 
-than other groups, we would flag this as a fairness harm.
+which are metrics evaluated on slices of data.
+For example, to measure gender-based harms due to errors, we would begin by
+evaluating the errors separately for males, females and nonbinary persons
+in our dataset.
+If we found that males were experiencing errors at a much lower rate than
+females and nonbinary persons, we would flag this as a fairness harm.
 
 Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
 with this quantification.
