@@ -56,9 +56,9 @@ Some of these are:
   works) do not exist.
   For example, a text generator prompted about "Female scientists of the 1800s"
   might not produce a result.
-  When asked about historical sites near St. Louis, MIssouri, a search engine
+  When asked about historical sites near St. Louis, Missouri, a search engine
   might fail to mention `Cahokia <https://en.wikipedia.org/wiki/Cahokia>`_.
-  A similar query about southern Africa might fail to mention
+  A similar query about southern Africa might overlook
   `Great Zimbabwe <https://en.wikipedia.org/wiki/Great_Zimbabwe>`_, instead
   concentrating on colonial era sites.
   More subtly, a short biography of Alan Turing might not mention his
