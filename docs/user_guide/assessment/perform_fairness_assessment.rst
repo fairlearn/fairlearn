@@ -197,9 +197,10 @@ Compare quantified harms across the groups
 
 To summarize the disparities in errors (or other metrics), we may want to 
 report quantities such as the difference or ratio of the metric values between 
-the best and the worst slice. In settings where the goal is to guarantee 
-certain minimum quality of service across all groups (such as speech recognition), 
-it is also meaningful to report the worst performance across all considered groups.
+the best and the worst groups identified by the sensitive feature(s).
+In settings where the goal is to guarantee certain minimum quality of service
+across all groups (such as speech recognition), it is also meaningful to
+report the worst performance across all considered groups.
 
 The :class:`MetricFrame` class provides several methods for comparing
 the computed metrics.
