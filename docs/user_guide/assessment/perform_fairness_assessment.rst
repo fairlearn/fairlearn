@@ -24,12 +24,12 @@ Identify types of harms
 See :ref:`types_of_harms` for a guide to types of fairness-related harms.
 The Fairlearn package is particularly suitable for measuring:
 
-* *Allocation Harms* These are when a system unfairly extends or witholds
+* *Allocation Harms* occur when a system unfairly extends or witholds
   opportunities, resources, or information.
   Common (but by no means exhaustive) examples are hiring for jobs, student
   admissions and loan origination
 
-* *Quality of Service Harms* These occur when a system works much better for
+* *Quality of Service Harms* occur when a system works much better for
   one group than another.
   For example, facial recognition and speech-to-text systems may have
   substantially different performance for different ethnicities
