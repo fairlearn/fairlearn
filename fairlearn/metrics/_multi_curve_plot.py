@@ -33,7 +33,7 @@ def plot_model_comparison(
     **kwargs,
 ):
     r"""
-    A scatter plot comparing multiple models along two metrics.
+    Create a scatter plot comparing multiple models along two metrics.
 
     A typical use case is when one of the metrics is a performance metric
     (e.g., balanced_accuracy) and the other is a fairness metric
