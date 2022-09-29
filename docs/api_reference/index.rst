@@ -12,3 +12,4 @@ API Docs
    fairlearn.preprocessing
    fairlearn.reductions
    fairlearn.experimental
+   fairlearn.linear_model

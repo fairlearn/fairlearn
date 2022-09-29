@@ -45,6 +45,13 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✔
       - ✔
       - ✘
+   *  - :class:`~fairlearn.linear_model.ConstrainedLogisticRegression`
+      - In-processing algorithm that trains a Logistic Regression model while being
+        subject to fairness constraints. Also supports multinomial classfification.
+        Based on :footcite:`zafar2017fairness`.
+      - ✔
+      - ✘
+      - DP
 
 DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
 rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
@@ -186,6 +193,120 @@ we would expect with :math:`\alpha=0.5`.
 .. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_003.png
     :align: center
     :target: ../auto_examples/plot_correlationremover_before_after.html
+
+.. _inprocessing:
+
+In-processing
+--------------
+
+.. currentmodule:: fairlearn.linear_model
+
+In-processing algorithms make use of a fairness constraint during the training process.
+These algorithms adhere to the scikit-learn paradigm, such that each algorithm
+implements a :code:`fit` and :code:`predict` method.
+
+.. _constrained_logistic_regression:
+
+Constrained Logistic Regression
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This in-processing algorithm is introduced by :footcite:`zafar2017fairness`, and the goal
+of the authors was to create a flexible mechanism from which fair classifiers can
+be made. Currently, the only form of constraints that is implemented is the
+**decision boundary covariance**. Mathetmatically. this constraint is defined as the
+covariance between the sensitive features :math:`\left\{\mathbf{z}_{i}\right\}_{i=1}^{N}`,
+and the signed distance from the users` feature vectors to the decision boundary
+:math:`\left\{d_{\boldsymbol{\theta}}\left(\mathbf{x}_{i}\right)\right\}_{i=1}^{N}`,
+which looks as follows:
+
+.. math::
+    \operatorname{Cov}\left(\mathbf{z}, d_{\boldsymbol{\theta}}(\mathbf{x})\right)
+    =\mathbb{E}\left[(\mathbf{z}-\overline{\mathbf{z}})
+    d_{\boldsymbol{\theta}}(\mathbf{x})\right]
+    -\mathbb{E}[(\mathbf{z}-\overline{\mathbf{z}})]
+    \bar{d}_{\boldsymbol{\theta}}(\mathbf{x})\\
+    \approx \frac{1}{N} \sum_{i=1}^{N}\left(\mathbf{z}_{i}-\overline{\mathbf{z}}\right)
+    d_{\boldsymbol{\theta}}\left(\mathbf{x}_{i}\right)
+
+The reasoning behind this derivation is further explained in
+:footcite:`zafar2017fairness`.
+This measure is a proxy for demographic parity, because the decision boundary
+covariance will be approximately zero when demographic parity is satisfied.
+Thus, supplying the algorithm with a :code:`covariance_bound` value of zero will
+result in the largest drop of accuracy. The magnitude of this decrease can be different
+for every dataset, as well as for different hyperparameters.
+
+The algorithm will turn into a default :class:`sklearn.linear_model.LogisticRegression`
+when the user provides :code:`None` to the constraints parameter.
+
+This algorithm supports both binary and multinomial classification, as well as one or
+mulitple sensitive features. We will have a look at this by means of some code examples.
+In the examples below, the `Diabetes 130-Hospitals <https://www.openml.org/d/43874>`_
+is used to illustrate the uses of the :code:`ConstrainedLogisticRegression`.
+Let us first look at the most simple case, binary classification with a single sensitive
+attribute, and compare how different values for the :code:`covariance_bound` influence
+the accuracy.
+
+.. doctest:: mitigation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.linear_model import ConstrainedLogisticRegression
+    >>> import pandas as pd
+    >>> from sklearn.datasets import fetch_openml
+    >>> data = fetch_openml(data_id=43874, as_frame=True)
+    >>> X = data.data[["had_inpatient_days" ,"time_in_hospital"]]
+    >>> X = pd.get_dummies(X)
+    >>> y = data.data[["readmit_binary"]]
+    >>> sens = data.data[["race"]]
+    >>> clr_zero = ConstrainedLogisticRegression(covariance_bound=0).fit(X, y, sensitive_features=sens)
+    >>> clr_one = ConstrainedLogisticRegression(covariance_bound=1).fit(X, y, sensitive_features=sens)
+    >>> clr_zero.score(X, y)  # doctest: +SKIP
+    0.5391191557101586
+    >>> clr_one.score(X, y)  # doctest: +SKIP
+    0.6138002869327673
+
+In the case of a single sensitive feature, the covariance bound can be provided by a
+single number. It can be any positive number (or zero), and zero will always have
+the lowest accuracy, as seen in the example above. We advise users to try out multiple
+covariance values to get an idea of the covariance-accuracy trade-off, as well as how
+the covariance value relates to the demographic parity metric.
+
+In the case of multiple sensitive features, there are multiple ways of providing
+the covariance bound value(s), either via a single value, a list, or a dictionary
+when the sensitive features are provided in a :class:`pandas.DataFrame`. The below
+example illustrates all three possibilities.
+
+.. doctest:: mitigation
+
+    >>> sens = data.data[["race", "gender", "age"]]
+    >>> covariance_bound = 0
+    >>> covariance_bound = [0, 0.5, 1]
+    >>> covariance_bound = {"race": 0, "gender": 0.5, "age": 1}
+
+The first way of supplying the covariance bound indicates that all sensitive features
+should have the same value, in this case zero. By providing the covariance bound values
+in a list, you are telling the algorithm that these values correspond to the order in
+which the sensitive features occur in either the :class:`numpy.array` or
+:class:`pandas.DataFrame`. The dictionary is perhaps the most informative way of
+providing the covariance bound values, as it leaves no room for misunderstanding.
+In the above example, the second and third methods of supplying the covariance bound
+have the same result, meaning that either can be used.
+
+As mentioned before, multinomial classification is also supported. There are no
+adapations that need to be made to the code, simply provide :code:`y` as an
+array-like with multiple classes. In the running example, the "readmitted" column
+has the classes "NO", "<30", ">30".
+
+.. doctest:: mitigation
+
+    >>> y = data.data[["readmitted"]]
+    >>> sens = data.data[["race"]]
+    >>> clr_zero = ConstrainedLogisticRegression(covariance_bound=0).fit(X, y, sensitive_features=sens)
+    >>> clr_one = ConstrainedLogisticRegression(covariance_bound=1).fit(X, y, sensitive_features=sens)
+    >>> clr_zero.score(X, y)  # doctest: +SKIP
+    0.5391191557101586
+    >>> clr_one.score(X, y)  # doctest: +SKIP
+    0.558270935282904
 
 .. _postprocessing:
 
