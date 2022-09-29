@@ -30,7 +30,8 @@ Types of harms
 --------------
 
 There are many types of harms (see, e.g., the
-`keynote by K. Crawford at NeurIPS 2017 <https://www.youtube.com/watch?v=fMym_BKWQzk>`_).
+`keynote by K. Crawford at NeurIPS 2017 <https://www.youtube.com/watch?v=fMym_BKWQzk>`_
+or :footcite:cts:`barocas2017problem`).
 Some of these are:
 
 * *Allocation harms* can occur when AI systems extend or withhold
