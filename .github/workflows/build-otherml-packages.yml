@@ -40,5 +40,5 @@ jobs:
       - run: |
           source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
-          python -m pytest $baseDir/test_${{matrix.mlpackage}}.py 
+          python -m pytest --cov=fairlearn --cov-report=xml $baseDir/test_${{matrix.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
