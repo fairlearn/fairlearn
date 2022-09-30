@@ -66,7 +66,7 @@ Some of these are:
   sexuality.
 
 This list is not exhaustive, and it is important to remember that harms
-are not exclusive.
+are not mutually exclusive.
 A system can harm multiple groups of people in different ways, and also
 visit multiple harms on a single group of people.
 The Fairlearn package is most applicable to allocation and quality of service harms,

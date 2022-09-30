@@ -27,12 +27,12 @@ The Fairlearn package is particularly suitable for measuring:
 * *Allocation Harms* occur when a system unfairly extends or witholds
   opportunities, resources, or information.
   Common (but by no means exhaustive) examples are hiring for jobs, student
-  admissions and loan origination
+  admissions and loan origination.
 
 * *Quality of Service Harms* occur when a system works much better for
   one group than another.
   For example, facial recognition and speech-to-text systems may have
-  substantially different performance for different ethnicities
+  substantially different performance for different ethnicities.
 
 Note that one system can lead to multiple harms, and different types of 
 harms are not mutually exclusive.
@@ -116,7 +116,7 @@ For example, to measure gender-based harms due to errors, we would begin by
 evaluating the errors separately for males, females and nonbinary persons
 in our dataset.
 If we found that males were experiencing errors at a much lower rate than
-females and nonbinary persons, we would flag this as a fairness harm.
+females and nonbinary persons, we would flag this as a potential fairness harm.
 
 Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
 with this quantification.
