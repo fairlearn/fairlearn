@@ -41,7 +41,7 @@ from ._extra_metrics import true_positive_rate  # noqa: F401; noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
-from ._multi_curve_plot import plot_model_comparison  # noqa: F401
+from ._plot_model_comparison import plot_model_comparison  # noqa: F401
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
