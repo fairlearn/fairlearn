@@ -189,8 +189,7 @@ def test_kw_error_point_legend_kws():
             ),
             y_true=y_t,
             y_preds=y_p,
-            sensitive_features=g_1,
-            legend_kwargs=1,
+            sensitive_features=g_1
         )
 
 
