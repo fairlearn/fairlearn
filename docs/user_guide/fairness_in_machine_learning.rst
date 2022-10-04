@@ -31,7 +31,7 @@ Types of harms
 
 There are many types of harms (see, e.g., the
 `keynote by K. Crawford at NeurIPS 2017 <https://www.youtube.com/watch?v=fMym_BKWQzk>`_).
-The Fairlearn package is most applicable to two kinds of harms:
+Some of these are:
 
 * *Allocation harms* can occur when AI systems extend or withhold
   opportunities, resources, or information. Some of the key applications are in
@@ -41,6 +41,35 @@ The Fairlearn package is most applicable to two kinds of harms:
   one person as it does for another, even if no opportunities, resources, or
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
+
+* *Stereotyping harms* can occur when a system suggests completions which
+  perpetuate stereotypes.
+  These are often seen when search engines propose completions to partially
+  typed queries.
+  See :footcite:cts:`umojanoble2018algorithmsoppression` for an in-depth
+  look at this issue.
+  Note that even stereotypes which are nominally positive are also
+  problematic, since they still create expectations based on outward
+  characteristics, rather than treating people as individuals.
+
+* *Erasure harms* can occur when a system behaves as if groups (or their
+  works) do not exist.
+  For example, a text generator prompted about "Female scientists of the 1800s"
+  might not produce a result.
+  When asked about historical sites near St. Louis, Missouri, a search engine
+  might fail to mention `Cahokia <https://en.wikipedia.org/wiki/Cahokia>`_.
+  A similar query about southern Africa might overlook
+  `Great Zimbabwe <https://en.wikipedia.org/wiki/Great_Zimbabwe>`_, instead
+  concentrating on colonial era sites.
+  More subtly, a short biography of Alan Turing might not mention his
+  sexuality.
+
+This list is not exhaustive, and it is important to remember that harms
+are not mutually exclusive.
+A system can harm multiple groups of people in different ways, and also
+visit multiple harms on a single group of people.
+The Fairlearn package is most applicable to allocation and quality of service harms,
+since these are easiest to measure.
 
 Concept glossary
 ----------------------------
