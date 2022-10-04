@@ -7,6 +7,7 @@ dependencies:
 - python==3.8
 - pip>=19.1.1
 - pytest
+- pytest-cov
 - pytorch
 - cpuonly
 - skorch
