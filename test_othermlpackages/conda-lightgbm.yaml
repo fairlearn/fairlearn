@@ -8,5 +8,6 @@ dependencies:
 - numpy
 - pandas
 - pytest
+- pytest-cov
 - scikit-learn
 - lightgbm
