@@ -86,7 +86,7 @@ Fairlearn metrics
 ~~~~~~~~~~~~~~~~~
 
 Check out our in-depth `guide on the Fairlearn
-metrics <https://fairlearn.org/main/user_guide/assessment.html>`__.
+metrics <https://fairlearn.org/main/user_guide/assessment>`__.
 
 Fairlearn algorithms
 ~~~~~~~~~~~~~~~~~~~~
