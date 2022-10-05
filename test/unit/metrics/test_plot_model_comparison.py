@@ -180,19 +180,6 @@ def test_kw_error_point_label_position2():
         )
 
 
-def test_kw_error_point_legend_kws():
-    with pytest.raises(ValueError):
-        plot_model_comparison(
-            x_axis_metric=accuracy_score,
-            y_axis_metric=make_derived_metric(
-                metric=selection_rate, transform="difference"
-            ),
-            y_true=y_t,
-            y_preds=y_p,
-            sensitive_features=g_1
-        )
-
-
 def test_other_order():
     plot_model_comparison(
         y_axis_metric=accuracy_score,
