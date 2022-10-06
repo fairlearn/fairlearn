@@ -318,6 +318,8 @@ close to the nominal value :math:`\pm 15.5`.
 *Need to figure out the estimate on the bootstrap_sum, since*
 :math:`\sqrt{600 \times 0.8 \times 0.2} = 9.8`
 *which is smaller than the range seen.*
+I'm pretty sure that it's because we need to combine P(A) with
+p(1|A), but I'm blanking on how to do that.
 
 Now, let us consider the various methods on :class:`MetricFrame`.
 Rather than using a different method, we have a :code:`quantiles`
