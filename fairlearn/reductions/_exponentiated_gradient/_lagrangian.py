@@ -166,7 +166,7 @@ class _Lagrangian:
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
         result = opt.linprog(
-            c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="simplex"
+            c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="highs-ds"
         )
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
@@ -181,7 +181,7 @@ class _Lagrangian:
             A_ub=dual_A_ub,
             b_ub=dual_b_ub,
             bounds=dual_bounds,
-            method="simplex",
+            method="highs-ds",
         )
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
