@@ -21,14 +21,23 @@ We next examine these four steps in more detail.
 Identify types of harms
 -----------------------
 
-See :ref:`types_of_harms` for a guide to types of fairness-related harms. 
-For example, in a system for screening job applications, qualified candidates 
-that are automatically rejected experience an allocation harm. In a 
-speech-to-text transcription system, disparities in word error rates for 
-different groups may result in harms due to differences in the quality of service.
+See :ref:`types_of_harms` for a guide to types of fairness-related harms.
+The Fairlearn package is particularly suitable for measuring:
+
+* *Allocation Harms* occur when a system unfairly extends or witholds
+  opportunities, resources, or information.
+  Common (but by no means exhaustive) examples are hiring for jobs, student
+  admissions and loan origination.
+
+* *Quality of Service Harms* occur when a system works much better for
+  one group than another.
+  For example, facial recognition and speech-to-text systems may have
+  substantially different performance for different ethnicities.
+
 Note that one system can lead to multiple harms, and different types of 
-harms are not mutually exclusive. For more information, review 
-Fairlearn's `2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
+harms are not mutually exclusive.
+For more information, review Fairlearn's
+`2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
 
 Identify the groups that might be harmed
 ----------------------------------------
@@ -102,10 +111,12 @@ In particular, be careful of falling into one of the
 :ref:`abstraction traps <abstraction_traps>`.
 
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
-which are metrics evaluated on slices of data. For example, to measure harms due to 
-errors, we would begin by evaluating the errors on each slice of the data that 
-corresponds to a group. If some of the groups are seeing much larger errors 
-than other groups, we would flag this as a fairness harm.
+which are metrics evaluated on slices of data.
+For example, to measure gender-based harms due to errors, we would begin by
+evaluating the errors separately for males, females and nonbinary persons
+in our dataset.
+If we found that males were experiencing errors at a much lower rate than
+females and nonbinary persons, we would flag this as a potential fairness harm.
 
 Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
 with this quantification.
@@ -195,9 +206,10 @@ Compare quantified harms across the groups
 
 To summarize the disparities in errors (or other metrics), we may want to 
 report quantities such as the difference or ratio of the metric values between 
-the best and the worst slice. In settings where the goal is to guarantee 
-certain minimum quality of service across all groups (such as speech recognition), 
-it is also meaningful to report the worst performance across all considered groups.
+the best and the worst groups identified by the sensitive feature(s).
+In settings where the goal is to guarantee certain minimum quality of service
+across all groups (such as speech recognition), it is also meaningful to
+report the worst performance across all considered groups.
 
 The :class:`MetricFrame` class provides several methods for comparing
 the computed metrics.
