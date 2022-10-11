@@ -201,6 +201,7 @@ def random_metric2(yp, yt):
 
 
 def test_named():
+
     ax = plot_model_comparison(
         x_axis_metric=random_metric1,
         y_axis_metric=random_metric2,
@@ -213,7 +214,38 @@ def test_named():
     assert ax.get_ylabel() == "random metric2"
 
 
+def test_missing_names():
+    def random_metric1(yp, yt):
+        return np.mean(yp == yt)
+
+    def random_metric2(yp, yt):
+        return np.mean(yp == yt) ** 2
+
+    random_metric1.__qualname__ = ""
+    random_metric1.__name__ = "test1"
+
+    random_metric2.__qualname__ = ""
+    random_metric2.__name__ = ""
+
+    ax = plot_model_comparison(
+        x_axis_metric=random_metric1,
+        y_axis_metric=random_metric2,
+        y_true=y_t,
+        y_preds=y_p,
+        sensitive_features=g_1,
+    )
+
+    assert ax.get_xlabel() == "test1"
+    assert ax.get_ylabel() != ""
+
+
 def test_custom_name():
+    def random_metric1(yp, yt):
+        return np.mean(yp == yt)
+
+    def random_metric2(yp, yt):
+        return np.mean(yp == yt) ** 2
+
     ax = plot_model_comparison(
         x_axis_metric=random_metric1,
         y_axis_metric=random_metric2,

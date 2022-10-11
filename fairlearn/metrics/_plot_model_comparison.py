@@ -238,9 +238,9 @@ def plot_model_comparison(
             (ax.set_xlabel, x_axis_metric),
             (ax.set_ylabel, y_axis_metric),
         ):
-            if hasattr(m, "__qualname__"):
+            if hasattr(m, "__qualname__") and m.__qualname__ != "":
                 name = m.__qualname__
-            elif hasattr(m, "__name__"):
+            elif hasattr(m, "__name__") and m.__name__ != "":
                 name = m.__name__
             elif isinstance(m, _DerivedMetric):
                 name = f"{m._metric_fn.__name__}, {m._transform}"
@@ -260,14 +260,6 @@ def plot_model_comparison(
 
     # Add actual points
     ax.scatter(x, y, **kwargs)
-
-    # FIXME: @hildeweerts Do we need to set xlim/ylim separately?
-    # NOTE: If so, I think matplotlib automatically has 5% margin
-    # Also, we need to store extremas of previous calls to scatter
-    # x_max, x_min, y_max, y_min = amax(x), amin(x), amax(y), amin(y)
-    # x_margin, y_margin = (x_max - x_min) * 0.05, (y_max - y_min) * 0.05
-    # ax.set_xlim(left=x_min - x_margin, right=x_max + x_margin)
-    # ax.set_ylim(bottom=y_min - y_margin, top=y_max + y_margin)
 
     if legend:
         ax.legend()
