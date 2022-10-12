@@ -32,6 +32,7 @@ _MORE_THAN_ONE_COLUMN_ERROR_MESSAGE = "{} is a {} with more than one column"
 _NOT_ALLOWED_TYPE_ERROR_MESSAGE = "{} is not an ndarray, Series or DataFrame"
 _NDARRAY_NOT_TWO_DIMENSIONAL_ERROR_MESSAGE = "{} is an ndarray which is not 2D"
 _NOT_ALLOWED_MATRIX_TYPE_ERROR_MESSAGE = "{} is not an ndarray or DataFrame"
+_INCONSISTENT_ARRAY_LENGTH = "Arrays {} have an inconsistent number of items"
 
 _ALLOWED_INPUT_TYPES_X = [np.ndarray, pd.DataFrame]
 _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES = [np.ndarray, pd.DataFrame, pd.Series, list]
@@ -41,7 +42,12 @@ _MERGE_COLUMN_SEPARATOR = ","
 
 
 def _validate_and_reformat_input(
-    X, y=None, expect_y=True, enforce_binary_labels=False, **kwargs
+    X,
+    y=None,
+    expect_y=True,
+    expect_sensitive_features=True,
+    enforce_binary_labels=False,
+    **kwargs,
 ):
     """Validate input data and return the data in an appropriate format.
 
@@ -56,6 +62,9 @@ def _validate_and_reformat_input(
         The label vector
     expect_y : bool
         If True y needs to be provided, otherwise ignores the argument; default True
+    expect_sensitive_features : bool
+        If true, sensitive_features must be provided to the call to this function.
+        This is the default setting.
     enforce_binary_labels : bool
         If True raise exception if there are more than two distinct
         values in the `y` data; default False
@@ -84,18 +93,22 @@ def _validate_and_reformat_input(
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
     else:
-        X = check_array(X)
+        X = check_array(X, dtype=None, force_all_finite=False)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
-    if sensitive_features is None:
+    if sensitive_features is not None:
+        check_consistent_length(X, sensitive_features)
+        sensitive_features = check_array(
+            sensitive_features, ensure_2d=False, dtype=None
+        )
+
+        # compress multiple sensitive features into a single column
+        if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
+            sensitive_features = _merge_columns(sensitive_features)
+
+        sensitive_features = pd.Series(sensitive_features.squeeze())
+    elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
-
-    check_consistent_length(X, sensitive_features)
-    sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
-
-    # compress multiple sensitive features into a single column
-    if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-        sensitive_features = _merge_columns(sensitive_features)
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
@@ -119,7 +132,7 @@ def _validate_and_reformat_input(
     return (
         pd.DataFrame(X),
         result_y,
-        pd.Series(sensitive_features.squeeze()),
+        sensitive_features,
         control_features,
     )
 
