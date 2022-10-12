@@ -81,7 +81,7 @@ class _AdversarialFairness(BaseEstimator):
         The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
         or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
         automatically infer
-        the backend from the :code:`predictor_model` and which are installed.
+        the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
@@ -826,7 +826,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
         or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
         automatically infer
-        the backend from the :code:`predictor_model` and which are installed.
+        the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
@@ -977,7 +977,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
         or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
         automatically infer
-        the backend from the :code:`predictor_model` and which are installed.
+        the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
