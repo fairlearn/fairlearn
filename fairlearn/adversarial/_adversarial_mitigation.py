@@ -52,28 +52,33 @@ class _AdversarialFairness(BaseEstimator):
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
     predictor using an API that is similar to estimators in `sklearn`.
 
-    As per [1]_, the neural network models :code:`predictor_model` and
-    :code:`adversary_model` should not have a discrete prediction at the end of the
-    model, as gradients do not propagate through a discretization step.
-    When discrete predictions are required, as is the case in binary and
-    multiclass classification, please just supply the predictor model that
-    produces continuous values, e.g., using a sigmoidal or soft-max
-    activation, and specify the appropriate final transformation separately via
-    parameter :code:`prediction_function` (or let us automatically infer this).
-
-    The distribution types of :code:`y` and :code:`sensitive_features`
-    are set by their preprocessor :code:`y_transform` and :code:`sf_transform`
-    respectively. The default transformer :code:`"auto"`
-    attempts to automatically infer
-    whether to assume binomial, multinomial, or normally distributed data.
-    You can force the transformer to assume one of the above by passing
-    :code:`"binary"`, :code:`"category"`,
-    :code:`"continuous"` instead. Better yet,
-    you can pass :code:`"one_hot_encoder"` or :code:`None` en choose a
-    preprocessing technique.
-    Loss functions and decision functions
-    for the target and sensitive features are also predefined for inferred data
-    types, and are hence automatically inferred.
+    The predictor model takes the features :code:`X` as input and seeks
+    to predict :code:`y`.
+    For real-valued predictions of :code:`y`, regression takes place.
+    For binary classification, the predictor model should return a single
+    real-valued score, which is transformed into a probability of the
+    positive class via the logistic function (aka sigmoid), similarly to
+    logistic regression. For multi-class classification, the predictor
+    model should return a vector of real-valued scores, which are
+    transformed into class probabilities via the softmax function,
+    similarly to multinomial logistic regression. The training loss is
+    the negative log likelihood (aka log loss, logistic loss,
+    cross-entropy loss). For regression, the squared error is taken, as
+    it is proven to be equivalent to a scaled cross-entropy loss (under
+    certain distribution assumptions).
+    
+    The adversarial model for demographic parity takes scores
+    produced by the predictor model as input, and seeks to predict
+    :code:`sensitive_features`. Depending on the type of the provided
+    sensitive features, the model should produce a scalar
+    or vector output. Three types of sensitive features are supported:
+    (1) a single binary feature; (2) a single discrete feature; (3) one or
+    multiple real-valued features. For a single binary sensitive feature
+    and a single discrete feature, the network outputs are transformed
+    by the logistic function and the softmax function, respectively, and
+    the loss is the negative log likelihood. For one or multiple
+    real-valued features, the network output is left as is, and the
+    loss is a square loss.
 
     Parameters
     ----------
@@ -940,19 +945,52 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
        AIES, 2018.
 
     """  # noqa : E501
-    # Hidden: predictor_loss, adversary_loss, y_transform,
-    # sf_transform
-
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        *,
+        backend="auto",
+        predictor_model=[],  # [] is a NN with no hidden layers (linear NN).
+        adversary_model=[],
+        predictor_optimizer="Adam",
+        adversary_optimizer="Adam",
+        constraints="demographic_parity",
+        learning_rate=0.001,
+        alpha=1.0,
+        epochs=1,
+        batch_size=32,
+        shuffle=False,
+        progress_updates=None,
+        skip_validation=False,
+        callbacks=None,
+        cuda=None,
+        warm_start=False,
+        random_state=None,
+    ):
         """Initialize model by setting the predictor loss and function."""
         self._estimator_type = "classifier"
-        kwargs["y_transform"] = "classification"
-        kwargs["predictor_loss"] = "classification"
-        kwargs["adversary_loss"] = "auto"  # Removed choice for now.
-        kwargs["predictor_function"] = "classification"
-        kwargs["threshold_value"] = 0.5  # Removed choice for now.
-        super(AdversarialFairnessClassifier, self).__init__(**kwargs)
-
+        super(AdversarialFairnessClassifier, self).__init__(
+            backend = backend,
+            predictor_model = predictor_model,
+            adversary_model = adversary_model,
+            predictor_loss = "classification",
+            adversary_loss = "auto",
+            predictor_function = "classification",
+            threshold_value = 0.5,
+            predictor_optimizer = predictor_optimizer,
+            adversary_optimizer = adversary_optimizer,
+            constraints = constraints,
+            learning_rate = learning_rate,
+            alpha = alpha,
+            epochs = epochs,
+            batch_size = batch_size,
+            shuffle = shuffle,
+            progress_updates = progress_updates,
+            skip_validation = skip_validation,
+            callbacks = callbacks,
+            cuda = cuda,
+            warm_start = warm_start,
+            random_state = random_state
+        )
 
 class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     r"""Train PyTorch or Tensorflow regressors while mitigating unfairness.
@@ -968,19 +1006,22 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. The API
     follows conventions of `sklearn` estimators.
 
-    As per [1]_, the neural network models :code:`predictor_model` and
-    :code:`adversary_model` should not have a discrete prediction at the end of the
-    model, as gradients do not propagate through a discretization step.
-    When discrete predictions are required, as is the case in binary and
-    multiclass classification, please just supply the predictor model that
-    produces continuous values, e.g., using a sigmoidal or soft-max
-    activation, and specify the appropriate final transformation separately via
-    parameter :code:`prediction_function` (or let us automatically infer this).
-
-    We support continuous vector predictions. Sensitive features must be
-    single-feature discrete, or (possibly multi-output) continuous.
-    We apply preprocessing to ensure everything is encoded as floats, and
-    appropriate loss functions/predictor functions are inferred.
+    The regressor model takes the features :code:`X` as input and seeks
+    to predict :code:`y`.
+    The training loss is measured using the squared error.
+    
+    The adversarial model for demographic parity takes scores
+    produced by the predictor model as input, and seeks to predict
+    :code:`sensitive_features`. Depending on the type of the provided
+    sensitive features, the model should produce a scalar
+    or vector output. Three types of sensitive features are supported:
+    (1) a single binary feature; (2) a single discrete feature; (3) one or
+    multiple real-valued features. For a single binary sensitive feature
+    and a single discrete feature, the network outputs are transformed
+    by the logistic function and the softmax function, respectively, and
+    the loss is the negative log likelihood. For one or multiple
+    real-valued features, the network output is left as is, and the
+    loss is a square loss.
 
     Parameters
     ----------
@@ -1091,18 +1132,52 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
        AIES, 2018.
 
     """  # noqa : E501
-    # Hidden: predictor_loss, adversary_loss, predictor_function, threshold,
-    # y_transform, sf_transform
-
-    def __init__(self, *args, **kwargs):
-        """Initialize model by setting the predictor loss."""
+    def __init__(
+        self,
+        *,
+        backend="auto",
+        predictor_model=[],  # [] is a NN with no hidden layers (linear NN).
+        adversary_model=[],
+        predictor_optimizer="Adam",
+        adversary_optimizer="Adam",
+        constraints="demographic_parity",
+        learning_rate=0.001,
+        alpha=1.0,
+        epochs=1,
+        batch_size=32,
+        shuffle=False,
+        progress_updates=None,
+        skip_validation=False,
+        callbacks=None,
+        cuda=None,
+        warm_start=False,
+        random_state=None,
+    ):
+        """Initialize model by setting the predictor loss and function."""
         self._estimator_type = "regressor"
-        kwargs["y_transform"] = None
-        kwargs["predictor_loss"] = "continuous"
-        kwargs["adversary_loss"] = "auto"  # Removed choice for now.
-        kwargs["predictor_function"] = None
-        super(AdversarialFairnessRegressor, self).__init__(*args, **kwargs)
-
+        super(AdversarialFairnessClassifier, self).__init__(
+            backend = backend,
+            predictor_model = predictor_model,
+            adversary_model = adversary_model,
+            predictor_loss = "continuous",
+            adversary_loss = "auto",
+            predictor_function = None,
+            predictor_optimizer = predictor_optimizer,
+            adversary_optimizer = adversary_optimizer,
+            y_transform = None,
+            constraints = constraints,
+            learning_rate = learning_rate,
+            alpha = alpha,
+            epochs = epochs,
+            batch_size = batch_size,
+            shuffle = shuffle,
+            progress_updates = progress_updates,
+            skip_validation = skip_validation,
+            callbacks = callbacks,
+            cuda = cuda,
+            warm_start = warm_start,
+            random_state = random_state
+        )
 
 def check_X(X):
     """
