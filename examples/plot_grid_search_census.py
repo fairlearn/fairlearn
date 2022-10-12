@@ -39,8 +39,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-from fairlearn.metrics import MetricFrame, count, selection_rate
 from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
+from fairlearn.metrics import (
+    MetricFrame, selection_rate, count, plot_model_comparison, selection_rate_difference
+)
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
@@ -242,6 +244,24 @@ plt.ylabel("selection rate difference")
 # disparity axis covers more values than the accuracy, so we can reduce
 # disparity substantially for a small loss in accuracy.
 #
-# In a real example, we would pick the model which represented the best
-# trade-off between accuracy and disparity given the relevant business
-# constraints.
+# In a real example, we would pick the model which represented the best trade-off
+# between accuracy and disparity given the relevant business constraints.
+#
+# %% [markdown]
+# Comparing models easily
+# -----------------------
+# Fairlearn also provides functionality to compare models much more easily.
+
+# %%
+
+# Plot model comparison
+plot_model_comparison(
+    x_axis_metric=skm.accuracy_score,
+    y_axis_metric=selection_rate_difference,
+    y_true=Y_test,
+    y_preds=predictions,
+    sensitive_features=A_test,
+    point_labels=True,
+    show_plot=True
+)
+# End model comparison
