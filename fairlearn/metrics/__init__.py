@@ -41,6 +41,7 @@ from ._extra_metrics import true_positive_rate  # noqa: F401; noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
+from ._plot_model_comparison import plot_model_comparison  # noqa: F401
 
 # Add the generated metrics of the form and
 # `<metric>_{difference,ratio,group_min,group_max`
@@ -51,7 +52,11 @@ for _name, _func in _generated_metric_dict.items():
 # ============================================
 # Build list of items to be listed in the docs
 
-_core = ["MetricFrame", "make_derived_metric"]
+_core = [
+    "MetricFrame",
+    "make_derived_metric",
+    "plot_model_comparison"
+]
 
 _disparities = [
     "demographic_parity_difference",
