@@ -66,7 +66,7 @@ class _AdversarialFairness(BaseEstimator):
     cross-entropy loss). For regression, the squared error is taken, as
     it is proven to be equivalent to a scaled cross-entropy loss (under
     certain distribution assumptions).
-    
+
     The adversarial model for demographic parity takes scores
     produced by the predictor model as input, and seeks to predict
     :code:`sensitive_features`. Depending on the type of the provided
@@ -822,7 +822,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     similarly to multinomial logistic regression. The training loss is
     the negative log likelihood (aka log loss, logistic loss,
     cross-entropy loss).
-    
+
     The adversarial model for demographic parity takes scores
     produced by the predictor model as input, and seeks to predict
     :code:`sensitive_features`. Depending on the type of the provided
@@ -945,6 +945,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
        AIES, 2018.
 
     """  # noqa : E501
+
     def __init__(
         self,
         *,
@@ -969,28 +970,29 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         """Initialize model by setting the predictor loss and function."""
         self._estimator_type = "classifier"
         super(AdversarialFairnessClassifier, self).__init__(
-            backend = backend,
-            predictor_model = predictor_model,
-            adversary_model = adversary_model,
-            predictor_loss = "classification",
-            adversary_loss = "auto",
-            predictor_function = "classification",
-            threshold_value = 0.5,
-            predictor_optimizer = predictor_optimizer,
-            adversary_optimizer = adversary_optimizer,
-            constraints = constraints,
-            learning_rate = learning_rate,
-            alpha = alpha,
-            epochs = epochs,
-            batch_size = batch_size,
-            shuffle = shuffle,
-            progress_updates = progress_updates,
-            skip_validation = skip_validation,
-            callbacks = callbacks,
-            cuda = cuda,
-            warm_start = warm_start,
-            random_state = random_state
+            backend=backend,
+            predictor_model=predictor_model,
+            adversary_model=adversary_model,
+            predictor_loss="classification",
+            adversary_loss="auto",
+            predictor_function="classification",
+            threshold_value=0.5,
+            predictor_optimizer=predictor_optimizer,
+            adversary_optimizer=adversary_optimizer,
+            constraints=constraints,
+            learning_rate=learning_rate,
+            alpha=alpha,
+            epochs=epochs,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            progress_updates=progress_updates,
+            skip_validation=skip_validation,
+            callbacks=callbacks,
+            cuda=cuda,
+            warm_start=warm_start,
+            random_state=random_state,
         )
+
 
 class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     r"""Train PyTorch or Tensorflow regressors while mitigating unfairness.
@@ -1009,7 +1011,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     The regressor model takes the features :code:`X` as input and seeks
     to predict :code:`y`.
     The training loss is measured using the squared error.
-    
+
     The adversarial model for demographic parity takes scores
     produced by the predictor model as input, and seeks to predict
     :code:`sensitive_features`. Depending on the type of the provided
@@ -1132,6 +1134,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
        AIES, 2018.
 
     """  # noqa : E501
+
     def __init__(
         self,
         *,
@@ -1156,28 +1159,29 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         """Initialize model by setting the predictor loss and function."""
         self._estimator_type = "regressor"
         super(AdversarialFairnessClassifier, self).__init__(
-            backend = backend,
-            predictor_model = predictor_model,
-            adversary_model = adversary_model,
-            predictor_loss = "continuous",
-            adversary_loss = "auto",
-            predictor_function = None,
-            predictor_optimizer = predictor_optimizer,
-            adversary_optimizer = adversary_optimizer,
-            y_transform = None,
-            constraints = constraints,
-            learning_rate = learning_rate,
-            alpha = alpha,
-            epochs = epochs,
-            batch_size = batch_size,
-            shuffle = shuffle,
-            progress_updates = progress_updates,
-            skip_validation = skip_validation,
-            callbacks = callbacks,
-            cuda = cuda,
-            warm_start = warm_start,
-            random_state = random_state
+            backend=backend,
+            predictor_model=predictor_model,
+            adversary_model=adversary_model,
+            predictor_loss="continuous",
+            adversary_loss="auto",
+            predictor_function=None,
+            predictor_optimizer=predictor_optimizer,
+            adversary_optimizer=adversary_optimizer,
+            y_transform=None,
+            constraints=constraints,
+            learning_rate=learning_rate,
+            alpha=alpha,
+            epochs=epochs,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            progress_updates=progress_updates,
+            skip_validation=skip_validation,
+            callbacks=callbacks,
+            cuda=cuda,
+            warm_start=warm_start,
+            random_state=random_state,
         )
+
 
 def check_X(X):
     """
