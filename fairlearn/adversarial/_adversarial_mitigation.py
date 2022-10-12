@@ -91,12 +91,12 @@ class _AdversarialFairness(BaseEstimator):
 
     predictor_model : list, torch.nn.Module, tensorflow.keras.Model
         The predictor model to train.
-        Instead of a neural network model, we can pass a list of keywords
-        :math:`k_1, k_2, \dots` that indicate either
-        the number of nodes :math:`k_i` (if :math:`k_i` is integer) or a keyword
-        that indicates an activation function (if :math:`k_i` is a string) or
+        Instead of a neural network model, it is possible to pass a list
+        :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
+        the number of nodes (if :math:`k_i` is an integer) or
+        an activation function (if :math:`k_i` is a string) or
         a layer or activation function instance directly (if :math:`k_i` is
-        callable). The default parameter is :code:`[]`, which indicates
+        a callable). The default parameter is :code:`[]`, which indicates
         a neural network without any hidden layers.
         However, the number of nodes in the input
         and output layer are automatically inferred from data, and the final
@@ -106,14 +106,14 @@ class _AdversarialFairness(BaseEstimator):
         that uses a different backend.
 
     adversary_model : list, torch.nn.Module, tensorflow.keras.Model
-        The adversary model to train. Defined similarly as predictor_model.
+        The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
-        initialized with the model and given learning rate.
+        initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
         or tensorflow.keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
@@ -121,11 +121,11 @@ class _AdversarialFairness(BaseEstimator):
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
     adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
-        The optimizer class to use. Similarly defined as
-        :code:`predictor_optimizer`
+        The optimizer class to use. Defined similarly as
+        :code:`predictor_optimizer`.
 
     constraints : str, default = 'demographic_parity'
-        The fairness measure to optimize for. Must be either 'demographic_parity'
+        The fairness constraint. Must be either 'demographic_parity'
         (Demographic Parity) or 'equalized_odds' (Equalized Odds).
 
     y_transform : str, sklearn.base.TransformerMixin, default = "auto"
@@ -145,12 +145,12 @@ class _AdversarialFairness(BaseEstimator):
         to a 2d ndarray containing only floats.
 
     learning_rate : float, default = 0.001
-        A small number greater than zero to set as learning rate
+        A small number greater than zero to set as a learning rate.
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
         is the factor that balances the training towards predicting :math:`Y`
-        (choose :math:`\alpha` closer to zero) or increasing fairness
+        (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
     epochs : int, default = 1
@@ -189,12 +189,12 @@ class _AdversarialFairness(BaseEstimator):
         backend.
 
     warm_start : bool, default = False
-        Normally, when set to False, a call to fit triggers reinitialization,
+        Normally, when set to False, a call to :code:`fit()` triggers reinitialization,
         which discards the models and intializes them again. Setting to
         True triggers reuse of these models. Note: if pre-initialized models
-        were passed, the model (and its parameters) are never discard.
+        are passed, the models (and their parameters) are never discarded.
 
-    random_state : int, RandomState instance, default = None
+    random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
 
