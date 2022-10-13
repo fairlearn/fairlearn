@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 class _AdversarialFairness(BaseEstimator):
-    r"""Train PyTorch or Tensorflow predictors while mitigating unfairness .
+    r"""Train PyTorch or TensorFlow predictors while mitigating unfairness .
 
     This model implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
@@ -48,7 +48,7 @@ class _AdversarialFairness(BaseEstimator):
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
-    `Tensorflow2 model
+    `TensorFlow2 model
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. You train this
     predictor using an API that is similar to estimators in `sklearn`.
 
@@ -79,6 +79,10 @@ class _AdversarialFairness(BaseEstimator):
     the loss is the negative log likelihood. For one or multiple
     real-valued features, the network output is left as is, and the
     loss is a square loss.
+
+    The adversarial model for equalized odds additionaly takes
+    :code:`y` as input. For multi-class classification, :code:`y` is
+    transformed using one-hot encoding.
 
     Parameters
     ----------
@@ -112,7 +116,7 @@ class _AdversarialFairness(BaseEstimator):
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
-        either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
+        either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
         or tensorflow.keras.optimizers.Optimizer is passed, this
@@ -126,7 +130,7 @@ class _AdversarialFairness(BaseEstimator):
 
     constraints : str, default = 'demographic_parity'
         The fairness constraint. Must be either 'demographic_parity'
-        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+        or 'equalized_odds'.
 
     y_transform : str, sklearn.base.TransformerMixin, default = "auto"
         The preprocessor to use on the predictions :code:`y`.
@@ -149,7 +153,7 @@ class _AdversarialFairness(BaseEstimator):
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
-        is the factor that balances the training towards predicting :math:`Y`
+        is the factor that balances the training towards predicting :code:'y'
         (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
@@ -170,13 +174,13 @@ class _AdversarialFairness(BaseEstimator):
     skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage. Note that not only checking :math:`X`
-        is skipped, but also no tranform is applied to :math:`y` and
-        :math:`z` (sensitive features).
+        at an earlier stage. Note that not only checking :code:'X'
+        is skipped, but also no tranform is applied to :code:'y' and
+        :code:'sensitive_features'.
 
     callbacks : callable
         Callback function, called after every batch. For instance useable when
-        wanting to validate. Can also be a list of callback functions
+        wanting to validate. A list of callback functions can also be provided.
         Each callback function is passed two arguments :code:`self` (the
         estimator instance) and :code:`step` (the completed iteration), and
         may return a Boolean value. If the returned value is `True`, the
@@ -671,7 +675,7 @@ class _AdversarialFairness(BaseEstimator):
 
     def _validate_backend(self):
         """
-        Import either PyTorch or Tensorflow, depending on predictor.
+        Import either PyTorch or TensorFlow, depending on predictor.
 
         Given a backend and the predictor/adversary models, we do some steps.
         Firstly, if the backend is a BackendEngine subclass, we just use this.
@@ -798,7 +802,7 @@ class _AdversarialFairness(BaseEstimator):
 
 
 class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
-    r"""Train PyTorch or Tensorflow classifiers while mitigating unfairness.
+    r"""Train PyTorch or TensorFlow classifiers while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
@@ -807,7 +811,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
-    `Tensorflow2 model
+    `TensorFlow2 model
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. The API
     follows conventions of `sklearn` estimators.
 
@@ -835,6 +839,10 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     the loss is the negative log likelihood. For one or multiple
     real-valued features, the network output is left as is, and the
     loss is a square loss.
+
+    The adversarial model for equalized odds additionaly takes
+    :code:`y` as input. For multi-class classification, :code:`y` is
+    transformed using one-hot encoding.
 
     Parameters
     ----------
@@ -868,7 +876,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
-        either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
+        either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
         or tensorflow.keras.optimizers.Optimizer is passed, this
@@ -882,14 +890,14 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
     constraints : str, default = 'demographic_parity'
         The fairness constraint. Must be either 'demographic_parity'
-        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+        or 'equalized_odds'.
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as a learning rate.
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
-        is the factor that balances the training towards predicting :math:`Y`
+        is the factor that balances the training towards predicting :code:'y'
         (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
@@ -910,13 +918,13 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage. Note that not only checking :math:`X`
-        is skipped, but also no tranform is applied to :math:`y` and
-        :math:`z` (sensitive features).
+        at an earlier stage. Note that not only checking :code:'X'
+        is skipped, but also no tranform is applied to :code:'y' and
+        :code:'sensitive_features'.
 
     callbacks : callable
         Callback function, called after every batch. For instance useable when
-        wanting to validate. Can also be a list of callback functions
+        wanting to validate. A list of callback functions can also be provided.
         Each callback function is passed two arguments :code:`self` (the
         estimator instance) and :code:`step` (the completed iteration), and
         may return a Boolean value. If the returned value is `True`, the
@@ -995,7 +1003,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
 
 class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
-    r"""Train PyTorch or Tensorflow regressors while mitigating unfairness.
+    r"""Train PyTorch or TensorFlow regressors while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
     `"Mitigating Unwanted Biases with Adversarial Learning"
@@ -1004,7 +1012,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
     <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
-    `Tensorflow2 model
+    `TensorFlow2 model
     <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_. The API
     follows conventions of `sklearn` estimators.
 
@@ -1024,6 +1032,9 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     the loss is the negative log likelihood. For one or multiple
     real-valued features, the network output is left as is, and the
     loss is a square loss.
+
+    The adversarial model for equalized odds additionaly takes
+    :code:`y` as input.
 
     Parameters
     ----------
@@ -1057,7 +1068,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
 
     predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
-        either "SGD" or "Adam". A corresponding SGD or Adam optimizer is
+        either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
         or tensorflow.keras.optimizers.Optimizer is passed, this
@@ -1071,14 +1082,14 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
 
     constraints : str, default = 'demographic_parity'
         The fairness constraint. Must be either 'demographic_parity'
-        (Demographic Parity) or 'equalized_odds' (Equalized Odds).
+        or 'equalized_odds'.
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as a learning rate.
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
-        is the factor that balances the training towards predicting :math:`Y`
+        is the factor that balances the training towards predicting :code:'y'
         (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
@@ -1099,13 +1110,13 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage. Note that not only checking :math:`X`
-        is skipped, but also no tranform is applied to :math:`y` and
-        :math:`z` (sensitive features).
+        at an earlier stage. Note that not only checking :code:'X'
+        is skipped, but also no tranform is applied to :code:'y' and
+        :code:'sensitive_features'.
 
     callbacks : callable
         Callback function, called after every batch. For instance useable when
-        wanting to validate. Can also be a list of callback functions
+        wanting to validate. A list of callback functions can also be provided.
         Each callback function is passed two arguments :code:`self` (the
         estimator instance) and :code:`step` (the completed iteration), and
         may return a Boolean value. If the returned value is `True`, the
