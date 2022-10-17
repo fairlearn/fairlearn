@@ -65,6 +65,47 @@ jobs:
           path_to_write_report: ./coverage/codecov_report.txt
           verbose: true
 
+  other-ml:
+    strategy:
+      matrix:
+        mlpackage: [ lightgbm, xgboost, tensorflow, pytorch]
+    runs-on: ubuntu-latest
+    env:
+      baseDir: test_othermlpackages
+      condaEnv: test-conda-env
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+      - run: |
+          conda update -n base -c defaults conda
+        name: Update and initialise conda
+      - run: |
+          conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
+        name: Create conda environment
+      - run: |
+          # For some reason, 'conda init bash' doesn't stick so
+          # We have to keep doing the following
+          source /usr/share/miniconda/etc/profile.d/conda.sh
+          conda activate $condaEnv
+          pip install .
+        name: Install Fairlearn
+      - run: |
+          source /usr/share/miniconda/etc/profile.d/conda.sh
+          conda activate $condaEnv
+          python -m pytest --cov=fairlearn --cov-report=xml $baseDir/test_${{matrix.mlpackage}}.py 
+        name: Run ${{matrix.mlpackage}} tests
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
+
   linting:
     runs-on: ubuntu-latest
     steps:
