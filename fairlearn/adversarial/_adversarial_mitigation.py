@@ -1158,7 +1158,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     ):
         """Initialize model by setting the predictor loss and function."""
         self._estimator_type = "regressor"
-        super(AdversarialFairnessClassifier, self).__init__(
+        super(AdversarialFairnessRegressor, self).__init__(
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
