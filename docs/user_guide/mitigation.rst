@@ -47,16 +47,18 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✘
    *  - :class:`~fairlearn.adversarial.AdversarialFairnessClassifier`
       - An optimization algorithm based on the paper *Mitigating Unwanted Biases*
-        *with Adversarial Learning* :footcite:`zhang2018mitigating`. This adversarial method trains a neural network classifier to be more fair by learning to fool an adversarial that tries to infer the protected variable.
+        *with Adversarial Learning* :footcite:`zhang2018mitigating`. This method trains a neural
+        network classifier that minimizes training error while
+        preventing an adversarial network from inferring sensitive features.
         The neural networks can be defined either as a `PyTorch module
         <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
-        `Tensorflow2 model 
+        `TensorFlow2 model 
         <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_.
       - ✔
       - ✘
       - DP, EO
    *  - :class:`~fairlearn.adversarial.AdversarialFairnessRegressor`
-      - The regressor variant of the above Adversarial Fairness Classifier.
+      - The regressor variant of the above :class:`~fairlearn.adversarial.AdversarialFairnessClassifier`.
         Useful to train a neural network with continuous valued output(s).
       - ✘
       - ✔
