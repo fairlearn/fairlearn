@@ -1,8 +1,6 @@
 name: build-test
 
-on:
-  pull_request:
-  push:
+on: [push, pull_request]
 
 concurrency: 
   # this ensures after each commit the old jobs are cancelled and the new ones
