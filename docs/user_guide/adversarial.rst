@@ -13,11 +13,12 @@ Adversarial Mitigation
 
 Fairlearn provides an implementation of the adversarial
 mitigation method of :footcite:t:`zhang2018mitigating`.
-We assume we have data :math:`X, A, Y`, where we want to
-predict :math:`Y` from :math:`X` while enforcing fairness constraints with
-respect to sensitive features :math:`A`. Both classification and regression
-are supported (classes :class:`~AdversarialFairnessClassification` and
-:class:`~AdversarialFairnessRegression`) and two types of
+The input to the method consists of features :math:`X,` labels :math:`Y,`
+and sensitive features :math:`A`. The goal is to fit an estimator that
+predicts :math:`Y` from :math:`X` while enforcing fairness constraints with
+respect to :math:`A`. Both classification and regression
+are supported (classes :class:`~fairlearn.adversarial.AdversarialFairnessClassification` and
+:class:`~fairlearn.adversarial.AdversarialFairnessRegression`) with two types of
 fairness constraints: demographic parity and equalized odds.
 
 To train an adversarial mitigation algorithm, the user needs to provide
