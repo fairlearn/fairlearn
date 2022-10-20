@@ -6,22 +6,32 @@
 
 .. _adversarial:
 
-Adversarial Learning
+Adversarial Mitigation
 --------------------
 
 .. currentmodule:: fairlearn.adversarial
 
 Fairlearn provides an implementation of the adversarial
-learning method presented in :footcite:`zhang2018mitigating`.
+mitigation method of :footcite:t:`zhang2018mitigating`.
 We assume we have data :math:`X, A, Y`, where we want to
-predict :math:`Y` from :math:`X` while being fair with respect to :math:`A`
-based on some fairness measure. We firstly create predictor and adversary neural
-networks with learnable weights :math:`W` and :math:`U` respectively. Without
-considering fairness yet, this typical supervised-learning problem aims to
-minimize the predictor loss :math:`L_P`. Now, to improve fairness, we not
-only want to minimize the predictor loss, but we want to decrease the
+predict :math:`Y` from :math:`X` while enforcing fairness constraints with
+respect to sensitive features :math:`A`. Both classification and regression
+are supported (classes :class:`~AdversarialFairnessClassification` and
+:class:`~AdversarialFairnessRegression`) and two types of
+fairness constraints: demographic parity and equalized odds.
+
+To train an adversarial mitigation algorithm, the user needs to provide
+two neural networks, predictor network and adversary network,
+with learnable weights :math:`W` and :math:`U,` respectively. The predictor
+network is constructed to solve the underlying supervised learning task,
+without considering fairness, by minimizing the predictor loss :math:`L_P.`
+However, to improve fairness, we do not
+only minimize the predictor loss, but we also want to decrease the
 adversary's ability to predict the sensitive features from the predictor's
-predictions. Suppose the adversary has loss term :math:`L_A`, then the paper
+predictions (to implement demographic parity), or jointly from the predictor's
+predictions and true labels (to implement equalized odds).
+
+Suppose the adversary has the loss term :math:`L_A`, then the paper
 trains the predictor with gradient:
 
 .. math::
