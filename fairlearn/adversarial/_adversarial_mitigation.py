@@ -153,7 +153,7 @@ class _AdversarialFairness(BaseEstimator):
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
-        is the factor that balances the training towards predicting :code:'y'
+        is the factor that balances the training towards predicting :code:`y`
         (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
@@ -174,9 +174,9 @@ class _AdversarialFairness(BaseEstimator):
     skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage. Note that not only checking :code:'X'
-        is skipped, but also no tranform is applied to :code:'y' and
-        :code:'sensitive_features'.
+        at an earlier stage. Note that not only checking :code:`X`
+        is skipped, but also no tranform is applied to :code:`y` and
+        :code:`sensitive_features`.
 
     callbacks : callable
         Callback function, called after every batch. For instance useable when
@@ -897,7 +897,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
-        is the factor that balances the training towards predicting :code:'y'
+        is the factor that balances the training towards predicting :code:`y`
         (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
@@ -918,9 +918,9 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage. Note that not only checking :code:'X'
-        is skipped, but also no tranform is applied to :code:'y' and
-        :code:'sensitive_features'.
+        at an earlier stage. Note that not only checking :code:`X`
+        is skipped, but also no tranform is applied to :code:`y` and
+        :code:`sensitive_features`.
 
     callbacks : callable
         Callback function, called after every batch. For instance useable when
@@ -1089,7 +1089,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
 
     alpha : float, default = 1.0
         A small number :math:`\alpha` as specified in the paper. It
-        is the factor that balances the training towards predicting :code:'y'
+        is the factor that balances the training towards predicting :code:`y`
         (choose :math:`\alpha` closer to zero) or enforcing fairness constraint
         (choose larger :math:`\alpha`).
 
@@ -1110,9 +1110,9 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     skip_validation : bool, default = False
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
-        at an earlier stage. Note that not only checking :code:'X'
-        is skipped, but also no tranform is applied to :code:'y' and
-        :code:'sensitive_features'.
+        at an earlier stage. Note that not only checking :code:`X`
+        is skipped, but also no tranform is applied to :code:`y` and
+        :code:`sensitive_features`.
 
     callbacks : callable
         Callback function, called after every batch. For instance useable when
