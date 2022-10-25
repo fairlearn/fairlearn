@@ -22,7 +22,7 @@ are supported (classes :class:`~fairlearn.adversarial.AdversarialFairnessClassif
 fairness constraints: demographic parity and equalized odds.
 
 To train an adversarial mitigation algorithm, the user needs to provide
-two neural networks, predictor network and adversary network,
+two neural networks, a predictor network and an adversary network,
 with learnable weights :math:`W` and :math:`U,` respectively. The predictor
 network is constructed to solve the underlying supervised learning task,
 without considering fairness, by minimizing the predictor loss :math:`L_P.`
@@ -32,24 +32,24 @@ adversary's ability to predict the sensitive features from the predictor's
 predictions (when implementing demographic parity), or jointly from the predictor's
 predictions and true labels (when implementing equalized odds).
 
-Suppose the adversary has the loss term :math:`L_A`, then the algorithm
+Suppose the adversary has the loss term :math:`L_A.` The algorithm
 updates adversary weights :math:`U` by descending along the gradient :math:`\nabla_U L_A`.
 However, when updating the predictor weights :math:`W`, the algorithm uses
 
 .. math::
     \nabla_W L_P - \text{proj}_{\nabla_W L_A} \nabla_W L_P - \alpha \nabla_W L_A.
 
+instead of just gradient.
 Compared with standard stochastic gradient descent, there are two additional terms
-that seek to prevent the decrease of the adversary loss; the hyperparameter
+that seek to prevent the decrease of the adversary loss. The hyperparameter
 :math:`\alpha` specifies the strength of enforcing the fairness constraint.
 For details, see :footcite:t:`zhang2018mitigating`.
 
-In :ref:`models` we discuss the models that this implementation accepts.
-In :ref:`data_preprocessing`, we discuss the input format of :math:`X`
-and how :math:`Y` and :math:`A` are preprocessed.
-Then, in :ref:`loss_functions`,
-we describe how the loss functions :math:`L_P` and :math:`L_A` are chosen.
-Last, in :ref:`training` we give some
+In :ref:`models`, we discuss the models that this implementation accepts.
+In :ref:`data_types`, we discuss the input format of :math:`X,`
+how :math:`Y` and :math:`A` are preprocessed, and
+how the loss functions :math:`L_P` and :math:`L_A` are chosen.
+Finally, in :ref:`training` we give some
 useful tips to keep in mind when training this model, as
 adversarial methods such as these
 can be difficult to train.
@@ -69,7 +69,7 @@ possible.
 It is very important to define the neural network models with no activation function
 or discrete prediction function on the final layer. So, for instance, when predicting
 a categorical feature that is one-hot-encoded, the neural network should output a
-vector of real-valued scores, not the one-hot-encoded discrete prediction.::
+vector of real-valued scores, not the one-hot-encoded discrete prediction::
 
     predictor_model = tf.keras.Sequential([
         tf.keras.layers.Dense(50, activation='relu'),
@@ -93,9 +93,9 @@ an activation function (if :math:`k_i` is a string) or
 a layer or activation function instance directly (if :math:`k_i` is
 a callable).
 However, the number of nodes in the input
-and output layer are automatically inferred from data, and the final
+and output layer is automatically inferred from data, and the final
 activation function (such as softmax for categorical
-predictors) are inferred from data.
+predictors) is also inferred from data.
 So, in the following example, the predictor model is
 a neural network with an input layer of
 the appropriate number of nodes, a hidden layer with 50 nodes and
@@ -108,24 +108,23 @@ hot encoded :math:`Y` and sigmoid for binary :math:`Y`::
         adversary_model=[3, "relu"]
     )
 
-.. _data_preprocessing:
+.. _data_types:
 
 Data types and loss functions
 ~~~~~~~~~~~~~~~~~~
 
 We require the provided data :math:`X` to be provided as a matrix
-(2d array-like) of floats; this data is directly provided to
+(2d array-like) of floats; this data is directly passed to
 neural network models.
 
-The labels :math:`Y` and sensitive features :math:`A` are automatically
+Labels :math:`Y` and sensitive features :math:`A` are automatically
 preprocessed based on their type: binary data is represented as 0/1,
 categorical data is one-hot encoded, float data is left unchanged.
 
 :footcite:t:`zhang2018mitigating` do not explicitly define loss functions.
-In the public API
-(:class:`~AdversarialFairnessClassifier` and :class:`~AdversarialFairnessRegressor`),
+In :class:`~AdversarialFairnessClassifier` and :class:`~AdversarialFairnessRegressor`,
 the loss functions are automatically inferred based on
-the data type of the label or sensitive features.
+the data type of the label and sensitive features.
 For binary and categorical target variables, the training loss is cross-entropy.
 For float targets variables, the training loss is the mean squared error.
 
@@ -158,11 +157,11 @@ Some pieces of advice regarding training with adversarial fairness:
 #. Validate your model! Provide this model with a callback function in
    the constructor's keyword :code:`callbacks` (see :ref:`Example 2`).
    Optionally, have this function return :code:`True`
-   to indicate early stoppings.
+   to indicate early stopping.
 #. :footcite:t:`zhang2018mitigating` have found it to be useful to maintain a global step
    count and gradually increase :math:`\alpha` while decreasing the learning
    rate :math:`\eta` and taking :math:`\alpha \eta \rightarrow 0`
-   over the course of iterations. In particular, use a callback function to perform
+   as the global step count increases. In particular, use a callback function to perform
    these hyperparameter updates. An example can be seen in the example notebook.
 
 
@@ -170,7 +169,7 @@ Some pieces of advice regarding training with adversarial fairness:
 
 Example 1: Basics & model specification
 ~~~~~~~~~
-Firstly, we cover a most basic application of adversarial mitigation.
+First, we cover a most basic application of adversarial mitigation.
 We start by loading and preprocessing the dataset::
 
     from sklearn.datasets import fetch_openml
@@ -180,9 +179,9 @@ We start by loading and preprocessing the dataset::
 
     z = X["sex"] # In this example, we consider 'sex' the sensitive feature.
 
-The UCI adult dataset can not be fed into a neural network (yet),
+The UCI adult dataset cannot be fed into a neural network (yet),
 as we have many columns that are not numerical in nature. To resolve this
-issue, we could for instance use one-hot-encodings to preprocess categorical
+issue, we could for instance use one-hot encodings to preprocess categorical
 columns. Additionally, let's preprocess the numeric columns to a
 standardized range. For these tasks, we can use functionality from
 scikit-learn (:py:mod:`sklearn.preprocessor`). We also use an imputer
@@ -299,7 +298,7 @@ good training results after the first attempt. In general, training
 adversarial networks is hard, and users may need to tweak the
 hyperparameters continuously. Besides general scikit-learn algorithms
 that finetune estimators,
-:ref:`Example 2`` will demonstrate some problem-specific
+:ref:`Example 2` will demonstrate some problem-specific
 techniques we can use such as using dynamic hyperparameters,
 validation, and early stopping to improve adversarial training.
 
@@ -307,13 +306,13 @@ validation, and early stopping to improve adversarial training.
 
 Example 2: Finetuning training
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Adversarial Learning is inherently difficult because of various issues,
+Adversarial learning is inherently difficult because of various issues,
 such as mode collapse, divergence, and diminishing gradients.
 In particular, mode collapse seems a real problem on this dataset: the
 predictor and adversary trap themselves in a local minimum by favoring one
 class (mode). Problems with diverging parameters may also occur, which
 may be an indication of a bad choice of hyperparameters, such as a
-learning rate that is too large. The problems teh user may encounter are
+learning rate that is too large. The problems that a user may encounter are
 of course case specific, but general good practices when training
 such models are: train slowly, ensuring the
 losses remain balanced, and keep track of validation accuracies.
@@ -322,7 +321,7 @@ networks work best for this use case.
 
 In this example, we demonstrate some of these good practices.
 We start by defining our
-predictor neural network explicitely so that it is more apparant.
+predictor neural network explicitly so that it is more apparent.
 We will be using PyTorch, but the same can be achieved using Tensorflow::
 
     import torch
@@ -347,7 +346,7 @@ We also take a look at some validation
 metrics. Most importantly, we chose the demographic parity difference
 to check to what
 extent the constraint (demographic parity in this case) is satisfied.
-We also look at the selection_rate to observe whether our model is
+We also look at the selection rate to observe whether our model is
 suffering from mode collapse, and we also calculate the accuracy on the
 validation set as well.
 We will pass this validation step to our model later::
@@ -371,7 +370,7 @@ We will pass this validation step to our model later::
         return dp_diff, accuracy, selection_rate
 
 We may define the optimizers however we like. In this case, we use the
-suggestion from the paper to set the hyperparameters alpha and learning
+suggestion from the paper to set the hyperparameters :math:`\alpha` and learning
 rate :math:`\eta` to depend on the timestep such that :math:`\alpha \eta
 \rightarrow 0` as the timestep grows::
 
@@ -415,7 +414,7 @@ easily by calling :code:`return True` in a callback function::
             ):
                 return True
 
-Then, the instance itself. Notice that we do not explicitely define loss
+Then, the instance itself. Notice that we do not explicitly define loss
 functions, because adversarial fairness is able to infer the loss function
 on its own in this example::
 
@@ -431,7 +430,7 @@ on its own in this example::
         random_state=123,
     )
 
-Then, we fit the model.::
+Then, we fit the model::
 
     mitigator.fit(X_prep_train, Y_train, sensitive_features=Z_train)
 
@@ -454,7 +453,7 @@ Finally, we validate as before, and take a look at the results::
 
 Notice we achieve a much lower demographic parity
 difference than in Exercise 1! This may come at the cost of some accuracy,
-but such a tradeof is to be expected as we are purposely mitigating
+but such a tradeoff is to be expected as we are purposely mitigating
 the unfairness that was present in the data.
 
 .. _Example 3:
@@ -464,7 +463,7 @@ Example 3: Scikit-learn applications
 AdversarialFairness is quite compliant with scikit-learn API, so functions
 such as pipelining and model selection are applicable here. In particular,
 applying pipelining might seem complicated as scikit-learn only pipelines
-:code:`X` and :code:`y``, not the :code:`sensitive_features`.
+:code:`X` and :code:`Y`, not the :code:`sensitive_features`.
 We overcome this issue by passing the sensitive features through the
 pipeline as keyword-argument :code:`[name of model]__sensitive_features`
 to fit::
