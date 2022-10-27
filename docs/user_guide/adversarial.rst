@@ -128,6 +128,40 @@ the data type of the label and sensitive features.
 For binary and categorical target variables, the training loss is cross-entropy.
 For float targets variables, the training loss is the mean squared error.
 
+To summarize:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 4 4 4 10 10 8
+   :stub-columns: 0
+    
+   *  - label :math:`Y`
+      - transformed label :math:`Y'`
+      - score :math:`Z`
+      - probabilistic prediction
+      - loss function
+      - prediction
+   *  - binary (two distinct :code:`int` or :code:`str` values)
+      - 0/1
+      - :math:`\mathbb{R}`
+      - :math:`\mathbb{P}(Y'=1) = 1/(1+e^{-Z})`
+      - :math:`-Y'\log\mathbb{P}(Y'=1) -(1-Y')\log\mathbb{P}(Y'=1)`
+      - :math:1 if :math:`Z\ge 0`, else 0 
+   *  - categorical (:math:`k`&nbsp;distinct :code:`int` or :code:`str` values)
+      - one-hot encoding
+      - :math:`\mathbb{R}^k`
+      - :math:`\mathbb{P}(Y'=\mathbf{e}_j) = e^{Z_j}/\sum_{\ell=1}^k e^{Z_{\ell}}`
+      - :math:`-\sum_{j=1}^k Y'_j\log\mathbb{P}(Y'=\mathbf{e}_j)`
+      - :math:`\arg\max_j Z_j`
+   *  - continuous (allowing :math:`\mathbb{R}^k`)
+      - unchanged
+      - :math:`\mathbb{R}^k`
+      - N/A
+      - :math:`\Vert Z-Y\Vert^2`
+      - :math:`Z`
+
+Sensitive features are treated similarly.
+
 *Note: currently, all data needs to be passed to the model in the first call
 to fit.*
 
