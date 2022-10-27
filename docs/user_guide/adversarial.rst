@@ -132,7 +132,7 @@ To summarize:
 
 .. list-table::
    :header-rows: 1
-   :widths: 6 4 4 10 10 8
+   :widths: 8 4 4 6 10 6
    :stub-columns: 0
     
    *  - label :math:`Y`
