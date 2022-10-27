@@ -26,3 +26,8 @@ v0.8.0
 * Internal performance improvements for :class:`~fairlearn.metrics.MetricFrame`.
   Some results may now have a more appropriate type than :code:`object`, but otherwise
   the only visible difference should be a substantial speed increase.
+* Added :meth:`~fairlearn.metrics.plot_model_comparison` to create scatter plots
+  for comparing multiple models along two metrics.
+* Added adversarial mitigation approaches
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` and
+  :class:`~fairlearn.adversarial.AdversarialFairnessRegressor`.

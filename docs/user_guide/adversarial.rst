@@ -136,27 +136,33 @@ To summarize:
    :stub-columns: 0
     
    *  - label :math:`Y`
-      - transf. label :math:`Y'`
-      - score :math:`Z`
+      - derived label :math:`Y'`
+      - netwk output :math:`Z`
       - probabilistic prediction
       - loss function
       - prediction
-   *  - **binary** (two distinct :code:`int` or :code:`str` values)
+   *  - **binary**
+        (two distinct :code:`int` or :code:`str` values)
       - 0/1
       - :math:`\mathbb{R}`
-      - :math:`\mathbb{P}(Y'=1)` :math:`\;\;=1/(1+e^{-Z})`
-      - :math:`-Y'\log\mathbb{P}(Y'=1)` :math:`\;\;-(1-Y')\log\mathbb{P}(Y'=0)`
+      - | :math:`\mathbb{P}(Y'=1)`
+        | :math:`\;\;=1/(1+e^{-Z})`
+      - | :math:`-Y'\log\mathbb{P}(Y'=1)`
+        | :math:`\;\;-(1-Y')\log\mathbb{P}(Y'=0)`
       - 1 if :math:`Z\ge 0`, else 0 
-   *  - **categorical** (:math:`k` distinct :code:`int` or :code:`str` values)
+   *  - | **categorical**
+        | (:math:`k` distinct :code:`int` or :code:`str` values)
       - one-hot encoding
       - :math:`\mathbb{R}^k`
-      - :math:`\mathbb{P}(Y'=\mathbf{e}_j)` :math:`\;\;=e^{Z_j}/\sum_{\ell=1}^k e^{Z_{\ell}}`
+      - | :math:`\mathbb{P}(Y'=\mathbf{e}_j)`
+        | :math:`\;\;=e^{Z_j}/\sum_{\ell=1}^k e^{Z_{\ell}}`
       - :math:`-\sum_{j=1}^k Y'_j\log\mathbb{P}(Y'=\mathbf{e}_j)`
-      - :math:`\arg\max_j Z_j`
-   *  - **continuous** (allowing :math:`\mathbb{R}^k`)
+      - :math:`\text{argmax}_j\,Z_j`
+   *  - | **continuous**
+        | (allowing :math:`\mathbb{R}^k`)
       - unchanged
       - :math:`\mathbb{R}^k`
-      - N/A
+      - not available
       - :math:`\Vert Z-Y\Vert^2`
       - :math:`Z`
 
