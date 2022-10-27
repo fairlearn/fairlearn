@@ -145,21 +145,21 @@ To summarize:
         (two distinct :code:`int` or :code:`str` values)
       - 0/1
       - :math:`\mathbb{R}`
-      - | :math:`\mathbb{P}(Y'=1)`
-        | :math:`\;\;=1/(1+e^{-Z})`
-      - | :math:`-Y'\log\mathbb{P}(Y'=1)`
-        | :math:`\;\;-(1-Y')\log\mathbb{P}(Y'=0)`
+      - :math:`\mathbb{P}(Y'=1)`
+        :math:`\;\;=1/(1+e^{-Z})`
+      - :math:`-Y'\log\mathbb{P}(Y'=1)`
+        :math:`\;\;-(1-Y')\log\mathbb{P}(Y'=0)`
       - 1 if :math:`Z\ge 0`, else 0 
-   *  - | **categorical**
-        | (:math:`k` distinct :code:`int` or :code:`str` values)
+   *  - **categorical**
+        (:math:`k` distinct :code:`int` or :code:`str` values)
       - one-hot encoding
       - :math:`\mathbb{R}^k`
-      - | :math:`\mathbb{P}(Y'=\mathbf{e}_j)`
-        | :math:`\;\;=e^{Z_j}/\sum_{\ell=1}^k e^{Z_{\ell}}`
+      - :math:`\mathbb{P}(Y'=\mathbf{e}_j)`
+        :math:`\;\;=e^{Z_j}/\sum_{\ell=1}^k e^{Z_{\ell}}`
       - :math:`-\sum_{j=1}^k Y'_j\log\mathbb{P}(Y'=\mathbf{e}_j)`
       - :math:`\text{argmax}_j\,Z_j`
-   *  - | **continuous**
-        | (allowing :math:`\mathbb{R}^k`)
+   *  - **continuous**
+        (allowing :math:`\mathbb{R}^k`)
       - unchanged
       - :math:`\mathbb{R}^k`
       - not available
