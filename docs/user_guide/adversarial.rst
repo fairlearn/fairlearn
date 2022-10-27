@@ -132,17 +132,16 @@ To summarize:
 
 .. list-table::
    :header-rows: 1
-   :widths: 8 4 4 6 10 6
+   :widths: 6 4 6 6 10 6
    :stub-columns: 0
     
    *  - label :math:`Y`
       - derived label :math:`Y'`
-      - netwk output :math:`Z`
+      - network output :math:`Z`
       - probabilistic prediction
       - loss function
       - prediction
    *  - **binary**
-        (two distinct :code:`int` or :code:`str` values)
       - 0/1
       - :math:`\mathbb{R}`
       - :math:`\mathbb{P}(Y'=1)`
@@ -151,7 +150,7 @@ To summarize:
         :math:`\;\;-(1-Y')\log\mathbb{P}(Y'=0)`
       - 1 if :math:`Z\ge 0`, else 0 
    *  - **categorical**
-        (:math:`k` distinct :code:`int` or :code:`str` values)
+        (:math:`k` values)
       - one-hot encoding
       - :math:`\mathbb{R}^k`
       - :math:`\mathbb{P}(Y'=\mathbf{e}_j)`
@@ -159,14 +158,16 @@ To summarize:
       - :math:`-\sum_{j=1}^k Y'_j\log\mathbb{P}(Y'=\mathbf{e}_j)`
       - :math:`\text{argmax}_j\,Z_j`
    *  - **continuous**
-        (allowing :math:`\mathbb{R}^k`)
+        (in :math:`\mathbb{R}^k`)
       - unchanged
       - :math:`\mathbb{R}^k`
       - not available
       - :math:`\Vert Z-Y\Vert^2`
       - :math:`Z`
 
-Sensitive features are treated similarly.
+The label is treated as binary if it takes on two distinct :code:`int` or :code:`str` values,
+as categorical if it takes on :math:`k` distinct :code:`int` or :code:`str` values (with :math:`k>2`),
+and as continuous if it is a float or a vector of floats. Sensitive features are treated similarly.
 
 *Note: currently, all data needs to be passed to the model in the first call
 to fit.*
