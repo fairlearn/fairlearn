@@ -80,8 +80,9 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: env.WHEEL_ARTIFACT
+        path: dist
     - name: DEBUG
-      run: ls
+      run: ls -R
     # See
     # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
     - name: Release to Test-PyPI
