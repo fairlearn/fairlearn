@@ -93,8 +93,6 @@ jobs:
         repository_url: https://test.pypi.org/legacy/
     - name: Release to PyPI
       if: inputs.use_test_pypi == false
-      run: echo "Releasing to PyPI"
-    - name: Tag repo
-      run: echo "Use an appropriate Action to lay down the tag"
-    - name: Create GitHub Release
-      run: echo "Use another GitHub Action based on the tag and artifact"
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
