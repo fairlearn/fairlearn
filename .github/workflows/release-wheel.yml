@@ -85,12 +85,12 @@ jobs:
       run: ls -R
     # See
     # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-    - name: Release to Test-PyPI
-      if: inputs.use_test_pypi
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
+    #- name: Release to Test-PyPI
+    #  if: inputs.use_test_pypi
+    #  uses: pypa/gh-action-pypi-publish@release/v1
+    #  with:
+    #    password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+    #    repository_url: https://test.pypi.org/legacy/
     - name: Release to PyPI
       if: inputs.use_test_pypi == false
       uses: pypa/gh-action-pypi-publish@release/v1
