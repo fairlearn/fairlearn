@@ -83,10 +83,10 @@ jobs:
     - name: DEBUG
       run: ls
     - name: Release to Test-PyPI
-      if: ${{ inputs.use_test_pypi }} == 'true'
+      if: inputs.use_test_pypi
       run: echo "Releasing to Test-PyPI"
     - name: Release to PyPI
-      if: ${{ inputs.use_test_pypi }} == 'false'
+      if: ! inputs.use_test_pypi
       run: echo "Releasing to PyPI"
     - name: Tag repo
       run: echo "Use an appropriate Action to lay down the tag"
