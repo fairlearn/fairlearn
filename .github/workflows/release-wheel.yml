@@ -82,6 +82,8 @@ jobs:
         name: env.WHEEL_ARTIFACT
     - name: DEBUG
       run: echo ${{ inputs.use_test_pypi }}
+    # See
+    # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
     - name: Release to Test-PyPI
       if: inputs.use_test_pypi
       run: echo "Releasing to Test-PyPI"
