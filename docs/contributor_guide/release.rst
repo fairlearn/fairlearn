@@ -20,13 +20,15 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
    create a summary of the highlights at the top of the file. Create a PR
    for this and merge it before proceeding.
 
-#. If this is a non-patch release, create a new branch:
+#. If this is a non-patch release:
 
-    :code:`git checkout -b release/v<x.y>`
+    #. Create a new branch:
 
-#. Push the branch to GitHub:
+        :code:`git checkout -b release/v<x.y>`
 
-    :code:`git push -u origin release/v<x.y>`
+    #. Push the branch to GitHub:
+
+        :code:`git push -u origin release/v<x.y>`
 
 #. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z`
 
@@ -55,8 +57,6 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Update the version in `docs/static_landing_page/js/landing_page.js`
        so that all the links point to the new release
     #. Update the `docs\_static\versions.json` file
-    #. Update `smv_tag_whitelist` in `docs/conf.py` to show only the latest
-       patch version of every minor release.
     #. Create a new file `vx.y.z+1.rst` in `docs/user_guide/installation_and_version_guide`
    
 .. note::
