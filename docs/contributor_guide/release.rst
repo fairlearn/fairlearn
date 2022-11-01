@@ -24,13 +24,13 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
     #. Create a new branch:
 
-        :code:`git checkout -b release/v<x.y>`
+        :code:`git checkout -b release/v<x.y>.X`
 
     #. Push the branch to GitHub:
 
-        :code:`git push -u origin release/v<x.y>`
+        :code:`git push -u origin release/v<x.y>.X`
 
-#. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z`
+#. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z` (where `z=0` for the first release from a branch)
 
 #. Merge that PR.
 
