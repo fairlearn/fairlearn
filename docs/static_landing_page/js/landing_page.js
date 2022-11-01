@@ -148,7 +148,7 @@ $(document).ready(function () {
 
 async function setLinks() {
   // update this version with every release
-  const latestVersion = 'v0.7.0';
+  const latestVersion = 'v0.8.0';
   const prefix = "./" + latestVersion;
 
   const contribGuideLink = prefix + "/contributor_guide/index.html";
