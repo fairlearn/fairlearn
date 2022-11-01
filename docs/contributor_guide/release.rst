@@ -20,23 +20,24 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
    create a summary of the highlights at the top of the file. Create a PR
    for this and merge it before proceeding.
 
-#. Create the branch for the release:
+#. If this is a non-patch release:
 
-    :code:`git checkout -b release/v<x.y.z>`
+    #. Create a new branch:
 
-#. Push the branch to GitHub:
+        :code:`git checkout -b release/v<x.y>.X`
 
-    :code:`git push -u origin release/v<x.y.z>`
+    #. Push the branch to GitHub:
 
-#. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z`
+        :code:`git push -u origin release/v<x.y>.X`
+
+#. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z` (where `z=0` for the first release from a branch)
 
 #. Merge that PR.
 
-#. Run the `release pipeline <https://dev.azure.com/responsibleai/fairlearn/_build?definitionId=60>`_
+#. Run the `Release Wheel workflow on GitHub <https://github.com/fairlearn/fairlearn/actions/workflows/release-wheel.yml>`_
 
-    #. Ensure that you have selected the correct release branch
-    #. Run first on 'Test' which will upload to <https://test.pypi.org>
-    #. Finally, run the release pipeline set to 'Production' which will upload to <https://pypi.org/>
+.. note::
+    Ensure that you have selected the correct release branch
 
 #. On the release branch, place an annotated tag:
 
@@ -55,8 +56,7 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Update the version in `__init__.py` to `x.y.z+1.dev0`
     #. Update the version in `docs/static_landing_page/js/landing_page.js`
        so that all the links point to the new release
-    #. Update `smv_tag_whitelist` in `docs/conf.py` to show only the latest
-       patch version of every minor release.
+    #. Update the `docs\_static\versions.json` file
     #. Create a new file `vx.y.z+1.rst` in `docs/user_guide/installation_and_version_guide`
    
 .. note::
