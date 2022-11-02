@@ -45,6 +45,10 @@ jobs:
           command: make doc
           no_output_timeout: 30m
 
+      - run:
+          name: "Copy landing_page.js"
+          command: cp  docs/static_landing_page/js/landing_page.js docs/_build/
+
       - persist_to_workspace:
           root: docs/_build
           paths: html
@@ -109,7 +113,7 @@ jobs:
       # deployed.
       - attach_workspace:
           at: doc/_build
-      - run: ls -ltrh doc/_build/html
+      - run: ls -ltrh doc/_build/
       - deploy:
           command: |
             if [[ "${CIRCLE_BRANCH}" =~ ^main$|^release/[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
