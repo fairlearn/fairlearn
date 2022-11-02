@@ -27,8 +27,8 @@ if [ "$CIRCLE_BRANCH" = "main" ]
 then
     dir=main
 else
-    # Strip off .X
-    dir="${CIRCLE_BRANCH::-2}"
+    # Strip off 'release/' from the beginning and '.X' from the end
+    dir="${CIRCLE_BRANCH:8:-2}"
 fi
 
 MSG="Pushing the docs to $dir/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
