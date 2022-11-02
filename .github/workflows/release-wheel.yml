@@ -1,13 +1,9 @@
 name: Release Wheel
 
 # Following will be changed in due course
-on: # [push, pull_request]
+on:
   workflow_dispatch:
-    inputs:
-      use_test_pypi:
-        description: 'Release to Test-PyPI'
-        required: true
-        default: true
+
 
 concurrency: 
   # this ensures after each commit the old jobs are cancelled and the new ones
@@ -23,9 +19,9 @@ jobs:
   build-wheel:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: "3.10"
     - name: Update pip and setuptools
@@ -48,9 +44,9 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.8', '3.9', '3.10']
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Remove Fairlearn source directory
@@ -80,15 +76,18 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: env.WHEEL_ARTIFACT
+        path: dist
     - name: DEBUG
-      run: ls
-    - name: Release to Test-PyPI
-      if: ${{ inputs.use_test_pypi }} == true
-      run: echo "Releasing to Test-PyPI"
+      run: ls -R
+    # See
+    # https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+    #- name: Release to Test-PyPI
+    #  if: inputs.use_test_pypi
+    #  uses: pypa/gh-action-pypi-publish@release/v1
+    #  with:
+    #    password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+    #    repository_url: https://test.pypi.org/legacy/
     - name: Release to PyPI
-      if: ${{ inputs.use_test_pypi }} == false
-      run: echo "Releasing to PyPI"
-    - name: Tag repo
-      run: echo "Use an appropriate Action to lay down the tag"
-    - name: Create GitHub Release
-      run: echo "Use another GitHub Action based on the tag and artifact"
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}

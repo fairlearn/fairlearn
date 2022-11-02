@@ -4,6 +4,7 @@
 import pytest
 
 from fairlearn.reductions import DemographicParity
+from fairlearn.adversarial import AdversarialFairnessClassifier
 
 from . import package_test_common as ptc
 
@@ -43,3 +44,14 @@ def test_thresholdoptimizer_classification():
     estimator = KerasClassifier(build_fn=create_model)
 
     ptc.run_thresholdoptimizer_classification(estimator)
+
+
+def test_adversarial_classification():
+    mitigator = AdversarialFairnessClassifier(
+        backend="tensorflow",
+        predictor_model=[50, "relu"],
+        adversary_model=[3, "relu"],
+        random_state=123,
+    )
+
+    ptc.run_AdversarialFairness_classification(mitigator)

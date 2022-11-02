@@ -1,17 +1,18 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from fairlearn.adversarial import AdversarialFairnessClassifier
+import pytest
 import numpy as np
 import pandas as pd
-import pytest
 
 torch = pytest.importorskip("torch")
 from skorch import NeuralNetClassifier  # noqa
 from torch import nn, optim  # noqa
 
 from fairlearn.reductions import DemographicParity  # noqa
-
 from . import package_test_common as ptc  # noqa
+from . import adversarial_fairness as af  # noqa
 
 
 def create_model():
@@ -89,6 +90,10 @@ def create_model():
     return net
 
 
+def test_examples():
+    af.test_examples()
+
+
 def test_expgrad_classification():
     estimator = create_model()
     disparity_moment = DemographicParity()
@@ -107,3 +112,14 @@ def test_thresholdoptimizer_classification():
     estimator = create_model()
 
     ptc.run_thresholdoptimizer_classification(estimator)
+
+
+def test_adversarial_classification():
+    mitigator = AdversarialFairnessClassifier(
+        backend="torch",
+        predictor_model=[50, "relu"],
+        adversary_model=[3, "relu"],
+        random_state=123,
+    )
+
+    ptc.run_AdversarialFairness_classification(mitigator)
