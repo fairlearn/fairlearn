@@ -63,7 +63,8 @@ touch .nojekyll
 if [ "$CIRCLE_BRANCH" = "main" ]
 then
     echo "Copying landing_page.js into js directory"
-    cp $GENERATED_DOC_DIR/landing_page.js js/
+    ls $GENERATED_DOC_DIR/..
+    cp $GENERATED_DOC_DIR/../landing_page.js js/
 fi
 
 echo "fairlearn.org" > CNAME
