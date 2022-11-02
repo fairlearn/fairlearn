@@ -112,7 +112,7 @@ jobs:
       - run: ls -ltrh doc/_build/html
       - deploy:
           command: |
-            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
+            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^release/[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
               bash .circleci/push_doc.sh doc/_build/html
             fi
 
@@ -130,4 +130,4 @@ workflows:
           filters:
             branches:
               # don't deploy to GitHub pages from other branches
-              only: /^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9,X]+$/
+              only: /^main$|^release/v[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$/
