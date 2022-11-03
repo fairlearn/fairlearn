@@ -51,7 +51,7 @@ jobs:
 
       - run:
           name: DEBUG Check
-          command: ls /docs/_build/
+          command: ls docs/_build/
 
       - persist_to_workspace:
           root: docs/_build
