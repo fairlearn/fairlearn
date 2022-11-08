@@ -49,7 +49,7 @@ In :ref:`adversarial_models`, we discuss the models that this implementation acc
 In :ref:`adversarial_data_types`, we discuss the input format of :math:`X,`
 how :math:`Y` and :math:`A` are preprocessed, and
 how the loss functions :math:`L_P` and :math:`L_A` are chosen.
-Finally, in :ref:`training` we give some
+Finally, in :ref:`adversarial_training` we give some
 useful tips to keep in mind when training this model, as
 adversarial methods such as these
 can be difficult to train.
@@ -197,7 +197,7 @@ Some pieces of advice regarding training with adversarial fairness:
 #. For some tabular datasets, we found that single hidden layer neural
    networks are easier to train than deeper networks.
 #. Validate your model! Provide this model with a callback function in
-   the constructor's keyword :code:`callbacks` (see :ref:`Example 2`).
+   the constructor's keyword :code:`callbacks` (see :ref:`adversarial_Example_2`).
    Optionally, have this function return :code:`True`
    to indicate early stopping.
 #. :footcite:t:`zhang2018mitigating` have found it to be useful to maintain a global step
@@ -227,7 +227,7 @@ as we have many columns that are not numerical in nature. To resolve this
 issue, we could for instance use one-hot encodings to preprocess categorical
 columns. Additionally, let's preprocess the numeric columns to a
 standardized range. For these tasks, we can use functionality from
-scikit-learn (:py:mod:`sklearn.preprocessor`). We also use an imputer
+scikit-learn (:py:mod:`sklearn.preprocessing`). We also use an imputer
 to get rid of NaN's::
 
     from sklearn.compose import make_column_transformer, make_column_selector
