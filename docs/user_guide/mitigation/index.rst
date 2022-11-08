@@ -97,3 +97,4 @@ fairness definitions, please open a
    :maxdepth: 2
 
    preprocessing
+   reductions
