@@ -96,4 +96,4 @@ fairness definitions, please open a
 .. toctree::
    :maxdepth: 2
 
-   perform_fairness_assessment
+   preprocessing
