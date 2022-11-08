@@ -98,3 +98,4 @@ fairness definitions, please open a
 
    preprocessing
    reductions
+   adversarial
