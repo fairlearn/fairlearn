@@ -104,7 +104,7 @@ the correlation between the other features.
 We can also use the :code:`alpha` parameter with for instance :math:`\alpha=0.5`
 to control the level of filtering between the sensitive and non-sensitive features.
 
-.. doctest:: mitigation_preprocessing_preprocessing
+.. doctest:: mitigation_preprocessing
 
     >>> cr = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
     >>> cr.fit(X)
