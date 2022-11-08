@@ -45,9 +45,15 @@ jobs:
           command: make doc
           no_output_timeout: 30m
 
+      - run:
+          name: "Copy landing_page.js"
+          command: cp docs/static_landing_page/js/landing_page.js docs/_build/
+
       - persist_to_workspace:
           root: docs/_build
-          paths: html
+          paths: 
+            - html
+            - landing_page.js
 
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
@@ -109,11 +115,11 @@ jobs:
       # deployed.
       - attach_workspace:
           at: doc/_build
-      - run: ls -ltrh doc/_build/html
+      - run: ls -ltrh doc/_build/
       - deploy:
           command: |
-            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              bash devops/circle/push_doc.sh doc/_build/html
+            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^release/[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
+              bash .circleci/push_doc.sh doc/_build/html
             fi
 
 # This workflow defines the ordering, in this case build-doc needs to happen
@@ -130,4 +136,4 @@ workflows:
           filters:
             branches:
               # don't deploy to GitHub pages from other branches
-              only: /^main$|^[0-9]+\.[0-9]$|^[0-9]+\.[0-9]+\.[0-9]+$/
+              only: /^main$|^release/v[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$/

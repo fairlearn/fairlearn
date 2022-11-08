@@ -27,8 +27,8 @@ if [ "$CIRCLE_BRANCH" = "main" ]
 then
     dir=main
 else
-    # Strip off .X
-    dir="${CIRCLE_BRANCH::-2}"
+    # Strip off 'release/' from the beginning and '.X' from the end
+    dir="${CIRCLE_BRANCH:8:-2}"
 fi
 
 MSG="Pushing the docs to $dir/ for branch: $CIRCLE_BRANCH, commit $CIRCLE_SHA1"
@@ -57,11 +57,26 @@ then
 fi
 cp -R $GENERATED_DOC_DIR $dir
 touch .nojekyll
+
+# If we're working with main, we should also update the link from the
+# landing page on fairlearn.org
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    echo "Copying landing_page.js into js directory"
+    ls $GENERATED_DOC_DIR/..
+    cp $GENERATED_DOC_DIR/../landing_page.js js/
+fi
+
 echo "fairlearn.org" > CNAME
 git config user.email "ci-build@fairlearn.org"
 git config user.name $USERNAME
 git config push.default matching
 git add -f $dir/
 git commit -m "$MSG" $dir
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    git add -f js/
+    git commit -m "$MSG" js/
+fi
 git push
 echo $MSG
