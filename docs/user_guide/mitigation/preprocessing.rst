@@ -84,11 +84,11 @@ not highly correlated with the three mentioned attributes, but we want to remove
 these correlations nonetheless. The code for generating the correlation matrix
 can be found in
 `this example notebook
-<../auto_examples/plot_correlationremover_before_after.html>`_.
+<../../auto_examples/plot_correlationremover_before_after.html>`_.
 
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_001.png
+.. figure:: ../../auto_examples/images/sphx_glr_plot_correlationremover_before_after_001.png
     :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
+    :target: ../../auto_examples/plot_correlationremover_before_after.html
 
 In order to see the effect of :class:`CorrelationRemover`, we visualize
 how the correlation matrix has changed after the transformation of the
@@ -97,9 +97,9 @@ way, the :code:`CorrelationRemover` successfully removed all correlation
 between 'race_AfricanAmerican' and the other columns while retaining
 the correlation between the other features.
 
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
+.. figure:: ../../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
     :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
+    :target: ../../auto_examples/plot_correlationremover_before_after.html
 
 We can also use the :code:`alpha` parameter with for instance :math:`\alpha=0.5`
 to control the level of filtering between the sensitive and non-sensitive features.
@@ -115,6 +115,6 @@ As we can see in the visulization below, not all correlation between
 'race_AfricanAmerican' and the other columns was removed. This is exactly what
 we would expect with :math:`\alpha=0.5`.
 
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_003.png
+.. figure:: ../../auto_examples/images/sphx_glr_plot_correlationremover_before_after_003.png
     :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
+    :target: ../../auto_examples/plot_correlationremover_before_after.html
