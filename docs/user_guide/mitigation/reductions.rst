@@ -1,221 +1,7 @@
-.. _mitigation:
-
-Mitigation
-==========
-
-Fairlearn contains the following algorithms for mitigating unfairness:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 5 20 5 5 8
-   :stub-columns: 1
-
-   *  - algorithm
-      - description
-      - binary classification
-      - regression
-      - supported fairness definitions
-   *  - :class:`~fairlearn.reductions.ExponentiatedGradient`
-      - A wrapper (reduction) approach to fair classification described in *A Reductions*
-        *Approach to Fair Classification* :footcite:`agarwal2018reductions`.
-      - ✔
-      - ✔
-      - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :class:`~fairlearn.reductions.GridSearch`
-      - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
-        *Approach to Fair Classification* :footcite:`agarwal2018reductions`. For regression it acts as a
-        grid-search variant of the algorithm described in Section 5 of
-        *Fair Regression: Quantitative Definitions and Reduction-based*
-        *Algorithms* :footcite:`agarwal2019fair`.
-      - ✔
-      - ✔
-      - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
-      - Postprocessing algorithm based on the paper *Equality of Opportunity*
-        *in Supervised Learning* :footcite:`hardt2016equality`. This technique takes as input an
-        existing classifier and the sensitive feature, and derives a monotone
-        transformation of the classifier's prediction to enforce the specified
-        parity constraints.
-      - ✔
-      - ✘
-      - DP, EO, TPRP, FPRP
-   *  - :class:`~fairlearn.preprocessing.CorrelationRemover`
-      - Preprocessing algorithm that removes correlation between sensitive
-        features and non-sensitive features through linear transformations.
-      - ✔
-      - ✔
-      - ✘
-   *  - :class:`~fairlearn.adversarial.AdversarialFairnessClassifier`
-      - An optimization algorithm based on the paper *Mitigating Unwanted Biases*
-        *with Adversarial Learning* :footcite:`zhang2018mitigating`. This method trains a neural
-        network classifier that minimizes training error while
-        preventing an adversarial network from inferring sensitive features.
-        The neural networks can be defined either as a `PyTorch module
-        <https://pytorch.org/docs/stable/generated/torch.nn.Module.html>`_ or
-        `TensorFlow2 model 
-        <https://www.tensorflow.org/api_docs/python/tf/keras/Model>`_.
-      - ✔
-      - ✘
-      - DP, EO
-   *  - :class:`~fairlearn.adversarial.AdversarialFairnessRegressor`
-      - The regressor variant of the above :class:`~fairlearn.adversarial.AdversarialFairnessClassifier`.
-        Useful to train a neural network with continuous valued output(s).
-      - ✘
-      - ✔
-      - DP, EO
-
-DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
-rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
-BGL to *bounded group loss*. For
-more information on the definitions refer to
-:ref:`fairness_in_machine_learning`. To request additional algorithms or
-fairness definitions, please open a
-`new issue <https://github.com/fairlearn/fairlearn/issues>`_ on GitHub.
-
-.. note::
-
-   Fairlearn mitigation algorithms largely follow the
-   `conventions of scikit-learn <https://scikit-learn.org/stable/developers/contributing.html#different-objects>`_,
-   meaning that they implement the :code:`fit` method to train a model and the :code:`predict` method
-   to make predictions. However, in contrast with 
-   `scikit-learn <https://scikit-learn.org/stable/glossary.html#term-estimator>`_,
-   Fairlearn algorithms can produce randomized predictors. Randomization of
-   predictions is required to satisfy many definitions of fairness. Because of
-   randomization, it is possible to get different outputs from the predictor's
-   :code:`predict` method on identical data. For each of our algorithms, we provide
-   explicit access to the probability distribution used for randomization.
-
-.. _preprocessing:
-
-Preprocessing
---------------
-   
-.. currentmodule:: fairlearn.preprocessing
-
-Preprocessing algorithms transform the dataset to mitigate possible unfairness
-present in the data.
-Preprocessing algorithms in Fairlearn follow the :class:`sklearn.base.TransformerMixin`
-class, meaning that they can :code:`fit` to the dataset and :code:`transform` it
-(or :code:`fit_transform` to fit and transform in one go).
-
-.. _correlation_remover:
-
-Correlation Remover
-~~~~~~~~~~~~~~~~~~~
-Sensitive features can be correlated with non-sensitive features in the dataset.
-By applying the :code:`CorrelationRemover`, these correlations are projected away
-while details from the original data are retained as much as possible (as measured
-by the least-squares error). The user can control the level of projection via the
-:code:`alpha` parameter. In mathematical terms, assume we have the original dataset
-:math:`X` which contains a set of sensitive attributes :math:`S` and a set of
-non-sensitive attributes :math:`Z`. The removal of correlation is then
-described as:
-
-.. math::
-        \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}
-        -\mathbf{x}_{i}\right\|^{2} \\
-        \text{subject to} \\
-        \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i}\left(\mathbf{s}_{i}-\overline{\mathbf{s}}
-        \right)^{T}=\mathbf{0}
-
-The solution to this problem is found by centering sensitive features, fitting a
-linear regression model to the non-sensitive features and reporting the residual.
-The columns in :math:`S` will be dropped from the dataset :math:`X`.
-The amount of correlation that is removed can be controlled using the
-:code:`alpha` parameter. This is described as follows:
-
-.. math::
-        X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
-
-Note that the lack of correlation does not imply anything about statistical dependence.
-In particular, since correlation measures linear relationships, it might still be
-possible that non-linear relationships exist in the data. Therefore, we expect this
-to be most appropriate as a preprocessing step for (generalized) linear models.
-
-In the example below, the `Diabetes 130-Hospitals <https://www.openml.org/d/43874>`_
-is loaded and the correlation between the African American race and
-the non-sensitive features is removed. This dataset contains more races,
-but in example we will only focus on the African American race.
-The :code:`CorrelationRemover` will drop the sensitive features from the dataset.
-
-.. doctest:: mitigation
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from fairlearn.preprocessing import CorrelationRemover
-    >>> import pandas as pd
-    >>> from sklearn.datasets import fetch_openml
-    >>> data = fetch_openml(data_id=43874, as_frame=True)
-    >>> X = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
-    >>> X = pd.get_dummies(X)
-    >>> X = X.drop(["race_Asian",
-    ...                     "race_Caucasian",
-    ...                     "race_Hispanic",
-    ...                     "race_Other",
-    ...                     "race_Unknown",
-    ...                     "had_inpatient_days_False",
-    ...                     "medicare_False"], axis=1)
-    >>> cr = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'])
-    >>> cr.fit(X)
-    CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'])
-    >>> X_transform = cr.transform(X)
-
-In the visualization below, we see the correlation values in the
-original dataset. We are particularly interested in the correlations
-between the 'race_AfricanAmerican' column and the three non-sensitive attributes
-'time_in_hospital', 'had_inpatient_days' and 'medicare_True'. The target
-variable is also included in these visualization for completeness, and it is
-defined as a binary feature which indicated whether the readmission of a patient
-occurred within 30 days of the release. We see that 'race_AfricanAmerican' is
-not highly correlated with the three mentioned attributes, but we want to remove
-these correlations nonetheless. The code for generating the correlation matrix
-can be found in
-`this example notebook
-<../auto_examples/plot_correlationremover_before_after.html>`_.
-
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_001.png
-    :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
-
-In order to see the effect of :class:`CorrelationRemover`, we visualize
-how the correlation matrix has changed after the transformation of the
-dataset. Due to rounding, some of the 0.0 values appear as -0.0. Either
-way, the :code:`CorrelationRemover` successfully removed all correlation
-between 'race_AfricanAmerican' and the other columns while retaining
-the correlation between the other features.
-
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_002.png
-    :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
-
-We can also use the :code:`alpha` parameter with for instance :math:`\alpha=0.5`
-to control the level of filtering between the sensitive and non-sensitive features.
-
-.. doctest:: mitigation
-
-    >>> cr = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
-    >>> cr.fit(X)
-    CorrelationRemover(alpha=0.5, sensitive_feature_ids=['race_AfricanAmerican'])
-    >>> X_transform = cr.transform(X)
-
-As we can see in the visulization below, not all correlation between
-'race_AfricanAmerican' and the other columns was removed. This is exactly what
-we would expect with :math:`\alpha=0.5`.
-
-.. figure:: ../auto_examples/images/sphx_glr_plot_correlationremover_before_after_003.png
-    :align: center
-    :target: ../auto_examples/plot_correlationremover_before_after.html
-
-.. _postprocessing:
-
-Postprocessing
---------------
-
-.. currentmodule:: fairlearn.postprocessing
-
 .. _reductions:
 
 Reductions
-----------
+==========
 
 .. currentmodule:: fairlearn.reductions
 
@@ -268,7 +54,7 @@ provide :code:`signed_weights` that are used to relabel and reweight samples.
 .. _constraints_binary_classification:
 
 Fairness constraints for binary classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 All supported fairness constraints for binary classification inherit from
 :code:`UtilityParity`. They are based on some underlying metric called
@@ -357,7 +143,7 @@ bound the ratio between the pairs of groups, but such a bound is implied.
 .. _demographic_parity:
 
 Demographic Parity
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *demographic parity* if
 
@@ -391,7 +177,7 @@ the predicted labels.
     The example below uses :code:`load_data` to illustrate how :code:`DemographicParity`
     instantiates inequalities from :ref:`constraints_binary_classification`.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import DemographicParity
@@ -432,7 +218,7 @@ The ratio constraints for the demographic parity with :code:`ratio_bound`
 
 Revisiting the same example as above we get
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> dp = DemographicParity(ratio_bound=0.9, ratio_bound_slack=0.01)
     >>> dp.load_data(X, y_pred, sensitive_features=sensitive_features)
@@ -458,7 +244,7 @@ of the constraints, we obtain
 .. _false_positive_rate_parity:
 
 True Positive Rate Parity and False Positive Rate Parity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *true positive rate parity* if
 
@@ -480,7 +266,7 @@ by considering both events :math:`Y=0` and :math:`Y=1`.
 
 In practice this can be used in a difference-based relaxation as follows:
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import TruePositiveRateParity
@@ -521,7 +307,7 @@ In practice this can be used in a difference-based relaxation as follows:
 
 Alternatively, a ratio-based relaxation is also available:
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> tprp = TruePositiveRateParity(ratio_bound=0.9, ratio_bound_slack=0.01)
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
@@ -536,7 +322,7 @@ Alternatively, a ratio-based relaxation is also available:
 .. _equalized_odds:
     
 Equalized Odds
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
 *true positive rate parity* and *false positive rate parity*, i.e.,
@@ -548,7 +334,7 @@ A binary classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
 The constraints represent the union of constraints for true positive rate
 and false positive rate.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> from fairlearn.reductions import EqualizedOdds
     >>> eo = EqualizedOdds(difference_bound=0.01)
@@ -568,7 +354,7 @@ and false positive rate.
 .. _error_rate_parity:
 
 Error Rate Parity
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 The *error rate parity* requires that the error rates should be
 the same across all groups. For a classifier :math:`h(X)`
@@ -584,7 +370,7 @@ to poor outcomes. The difference-based relaxation specifies that
 the error rate of any given group should not deviate from
 the overall error rate by more than the value of :code:`difference_bound`.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ErrorRateParity
@@ -626,7 +412,7 @@ Alternatively, error rate parity can be relaxed via ratio constraints as
 with a :code:`ratio_bound` :math:`r`. The usage is identical with other
 constraints:
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> erp = ErrorRateParity(ratio_bound=0.9, ratio_bound_slack=0.01)
@@ -641,7 +427,7 @@ constraints:
 
 
 Control features
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 The above examples of :class:`Moment` (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
@@ -676,7 +462,7 @@ The other constraints acquire similar modifications.
 .. _constraints_multi_class_classification:
 
 Fairness constraints for multiclass classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 Reductions approaches do not support multiclass classification yet at this
 point. If this is an important scenario for you please let us know!
@@ -684,7 +470,7 @@ point. If this is an important scenario for you please let us know!
 .. _constraints_regression:
 
 Fairness constraints for regression
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 The performance objective in the regression scenario is to minimize the
 loss of our regressor :math:`h`. The loss can be expressed as
@@ -692,7 +478,7 @@ loss of our regressor :math:`h`. The loss can be expressed as
 :code:`min_val` and :code:`max_val` that define the value range within which
 the loss is evaluated. Values outside of the value range get clipped.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> from fairlearn.reductions import SquareLoss, AbsoluteLoss, ZeroOneLoss
     >>> y_true = [0,   0.3, 1,   0.9]
@@ -718,7 +504,7 @@ supported type of constraint at this point is :class:`BoundedGroupLoss`.
 .. _bounded_group_loss:
 
 Bounded Group Loss
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 *Bounded group loss* requires the loss of each group to be below a
 user-specified amount :math:`\zeta`. If :math:`\zeta` is chosen reasonably
@@ -735,7 +521,7 @@ In the example below we use :class:`BoundedGroupLoss` with
 Group :code:`"a"` has an average loss of :math:`0.05`, while group
 :code:`"b"`'s average loss is :math:`0.5`.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import BoundedGroupLoss, ZeroOneLoss
@@ -770,21 +556,8 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     during the unfairness mitigation. As a result the constraint violation
     detected by :code:`gamma` is identical to the mean absolute error.
 
-.. _exponentiated_gradient:
-
-Exponentiated Gradient
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. _grid_search:
-
-Grid Search
-~~~~~~~~~~~
-
-.. include:: adversarial.rst
-
-.. _references:
 
 References
-~~~~~~~~~~
+----------
 
 .. footbibliography::

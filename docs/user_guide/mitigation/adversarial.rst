@@ -7,7 +7,7 @@
 .. _adversarial:
 
 Adversarial Mitigation
---------------------
+======================
 
 .. currentmodule:: fairlearn.adversarial
 
@@ -45,19 +45,19 @@ that seek to prevent the decrease of the adversary loss. The hyperparameter
 :math:`\alpha` specifies the strength of enforcing the fairness constraint.
 For details, see :footcite:t:`zhang2018mitigating`.
 
-In :ref:`models`, we discuss the models that this implementation accepts.
-In :ref:`data_types`, we discuss the input format of :math:`X,`
+In :ref:`adversarial_models`, we discuss the models that this implementation accepts.
+In :ref:`adversarial_data_types`, we discuss the input format of :math:`X,`
 how :math:`Y` and :math:`A` are preprocessed, and
 how the loss functions :math:`L_P` and :math:`L_A` are chosen.
-Finally, in :ref:`training` we give some
+Finally, in :ref:`adversarial_training` we give some
 useful tips to keep in mind when training this model, as
 adversarial methods such as these
 can be difficult to train.
 
-.. _models:
+.. _adversarial_models:
 
 Models
-~~~~~~
+------
 
 One can implement the predictor and adversarial neural networks as
 a `torch.nn.Module` (using PyTorch) or as a `tensorflow.keras.Model` (using TensorFlow).
@@ -108,10 +108,10 @@ hot encoded :math:`Y` and sigmoid for binary :math:`Y`::
         adversary_model=[3, "relu"]
     )
 
-.. _data_types:
+.. _adversarial_data_types:
 
 Data types and loss functions
-~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 We require the provided data :math:`X` to be provided as a matrix
 (2d array-like) of floats; this data is directly passed to
@@ -172,10 +172,11 @@ and as continuous if it is a float or a vector of floats. Sensitive features are
 *Note: currently, all data needs to be passed to the model in the first call
 to fit.*
 
-.. _training:
+.. _adversarial_training:
 
 Training
-~~~~~~~~
+--------
+
 Adversarial learning is inherently difficult because of various issues,
 such as mode collapse, divergence, and diminishing gradients. Mode collapse
 is the scenario where the predictor learns to produce one output, and because
@@ -196,7 +197,7 @@ Some pieces of advice regarding training with adversarial fairness:
 #. For some tabular datasets, we found that single hidden layer neural
    networks are easier to train than deeper networks.
 #. Validate your model! Provide this model with a callback function in
-   the constructor's keyword :code:`callbacks` (see :ref:`Example 2`).
+   the constructor's keyword :code:`callbacks` (see :ref:`adversarial_Example_2`).
    Optionally, have this function return :code:`True`
    to indicate early stopping.
 #. :footcite:t:`zhang2018mitigating` have found it to be useful to maintain a global step
@@ -206,10 +207,11 @@ Some pieces of advice regarding training with adversarial fairness:
    these hyperparameter updates. An example can be seen in the example notebook.
 
 
-.. _Example 1:
+.. _adversarial_Example_1:
 
 Example 1: Basics & model specification
-~~~~~~~~~
+---------------------------------------
+
 First, we cover a most basic application of adversarial mitigation.
 We start by loading and preprocessing the dataset::
 
@@ -225,7 +227,7 @@ as we have many columns that are not numerical in nature. To resolve this
 issue, we could for instance use one-hot encodings to preprocess categorical
 columns. Additionally, let's preprocess the numeric columns to a
 standardized range. For these tasks, we can use functionality from
-scikit-learn (:py:mod:`sklearn.preprocessor`). We also use an imputer
+scikit-learn (:py:mod:`sklearn.preprocessing`). We also use an imputer
 to get rid of NaN's::
 
     from sklearn.compose import make_column_transformer, make_column_selector
@@ -339,14 +341,15 @@ good training results after the first attempt. In general, training
 adversarial networks is hard, and users may need to tweak the
 hyperparameters continuously. Besides general scikit-learn algorithms
 that finetune estimators,
-:ref:`Example 2` will demonstrate some problem-specific
+:ref:`adversarial_Example_2` will demonstrate some problem-specific
 techniques we can use such as using dynamic hyperparameters,
 validation, and early stopping to improve adversarial training.
 
-.. _Example 2:
+.. _adversarial_Example_2:
 
 Example 2: Finetuning training
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
+
 Adversarial learning is inherently difficult because of various issues,
 such as mode collapse, divergence, and diminishing gradients.
 In particular, mode collapse seems a real problem on this dataset: the
@@ -497,10 +500,11 @@ difference than in Exercise 1! This may come at the cost of some accuracy,
 but such a tradeoff is to be expected as we are purposely mitigating
 the unfairness that was present in the data.
 
-.. _Example 3:
+.. _adversarial_Example_3:
 
 Example 3: Scikit-learn applications
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
+
 AdversarialFairness is quite compliant with scikit-learn API, so functions
 such as pipelining and model selection are applicable here. In particular,
 applying pipelining might seem complicated as scikit-learn only pipelines
@@ -538,4 +542,10 @@ to fit::
     Female  0.906308       0.978664
     Male    0.723336       0.484927
 
-Notice how the same result is obtained as in :ref:`Example 1`.
+Notice how the same result is obtained as in :ref:`adversarial_Example_1`.
+
+
+References
+----------
+
+.. footbibliography::
