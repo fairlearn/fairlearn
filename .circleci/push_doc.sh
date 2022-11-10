@@ -76,7 +76,8 @@ git commit -m "$MSG" $dir
 if [ "$CIRCLE_BRANCH" = "main" ]
 then
     git add -f js/
-    git commit -m "$MSG" js/
+    # May not have changes to js directory, so use --allow-empty
+    git commit --allow-empty -m "$MSG" js/
 fi
 git push
 echo $MSG
