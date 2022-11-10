@@ -73,15 +73,10 @@ git config user.name $USERNAME
 git config push.default matching
 git add -f $dir/
 git commit -m "$MSG" $dir
-
-# See if the JS dir changed
-modified_js = `git status -s -uno js | wc -l`
-if [ "$CIRCLE_BRANCH" = "main"  && $modified_js -ne 0 ]
+if [ "$CIRCLE_BRANCH" = "main" ]
 then
     git add -f js/
-    git commit -m "JS dir update: $MSG" js/
+    git commit -m "$MSG" js/
 fi
-
-# Push all the changes
 git push
 echo $MSG
