@@ -8,12 +8,13 @@ _ARRAY_NOT_1D = "Supplied input array has more than one non-trivial dimension"
 
 def _convert_to_ndarray_and_squeeze(target):
     """Convert input to a `numpy.ndarray` and calls squeeze (to dispose of unit length dimensions).
-
+    There is a special case for empty.
     There is a special case to stop single element arrays being converted to scalars.
     """
     result = np.asarray(target)
-
-    if result.size > 1:
+    if result.size == 0:
+        result = result
+    elif result.size > 1:
         result = np.squeeze(result)
     else:
         result = result.reshape(1)
