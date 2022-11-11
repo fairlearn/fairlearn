@@ -11,6 +11,7 @@ def _convert_to_ndarray_and_squeeze(target):
     There is a special case for empty.
     There is a special case to stop single element arrays being converted to scalars.
     """
+
     result = np.asarray(target)
     if result.size == 0:
         result = result
