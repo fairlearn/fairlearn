@@ -228,7 +228,10 @@ def linkcode_resolve(domain, info):
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
         os.sep, "/"
     )
-    return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
+    if tag_or_branch == 'main':
+        return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
+    else:
+        return f"http://github.com/fairlearn/fairlearn/blob/v{tag_or_branch}/fairlearn/{fn}{linespec}"
 
 
 # -- LaTeX macros ------------------------------------------------------------
