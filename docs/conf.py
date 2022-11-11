@@ -78,8 +78,10 @@ intersphinx_mapping = {
     ),
     "tensorflow": (
         "https://www.tensorflow.org/api_docs/python",
-        "https://raw.githubusercontent.com/GPflow/"
-        "tensorflow-intersphinx/master/tf2_py_objects.inv",
+        (
+            "https://raw.githubusercontent.com/GPflow/"
+            "tensorflow-intersphinx/master/tf2_py_objects.inv"
+        ),
     ),
 }
 
@@ -228,7 +230,17 @@ def linkcode_resolve(domain, info):
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
         os.sep, "/"
     )
-    return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
+    if tag_or_branch == "main":
+        return (
+            "http://github.com/fairlearn/fairlearn/blob"
+            f"/{tag_or_branch}/fairlearn/{fn}{linespec}"
+        )
+
+    else:
+        return (
+            "http://github.com/fairlearn/fairlearn/blob/"
+            f"v{tag_or_branch}/fairlearn/{fn}{linespec}"
+        )
 
 
 # -- LaTeX macros ------------------------------------------------------------
