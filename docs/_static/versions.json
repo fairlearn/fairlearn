@@ -25,8 +25,9 @@
         "url": "https://fairlearn.org/v0.4.6/"
     },
     {
+
         "name": "v0.8 (dev)",
-        "version": "v0.8",
+        "version": "0.8",
         "url": "https://fairlearn.org/main/"
     }
 ]
