@@ -8,7 +8,7 @@ User Guide
 
    fairness_in_machine_learning
    assessment/index
-   mitigation
+   mitigation/index
    datasets/index
    installation_and_version_guide/index
    further_resources
