@@ -176,7 +176,7 @@ sphinx_gallery_conf = {
 }
 
 html_sidebars = {
-    "**": ["search-field.html", "sidebar-nav-bs.html"],
+    "**": ["sidebar-nav-bs.html"],
 }
 
 # Auto-Doc Options
