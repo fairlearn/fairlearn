@@ -141,6 +141,8 @@ html_theme_options = {
         "version_match": tag_or_branch,
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_persistent": [],
+    "header_links_before_dropdown": 7,
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -176,7 +178,7 @@ sphinx_gallery_conf = {
 }
 
 html_sidebars = {
-    "**": ["sidebar-nav-bs.html"],
+    "**": ["search-field", "sidebar-nav-bs.html"],
 }
 
 # Auto-Doc Options

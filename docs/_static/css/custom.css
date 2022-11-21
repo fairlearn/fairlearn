@@ -52,3 +52,8 @@ div.sponsor-div-box {
    font-size: 0.9rem;
    text-align: center;
  }
+
+ /* Fix version switcher button margin bottom */
+ button.version-switcher__button{
+   margin-bottom: 0em;
+ }
