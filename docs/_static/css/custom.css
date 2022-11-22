@@ -57,3 +57,8 @@ div.sponsor-div-box {
  button.version-switcher__button{
    margin-bottom: 0em;
  }
+
+ /* Fix scrollbars on primary sidebar */
+ .bd-sidebar-primary .sidebar-end-items{
+   margin-top: unset;
+ }

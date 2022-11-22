@@ -117,22 +117,22 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/fairlearn/fairlearn",
-            "icon": "fab fa-github",
+            "icon": "fa-brands fa-github",
         },
         {
             "name": "Twitter",
             "url": "https://twitter.com/fairlearn",
-            "icon": "fab fa-twitter",
+            "icon": "fa-brands fa-twitter",
         },
         {
             "name": "StackOverflow",
             "url": "https://stackoverflow.com/questions/tagged/fairlearn",
-            "icon": "fab fa-stack-overflow",
+            "icon": "fa-brands fa-stack-overflow",
         },
         {
             "name": "Discord",
             "url": "https://discord.gg/R22yCfgsRn",
-            "icon": "fab fa-discord",
+            "icon": "fa-brands fa-discord",
         },
     ],
     "show_prev_next": False,
@@ -162,6 +162,9 @@ html_use_index = False
 html_static_path = ["_static"]
 
 html_css_files = ["css/custom.css"]
+
+# Remove source link
+html_show_sourcelink = False
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
