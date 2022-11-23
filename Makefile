@@ -22,8 +22,5 @@ test-unit:
 test-deprecation:
 	$(PYTEST) -Werror::DeprecationWarning -Werror::FutureWarning ./test/unit
 
-doc-multiversion:
-	python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
-
 doc:
 	python -m sphinx -v -b html -n -j auto docs docs/_build/html

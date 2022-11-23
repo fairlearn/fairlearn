@@ -10,7 +10,7 @@ allow users to check the documentation of the version of the package that they
 are using.
 
 To contribute, make sure to install sphinx and its
-add-ons by running 
+add-ons by running
 
 .. code-block::
 
@@ -32,7 +32,7 @@ directory:
 or use the shortcut
 
 .. code-block::
-    
+
         make doc
 
 This will generate the website in the directory mentioned at the end of the
@@ -40,7 +40,7 @@ command. Rerunning this after making changes to individual files only
 rebuilds the changed pages, so the build time should be a lot shorter.
 
 You can check that the document(s) render properly by inspecting the HTML with
-the following commands: 
+the following commands:
 
 .. code-block::
 
@@ -61,7 +61,7 @@ For Linux users, use :code: `xdg-open docs/_build/html/index.html`
 :code:`plot_*` can be replaced with any of the notebooks in the
 :code:`auto_examples` folder. To view your changes, simply navigate to the
 relevant part of the website and check that your updates render properly
-and links work as expected. 
+and links work as expected.
 
 Note that some changes to documentation may involve modifying several files
 (i.e: index files, other documents in which the current one should be linked).
@@ -74,6 +74,27 @@ ensure that they all render properly.
     pull request) and need help, simply @mention
     :code:`@fairlearn/fairlearn-maintainers` to get help.
 
+Citations
+^^^^^^^^^
+
+Citations are built using the `sphinxcontrib-bibtex <https://pypi.org/project/sphinxcontrib-bibtex/>`_ 
+extension. This allows us to use the `refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ BibTeX file to generate our citations.
+
+To add a citation:
+
+1. Check if your required BibTex entry already exists in the 
+   `docs/refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ file. If not, simply paste your entry at the end.
+2. Change your bibtex id to the format ``<author-last-name><4digit-year><keyword>``.
+3. Use the :code:`:footcite:`bibtex-id`` role to create an inline citation rendered as :code:`[CitationNumber]`.
+   For example, :code:`:footcite:`agarwal2018reductions`` will be rendered as :footcite:`agarwal2018reductions`.
+4. You can also use :code:`:footcite:t:`bibtex-id`` to create a textual citation. The role :code:`:footcite:t:`agarwal2018reductions`` will be rendered as :footcite:t:`agarwal2018reductions`.
+5. To add the bibliography use :code:`.. footbibliography::` directive at the bottom of your file if not already present.
+   This will list all the citations for the current document.
+
+   For example :code:`.. footbibliography::` will be rendered as shown below:
+
+   .. footbibliography::
+
 Building the website for all versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -85,13 +106,7 @@ To fully build the website for all versions use the following script:
 
 .. code-block::
 
-    python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
-
-or the shortcut
-
-.. code-block::
-
-    make doc-multiversion
+    make doc
 
 The comprehensive set of commands to build the website is in our CircleCI
 configuration file in the `.circleci` directory of the repository.

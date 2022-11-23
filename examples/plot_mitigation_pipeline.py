@@ -15,16 +15,18 @@ Passing pipelines to mitigation techniques
 # fairness assessment and mitigation please refer to the :ref:`user_guide`.
 
 import json
-from fairlearn.datasets import fetch_adult
-from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-from fairlearn.reductions import ExponentiatedGradient, DemographicParity
+
 from sklearn.compose import ColumnTransformer
+from sklearn.compose import make_column_selector as selector
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+from fairlearn.datasets import fetch_adult
+from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
+from fairlearn.reductions import DemographicParity, ExponentiatedGradient
 
 # %%
 # Below we load the "Adult" census dataset and split its features, sensitive
@@ -36,7 +38,8 @@ y = (data.target == ">50K") * 1
 A = X_raw["sex"]
 
 (X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
-    X_raw, y, A, test_size=0.3, random_state=12345, stratify=y)
+    X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
+)
 
 X_train = X_train.reset_index(drop=True)
 X_test = X_test.reset_index(drop=True)
@@ -89,13 +92,17 @@ threshold_optimizer = ThresholdOptimizer(
     estimator=pipeline,
     constraints="demographic_parity",
     predict_method="predict_proba",
-    prefit=False)
+    prefit=False,
+)
 threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
 print(threshold_optimizer.predict(X_test, sensitive_features=A_test))
-print(json.dumps(
-    threshold_optimizer.interpolated_thresholder_.interpolation_dict,
-    default=str,
-    indent=4))
+print(
+    json.dumps(
+        threshold_optimizer.interpolated_thresholder_.interpolation_dict,
+        default=str,
+        indent=4,
+    )
+)
 plot_threshold_optimizer(threshold_optimizer)
 
 # %%
@@ -108,6 +115,7 @@ plot_threshold_optimizer(threshold_optimizer)
 exponentiated_gradient = ExponentiatedGradient(
     estimator=pipeline,
     constraints=DemographicParity(),
-    sample_weight_name="classifier__sample_weight")
+    sample_weight_name="classifier__sample_weight",
+)
 exponentiated_gradient.fit(X_train, y_train, sensitive_features=A_train)
 print(exponentiated_gradient.predict(X_test))
