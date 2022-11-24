@@ -2,7 +2,7 @@
 
 # Required for environment
 autopep8
-flake8
+flake8<6  # Having strange issue with latest release
 flake8-blind-except
 flake8-builtins
 flake8-copyright
