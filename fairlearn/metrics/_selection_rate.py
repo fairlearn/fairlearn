@@ -34,10 +34,10 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
     sample_weight : array_like
         Optional array of sample weights
     """
-    if len(y_pred) == 0:
+    selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
+    if len(selected) == 0:
         raise ValueError(_EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE)
 
-    selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
     s_w = np.ones(len(selected))
     if sample_weight is not None:
         s_w = np.squeeze(np.asarray(sample_weight))
