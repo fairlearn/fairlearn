@@ -461,7 +461,6 @@ The other constraints acquire similar modifications.
 
 .. _constraints_multi_class_classification:
 
-
 Fairness constraints for multiclass classification
 --------------------------------------------------
 
@@ -472,6 +471,7 @@ point. If this is an important scenario for you please let us know!
 
 Fairness constraints for regression
 -----------------------------------
+
 The performance objective in the regression scenario is to minimize the
 loss of our regressor :math:`h`. The loss can be expressed as
 :class:`SquareLoss` or :class:`AbsoluteLoss`. Both take constructor arguments
