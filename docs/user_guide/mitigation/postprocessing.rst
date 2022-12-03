@@ -179,8 +179,9 @@ Note that the plot omits points that are within the convex hull of points.
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
+    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(
-    ...     threshold_optimizer.interpolated_thresholder_.interpolation_dict,
+    ...     threshold_rules_by_group,
     ...     default=str,
     ...     indent=4))
     {
