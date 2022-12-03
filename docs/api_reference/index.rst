@@ -11,4 +11,5 @@ API Docs
    fairlearn.postprocessing
    fairlearn.preprocessing
    fairlearn.reductions
+   fairlearn.adversarial
    fairlearn.experimental

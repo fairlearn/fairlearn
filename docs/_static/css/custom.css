@@ -52,3 +52,18 @@ div.sponsor-div-box {
    font-size: 0.9rem;
    text-align: center;
  }
+
+ /* Fix version switcher button margin bottom */
+ button.version-switcher__button {
+   margin-bottom: 0em;
+ }
+
+ /* Fix scrollbars on primary sidebar */
+ .bd-sidebar-primary .sidebar-end-items {
+   margin-top: unset;
+ }
+
+ /* Fix Sphinx-Glr page bottom border */
+ p.sphx-glr-signature a.reference.external {
+   padding-bottom: 0px;
+ }

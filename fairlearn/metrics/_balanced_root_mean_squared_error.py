@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import math
+
 import numpy as np
 import sklearn.metrics as skm
 
@@ -11,7 +12,7 @@ _Y_TRUE_NOT_0_1 = "Only 0 and 1 are allowed in y_true and both must be present"
 
 
 def _balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
-    r"""Calculate the mean of the root mean squared error (RMSE) for the positive and negative cases.
+    r"""Calculate the balanced mean of the root mean squared error (RMSE).
 
     Used for binary logistic regression, this computes the error as
 
@@ -37,7 +38,7 @@ def _balanced_root_mean_squared_error(y_true, y_pred, sample_weight=None):
 
     errs = np.zeros(2)
     for i in range(0, 2):
-        indices = (y_ta == i)
+        indices = y_ta == i
         y_ta_s = y_ta[indices]
         y_pa_s = y_pa[indices]
         s_w_s = s_w[indices]

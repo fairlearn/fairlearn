@@ -40,11 +40,11 @@ def append_scrapbook_commands(input_nb_path, output_nb_path, scrap_specs):
 
     # Create a cell to store each key and value in the scrapbook
     for k, v in scrap_specs.items():
-        source = "sb.glue(\"{0}\", {1})".format(k, v.code)
+        source = 'sb.glue("{0}", {1})'.format(k, v.code)
         scrapbook_cells.append(nbf.v4.new_code_cell(source=source))
 
     # Append the cells to the notebook
-    [notebook['cells'].append(c) for c in scrapbook_cells]
+    [notebook["cells"].append(c) for c in scrapbook_cells]
 
     # Write out the new notebook
     nbf.write(notebook, output_nb_path)
@@ -82,22 +82,13 @@ def test_grid_search_for_binary_classification():
 
     test_values = {}
     test_values["best_lambda_second_grid"] = ScrapSpec(
-        "lambda_best_second", pytest.approx(0.8333333333))
+        "lambda_best_second", pytest.approx(0.8333333333)
+    )
     test_values["best_coeff_second0"] = ScrapSpec(
         "second_sweep.predictors_[second_sweep.best_idx_].coef_[0][0]",
-        pytest.approx(2.53725364))
+        pytest.approx(2.53725364),
+    )
 
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_mitigating_disparities_in_ranking_from_binary_data():
-    nb_name = "Mitigating Disparities in Ranking from Binary Data"
-    test_values = {}
-    # Needs wider bound due to randomness in ExponentiatedGradient
-    test_values["sel_eg_X_alt_disparity"] = ScrapSpec(
-        "sel_expgrad_X_alt.loc[ 'disparity', :][0]",
-        pytest.approx(0.35, abs=0.08))
     assay_one_notebook(nb_name, test_values)
 
 
@@ -106,11 +97,9 @@ def test_binary_classification_with_the_uci_credit_card_default_dataset():
     nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
     test_values = {}
     test_values["Contains_Unmitigated"] = ScrapSpec(
-        "'Unmitigated' in models_dict",
-        True
+        "'Unmitigated' in models_dict", True
     )
     test_values["Contains_ThresholdOptimizer"] = ScrapSpec(
-        "'ThresholdOptimizer' in models_dict",
-        True
+        "'ThresholdOptimizer' in models_dict", True
     )
     assay_one_notebook(nb_name, test_values)

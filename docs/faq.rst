@@ -140,7 +140,7 @@ Does Fairlearn support multiclass classification?
     :py:func:`sklearn.metrics.accuracy_score` or
     :py:func:`sklearn.metrics.confusion_matrix` as the metric functions, and
     supply multiclass data for :code:`y_true` and :code:`y_pred`.
-    We give an example with multiclass data in the :ref:`user guide <metrics_with_grouping>`.
+    We give an example with multiclass data in the :ref:`user guide <assessment>`.
     There are
     `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
     to add more extensive support to Fairlearn's assessment capabilities.
@@ -156,7 +156,7 @@ Does Fairlearn support multiclass classification?
 Does Fairlearn support multiple and non-binary sensitive features?
     Fairlearn's assessment capabilities support sensitive features with more
     than two values as well as multiple sensitive features.
-    Our :ref:`user guide <metrics_with_grouping>` has examples for both of
+    Our :ref:`user guide <assessment>` has examples for both of
     these cases.
     The mitigation techniques all support mitigation with non-binary and
     multiple sensitive features as well. For a full list of techniques
@@ -172,7 +172,7 @@ Does Fairlearn work for image and text data?
     data it is operating on).
 
 Is Fairlearn available in languages other than Python?
-    For the moment, we only support Python >= 3.7
+    For the moment, we only support Python >= 3.8
 
 Can I contribute to Fairlearn?
     Absolutely! Please see our :ref:`contributor guide <contributor_guide>` to
@@ -180,3 +180,16 @@ Can I contribute to Fairlearn?
 
 What is the relationship between Fairlearn and Microsoft?
     Fairlearn has grown from a project at Microsoft Research in New York City.
+
+What happened to the :code:`FairlearnDashboard`?
+    The Fairlearn dashboard was a Jupyter notebook widget for assessing how a
+    model's predictions impact different groups as defined by sensitive features, and
+    also for comparing multiple models in terms of various fairness and performance
+    metrics.
+
+    The :code:`FairlearnDashboard` is no longer being developed as
+    part of Fairlearn. Instead, it has found a new home at Microsoft with the name
+    :code:`FairnessDashboard`. For more information on how to use it refer to
+    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    Fairlearn provides some of the existing functionality through
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.

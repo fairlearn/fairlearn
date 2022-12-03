@@ -12,15 +12,15 @@ from ._extra_metrics import (
     _mean_overprediction,
     _mean_underprediction,
     _root_mean_squared_error,
+    count,
     false_negative_rate,
     false_positive_rate,
     mean_prediction,
     selection_rate,
     true_negative_rate,
-    count,
 )
-from ._metric_frame import MetricFrame
 from ._input_manipulations import _convert_to_ndarray_and_squeeze
+from ._metric_frame import MetricFrame
 
 _Y_TRUE = "trueY"
 _Y_PRED = "predictedY"
@@ -43,9 +43,7 @@ _VERSION = "schemaVersion"
 BINARY_CLASSIFICATION = "binary_classification"
 PROBABILITY = "probability"
 REGRESSION = "regression"
-_allowed_prediction_types = frozenset(
-    [BINARY_CLASSIFICATION, PROBABILITY, REGRESSION]
-)
+_allowed_prediction_types = frozenset([BINARY_CLASSIFICATION, PROBABILITY, REGRESSION])
 
 # The following keys need to match those of _metric_methods in
 # _fairlearn_dashboard.py
@@ -81,6 +79,7 @@ class _func_wrapper:
 
     def __init__(self, metric_function):
         self.metric_function = metric_function
+        self.__name__ = f"{metric_function.__name__}_wrapped"
 
     def __call__(self, y_true, y_pred):
         result = 0
@@ -161,9 +160,7 @@ def _process_predictions(predictions):
     return names, preds
 
 
-def _create_group_metric_set(
-    y_true, predictions, sensitive_features, prediction_type
-):
+def _create_group_metric_set(y_true, predictions, sensitive_features, prediction_type):
     """Create a dictionary matching the Dashboard's cache."""
     result = dict()
     result[_SCHEMA] = _DASHBOARD_DICTIONARY
@@ -187,9 +184,7 @@ def _create_group_metric_set(
         result[_PREDICTION_TYPE] = _PREDICTION_PROBABILITY
         function_dict = PROBABILITY_METRICS
     else:
-        raise NotImplementedError(
-            "No support yet for {0}".format(prediction_type)
-        )
+        raise NotImplementedError("No support yet for {0}".format(prediction_type))
 
     # Sort out y_true
     _yt = _convert_to_ndarray_and_squeeze(y_true)

@@ -9,7 +9,7 @@ version: 2.0
 jobs:
   build-doc:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -17,97 +17,110 @@ jobs:
       - checkout
 
       - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
+
+      - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
-      
+          command: python -m pip install --upgrade pip setuptools wheel
+
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
+          command: python scripts/install_requirements.py --pinned False
 
       - run:
           name: "Build Documentation"
-          command: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
+          command: make doc
           no_output_timeout: 30m
+
+      - run:
+          name: "Copy landing_page.js"
+          command: cp docs/static_landing_page/js/landing_page.js docs/_build/
 
       - persist_to_workspace:
           root: docs/_build
-          paths: html
-      
+          paths: 
+            - html
+            - landing_page.js
+
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
           path: docs/_build/html
 
   build-doctest:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: cimg/python:3.8.12
 
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch
       - checkout
-      
+
+      - run:
+          name: Show Python version
+          command: python --version
+
+      - run:
+          name: Show Ubuntu version
+          command: lsb_release -a
+
+      - run:
+          name: Update apt
+          command: sudo apt update
+
       - run:
           name: Install pandoc
           command: sudo apt-get install pandoc pandoc-citeproc
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: sudo python -m pip install --upgrade pip setuptools wheel
-      
+          command: python -m pip install --upgrade pip setuptools wheel
+
       - run:
           name: 'Install required packages'
-          command: sudo python scripts/install_requirements.py --pinned False
-      
+          command: python scripts/install_requirements.py --pinned False
+
       - run:
           name: 'Build doctest'
           command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
-      
+
   deploy-doc:
     docker:
-      - image: node:14.0.0-stretch  # npm required for gh-pages
-
+      - image: cimg/python:3.8.12
     steps:
       - checkout
- 
       - add_ssh_keys:
-          # To generate a key run the following in git bash (on Windows):
-          # ssh-keygen -t rsa -m pem -C "ci-build@fairlearn.org"
+          # To generate a new key:
+          # ssh-keygen -t ed25519 -C "ci-build@fairlearn.org" -f output_key_file
           # Do not add a passphrase.
-          # Upload public key as a deploy key to the website repository.
+          # Upload public key as a deploy key to the website GH repository.
           # Upload private key to CircleCI as an SSH key at
           # https://app.circleci.com/settings/project/github/fairlearn/fairlearn#ssh.
           fingerprints:  # fingerprint of deploy (public) key
             - "b5:72:60:33:2a:d4:bb:28:0d:36:23:86:74:d3:c6:10"
-
+      # Attach documentation generated in the 'doc' step so that it can be
+      # deployed.
       - attach_workspace:
-          at: docs/_build
-      
-      - run:
-          # By default GitHub attempts jekyll builds.
-          # Instead, we want the webpage to just point at index.html
-          name: Disable jekyll builds
-          command: touch docs/_build/html/.nojekyll
-      
-      - run:
-          # Create CNAME file for fairlearn.org
-          name: Create CNAME file
-          command: echo "fairlearn.org" > docs/_build/html/CNAME
-
-      - run:
-          name: 'Install gh-pages and configure dependencies'
+          at: doc/_build
+      - run: ls -ltrh doc/_build/
+      - deploy:
           command: |
-            npm install -g --silent gh-pages@2.0.1
-            git config user.email "ci-build@fairlearn.org"
-            git config user.name "ci-build"
-
-      - run:
-          name: 'Push to GitHub Pages repository'
-          command: gh-pages --dotfiles --message "Updates" --dist docs/_build/html --repo https://github.com/fairlearn/fairlearn.github.io.git --branch master
+            if [[ "${CIRCLE_BRANCH}" =~ ^main$|^release/[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
+              bash .circleci/push_doc.sh doc/_build/html
+            fi
 
 # This workflow defines the ordering, in this case build-doc needs to happen
 # before deploy-doc.
@@ -122,4 +135,5 @@ workflows:
             - build-doc
           filters:
             branches:
-              only: main  # don't deploy to GitHub pages from other branches
+              # don't deploy to GitHub pages from other branches
+              only: /^main$|^release/v[0-9]+\.[0-9]$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$/
