@@ -90,32 +90,3 @@ def test_grid_search_for_binary_classification():
     )
 
     assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_binary_classification_with_the_uci_credit_card_default_dataset():
-    nb_name = "Binary Classification with the UCI Credit-card Default Dataset"
-    test_values = {}
-    test_values["Contains_Unmitigated"] = ScrapSpec(
-        "'Unmitigated' in models_dict", True
-    )
-    test_values["Contains_ThresholdOptimizer"] = ScrapSpec(
-        "'ThresholdOptimizer' in models_dict", True
-    )
-    assay_one_notebook(nb_name, test_values)
-
-
-@pytest.mark.notebooks
-def test_credit_loan_ey():
-    nb_name = "Credit Loan Decisions.ipynb"
-    test_values = {}
-    test_values["Balanced_accuracy_unmitigated"] = ScrapSpec(
-        "balanced_accuracy_unmitigated",
-        pytest.approx(0.80168)
-    )
-
-    test_values["Balanced_accuracy_inprocess"] = ScrapSpec(
-        "bal_acc_inprocess",
-        pytest.approx(0.78842)
-    )
-    assay_one_notebook(nb_name, test_values)

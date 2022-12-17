@@ -19,23 +19,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# %%
 sns.set()
 
-# %%
 pd.set_option("display.float_format", "{:.3f}".format)
 
-# %%
 import lightgbm as lgb
 from sklearn.calibration import CalibratedClassifierCV
-
-# %%
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-
-# %%
 from fairlearn.metrics import MetricFrame
 from fairlearn.metrics import (
     count,
@@ -44,43 +37,36 @@ from fairlearn.metrics import (
     false_positive_rate,
     false_negative_rate,
 )
-
-# %%
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import EqualizedOdds
-
-# %%
 from sklearn.model_selection import train_test_split
-
-# %%
 from datetime import date
 import warnings
 
 warnings.simplefilter("ignore")
 
-# %%
 rand_seed = 1234
 np.random.seed(rand_seed)
 
 # %%
 # Fairness considerations of credit loan decisions
-# ================================================
+# ------------------------------------------------
 
 # %%
 # Fairness and credit lending in the US
-# -----------------------------------------
+# =====================================
 
 # %%
 # In 2019, Apple received backlash on social media after its newly launched
-# _Apple Card_ product appeared to `offer higher credit limits to men compared
+# *Apple Card* product appeared to `offer higher credit limits to men compared
 # to women
 # <https://edition.cnn.com/2019/11/12/business/apple-card-gender-bias/index.html>`_.
 # In multiple cases, married couples found the husband received a credit limit
 # that was 10-20x higher than the wife's even when the couple had joint assets.
 #
 # From a regulatory perspective, financial institutions that operate within
-# the United States are subject to _legal regulations_ prohibiting
+# the United States are subject to *legal regulations* prohibiting
 # discrimination on the `basis of race, gender, or other protected classes
 # <https://www.govinfo.gov/content/pkg/USCODE-2011-title15/html/USCODE-2011-title15-chap41-subchapIV.htm>`_.
 # With the increasing prevalence of automated decision-systems in the financial
@@ -91,27 +77,27 @@ np.random.seed(rand_seed)
 # same concept as anti-discrimination law. An AI system can comply with
 # anti-discrimination law while exhibiting fairness-related concerns. On the
 # other hand, some fairness interventions may be illegal under
-# anti-discrimination law. `Xiang and Raji  (2019)
-# <https://arxiv.org/abs/1912.00761>`_` discuss the compatibilities and
+# anti-discrimination law. `Xiang and Raji (2019)
+# <https://arxiv.org/abs/1912.00761>`_ discuss the compatibilities and
 # disconnects between anti-discrimination law and algorithmic notions of
 # fairness. In this case study, we focus on fairness in financial services
 # rather than compliance with financial anti-discrimination regulations.
 
 # %%
 # Ernst & Young (EY) case study
-# =============================
+# -----------------------------
 
 # %%
-# In this case study, we aim to replicate the work done in a `white paper
+# In this case study, we aim to replicate the work done in a `white paper 
 # <https://www.microsoft.com/en-us/research/uploads/prod/2020/09/Fairlearn-EY_WhitePaper-2020-09-22.pdf>`_,
 # co-authored by *Microsoft* and *EY*, on mitigating gender-related performance
-# disparities in financial lending decisions. In their analysis, *Microsoft* and
-# *EY* demonstrated how *Fairlearn* could be used to measure and mitigate
+# disparities in financial lending decisions. In their analysis, Microsoft and
+# EY demonstrated how Fairlearn could be used to measure and mitigate
 # unfairness in the loan adjudication process.
 #
 # Using a dataset of credit loan outcomes (whether an individual defaulted on
 # a credit loan), we train a fairness-unaware model to predict the likelihood an
-# individual will default on a given loan. We use the *Fairlearn* toolkit for
+# individual will default on a given loan. We use the Fairlearn toolkit for
 # assessing the fairness of our model, according to several metrics. Finally, we
 # perform two unfairness mitigation strategies on our model and compare the
 # results to our original model.
@@ -122,7 +108,7 @@ np.random.seed(rand_seed)
 
 # %%
 # Credit decisions dataset
-# -------------------------
+# ========================
 
 # %%
 # As mentioned, we will not be able to use the original loans dataset, and
@@ -133,31 +119,36 @@ np.random.seed(rand_seed)
 # April 2005 to September 2005, as well as demographic information, such as
 # *sex*, *age*, *marital status*, and *education level* of the applicant. A full
 # summary of features is provided below:
-
-# %%
-# |features| description|
-# |---|---|
-# | sex, education,<br> marriage, age | demographic features |
-# | pay_0, pay_2, pay_3,<br> pay_4, pay_5, pay_6 | repayment status<br> (ordinal) |
-# | bill_amt1, bill_amt2, bill_amt3,<br> bill_amt4, bill_amt5, bill_amt_6 | bill statement amount<br>(Taiwan dollars) |
-# | pay_amt1, pay_amt2, pay_amt3,<br> pay_amt4, pay_amt5, pay_amt6 | previous statement amount<br>(Taiwan dollars) |
-# | default payment next month | default information<br> (1 = YES, 0 = NO) |
-
-# %%
+# 
+# .. list-table::
+#   :header-rows: 1
+#   :stub-columns: 1
+# 
+#   *  - features
+#      - description
+#   *  - sex, education, marriage, age
+#      - demographic features
+#   *  - pay_0, pay_2, pay_3, pay_4, pay_5, pay_6 
+#      - repayment status (ordinal)
+#   *  - bill_amt1, bill_amt2, bill_amt3, bill_amt4, bill_amt5, bill_amt_6
+#      - bill statement amount (Taiwan dollars)
+#   *  - pay_amt1, pay_amt2, pay_amt3, pay_amt4, pay_amt5, pay_amt6
+#      - previous statement amount (Taiwan dollars)
+#   *  - default payment next month
+#      - default information (1 = YES, 0 = NO)
+# 
 # Let's pretend we are a data scientist at a financial institution who is
 # tasked with developing a classification model to predict whether an applicant
 # will default on a personal loan. A positive prediction by the model means the
-# applicant would default on the credit loan. _Defaulting on a loan_ means the
+# applicant would default on the credit loan. *Defaulting on a loan* means the
 # client fails to make payments within a 30-day window, and the lender can take
 # legal actions against the client.
-
-# %%
+#
 # Although we do not have a dataset of loan default history, we do have this
 # data set of credit card payment history. We assume customers who make monthly
-# credit card payments on time are more _creditworthy_, and thus less likely to
+# credit card payments on time are more *creditworthy*, and thus less likely to
 # default on a personal credit loan.
-
-# %%
+#
 # **Decision point: task definition**
 #
 # - **Defaulting on a credit card payment** can be viewed as a proxy for the
@@ -165,10 +156,10 @@ np.random.seed(rand_seed)
 # - Because most customers did not default on their credit card payment, we will
 #   need to take this class imbalance into account during our modeling process.
 #
-# As the data is read in-memory, we will change the column :param:`PAY_0` to
-# :param:`PAY_1` to make the naming more consistent with the naming of the other
-# columns. In addition, the target variable :param:`default payment next month`
-# is changed to `default` to reduce verbosity.
+# As the data is read in-memory, we will change the column :code:`PAY_0` to
+# :code:`PAY_1` to make the naming more consistent with the naming of the other
+# columns. In addition, the target variable :code:`default payment next month`
+# is changed to :code:`default` to reduce verbosity.
 
 # %%
 data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/default%20of%20credit%20card%20clients.xls"
@@ -187,37 +178,36 @@ dataset.shape
 dataset.head()
 
 # %%
-# From the `dataset description<https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients>`_,
+# From the `dataset description 
+# <https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients>`_,
 # we see there are three categorical features:
-# - `SEX`: Sex of the applicant (as a binary feature)
-# - `EDUCATION`: Highest level of education achieved by the applicant.
-# - `MARRIAGE`: Marital status of the applicant.
+# 
+# - :code:`SEX`: Sex of the applicant (as a binary feature)
+# - :code:`EDUCATION`: Highest level of education achieved by the applicant.
+# - :code:`MARRIAGE`: Marital status of the applicant.
 
 # %%
 categorical_features = ["SEX", "EDUCATION", "MARRIAGE"]
 
-# %%
 for col_name in categorical_features:
     dataset[col_name] = dataset[col_name].astype("category")
 
-# %%
 Y, A = dataset.loc[:, "default"], dataset.loc[:, "SEX"]
 X = pd.get_dummies(dataset.drop(columns=["default", "SEX"]))
 
-# %%
 A_str = A.map({1: "male", 2: "female"})
 
 # %%
 # Dataset imbalances
-# ------------------
+# ==================
 
 # %% Before we start training a classifier model, we want to explore the dataset
 # for any characteristics that may lead to fairness-related harms later on in
 # the modeling process. In particular, we wil focus on the distribution of
-# sensitive feature `SEX` and the target label `default`.
+# sensitive feature :code:`SEX` and the target label :code:`default`.
 #
 # As part of an exploratory data analysis, let's explore the distribution of
-# our sensitive feature `SEX`. We see that 60% of loan applicants were labeled
+# our sensitive feature :code:`SEX`. We see that 60% of loan applicants were labeled
 # as `female` and 40% as `male`, so we do not need to worry about imbalance in
 # this feature.
 
@@ -225,56 +215,54 @@ A_str = A.map({1: "male", 2: "female"})
 A_str.value_counts(normalize=True)
 
 # %%
-# Next, let's explore the distribution of the *loan default rate* `Y`. We see
-# that around 78% of individuals in the dataset do not default on their credit
-# loan. While the target label does not display extreme imbalance, we will need
-# to account for this imbalance in our modeling section. As opposed to the
-# _sensitive feature_ `SEX`, an imbalance in the target label may result in a
-# classifier that over-optimizes for the majority class. For example, a
-# classifier that predicts an applicant will not default would achieve an
-# accuracy of 78%, so we will use the `balanced_accuracy` score as our
-# evaluation metric to counteract the label imbalance.
+# Next, let's explore the distribution of the *loan default rate* :code:`Y`.
+# We see that around 78% of individuals in the dataset do not default on their
+# credit loan. While the target label does not display extreme imbalance, we
+# will need to account for this imbalance in our modeling section. As opposed
+# to the *sensitive feature* :code:`SEX`, an imbalance in the target label may
+# result in a classifier that over-optimizes for the majority class.
+# For example, a classifier that predicts an applicant will not default would
+# achieve an accuracy of 78%, so we will use the :code:`balanced_accuracy`
+# score as our evaluation metric to counteract the label imbalance.
 
 # %%
 Y.value_counts(normalize=True)
 
 # %%
 # Add synthetic noise that is related to the outcome and sex
-# --------------------------------------------------------------
+# ==========================================================
 
 # %%
-# For the purpose of this case study, we add a synthetic feature `Interest`
-# that introduces correlation between the `SEX` label of an applicant and the
-# `default` outcome. The purpose of this feature is to replicate outcome
-# disparities present in the original dataset. We can think of this `Interest`
-# feature as the _interest rate_ for the applicant. If the applicant has a
+# For the purpose of this case study, we add a synthetic feature :code:`Interest`
+# that introduces correlation between the :code:`SEX` label of an applicant and the
+# :code:`default` outcome. The purpose of this feature is to replicate outcome
+# disparities present in the original dataset. We can think of this :code:`Interest`
+# feature as the *interest rate* for the applicant. If the applicant has a
 # history of defaulting on credit card payments, the bank will lend to the
 # applicant at a higher interest rate. We also assume because banks have
 # historically lended primarily to men, there is less uncertainty (or variance)
-# in the _interest rate_ for these applicants.
+# in the *interest rate* for these applicants.
 
 # %%
-# To refect the above reasoning, the `Interest` feature is drawn from a
+# To reflect the above reasoning, the :code:`Interest` feature is drawn from a
 # *Gaussian distribution* with the following criterion:
-# * If *Male*, draw `Interest` from **Normal**(2 $\cdot$ Default, 1)
-# * If *Female*, draw `Interest` from **Normal**(2 $\cdot$ Default, 2)
+# 
+# * If *Male*, draw :code:`Interest` from :math:`\mathcal{N}(2 \cdot \text{Default}, 1)`
+# * If *Female*, draw :code:`Interest` from :math:`\mathcal{N}(2 \cdot \text{Default}, 2)`
 #
 # This feature is drawn from a *Gaussian distribution* for computational
 # simplicity.
 
-# %%
-# If default, Normal(2, 1) for male, Normal(2, 2) for female If no default,
-# Normal(0, 1) for male, Normal(0, 2) for female
 X.loc[:, "Interest"] = np.random.normal(loc=2 * Y, scale=A)
 
 # %%
 # Check if this will lead to disparity in naive model
-# ---------------------------------------------------
+# ===================================================
 
 # %%
 # Now that we have created our synthetic feature, let's check how this new
-# feature interacts with our *sensitive_feature* `Sex` and our target label
-# `default`. We see that for both sexes, the `Interest` feature is higher for
+# feature interacts with our *sensitive_feature* :code:`Sex` and our target label
+# :code:`default`. We see that for both sexes, the :code:`Interest` feature is higher for
 # individuals who defaulted on their loan.
 
 # %%
@@ -301,7 +289,7 @@ X["Interest"][(A == 2) & (Y == 1)].plot(
 
 # %%
 # Training an initial model
-# ---------------------------
+# =========================
 
 # %%
 # In this section, we will train a fairness-unaware model on the training
@@ -344,7 +332,7 @@ X_train, y_train, A_train = resample_training_data(X_train, y_train, A_train)
 
 # %%
 # At this stage, we will train a *gradient-boosted tree classifier* using the
-# `lightgbm` package on the balanced training dataset. When we evaluate the
+# :code:`lightgbm` package on the balanced training dataset. When we evaluate the
 # model, we will use the unbalanced testing dataset.
 
 # %%
@@ -376,7 +364,7 @@ Y_pred = estimator.predict(X_test)
 # %%
 # From the *ROC Score*, we see the model appears to be differentiating
 # between *true positives* and *false positives* well. This is to be expected
-# given the `INTEREST` feature provides a strong discriminant feature for the
+# given the :code:`INTEREST` feature provides a strong discriminant feature for the
 # classification task.
 
 # %%
@@ -384,11 +372,11 @@ roc_auc_score(y_test, Y_pred_proba)
 
 # %%
 # Feature Importance of the Unmitigated Classifier
-# ----------------------------------------------------
+# ================================================
 
 # %%
 # As a model validation check, let's explore the feature importances of our
-# classifier. As expected, our synthetic feature `INTEREST` has the highest
+# classifier. As expected, our synthetic feature :code:`INTEREST` has the highest
 # feature importance because it is highly correlated with the target variable,
 # by construction.
 
@@ -404,7 +392,7 @@ lgb.plot_importance(
 
 # %%
 # Fairness assessment of unmitigated model
-# ==========================================
+# ----------------------------------------
 
 # %%
 # Now that we have trained our initial fairness-unaware model, let's perform
@@ -417,7 +405,7 @@ lgb.plot_importance(
 
 # %%
 # Who will be harmed?
-# -------------------
+# ===================
 #
 
 # %%
@@ -428,7 +416,7 @@ lgb.plot_importance(
 
 # %%
 # Types of harm experienced
-# -------------------------
+# =========================
 #
 
 # %%
@@ -444,12 +432,9 @@ lgb.plot_importance(
 # system is extending or withholding financial assets from individuals. A review
 # of historical incidents shows these types of automated lending decision
 # systems may discriminate unfairly based on sex.
-
-# %%
-# Negative impact of credit score
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# %%
+#
+# **Negative impact of credit score**
+#
 # A secondary harm that is somewhat unique to credit lending decisions is the
 # long-term impact on an individual's credit score. In the United States, a
 # `FICO credit score <https://www.investopedia.com/terms/c/credit_score.asp>`_
@@ -459,7 +444,7 @@ lgb.plot_importance(
 # increases after a successful repayment of a loan and decreases if the
 # applicant fails to repay the loan.
 #
-#  When applying for a credit loan, there are three major outcomes:
+# When applying for a credit loan, there are three major outcomes:
 #
 # 1. The individual receives the credit loan and pays back the loan. In this
 #    scenario, we expect the individual's credit score to increase as a result
@@ -479,12 +464,9 @@ lgb.plot_importance(
 #    future loan. In the modeling process, this outcome is tied to the
 #    **selection rate** (the proportion of positive predictions outputted by the
 #    model).
-
-# %%
-# Prevention of wealth accumulation
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# %%
+#
+# **Prevention of wealth accumulation**
+#
 # One other type of harm we anticipate in this scenario is the long-term
 # effects of *denying loans to applicants who would have successfully paid back
 # the loan*. By receiving a loan, an applicant is able to purchase a home, start
@@ -492,7 +474,7 @@ lgb.plot_importance(
 # do otherwise. These outcomes are tied to **false positive error** rates in
 # which the model predicts an applicant will default on the loan, but the
 # individual would have successfully paid the loan back. In the United States,
-# the practice of `**redlining**
+# the practice of `redlining
 # <https://news.trust.org/item/20200713110849-az14m/>`_, denying mortgage loans
 # and other financial services to predominantly Black or other minority
 # communites, has resulted in a vast racial wealth gap between white and Black
@@ -505,13 +487,13 @@ lgb.plot_importance(
 
 # %%
 # Define fairness metrics based on harms
-# =========================================
+# --------------------------------------
 
 # %%
 # Now that we have identified the relevant harms we anticpate users will
 # experience, we can define our fairness metrics. In addition to the metrics, we
 # will quantify the uncertainty around each metric using *custom functions* to
-# compute the _standard error_ for each metric at the $\alpha=0.95$ confidence
+# compute the *standard error* for each metric at the $\alpha=0.95$ confidence
 # level.
 
 # %%
@@ -534,8 +516,6 @@ def compute_error_metric(metric_value, sample_size):
         / np.sqrt(sample_size)
     )
 
-
-# %%
 def false_positive_error(y_true, y_pred):
     """
     Computes the standard error for the false positive rate estimate.
@@ -543,14 +523,12 @@ def false_positive_error(y_true, y_pred):
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     return compute_error_metric(fp, tn + fp)
 
-
 def false_negative_error(y_true, y_pred):
     """
     Computes the standard error for the false negative rate estimate.
     """
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     return compute_error_metric(fn, fn + tp)
-
 
 def balanced_accuracy_error(y_true, y_pred):
     """
@@ -561,8 +539,6 @@ def balanced_accuracy_error(y_true, y_pred):
     ), false_negative_error(y_true, y_pred)
     return np.sqrt(fnr_error**2 + fpr_error**2) / 2
 
-
-# %%
 fairness_metrics = {
     "count": count,
     "balanced_accuracy": balanced_accuracy_score,
@@ -584,10 +560,10 @@ metrics_to_report = [
 
 # %%
 # To compute the disaggregated performance metrics, we will use the
-# `MetricFrame` object within the `Fairlearn` library. We will pass in our
-# dictionary of metrics `fairness_metrics`, along with our test labels `y_test`
-# and test predictions `Y_pred`. In addition, we pass in the
-# *sensitive_features* `A_test` to disaggregate our model results.
+# :code:`MetricFrame` object within the Fairlearn library. We will pass in our
+# dictionary of metrics :code:`fairness_metrics`, along with our test labels :code:`y_test`
+# and test predictions :code:`Y_pred`. In addition, we pass in the
+# *sensitive_features* :code:`A_test` to disaggregate our model results.
 
 # %%
 # Instantiate the MetricFrame for the unmitigated model
@@ -598,7 +574,6 @@ metricframe_unmitigated = MetricFrame(
     sensitive_features=A_test,
 )
 
-# %%
 metricframe_unmitigated.by_group[metrics_to_report]
 
 metricframe_unmitigated.difference()[metrics_to_report]
@@ -609,14 +584,14 @@ metricframe_unmitigated.overall[metrics_to_report]
 # %%
 def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
     """
-    Plots the disaggregated `metric` for each group with an associated
+    Plots the disaggregated metric for each group with an associated
     error bar. Both metric and the error bar are provided as columns in the
-    provided :code:`MetricFrame`.
+    provided MetricFrame.
 
     Parameters:
     - metricframe: The metricframe containing the metrics and their associated uncertainty quantification.
     - metric: The set of metrics to plot
-    - error_name: The associated standard error for each metric in `metric`
+    - error_name: The associated standard error for each metric in metric
 
     Returns:
     - Matplotlib Plot of point estimates with error bars
@@ -661,13 +636,14 @@ metricframe_unmitigated.by_group[metrics_to_report].plot.bar(
     subplots=True, layout=[3, 1], figsize=[12, 18]
 )
 
-# %% Finally, let's compute the `equalized_odds_difference` for this unmitigated
+# %%
+# Finally, let's compute the :code:`equalized_odds_difference` for this unmitigated
 # model. The :code:`equalized_odds_difference` is the maximum of the
-# `false_positive_rate_difference` and `false_negative_rate_difference`. In our
+# :code:`false_positive_rate_difference` and :code:`false_negative_rate_difference`. In our
 # lending context, both *false_negative_rate_disparities* and
 # *false_positive_rate_disparities* result in fairness-related harms. Therefore,
 # we attempt to minimize both of these metrics by minimizing the
-# `equalized_odds_difference`.
+# :code:`equalized_odds_difference`.
 
 # %%
 balanced_accuracy_unmitigated = balanced_accuracy_score(y_test, Y_pred)
@@ -683,13 +659,11 @@ equalized_odds_unmitigated = equalized_odds_difference(
 
 # %%
 # Mitigating Unfairness in ML models
-# ====================================
-
-# %%
+# ----------------------------------
 # In the previous section, we identified disparities in the model's
-# performance with respect to `SEX`. In particular, we found that model produces
-# a significantly higher `false_negative_rate` and `false_positive_rate` for the
-# applicants labeled `female` compared to those labeled `male`. In the context
+# performance with respect to :code:`SEX`. In particular, we found that model produces
+# a significantly higher :code:`false_negative_rate` and :code:`false_positive_rate` for the
+# applicants labeled :code:`female` compared to those labeled :code:`male`. In the context
 # of credit decision scenario, this means the model under-allocates loans to
 # *women* who would have paid the loan, but over-allocates loans to *women* who
 # go on to default on their loan.
@@ -698,33 +672,31 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # disparities we found in our unmitigated model. We will apply two different
 # mitigation strategies:
 #
-# - *Post-processing*: In the post-processing approach, the outputs of a trained
+# - *Postprocessing*: In the postprocessing approach, the outputs of a trained
 #   classifer are transformed to satisfy some fairness criterion.
 # - *Reductions*: In the reductions approach, we take in a model class and
 #   iteratively create a sequence of models that optimize some fairness
-#   constraint. Compared to the *post-processing* approach, the fairness
+#   constraint. Compared to the *postprocessing* approach, the fairness
 #   constraint is satisfied during the model training time rather than
 #   afterwards.
 
 # %%
 # Postprocessing mitigations: ThresholdOptimizer
-# -------------------------------------------------
-
-# %%
-# In the _Fairlearn_ package, *post-processing* mitigation is offered through
-# the `ThresholdOptimizer` algorithm, following `Hardt, Price, and Srebro (2016)
-# <https://arxiv.org/abs/1610.02413>`_. The `ThresholdOptimizer` takes in an
+# ==============================================
+# In the Fairlearn package, *postprocessing* mitigation is offered through
+# the :code:`ThresholdOptimizer` algorithm, following `Hardt, Price, and Srebro (2016)
+# <https://arxiv.org/abs/1610.02413>`_. The :code:`ThresholdOptimizer` takes in an
 # exisiting (possilbly pre-fit) machine learning model whose predictions acts as
-# a scoring function to identify separate thresholds for each _sensitive
-# feature_ group. The `ThresholdOptimizer` optimizes a specified objective
-# metric (in our case, `balanced_accuracy`) subject to some fairness constraint
+# a scoring function to identify separate thresholds for each *sensitive
+# feature* group. The :code:`ThresholdOptimizer` optimizes a specified objective
+# metric (in our case, :code:`balanced_accuracy`) subject to some fairness constraint
 # (`equalized_odds`), resulting in a thresholded version of the underlying
 # machine learning model.
 #
-# To instantiate our `ThresholdOptimizer`, we need to specify our fairness
-# constraint as a model parameter. Because both `false_negative_rate`
-# disparities and `false_positive_rate` disparities translate into real-world
-# harms in our scenario, we will aim to minimize the `equalized_odds` difference
+# To instantiate our :code:`ThresholdOptimizer`, we need to specify our fairness
+# constraint as a model parameter. Because both :code:`false_negative_rate`
+# disparities and :code:`false_positive_rate` disparities translate into real-world
+# harms in our scenario, we will aim to minimize the :code:`equalized_odds` difference
 # as our *fairness constraint*.
 
 # %%
@@ -737,12 +709,12 @@ postprocess_est = ThresholdOptimizer(
 )
 
 # %%
-# One key limitation of the `ThresholdOptimizer` is the need for sensitive
+# One key limitation of the :code:`ThresholdOptimizer` is the need for sensitive
 # features during training and prediction time. If we do not have access to the
-# `sensitive_features` during prediction time, we cannot use the
-# `ThresholdOptimizer`.
+# :code:`sensitive_features` during prediction time, we cannot use the
+# :code:`ThresholdOptimizer`.
 #
-# We pass in `A_train` to the `fit` function with the `sensitive_features`
+# We pass in :code:`A_train` to the :code:`fit` function with the :code:`sensitive_features`
 # parameter.
 
 # %%
@@ -756,8 +728,8 @@ postprocess_pred_proba = postprocess_est._pmf_predict(
 
 
 # %%
-# Fairness assessment of post-processing model
-# --------------------------------------------
+# Fairness assessment of postprocessing model
+# ===========================================
 
 # %%
 def compare_metricframe_results(mframe_1, mframe_2, metrics, names):
@@ -802,7 +774,6 @@ metricframe_postprocess.difference()[metrics_to_report]
 # Now, let's compare the performance of our *thresholded* classifier with the
 # original *unmitigated* model.
 
-# %%
 compare_metricframe_results(
     metricframe_unmitigated,
     metricframe_postprocess,
@@ -816,59 +787,55 @@ metricframe_postprocess.by_group[metrics_to_report].plot.bar(
 
 
 # %%
-# We see that the `ThresholdOptimizer` algorithm achieves a much lower
-# disparity between the two groups compared to the _unmitigated_ model. However,
-# this does come with the trade-off that the `ThresholdOptimizer` achieves a
-# lower `balanced_accuracy` score for _male_ applicants.
+# We see that the :code:`ThresholdOptimizer` algorithm achieves a much lower
+# disparity between the two groups compared to the *unmitigated* model. However,
+# this does come with the trade-off that the :code:`ThresholdOptimizer` achieves a
+# lower :code:`balanced_accuracy` score for *male* applicants.
 
 # %%
 # Reductions approach to unfairness mitigation
-# ============================================
-
-# %%
+# --------------------------------------------
 # In the previous section, we took a fairness-unaware model and used the
-# `ThresholdOptimizer` to transform the model's decision boundary to satisfy our
-# fairness constraints. One key limitation of the `ThresholdOptimizer` is
-3  # needing access to our *sensitive_feature* during prediction time.
-
+# :code:`ThresholdOptimizer` to transform the model's decision boundary to satisfy our
+# fairness constraints. One key limitation of the :code:`ThresholdOptimizer` is
+# needing access to our *sensitive_feature* during prediction time.
+# 
 # In this section, we will use the *reductions* approach of `Agarwal et. al
 # (2018) <https://arxiv.org/pdf/1803.02453.pdf>`_ to produce models that satisfy
 # the fairness constraint without needing access to the sensitive features at
 # deployment time.
 #
-# The main reduction algorithm in Fairlearn is `ExponentiatedGradient`. The
+# The main reduction algorithm in Fairlearn is :code:`ExponentiatedGradient`. The
 # algorithm creates a sequence of re-weighted datasets and retrains the wrapped
 # classifier on each of the datasets. This re-training process is guaranteed to
 # find a model that satisfies the fairness constraints while optimizing the
 # performance metric.
 #
-# The model returned by `ExponentiatedGradient` consists of several inner
+# The model returned by :code:`ExponentiatedGradient` consists of several inner
 # models, returned by a wrapped estimator.
-
-# %%
-# To instantiate an `ExponentiatedGradient` model, we pass in two parameters:
-# - a base `estimator` (object that supports training)
-# - fairness `constraints` (object of type :class:fairlearn.reductions.Moment)
-
-# %%
-# When passing in a fairness *constraint* as a `Moment`, we can specify an
-# `epsilon` value representing the maximum allowed difference or ratio between
+#
+# To instantiate an :code:`ExponentiatedGradient` model, we pass in two parameters:
+# 
+# - a base :code:`estimator` (object that supports training)
+# - fairness :code:`constraints` (object of type :class:`fairlearn.reductions.Moment`)
+#
+# When passing in a fairness *constraint* as a :code:`Moment`, we can specify an
+# :code:`epsilon` value representing the maximum allowed difference or ratio between
 # our largest and smallest value. For example, in the below code,
-# `EqualizedOdds(difference_bound=epsilon)` means that we are using
-# `EqualizedOdds` as our fairness constraint, and we will allow a maximal
-# difference of `epsilon` between our largest and smallest *equalized odds*
+# :code:`EqualizedOdds(difference_bound=epsilon)` means that we are using
+# :code:`EqualizedOdds` as our fairness constraint, and we will allow a maximal
+# difference of :code:`epsilon` between our largest and smallest *equalized odds*
 # value.
 
-# %%
 def get_expgrad_models_per_epsilon(
     estimator, epsilon, X_train, y_train, A_train
 ):
     """
-    Instantiates and trains an :class:ExponentiatedGradient model on the
+    Instantiates and trains an ExponentiatedGradient model on the
     balanced training dataset.
 
     Parameters:
-        - Estimator: Base estimator to contains a `fit` and `predict` function.
+        - Estimator: Base estimator to contains a fit and predict function.
         - Epsilon: Float representing maximum difference bound for the fairness Moment constraint
 
     Returns:
@@ -888,16 +855,16 @@ def get_expgrad_models_per_epsilon(
 
 # %%
 # Because the *performance-fairness trade-off* learned by the
-# `ExponentiatedGradient` model is sensitive to our chosen `epsilon` value, we
-# can treat `epsilon` as a *hyperparameter* and iterate over a range of
-# potential values. Here, we will train two `ExponentiatedGradient` models, one
-# with `epsilon=0.01` and the second with `epsilon=0.02`, and store the inner
+# :code:`ExponentiatedGradient` model is sensitive to our chosen :code:`epsilon` value, we
+# can treat :code:`epsilon` as a *hyperparameter* and iterate over a range of
+# potential values. Here, we will train two :code:`ExponentiatedGradient` models, one
+# with :code:`epsilon=0.01` and the second with :code:`epsilon=0.02`, and store the inner
 # models learned through each of the training processes.
 #
-# In practice, we recommend choosing smaller values of :param:`epsilon` on
-# the order of the _square root_ of the number of samples in the training
-# dataset: $$\dfrac{1}{\sqrt{numberSamples}} \approx \dfrac{1}{\sqrt{25000}}
-# \approx 0.01 $$
+# In practice, we recommend choosing smaller values of :code:`epsilon` on
+# the order of the *square root* of the number of samples in the training
+# dataset: :math:`\dfrac{1}{\sqrt{\text{numberSamples}}} \approx \dfrac{1}{\sqrt{25000}}
+# \approx 0.01`
 
 # %%
 epsilons = [0.01, 0.02]
@@ -922,26 +889,23 @@ for epsilon, models in all_models.items():
 
 # %%
 # Here, we can see all the inner models learned for each value of
-# :param:`epsilon`. With the `ExponentiatedGradient` model, we specify an
-# `epsilon` parameter that represents the maximal disparity in our fairness
-# metric that our final model should satisfy. For example, an `epsilon=0.02`
+# :param:`epsilon`. With the :code:`ExponentiatedGradient` model, we specify an
+# :code:`epsilon` parameter that represents the maximal disparity in our fairness
+# metric that our final model should satisfy. For example, an :code:`epsilon=0.02`
 # means that the training value of the *equalized odds difference* of the
-# returned model is at most `0.02` (if the algorithm converges).
+# returned model is at most :code:`0.02` (if the algorithm converges).
 
 # %%
 # Reviewing inner models of ExponentiatedGradient
-# ---------------------------------------------------
-
-# %%
+# ===============================================
 # In many situations due to regulation or other technical restrictions, the
-# randomized nature of `ExponentiatedGradient` algorithm may be undesirable. In
+# randomized nature of :code:`ExponentiatedGradient` algorithm may be undesirable. In
 # addition, the multiple inner models of the algorithm introduce challenges for
 # model interpretability. One potential workaround to avoid these issues is to
 # select one of the inner models and deploy it instead.
-
-# %%
-# In the previous section, we trained multiple `ExponentiatedGradient` models
-# at different `epsilon` levels and collected all the inner models learned by
+#
+# In the previous section, we trained multiple :code:`ExponentiatedGradient` models
+# at different :code:`epsilon` levels and collected all the inner models learned by
 # this process. However, some of these inner models are better performance in
 # both their *balanced error rate* and *equalized odds difference*. We will
 # filter out these *"dominated"* models and plot the performance trade-offs of
@@ -994,18 +958,18 @@ def aggregate_predictor_performances(
     predictors, metric, X_test, Y_test, A_test=None
 ):
     """
-    Helper function to compute the specified metric for all classifiers in `predictors`.
+    Helper function to compute the specified metric for all classifiers in predictors.
     If no sensitive features are present, the metric is computed without disaggregation.
 
     Parameters:
     - predictors: A set of classifiers to generate predictions from.
-    - metric: The metric (callable) to compute for each classifier in `predictor`
+    - metric: The metric (callable) to compute for each classifier in predictor
     - X_test: The data features of the testing data set
     - Y_test: The target labels of the teting data set
     - A_test: The sensitive feature of the testing data set.
 
     Returns:
-        - List of performance scores for each classifier in `predictors`, for the given `metric`.
+        - List of performance scores for each classifier in predictors, for the given metric.
     """
     all_predictions = [predictor.predict(X_test) for predictor in predictors]
     if A_test is not None:
@@ -1025,7 +989,7 @@ def model_performance_sweep(models_dict, X_test, y_test, A_test):
     the index of the model, the equalized_odds_difference score and the balanced_error for the model.
 
     Parameters:
-    - :param models_dict: Dictionary mapping model ids to a model.
+    - models_dict: Dictionary mapping model ids to a model.
     - X_test: The data features of the testing data set
     - y_test: The target labels of the teting data set
     - A_test: The sensitive feature of the testing data set.
@@ -1095,32 +1059,30 @@ plt.legend(bbox_to_anchor=(1.85, 1))
 # %%
 # With the above plot, we can see how the performance of the non-dominated
 # inner models compares to the original unmitigated model. In many cases, we see
-# that a reduction in the *equalized_odds_difference* is accompanied by a small
+# that a reduction in the :code:`equalized_odds_difference` is accompanied by a small
 # increase in the *weighted error rate*.
 
 # %%
 # Selecting a suitable inner model
-# --------------------------------
-
-# %%
+# ================================
 # One strategy we can use to select a model is creating a *threshold* based
 # on the *balanced error rate* of the unmitigated model. Then out of the
 # filtered models, we select the model that minimizes the
-# *equalized_odds_difference*. The process can be broken down into the three
+# :code:`equalized_odds_difference`. The process can be broken down into the three
 # steps below:
 #
-# - 1.) Create threshold based on `balanced_error` of the unmitigated model.
-# - 2.) Filter only models whose `balanced_error` are below the threshold.
-# - 3.) Choose the model with smallest `equalized_odds` difference.
+# - 1.) Create threshold based on :code:`balanced_error` of the unmitigated model.
+# - 2.) Filter only models whose :code:`balanced_error` are below the threshold.
+# - 3.) Choose the model with smallest :code:`equalized_odds` difference.
 #
 # Within the context of fair lending in the United States, if a financial
 # institution is found to be engaging in discriminatory behavior, they must
 # produce documentation that demonstrates the model chosen is the least
 # discriminatory model while satisfying profitability and other business needs.
 # In our approach, the business need of profitability is simulated by
-# thresholding based on the `balanced_error` rate of the unmitigated model, and
+# thresholding based on the :code:`balanced_error` rate of the unmitigated model, and
 # we choose the least discriminatory model based on the smallest
-# `equalized_odds_difference` value.
+# :code:`equalized_odds_difference` value.
 
 # %%
 def filter_models_by_unmitigiated_score(
@@ -1141,7 +1103,7 @@ def filter_models_by_unmitigiated_score(
     - unmitigated_score: The performance score of the unmitigated model.
     - performance_metric: The model performance metric to threshold on.
     - fairness_metric: The fairness metric to optimize for
-    - threshold: The threshold padding added to the `unmitigated_score`.
+    - threshold: The threshold padding added to the :code:`unmitigated_score`.
     """
     # Create threshold based on balanced_error of unmitigated model and filter
     models_filtered = models_frames.query(
@@ -1205,7 +1167,7 @@ metricframe_inprocess.by_group[metrics_to_report].plot.bar(
 
 # %%
 # Now we have trained two different fairness-aware models using the
-# *post-processing* approach and the *reductions* approach. Let's compare the
+# *postprocessing* approach and the *reductions* approach. Let's compare the
 # performance of these models to our original fairness-unaware model.
 
 # %%
@@ -1233,10 +1195,10 @@ def create_metricframe_w_errors(mframe, metrics_to_report, metric_error_pair):
 
 # %%
 # Report model performance error bars for metrics
-# -----------------------------------------------
+# ===============================================
 
 # %%
-# __Unmitigated model__
+# **Unmitigated model**
 
 # %%
 create_metricframe_w_errors(
@@ -1246,7 +1208,7 @@ create_metricframe_w_errors(
 metricframe_unmitigated.overall[metrics_to_report]
 
 # %%
-# __ExponentiatedGradient model__
+# **ExponentiatedGradient model**
 
 # %%
 create_metricframe_w_errors(
@@ -1254,7 +1216,7 @@ create_metricframe_w_errors(
 )
 
 # %%
-# __ThresholdOptimizer__
+# **ThresholdOptimizer**
 
 # %%
 metricframe_inprocess.overall[metrics_to_report]
@@ -1276,16 +1238,16 @@ metricframe_postprocess.overall[metrics_to_report]
 
 
 # %%
-# ## Conclusion and Discussion
-# ============================
+# Conclusion and Discussion
+# ----------------------------
 
 # %%
 # In this case study, we walked through the process of assessing a credit
 # decision model for gender-related performance disparities. Our analysis
-# follows closely the work done in the `*Microsoft/EY white paper*
+# follows closely the work done in the `Microsoft/EY white paper
 # <https://www.microsoft.com/en-us/research/uploads/prod/2020/09/Fairlearn-EY_WhitePaper-2020-09-22.pdf>`_
 # where they used the *Fairlearn* toolkit to perform an audit of a
-# fairness-unaware tree-based model. We applied a *post-processing* and
+# fairness-unaware tree-based model. We applied a *postprocessing* and
 # *reductions* mitigation techniques to mitigate the *equalized odds difference*
 # in our model.
 #
@@ -1299,7 +1261,7 @@ metricframe_postprocess.overall[metrics_to_report]
 
 # %%
 # Designing a Model Card
-# --------------------------
+# ======================
 
 # %%
 # A key facet of Responsible Machine Learning is responsible documentation
@@ -1317,7 +1279,7 @@ metricframe_postprocess.overall[metrics_to_report]
 
 # %%
 # Fairness under unawareness
-# --------------------------
+# ==========================
 
 # %%
 # When proving credit models are compliant with fair lending laws,
