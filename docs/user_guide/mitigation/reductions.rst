@@ -1,90 +1,7 @@
-.. _mitigation:
-
-Mitigation
-==========
-
-Fairlearn contains the following algorithms for mitigating unfairness:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 5 20 5 5 8
-   :stub-columns: 1
-
-   *  - algorithm
-      - description
-      - binary classification
-      - regression
-      - supported fairness definitions
-   *  - :class:`~fairlearn.reductions.ExponentiatedGradient`
-      - A wrapper (reduction) approach to fair classification described in *A Reductions*
-        *Approach to Fair Classification* [#2]_.
-      - ✔
-      - ✔
-      - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :class:`~fairlearn.reductions.GridSearch`
-      - A wrapper (reduction) approach described in Section 3.4 of *A Reductions*
-        *Approach to Fair Classification* [#2]_. For regression it acts as a
-        grid-search variant of the algorithm described in Section 5 of
-        *Fair Regression: Quantitative Definitions and Reduction-based*
-        *Algorithms* [#1]_.
-      - ✔
-      - ✔
-      - DP, EO, TPRP, FPRP, ERP, BGL
-   *  - :class:`~fairlearn.postprocessing.ThresholdOptimizer`
-      - Postprocessing algorithm based on the paper *Equality of Opportunity*
-        *in Supervised Learning* [#3]_. This technique takes as input an
-        existing classifier and the sensitive feature, and derives a monotone
-        transformation of the classifier's prediction to enforce the specified
-        parity constraints.
-      - ✔
-      - ✘
-      - DP, EO, TPRP, FPRP
-   *  - :class:`~fairlearn.preprocessing.CorrelationRemover`
-      - Preprocessing algorithm that removes correlation between sensitive
-        features and non-sensitive features through linear transformations.
-      - ✔
-      - ✔
-      - ✘
-
-DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
-rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
-BGL to *bounded group loss*. For
-more information on the definitions refer to
-:ref:`fairness_in_machine_learning`. To request additional algorithms or
-fairness definitions, please open a
-`new issue <https://github.com/fairlearn/fairlearn/issues>`_ on GitHub.
-
-.. note::
-
-   Fairlearn mitigation algorithms largely follow the
-   `conventions of scikit-learn <https://scikit-learn.org/stable/developers/contributing.html#different-objects>`_,
-   meaning that they implement the :code:`fit` method to train a model and the :code:`predict` method
-   to make predictions. However, in contrast with 
-   `scikit-learn <https://scikit-learn.org/stable/glossary.html#term-estimator>`_,
-   Fairlearn algorithms can produce randomized predictors. Randomization of
-   predictions is required to satisfy many definitions of fairness. Because of
-   randomization, it is possible to get different outputs from the predictor's
-   :code:`predict` method on identical data. For each of our algorithms, we provide
-   explicit access to the probability distribution used for randomization.
-
-.. _preprocessing:
-
-Preprocessing
---------------
-   
-.. currentmodule:: fairlearn.preprocessing
-
-.. _postprocessing:
-
-Postprocessing
---------------
-
-.. currentmodule:: fairlearn.postprocessing
-
 .. _reductions:
 
 Reductions
-----------
+==========
 
 .. currentmodule:: fairlearn.reductions
 
@@ -106,7 +23,7 @@ and :ref:`constraints_regression`.
 
 The reductions approach for classification seeks to reduce binary
 classification subject to fairness constraints to a sequence of weighted
-classification problems (see [#2]_), and similarly for regression (see [#1]_).
+classification problems (see :footcite:`agarwal2018reductions`), and similarly for regression (see :footcite:`agarwal2019fair`).
 As a result, the reduction algorithms
 in Fairlearn only require a wrapper access to any "base" learning algorithm.
 By this we mean that the "base" algorithm only needs to implement :code:`fit` and
@@ -137,7 +54,7 @@ provide :code:`signed_weights` that are used to relabel and reweight samples.
 .. _constraints_binary_classification:
 
 Fairness constraints for binary classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 All supported fairness constraints for binary classification inherit from
 :code:`UtilityParity`. They are based on some underlying metric called
@@ -226,7 +143,7 @@ bound the ratio between the pairs of groups, but such a bound is implied.
 .. _demographic_parity:
 
 Demographic Parity
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *demographic parity* if
 
@@ -260,7 +177,7 @@ the predicted labels.
     The example below uses :code:`load_data` to illustrate how :code:`DemographicParity`
     instantiates inequalities from :ref:`constraints_binary_classification`.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import DemographicParity
@@ -301,7 +218,7 @@ The ratio constraints for the demographic parity with :code:`ratio_bound`
 
 Revisiting the same example as above we get
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> dp = DemographicParity(ratio_bound=0.9, ratio_bound_slack=0.01)
     >>> dp.load_data(X, y_pred, sensitive_features=sensitive_features)
@@ -327,7 +244,7 @@ of the constraints, we obtain
 .. _false_positive_rate_parity:
 
 True Positive Rate Parity and False Positive Rate Parity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *true positive rate parity* if
 
@@ -349,7 +266,7 @@ by considering both events :math:`Y=0` and :math:`Y=1`.
 
 In practice this can be used in a difference-based relaxation as follows:
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import TruePositiveRateParity
@@ -390,7 +307,7 @@ In practice this can be used in a difference-based relaxation as follows:
 
 Alternatively, a ratio-based relaxation is also available:
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> tprp = TruePositiveRateParity(ratio_bound=0.9, ratio_bound_slack=0.01)
     >>> tprp.load_data(X, y_true, sensitive_features=sensitive_features)
@@ -405,7 +322,7 @@ Alternatively, a ratio-based relaxation is also available:
 .. _equalized_odds:
     
 Equalized Odds
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 A binary classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
 *true positive rate parity* and *false positive rate parity*, i.e.,
@@ -417,7 +334,7 @@ A binary classifier :math:`h(X)` satisfies *equalized odds* if it satisfies both
 The constraints represent the union of constraints for true positive rate
 and false positive rate.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> from fairlearn.reductions import EqualizedOdds
     >>> eo = EqualizedOdds(difference_bound=0.01)
@@ -437,7 +354,7 @@ and false positive rate.
 .. _error_rate_parity:
 
 Error Rate Parity
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 The *error rate parity* requires that the error rates should be
 the same across all groups. For a classifier :math:`h(X)`
@@ -453,7 +370,7 @@ to poor outcomes. The difference-based relaxation specifies that
 the error rate of any given group should not deviate from
 the overall error rate by more than the value of :code:`difference_bound`.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ErrorRateParity
@@ -495,7 +412,7 @@ Alternatively, error rate parity can be relaxed via ratio constraints as
 with a :code:`ratio_bound` :math:`r`. The usage is identical with other
 constraints:
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> erp = ErrorRateParity(ratio_bound=0.9, ratio_bound_slack=0.01)
@@ -510,7 +427,7 @@ constraints:
 
 
 Control features
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 The above examples of :class:`Moment` (:ref:`demographic_parity`,
 :ref:`True and False Positive Rate Parity <true_positive_rate_parity>`,
@@ -545,7 +462,7 @@ The other constraints acquire similar modifications.
 .. _constraints_multi_class_classification:
 
 Fairness constraints for multiclass classification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 Reductions approaches do not support multiclass classification yet at this
 point. If this is an important scenario for you please let us know!
@@ -553,7 +470,7 @@ point. If this is an important scenario for you please let us know!
 .. _constraints_regression:
 
 Fairness constraints for regression
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 The performance objective in the regression scenario is to minimize the
 loss of our regressor :math:`h`. The loss can be expressed as
@@ -561,7 +478,7 @@ loss of our regressor :math:`h`. The loss can be expressed as
 :code:`min_val` and :code:`max_val` that define the value range within which
 the loss is evaluated. Values outside of the value range get clipped.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
 
     >>> from fairlearn.reductions import SquareLoss, AbsoluteLoss, ZeroOneLoss
     >>> y_true = [0,   0.3, 1,   0.9]
@@ -587,7 +504,7 @@ supported type of constraint at this point is :class:`BoundedGroupLoss`.
 .. _bounded_group_loss:
 
 Bounded Group Loss
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 *Bounded group loss* requires the loss of each group to be below a
 user-specified amount :math:`\zeta`. If :math:`\zeta` is chosen reasonably
@@ -604,7 +521,7 @@ In the example below we use :class:`BoundedGroupLoss` with
 Group :code:`"a"` has an average loss of :math:`0.05`, while group
 :code:`"b"`'s average loss is :math:`0.5`.
 
-.. doctest:: mitigation
+.. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import BoundedGroupLoss, ZeroOneLoss
@@ -639,27 +556,8 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     during the unfairness mitigation. As a result the constraint violation
     detected by :code:`gamma` is identical to the mean absolute error.
 
-.. _exponentiated_gradient:
 
-Exponentiated Gradient
-~~~~~~~~~~~~~~~~~~~~~~
+References
+----------
 
-.. _grid_search:
-
-Grid Search
-~~~~~~~~~~~
-
-.. topic:: References:
-
-   .. [#1] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
-      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
-      ICML, 2019.
-   
-   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
-      Approach to Fair Classification"
-      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
-   
-   .. [#3] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
-      Learning"
-      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NeurIPS, 2016.
+.. footbibliography::

@@ -4,23 +4,23 @@
 """Utility class for plotting metrics with and without confidence interval ranges."""
 
 from typing import List, Union
-import pandas as pd
-import numpy as np
 
-from ._metric_frame import MetricFrame
+import numpy as np
+import pandas as pd
 from matplotlib.lines import Line2D
 from sklearn.utils import check_consistent_length
 
-_METRIC_FRAME_INVALID_ERROR = (
-    "Input metric_frame should be of type MetricFrame."
-)
-_METRIC_LENGTH_ZERO_ERROR = \
+from ._metric_frame import MetricFrame
+
+_METRIC_FRAME_INVALID_ERROR = "Input metric_frame should be of type MetricFrame."
+_METRIC_LENGTH_ZERO_ERROR = (
     "No metrics were provided to plot. A nonzero number of metrics is required."
-_METRICS_NOT_LIST_OR_STR_ERROR = """Metric should be a string of a single metric or a list of the metrics
-     in provided MetricFrame, but {0} was provided"""
-_CONF_INTERVALS_MUST_BE_ARRAY = (
-    "Calculated conf_intervals must be array of length 2"
 )
+_METRICS_NOT_LIST_OR_STR_ERROR = (
+    "Metric should be a string of a single metric or a list of the metrics"
+    "in provided MetricFrame, but {0} was provided"
+)
+_CONF_INTERVALS_MUST_BE_ARRAY = "Calculated conf_intervals must be array of length 2"
 _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = (
     "Calculated conf_intervals' upper bound cannot be less than lower bound"
 )
@@ -56,9 +56,7 @@ def _build_legend(ax, kind, legend_label):
     ax.legend(handles=handles)
 
 
-def _plot_df(
-    df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs
-):
+def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
     r"""Plot the data with or without errors.
 
     Parameters
@@ -99,16 +97,10 @@ def _plot_df(
         )
         if kind == "point":
             axs = df[metrics].plot(
-                linestyle="",
-                marker="o",
-                yerr=yerr,
-                subplots=subplots,
-                **kwargs
+                linestyle="", marker="o", yerr=yerr, subplots=subplots, **kwargs
             )
         else:
-            axs = df[metrics].plot(
-                kind=kind, yerr=yerr, subplots=subplots, **kwargs
-            )
+            axs = df[metrics].plot(kind=kind, yerr=yerr, subplots=subplots, **kwargs)
 
         if isinstance(axs, np.ndarray):
             for ax in axs.flatten():
@@ -140,7 +132,7 @@ def plot_metric_frame(
     ci_labels_color: str = "black",
     ci_labels_ha: str = "center",
     ci_labels_legend: str = "Conf. Intervals",
-    **kwargs
+    **kwargs,
 ):
     r"""Visualization for metrics with and without confidence intervals.
 
@@ -206,11 +198,7 @@ def plot_metric_frame(
     if not isinstance(metric_frame, MetricFrame):
         raise (ValueError(_METRIC_FRAME_INVALID_ERROR))
     # ensure metrics is either list, str, or None
-    if not (
-        isinstance(metrics, list)
-        or isinstance(metrics, str)
-        or metrics is None
-    ):
+    if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
         raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
 
     metrics = [metrics] if isinstance(metrics, str) else metrics
@@ -268,11 +256,7 @@ def plot_metric_frame(
     # Confidence interval labels don't get plotted when subplots=False
     if plot_ci_labels and kind == "bar" and subplots:
         for j, metric in enumerate(metrics):
-            temp_axs = (
-                axs.flatten()
-                if isinstance(axs, np.ndarray)
-                else np.array([axs])
-            )
+            temp_axs = axs.flatten() if isinstance(axs, np.ndarray) else np.array([axs])
             y_min, y_max = temp_axs[j].get_ylim()
             y_range = y_max - y_min
 

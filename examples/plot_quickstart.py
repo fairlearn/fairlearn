@@ -7,18 +7,19 @@ MetricFrame visualizations
 ==========================
 """
 
-# %%
-from fairlearn.metrics import (
-    MetricFrame,
-    false_positive_rate,
-    false_negative_rate,
-    selection_rate,
-    count,
-)
 import pandas as pd
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.tree import DecisionTreeClassifier
+
+# %%
+from fairlearn.metrics import (
+    MetricFrame,
+    count,
+    false_negative_rate,
+    false_positive_rate,
+    selection_rate,
+)
 
 data = fetch_openml(data_id=1590, as_frame=True)
 X = pd.get_dummies(data.data)
@@ -80,3 +81,14 @@ metric_frame.by_group[["count"]].plot(
     figsize=[12, 8],
     title="Show count metric in pie chart",
 )
+
+# Saving plots
+fig = metric_frame.by_group[["count"]].plot(
+    kind="pie",
+    subplots=True,
+    layout=[1, 1],
+    legend=False,
+    figsize=[12, 8],
+    title="Show count metric in pie chart",
+)
+fig[0][0].figure.savefig("filename.png")
