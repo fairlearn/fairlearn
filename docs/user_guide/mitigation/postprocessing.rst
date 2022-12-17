@@ -14,69 +14,134 @@ Threshold optimizer
 ^^^^^^^^^^^^^^^^^^^
 
 :class:`ThresholdOptimizer` is based on the paper
-*Equality of Opportunity in Supervised Learning* [#3]_. Unlike other
-mitigation techniques :class:`ThresholdOptimizer` is built to satisfy the
-specified fairness criteria exactly and with no remaining disparity.
+*Equality of Opportunity in Supervised Learning*
+:footcite:`hardt2016equality`.
+Unlike other mitigation techniques :class:`ThresholdOptimizer` is built to
+satisfy the specified fairness criteria exactly and with no remaining
+disparity.
 In many cases this comes at the expense of performance, for example, with
-significantly lower accuracy. Regardless, it is a useful data point to compare
-results with. Importantly, :class:`ThresholdOptimizer` requires the sensitive
-features to be available at deployment time (i.e., for the :code:`predict`
-method).
+significantly lower accuracy.
+Regardless, it is a useful data point to compare results with.
+Importantly, :class:`ThresholdOptimizer` requires the sensitive features to be
+available at deployment time (i.e., for the :code:`predict` method).
 
 For each sensitive feature value, :class:`ThresholdOptimizer` creates separate
 thresholds and applies them to the predictions of the user-provided
-:code:`estimator`. To decide on the thresholds it generates all possible
-thresholds and selects the best combination in terms of the
-:code:`objective` and the fairness :code:`constraints`. This process is
-visualized below using
-:func:`fairlearn.postprocessing.plot_threshold_optimizer`. To ensure that
-the fairness constraint is upheld :class:`ThresholdOptimizer` simultaneously
-walks along all the curves while monitoring the objective value, and picks the
-spot on the x-axis with the optimal objective weighed by the sizes of the
-groups corresponding to each sensitive feature value. The selected point is
-marked by the dashed blue line. The intersections with the curves are
-represented through interpolation of the thresholds we used to create the
-plot. To achieve an exact match between the sensitive feature groups in terms
-of the constraint, one typically needs to randomize between two thresholds.
+:code:`estimator`.
+To decide on the thresholds it generates all possible thresholds and selects
+the best combination in terms of the :code:`objective` and the fairness
+:code:`constraints`.
+This process is visualized below using
+:func:`fairlearn.postprocessing.plot_threshold_optimizer`.
+To ensure that the fairness constraint is upheld :class:`ThresholdOptimizer`
+simultaneously walks along all the curves while monitoring the objective
+value, and picks the spot on the x-axis with the optimal objective weighed by
+the sizes of the groups corresponding to each sensitive feature value.
+The selected point is marked by the dashed blue line.
+The intersections with the curves are represented through interpolation of the
+thresholds we used to create the plot.
+To achieve an exact match between the sensitive feature groups in terms of the
+constraint, one typically needs to randomize between two thresholds.
 
 To illustrate its behavior, let's examine what this looks like with
-demographic parity as the fairness constraint. Note that this is only an
-excerpt of the
-:ref:`full sample code <sphx_glr_auto_examples_plot_mitigation_pipeline.py>`.
+demographic parity as the fairness constraint.
 
-.. literalinclude:: ../auto_examples/plot_mitigation_pipeline.py
-    :language: python
-    :start-after: # starting with :class:`fairlearn.postprocessing.ThresholdOptimizer`:
-    :end-before: # %%
+.. doctest:: mitigation_postprocessing
+    :options:  +NORMALIZE_WHITESPACE
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. literalinclude:: ../auto_examples/plot_mitigation_pipeline.rst
-    :start-after: .. sphx-glr-output-block-008-start
-    :end-before: .. sphx-glr-output-block-008-end
-    :lines: 3-
-
-.. figure:: ../auto_examples/images/sphx_glr_plot_mitigation_pipeline_001.png
-    :target: ../auto_examples/plot_mitigation_pipeline.html
-    :align: center 
-
-TODO remove:
-{
-"Female": {
-"p0": 0.9527202201546324,
-"operation0": "[>0.5]",
-"p1": 0.047279779845367575,
-"operation1": "[>-inf]"
-},
-"Male": {
-"p0": 0.9998874603553525,
-"operation0": "[>0.5]",
-"p1": 0.00011253964464752464,
-"operation1": "[>-inf]"
-}
-}
+    >>> import json
+    >>> import pandas as pd
+    >>> from sklearn.compose import ColumnTransformer
+    >>> from sklearn.compose import make_column_selector as selector
+    >>> from sklearn.impute import SimpleImputer
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> from sklearn.model_selection import train_test_split
+    >>> from sklearn.pipeline import Pipeline
+    >>> from sklearn.preprocessing import OneHotEncoder, StandardScaler
+    >>> from fairlearn.datasets import fetch_adult
+    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
+    >>> from fairlearn.reductions import DemographicParity, ExponentiatedGradient
+    >>> data = fetch_adult(as_frame=True)
+    >>> X_raw = data.data
+    >>> y = (data.target == ">50K") * 1
+    >>> A = X_raw["sex"]
+    >>> (X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+    ...     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y)
+    >>> X_train = X_train.reset_index(drop=True)
+    >>> X_test = X_test.reset_index(drop=True)
+    >>> y_train = y_train.reset_index(drop=True)
+    >>> y_test = y_test.reset_index(drop=True)
+    >>> A_train = A_train.reset_index(drop=True)
+    >>> A_test = A_test.reset_index(drop=True)
+    >>> numeric_transformer = Pipeline(
+    ...     steps=[
+    ...         ("impute", SimpleImputer()),
+    ...         ("scaler", StandardScaler()),
+    ...     ]
+    ... )
+    >>> categorical_transformer = Pipeline(
+    ...     [
+    ...         ("impute", SimpleImputer(strategy="most_frequent")),
+    ...         ("ohe", OneHotEncoder(handle_unknown="ignore")),
+    ...     ]
+    ... )
+    >>> preprocessor = ColumnTransformer(
+    ...     transformers=[
+    ...         ("num", numeric_transformer, selector(dtype_exclude="category")),
+    ...         ("cat", categorical_transformer, selector(dtype_include="category")),
+    ...     ]
+    ... )
+    >>> pipeline = Pipeline(
+    ...     steps=[
+    ...         ("preprocessor", preprocessor),
+    ...         (
+    ...             "classifier",
+    ...             LogisticRegression(solver="liblinear", fit_intercept=True),
+    ...         ),
+    ...     ]
+    ... )
+    >>> threshold_optimizer = ThresholdOptimizer(
+    ...     estimator=pipeline,
+    ...     constraints="demographic_parity",
+    ...     predict_method="predict_proba",
+    ...     prefit=False,
+    ... )
+    >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
+    ThresholdOptimizer(estimator=Pipeline(steps=[('preprocessor',
+                                                  ColumnTransformer(transformers=[('num',
+                                                                                   Pipeline(steps=[('impute',
+                                                                                                    SimpleImputer()),
+                                                                                                   ('scaler',
+                                                                                                    StandardScaler())]),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>),
+                                                                                  ('cat',
+                                                                                   Pipeline(steps=[('impute',
+                                                                                                    SimpleImputer(strategy='most_frequent')),
+                                                                                                   ('ohe',
+                                                                                                    OneHotEncoder(handle_unknown='ignore'))]),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>)])),
+                                                 ('classifier',
+                                                  LogisticRegression(solver='liblinear'))]),
+                       predict_method='predict_proba')
+    >>> threshold_optimizer.predict(X_test, sensitive_features=A_test)
+    array([0, 0, 1, ..., 0, 0, 1])
+    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
+    >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
+    {
+        "Female": {
+            "p0": 0.8004605263157903,
+            "operation0": "[>0.20326115065158867]",
+            "p1": 0.19953947368420966,
+            "operation1": "[>0.18733195463637906]"
+        },
+        "Male": {
+            "p0": 0.03672549019607803,
+            "operation0": "[>0.6820004991747526]",
+            "p1": 0.9632745098039219,
+            "operation1": "[>0.6662093209959495]"
+        }
+    }
+    >>> plot_threshold_optimizer(threshold_optimizer)
 
 When calling :code:`predict` :class:`ThresholdOptimizer` uses one of the
 thresholds at random based on the probabilities :math:`p_0` and :math:`p_1`.
@@ -160,24 +225,16 @@ Note that the plot omits points that are within the convex hull of points.
 
 .. _printed_thresholds:
 
-.. plot::
-    :include-source:
+.. doctest:: mitigation_postprocessing
+    :options:  +NORMALIZE_WHITESPACE
 
-    >>> from sklearn.linear_model import LogisticRegression
-    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-    >>> from sklearn.datasets import fetch_openml
-    >>> import pandas as pd
-    >>> import json
-    >>> data = fetch_openml(data_id=1590, as_frame=True)
-    >>> X = pd.get_dummies(data.data)
-    >>> y = (data.target == '>50K') * 1
-    >>> sex = data.data['sex']
+    >>> data = fetch_adult(as_frame=True)
     >>> logistic_regression = LogisticRegression()
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=logistic_regression,
     ...     constraints="equalized_odds",
     ...     objective="accuracy_score")
-    >>> threshold_optimizer.fit(X, y, sensitive_features=sex)
+    >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
     ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(
@@ -297,20 +354,15 @@ assumes that it is already trained.
 
 .. doctest:: mitigation
 
-    >>> from sklearn.linear_model import LogisticRegression
-    >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-    >>> X = [[0], [1], [2], [3]]
-    >>> y = [0, 1, 0, 1]
-    >>> A = ['A', 'A', 'B', 'B']
     >>> prefit_logistic_regression = LogisticRegression()
-    >>> prefit_logistic_regression.fit(X, y)
+    >>> prefit_logistic_regression.fit(X_train, y_train)
     LogisticRegression()
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=prefit_logistic_regression,
     ...     constraints="demographic_parity",
     ...     objective="accuracy_score",
     ...     prefit=True)
-    >>> threshold_optimizer.fit(X, y, sensitive_features=A)
+    >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
     ThresholdOptimizer(estimator=LogisticRegression(), prefit=True)
 
 If it detects that the estimator may not be fitted as defined by
