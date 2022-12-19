@@ -493,7 +493,7 @@ lgb.plot_importance(
 # Now that we have identified the relevant harms we anticpate users will
 # experience, we can define our fairness metrics. In addition to the metrics, we
 # will quantify the uncertainty around each metric using *custom functions* to
-# compute the *standard error* for each metric at the $\alpha=0.95$ confidence
+# compute the *standard error* for each metric at the :math:`\alpha=0.95` confidence
 # level.
 
 # %%
