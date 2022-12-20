@@ -7,8 +7,12 @@ import fairlearn.metrics as metrics
 
 # ======================================================
 
+apx0 = 1e-15
+apx1 = 1 - apx0
+
 y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+y_pred_log_loss = [apx1, 0, apx1, apx0, 1, apx0, 0, apx1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 sf_binary = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 
 derived_metric_results = {
@@ -57,9 +61,13 @@ def test_dict_sizes():
 def test_generated_metrics_smoke(func_name):
     func = getattr(metrics, func_name)
     assert callable(func)
+    if func_name.startswith("log_loss"):
+        y_pred_test = y_pred_log_loss
+    else:
+        y_pred_test = y_pred
     result = func(
         y_true,
-        y_pred,
+        y_pred_test,
         sensitive_features=sf_binary,
         method=derived_metric_results[func_name]["method"],
     )
