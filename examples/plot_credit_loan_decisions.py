@@ -201,7 +201,8 @@ A_str = A.map({1: "male", 2: "female"})
 # Dataset imbalances
 # ==================
 
-# %% Before we start training a classifier model, we want to explore the dataset
+# %%
+# Before we start training a classifier model, we want to explore the dataset
 # for any characteristics that may lead to fairness-related harms later on in
 # the modeling process. In particular, we wil focus on the distribution of
 # sensitive feature :code:`SEX` and the target label :code:`default`.
@@ -354,7 +355,8 @@ estimator = Pipeline(
 
 estimator.fit(X_train, y_train)
 
-# %% We compute the *binary predictions* and the *prediction probabilities* for
+# %%
+# We compute the *binary predictions* and the *prediction probabilities* for
 # the testing data points.
 
 # %%
@@ -889,7 +891,7 @@ for epsilon, models in all_models.items():
 
 # %%
 # Here, we can see all the inner models learned for each value of
-# :param:`epsilon`. With the :code:`ExponentiatedGradient` model, we specify an
+# :code:`epsilon`. With the :code:`ExponentiatedGradient` model, we specify an
 # :code:`epsilon` parameter that represents the maximal disparity in our fairness
 # metric that our final model should satisfy. For example, an :code:`epsilon=0.02`
 # means that the training value of the *equalized odds difference* of the
