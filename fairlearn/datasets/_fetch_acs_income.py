@@ -181,7 +181,6 @@ def fetch_acs_income(
         cache=cache,
         as_frame=True,
         return_X_y=False,
-        parser="auto",
     )
 
     # filter by state

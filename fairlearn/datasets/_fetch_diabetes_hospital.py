@@ -96,5 +96,4 @@ def fetch_diabetes_hospital(
         cache=cache,
         as_frame=True,
         return_X_y=return_X_y,
-        parser="auto",
     )

@@ -8,11 +8,11 @@ import copy
 import pandas as pd
 from numpy import mean, random, number
 
+from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
 from sklearn.compose import make_column_selector, make_column_transformer
 
-import fairlearn.datasets as fld
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 def fetch_adult():
     """Grab dataset for testing."""
-    data = fld.fetch_adult(as_frame=True)
+    data = fetch_openml(data_id=1590, as_frame=True)
     X = data.data.drop(labels=["sex"], axis=1)
     X = pd.get_dummies(X)
     Y = (data.target == ">50K") * 1
@@ -127,7 +127,7 @@ def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
     random.seed(123)
 
-    X, y = fld.fetch_adult(as_frame=True, return_X_y=True)
+    X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
 
     non_NaN_rows = ~X.isna().any(axis=1)
 

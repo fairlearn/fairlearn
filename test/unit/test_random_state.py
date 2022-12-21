@@ -70,7 +70,7 @@ def test_random_state_exponentiated_gradient():
 
 def _get_test_data():
     # fetch data from OpenML
-    data = fetch_openml(data_id=42193, parser="auto")
+    data = fetch_openml(data_id=42193)
     X = (
         pd.DataFrame(data["data"], columns=data["feature_names"])
         .drop(columns=["race_Caucasian", "c_charge_degree_F"])
