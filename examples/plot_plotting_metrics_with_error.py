@@ -26,7 +26,7 @@ from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_fram
 from fairlearn.metrics import MetricFrame
 
 # %%
-# We download the data set using :func:`fetch_adult` function in :mod:`fairlearn.datasets`.
+# We download the data set using the function :func:`fetch_adult` in :mod:`fairlearn.datasets`.
 # The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
 # There are some caveats to using this dataset, but we will use it solely as an example
 # to demonstrate the functionality of plotting metrics with error bars.
