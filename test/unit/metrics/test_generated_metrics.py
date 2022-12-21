@@ -7,6 +7,13 @@ import fairlearn.metrics as metrics
 
 # ======================================================
 
+# Evaluation of log loss with y_true=1 and y_pred=0 (or vice versa)
+# gives mathematically an infinite value. Scikit-learn in this case
+# returns a finite value based on the setting of the keyword parameter
+# eps of log_loss function. In our tests with log loss, we replace 0 with
+# apx0 and 1 with apx1 in y_pred when it disagrees with y_true. This
+# avoids the issue of an infinite log loss.
+
 apx0 = 1e-15
 apx1 = 1 - apx0
 
