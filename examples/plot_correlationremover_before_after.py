@@ -36,7 +36,7 @@ from fairlearn.preprocessing import CorrelationRemover
 # specifically at the African American race.
 # Finally, the columns are rearranged for consistency.
 
-data = fetch_diabetes_hospital(as_frame=True)
+data = fetch_diabetes_hospital()
 X_raw = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
 X_raw = pd.get_dummies(X_raw)
 y = data.target

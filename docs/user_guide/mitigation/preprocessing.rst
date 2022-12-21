@@ -58,7 +58,7 @@ The :code:`CorrelationRemover` will drop the sensitive features from the dataset
     >>> from fairlearn.preprocessing import CorrelationRemover
     >>> import pandas as pd
     >>> from fairlearn.datasets import fetch_diabetes_hospital
-    >>> data = fetch_diabetes_hospital(as_frame=True)
+    >>> data = fetch_diabetes_hospital()
     >>> X = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
     >>> X = pd.get_dummies(X)
     >>> X = X.drop(["race_Asian",
