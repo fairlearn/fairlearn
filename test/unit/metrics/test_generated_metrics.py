@@ -7,8 +7,19 @@ import fairlearn.metrics as metrics
 
 # ======================================================
 
+# Evaluation of log loss with y_true=1 and y_pred=0 (or vice versa)
+# gives mathematically an infinite value. Scikit-learn in this case
+# returns a finite value based on the setting of the keyword parameter
+# eps of log_loss function. In our tests with log loss, we replace 0 with
+# apx0 and 1 with apx1 in y_pred when it disagrees with y_true. This
+# avoids the issue of an infinite log loss.
+
+apx0 = 1e-15
+apx1 = 1 - apx0
+
 y_true = [0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 y_pred = [1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+y_pred_log_loss = [apx1, 0, apx1, apx0, 1, apx0, 0, apx1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
 sf_binary = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 
 derived_metric_results = {
@@ -57,9 +68,13 @@ def test_dict_sizes():
 def test_generated_metrics_smoke(func_name):
     func = getattr(metrics, func_name)
     assert callable(func)
+    if func_name.startswith("log_loss"):
+        y_pred_test = y_pred_log_loss
+    else:
+        y_pred_test = y_pred
     result = func(
         y_true,
-        y_pred,
+        y_pred_test,
         sensitive_features=sf_binary,
         method=derived_metric_results[func_name]["method"],
     )

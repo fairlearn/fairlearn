@@ -35,19 +35,19 @@ import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
-from sklearn.datasets import fetch_openml
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import MetricFrame, accuracy_score_group_min, make_derived_metric
 
 # %%
 # Next, we import the data, dropping any rows which are missing data:
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult(as_frame=True)
 X_raw = data.data
 y = (data.target == ">50K") * 1
 A = X_raw[["race", "sex"]]
