@@ -215,9 +215,9 @@ Example 1: Basics & model specification
 First, we cover a most basic application of adversarial mitigation.
 We start by loading and preprocessing the dataset::
 
-    from sklearn.datasets import fetch_openml
+    from fairlearn.datasets import fetch_adult
 
-    X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
+    X, y = fetch_adult(as_frame=True, return_X_y=True)
     pos_label = y[0]
 
     z = X["sex"] # In this example, we consider 'sex' the sensitive feature.

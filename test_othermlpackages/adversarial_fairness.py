@@ -9,8 +9,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 import torch
 from numpy import mean, number
-from sklearn.datasets import fetch_openml
 
+from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
     MetricFrame,
     selection_rate,
@@ -28,7 +28,7 @@ step = 1
 
 def test_examples():
     # EXAMPLE 1
-    X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
+    X, y = fetch_adult(as_frame=True, return_X_y=True)
     pos_label = y[0]
 
     z = X["sex"]  # In this example, we consider 'sex' the sensitive feature.
