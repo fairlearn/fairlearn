@@ -202,7 +202,7 @@ A_str = A.map({1: "male", 2: "female"})
 # Before we start training a classifier model, we want to explore the
 # dataset for any characteristics that may lead to fairness-related harms
 # later on in the modeling process.
-# In particular, we wil focus on the distribution of sensitive feature
+# In particular, we will focus on the distribution of sensitive feature
 # :code:`SEX` and the target label :code:`default`.
 #
 # As part of an exploratory data analysis, let's explore the distribution of
@@ -210,7 +210,6 @@ A_str = A.map({1: "male", 2: "female"})
 # labeled as `female` and 40% as `male`, so we do not need to worry about
 # imbalance in this feature.
 
-# %%
 A_str.value_counts(normalize=True)
 
 # %%
@@ -224,7 +223,6 @@ A_str.value_counts(normalize=True)
 # achieve an accuracy of 78%, so we will use the :code:`balanced_accuracy`
 # score as our evaluation metric to counteract the label imbalance.
 
-# %%
 Y.value_counts(normalize=True)
 
 # %%
@@ -360,8 +358,9 @@ estimator = Pipeline(
 
 estimator.fit(X_train, y_train)
 
-# %% We compute the *binary predictions* and the *prediction probabilities*
-# for the testing data points.
+# %%
+# We compute the *binary predictions* and the *prediction probabilities* for
+# the testing data points.
 
 # %%
 Y_pred_proba = estimator.predict_proba(X_test)[:, 1]
@@ -893,7 +892,7 @@ for epsilon, models in all_models.items():
 
 # %%
 # Here, we can see all the inner models learned for each value of
-# :param:`epsilon`. With the :code:`ExponentiatedGradient` model, we specify an
+# :code:`epsilon`. With the :code:`ExponentiatedGradient` model, we specify an
 # :code:`epsilon` parameter that represents the maximal disparity in our fairness
 # metric that our final model should satisfy. For example, an :code:`epsilon=0.02`
 # means that the training value of the *equalized odds difference* of the
