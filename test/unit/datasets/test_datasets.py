@@ -7,8 +7,9 @@ import pytest
 
 from fairlearn.datasets import (
     fetch_adult,
-    fetch_boston,
     fetch_bank_marketing,
+    fetch_boston,
+    fetch_credit_card,
     fetch_diabetes_hospital,
 )
 
@@ -21,8 +22,9 @@ class TestFairlearnDataset:
         "fetch_function",
         [
             fetch_adult,
-            fetch_boston,
             fetch_bank_marketing,
+            fetch_boston,
+            fetch_credit_card,
             fetch_diabetes_hospital,
         ],
     )
@@ -51,8 +53,9 @@ class TestFairlearnDataset:
         "fetch_function",
         [
             fetch_adult,
-            fetch_boston,
             fetch_bank_marketing,
+            fetch_boston,
+            fetch_credit_card,
             fetch_diabetes_hospital,
         ],
     )
