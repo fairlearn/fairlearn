@@ -31,7 +31,6 @@ from fairlearn.metrics import (
     false_positive_rate,
     false_negative_rate,
 )
-from fairlearn.datasets import fetch_credit_card
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import EqualizedOdds
@@ -46,17 +45,17 @@ np.random.seed(rand_seed)
 # %%
 # Fairness considerations of credit loan decisions
 # ------------------------------------------------
-# 
+#
 # Fairness and credit lending in the US
 # =====================================
-# 
+#
 # In 2019, Apple received backlash on social media after its newly launched
 # *Apple Card* product appeared to `offer higher credit limits to men compared
 # to women
 # <https://edition.cnn.com/2019/11/12/business/apple-card-gender-bias/index.html>`_.
 # In multiple cases, married couples found the husband received a credit limit
 # that was 10-20x higher than the wife's even when the couple had joint assets.
-# 
+#
 # From a regulatory perspective, financial institutions that operate within
 # the United States are subject to *legal regulations* prohibiting
 # discrimination on the `basis of race, gender, or other protected classes
@@ -64,7 +63,7 @@ np.random.seed(rand_seed)
 # With the increasing prevalence of automated decision-systems in the financial
 # lending space, experts have raised concerns about whether these systems could
 # exacerabate existing inequalities in financial lending.
-# 
+#
 # Although the two concepts are intertwined, algorithmic fairness is not the
 # same concept as anti-discrimination law. An AI system can comply with
 # anti-discrimination law while exhibiting fairness-related concerns. On the
@@ -74,31 +73,31 @@ np.random.seed(rand_seed)
 # disconnects between anti-discrimination law and algorithmic notions of
 # fairness. In this case study, we focus on fairness in financial services
 # rather than compliance with financial anti-discrimination regulations.
-# 
+#
 # Ernst & Young (EY) case study
 # -----------------------------
-# 
-# In this case study, we aim to replicate the work done in a `white paper 
+#
+# In this case study, we aim to replicate the work done in a `white paper
 # <https://www.microsoft.com/en-us/research/uploads/prod/2020/09/Fairlearn-EY_WhitePaper-2020-09-22.pdf>`_,
 # co-authored by *Microsoft* and *EY*, on mitigating gender-related performance
 # disparities in financial lending decisions. In their analysis, Microsoft and
 # EY demonstrated how Fairlearn could be used to measure and mitigate
 # unfairness in the loan adjudication process.
-# 
+#
 # Using a dataset of credit loan outcomes (whether an individual defaulted on
 # a credit loan), we train a fairness-unaware model to predict the likelihood
 # an individual will default on a given loan. We use the Fairlearn toolkit for
 # assessing the fairness of our model, according to several metrics.
 # Finally, we perform two unfairness mitigation strategies on our model and
 # compare the results to our original model.
-# 
+#
 # Because the dataset used in the white paper is not publicly available, we
 # will introduce a semi-synthetic feature into an existing publicly available
 # dataset to replicate the outcome disparity found in the original dataset.
-# 
+#
 # Credit decisions dataset
 # ========================
-# 
+#
 # As mentioned, we will not be able to use the original loans dataset, and
 # instead will be working with a publicly available dataset of credit card
 # defaults in Taiwan collected in 2005. This dataset represents binary credit
@@ -107,16 +106,16 @@ np.random.seed(rand_seed)
 # from April 2005 to September 2005, as well as demographic information, such
 # as *sex*, *age*, *marital status*, and *education level* of the applicant.
 # A full summary of features is provided below:
-# 
+#
 # .. list-table::
 #   :header-rows: 1
 #   :stub-columns: 1
-# 
+#
 #   *  - features
 #      - description
 #   *  - sex, education, marriage, age
 #      - demographic features
-#   *  - pay_0, pay_2, pay_3, pay_4, pay_5, pay_6 
+#   *  - pay_0, pay_2, pay_3, pay_4, pay_5, pay_6
 #      - repayment status (ordinal)
 #   *  - bill_amt1, bill_amt2, bill_amt3, bill_amt4, bill_amt5, bill_amt_6
 #      - bill statement amount (Taiwan dollars)
@@ -124,7 +123,7 @@ np.random.seed(rand_seed)
 #      - previous statement amount (Taiwan dollars)
 #   *  - default payment next month
 #      - default information (1 = YES, 0 = NO)
-# 
+#
 # Let's pretend we are a data scientist at a financial institution who is
 # tasked with developing a classification model to predict whether an
 # applicant will default on a personal loan. A positive prediction by the
@@ -166,10 +165,10 @@ dataset.shape
 dataset.head()
 
 # %%
-# From the `dataset description 
+# From the `dataset description
 # <https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients>`_,
 # we see there are three categorical features:
-# 
+#
 # - :code:`SEX`: Sex of the applicant (as a binary feature)
 # - :code:`EDUCATION`: Highest level of education achieved by the applicant.
 # - :code:`MARRIAGE`: Marital status of the applicant.
@@ -187,7 +186,7 @@ A_str = A.map({1: "male", 2: "female"})
 # %%
 # Dataset imbalances
 # ==================
-# 
+#
 # Before we start training a classifier model, we want to explore the
 # dataset for any characteristics that may lead to fairness-related harms
 # later on in the modeling process.
@@ -217,7 +216,7 @@ Y.value_counts(normalize=True)
 # %%
 # Add synthetic noise that is related to the outcome and sex
 # ==========================================================
-# 
+#
 # For the purpose of this case study, we add a synthetic feature
 # :code:`Interest` that introduces correlation between the :code:`SEX` label
 # of an applicant and the :code:`default` outcome.
@@ -230,10 +229,10 @@ Y.value_counts(normalize=True)
 # We also assume because banks have historically lended primarily to men,
 # there is less uncertainty (or variance) in the *interest rate* for these
 # applicants.
-# 
+#
 # To reflect the above reasoning, the :code:`Interest` feature is drawn from a
 # *Gaussian distribution* with the following criterion:
-# 
+#
 # * If *Male*, draw :code:`Interest` from
 #   :math:`\mathcal{N}(2 \cdot \text{Default}, 1)`
 # * If *Female*, draw :code:`Interest` from
@@ -247,7 +246,7 @@ X.loc[:, "Interest"] = np.random.normal(loc=2 * Y, scale=A)
 # %%
 # Check if this will lead to disparity in naive model
 # ===================================================
-# 
+#
 # Now that we have created our synthetic feature, let's check how this new
 # feature interacts with our *sensitive_feature* :code:`Sex` and our target
 # label :code:`default`.
@@ -278,25 +277,22 @@ X["Interest"][(A == 2) & (Y == 1)].plot(
 # %%
 # Training an initial model
 # =========================
-# 
+#
 # In this section, we will train a fairness-unaware model on the training
 # data. However because of the imbalances in the dataset, we will first
 # resample the training data to produce a new balanced training dataset.
 
 def resample_training_data(X_train, Y_train, A_train):
-    """
-    Method to down-sample the majority class in the training dataset to
-    produce a balanced dataset with a 50/50 split in the predictive labels.
+    """Down-sample the majority class in the training dataset to produce a
+    balanced dataset with a 50/50 split in the predictive labels.
 
     Parameters:
-    - X_train: The training split of the features
-    - Y_train: The training split of the target labels
-    - A_train: The training split of the sensitive features
+    X_train: The training split of the features
+    Y_train: The training split of the target labels
+    A_train: The training split of the sensitive features
 
-    Output:
-        Tuple of X_train, Y_train, A_train where each dataset has been
-        re-balanced.
-
+    Returns:
+    Tuple of X_train, Y_train, A_train where each dataset has been re-balanced.
     """
     negative_ids = Y_train[Y_train == 0].index
     positive_ids = Y_train[Y_train == 1].index
@@ -358,7 +354,7 @@ roc_auc_score(y_test, Y_pred_proba)
 # %%
 # Feature Importance of the Unmitigated Classifier
 # ================================================
-# 
+#
 # As a model validation check, let's explore the feature importances of our
 # classifier.
 # As expected, our synthetic feature :code:`INTEREST` has the highest feature
@@ -377,7 +373,7 @@ lgb.plot_importance(
 # %%
 # Fairness assessment of unmitigated model
 # ----------------------------------------
-# 
+#
 # Now that we have trained our initial fairness-unaware model, let's perform
 # our fairness assessment for this model. When conducting a fairness assessment,
 # there are three main steps we want to perform:
@@ -385,10 +381,10 @@ lgb.plot_importance(
 # 1. Identify who will be harmed.
 # 2. Identify the types of harms we anticipate.
 # 3. Define fairness metrics based on the anticipated harms.
-# 
+#
 # Who will be harmed?
 # ===================
-# 
+#
 # Based on the incident with *Apple* credit card mentioned at the beginning
 # of this notebook, we believe the model may incorrectly predict women will
 # default on the credit loan. The system may unfairly allocate less loans to
@@ -397,7 +393,7 @@ lgb.plot_importance(
 # %%
 # Types of harm experienced
 # =========================
-# 
+#
 # When discussing fairness in AI systems, the first step is understanding
 # what types of harms we anticipate the system may produce. Using the `harms
 # taxonomy in the Fairlearn User Guide
@@ -462,10 +458,10 @@ lgb.plot_importance(
 # is reflected in the lack of economic investment in Black communities, and
 # Black applicants are denied loans at a higher rate compared to white
 # Americans.
-# 
+#
 # Define fairness metrics based on harms
 # --------------------------------------
-# 
+#
 # Now that we have identified the relevant harms we anticpate users will
 # experience, we can define our fairness metrics. In addition to the metrics, we
 # will quantify the uncertainty around each metric using *custom functions* to
@@ -473,16 +469,15 @@ lgb.plot_importance(
 # level.
 
 def compute_error_metric(metric_value, sample_size):
-    """
-    Helper function to compute standard error of a given metric,
-    based on assumption of normal distribution.
+    """Compute standard error of a given metric based on the assumption of
+    normal distribution.
 
-    Parameters -
-        metric_value: Value of the metric
-        sample_size: Number of data points associated with the metric
+    Parameters:
+    metric_value: Value of the metric
+    sample_size: Number of data points associated with the metric
 
-    Returns - The standard error of the metric
-
+    Returns:
+    The standard error of the metric
     """
     metric_value = metric_value / sample_size
     return (
@@ -491,28 +486,26 @@ def compute_error_metric(metric_value, sample_size):
         / np.sqrt(sample_size)
     )
 
+
 def false_positive_error(y_true, y_pred):
-    """
-    Computes the standard error for the false positive rate estimate.
-    """
+    """Compute the standard error for the false positive rate estimate."""
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     return compute_error_metric(fp, tn + fp)
 
+
 def false_negative_error(y_true, y_pred):
-    """
-    Computes the standard error for the false negative rate estimate.
-    """
+    """Compute the standard error for the false negative rate estimate."""
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     return compute_error_metric(fn, fn + tp)
 
+
 def balanced_accuracy_error(y_true, y_pred):
-    """
-    Computes the standard error for the balanced accuracy estimate.
-    """
+    """Compute the standard error for the balanced accuracy estimate."""
     fpr_error, fnr_error = false_positive_error(
         y_true, y_pred
     ), false_negative_error(y_true, y_pred)
     return np.sqrt(fnr_error**2 + fpr_error**2) / 2
+
 
 fairness_metrics = {
     "count": count,
@@ -539,7 +532,7 @@ metrics_to_report = [
 # dictionary of metrics :code:`fairness_metrics`, along with our test labels :code:`y_test`
 # and test predictions :code:`Y_pred`. In addition, we pass in the
 # *sensitive_features* :code:`A_test` to disaggregate our model results.
-# 
+#
 # Instantiate the MetricFrame for the unmitigated model
 metricframe_unmitigated = MetricFrame(
     metrics=fairness_metrics,
@@ -557,18 +550,23 @@ metricframe_unmitigated.overall[metrics_to_report]
 
 # %%
 def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
-    """
-    Plots the disaggregated metric for each group with an associated
+    """Plot the disaggregated metric for each group with an associated
     error bar. Both metric and the error bar are provided as columns in the
     provided MetricFrame.
 
-    Parameters:
-    - metricframe: The metricframe containing the metrics and their associated uncertainty quantification.
-    - metric: The set of metrics to plot
-    - error_name: The associated standard error for each metric in metric
+    Parameters
+    ----------
+    metricframe : MetricFrame
+        The MetricFrame containing the metrics and their associated
+        uncertainty quantification.
+    metric : str
+        The metric to plot
+    error_name : str
+        The associated standard error for each metric in metric
 
-    Returns:
-    - Matplotlib Plot of point estimates with error bars
+    Returns
+    -------
+    Matplotlib Plot of point estimates with error bars
     """
     grouped_metrics = metricframe.by_group
     point_estimates = grouped_metrics[metric]
@@ -629,7 +627,7 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # negatives* have the equally adverse costs to each group. In practice, we would
 # develop some weighting mechanism to assign a weight to each *false negative*
 # and *false positive* event.
-# 
+#
 # Mitigating Unfairness in ML models
 # ----------------------------------
 # In the previous section, we identified disparities in the model's
@@ -651,7 +649,7 @@ equalized_odds_unmitigated = equalized_odds_difference(
 #   constraint. Compared to the *postprocessing* approach, the fairness
 #   constraint is satisfied during the model training time rather than
 #   afterwards.
-# 
+#
 # Postprocessing mitigations: ThresholdOptimizer
 # ==============================================
 # In the Fairlearn package, *postprocessing* mitigation is offered through
@@ -686,7 +684,7 @@ postprocess_est = ThresholdOptimizer(
 #
 # We pass in :code:`A_train` to the :code:`fit` function with the :code:`sensitive_features`
 # parameter.
- 
+
 postprocess_est.fit(X=X_train, y=y_train, sensitive_features=A_train)
 
 postprocess_pred = postprocess_est.predict(X_test, sensitive_features=A_test)
@@ -699,20 +697,23 @@ postprocess_pred_proba = postprocess_est._pmf_predict(
 # %%
 # Fairness assessment of postprocessing model
 # ===========================================
-# 
+#
 
 def compare_metricframe_results(mframe_1, mframe_2, metrics, names):
-    """
-    Concatenates the results of two MetricFrames along a subset of metrics.
+    """Concatenate the results of two MetricFrames along a subset of metrics.
 
-    Parameters:
-    - mframe_1: First MetricFrame for comparison
-    - mframe_2: Second MetricFrame for comparison
-    - metrics: The subset of metrics for comparison
-    - names: The names of the selected metrics
+    Parameters
+    ----------
+    mframe_1: First MetricFrame for comparison
+    mframe_2: Second MetricFrame for comparison
+    metrics: The subset of metrics for comparison
+    names: The names of the selected metrics
 
-    Returns:
-        Metricframe: The concatenation of the two MetricFrames, restricted to the metrics specified.
+    Returns
+    -------
+    MetricFrame : MetricFrame
+        The concatenation of the two MetricFrames, restricted to the metrics
+        specified.
 
     """
     return pd.concat(
@@ -757,58 +758,64 @@ metricframe_postprocess.by_group[metrics_to_report].plot.bar(
 
 # %%
 # We see that the :code:`ThresholdOptimizer` algorithm achieves a much lower
-# disparity between the two groups compared to the *unmitigated* model. However,
-# this does come with the trade-off that the :code:`ThresholdOptimizer` achieves a
-# lower :code:`balanced_accuracy` score for *male* applicants.
-# 
+# disparity between the two groups compared to the *unmitigated* model.
+# However, this does come with the trade-off that the
+# :code:`ThresholdOptimizer` achieves a lower :code:`balanced_accuracy` score
+# for *male* applicants.
+#
 # Reductions approach to unfairness mitigation
 # --------------------------------------------
 # In the previous section, we took a fairness-unaware model and used the
-# :code:`ThresholdOptimizer` to transform the model's decision boundary to satisfy our
-# fairness constraints. One key limitation of the :code:`ThresholdOptimizer` is
-# needing access to our *sensitive_feature* during prediction time.
-# 
+# :code:`ThresholdOptimizer` to transform the model's decision boundary to
+# satisfy our fairness constraints.
+# One key limitation of the :code:`ThresholdOptimizer` is needing access to
+# our *sensitive_feature* during prediction time.
+#
 # In this section, we will use the *reductions* approach of `Agarwal et. al
 # (2018) <https://arxiv.org/pdf/1803.02453.pdf>`_ to produce models that satisfy
 # the fairness constraint without needing access to the sensitive features at
 # deployment time.
 #
-# The main reduction algorithm in Fairlearn is :code:`ExponentiatedGradient`. The
-# algorithm creates a sequence of re-weighted datasets and retrains the wrapped
-# classifier on each of the datasets. This re-training process is guaranteed to
-# find a model that satisfies the fairness constraints while optimizing the
-# performance metric.
+# The main reduction algorithm in Fairlearn is :code:`ExponentiatedGradient`.
+# The algorithm creates a sequence of re-weighted datasets and retrains the
+# wrapped classifier on each of the datasets.
+# This re-training process is guaranteed to find a model that satisfies the
+# fairness constraints while optimizing the performance metric.
 #
 # The model returned by :code:`ExponentiatedGradient` consists of several inner
 # models, returned by a wrapped estimator.
 #
-# To instantiate an :code:`ExponentiatedGradient` model, we pass in two parameters:
-# 
+# To instantiate an :code:`ExponentiatedGradient` model, we pass in two
+# parameters:
+#
 # - a base :code:`estimator` (object that supports training)
 # - fairness :code:`constraints` (object of type :class:`fairlearn.reductions.Moment`)
 #
-# When passing in a fairness *constraint* as a :code:`Moment`, we can specify an
-# :code:`epsilon` value representing the maximum allowed difference or ratio between
-# our largest and smallest value. For example, in the below code,
+# When passing in a fairness *constraint* as a :code:`Moment`, we can specify
+# an :code:`epsilon` value representing the maximum allowed difference or ratio
+# between our largest and smallest value.
+# For example, in the below code,
 # :code:`EqualizedOdds(difference_bound=epsilon)` means that we are using
-# :code:`EqualizedOdds` as our fairness constraint, and we will allow a maximal
-# difference of :code:`epsilon` between our largest and smallest *equalized odds*
-# value.
+# :code:`EqualizedOdds` as our fairness constraint, and we will allow a
+# maximal difference of :code:`epsilon` between our largest and smallest
+# *equalized odds* value.
 
 def get_expgrad_models_per_epsilon(
     estimator, epsilon, X_train, y_train, A_train
 ):
-    """
-    Instantiates and trains an ExponentiatedGradient model on the
+    """Instantiate and train an ExponentiatedGradient model on the
     balanced training dataset.
 
-    Parameters:
-        - Estimator: Base estimator to contains a fit and predict function.
-        - Epsilon: Float representing maximum difference bound for the fairness Moment constraint
+    Parameters
+    ----------
+    Estimator: Base estimator to contains a fit and predict function.
+    Epsilon: Float representing maximum difference bound for the fairness Moment constraint
 
-    Returns:
-        - Predictors: List of inner model predictors learned by the
-        ExponentiatedGradient model during the training process.
+    Returns
+    -------
+    Predictors
+        List of inner model predictors learned by the ExponentiatedGradient
+        model during the training process.
 
     """
     exp_grad_est = ExponentiatedGradient(
@@ -823,16 +830,17 @@ def get_expgrad_models_per_epsilon(
 
 # %%
 # Because the *performance-fairness trade-off* learned by the
-# :code:`ExponentiatedGradient` model is sensitive to our chosen :code:`epsilon` value, we
-# can treat :code:`epsilon` as a *hyperparameter* and iterate over a range of
-# potential values. Here, we will train two :code:`ExponentiatedGradient` models, one
-# with :code:`epsilon=0.01` and the second with :code:`epsilon=0.02`, and store the inner
-# models learned through each of the training processes.
+# :code:`ExponentiatedGradient` model is sensitive to our chosen
+# :code:`epsilon` value, we can treat :code:`epsilon` as a *hyperparameter*
+# and iterate over a range of potential values.
+# Here, we will train two :code:`ExponentiatedGradient` models, one with
+# :code:`epsilon=0.01` and the second with :code:`epsilon=0.02`, and store the
+# inner models learned through each of the training processes.
 #
 # In practice, we recommend choosing smaller values of :code:`epsilon` on
 # the order of the *square root* of the number of samples in the training
-# dataset: :math:`\dfrac{1}{\sqrt{\text{numberSamples}}} \approx \dfrac{1}{\sqrt{25000}}
-# \approx 0.01`
+# dataset:
+# :math:`\dfrac{1}{\sqrt{\text{numberSamples}}} \approx \dfrac{1}{\sqrt{25000}} \approx 0.01`
 
 epsilons = [0.01, 0.02]
 
@@ -856,38 +864,46 @@ for epsilon, models in all_models.items():
 
 # %%
 # Here, we can see all the inner models learned for each value of
-# :code:`epsilon`. With the :code:`ExponentiatedGradient` model, we specify an
-# :code:`epsilon` parameter that represents the maximal disparity in our fairness
-# metric that our final model should satisfy. For example, an :code:`epsilon=0.02`
-# means that the training value of the *equalized odds difference* of the
-# returned model is at most :code:`0.02` (if the algorithm converges).
-# 
+# :code:`epsilon`.
+# With the :code:`ExponentiatedGradient` model, we specify an :code:`epsilon`
+# parameter that represents the maximal disparity in our fairness metric that
+# our final model should satisfy.
+# For example, an :code:`epsilon=0.02` means that the training value of the
+# *equalized odds difference* of the returned model is at most :code:`0.02`
+# (if the algorithm converges).
+#
 # Reviewing inner models of ExponentiatedGradient
 # ===============================================
 # In many situations due to regulation or other technical restrictions, the
-# randomized nature of :code:`ExponentiatedGradient` algorithm may be undesirable. In
-# addition, the multiple inner models of the algorithm introduce challenges for
-# model interpretability. One potential workaround to avoid these issues is to
-# select one of the inner models and deploy it instead.
+# randomized nature of :code:`ExponentiatedGradient` algorithm may be
+# undesirable.
+# In addition, the multiple inner models of the algorithm introduce challenges
+# for model interpretability.
+# One potential workaround to avoid these issues is to select one of the inner
+# models and deploy it instead.
 #
-# In the previous section, we trained multiple :code:`ExponentiatedGradient` models
-# at different :code:`epsilon` levels and collected all the inner models learned by
-# this process. However, some of these inner models are better performance in
-# both their *balanced error rate* and *equalized odds difference*. We will
-# filter out these *"dominated"* models and plot the performance trade-offs of
-# the remaining models.
+# In the previous section, we trained multiple :code:`ExponentiatedGradient`
+# models at different :code:`epsilon` levels and collected all the inner
+# models learned by this process.
+# However, some of these inner models have worse performance in both their
+# *balanced error rate* and *equalized odds difference*.
+# We will filter out these *"dominated"* models and plot the performance
+# trade-offs of the remaining models.
 
 def is_pareto_efficient(points):
-    """
-    Filters a NumPy Matrix to remove rows that are strictly dominated
-    by another row in the matrix. Stricly dominated means the all the row values are greater than
-    the values of another row.
+    """Filter a NumPy Matrix to remove rows that are strictly dominated by
+    another row in the matrix. Strictly dominated means the all the row values
+    are greater than the values of another row.
 
-    Parameters:
-        Points: NumPy array (NxM) of model metrics. Assumption that smaller values for metrics are preferred.
+    Parameters
+    ----------
+    Points: NumPy array (NxM) of model metrics.
+        Assumption that smaller values for metrics are preferred.
 
-    Returns:
-        Boolean Array: Nx1 boolean mask representing the non-dominated indices.
+    Returns
+    -------
+    Boolean Array
+        Nx1 boolean mask representing the non-dominated indices.
     """
     n, m = points.shape
     is_efficient = np.ones(n, dtype=bool)
@@ -902,17 +918,19 @@ def is_pareto_efficient(points):
 
 # %%
 def filter_dominated_rows(points):
-    """
-    Removes rows from a DataFrame that are monotonically dominated by another
-    row in the DataFrame.
+    """Remove rows from a DataFrame that are monotonically dominated by
+    another row in the DataFrame.
 
-    Parameters:
-        Points: DataFrame where each row represents the summarized performance (balanced accuracy, fairness metric)
-        of an inner model.
+    Parameters
+    ----------
+    Points: DataFrame where each row represents the summarized performance
+            (balanced accuracy, fairness metric) of an inner model.
 
-    Returns:
-        Pareto_mask: Boolean mask representing indices of input DataFrame that are not monotonically dominated.
-        Masked_Dataframe: DataFrame with dominated rows filtered out.
+    Returns
+    -------
+    pareto mask: Boolean mask representing indices of input DataFrame that are not monotonically dominated.
+    masked_DataFrame: DataFrame with dominated rows filtered out.
+
     """
     pareto_mask = is_pareto_efficient(points.to_numpy())
     return pareto_mask, points.loc[pareto_mask, :]
@@ -922,19 +940,22 @@ def filter_dominated_rows(points):
 def aggregate_predictor_performances(
     predictors, metric, X_test, Y_test, A_test=None
 ):
-    """
-    Helper function to compute the specified metric for all classifiers in predictors.
-    If no sensitive features are present, the metric is computed without disaggregation.
+    """Compute the specified metric for all classifiers in predictors.
+    If no sensitive features are present, the metric is computed without
+    disaggregation.
 
-    Parameters:
-    - predictors: A set of classifiers to generate predictions from.
-    - metric: The metric (callable) to compute for each classifier in predictor
-    - X_test: The data features of the testing data set
-    - Y_test: The target labels of the teting data set
-    - A_test: The sensitive feature of the testing data set.
+    Parameters
+    ----------
+    predictors: A set of classifiers to generate predictions from.
+    metric: The metric (callable) to compute for each classifier in predictor
+    X_test: The data features of the testing data set
+    Y_test: The target labels of the teting data set
+    A_test: The sensitive feature of the testing data set.
 
-    Returns:
-        - List of performance scores for each classifier in predictors, for the given metric.
+    Returns
+    -------
+    List of performance scores for each classifier in predictors, for the
+    given metric.
     """
     all_predictions = [predictor.predict(X_test) for predictor in predictors]
     if A_test is not None:
@@ -948,19 +969,23 @@ def aggregate_predictor_performances(
 
 # %%
 def model_performance_sweep(models_dict, X_test, y_test, A_test):
-    """
-    Computes the equalized_odds_difference and balanced_error_rate for a given list of inner models
-    learned by the ExponentiatedGradient algorithm. Returns a DataFrame containing the epsilon level of the model,
-    the index of the model, the equalized_odds_difference score and the balanced_error for the model.
+    """Compute the equalized_odds_difference and balanced_error_rate for a
+    given list of inner models learned by the ExponentiatedGradient algorithm.
+    Return a DataFrame containing the epsilon level of the model, the index
+    of the model, the equalized_odds_difference score and the balanced_error
+    for the model.
 
-    Parameters:
-    - models_dict: Dictionary mapping model ids to a model.
-    - X_test: The data features of the testing data set
-    - y_test: The target labels of the teting data set
-    - A_test: The sensitive feature of the testing data set.
+    Parameters
+    ----------
+    models_dict: Dictionary mapping model ids to a model.
+    X_test: The data features of the testing data set
+    y_test: The target labels of the testing data set
+    A_test: The sensitive feature of the testing data set.
 
-    Returns:
-        DataFrame where each row represents a model (epsilon, index) and its performance metrics
+    Returns
+    -------
+    DataFrame where each row represents a model (epsilon, index) and its
+    performance metrics
     """
     performances = []
     for (eps, models) in models_dict.items():
@@ -999,7 +1024,7 @@ for index, row in performance_df_masked.iterrows():
     bal_error, eq_odds_diff = row["balanced_error"], row["equalized_odds"]
     epsilon_, index_ = row["epsilon"], row["index"]
     plt.scatter(
-        bal_error, eq_odds_diff, color="green", label=f"ExponentiatedGradient"
+        bal_error, eq_odds_diff, color="green", label="ExponentiatedGradient"
     )
     plt.text(
         bal_error + 0.001,
@@ -1010,10 +1035,10 @@ for index, row in performance_df_masked.iterrows():
 plt.scatter(
     1.0 - balanced_accuracy_unmitigated,
     equalized_odds_unmitigated,
-    label=f"UnmitigatedModel",
+    label="UnmitigatedModel",
 )
 plt.scatter(
-    1.0 - bal_acc_postprocess, eq_odds_postprocess, label=f"PostProcess"
+    1.0 - bal_acc_postprocess, eq_odds_postprocess, label="PostProcess"
 )
 plt.xlabel("Weighted Error Rate")
 plt.ylabel("Equalized Odds")
@@ -1025,7 +1050,7 @@ plt.legend(bbox_to_anchor=(1.85, 1))
 # inner models compares to the original unmitigated model. In many cases, we see
 # that a reduction in the :code:`equalized_odds_difference` is accompanied by a small
 # increase in the *weighted error rate*.
-# 
+#
 # Selecting a suitable inner model
 # ================================
 # One strategy we can use to select a model is creating a *threshold* based
@@ -1055,17 +1080,19 @@ def filter_models_by_unmitigiated_score(
     fairness_metric="equalized_odds",
     threshold=0.01,
 ):
-    """
-    Filters out models whose performance score is above the desired threshold.
-    Out of the remaining model, return the models with the best score on the fairness metric
+    """Filter out models whose performance score is above the desired
+    threshold. Out of the remaining model, return the models with the best
+    score on the fairness metric.
 
-    Parameters:
-    - all_models: Dictionary (Epsilon, Index) mapping (epilson, index number) pairs to a Model object
-    - models_frames: A DataFrame representing each model's performance and fairness score.
-    - unmitigated_score: The performance score of the unmitigated model.
-    - performance_metric: The model performance metric to threshold on.
-    - fairness_metric: The fairness metric to optimize for
-    - threshold: The threshold padding added to the :code:`unmitigated_score`.
+    Parameters
+    ----------
+    all_models: Dictionary (Epsilon, Index) mapping (epilson, index number) pairs to a Model object
+    models_frames: A DataFrame representing each model's performance and fairness score.
+    unmitigated_score: The performance score of the unmitigated model.
+    performance_metric: The model performance metric to threshold on.
+    fairness_metric: The fairness metric to optimize for
+    threshold: The threshold padding added to the :code:`unmitigated_score`.
+
     """
     # Create threshold based on balanced_error of unmitigated model and filter
     models_filtered = models_frames.query(
@@ -1125,7 +1152,7 @@ metricframe_inprocess.by_group[metrics_to_report].plot.bar(
 # %%
 # Discuss Performance and Trade-Offs
 # --------------------------------------
-# 
+#
 # Now we have trained two different fairness-aware models using the
 # *postprocessing* approach and the *reductions* approach. Let's compare the
 # performance of these models to our original fairness-unaware model.
@@ -1155,7 +1182,7 @@ def create_metricframe_w_errors(mframe, metrics_to_report, metric_error_pair):
 # %%
 # Report model performance error bars for metrics
 # ===============================================
-# 
+#
 # **Unmitigated model**
 
 create_metricframe_w_errors(
@@ -1190,10 +1217,10 @@ metricframe_postprocess.overall[metrics_to_report]
 # in the *false negative rate* for *male applicants*. However overall, the
 # *equalized odds difference* for the *reductions* models is lower
 # than that of the original fairness-unaware model.
-# 
+#
 # Conclusion and Discussion
 # ----------------------------
-# 
+#
 # In this case study, we walked through the process of assessing a credit
 # decision model for gender-related performance disparities. Our analysis
 # follows closely the work done in the `Microsoft/EY white paper
@@ -1210,15 +1237,15 @@ metricframe_postprocess.overall[metrics_to_report]
 # profitability of the model. By maintaining a relatively similar *balanced
 # error score*, we've produced a model that preserves profitability to the firm
 # while producing more fair and equitable outcomes for women in this scenario.
-# 
+#
 # Designing a Model Card
 # ======================
-# 
+#
 # A key facet of Responsible Machine Learning is responsible documentation
 # practices. `Mitchell et al. (2019) <https://arxiv.org/abs/1810.03993>`_
 # proposed the model card framework for documentating and reporting model
 # training details and deployment considerations.
-# 
+#
 # A *model card* contains sections for documenting training and evaluation
 # dataset descriptions, ethical concerns, and quantitative evaluation summaries.
 # In practice, we would ideally create a model card for our model before
@@ -1226,10 +1253,10 @@ metricframe_postprocess.overall[metrics_to_report]
 # this case study, interested readers can learn more about creating model cards
 # using the *Model Card Toolkit* from the
 # `Fairlearn PyCon tutorial <https://github.com/fairlearn/talks/tree/main/2022_pycon>`_.
-# 
+#
 # Fairness under unawareness
 # ==========================
-# 
+#
 # When proving credit models are compliant with fair lending laws,
 # practitoners may run into the issue of not having access to the sensitive
 # demographic features. As a result, financial institutions are often tasked
