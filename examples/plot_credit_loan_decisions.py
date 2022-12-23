@@ -17,14 +17,10 @@ Credit Loan Decisions
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-
-sns.set()
 
 pd.set_option("display.float_format", "{:.3f}".format)
 
 import lightgbm as lgb
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import Pipeline
@@ -96,11 +92,11 @@ np.random.seed(rand_seed)
 # unfairness in the loan adjudication process.
 #
 # Using a dataset of credit loan outcomes (whether an individual defaulted on
-# a credit loan), we train a fairness-unaware model to predict the likelihood an
-# individual will default on a given loan. We use the Fairlearn toolkit for
-# assessing the fairness of our model, according to several metrics. Finally, we
-# perform two unfairness mitigation strategies on our model and compare the
-# results to our original model.
+# a credit loan), we train a fairness-unaware model to predict the likelihood
+# an individual will default on a given loan. We use the Fairlearn toolkit for
+# assessing the fairness of our model, according to several metrics.
+# Finally, we perform two unfairness mitigation strategies on our model and
+# compare the results to our original model.
 #
 # Because the dataset used in the white paper is not publicly available, we
 # will introduce a semi-synthetic feature into an existing publicly available
@@ -114,11 +110,11 @@ np.random.seed(rand_seed)
 # As mentioned, we will not be able to use the original loans dataset, and
 # instead will be working with a publicly available dataset of credit card
 # defaults in Taiwan collected in 2005. This dataset represents binary credit
-# card default outcomes for 30,000 applicants with information pertaining to an
-# applicant's payment history and bill statements over a six-month period from
-# April 2005 to September 2005, as well as demographic information, such as
-# *sex*, *age*, *marital status*, and *education level* of the applicant. A full
-# summary of features is provided below:
+# card default outcomes for 30,000 applicants with information pertaining to
+# an applicant's payment history and bill statements over a six-month period
+# from April 2005 to September 2005, as well as demographic information, such
+# as *sex*, *age*, *marital status*, and *education level* of the applicant.
+# A full summary of features is provided below:
 # 
 # .. list-table::
 #   :header-rows: 1
@@ -138,28 +134,30 @@ np.random.seed(rand_seed)
 #      - default information (1 = YES, 0 = NO)
 # 
 # Let's pretend we are a data scientist at a financial institution who is
-# tasked with developing a classification model to predict whether an applicant
-# will default on a personal loan. A positive prediction by the model means the
-# applicant would default on the credit loan. *Defaulting on a loan* means the
-# client fails to make payments within a 30-day window, and the lender can take
-# legal actions against the client.
+# tasked with developing a classification model to predict whether an
+# applicant will default on a personal loan. A positive prediction by the
+# model means the applicant would default on the credit loan.
+# *Defaulting on a loan* means the client fails to make payments within a
+# 30-day window, and the lender can take legal actions against the client.
 #
 # Although we do not have a dataset of loan default history, we do have this
-# data set of credit card payment history. We assume customers who make monthly
-# credit card payments on time are more *creditworthy*, and thus less likely to
-# default on a personal credit loan.
+# data set of credit card payment history. We assume customers who make
+# monthly credit card payments on time are more *creditworthy*, and thus less
+# likely to default on a personal credit loan.
 #
 # **Decision point: task definition**
 #
 # - **Defaulting on a credit card payment** can be viewed as a proxy for the
 #   fact that an applicant might not be a good candidate for a personal loan.
-# - Because most customers did not default on their credit card payment, we will
-#   need to take this class imbalance into account during our modeling process.
+# - Because most customers did not default on their credit card payment, we
+#   will need to take this class imbalance into account during our modeling
+#   process.
 #
 # As the data is read in-memory, we will change the column :code:`PAY_0` to
-# :code:`PAY_1` to make the naming more consistent with the naming of the other
-# columns. In addition, the target variable :code:`default payment next month`
-# is changed to :code:`default` to reduce verbosity.
+# :code:`PAY_1` to make the naming more consistent with the naming of the
+# other columns.
+# In addition, the target variable :code:`default payment next month` is
+# changed to :code:`default` to reduce verbosity.
 
 # %%
 data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/default%20of%20credit%20card%20clients.xls"
@@ -200,16 +198,17 @@ A_str = A.map({1: "male", 2: "female"})
 # %%
 # Dataset imbalances
 # ==================
-
-# %% Before we start training a classifier model, we want to explore the dataset
-# for any characteristics that may lead to fairness-related harms later on in
-# the modeling process. In particular, we wil focus on the distribution of
-# sensitive feature :code:`SEX` and the target label :code:`default`.
+# 
+# Before we start training a classifier model, we want to explore the
+# dataset for any characteristics that may lead to fairness-related harms
+# later on in the modeling process.
+# In particular, we wil focus on the distribution of sensitive feature
+# :code:`SEX` and the target label :code:`default`.
 #
 # As part of an exploratory data analysis, let's explore the distribution of
-# our sensitive feature :code:`SEX`. We see that 60% of loan applicants were labeled
-# as `female` and 40% as `male`, so we do not need to worry about imbalance in
-# this feature.
+# our sensitive feature :code:`SEX`. We see that 60% of loan applicants were
+# labeled as `female` and 40% as `male`, so we do not need to worry about
+# imbalance in this feature.
 
 # %%
 A_str.value_counts(normalize=True)
@@ -233,22 +232,27 @@ Y.value_counts(normalize=True)
 # ==========================================================
 
 # %%
-# For the purpose of this case study, we add a synthetic feature :code:`Interest`
-# that introduces correlation between the :code:`SEX` label of an applicant and the
-# :code:`default` outcome. The purpose of this feature is to replicate outcome
-# disparities present in the original dataset. We can think of this :code:`Interest`
-# feature as the *interest rate* for the applicant. If the applicant has a
-# history of defaulting on credit card payments, the bank will lend to the
-# applicant at a higher interest rate. We also assume because banks have
-# historically lended primarily to men, there is less uncertainty (or variance)
-# in the *interest rate* for these applicants.
+# For the purpose of this case study, we add a synthetic feature
+# :code:`Interest` that introduces correlation between the :code:`SEX` label
+# of an applicant and the :code:`default` outcome.
+# The purpose of this feature is to replicate outcome disparities present in
+# the original dataset.
+# We can think of this :code:`Interest` feature as the *interest rate* for
+# the applicant.
+# If the applicant has a history of defaulting on credit card payments, the
+# bank will lend to the applicant at a higher interest rate.
+# We also assume because banks have historically lended primarily to men,
+# there is less uncertainty (or variance) in the *interest rate* for these
+# applicants.
 
 # %%
 # To reflect the above reasoning, the :code:`Interest` feature is drawn from a
 # *Gaussian distribution* with the following criterion:
 # 
-# * If *Male*, draw :code:`Interest` from :math:`\mathcal{N}(2 \cdot \text{Default}, 1)`
-# * If *Female*, draw :code:`Interest` from :math:`\mathcal{N}(2 \cdot \text{Default}, 2)`
+# * If *Male*, draw :code:`Interest` from
+#   :math:`\mathcal{N}(2 \cdot \text{Default}, 1)`
+# * If *Female*, draw :code:`Interest` from
+#   :math:`\mathcal{N}(2 \cdot \text{Default}, 2)`
 #
 # This feature is drawn from a *Gaussian distribution* for computational
 # simplicity.
@@ -261,8 +265,9 @@ X.loc[:, "Interest"] = np.random.normal(loc=2 * Y, scale=A)
 
 # %%
 # Now that we have created our synthetic feature, let's check how this new
-# feature interacts with our *sensitive_feature* :code:`Sex` and our target label
-# :code:`default`. We see that for both sexes, the :code:`Interest` feature is higher for
+# feature interacts with our *sensitive_feature* :code:`Sex` and our target
+# label :code:`default`.
+# We see that for both sexes, the :code:`Interest` feature is higher for
 # individuals who defaulted on their loan.
 
 # %%
@@ -293,14 +298,14 @@ X["Interest"][(A == 2) & (Y == 1)].plot(
 
 # %%
 # In this section, we will train a fairness-unaware model on the training
-# data. However because of the imbalances in the dataset, we will first resample
-# the training data to produce a new balanced training dataset.
+# data. However because of the imbalances in the dataset, we will first
+# resample the training data to produce a new balanced training dataset.
 
 # %%
 def resample_training_data(X_train, Y_train, A_train):
     """
-    Method to down-sample the majority class in the training dataset to produce
-    a balanced dataset with a 50/50 split in the predictive labels.
+    Method to down-sample the majority class in the training dataset to
+    produce a balanced dataset with a 50/50 split in the predictive labels.
 
     Parameters:
     - X_train: The training split of the features
@@ -308,7 +313,8 @@ def resample_training_data(X_train, Y_train, A_train):
     - A_train: The training split of the sensitive features
 
     Output:
-        Tuple of X_train, Y_train, A_train where each dataset has been re-balanced.
+        Tuple of X_train, Y_train, A_train where each dataset has been
+        re-balanced.
 
     """
     negative_ids = Y_train[Y_train == 0].index
@@ -332,8 +338,8 @@ X_train, y_train, A_train = resample_training_data(X_train, y_train, A_train)
 
 # %%
 # At this stage, we will train a *gradient-boosted tree classifier* using the
-# :code:`lightgbm` package on the balanced training dataset. When we evaluate the
-# model, we will use the unbalanced testing dataset.
+# :code:`lightgbm` package on the balanced training dataset.
+# When we evaluate the model, we will use the unbalanced testing dataset.
 
 # %%
 lgb_params = {
@@ -354,8 +360,8 @@ estimator = Pipeline(
 
 estimator.fit(X_train, y_train)
 
-# %% We compute the *binary predictions* and the *prediction probabilities* for
-# the testing data points.
+# %% We compute the *binary predictions* and the *prediction probabilities*
+# for the testing data points.
 
 # %%
 Y_pred_proba = estimator.predict_proba(X_test)[:, 1]
@@ -363,9 +369,9 @@ Y_pred = estimator.predict(X_test)
 
 # %%
 # From the *ROC Score*, we see the model appears to be differentiating
-# between *true positives* and *false positives* well. This is to be expected
-# given the :code:`INTEREST` feature provides a strong discriminant feature for the
-# classification task.
+# between *true positives* and *false positives* well.
+# This is to be expected given the :code:`INTEREST` feature provides a
+# strong discriminant feature for the classification task.
 
 # %%
 roc_auc_score(y_test, Y_pred_proba)
@@ -376,8 +382,9 @@ roc_auc_score(y_test, Y_pred_proba)
 
 # %%
 # As a model validation check, let's explore the feature importances of our
-# classifier. As expected, our synthetic feature :code:`INTEREST` has the highest
-# feature importance because it is highly correlated with the target variable,
+# classifier.
+# As expected, our synthetic feature :code:`INTEREST` has the highest feature
+# importance because it is highly correlated with the target variable,
 # by construction.
 
 # %%
@@ -393,22 +400,19 @@ lgb.plot_importance(
 # %%
 # Fairness assessment of unmitigated model
 # ----------------------------------------
-
-# %%
+# 
 # Now that we have trained our initial fairness-unaware model, let's perform
 # our fairness assessment for this model. When conducting a fairness assessment,
 # there are three main steps we want to perform:
 #
-# 1. ) Identify who will be harmed.
-# 2. ) Identify the types of harms we anticipate.
-# 3. ) Define fairness metrics based on the anticipated harms.
+# 1. Identify who will be harmed.
+# 2. Identify the types of harms we anticipate.
+# 3. Define fairness metrics based on the anticipated harms.
 
 # %%
 # Who will be harmed?
 # ===================
-#
-
-# %%
+# 
 # Based on the incident with *Apple* credit card mentioned at the beginning
 # of this notebook, we believe the model may incorrectly predict women will
 # default on the credit loan. The system may unfairly allocate less loans to
