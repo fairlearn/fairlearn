@@ -46,8 +46,9 @@ constraint, one typically needs to randomize between two thresholds.
 To illustrate its behavior, let's examine what this looks like with
 demographic parity as the fairness constraint.
 
-.. doctest:: mitigation_postprocessing
-    :options:  +NORMALIZE_WHITESPACE
+.. plot::
+   :context: close-figs
+   :format: doctest
 
     >>> import json
     >>> import pandas as pd
@@ -225,17 +226,16 @@ Note that the plot omits points that are within the convex hull of points.
 
 .. _printed_thresholds:
 
-.. doctest:: mitigation_postprocessing
-    :options:  +NORMALIZE_WHITESPACE
+.. plot::
+   :context: close-figs
+   :format: doctest
 
-    >>> data = fetch_adult(as_frame=True)
-    >>> logistic_regression = LogisticRegression()
     >>> threshold_optimizer = ThresholdOptimizer(
-    ...     estimator=logistic_regression,
+    ...     estimator=pipeline,
     ...     constraints="equalized_odds",
     ...     objective="accuracy_score")
     >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
-    ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression())
+    ThresholdOptimizer(constraints='equalized_odds', estimator=LogisticRegression(solver="liblinear", fit_intercept=True))
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(
     ...     threshold_rules_by_group,
@@ -352,11 +352,10 @@ By default, :class:`ThresholdOptimizer` trains the passed estimator using its
 :class:`ThresholdOptimizer` does not call :code:`fit()` on the estimator and
 assumes that it is already trained.
 
-.. doctest:: mitigation
+.. plot::
+   :format: doctest
 
-    >>> prefit_logistic_regression = LogisticRegression()
-    >>> prefit_logistic_regression.fit(X_train, y_train)
-    LogisticRegression()
+    >>> pipeline.fit(X_train, y_train)
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=prefit_logistic_regression,
     ...     constraints="demographic_parity",
@@ -371,3 +370,9 @@ it prints a warning, but still proceeds with the assumption that the user
 knows what they are doing. Not every machine learning package adheres to
 scikit-learn's convention of setting all members with trailing underscore
 during :code:`fit()`, so this is unfortunately an imperfect check.
+
+
+References
+----------
+
+.. footbibliography::

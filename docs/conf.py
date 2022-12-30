@@ -63,6 +63,7 @@ extensions = [
     "sphinx_gallery.gen_gallery",
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
     "numpydoc",
+    "matplotlib.sphinxext.plot_directive",
 ]
 
 source_suffix = [".rst"]
@@ -190,6 +191,13 @@ html_sidebars = {
 # Change the ordering of the member documentation
 autodoc_member_order = "groupwise"
 
+# Options for the `::plot` directive
+# ----------------------------------
+# https://matplotlib.org/stable/api/sphinxext_plot_directive_api.html
+plot_formats = ["png"]
+plot_include_source = True
+plot_html_show_formats = False
+plot_html_show_source_link = False
 
 # Linking Code
 # ------------
