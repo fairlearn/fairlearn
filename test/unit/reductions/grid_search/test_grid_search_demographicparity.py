@@ -40,7 +40,7 @@ def _simple_threshold_data(
     X = pd.DataFrame(
         {
             "actual_feature": score_feature,
-            "sensitive_feature1": A,
+            "sensitive_features": A,
             "constant_ones_feature": np.ones(len(Y)),
         }
     )
