@@ -605,7 +605,7 @@ plot_group_metrics_with_error_bars(
 
 # %%
 metricframe_unmitigated.by_group[metrics_to_report].plot.bar(
-    subplots=True, layout=[3, 1], figsize=[12, 18]
+    subplots=True, layout=[1, 3], figsize=[12, 4], legend=None, rot=0
 )
 
 # %%
@@ -752,7 +752,7 @@ compare_metricframe_results(
 )
 
 metricframe_postprocess.by_group[metrics_to_report].plot.bar(
-    subplots=True, layout=[3, 1], figsize=[12, 18]
+    subplots=True, layout=[1, 3], figsize=[12, 4], legend=None, rot=0
 )
 
 
@@ -885,10 +885,12 @@ for epsilon, models in all_models.items():
 # In the previous section, we trained multiple :code:`ExponentiatedGradient`
 # models at different :code:`epsilon` levels and collected all the inner
 # models learned by this process.
-# However, some of these inner models have worse performance in both their
-# *balanced error rate* and *equalized odds difference*.
-# We will filter out these *"dominated"* models and plot the performance
-# trade-offs of the remaining models.
+# When picking a suitable inner model, we consider trade-offs between
+# our two metrics of interest: *balanced error rate* and *equalized odds difference*.
+# Since our focus is on these two metrics, we will filter out
+# the models that are outperformed in both of the metrics by some other
+# model (we refer to these as *"dominated"* models), and plot just the remaining
+# *"undominated"* models.
 
 def is_pareto_efficient(points):
     """Filter a NumPy Matrix to remove rows that are strictly dominated by
@@ -1146,7 +1148,7 @@ metricframe_inprocess.difference()[metrics_to_report]
 metricframe_inprocess.overall[metrics_to_report]
 
 metricframe_inprocess.by_group[metrics_to_report].plot.bar(
-    subplots=True, layout=[3, 1], figsize=[12, 18]
+    subplots=True, layout=[1, 3], figsize=[12, 4], legend=None, rot=0
 )
 
 # %%
