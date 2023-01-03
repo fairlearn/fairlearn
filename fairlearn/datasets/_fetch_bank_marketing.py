@@ -100,4 +100,5 @@ def fetch_bank_marketing(
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
+        parser="liac-arff",
     )

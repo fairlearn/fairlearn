@@ -8,7 +8,7 @@ MetricFrame visualizations
 """
 
 import pandas as pd
-from sklearn.datasets import fetch_openml
+from fairlearn.datasets import fetch_adult
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.tree import DecisionTreeClassifier
 
@@ -21,7 +21,7 @@ from fairlearn.metrics import (
     selection_rate,
 )
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult(as_frame=True)
 X = pd.get_dummies(data.data)
 y_true = (data.target == ">50K") * 1
 sex = data.data["sex"]

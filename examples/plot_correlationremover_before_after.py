@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from sklearn.datasets import fetch_openml
+from fairlearn.datasets import fetch_diabetes_hospital
 from fairlearn.preprocessing import CorrelationRemover
 
 # %%
@@ -36,7 +36,7 @@ from fairlearn.preprocessing import CorrelationRemover
 # specifically at the African American race.
 # Finally, the columns are rearranged for consistency.
 
-data = fetch_openml(data_id=43874, as_frame=True)
+data = fetch_diabetes_hospital()
 X_raw = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
 X_raw = pd.get_dummies(X_raw)
 y = data.target

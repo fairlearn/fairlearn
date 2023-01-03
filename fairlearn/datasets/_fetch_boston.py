@@ -150,4 +150,5 @@ def fetch_boston(
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
+        parser="liac-arff",
     )
