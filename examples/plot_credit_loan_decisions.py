@@ -580,7 +580,7 @@ metricframe_unmitigated.by_group[metrics_to_report]
 metricframe_unmitigated.difference()[metrics_to_report]
 
 metricframe_unmitigated.overall[metrics_to_report]
-exit()
+#exit()
 
 # %%
 def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
@@ -1041,6 +1041,7 @@ def model_performance_sweep(models_dict, X_test, y_test, A_test):
 
 
 # %%
+exit()
 performance_df = model_performance_sweep(all_models, X_test, y_test, A_test)
 
 # %%
