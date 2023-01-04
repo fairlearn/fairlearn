@@ -580,7 +580,7 @@ metricframe_unmitigated.by_group[metrics_to_report]
 metricframe_unmitigated.difference()[metrics_to_report]
 
 metricframe_unmitigated.overall[metrics_to_report]
-exit()
+
 
 # %%
 def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
