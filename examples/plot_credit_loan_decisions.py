@@ -580,8 +580,7 @@ metricframe_unmitigated.by_group[metrics_to_report]
 metricframe_unmitigated.difference()[metrics_to_report]
 
 metricframe_unmitigated.overall[metrics_to_report]
-# exit() # bin search iteration 1: 10min
-
+#exit()
 
 # %%
 def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
@@ -789,7 +788,6 @@ compare_metricframe_results(
 metricframe_postprocess.by_group[metrics_to_report].plot.bar(
     subplots=True, layout=[1, 3], figsize=[12, 4], legend=None, rot=0
 )
-exit() # bin search iteration 3
 
 
 # %%
@@ -1043,7 +1041,7 @@ def model_performance_sweep(models_dict, X_test, y_test, A_test):
 
 
 # %%
-exit() # bin search iteration 2: timeout
+exit()
 performance_df = model_performance_sweep(all_models, X_test, y_test, A_test)
 
 # %%
