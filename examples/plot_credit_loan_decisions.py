@@ -23,6 +23,7 @@ from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from fairlearn.datasets import fetch_credit_card
 from fairlearn.metrics import MetricFrame
 from fairlearn.metrics import (
     count,
@@ -150,10 +151,43 @@ np.random.seed(rand_seed)
 # In addition, the target variable :code:`default payment next month` is
 # changed to :code:`default` to reduce verbosity.
 
-data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/default%20of%20credit%20card%20clients.xls"
+# data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/default%20of%20credit%20card%20clients.xls"
+# dataset = (
+#     pd.read_excel(io=data_url, header=1)
+#     .drop(columns=["ID"])
+#     .rename(
+#         columns={"PAY_0": "PAY_1", "default payment next month": "default"}
+#     )
+# )
+
+column_dict = {
+    'x1': 'LIMIT_BAL',
+    'x2': 'SEX',
+    'x3': 'EDUCATION',
+    'x4': 'MARRIAGE',
+    'x5': 'AGE',
+    'x6': 'PAY_0',
+    'x7': 'PAY_2',
+    'x8': 'PAY_3',
+    'x9': 'PAY_4',
+    'x10': 'PAY_5',
+    'x11': 'PAY_6',
+    'x12': 'BILL_AMT1',
+    'x13': 'BILL_AMT2',
+    'x14': 'BILL_AMT3',
+    'x15': 'BILL_AMT4',
+    'x16': 'BILL_AMT5',
+    'x17': 'BILL_AMT6',
+    'x18': 'PAY_AMT1',
+    'x19': 'PAY_AMT2',
+    'x20': 'PAY_AMT3',
+    'x21': 'PAY_AMT4',
+    'x22': 'PAY_AMT5',
+    'x23': 'PAY_AMT6',
+    'y': 'default payment next month'}
 dataset = (
-    pd.read_excel(io=data_url, header=1)
-    .drop(columns=["ID"])
+    fetch_credit_card(as_frame=True).frame
+    .rename(columns=column_dict)
     .rename(
         columns={"PAY_0": "PAY_1", "default payment next month": "default"}
     )
@@ -178,7 +212,7 @@ categorical_features = ["SEX", "EDUCATION", "MARRIAGE"]
 for col_name in categorical_features:
     dataset[col_name] = dataset[col_name].astype("category")
 
-Y, A = dataset.loc[:, "default"], dataset.loc[:, "SEX"]
+Y, A = dataset["default"].astype(int), dataset["SEX"]
 X = pd.get_dummies(dataset.drop(columns=["default", "SEX"]))
 
 A_str = A.map({1: "male", 2: "female"})
