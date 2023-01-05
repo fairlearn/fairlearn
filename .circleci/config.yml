@@ -10,7 +10,7 @@ jobs:
   build-doc:
     docker:
       - image: cimg/python:3.8.12
-
+    resource_class: large
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch
