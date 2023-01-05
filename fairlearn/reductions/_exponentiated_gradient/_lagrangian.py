@@ -23,7 +23,7 @@ _MESSAGE_BAD_OBJECTIVE = (
 )
 
 
-class _FlatteningPredictor:
+class _PredictorAsCallable:
     def __init__(self, classifier):
         self._classifier = classifier
 
@@ -246,7 +246,7 @@ class _Lagrangian:
         """
         classifier = self._call_oracle(lambda_vec)
 
-        h = _FlatteningPredictor(classifier)
+        h = _PredictorAsCallable(classifier)
 
         h_error = self.obj.gamma(h)[0]
         h_gamma = self.constraints.gamma(h)
