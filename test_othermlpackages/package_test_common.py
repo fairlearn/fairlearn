@@ -155,10 +155,6 @@ def run_AdversarialFairness_classification(estimator):
     X = preprocess(X)
     y = preprocess(y)
     sensitive_feature = preprocess(sensitive_feature)
-    # DEBUG
-    print(X)
-    print(y)
-    print(sensitive_feature)
 
     X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(
         X, y, sensitive_feature, test_size=0.2, random_state=12345, stratify=y
