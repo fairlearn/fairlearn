@@ -8,7 +8,7 @@ from sklearn.datasets import fetch_openml
 
 from fairlearn.exceptions import DataFairnessWarning
 
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
+from ._constants import _DOWNLOAD_DIRECTORY_NAME, _PARSER_KWARG_COMPATIBILITY
 
 
 def fetch_boston(
@@ -150,5 +150,5 @@ def fetch_boston(
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        parser="liac-arff",
+        **_PARSER_KWARG_COMPATIBILITY,
     )
