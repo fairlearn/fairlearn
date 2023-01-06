@@ -535,15 +535,11 @@ class _AdversarialFairness(BaseEstimator):
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
-                try:
-                    (LP, LA) = self.backendEngine_.train_step(
-                        X[batch_slice], Y[batch_slice], A[batch_slice]
-                    )
-                    predictor_losses.append(LP)
-                    adversary_losses.append(LA)
-                except Exception as e:
-                    print(f"Exception raised in epoch {epoch}, batch {batch}")
-                    raise e
+                (LP, LA) = self.backendEngine_.train_step(
+                    X[batch_slice], Y[batch_slice], A[batch_slice]
+                )
+                predictor_losses.append(LP)
+                adversary_losses.append(LA)
 
                 self.step_ += 1
 
