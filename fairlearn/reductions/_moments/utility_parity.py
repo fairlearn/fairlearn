@@ -165,31 +165,31 @@ class UtilityParity(ClassificationMoment):
         self.index = signed.index
         self.default_objective_lambda_vec = None
 
-        # Fill information about the matrix M, which is used to calculate signed weights
+        # Fill information about the matrix U, which is used to calculate signed weights
         # and gamme vector. The matrix has a row corresponding to each example and column
         # corresponding to each component of lambda, the signed weights and gamma are
         # calculated as:
         #
-        # * signed_weights = utility_diff * M.dot(lambda_vec)
-        # * gamma = -M.T.dot(utilities[y_pred]) / total_samples
+        # signed_weights = utility_diff * U.dot(lambda_vec)
+        # gamma = -U.T.dot(utilities[y_pred]) / total_samples
         #
         # If the i-th example's event and group are "e" and "g" then the entries in the
         # i-th row of the matrix, indexed by tuples (sign, event, group), are defined as:
         #
-        # M_i,(+,e',g') =      1[e=e']/P(e) - rho*1[e=e',g=g']/P(g,e)
-        # M_i,(-,e',g') = -rho*1[e=e']/P(e) +     1[e=e',g=g']/P(g,e)
+        # U_i,(+,e',g') =      1[e=e']/P(e) - rho*1[e=e',g=g']/P(g,e)
+        # U_i,(-,e',g') = -rho*1[e=e']/P(e) +     1[e=e',g=g']/P(g,e)
         #
         # This corresponds to the expression given right above Theorem 1 of the paper
         # "A Reductions Approach to Fair Classification".
 
-        self.M = pd.DataFrame(0, index=self.tags.index, columns=self.index)
+        self.U = pd.DataFrame(0, index=self.tags.index, columns=self.index)
         for e, g in self.prob_group_event.index:
             event_select = 1*(self.tags[_EVENT] == e)
             group_event_select = event_select * (self.tags[_GROUP_ID] == g)
-            self.M["+", e, g] = \
+            self.U["+", e, g] = \
                 event_select / self.prob_event[e] + \
                 (-self.ratio) * group_event_select / self.prob_group_event[e, g]
-            self.M["-", e, g] = \
+            self.U["-", e, g] = \
                 (-self.ratio) * event_select / self.prob_event[e] + \
                 group_event_select / self.prob_group_event[e, g]
 
@@ -222,7 +222,7 @@ class UtilityParity(ClassificationMoment):
             # TensorFlow seems to return an (n,1) array instead of an (n) array
             predictions = np.squeeze(predictions)
         pred = self.utility_diff.T * predictions + self.utilities[:, 0]
-        g_signed = -self.M.T.dot(pred) / self.total_samples
+        g_signed = -self.U.T.dot(pred) / self.total_samples
         self._gamma_descr = str(g_signed)
         return g_signed
 
@@ -272,7 +272,7 @@ class UtilityParity(ClassificationMoment):
             The vector of Lagrange multipliers indexed by `index`
 
         """
-        return self.utility_diff * self.M.dot(lambda_vec)
+        return self.utility_diff * self.U.dot(lambda_vec)
 
 
 # Ensure that UtilityParity shows up in correct place in documentation
