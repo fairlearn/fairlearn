@@ -15,7 +15,6 @@ from .moment import (
     _EVENT,
     _GROUP_ID,
     _LABEL,
-    _PREDICTION,
     _SIGN,
     ClassificationMoment,
 )
@@ -192,7 +191,7 @@ class UtilityParity(ClassificationMoment):
                 (-self.ratio) * group_event_select / self.prob_group_event[e, g]
             self.M["-", e, g] = \
                 (-self.ratio) * event_select / self.prob_event[e] + \
-                    group_event_select / self.prob_group_event[e, g]
+                group_event_select / self.prob_group_event[e, g]
 
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].dropna().unique()
