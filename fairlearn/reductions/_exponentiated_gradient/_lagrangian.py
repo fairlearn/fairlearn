@@ -28,12 +28,7 @@ class _PredictorAsCallable:
         self._classifier = classifier
 
     def __call__(self, X):
-        pred = self._classifier.predict(X)
-        # Some estimators return an output of the shape (num_preds, 1) - flatten such
-        # results
-#        if getattr(pred, "flatten", None) is not None:
-#            pred = pred.flatten()
-        return pred
+        return self._classifier.predict(X)
 
 
 class _Lagrangian:

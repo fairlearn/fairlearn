@@ -496,9 +496,11 @@ class _AdversarialFairness(BaseEstimator):
 
         self.step_ = 0
         for epoch in range(epochs):
+            print(f"epoch: {epoch}")
             if self.shuffle:
                 X, Y, A = self.backendEngine_.shuffle(X, Y, A)
             for batch in range(batches):
+                print(f"batch: {batch}")
                 if self.progress_updates:
                     if (time() - last_update_time) > self.progress_updates:
                         last_update_time = time()
