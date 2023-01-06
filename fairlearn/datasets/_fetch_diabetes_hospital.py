@@ -4,7 +4,7 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
+from ._constants import _DOWNLOAD_DIRECTORY_NAME, _PARSER_KWARG_COMPATIBILITY
 
 
 def fetch_diabetes_hospital(
@@ -96,5 +96,5 @@ def fetch_diabetes_hospital(
         cache=cache,
         as_frame=True,
         return_X_y=return_X_y,
-        parser="liac-arff",
+        **_PARSER_KWARG_COMPATIBILITY,
     )

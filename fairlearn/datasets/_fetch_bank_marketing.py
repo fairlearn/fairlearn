@@ -5,7 +5,7 @@ import pathlib
 
 from sklearn.datasets import fetch_openml
 
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
+from ._constants import _DOWNLOAD_DIRECTORY_NAME, _PARSER_KWARG_COMPATIBILITY
 
 
 def fetch_bank_marketing(
@@ -100,5 +100,5 @@ def fetch_bank_marketing(
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        parser="liac-arff",
+        **_PARSER_KWARG_COMPATIBILITY,
     )
