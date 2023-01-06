@@ -496,11 +496,9 @@ class _AdversarialFairness(BaseEstimator):
 
         self.step_ = 0
         for epoch in range(epochs):
-            print(f"epoch: {epoch}")
             if self.shuffle:
                 X, Y, A = self.backendEngine_.shuffle(X, Y, A)
             for batch in range(batches):
-                print(f"batch: {batch}")
                 if self.progress_updates:
                     if (time() - last_update_time) > self.progress_updates:
                         last_update_time = time()
@@ -537,11 +535,15 @@ class _AdversarialFairness(BaseEstimator):
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
-                (LP, LA) = self.backendEngine_.train_step(
-                    X[batch_slice], Y[batch_slice], A[batch_slice]
-                )
-                predictor_losses.append(LP)
-                adversary_losses.append(LA)
+                try:
+                    (LP, LA) = self.backendEngine_.train_step(
+                        X[batch_slice], Y[batch_slice], A[batch_slice]
+                    )
+                    predictor_losses.append(LP)
+                    adversary_losses.append(LA)
+                except Exception as e:
+                    print(f"Exception raised in epoch {epoch}, batch {batch}")
+                    raise e
 
                 self.step_ += 1
 

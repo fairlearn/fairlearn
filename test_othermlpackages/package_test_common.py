@@ -161,7 +161,7 @@ def run_AdversarialFairness_classification(estimator):
     )
 
     estimator.epochs = 100
-    estimator.batch_size = 2 ** 9
+    estimator.batch_size = 2 ** 10
     estimator.shuffle = True
     estimator.progress_updates = None
 
