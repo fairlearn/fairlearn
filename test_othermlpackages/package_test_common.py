@@ -183,5 +183,6 @@ def run_AdversarialFairness_classification(estimator):
             + f"Accuracy {str(accuracy)} with a disparity difference of"  # noqa
             + f"{str(dp_diff)}."  # noqa
         )
-
+    print(f"accuracy is {accuracy}, df_diff is {df_diff}")
+    assert False
     assert estimator is not None
