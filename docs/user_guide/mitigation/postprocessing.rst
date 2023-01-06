@@ -59,20 +59,13 @@ true positive rate parity as the fairness constraint.
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.pipeline import Pipeline
     >>> from sklearn.preprocessing import OneHotEncoder, StandardScaler
-    >>> from fairlearn.datasets import fetch_diabetes_hospital
+    >>> from fairlearn.datasets import fetch_adult
     >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
-    >>> data = fetch_diabetes_hospital()
-    >>> X_raw = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
-    >>> X_raw = pd.get_dummies(X_raw)
-    >>> y = data.target
-    >>> X_raw = X_raw.drop(["race_Asian",
-    ...                     'race_Caucasian',
-    ...                     'race_Hispanic',
-    ...                     'race_Other',
-    ...                     'race_Unknown',
-    ...                     'had_inpatient_days_False',
-    ...                     'medicare_False'], axis=1)
-    >>> X_raw = X_raw[['time_in_hospital', 'had_inpatient_days_True', 'medicare_True', 'race_AfricanAmerican']]
+    >>> from fairlearn.reductions import DemographicParity, ExponentiatedGradient
+    >>> data = fetch_adult(as_frame=True)
+    >>> X_raw = data.data
+    >>> y = (data.target == ">50K") * 1
+    >>> A = X_raw["sex"]
     >>> (X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
     ...     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y)
     >>> X_train = X_train.reset_index(drop=True)
@@ -110,7 +103,7 @@ true positive rate parity as the fairness constraint.
     ... )
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=pipeline,
-    ...     constraints="true_positive_rate_parity",
+    ...     constraints="demographic_parity",
     ...     predict_method="predict_proba",
     ...     prefit=False,
     ... )
@@ -121,13 +114,13 @@ true positive rate parity as the fairness constraint.
                                                                                                     SimpleImputer()),
                                                                                                    ('scaler',
                                                                                                     StandardScaler())]),
-                                                                                   <sklearn.compose._column_transformer.make_column_selector object at ...),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>),
                                                                                   ('cat',
                                                                                    Pipeline(steps=[('impute',
                                                                                                     SimpleImputer(strategy='most_frequent')),
                                                                                                    ('ohe',
                                                                                                     OneHotEncoder(handle_unknown='ignore'))]),
-                                                                                   <sklearn.compose._column_transformer.make_column_selector object at ...)])),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>)])),
                                                  ('classifier',
                                                   LogisticRegression(solver='liblinear'))]),
                        predict_method='predict_proba')
@@ -137,16 +130,16 @@ true positive rate parity as the fairness constraint.
     >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
     {
         "Female": {
-            "p0": 0.8004605263157903,
-            "operation0": "[>0.20326115065158867]",
-            "p1": 0.19953947368420966,
-            "operation1": "[>0.18733195463637906]"
+            "p0": 0.800...,
+            "operation0": "[>0.203...]",
+            "p1": 0.199...,
+            "operation1": "[>0.187...]"
         },
         "Male": {
-            "p0": 0.03672549019607803,
-            "operation0": "[>0.6820004991747526]",
-            "p1": 0.9632745098039219,
-            "operation1": "[>0.6662093209959495]"
+            "p0": 0.036...,
+            "operation0": "[>0.682...]",
+            "p1": 0.963...,
+            "operation1": "[>0.666...]"
         }
     }
     >>> plot_threshold_optimizer(threshold_optimizer)
