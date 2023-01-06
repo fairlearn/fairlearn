@@ -31,8 +31,8 @@ class _PredictorAsCallable:
         pred = self._classifier.predict(X)
         # Some estimators return an output of the shape (num_preds, 1) - flatten such
         # results
-        if getattr(pred, "flatten", None) is not None:
-            pred = pred.flatten()
+#        if getattr(pred, "flatten", None) is not None:
+#            pred = pred.flatten()
         return pred
 
 
