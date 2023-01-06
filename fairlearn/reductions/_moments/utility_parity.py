@@ -153,6 +153,7 @@ class UtilityParity(ClassificationMoment):
                 ]
             ).T
         self.utilities = utilities
+        self.utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
         self.prob_group_event = (
             self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
@@ -164,6 +165,34 @@ class UtilityParity(ClassificationMoment):
         )
         self.index = signed.index
         self.default_objective_lambda_vec = None
+
+        # Fill information about the matrix M, which is used to calculate signed weights
+        # and gamme vector. The matrix has a row corresponding to each example and column
+        # corresponding to each component of lambda, the signed weights and gamma are
+        # calculated as:
+        #
+        # * signed_weights = utility_diff * M.dot(lambda_vec)
+        # * gamma = -M.T.dot(utilities[y_pred]) / total_samples
+        #
+        # If the i-th example's event and group are "e" and "g" then the entries in the
+        # i-th row of the matrix, indexed by tuples (sign, event, group), are defined as:
+        #
+        # M_i,(+,e',g') =      1[e=e']/P(e) - rho*1[e=e',g=g']/P(g,e)
+        # M_i,(-,e',g') = -rho*1[e=e']/P(e) +     1[e=e',g=g']/P(g,e)
+        #
+        # This corresponds to the expression given right above Theorem 1 of the paper
+        # "A Reductions Approach to Fair Classification".
+
+        self.M = pd.DataFrame(0, index=self.tags.index, columns=self.index)
+        for e, g in self.prob_group_event.index:
+            event_select = 1*(self.tags[_EVENT] == e)
+            group_event_select = event_select * (self.tags[_GROUP_ID] == g)
+            self.M["+", e, g] = \
+                event_select / self.prob_event[e] + \
+                (-self.ratio) * group_event_select / self.prob_group_event[e, g]
+            self.M["-", e, g] = \
+                (-self.ratio) * event_select / self.prob_event[e] + \
+                    group_event_select / self.prob_group_event[e, g]
 
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].dropna().unique()
@@ -177,44 +206,25 @@ class UtilityParity(ClassificationMoment):
         self.neg_basis_present = pd.Series(dtype="float64")
         zero_vec = pd.Series(0.0, self.index)
         i = 0
-        for event_val in event_vals:
+        for e in event_vals:
             # Constraints on the final group are redundant, so they are not included in the basis.
-            for group in group_vals[:-1]:
+            for g in group_vals[:-1]:
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
-                self.pos_basis[i]["+", event_val, group] = 1
-                self.neg_basis[i]["-", event_val, group] = 1
+                self.pos_basis[i]["+", e, g] = 1
+                self.neg_basis[i]["-", e, g] = 1
                 self.neg_basis_present.at[i] = True
                 i += 1
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         predictions = predictor(self.X)
         if isinstance(predictions, np.ndarray):
             # TensorFlow seems to return an (n,1) array instead of an (n) array
             predictions = np.squeeze(predictions)
-        pred = utility_diff.T * predictions + self.utilities[:, 0]
-        self.tags[_PREDICTION] = pred
-        expect_event = self.tags.groupby(_EVENT).mean(numeric_only=True)
-        expect_group_event = self.tags.groupby([_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_UPPER_BOUND_DIFF] = (
-            self.ratio * expect_group_event[_PREDICTION] - expect_event[_PREDICTION]
-        )
-        expect_group_event[_LOWER_BOUND_DIFF] = (
-            -expect_group_event[_PREDICTION] + self.ratio * expect_event[_PREDICTION]
-        )
-        g_signed = pd.concat(
-            [
-                expect_group_event[_UPPER_BOUND_DIFF],
-                expect_group_event[_LOWER_BOUND_DIFF],
-            ],
-            keys=["+", "-"],
-            names=[_SIGN, _EVENT, _GROUP_ID],
-        )
-        self._gamma_descr = str(
-            expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF, _LOWER_BOUND_DIFF]]
-        )
+        pred = self.utility_diff.T * predictions + self.utilities[:, 0]
+        g_signed = -self.M.T.dot(pred) / self.total_samples
+        self._gamma_descr = str(g_signed)
         return g_signed
 
     def bound(self):
@@ -263,22 +273,7 @@ class UtilityParity(ClassificationMoment):
             The vector of Lagrange multipliers indexed by `index`
 
         """
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]).groupby(
-            level=_EVENT
-        ).sum() / self.prob_event
-        lambda_group_event = (
-            self.ratio * lambda_vec["+"] - lambda_vec["-"]
-        ) / self.prob_group_event
-        adjust = lambda_event - lambda_group_event
-        signed_weights = self.tags.apply(
-            lambda row: 0
-            if pd.isna(row[_EVENT])
-            else adjust[row[_EVENT], row[_GROUP_ID]],
-            axis=1,
-        )
-        utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
-        signed_weights = utility_diff.T * signed_weights
-        return signed_weights
+        return self.utility_diff * self.M.dot(lambda_vec)
 
 
 # Ensure that UtilityParity shows up in correct place in documentation
