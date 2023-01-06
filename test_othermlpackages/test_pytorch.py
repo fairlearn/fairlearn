@@ -88,17 +88,6 @@ def create_model():
     return net
 
 
-def test_adversarial_classification():
-    mitigator = AdversarialFairnessClassifier(
-        backend="torch",
-        predictor_model=[50, "relu"],
-        adversary_model=[3, "relu"],
-        random_state=123,
-    )
-
-    ptc.run_AdversarialFairness_classification(mitigator)
-
-
 def test_examples():
     af.test_examples()
 
@@ -121,3 +110,14 @@ def test_thresholdoptimizer_classification():
     estimator = create_model()
 
     ptc.run_thresholdoptimizer_classification(estimator)
+
+
+def test_adversarial_classification():
+    mitigator = AdversarialFairnessClassifier(
+        backend="torch",
+        predictor_model=[50, "relu"],
+        adversary_model=[3, "relu"],
+        random_state=123,
+    )
+
+    ptc.run_AdversarialFairness_classification(mitigator)
