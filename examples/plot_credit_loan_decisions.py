@@ -36,8 +36,10 @@ from fairlearn.reductions import ExponentiatedGradient
 from fairlearn.reductions import EqualizedOdds
 from sklearn.model_selection import train_test_split
 import warnings
+import logging
 
-warnings.simplefilter("ignore")
+# warnings.simplefilter("ignore")
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 rand_seed = 1234
 np.random.seed(rand_seed)
@@ -335,7 +337,7 @@ estimator = Pipeline(
 )
 
 estimator.fit(X_train, y_train)
-print(estimator.named_steps['classifier'])
+warnings.warn(str(estimator.named_steps['classifier']))
 
 # %%
 # We compute the *binary predictions* and the *prediction probabilities* for
