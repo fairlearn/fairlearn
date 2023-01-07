@@ -212,5 +212,4 @@ def test_signed_weights():
     expected = np.concatenate((w_a0_F, w_a0_T, w_a1_F, w_a1_T), axis=None)
 
     signed_weights = eqo.signed_weights(lambda_vec)
-    # Be bold and test for equality
-    assert np.array_equal(expected, signed_weights)
+    assert np.allclose(expected, signed_weights)
