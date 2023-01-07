@@ -43,7 +43,7 @@ jobs:
       - run:
           name: "Build Documentation"
           command: make doc
-          no_output_timeout: 60m
+          no_output_timeout: 30m
 
       - run:
           name: "Copy landing_page.js"

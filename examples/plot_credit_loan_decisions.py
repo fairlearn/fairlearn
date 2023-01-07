@@ -819,7 +819,8 @@ def get_expgrad_models_per_epsilon(
 
     """
     exp_grad_est = ExponentiatedGradient(
-        estimator=estimator.named_steps["classifier"],
+        estimator=estimator,
+        sample_weight_name='classifier__sample_weight',
         constraints=EqualizedOdds(difference_bound=epsilon),
     )
     # Is this an issue - Re-runs
