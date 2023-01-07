@@ -335,6 +335,7 @@ estimator = Pipeline(
 )
 
 estimator.fit(X_train, y_train)
+print(estimator.named_steps['classifier'])
 
 # %%
 # We compute the *binary predictions* and the *prediction probabilities* for
