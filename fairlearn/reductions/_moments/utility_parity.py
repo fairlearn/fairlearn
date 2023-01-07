@@ -180,7 +180,7 @@ class UtilityParity(ClassificationMoment):
         # U_i,(-,e',g') = -rho*1[e=e']/P(e) +     1[e=e',g=g']/P(g,e)
         #
         # This corresponds to the expression given right above Theorem 1 of the paper
-        # "A Reductions Approach to Fair Classification".
+        # "A Reductions Approach to Fair Classification" by Agarwal et al. (2018).
 
         self.U = pd.DataFrame(0, index=self.tags.index, columns=self.index)
         for e, g in self.prob_group_event.index:
