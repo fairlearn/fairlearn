@@ -166,7 +166,7 @@ class UtilityParity(ClassificationMoment):
         self.default_objective_lambda_vec = None
 
         # Fill information about the matrix U, which is used to calculate signed weights
-        # and gamme vector. The matrix has a row corresponding to each example and column
+        # and gamma vector. The matrix has a row corresponding to each example and column
         # corresponding to each component of lambda, the signed weights and gamma are
         # calculated as:
         #
