@@ -5,6 +5,7 @@ from pathlib import Path
 
 from sklearn.datasets import fetch_openml
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
+import fairlearn.utils._compatibility as compat
 
 
 def fetch_credit_card(
@@ -68,11 +69,12 @@ def fetch_credit_card(
     """
     if not data_home:
         data_home = Path().home() / _DOWNLOAD_DIRECTORY_NAME
-        return fetch_openml(
-            data_id=42477,
-            data_home=data_home,
-            cache=cache,
-            as_frame=as_frame,
-            return_X_y=return_X_y,
-            parser="liac-arff",
-        )
+
+    return fetch_openml(
+        data_id=42477,
+        data_home=data_home,
+        cache=cache,
+        as_frame=as_frame,
+        return_X_y=return_X_y,
+        **compat._PARSER_KWARG,
+    )
