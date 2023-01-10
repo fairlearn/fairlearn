@@ -16,8 +16,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-pd.set_option("display.float_format", "{:.3f}".format)
-
 import lightgbm as lgb
 from sklearn.metrics import balanced_accuracy_score, roc_auc_score
 from sklearn.metrics import confusion_matrix
