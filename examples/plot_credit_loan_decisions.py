@@ -325,6 +325,7 @@ lgb_params = {
     "num_leaves": 10,
     "max_depth": 3,
     "random_state": rand_seed,
+    "n_jobs": 1,
 }
 
 estimator = Pipeline(
