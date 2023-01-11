@@ -1,6 +1,7 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import fairlearn.utils._compatibility as compat
 from ._constants import (
     _TYPE_COMPLIANCE_ERROR,
     _TYPE_CHECK_ERROR,
@@ -128,7 +129,9 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
                 # NOTE: if 'binary' then it could be possible it is already 0/1
                 # encoded. So may want to skip redundant OHE in that case...
                 self.transform_ = OneHotEncoder(
-                    drop="if_binary", sparse=False, handle_unknown="error"
+                    drop="if_binary",
+                    handle_unknown="error",
+                    **compat._SPARSE_OUTPUT_FALSE,
                 )
                 self.transform_.fit(X)
                 self.n_features_out_ = sum(

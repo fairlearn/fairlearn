@@ -13,8 +13,8 @@ pip show fairlearn
 to show the version of Fairlearn which you currently have
 installed.
 Then, on the GitHub page, navigate to that version
-(e.g. [v0.4.5](https://github.com/fairlearn/fairlearn/tree/v0.4.5) or
-[v0.4.6](https://github.com/fairlearn/fairlearn/tree/v0.4.6)),
+(e.g. [v0.7.0](https://github.com/fairlearn/fairlearn/tree/v0.7.0) or
+[v0.8.0](https://github.com/fairlearn/fairlearn/tree/v0.8.0)),
 and download the notebooks from there.
 
 Alternatively, [install Fairlearn from a cloned repository](https://fairlearn.org/main/contributor_guide/development_process.html#advanced-installation-instructions)
