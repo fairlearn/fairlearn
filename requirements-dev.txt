@@ -14,12 +14,11 @@ requirements-parser
 # Required for test
 nbformat
 papermill
-# Pin pytest due to VS Code issue
-pytest==7.1.1
+pytest==7.2.0
 pytest-cov
 pytest-mock
 pytest-mpl>=0.11
-nteract-scrapbook
+scrapbook
 wheel
 lightgbm
 xlrd
