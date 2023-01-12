@@ -5,3 +5,14 @@ preview = true
 
 [tool.isort]
 profile = "black"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::FutureWarning",
+    "ignore:the imp module is deprecated:DeprecationWarning",
+    "ignore:Using or importing the ABCs from:DeprecationWarning",
+    "ignore:tostring:DeprecationWarning",
+    # coming from skorch
+    "ignore:distutils Version classes are deprecated:DeprecationWarning",
+]
