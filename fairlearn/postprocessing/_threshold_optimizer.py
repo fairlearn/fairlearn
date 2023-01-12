@@ -177,16 +177,23 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         Defines which method of the ``estimator`` is used to get the output
         values.
 
-        - 'auto': use one of ``predict_proba``, ``decision_function``, or
-          ``predict``, in that order.
-        - 'predict_proba': use the second column from the output of
-          `predict_proba`. It is assumed that the second column represents the
-          positive outcome.
-        - 'decision_function': use the raw values given by the
-          `decision_function`.
-        - 'predict': use the hard values reported by the `predict` method if
-          estimator is a classifier, and the regression values if estimator is
-          a regressor. This is equivalent to what is done in [1]_.
+            'auto'
+                use one of ``predict_proba``, ``decision_function``, or 
+                ``predict``, in that order.
+            
+            'predict_proba'
+                use the second column from the output of `predict_proba`. 
+                It is assumed that the second column represents the positive 
+                outcome.
+            
+            'decision_function'
+                use the raw values given by the `decision_function`.
+            
+            'predict'
+                use the hard values reported by the `predict` method if 
+                estimator is a classifier, and the regression values if 
+                estimator is a regressor. This is equivalent to what 
+                is done in [1]_.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
