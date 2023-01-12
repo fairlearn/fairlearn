@@ -50,6 +50,7 @@ def apply_to_dataframe(
     values = dict()
     for function_name, metric_function in metric_functions.items():
         values[function_name] = metric_function(data)
+    # correctly handle zero provided metrics
     if len(values) == 0:
         result = pd.Series(dtype=float)
     else:
