@@ -1,8 +1,8 @@
 # Requirements for Fairlearn development
 
 # Required for environment
-flake8<6  # Having strange issue with latest release
-autopep8<2.0.1 # To ensure compatibility with flake8<6
+flake8  # <6  # Having strange issue with latest release
+autopep8  # <2.0.1  # To ensure compatibility with flake8<6
 flake8-blind-except
 flake8-builtins
 flake8-copyright
