@@ -84,7 +84,11 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         self._create_lookup(X)
         X = self._validate_data(X)
         X_use, X_sensitive = self._split_X(X)
-        self.sensitive_mean_ = X_sensitive.mean()
+        # correctly handle zero provided sensitive features
+        if X_sensitive.shape[1] == 0:
+            self.sensitive_mean_ = np.array([])
+        else:
+            self.sensitive_mean_ = X_sensitive.mean()
         X_s_center = X_sensitive - self.sensitive_mean_
         self.beta_, _, _, _ = np.linalg.lstsq(X_s_center, X_use, rcond=None)
         self.X_shape_ = X.shape
