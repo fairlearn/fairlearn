@@ -92,3 +92,8 @@ fig = metric_frame.by_group[["count"]].plot(
     title="Show count metric in pie chart",
 )
 fig[0][0].figure.savefig("filename.png")
+
+# sphinx_gallery_start_ignore
+import os
+os.remove("filename.png")
+# sphinx_gallery_end_ignore
