@@ -186,10 +186,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 It is assumed that the second column represents the positive 
                 outcome.
             
-            'decision_function'
+            :code:`decision_function`
                 use the raw values given by the `decision_function`.
             
-            'predict'
+            :code:`predict`
                 use the hard values reported by the `predict` method if 
                 estimator is a classifier, and the regression values if 
                 estimator is a regressor. This is equivalent to what 
