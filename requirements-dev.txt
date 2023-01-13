@@ -20,10 +20,6 @@ wheel
 lightgbm
 xlrd
 
-# Required for notebooks
-jupyter
-nbval
-
 # Required for documentation
 bokeh
 pypandoc
