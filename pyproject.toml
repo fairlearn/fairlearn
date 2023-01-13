@@ -11,7 +11,4 @@ filterwarnings = [
     "error",
     "ignore:the imp module is deprecated:DeprecationWarning",
     "ignore::UserWarning",
-    "ignore::DataFairnessWarning",
-    "ignore::MatplotlibDeprecationWarning",
-    "ignore::PerformanceWarning",
 ]
