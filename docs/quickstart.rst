@@ -68,11 +68,11 @@ is about binary classification, but we similarly support regression.
 Prerequisites
 ^^^^^^^^^^^^^
 
-In order to follow the quickstart guide, you need to install additional dependencies:
+In order to run the code samples in the Quickstart tutorial, you need to install the following dependencies:
 
 .. code-block:: bash
 
-    pip install matplotlib
+    pip install fairlearn matplotlib
 
 Loading the dataset
 ^^^^^^^^^^^^^^^^^^^
@@ -121,10 +121,10 @@ we can evaluate metrics for subgroups within the data as below:
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> as = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
-    >>> as.overall
+    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
+    >>> mf.overall
     0.8443...
-    >>> as.by_group
+    >>> mf.by_group
     sex
     Female    0.9251...
     Male      0.8042...
