@@ -128,7 +128,7 @@ def test_bgl_unmitigated_same(A_two_dim):
     unmitigated_estimator.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
-    idx = pd.Int64Index(sorted([a0_label, a1_label]))
+    idx = pd.Index(sorted([a0_label, a1_label]))
     lagrange_balanced_series = pd.Series([1.0, 1.0], index=idx)
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
@@ -163,7 +163,7 @@ def test_bgl_lagrange_specifications(A_two_dim):
     estimator = LinearRegression()
 
     # Do the grid search with a zero Lagrange multiplier
-    idx = pd.Int64Index(sorted([a0_label, a1_label]))
+    idx = pd.Index(sorted([a0_label, a1_label]))
     l0_series = pd.Series([2.0, 0.0], index=idx)
     l1_series = pd.Series([1.5, 0.5], index=idx)
     l2_series = pd.Series([1.0, 1.0], index=idx)
