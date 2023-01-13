@@ -3,7 +3,6 @@
 
 from test.unit.reductions.data_generators import loan_scenario_generator
 
-import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
