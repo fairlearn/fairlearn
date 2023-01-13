@@ -9,8 +9,12 @@ profile = "black"
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
+
+    # Warnings in all-deps
     "default:You are about to use a dataset with known fairness issues:Warning",
     "default:Auto-removal of overlapping axes is deprecated:Warning",
     "default:DataFrame is highly fragmented:Warning",
-    "default::UserWarning",
+
+    # Warnings in other-ml (tensorflow)
+    "default:The initializer GlorotNormal is unseeded:UserWarning",
 ]
