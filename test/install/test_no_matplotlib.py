@@ -13,6 +13,8 @@ from fairlearn.postprocessing._threshold_optimizer import SIMPLE_CONSTRAINTS
 
 class FakePredictor(BaseEstimator, ClassifierMixin):
     def fit(self, X, y=None, **kwargs):
+        # We need to ensure that sklearn can tell the estimator is fitted
+        self.fitted_ = True
         return self
 
     def predict(self, X):
