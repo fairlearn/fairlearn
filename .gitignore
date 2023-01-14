@@ -120,4 +120,4 @@ docbuild/
 .DS_Store
 
 # plot_quickstart.py
-filename.png
+**/filename.png
