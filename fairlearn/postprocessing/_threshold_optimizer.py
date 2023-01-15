@@ -178,11 +178,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         values.
 
             'auto'
-                use one of ``predict_proba``, ``decision_function``, or 
-                ``predict``, in that order.
+                use one of :code:`predict_proba`, :code:`decision_function`, or 
+                :code:`predict`, in that order.
             
             'predict_proba'
-                use the second column from the output of `predict_proba`. 
+                use the second column from the output of :code:`predict_proba`. 
                 It is assumed that the second column represents the positive 
                 outcome.
             
