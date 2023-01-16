@@ -118,3 +118,6 @@ docbuild/
 
 # OSX directory info files
 .DS_Store
+
+# plot_quickstart.py
+**/filename.png
