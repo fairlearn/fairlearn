@@ -3,7 +3,6 @@
 
 from test.unit.reductions.data_generators import loan_scenario_generator
 
-import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
@@ -54,8 +53,8 @@ def _simple_compare(moment, metric):
 
     target = moment()
     target.load_data(
-        np.asarray(X_dummy),
-        np.asarray(y),
+        X_dummy,
+        y,
         sensitive_features=X["sens"],
         control_features=X["ctrl"],
     )
@@ -107,8 +106,8 @@ def _selected_label_compare(moment, metric, selected_label):
 
     target = moment()
     target.load_data(
-        np.asarray(X_dummy),
-        np.asarray(y),
+        X_dummy,
+        y,
         sensitive_features=X["sens"],
         control_features=X["ctrl"],
     )

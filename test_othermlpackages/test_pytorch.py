@@ -33,10 +33,10 @@ def create_model():
             return self.model(X)
 
     class SampleWeightNeuralNet(NeuralNetClassifier):
-        def __init__(self, *args, criterion__reduce=False, **kwargs):
+        def __init__(self, *args, criterion__reduction='none', **kwargs):
             # make sure to set reduce=False in your criterion, since we need the loss
             # for each sample so that it can be weighted
-            super().__init__(*args, criterion__reduce=criterion__reduce, **kwargs)
+            super().__init__(*args, criterion__reduction=criterion__reduction, **kwargs)
 
         def fit(self, X, y, sample_weight=None):
             if isinstance(X, (pd.DataFrame, pd.Series)):
