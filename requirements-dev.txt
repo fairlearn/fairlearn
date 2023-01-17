@@ -12,20 +12,13 @@ flake8-rst-docstrings
 requirements-parser
 
 # Required for test
-nbformat
-papermill
 pytest==7.2.0
 pytest-cov
 pytest-mock
 pytest-mpl>=0.11
-scrapbook
 wheel
 lightgbm
 xlrd
-
-# Required for notebooks
-jupyter
-nbval
 
 # Required for documentation
 bokeh
