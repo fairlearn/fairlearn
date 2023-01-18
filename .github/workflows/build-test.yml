@@ -1,6 +1,11 @@
 name: build-test
 
-on: [push, pull_request]
+on:
+  push
+  pull_request
+  schedule:
+    - cron: "0 8 * * *"
+
 
 concurrency: 
   # this ensures after each commit the old jobs are cancelled and the new ones
@@ -10,11 +15,12 @@ concurrency:
 
 jobs:
   all-deps:
-    # this job installs all dependencies and runs most tests
+    # This job installs all dependencies and runs most tests.
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.8", "3.9", "3.10"]
+        requirementsConstraints: ["", "--pinned"]
     runs-on: ${{ matrix.os }}
     env:
       MPLBACKEND: Agg
@@ -23,8 +29,9 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
+      - if: ${{ matrix.operatingSystem == 'macos-latest' }}
+        run: python scripts/install_requirements.py ${{ matrix.requirementsConstraints }}
       - run: pip install .
-      - run: pip install -r requirements-dev.txt
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -37,8 +44,9 @@ jobs:
           verbose: true
 
   minimal-deps:
-    # this job installs minimal dependencies and runs tests for the minimal
-    # dependency cases.
+    # This job installs minimal dependencies and runs tests for the minimal
+    # dependency cases. This also covers the case where matplotlib is not
+    # installed, i.e., fairlearn without extras.
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
