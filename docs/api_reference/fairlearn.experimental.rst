@@ -1,12 +1,11 @@
 fairlearn\.experimental package
 ===============================
 
-.. automodule:: fairlearn.experimental
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: fairlearn.metrics._plotter
 
-.. automodule:: fairlearn.metrics._plotter
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autosummary::    
+   :nosignatures:
+   :toctree: generated/
+   :template: function.rst
+   
+   plot_metric_frame

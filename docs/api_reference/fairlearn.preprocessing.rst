@@ -1,7 +1,11 @@
 fairlearn\.preprocessing package
 =================================
 
-.. automodule:: fairlearn.preprocessing
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: fairlearn.preprocessing
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated/
+   :template: classes.rst
+
+   CorrelationRemover

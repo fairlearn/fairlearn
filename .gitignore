@@ -118,3 +118,5 @@ docbuild/
 
 # OSX directory info files
 .DS_Store
+docs/api_reference/index.rst
+examples/filename.png

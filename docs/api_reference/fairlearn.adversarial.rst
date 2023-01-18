@@ -1,7 +1,12 @@
 fairlearn\.adversarial package
 ==============================
 
-.. automodule:: fairlearn.adversarial
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: fairlearn.adversarial
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated/
+   :template: classes.rst
+   
+   AdversarialFairnessClassifier
+   AdversarialFairnessRegressor
