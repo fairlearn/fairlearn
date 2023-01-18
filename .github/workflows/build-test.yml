@@ -25,7 +25,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.8", "3.9", "3.10"]
-        requirementsConstraints: ["", "--pinned"]
+        requirementsPinned: ["true", "false"]
     runs-on: ${{ matrix.os }}
     env:
       MPLBACKEND: Agg
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
-      - run: python scripts/install_requirements.py ${{ matrix.requirementsConstraints }}
+      - run: python scripts/install_requirements.py --pinned ${{ matrix.requirementsPinned }}
       - run: pip install .
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
