@@ -29,8 +29,7 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
-      - if: ${{ matrix.operatingSystem == 'macos-latest' }}
-        run: python scripts/install_requirements.py ${{ matrix.requirementsConstraints }}
+      - run: python scripts/install_requirements.py ${{ matrix.requirementsConstraints }}
       - run: pip install .
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
