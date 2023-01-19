@@ -12,7 +12,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.8", "3.9", "3.10"]
         requirementsPinned: ["true", "false"]
-    uses: ./.github/workflows/test-all-deps.yml@main
+    uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.8", "3.9", "3.10"]
-    uses: ./.github/workflows/test-minimal-deps.yml@main
+    uses: ./.github/workflows/test-minimal-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
@@ -36,7 +36,7 @@ jobs:
         os: [ubuntu-latest]
         python: ["3.8", "3.9", "3.10"]
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
-    uses: ./.github/workflows/test-other-ml.yml@main
+    uses: ./.github/workflows/test-other-ml.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
@@ -48,7 +48,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python: ["3.9"]
-    uses: ./.github/workflows/linting.yml@main
+    uses: ./.github/workflows/linting.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
