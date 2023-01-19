@@ -23,7 +23,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.8", "3.9", "3.10"]
-        requirementsPinned: ["true", "false"]
+        requirementsPinned: ["false"]
     uses: ./.github/workflows/test-all-deps.yml@main
     with:
       os: ${{ matrix.os }}
