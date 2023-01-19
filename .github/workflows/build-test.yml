@@ -63,4 +63,3 @@ jobs:
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      mlpackage: ${{ matrix.mlpackage }}
