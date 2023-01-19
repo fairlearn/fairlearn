@@ -27,7 +27,6 @@ jobs:
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      requirementsPinned: ${{ matrix.requirementsPinned }}
 
   
   other-ml:
