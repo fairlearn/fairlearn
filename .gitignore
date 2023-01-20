@@ -122,3 +122,5 @@ docbuild/
 # Generated API stub files
 docs/api_reference/generated/
 
+# plot_quickstart.py
+**/filename.png

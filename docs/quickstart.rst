@@ -28,7 +28,7 @@ see :ref:`version_guide`.
 
 .. note::
 
-    The Fairlearn API is still evolving, so example code in 
+    The Fairlearn API is still evolving, so example code in
     this documentation may not work with every version of Fairlearn.
     Please use the version selector to get to the instructions for
     the appropriate version. The instructions for the :code:`main`
@@ -65,6 +65,15 @@ code snippet examples of how to use basic Fairlearn functionality for those
 who are already intimately familiar with fairness in ML. The example below
 is about binary classification, but we similarly support regression.
 
+Prerequisites
+^^^^^^^^^^^^^
+
+In order to run the code samples in the Quickstart tutorial, you need to install the following dependencies:
+
+.. code-block:: bash
+
+    pip install fairlearn matplotlib
+
 Loading the dataset
 ^^^^^^^^^^^^^^^^^^^
 
@@ -75,9 +84,9 @@ than $50,000 a year.
 
 .. doctest:: quickstart
 
-    >>> import numpy as np 
+    >>> import numpy as np
     >>> import pandas as pd
-    >>> import matplotlib.pyplot as plt 
+    >>> import matplotlib.pyplot as plt
     >>> from fairlearn.datasets import fetch_adult
     >>> data = fetch_adult(as_frame=True)
     >>> X = pd.get_dummies(data.data)
@@ -107,15 +116,15 @@ we can evaluate metrics for subgroups within the data as below:
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
-    >>> 
+    >>>
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X, y_true)
     DecisionTreeClassifier(...)
     >>> y_pred = classifier.predict(X)
-    >>> gm = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
-    >>> print(gm.overall)
+    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
+    >>> mf.overall
     0.8443...
-    >>> print(gm.by_group)
+    >>> mf.by_group
     sex
     Female    0.9251...
     Male      0.8042...
@@ -165,23 +174,23 @@ such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Demographic Parity as the objective, leading to
 a vastly reduced difference in selection rate:
 
-.. doctest:: quickstart 
+.. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.reductions import ExponentiatedGradient, DemographicParity
+    >>> from fairlearn.reductions import DemographicParity, ExponentiatedGradient
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
-    >>> 
+    >>>
     >>> constraint = DemographicParity()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X, y_true, sensitive_features=sex)
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X)
-    >>> 
+    >>>
     >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred_mitigated, sensitive_features=sex)
-    >>> print(sr_mitigated.overall)
+    >>> sr_mitigated.overall
     0.1661...
-    >>> print(sr_mitigated.by_group)
+    >>> sr_mitigated.by_group
     sex
     Female    0.1552...
     Male      0.1715...
