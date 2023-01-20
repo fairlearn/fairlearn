@@ -118,5 +118,7 @@ docbuild/
 
 # OSX directory info files
 .DS_Store
-docs/api_reference/index.rst
-examples/filename.png
+
+# Generated API stub files
+docs/api_reference/generated/
+
