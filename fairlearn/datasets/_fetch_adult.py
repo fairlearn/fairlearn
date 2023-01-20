@@ -5,7 +5,8 @@ import pathlib
 
 from sklearn.datasets import fetch_openml
 
-from ._constants import _DOWNLOAD_DIRECTORY_NAME, _PARSER_KWARG_COMPATIBILITY
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
+import fairlearn.utils._compatibility as compat
 
 
 def fetch_adult(*, cache=True, data_home=None, as_frame=False, return_X_y=False):
@@ -97,5 +98,5 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=False, return_X_y=False)
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        **_PARSER_KWARG_COMPATIBILITY,
+        **compat._PARSER_KWARG,
     )

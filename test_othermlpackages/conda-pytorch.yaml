@@ -10,7 +10,8 @@ dependencies:
 - pytest-cov
 - pytorch
 - cpuonly
-- skorch
+- pip:
+   - skorch>=0.12.1
 
 # Note pytorch will not install cuda. If you do not want that, please
 # use conda install pytorch -c pytorch

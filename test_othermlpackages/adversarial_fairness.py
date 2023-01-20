@@ -10,6 +10,7 @@ from sklearn.pipeline import Pipeline
 import torch
 from numpy import mean, number
 
+import fairlearn.utils._compatibility as compat
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
     MetricFrame,
@@ -47,7 +48,9 @@ def test_examples():
             Pipeline(
                 [
                     ("imputer", SimpleImputer(strategy="most_frequent")),
-                    ("encoder", OneHotEncoder(drop="if_binary", sparse=False)),
+                    ("encoder", OneHotEncoder(
+                        drop="if_binary",
+                        **compat._SPARSE_OUTPUT_FALSE)),
                 ]
             ),
             make_column_selector(dtype_include="category"),

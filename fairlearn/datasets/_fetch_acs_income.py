@@ -7,7 +7,8 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_openml
 
-from ._constants import _DOWNLOAD_DIRECTORY_NAME, _PARSER_KWARG_COMPATIBILITY
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
+import fairlearn.utils._compatibility as compat
 
 
 def fetch_acs_income(
@@ -181,7 +182,7 @@ def fetch_acs_income(
         cache=cache,
         as_frame=True,
         return_X_y=False,
-        **_PARSER_KWARG_COMPATIBILITY,
+        **compat._PARSER_KWARG,
     )
 
     # filter by state
