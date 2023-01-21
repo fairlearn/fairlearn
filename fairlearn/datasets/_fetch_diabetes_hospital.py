@@ -17,7 +17,7 @@ def fetch_diabetes_hospital(
 
     ==============   ============================
     Samples total                          101766
-    Dimensionality                             24
+    Dimensionality                             25
     Features         numeric, categorical, string
     Classes                                     2
     ==============   ============================
@@ -73,13 +73,13 @@ def fetch_diabetes_hospital(
     dataset : :obj:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
-        data : ndarray, shape (101766, 24)
-            Each row corresponding to the 24 feature values in order.
+        data : ndarray, shape (101766, 25)
+            Each row corresponding to the 25 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (101766,)
             Each value represents whether readmission of the patient
             occurred within 30 days of the release.
-        feature_names : list of length 24
+        feature_names : list of length 25
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the Diabetes 130-Hospitals dataset.
