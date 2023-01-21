@@ -9,7 +9,7 @@ import fairlearn.utils._compatibility as compat
 
 
 def fetch_diabetes_hospital(
-    *, cache=True, data_home=None, return_X_y=False
+    *, as_frame=True, cache=True, data_home=None, return_X_y=False
 ):
     """Load the preprocessed Diabetes 130-Hospitals dataset (binary classification).
 
@@ -17,7 +17,7 @@ def fetch_diabetes_hospital(
 
     ==============   ============================
     Samples total                          101766
-    Dimensionality                             25
+    Dimensionality                             24
     Features         numeric, categorical, string
     Classes                                     2
     ==============   ============================
@@ -52,6 +52,10 @@ def fetch_diabetes_hospital(
 
     Parameters
     ----------
+    as_frame : bool, default=True
+        If True, the data is a pandas DataFrame including columns with
+        appropriate dtypes (numeric, string or categorical).
+
     cache : bool, default=True
         Whether to cache downloaded datasets using joblib.
 
@@ -69,19 +73,22 @@ def fetch_diabetes_hospital(
     dataset : :obj:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
-        data : ndarray, shape (101766, 25)
-            Each row corresponding to the 25 feature values in order.
+        data : ndarray, shape (101766, 24)
+            Each row corresponding to the 24 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (101766,)
             Each value represents whether readmission of the patient
             occurred within 30 days of the release.
-        feature_names : list of length 25
+        feature_names : list of length 24
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the Diabetes 130-Hospitals dataset.
 
+    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
+        if ``return_X_y`` is True and ``as_frame`` is False
+
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True
+        if ``return_X_y`` is True and ``as_frame`` is True
 
     References
     ----------
@@ -91,11 +98,21 @@ def fetch_diabetes_hospital(
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
-    return fetch_openml(
+    data_dict = fetch_openml(
         data_id=43874,
         data_home=data_home,
         cache=cache,
         as_frame=True,
-        return_X_y=return_X_y,
+        return_X_y=False,
         **compat._PARSER_KWARG,
     )
+
+    if not as_frame:
+        data_dict["data"] = data_dict["data"].values
+        data_dict["frame"] = None
+        data_dict["target"] = data_dict["target"].values
+
+    if return_X_y:
+        return (data_dict["data"], data_dict["target"])
+
+    return data_dict
