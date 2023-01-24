@@ -298,8 +298,8 @@ conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
 Another way of thinking about this metric is 
 requiring equal outcomes only within the subset of records belonging to the 
 positive class. In the hiring example, equal opportunity requires that the 
-individuals in group A who are qualified to be hired are just as likely to 
-be chosen as individuals in group B who are qualified to be hired. 
+individuals in *group A* who are qualified to be hired are just as likely to 
+be chosen as individuals in *group B* who are qualified to be hired. 
 However, by not considering whether false 
 positive rates are equivalent across groups, equal opportunity does not 
 capture the costs of missclassification disparities.
