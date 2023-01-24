@@ -28,9 +28,6 @@ import sys as _sys
 from ._disparities import demographic_parity_difference  # noqa: F401
 from ._disparities import demographic_parity_ratio  # noqa: F401
 from ._disparities import equalized_odds_difference, equalized_odds_ratio  # noqa: F401
-from ._extra_metrics import _balanced_root_mean_squared_error  # noqa: F401
-from ._extra_metrics import _mean_overprediction  # noqa: F401
-from ._extra_metrics import _mean_underprediction  # noqa: F401
 from ._extra_metrics import count  # noqa: F401
 from ._extra_metrics import false_negative_rate  # noqa: F401
 from ._extra_metrics import false_positive_rate  # noqa: F401
