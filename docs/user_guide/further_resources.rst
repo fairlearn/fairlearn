@@ -17,7 +17,7 @@ Books
     barocas2019fairness
     broussard2018artificial
     noble2018algorithms
-    o2017weapons
+    oneil2017weapons
 
 
 Papers
