@@ -1,0 +1,39 @@
+name: test-all-deps
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+      requirementsPinned:
+        required: false
+        type: string
+        default: "false"
+
+jobs:
+  all-deps:
+    # This job installs all dependencies and runs most tests.
+    runs-on: ${{ inputs.os }}
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ inputs.python }}
+      - run: python scripts/install_requirements.py --pinned ${{ inputs.requirementsPinned }}
+      - run: pip install .
+      - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true

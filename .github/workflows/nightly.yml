@@ -1,21 +1,9 @@
-name: build-test
+name: nightly
 
 on:
-  push:
-    branches:
-      - "main"
-  pull_request:
-    branches:
-      - "main"
-      - "release/**"
+  schedule:
+    - cron: "0 8 * * *"
   workflow_dispatch:
-
-
-concurrency: 
-  # this ensures after each commit the old jobs are cancelled and the new ones
-  # run instead.
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
 
 jobs:
   all-deps:
@@ -23,7 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python: ["3.8", "3.9", "3.10"]
-        requirementsPinned: ["false"]
+        requirementsPinned: ["true", "false"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
@@ -45,7 +33,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.8"]
+        python: ["3.8", "3.9", "3.10"]
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
     uses: ./.github/workflows/test-other-ml.yml
     with:
