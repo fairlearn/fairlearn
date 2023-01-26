@@ -18,7 +18,7 @@ def fetch_bank_marketing(
 
     ==============   ====================
     Samples total                   45211
-    Dimensionality                     17
+    Dimensionality                     16
     Features         numeric, categorical
     Classes                             2
     ==============   ====================
@@ -62,15 +62,15 @@ def fetch_bank_marketing(
     dataset : :obj:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
-        data : ndarray, shape (45211, 17)
-            Each row corresponding to the 17 feature values in order.
+        data : ndarray, shape (45211, 16)
+            Each row corresponding to the 16 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (45211,)
             Each value represents whether the client subscribed a
             term deposit which is 'yes' if the client subscribed and 'no'
             otherwise.
             If ``as_frame`` is True, ``target`` is a pandas object.
-        feature_names : list of length 17
+        feature_names : list of length 16
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the UCI bank marketing dataset.
