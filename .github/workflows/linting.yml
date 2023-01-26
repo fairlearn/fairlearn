@@ -1,0 +1,22 @@
+name: linting
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+
+jobs:
+  linting:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ inputs.python }}
+      - run: pip install -r requirements-dev.txt
+      - run: flake8 .
