@@ -54,6 +54,7 @@ else:
 extensions = [
     "bokeh.sphinxext.bokeh_plot",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
@@ -85,6 +86,11 @@ intersphinx_mapping = {
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+
+
+# generate autosummary even if no references
+autosummary_generate = True
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
