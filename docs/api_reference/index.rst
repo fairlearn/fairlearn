@@ -3,23 +3,18 @@
 API Docs
 ========
 
-.. toctree::
-   :maxdepth: 1
+fairlearn.datasets
+==================
 
-   fairlearn.datasets
-   fairlearn.metrics
-   fairlearn.postprocessing
-   fairlearn.preprocessing
-   fairlearn.reductions
-   fairlearn.adversarial
-   fairlearn.experimental
+.. automodule:: fairlearn.datasets
+    :no-members:
+    :no-inherited-members:
 
 .. currentmodule:: fairlearn
 
-fairlearn.datasets
-==================
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: function.rst
 
    datasets.fetch_acs_income
@@ -31,8 +26,16 @@ fairlearn.datasets
 
 fairlearn.metrics
 =================
+
+.. automodule:: fairlearn.metrics
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: fairlearn
+
 .. autosummary:: 
    :nosignatures:
+   :toctree: generated/
    :template: function.rst
 
     metrics.count
@@ -52,36 +55,62 @@ fairlearn.metrics
 
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: classes.rst
    
    metrics.MetricFrame
 
 fairlearn.postprocessing
 ========================
+
+.. automodule:: fairlearn.postprocessing
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: fairlearn
+
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: classes.rst
 
    postprocessing.ThresholdOptimizer
 
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: function.rst
 
    postprocessing.plot_threshold_optimizer
 
 fairlearn.preprocessing
 =======================
+
+.. automodule:: fairlearn.preprocessing
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: fairlearn
+
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: classes.rst
 
    preprocessing.CorrelationRemover
 
 fairlearn.reductions
 ====================
+
+.. automodule:: fairlearn.reductions
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: fairlearn
+
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: classes.rst
 
    reductions.AbsoluteLoss
@@ -104,8 +133,16 @@ fairlearn.reductions
 
 fairlearn.adversarial
 =====================
+
+.. automodule:: fairlearn.adversarial
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: fairlearn
+
 .. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: classes.rst
    
    adversarial.AdversarialFairnessClassifier
@@ -113,8 +150,16 @@ fairlearn.adversarial
 
 fairlearn.experimental
 ======================
-.. autosummary::    
+
+.. automodule:: fairlearn.experimental
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: fairlearn
+
+.. autosummary::
    :nosignatures:
+   :toctree: generated/
    :template: function.rst
    
    metrics._plotter.plot_metric_frame
