@@ -1,8 +1,0 @@
-# template to get pip and setuptools to the latest version
-
-steps:
-  - script: python -m pip install --upgrade pip
-    displayName: 'Upgrade pip to latest version'
-
-  - script: pip install --upgrade setuptools
-    displayName: 'Upgrade setuptools'

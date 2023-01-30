@@ -119,5 +119,5 @@ docbuild/
 # OSX directory info files
 .DS_Store
 
-# plot_quickstart.py
-**/filename.png
+# Generated API stub files
+docs/api_reference/generated/
