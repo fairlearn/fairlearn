@@ -91,4 +91,7 @@ fig = metric_frame.by_group[["count"]].plot(
     figsize=[12, 8],
     title="Show count metric in pie chart",
 )
-fig[0][0].figure.savefig("filename.png")
+
+# Don't save file during doc build
+if "__file__" in locals():
+    fig[0][0].figure.savefig("filename.png")
