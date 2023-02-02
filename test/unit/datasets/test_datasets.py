@@ -63,10 +63,9 @@ class TestFairlearnDataset:
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
     def test_fetch_diabetes_hospital_as_ndarray_raises_value_error(self):
-        """
-        Once this test no longer passes, the NOTE in the docstring of
-        fetch_diabetes_hospital regarding as_frame and the if clauses in both
-        dataset tests can be removed because the OpenML dataset has been fixed.
-        """
+        # Once this test no longer passes, the NOTE in the docstring of
+        # fetch_diabetes_hospital regarding as_frame and the if clauses in
+        # both dataset tests can be removed because the OpenML dataset has
+        # been fixed.
         with pytest.raises(ValueError):
             fetch_diabetes_hospital(as_frame=False)
