@@ -56,6 +56,11 @@ def fetch_diabetes_hospital(
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical).
 
+        NOTE: If set to False, this will raise an exception because of a
+              type mismatch in the OpenML dataset.
+
+        .. versionadded:: 0.9.0
+
     cache : bool, default=True
         Whether to cache downloaded datasets using joblib.
 
@@ -98,21 +103,11 @@ def fetch_diabetes_hospital(
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
-    data_dict = fetch_openml(
+    return fetch_openml(
         data_id=43874,
         data_home=data_home,
         cache=cache,
-        as_frame=True,
-        return_X_y=False,
+        as_frame=as_frame,
+        return_X_y=return_X_y,
         **compat._PARSER_KWARG,
     )
-
-    if not as_frame:
-        data_dict["data"] = data_dict["data"].values
-        data_dict["frame"] = None
-        data_dict["target"] = data_dict["target"].values
-
-    if return_X_y:
-        return (data_dict["data"], data_dict["target"])
-
-    return data_dict
