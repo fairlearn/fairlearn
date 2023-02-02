@@ -9,11 +9,7 @@ These are metrics which are not part of `scikit-learn`.
 import numpy as np
 import sklearn.metrics as skm
 
-from ._balanced_root_mean_squared_error import (  # noqa: F401
-    _balanced_root_mean_squared_error,
-)
-from ._mean_predictions import _mean_overprediction  # noqa: F401,E501
-from ._mean_predictions import _mean_underprediction, mean_prediction  # noqa: F401
+from ._mean_predictions import mean_prediction  # noqa: F401
 from ._metric_frame import check_consistent_length
 from ._selection_rate import selection_rate  # noqa: F401,E501
 
@@ -236,11 +232,6 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
         normalize="true",
     ).ravel()
     return fnr
-
-
-def _root_mean_squared_error(y_true, y_pred, **kwargs):
-    r"""Calculate the root mean squared error."""
-    return skm.mean_squared_error(y_true, y_pred, squared=False, **kwargs)
 
 
 def count(y_true, y_pred) -> int:
