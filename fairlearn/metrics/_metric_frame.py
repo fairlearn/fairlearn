@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import check_consistent_length
 
-from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
+from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
 from ._disaggregated_result import DisaggregatedResult
