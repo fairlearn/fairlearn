@@ -4,7 +4,7 @@
 import pytest
 
 import fairlearn.metrics as metrics
-from fairlearn.metrics._selection_rate import _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE
+from fairlearn.metrics._base_metrics import _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE
 
 
 def test_selection_rate_empty():
