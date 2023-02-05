@@ -30,7 +30,8 @@ class TestFairlearnDataset:
     )
     def test_dataset_as_bunch(self, as_frame, fetch_function):
         if as_frame is False and fetch_function is fetch_diabetes_hospital:
-            return
+            msg = "fetch_diabetes_hospital will be skipped until dataset is fixed."
+            pytest.skip(msg)
         dataset = fetch_function(as_frame=as_frame)
         assert dataset is not None
         assert dataset["data"].shape is not None
@@ -55,7 +56,8 @@ class TestFairlearnDataset:
     )
     def test_dataset_as_X_y(self, as_frame, fetch_function):
         if as_frame is False and fetch_function is fetch_diabetes_hospital:
-            return
+            msg = "fetch_diabetes_hospital will be skipped until dataset is fixed."
+            pytest.skip(msg)
         X, y = fetch_function(as_frame=as_frame, return_X_y=True)
         assert X is not None
         assert isinstance(X, pd.DataFrame if as_frame else np.ndarray)
