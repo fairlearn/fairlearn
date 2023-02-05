@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""A variety of extra metrics useful for assessing fairness.
+"""A variety of base metrics useful for assessing fairness.
 
 These are metrics which are not part of `scikit-learn`.
 """
