@@ -10,9 +10,7 @@ import numpy as np
 import sklearn.metrics as skm
 from typing import Any
 
-from ._mean_predictions import mean_prediction  # noqa: F401
 from ._metric_frame import check_consistent_length
-from ._selection_rate import selection_rate  # noqa: F401,E501
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = (
