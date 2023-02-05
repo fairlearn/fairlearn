@@ -25,16 +25,16 @@ for each combination of subgroups.
 
 import sys as _sys
 
+from ._base_metrics import count  # noqa: F401
+from ._base_metrics import false_negative_rate  # noqa: F401
+from ._base_metrics import false_positive_rate  # noqa: F401
+from ._base_metrics import mean_prediction  # noqa: F401
+from ._base_metrics import selection_rate  # noqa: F401
+from ._base_metrics import true_negative_rate  # noqa: F401
+from ._base_metrics import true_positive_rate  # noqa: F401; noqa: F401
 from ._disparities import demographic_parity_difference  # noqa: F401
 from ._disparities import demographic_parity_ratio  # noqa: F401
 from ._disparities import equalized_odds_difference, equalized_odds_ratio  # noqa: F401
-from ._extra_metrics import count  # noqa: F401
-from ._extra_metrics import false_negative_rate  # noqa: F401
-from ._extra_metrics import false_positive_rate  # noqa: F401
-from ._extra_metrics import mean_prediction  # noqa: F401
-from ._extra_metrics import selection_rate  # noqa: F401
-from ._extra_metrics import true_negative_rate  # noqa: F401
-from ._extra_metrics import true_positive_rate  # noqa: F401; noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
@@ -62,7 +62,7 @@ _disparities = [
     "equalized_odds_ratio",
 ]
 
-_extra_metrics = [
+_base_metrics = [
     "true_positive_rate",
     "true_negative_rate",
     "false_positive_rate",
@@ -73,5 +73,5 @@ _extra_metrics = [
 ]
 
 __all__ = (
-    _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))
+    _core + _disparities + _base_metrics + list(sorted(_generated_metric_dict.keys()))
 )
