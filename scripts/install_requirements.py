@@ -27,8 +27,22 @@ _REQUIREMENTS_EXTENSION = "txt"
 # names that require an override. The values are the lowest possible override
 # versions that should be used in the pinned requirements files.
 _REQUIREMENTS_FIXED_EXCEPTIONS = {
+    "3.8": {
+        "scipy": "1.5.0",
+        "numpy": "1.18.0",
+        "pandas": "0.25.2"
+    },
+    "3.9": {
+        "scipy": "1.6.0",
+        "numpy": "1.20.0",
+        "scikit-learn": "0.24.0",
+        "pandas": "1.1.3"
+    }
     "3.10": {
-        "scipy": "1.7.2"
+        "scipy": "1.7.2",
+        "numpy": "1.22.0",
+        "scikit-learn": "1.1.0",
+        "pandas": "1.3.4"
     }
 }
 
