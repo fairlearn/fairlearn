@@ -1,6 +1,9 @@
 v0.9.0
 ======
 
+* Added :code:`as_frame` (with default :code:`True`) argument to
+  :code:`datasets._fetch_diabetes_hospital`.
+
 .. note::
 
   v0.9.0 is not yet released. This page reflects changes on the current
