@@ -66,16 +66,16 @@ def _process_line(src_line):
         .get(python_version, {}).get(package_name, None)
     if replacement_version is not None:
         current_version = processed_line.split("==")[1]
-        _logger.debug(f"Replacing {package_name} version {current_version} "
-                      f"with {replacement_version}")
+        _logger.debug("Replacing {0} version {1} with {2}"
+                      .format(package_name, current_version, replacement_version))
         return processed_line.replace(current_version, replacement_version)
     return processed_line
 
 
 def _pin_requirements(src_file, dst_file):
-    with _LogWrapper(f"Pinning {src_file} into {dst_file}"):
+    with _LogWrapper("Pinning {0} into {1}".format(src_file, dst_file)):
 
-        _logger.debug(f"Reading file {src_file}")
+        _logger.debug("Reading file %s", src_file)
         text_lines = []
         with open(src_file, "r") as f:
             text_lines = f.readlines()
@@ -83,13 +83,13 @@ def _pin_requirements(src_file, dst_file):
         result_lines = [
             _process_line(current_line) for current_line in text_lines]
 
-        _logger.debug(f"Writing file {dst_file}")
+        _logger.debug("Writing file %s", dst_file)
         with open(dst_file, "w") as f:
             f.writelines(result_lines)
 
 
 def _install_requirements_file(file_stem, fix_requirements):
-    _logger.info(f"Processing {file_stem}")
+    _logger.info("Processing %s", file_stem)
 
     if fix_requirements:
         source_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
@@ -99,12 +99,12 @@ def _install_requirements_file(file_stem, fix_requirements):
     else:
         requirements_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
 
-    with _LogWrapper(f"Running pip on {requirements_file}"):
+    with _LogWrapper("Running pip on {0}".format(requirements_file)):
         command_args = ["pip", "install", "-r", requirements_file]
         subprocess.check_call(command_args)
 
     if fix_requirements:
-        _logger.info(f"Removing temporary file {requirements_file}")
+        _logger.info("Removing temporary file %s", requirements_file)
         os.remove(requirements_file)
 
 
@@ -115,7 +115,7 @@ def main(argv):
     if args.loglevel:
         logging.basicConfig(level=getattr(logging, args.loglevel))
 
-    _logger.info(f"Pinned set to: {args.pinned}")
+    _logger.info("Pinned set to: %s", args.pinned)
 
     for rs in _REQUIREMENTS_STEMS:
         _install_requirements_file(rs, args.pinned)
