@@ -8,7 +8,7 @@ dependencies:
 - pytest
 - pytest-cov
 - xgboost>=1.7.0
-- pandas<1.4 # Capped for xgboost only
+- pandas
 
 # Note xgboost not available for Windows on conda-forge
 # See
