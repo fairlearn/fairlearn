@@ -94,7 +94,7 @@ def _install_requirements_file(file_stem, fix_requirements):
     if fix_requirements:
         source_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
         requirements_file = \
-            f"{file_stem}{_INSERTION_FIXED}.{_REQUIREMENTS_EXTENSION}")
+            f"{file_stem}{_INSERTION_FIXED}.{_REQUIREMENTS_EXTENSION}"
         _pin_requirements(source_file, requirements_file)
     else:
         requirements_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
