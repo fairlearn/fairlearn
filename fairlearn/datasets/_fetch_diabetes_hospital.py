@@ -43,11 +43,6 @@ def fetch_diabetes_hospital(
 
     Read more in the :ref:`User Guide <diabetes_hospital_data>`.
 
-    .. note::
-        The dataset is always returned as a pandas object, because string
-        attributes are not supported for array representation, resulting
-        in a `ValueError`.
-
     .. versionadded:: 0.8.0
 
     Parameters
@@ -56,8 +51,9 @@ def fetch_diabetes_hospital(
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical).
 
-        NOTE: If set to False, this will raise an exception because of a
-              type mismatch in the OpenML dataset.
+        .. note::
+            If set to False, this will raise an exception because of a type mismatch
+            in the OpenML dataset.
 
         .. versionadded:: 0.9.0
 
@@ -76,7 +72,7 @@ def fetch_diabetes_hospital(
     Returns
     -------
     dataset : :obj:`~sklearn.utils.Bunch`
-        Dictionary-like object, with the following attributes.
+        Dictionary-like object, with the following attributes:
 
         data : ndarray, shape (101766, 24)
             Each row corresponding to the 24 feature values in order.
@@ -90,10 +86,10 @@ def fetch_diabetes_hospital(
             Description of the Diabetes 130-Hospitals dataset.
 
     (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
-        if ``return_X_y`` is True and ``as_frame`` is False
+        If ``return_X_y`` is True and ``as_frame`` is False
 
     (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is True
+        If ``return_X_y`` is True and ``as_frame`` is True
 
     References
     ----------
