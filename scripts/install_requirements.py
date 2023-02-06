@@ -6,40 +6,16 @@
 import argparse
 import logging
 import os
-import platform
 import subprocess
 import sys
 
 from _utils import _LogWrapper
 
-_REQUIREMENTS_STEMS = [
-    "requirements",
-    "requirements-customplots",
-    "requirements-dev"]
+_REQUIREMENTS_STEMS = ["requirements", "requirements-customplots", "requirements-dev"]
 
 _INSERTION_FIXED = "-fixed"
 
 _REQUIREMENTS_EXTENSION = "txt"
-
-# The pipelines with pinned requirements sometimes don't work when the newer
-# Python versions aren't supported by the oldest allowed package version.
-# The following nested dictionary maps the Python versions to the package
-# names that require an override. The values are the lowest possible override
-# versions that should be used in the pinned requirements files.
-_REQUIREMENTS_FIXED_EXCEPTIONS = {
-    "3.9": {
-        "scipy": "1.6.0",
-        "numpy": "1.20.0",
-        "scikit-learn": "0.24.0",
-        "pandas": "1.1.3"
-    }
-    "3.10": {
-        "scipy": "1.7.2",
-        "numpy": "1.22.0",
-        "scikit-learn": "1.1.0",
-        "pandas": "1.3.4"
-    }
-}
 
 
 _logger = logging.getLogger(__file__)
@@ -66,19 +42,7 @@ def _build_argument_parser():
 
 
 def _process_line(src_line):
-    if ">=" not in src_line:
-        return src_line
-    processed_line = src_line.replace(">=", "==")
-    python_version = platform.python_version().split(".")[:2]
-    package_name = src_line.split(">=")[0]
-    replacement_version = _REQUIREMENTS_FIXED_EXCEPTIONS \
-        .get(python_version, {}).get(package_name, None)
-    if replacement_version is not None:
-        current_version = processed_line.split("==")[1]
-        _logger.debug("Replacing {0} version {1} with {2}"
-                      .format(package_name, current_version, replacement_version))
-        return processed_line.replace(current_version, replacement_version)
-    return processed_line
+    return src_line.replace(">=", "==")
 
 
 def _pin_requirements(src_file, dst_file):
@@ -89,8 +53,7 @@ def _pin_requirements(src_file, dst_file):
         with open(src_file, "r") as f:
             text_lines = f.readlines()
 
-        result_lines = [
-            _process_line(current_line) for current_line in text_lines]
+        result_lines = [_process_line(current_line) for current_line in text_lines]
 
         _logger.debug("Writing file %s", dst_file)
         with open(dst_file, "w") as f:
@@ -101,12 +64,13 @@ def _install_requirements_file(file_stem, fix_requirements):
     _logger.info("Processing %s", file_stem)
 
     if fix_requirements:
-        source_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
-        requirements_file = \
-            f"{file_stem}{_INSERTION_FIXED}.{_REQUIREMENTS_EXTENSION}"
+        source_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)
+        requirements_file = "{0}{1}.{2}".format(
+            file_stem, _INSERTION_FIXED, _REQUIREMENTS_EXTENSION
+        )
         _pin_requirements(source_file, requirements_file)
     else:
-        requirements_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
+        requirements_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)
 
     with _LogWrapper("Running pip on {0}".format(requirements_file)):
         command_args = ["pip", "install", "-r", requirements_file]
