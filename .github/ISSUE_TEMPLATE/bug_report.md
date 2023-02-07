@@ -39,7 +39,7 @@ from fairlearn.reductions import ExponentiatedGradient, DemographicParity
 from sklearn.linear_model import LinearRegression
 from fairlearn.datasets import fetch_adult
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X = pd.get_dummies(data.data)
 y = (data.target == '>50K') * 1
 sensitive_features = data.data['sex']

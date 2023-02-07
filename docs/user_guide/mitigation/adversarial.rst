@@ -134,7 +134,7 @@ To summarize:
    :header-rows: 1
    :widths: 6 4 6 6 10 6
    :stub-columns: 0
-    
+
    *  - label :math:`Y`
       - derived label :math:`Y'`
       - network output :math:`Z`
@@ -148,7 +148,7 @@ To summarize:
         :math:`\;\;=1/(1+e^{-Z})`
       - :math:`-Y'\log\mathbb{P}(Y'=1)`
         :math:`\;\;-(1-Y')\log\mathbb{P}(Y'=0)`
-      - 1 if :math:`Z\ge 0`, else 0 
+      - 1 if :math:`Z\ge 0`, else 0
    *  - **categorical**
         (:math:`k` values)
       - one-hot encoding
@@ -217,7 +217,7 @@ We start by loading and preprocessing the dataset::
 
     from fairlearn.datasets import fetch_adult
 
-    X, y = fetch_adult(as_frame=True, return_X_y=True)
+    X, y = fetch_adult(return_X_y=True)
     pos_label = y[0]
 
     z = X["sex"] # In this example, we consider 'sex' the sensitive feature.
@@ -329,7 +329,7 @@ Then, to display the result::
 
     >>> print(mf.by_group)
             accuracy selection_rate
-    sex                            
+    sex
     Female  0.906308       0.978664
     Male    0.723336       0.484927
 
@@ -491,7 +491,7 @@ Finally, we validate as before, and take a look at the results::
         )
     >>> print(mf.by_group)
             accuracy selection_rate
-    sex                            
+    sex
     Female  0.823129       0.743352
     Male    0.789441       0.870849
 
@@ -538,7 +538,7 @@ to fit::
         )
     >>> print(mf.by_group)
             accuracy selection_rate
-    sex                            
+    sex
     Female  0.906308       0.978664
     Male    0.723336       0.484927
 

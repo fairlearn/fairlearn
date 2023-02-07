@@ -41,13 +41,17 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from fairlearn.datasets import fetch_adult
 from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 from fairlearn.metrics import (
-    MetricFrame, selection_rate, count, plot_model_comparison, selection_rate_difference
+    MetricFrame,
+    selection_rate,
+    count,
+    plot_model_comparison,
+    selection_rate_difference,
 )
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X_raw = data.data
 Y = (data.target == ">50K") * 1
 X_raw
@@ -262,6 +266,6 @@ plot_model_comparison(
     y_preds=predictions,
     sensitive_features=A_test,
     point_labels=True,
-    show_plot=True
+    show_plot=True,
 )
 # End model comparison
