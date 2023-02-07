@@ -8,14 +8,12 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 import fairlearn.utils._compatibility as compat
 
 
-def fetch_credit_card(
-    *, cache=True, data_home=None, as_frame=False, return_X_y=False
-):
+def fetch_credit_card(*, cache=True, data_home=None, as_frame=False, return_X_y=False):
     """Load the 'Default of Credit Card clients' dataset (binary classification).
 
     ===============   ===============
     Samples total               30000
-    Dimensionality                 24
+    Dimensionality                 23
     Features                     real
     Classes                         2
     ===============   ===============
@@ -55,13 +53,13 @@ def fetch_credit_card(
     dataset : class:`~sklearn.utils.Bunch`
         Dictionary-like object, with the following attributes.
 
-        data : NumPy Array or Pandas DataFrame, Shape (30000, 24)
-            Each row corresponds to the 24 feature values in order.
+        data : NumPy Array or Pandas DataFrame, Shape (30000, 23)
+            Each row corresponds to the 23 feature values in order.
             If ``as_frame`` is True, ``data`` is a Pandas DataFrame
         target : NumPy Array or Pandas Series, Shape (30000,)
             Each value represents whether an applicant defaulted on credit loan.
             If ``as_frame`` is True, ``target`` is a Pandas Series.
-        feature_names : List of Strings, Length 24
+        feature_names : List of Strings, Length 23
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the UCI Default of Credit Card

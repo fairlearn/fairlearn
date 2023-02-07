@@ -190,9 +190,7 @@ are interested in.
 Using the dataset
 ^^^^^^^^^^^^^^^^^
 The dataset can be loaded via the :func:`fairlearn.datasets.fetch_diabetes_hospital`
-function. By default, the dataset is returned as a :class:`pandas.DataFrame`, since
-the dataset contains string attributes that are not supported for array representation.
-Therefore, passing :code:`as_frame=False` would return a :code:`ValueError`.
+function. By default, the dataset is returned as a :class:`pandas.DataFrame`.
 
 .. topic:: References:
 

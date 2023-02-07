@@ -36,20 +36,32 @@ from fairlearn.preprocessing import CorrelationRemover
 # specifically at the African American race.
 # Finally, the columns are rearranged for consistency.
 
-data = fetch_diabetes_hospital()
+data = fetch_diabetes_hospital(as_frame=True)
 X_raw = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
 X_raw = pd.get_dummies(X_raw)
 y = data.target
 
-X_raw = X_raw.drop(["race_Asian",
-                    'race_Caucasian',
-                    'race_Hispanic',
-                    'race_Other',
-                    'race_Unknown',
-                    'had_inpatient_days_False',
-                    'medicare_False'], axis=1)
+X_raw = X_raw.drop(
+    [
+        "race_Asian",
+        "race_Caucasian",
+        "race_Hispanic",
+        "race_Other",
+        "race_Unknown",
+        "had_inpatient_days_False",
+        "medicare_False",
+    ],
+    axis=1,
+)
 
-X_raw = X_raw[['time_in_hospital', 'had_inpatient_days_True', 'medicare_True', 'race_AfricanAmerican']]
+X_raw = X_raw[
+    [
+        "time_in_hospital",
+        "had_inpatient_days_True",
+        "medicare_True",
+        "race_AfricanAmerican",
+    ]
+]
 
 # %%
 # We are now going to fit the CorrelationRemover to the data,
@@ -58,12 +70,16 @@ X_raw = X_raw[['time_in_hospital', 'had_inpatient_days_True', 'medicare_True', '
 
 cr = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"])
 X_cr = cr.fit_transform(X_raw)
-X_cr = pd.DataFrame(X_cr, columns=['time_in_hospital', 'had_inpatient_days_True', 'medicare_True'])
+X_cr = pd.DataFrame(
+    X_cr, columns=["time_in_hospital", "had_inpatient_days_True", "medicare_True"]
+)
 X_cr["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
-cr_alpha = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
+cr_alpha = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"], alpha=0.5)
 X_cr_alpha = cr_alpha.fit_transform(X_raw)
-X_cr_alpha = pd.DataFrame(X_cr_alpha, columns=['time_in_hospital', 'had_inpatient_days_True', 'medicare_True'])
+X_cr_alpha = pd.DataFrame(
+    X_cr_alpha, columns=["time_in_hospital", "had_inpatient_days_True", "medicare_True"]
+)
 X_cr_alpha["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
 # %%
@@ -74,7 +90,7 @@ X_cr_alpha["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
 
 def plot_heatmap(df, title):
-    df['target'] = y
+    df["target"] = y
     df = df.rename(columns={"had_inpatient_days_True": "had_inpatient_days"})
     cols = list(df.columns)
 
