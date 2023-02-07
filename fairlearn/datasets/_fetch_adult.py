@@ -9,7 +9,7 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 import fairlearn.utils._compatibility as compat
 
 
-def fetch_adult(*, cache=True, data_home=None, as_frame=False, return_X_y=False):
+def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
 
     Read more in the :ref:`User Guide <boston_housing_data>`.
@@ -42,7 +42,7 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=False, return_X_y=False)
         By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
-    as_frame : bool, default=False
+    as_frame : bool, default=True
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.

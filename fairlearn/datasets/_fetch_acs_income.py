@@ -15,7 +15,7 @@ def fetch_acs_income(
     *,
     cache=True,
     data_home=None,
-    as_frame=False,
+    as_frame=True,
     return_X_y=False,
     states=None,
 ):
@@ -47,7 +47,7 @@ def fetch_acs_income(
         By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
-    as_frame : bool, default=False
+    as_frame : bool, default=True
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.

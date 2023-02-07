@@ -8,7 +8,7 @@ from ._constants import _DOWNLOAD_DIRECTORY_NAME
 import fairlearn.utils._compatibility as compat
 
 
-def fetch_credit_card(*, cache=True, data_home=None, as_frame=False, return_X_y=False):
+def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     """Load the 'Default of Credit Card clients' dataset (binary classification).
 
     ===============   ===============
@@ -32,7 +32,7 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=False, return_X_y=
         Specifiy another download and cache folder for the datasets. By default,
         all scikit-learn data is stored in '~/.fairlearn-data' subfolders.
 
-    as_frame : boolean, default=False
+    as_frame : boolean, default=True
         If True,
             Returns the data as Pandas DataFrame, and the target
             is returned as a Pandas Series.

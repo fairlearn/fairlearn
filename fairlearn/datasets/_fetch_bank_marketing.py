@@ -10,7 +10,7 @@ import fairlearn.utils._compatibility as compat
 
 
 def fetch_bank_marketing(
-    *, cache=True, data_home=None, as_frame=False, return_X_y=False
+    *, cache=True, data_home=None, as_frame=True, return_X_y=False
 ):
     """Load the UCI bank marketing dataset (binary classification).
 
@@ -45,7 +45,7 @@ def fetch_bank_marketing(
         By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
-    as_frame : bool, default=False
+    as_frame : bool, default=True
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.
