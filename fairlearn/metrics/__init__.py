@@ -32,9 +32,9 @@ from ._base_metrics import mean_prediction  # noqa: F401
 from ._base_metrics import selection_rate  # noqa: F401
 from ._base_metrics import true_negative_rate  # noqa: F401
 from ._base_metrics import true_positive_rate  # noqa: F401; noqa: F401
-from ._fairness import demographic_parity_difference  # noqa: F401
-from ._fairness import demographic_parity_ratio  # noqa: F401
-from ._fairness import equalized_odds_difference, equalized_odds_ratio  # noqa: F401
+from ._fairness_metrics import demographic_parity_difference  # noqa: F401
+from ._fairness_metrics import demographic_parity_ratio  # noqa: F401
+from ._fairness_metrics import equalized_odds_difference, equalized_odds_ratio  # noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
