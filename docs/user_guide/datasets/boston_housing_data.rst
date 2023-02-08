@@ -415,7 +415,13 @@ We strongly discourage using the Boston Housing dataset for machine learning
 benchmarking purposes, and hope this article gives 
 you pause about using it in the future.
 
-.. topic:: References:
+References
+----------
+
+.. footbibliography::
+
+
+.. rubric:: Footnotes
 
   .. [#1] Scikit-Learn, `"The Ames housing dataset" <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>_`,
       2021.
