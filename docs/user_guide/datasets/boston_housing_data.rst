@@ -30,14 +30,14 @@ This article has the following goals:
 Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Harrison and Rubenfield [#1]_ 
+Harrison and Rubenfield :footcite:`harrison1978hedonic`
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
-The authors use a hedonic pricing [#9]_ 
+The authors use a hedonic pricing [#4]_ 
 approach, which assumes that the price of a good or service can be modeled as a 
 function of features both internal and external to the good or service. 
 The input to this model was a dataset comprising the Boston Standard Metropolitan 
-Statistical Area [#10]_, with the nitric oxides concentration (*NOX*) 
+Statistical Area [#5]_, with the nitric oxides concentration (*NOX*) 
 serving as a proxy for air quality.
 
 The paper sought to estimate the median value of owner-occupied homes (now 
@@ -64,7 +64,10 @@ Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`
 and for a time was included as one of scikit-learn's and tensorflow's standard toy datasets
 (see :mod:`tf.keras.datasets.boston_housing`).
 It has also been the benchmark of choice for many machine learning 
-`papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
+`papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_
+:footcite:`al2018comparative`
+:footcite:`shahhosseini2020optimizing`
+:footcite:`tipping1999relevance`.
 In 2020, users brought the dataset's fairness issues to the scikit-learn development team 
 (see scikit-learn issue `#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_), after which the team decided to remove the dataset in scikit-learn version 1.2.
 
@@ -174,8 +177,9 @@ have later been found to be unsubstantiated.
   a neighborhood and housing values."
 
 To describe the reasoning behind *B* further, the authors assume that 
-self-segregation correlates to higher home values. However, other 
-researchers (see [#5]_) did not find evidence that supports this hypothesis. 
+self-segregation correlates to higher home values.
+However, other researchers (see :footcite:`kain1975housing`) did not find
+evidence that supports this hypothesis. 
 
 Additionally, though the authors specify a parabolic transformation 
 for *B*, they do not provide evidence that the relationship between *B* and *MEDV* 
@@ -183,7 +187,7 @@ is parabolic.
 Harrison and Rubenfield set a threshold of 63% as the point in which median house 
 prices flip from declining to increasing, but do not provide the basis for 
 this threshold. 
-An analysis of the dataset [#8]_ 
+An analysis of the dataset [#3]_ 
 by M. Carlisle further shows that the Boston Housing dataset suffers from serious
 quality and incompleteness issues, as Carlisle was unable to recover the 
 original Census data mapping for all the points in the *B* variable. 
@@ -229,7 +233,8 @@ However, given the time period in which the paper
 was published there may have been a dearth of related measurement models.
 
 Intersectionality also requires consideration. 
-Intersectionality is defined as the interesection between multiple demographic groups.[#11]_ 
+Intersectionality is defined as the interesection between multiple demographic
+groups.:footcite:`crenshaw1991intersectionality`
 The impacts of a technical system on intersectional groups may be different 
 than the impacts experienced by the individual demographic groups (e.g., Black
 people in aggregate and women in aggregate may experience a technical system 
@@ -278,7 +283,7 @@ We apply a column transformation to the target feature
 to turn this problem into a classification problem.
 The code below maps *LSTAT* and *MEDV* to binary values where values greater 
 than the median of the column map to TRUE, and otherwise the values are FALSE. 
-This methodology follows scikit-lego's [#7]_ exploration
+This methodology follows scikit-lego's [#2]_ exploration
 of the Boston Housing data. We also transform *B* into a binary variable where 
 TRUE values are above the value 136.9. Observations below this point correspond to 
 the "true" proportion of Black people above 63%, at which point the authors
@@ -363,7 +368,7 @@ The Boston housing dataset presents many ethical issues, and in general, we
 strongly discourage using it in predictive modelling analyses. 
 We've kept it in Fairlearn because of its potential as a teaching tool 
 for how to deal with ethical issues in a dataset. 
-There are ways to remove correlations between sensitive features and the remaining columns [#7]_, 
+There are ways to remove correlations between sensitive features and the remaining columns [#2]_, 
 but that is by no means a guarantee that fairness-related harms won't occur. 
 Besides, other benchmark datasets exist that do not present these issues.
 
@@ -403,7 +408,7 @@ different types of statistical analyses and different predicted outcomes.
 If you are searching for a house pricing dataset to use for benchmarking 
 purposes or to create a hedonic pricing model, scikit-learn recommends the 
 California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
-or the Ames housing dataset [#6]_ 
+or the Ames housing dataset [#1]_ 
 in place of the Boston housing dataset, as using these datasets should not
 generate the same fairness-related harms. 
 We strongly discourage using the Boston Housing dataset for machine learning 
@@ -412,38 +417,17 @@ you pause about using it in the future.
 
 .. topic:: References:
 
-  .. [#1] David Harrison, Daniel Rubenfield, `"Hedonic Housing Prices and the Demand for Clean Air" <https://deepblue.lib.umich.edu/bitstream/handle/2027.42/22636/0000186.pdf?sequence=1&isAllowed=y>`_,
-      Journal of Environmental Economics and Management, 1978.
-      
-
-  .. [#2] Ali Al Bataineh, Devinder Kaur, `"A Comparative Study of Different Curve Fitting Algorithms in Artificial Neural Network using Housing Dataset" <https://ieeexplore.ieee.org/abstract/document/8556738>`_,
-      IEEE, 2018.
- 
-
-  .. [#3] Mohsen Shahhosseini, Guiping Hu, Hieu Pham, `"Optimizing Ensemble Weights for Machine Learning Models: A Case Study for Housing Price Prediction" <https://lib.dr.iastate.edu/cgi/viewcontent.cgi?article=1187&context=imse_conf>`_,
-      Industrial and Manufacturing Systems Engineering Conference Proceedings and Posters, 2019.   
-
-
-  .. [#4] Michael E. Tipping , `"The Relevance Vector Machine" <https://proceedings.neurips.cc/paper/1999/file/f3144cefe89a60d6a1afaf7859c5076b-Paper.pdf>`_,
-      1999.
-  
-  .. [#5] John F. Kain, John M. Quigley, `"Housing Markets and Racial Discrimination: A Microeconomic Analysis" <https://www.nber.org/books/kain75-1>`_, 
-      National Bureau of Economic Research (NBER), 1975.
-
-  .. [#6] Scikit-Learn, `"The Ames housing dataset" <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>_`,
+  .. [#1] Scikit-Learn, `"The Ames housing dataset" <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>_`,
       2021.
    
-  .. [#7] Scikit-Lego, `"Fairness" <https://scikit-lego.netlify.app/fairness.html>`_,
+  .. [#2] Scikit-Lego, `"Fairness" <https://scikit-lego.netlify.app/fairness.html>`_,
       2019.
    
-  .. [#8] M Carlisle, `"racist data destruction?" <https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_,
+  .. [#3] M Carlisle, `"racist data destruction?" <https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_,
       Medium, 2019.
 
-  .. [#9] Marshall Hargrave, `"Hedonic Pricing" <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_,
+  .. [#4] Marshall Hargrave, `"Hedonic Pricing" <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_,
       Investopedia, 2021.
   
-  .. [#10] `"Metropolitan Areas", <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_,
+  .. [#5] `"Metropolitan Areas", <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_,
         United States Census Bureau.
-  
-  .. [#11] Kinmberlé Crenshaw, Mapping the margins: Intersectionality, identity politics, and violence against women of color, 
-      Stanford Law Review, 1993, 43(6), 1241-1299.
