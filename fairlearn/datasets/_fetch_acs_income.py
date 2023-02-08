@@ -55,10 +55,8 @@ def fetch_acs_income(
         data. If ``return_X_y`` is True, then ``(data, target)`` will be pandas
         DataFrames or Series as describe above.
 
-        .. note::
-            Default value changed to True.
-
         .. versionchanged:: 0.9.0
+            Default value changed to True.
 
     return_X_y : bool, default=False
         If True, returns ``(data.data, data.target)`` instead of a Bunch

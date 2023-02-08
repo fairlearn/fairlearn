@@ -40,10 +40,8 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
             Returns a scikit-learn Bunch object with ``frame`` attribute containing
             the data and the target.
 
-        .. note::
-            Default value changed to True.
-
         .. versionchanged:: 0.9.0
+            Default value changed to True.
 
     return_X_y : boolean, default=False.
         If True,
