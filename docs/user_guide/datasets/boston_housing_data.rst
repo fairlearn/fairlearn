@@ -33,12 +33,12 @@ Dataset Origin and Use
 Harrison and Rubenfield :footcite:`harrison1978hedonic`
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
-The authors use a hedonic pricing [#4]_ 
+The authors use a hedonic pricing :footcite:`hargrave2021hedonic`
 approach, which assumes that the price of a good or service can be modeled as a 
 function of features both internal and external to the good or service. 
-The input to this model was a dataset comprising the Boston Standard Metropolitan 
-Statistical Area [#5]_, with the nitric oxides concentration (*NOX*) 
-serving as a proxy for air quality.
+The input to this model was a dataset comprising the Boston Standard
+Metropolitan Statistical Area :footcite:`uscensusbureaumetropolitan`, with the
+nitric oxides concentration (*NOX*) serving as a proxy for air quality.
 
 The paper sought to estimate the median value of owner-occupied homes (now 
 *MEDV*), and included the remaining variables to capture other neighborhood 
@@ -187,7 +187,7 @@ is parabolic.
 Harrison and Rubenfield set a threshold of 63% as the point in which median house 
 prices flip from declining to increasing, but do not provide the basis for 
 this threshold. 
-An analysis of the dataset [#3]_ 
+An analysis of the dataset :footcite:`carlisle2019racist`
 by M. Carlisle further shows that the Boston Housing dataset suffers from serious
 quality and incompleteness issues, as Carlisle was unable to recover the 
 original Census data mapping for all the points in the *B* variable. 
@@ -283,12 +283,13 @@ We apply a column transformation to the target feature
 to turn this problem into a classification problem.
 The code below maps *LSTAT* and *MEDV* to binary values where values greater 
 than the median of the column map to TRUE, and otherwise the values are FALSE. 
-This methodology follows scikit-lego's [#2]_ exploration
-of the Boston Housing data. We also transform *B* into a binary variable where 
-TRUE values are above the value 136.9. Observations below this point correspond to 
-the "true" proportion of Black people above 63%, at which point the authors
-assumed that house prices would begin to be affected by the racism of 
-others in the community.
+This methodology follows scikit-lego's :footcite:`scikitlego2019fairness`
+exploration of the Boston Housing data.
+We also transform *B* into a binary variable where TRUE values are above the
+value 136.9.
+Observations below this point correspond to the "true" proportion of Black
+people above 63%, at which point the authors assumed that house prices would
+begin to be affected by the racism of others in the community.
 
 .. doctest:: datasets
     :options:  +NORMALIZE_WHITESPACE
@@ -368,7 +369,8 @@ The Boston housing dataset presents many ethical issues, and in general, we
 strongly discourage using it in predictive modelling analyses. 
 We've kept it in Fairlearn because of its potential as a teaching tool 
 for how to deal with ethical issues in a dataset. 
-There are ways to remove correlations between sensitive features and the remaining columns [#2]_, 
+There are ways to remove correlations between sensitive features and the
+remaining columns :footcite:`scikitlego2019fairness`, 
 but that is by no means a guarantee that fairness-related harms won't occur. 
 Besides, other benchmark datasets exist that do not present these issues.
 
@@ -408,7 +410,7 @@ different types of statistical analyses and different predicted outcomes.
 If you are searching for a house pricing dataset to use for benchmarking 
 purposes or to create a hedonic pricing model, scikit-learn recommends the 
 California housing dataset (:func:`sklearn.datasets.fetch_california_housing`)
-or the Ames housing dataset [#1]_ 
+or the Ames housing dataset :footcite:`scikitlearn2022ames`
 in place of the Boston housing dataset, as using these datasets should not
 generate the same fairness-related harms. 
 We strongly discourage using the Boston Housing dataset for machine learning 
@@ -419,21 +421,3 @@ References
 ----------
 
 .. footbibliography::
-
-
-.. rubric:: Footnotes
-
-  .. [#1] Scikit-Learn, `"The Ames housing dataset" <https://inria.github.io/scikit-learn-mooc/python_scripts/datasets_ames_housing.html>_`,
-      2021.
-   
-  .. [#2] Scikit-Lego, `"Fairness" <https://scikit-lego.netlify.app/fairness.html>`_,
-      2019.
-   
-  .. [#3] M Carlisle, `"racist data destruction?" <https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8>`_,
-      Medium, 2019.
-
-  .. [#4] Marshall Hargrave, `"Hedonic Pricing" <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_,
-      Investopedia, 2021.
-  
-  .. [#5] `"Metropolitan Areas", <https://www.census.gov/history/www/programs/geography/metropolitan_areas.html>`_,
-        United States Census Bureau.
