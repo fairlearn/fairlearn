@@ -158,7 +158,7 @@ Project history
 
 Fairlearn was started in 2018 by Miro Dudik from Microsoft Research as a
 Python package to accompany the research paper,
-`A Reductions Approach to Fair Classification <http://proceedings.mlr.press/v80/agarwal18a/agarwal18a.pdf>`_.
+A Reductions Approach to Fair Classification :footcite:`agarwal2018reductions`.
 The package provided a reduction algorithm for mitigating unfairness in binary
 classification models --- a setting that was commonly studied in the
 machine learning community.
@@ -285,6 +285,5 @@ Infrastructure support
 We would also like to thank the following for free CPU time on their
 continuous integration servers:
 
-- `Microsoft Azure <https://azure.microsoft.com/en-us/>`_
 - `GitHub <https://github.com>`_
 - `CircleCI <https://circleci.com/>`_
