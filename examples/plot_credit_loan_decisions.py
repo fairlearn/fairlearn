@@ -393,7 +393,7 @@ lgb.plot_importance(
 #
 # When discussing fairness in AI systems, the first step is understanding
 # what types of harms we anticipate the system may produce. Using the
-# `harms taxonomy in the Fairlearn User Guide <types_of_harms>`_,
+# :ref:`harms taxonomy in the Fairlearn User Guide <types_of_harms>`,
 # we expect this system to produce *harms of allocation*. In addition, we also
 # anticipate the long-term impact on an individual's credit score if an
 # individual is unable to repay a loan they receive or if they are rejected for
