@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-import fairlearn.metrics._input_manipulations as fmim
+import fairlearn.utils._input_manipulations as fmim
 
 
 class TestConvertToNDArrayAndSqueeze:

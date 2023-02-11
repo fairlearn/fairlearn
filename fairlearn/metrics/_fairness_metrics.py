@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Metrics for measuring disparity."""
+"""Metrics for measuring fairness."""
 
-from ._extra_metrics import false_positive_rate, selection_rate, true_positive_rate
+from ._base_metrics import false_positive_rate, selection_rate, true_positive_rate
 from ._metric_frame import MetricFrame
 
 

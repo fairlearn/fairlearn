@@ -3,7 +3,7 @@
 
 import sklearn.metrics as skm
 
-from ._extra_metrics import (
+from ._base_metrics import (
     false_negative_rate,
     false_positive_rate,
     selection_rate,
@@ -13,7 +13,7 @@ from ._extra_metrics import (
 from ._make_derived_metric import make_derived_metric
 
 METRICS_SPEC = [
-    # base metrics from _extra_metrics
+    # base metrics from _base_metrics
     (true_positive_rate, ["difference", "ratio"]),
     (true_negative_rate, ["difference", "ratio"]),
     (false_positive_rate, ["difference", "ratio"]),
