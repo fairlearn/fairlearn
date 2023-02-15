@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def fetch_adult():
     """Grab dataset for testing."""
-    data = fld.fetch_adult(as_frame=True)
+    data = fld.fetch_adult()
     X = data.data.drop(labels=["sex"], axis=1)
     X = pd.get_dummies(X)
     Y = (data.target == ">50K") * 1
@@ -128,7 +128,7 @@ def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
     random.seed(123)
 
-    X, y = fld.fetch_adult(as_frame=True, return_X_y=True)
+    X, y = fld.fetch_adult(return_X_y=True)
 
     non_NaN_rows = ~X.isna().any(axis=1)
 
@@ -144,9 +144,7 @@ def run_AdversarialFairness_classification(estimator):
         ct = make_column_transformer(
             (StandardScaler(), make_column_selector(dtype_include=number)),
             (
-                OneHotEncoder(
-                    drop="if_binary",
-                    **compat._SPARSE_OUTPUT_FALSE),
+                OneHotEncoder(drop="if_binary", **compat._SPARSE_OUTPUT_FALSE),
                 make_column_selector(dtype_include="category"),
             ),
         )
@@ -161,7 +159,7 @@ def run_AdversarialFairness_classification(estimator):
     )
 
     estimator.epochs = 100
-    estimator.batch_size = 2 ** 10
+    estimator.batch_size = 2**10
     estimator.shuffle = True
     estimator.progress_updates = None
 

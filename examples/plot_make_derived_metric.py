@@ -47,7 +47,7 @@ from fairlearn.metrics import MetricFrame, accuracy_score_group_min, make_derive
 # %%
 # Next, we import the data, dropping any rows which are missing data:
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X_raw = data.data
 y = (data.target == ">50K") * 1
 A = X_raw[["race", "sex"]]

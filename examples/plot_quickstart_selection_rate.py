@@ -11,7 +11,7 @@ from fairlearn.datasets import fetch_adult
 # %%
 from fairlearn.metrics import MetricFrame, selection_rate
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X = data.data
 y_true = (data.target == ">50K") * 1
 sex = X["sex"]
