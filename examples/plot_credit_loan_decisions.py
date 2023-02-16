@@ -648,8 +648,8 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # Postprocessing mitigations: ThresholdOptimizer
 # ==============================================
 # In the Fairlearn package, *postprocessing* mitigation is offered through
-# the :code:`ThresholdOptimizer` algorithm, following Hardt, Price, and Srebro
-# (2016) :footcite:`hardt2016equality`.
+# the :code:`ThresholdOptimizer` algorithm, following
+# :footcite:cts:`hardt2016equality`.
 # The :code:`ThresholdOptimizer` takes in an exisiting (possibly pre-fit)
 # machine learning model whose predictions acts as a scoring function to
 # identify separate thresholds for each *sensitive feature* group.
