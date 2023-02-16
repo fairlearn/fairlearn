@@ -1259,9 +1259,8 @@ metricframe_postprocess.overall[metrics_to_report]
 # practitoners may run into the issue of not having access to the sensitive
 # demographic features. As a result, financial institutions are often tasked
 # with proving their models are compliant with fair lending laws by imputing
-# these demographics features. However, Chen et. al (2018)
-# :footcite:`chen2019fairness` show these imputation methods often
-# introduce new fairness-related issues.
+# these demographics features. However, :footcite:ct:`chen2019fairness` show
+# these imputation methods often introduce new fairness-related issues.
 #
 # References
 # ----------
