@@ -65,8 +65,8 @@ np.random.seed(rand_seed)
 # same concept as anti-discrimination law. An AI system can comply with
 # anti-discrimination law while exhibiting fairness-related concerns. On the
 # other hand, some fairness interventions may be illegal under
-# anti-discrimination law. Xiang and Raji (2019)
-# :footcite:`Xiang2019legalcompatibility` discuss the compatibilities and
+# anti-discrimination law.
+# :footcite:cts:`Xiang2019legalcompatibility` discuss the compatibilities and
 # disconnects between anti-discrimination law and algorithmic notions of
 # fairness. In this case study, we focus on fairness in financial services
 # rather than compliance with financial anti-discrimination regulations.

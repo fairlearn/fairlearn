@@ -30,7 +30,7 @@ This article has the following goals:
 Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Harrison and Rubenfield :footcite:`harrison1978hedonic`
+:footcite:cts:`harrison1978hedonic`
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
 The authors use a hedonic pricing [#1]_ approach, which assumes that the price
@@ -68,8 +68,10 @@ It has also been the benchmark of choice for many machine learning
 :footcite:`al2018comparative`
 :footcite:`shahhosseini2020optimizing`
 :footcite:`tipping1999relevance`.
-In 2020, users brought the dataset's fairness issues to the scikit-learn development team 
-(see scikit-learn issue `#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_), after which the team decided to remove the dataset in scikit-learn version 1.2.
+In 2020, users brought the dataset's fairness issues to the scikit-learn
+development team (see scikit-learn issue
+`#16155 <https://github.com/scikit-learn/scikit-learn/issues/16155>`_), after
+which the team decided to remove the dataset in scikit-learn version 1.2.
 
 The dataset contains the following columns:
 
