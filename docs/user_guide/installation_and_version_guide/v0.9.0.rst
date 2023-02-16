@@ -3,6 +3,7 @@ v0.9.0
 
 * Added :code:`as_frame` (with default :code:`True`) argument to
   :code:`datasets._fetch_diabetes_hospital`.
+* Changed :code:`as_frame` default to :code:`True` for all remaining datasets.
 
 .. note::
 

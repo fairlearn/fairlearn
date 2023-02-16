@@ -39,7 +39,7 @@ def data_generator():
     yield [[0, 1], [1, 0], [0.1, 2]], "continuous", [Series]
 
     # Larger examples.
-    X, y = fetch_adult(as_frame=True, return_X_y=True)
+    X, y = fetch_adult(return_X_y=True)
     yield y.tolist(), "binary"
     non_NaN_rows = ~X.isna().any(axis=1)
     X = X[non_NaN_rows]
