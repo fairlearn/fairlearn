@@ -1,4 +1,5 @@
 .. _boston_housing_data:
+
 Revisiting the Boston Housing Dataset
 -------------------------------------
 
@@ -234,8 +235,8 @@ However, given the time period in which the paper
 was published there may have been a dearth of related measurement models.
 
 Intersectionality also requires consideration. 
-Intersectionality is defined as the interesection between multiple demographic
-groups.:footcite:`crenshaw1991intersectionality`
+Intersectionality is defined as the intersection between multiple demographic
+groups. :footcite:`crenshaw1991intersectionality`
 The impacts of a technical system on intersectional groups may be different 
 than the impacts experienced by the individual demographic groups (e.g., Black
 people in aggregate and women in aggregate may experience a technical system
