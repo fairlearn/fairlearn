@@ -407,7 +407,7 @@ lgb.plot_importance(
 #
 # A secondary harm that is somewhat unique to credit lending decisions is the
 # long-term impact on an individual's credit score. In the United States, a
-# FICO credit score :footcite:`investopedia2022credit`
+# `FICO credit score <https://www.investopedia.com/terms/c/credit_score.asp>`_
 # is a number between 300 and 850 that represents a customer's
 # *creditworthiness*. An applicant's *credit score* is used by many financial
 # institutions for lending decisions. An applicant's *credit score* usually
