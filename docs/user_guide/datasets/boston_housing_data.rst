@@ -34,9 +34,10 @@ Dataset Origin and Use
 :footcite:cts:`harrison1978hedonic`
 developed the dataset to illustrate the issues with using housing market data 
 to measure consumer willingness to pay for clean air. 
-The authors use a hedonic pricing [#1]_ approach, which assumes that the price
-of a good or service can be modeled as a function of features both internal
-and external to the good or service. 
+The authors use a
+`hedonic pricing <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_
+approach, which assumes that the price of a good or service can be modeled as
+a function of features both internal and external to the good or service. 
 The input to this model was a dataset comprising the Boston Standard
 Metropolitan Statistical Area :footcite:`uscensusbureaumetropolitan`, with the
 nitric oxides concentration (*NOX*) serving as a proxy for air quality.
@@ -423,6 +424,3 @@ References
 ----------
 
 .. footbibliography::
-
-.. [#1] Marshall Hargrave, `"Hedonic Pricing" <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_,
-   Investopedia, 2021.
