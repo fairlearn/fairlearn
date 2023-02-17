@@ -1,4 +1,5 @@
 .. _diabetes_hospital_data:
+
 Diabetes 130-Hospitals Dataset
 ------------------------------
 

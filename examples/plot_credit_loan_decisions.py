@@ -48,16 +48,15 @@ np.random.seed(rand_seed)
 # =====================================
 #
 # In 2019, Apple received backlash on social media after its newly launched
-# *Apple Card* product appeared to `offer higher credit limits to men compared
-# to women
-# <https://edition.cnn.com/2019/11/12/business/apple-card-gender-bias/index.html>`_.
+# *Apple Card* product appeared to offer higher credit limits to men compared
+# to women :footcite:`nedlund2019apple`.
 # In multiple cases, married couples found the husband received a credit limit
 # that was 10-20x higher than the wife's even when the couple had joint assets.
 #
 # From a regulatory perspective, financial institutions that operate within
 # the United States are subject to *legal regulations* prohibiting
 # discrimination on the `basis of race, gender, or other protected classes
-# <https://www.govinfo.gov/content/pkg/USCODE-2011-title15/html/USCODE-2011-title15-chap41-subchapIV.htm>`_.
+# :footcite:`uscode2011title15chapter41subchapteriv`.
 # With the increasing prevalence of automated decision-systems in the financial
 # lending space, experts have raised concerns about whether these systems could
 # exacerabate existing inequalities in financial lending.
@@ -66,8 +65,8 @@ np.random.seed(rand_seed)
 # same concept as anti-discrimination law. An AI system can comply with
 # anti-discrimination law while exhibiting fairness-related concerns. On the
 # other hand, some fairness interventions may be illegal under
-# anti-discrimination law. `Xiang and Raji (2019)
-# <https://arxiv.org/abs/1912.00761>`_ discuss the compatibilities and
+# anti-discrimination law.
+# :footcite:cts:`Xiang2019legalcompatibility` discuss the compatibilities and
 # disconnects between anti-discrimination law and algorithmic notions of
 # fairness. In this case study, we focus on fairness in financial services
 # rather than compliance with financial anti-discrimination regulations.
@@ -75,8 +74,8 @@ np.random.seed(rand_seed)
 # Ernst & Young (EY) case study
 # -----------------------------
 #
-# In this case study, we aim to replicate the work done in a `white paper
-# <https://www.microsoft.com/en-us/research/uploads/prod/2020/09/Fairlearn-EY_WhitePaper-2020-09-22.pdf>`_,
+# In this case study, we aim to replicate the work done in a white paper
+# :footcite:`dudik2020assessing`,
 # co-authored by *Microsoft* and *EY*, on mitigating gender-related performance
 # disparities in financial lending decisions. In their analysis, Microsoft and
 # EY demonstrated how Fairlearn could be used to measure and mitigate
@@ -163,8 +162,7 @@ dataset.shape
 dataset.head()
 
 # %%
-# From the `dataset description
-# <https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients>`_,
+# From the `dataset description :footcite:`yeh2009comparisons`,
 # we see there are three categorical features:
 #
 # - :code:`SEX`: Sex of the applicant (as a binary feature)
@@ -394,9 +392,8 @@ lgb.plot_importance(
 # =========================
 #
 # When discussing fairness in AI systems, the first step is understanding
-# what types of harms we anticipate the system may produce. Using the `harms
-# taxonomy in the Fairlearn User Guide
-# <https://fairlearn.org/v0.7.0/user_guide/fairness_in_machine_learning.html#types-of-harms>`_,
+# what types of harms we anticipate the system may produce. Using the
+# :ref:`harms taxonomy in the Fairlearn User Guide <types_of_harms>`,
 # we expect this system to produce *harms of allocation*. In addition, we also
 # anticipate the long-term impact on an individual's credit score if an
 # individual is unable to repay a loan they receive or if they are rejected for
@@ -447,16 +444,15 @@ lgb.plot_importance(
 # do otherwise. These outcomes are tied to **false positive error** rates in
 # which the model predicts an applicant will default on the loan, but the
 # individual would have successfully paid the loan back. In the United States,
-# the practice of `redlining
-# <https://news.trust.org/item/20200713110849-az14m/>`_, denying mortgage loans
+# the practice of redlining :footcite:`peyton2020redlining`, denying mortgage loans
 # and other financial services to predominantly Black or other minority
 # communites, has resulted in a vast racial wealth gap between white and Black
-# Americans. Although the practice of redlining was banned in 1968 with the
-# *Fair Housing Act*, the `long-term impact of these practices
-# <https://www.washingtonpost.com/news/wonk/wp/2018/03/28/redlining-was-banned-50-years-ago-its-still-hurting-minorities-today/>`_
-# is reflected in the lack of economic investment in Black communities, and
-# Black applicants are denied loans at a higher rate compared to white
 # Americans.
+# Although the practice of redlining was banned in 1968 with the
+# *Fair Housing Act*, the long-term impact of these practices
+# :footcite:`jan2018redlining` is reflected in the lack of economic investment
+# in Black communities, and Black applicants are denied loans at a higher rate
+# compared to white Americans.
 #
 # Define fairness metrics based on harms
 # --------------------------------------
@@ -652,12 +648,13 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # Postprocessing mitigations: ThresholdOptimizer
 # ==============================================
 # In the Fairlearn package, *postprocessing* mitigation is offered through
-# the :code:`ThresholdOptimizer` algorithm, following `Hardt, Price, and Srebro (2016)
-# <https://arxiv.org/abs/1610.02413>`_. The :code:`ThresholdOptimizer` takes in an
-# exisiting (possilbly pre-fit) machine learning model whose predictions acts as
-# a scoring function to identify separate thresholds for each *sensitive
-# feature* group. The :code:`ThresholdOptimizer` optimizes a specified objective
-# metric (in our case, :code:`balanced_accuracy`) subject to some fairness constraint
+# the :code:`ThresholdOptimizer` algorithm, following
+# :footcite:cts:`hardt2016equality`.
+# The :code:`ThresholdOptimizer` takes in an exisiting (possibly pre-fit)
+# machine learning model whose predictions acts as a scoring function to
+# identify separate thresholds for each *sensitive feature* group.
+# The :code:`ThresholdOptimizer` optimizes a specified objective metric
+# (in our case, :code:`balanced_accuracy`) subject to some fairness constraint
 # (`equalized_odds`), resulting in a thresholded version of the underlying
 # machine learning model.
 #
@@ -681,8 +678,8 @@ postprocess_est = ThresholdOptimizer(
 # :code:`sensitive_features` during prediction time, we cannot use the
 # :code:`ThresholdOptimizer`.
 #
-# We pass in :code:`A_train` to the :code:`fit` function with the :code:`sensitive_features`
-# parameter.
+# We pass in :code:`A_train` to the :code:`fit` function with the
+# :code:`sensitive_features` parameter.
 
 postprocess_est.fit(X=X_train, y=y_train, sensitive_features=A_train)
 
@@ -770,8 +767,8 @@ metricframe_postprocess.by_group[metrics_to_report].plot.bar(
 # One key limitation of the :code:`ThresholdOptimizer` is needing access to
 # our *sensitive_feature* during prediction time.
 #
-# In this section, we will use the *reductions* approach of `Agarwal et. al
-# (2018) <https://arxiv.org/pdf/1803.02453.pdf>`_ to produce models that satisfy
+# In this section, we will use the *reductions* approach of Agarwal et. al
+# (2018) :footcite:`agarwal2018reductions` to produce models that satisfy
 # the fairness constraint without needing access to the sensitive features at
 # deployment time.
 #
@@ -1224,13 +1221,12 @@ metricframe_postprocess.overall[metrics_to_report]
 # ----------------------------
 #
 # In this case study, we walked through the process of assessing a credit
-# decision model for gender-related performance disparities. Our analysis
-# follows closely the work done in the `Microsoft/EY white paper
-# <https://www.microsoft.com/en-us/research/uploads/prod/2020/09/Fairlearn-EY_WhitePaper-2020-09-22.pdf>`_
-# where they used the *Fairlearn* toolkit to perform an audit of a
-# fairness-unaware tree-based model. We applied a *postprocessing* and
-# *reductions* mitigation techniques to mitigate the *equalized odds difference*
-# in our model.
+# decision model for gender-related performance disparities.
+# Our analysis follows closely the work done in the Microsoft/EY white paper
+# :footcite:`dudik2020assessing` where they used the *Fairlearn* toolkit to
+# perform an audit of a fairness-unaware tree-based model.
+# We applied a *postprocessing* and *reductions* mitigation techniques to
+# mitigate the *equalized odds difference* in our model.
 #
 # Through the *reductions* process, we generated a model that reduces the
 # *equalized odds difference* of the original model without a drastic increase
@@ -1244,7 +1240,7 @@ metricframe_postprocess.overall[metrics_to_report]
 # ======================
 #
 # A key facet of Responsible Machine Learning is responsible documentation
-# practices. `Mitchell et al. (2019) <https://arxiv.org/abs/1810.03993>`_
+# practices. :footcite:ct:`mitchell2019model`
 # proposed the model card framework for documentating and reporting model
 # training details and deployment considerations.
 #
@@ -1263,6 +1259,11 @@ metricframe_postprocess.overall[metrics_to_report]
 # practitoners may run into the issue of not having access to the sensitive
 # demographic features. As a result, financial institutions are often tasked
 # with proving their models are compliant with fair lending laws by imputing
-# these demographics features. However, `Chen et. al (2018)
-# <https://arxiv.org/abs/1811.11154>`_ show these imputation methods often
-# introduce new fairness-related issues.
+# these demographics features. However, :footcite:ct:`chen2019fairness` show
+# these imputation methods often introduce new fairness-related issues.
+#
+# References
+# ----------
+#
+# .. footbibliography::
+#
