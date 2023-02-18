@@ -94,19 +94,3 @@ To add a citation:
    For example :code:`.. footbibliography::` will be rendered as shown below:
 
    .. footbibliography::
-
-Building the website for all versions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Our documentation build runs for each pull request and upon merging pull
-requests. There should not be a need to run this locally except for very rare
-cases.
-
-To fully build the website for all versions use the following script:
-
-.. code-block::
-
-    make doc
-
-The comprehensive set of commands to build the website is in our CircleCI
-configuration file in the `.circleci` directory of the repository.
