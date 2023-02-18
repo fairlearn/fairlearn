@@ -12,7 +12,7 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
    are up to date. Run `python scripts/generate_maintainers_table.py` from the
    repository root directory. If the generated file
    `docs/about/maintainers.rst` does not change you can proceed with the next
-   step. Otherwise, create PR to update the generated maintainers file on
+   step. Otherwise, create a PR to update the generated maintainers file on
    the `main` branch. Proceed only when the PR is merged.
 
 #. Check the `docs/user_guide/installation_and_version_guide` for a file
@@ -30,7 +30,8 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
         :code:`git push -u origin release/v<x.y>.X`
 
-#. On the release branch, create a PR to update the version in `__init__.py` to `x.y.z` (where `z=0` for the first release from a branch)
+#. On the release branch, create a PR to update the version in `__init__.py`
+   to `x.y.z` (where `z=0` for the first release from a branch)
 
 #. Merge that PR.
 
@@ -49,7 +50,9 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
 #. On `GitHub's release page <https://github.com/fairlearn/fairlearn/releases>`_
    there should be a new release named `v<x.y.z>`.
-   Open it and post the changes from CHANGES.md into the description, then hit "publish".
+   Open it and post the changes from the release file within
+   `docs/user_guide/installation_and_version_guide` into the description, then
+   hit "publish".
 
 #. On the `main` branch, create a PR to:
 
