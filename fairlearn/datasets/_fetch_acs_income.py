@@ -88,10 +88,10 @@ def fetch_acs_income(
             Description of the ACSIncome dataset.
 
     (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
-        if ``return_X_y`` is True and ``as_frame`` is False
+        if ``return_X_y`` is True
 
-    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is True
+    dataset : :obj:`~sklearn.utils.Bunch`
+        if ``return_X_y`` is False
 
     References
     ----------
