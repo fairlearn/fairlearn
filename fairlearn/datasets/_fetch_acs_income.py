@@ -96,7 +96,7 @@ def fetch_acs_income(
 
     Notes
     ----------
-    We follow the convention of `sklearn.datasets.fetch_openml` to document this function.
+    We follow the convention of :func:`sklearn.datasets.fetch_openml` to document this function.
 
     References
     ----------
