@@ -84,12 +84,17 @@ def fetch_diabetes_hospital(
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the Diabetes 130-Hospitals dataset.
+        categories : dict or None
+            Maps each categorical feature name to a list of values, such that the
+            value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+        frame : pandas DataFrame
+            Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
+        
+    (data, target) : tuple if ``return_X_y`` is True
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
-        If ``return_X_y`` is True and ``as_frame`` is False
-
-    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        If ``return_X_y`` is True and ``as_frame`` is True
+    Notes
+    ----------
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
