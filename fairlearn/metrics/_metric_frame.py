@@ -13,7 +13,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_result import DisaggregatedResult
+from ._disaggregated_result import DisaggregatedResult, _VALID_ERROR_STRING, _INVALID_ERRORS_VALUE_ERROR_MESSAGE
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -344,7 +344,19 @@ class MetricFrame:
         else:
             self._result_cache['overall'] = result.overall
 
-        # Now
+        # Now do by_group
+        if self._user_supplied_callable:
+            self._result_cache['by_group'] = result.by_group.iloc[:, 0]
+        else:
+            self._result_cache['by_group'] = result.by_group
+
+        # Next up, group_max
+        self._result_cache['group_max'] = dict()
+        for err_string in _VALID_ERROR_STRING:
+            try:
+                self._result_cache['group_max'][err_string] = self.__group("max", err_string)
+            except Exception as e:
+                self._result_cache['group_max'][err_string] = e
 
 
     @property
@@ -409,10 +421,7 @@ class MetricFrame:
             (likely to occur as more sensitive and control features
             are specified), then the corresponding entry will be NaN.
         """
-        if self._user_supplied_callable:
-            return self._result.by_group.iloc[:, 0]
-        else:
-            return self._result.by_group
+        return self._result_cache['by_group']
 
     @property
     def control_levels(self) -> Optional[List[str]]:
@@ -503,7 +512,14 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("max", errors)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+        
+        value = self._result_cache['group_max'][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
 
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
