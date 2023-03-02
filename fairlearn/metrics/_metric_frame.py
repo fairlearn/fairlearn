@@ -323,32 +323,33 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        # Create the 'overall' results
-        self._result = DisaggregatedResult.create(
+        # Create the basic results
+        result = DisaggregatedResult.create(
             data=all_data,
             annotated_functions=annotated_funcs,
             sensitive_feature_names=self._sf_names,
             control_feature_names=self._cf_names,
         )
 
+        # Build into cache
         self._result_cache=dict()
-        self._populate_results(self._result)
+        self._populate_results(result)
 
-    def _populate_results(self, result: DisaggregatedResult):
+    def _populate_results(self, raw_result: DisaggregatedResult):
         # Start with overall
         if self._user_supplied_callable:
             if self.control_levels:
-                self._result_cache['overall'] = result.overall.iloc[:, 0]
+                self._result_cache['overall'] = raw_result.overall.iloc[:, 0]
             else:
-                self._result_cache['overall'] = result.overall.iloc[0]
+                self._result_cache['overall'] = raw_result.overall.iloc[0]
         else:
-            self._result_cache['overall'] = result.overall
+            self._result_cache['overall'] = raw_result.overall
 
         # Now do by_group
         if self._user_supplied_callable:
-            self._result_cache['by_group'] = result.by_group.iloc[:, 0]
+            self._result_cache['by_group'] = raw_result.by_group.iloc[:, 0]
         else:
-            self._result_cache['by_group'] = result.by_group
+            self._result_cache['by_group'] = raw_result.by_group
 
         # Next up, group_min and group_max
         group_functions = { 'group_min':'min', 'group_max':'max'}
@@ -356,7 +357,7 @@ class MetricFrame:
             self._result_cache[k] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    self._result_cache[k][err_string] = self.__group(v, err_string)
+                    self._result_cache[k][err_string] = self.__group(raw_result, v, err_string)
                 except Exception as e:
                     self._result_cache[k][err_string] = e
 
@@ -367,7 +368,7 @@ class MetricFrame:
             self._result_cache['difference'][ao] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    tmp = self._result.difference(self.control_levels, method=ao, errors=err_string)
+                    tmp = raw_result.difference(self.control_levels, method=ao, errors=err_string)
 
                     if isinstance(tmp, pd.Series):
                         result = tmp.map(lambda x: x if x is not None else np.nan)
@@ -390,7 +391,7 @@ class MetricFrame:
             self._result_cache['ratio'][ao] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    tmp = self._result.ratio(self.control_levels, method=ao, errors=err_string)
+                    tmp = raw_result.ratio(self.control_levels, method=ao, errors=err_string)
 
                     if isinstance(tmp, pd.Series):
                         result = tmp.map(lambda x: x if x is not None else np.nan)
@@ -506,7 +507,7 @@ class MetricFrame:
         return self._sf_names
 
     def __group(
-        self, grouping_function: str, errors: str = "raise"
+        self, disagg_result: DisaggregatedResult, grouping_function: str, errors: str = "raise"
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -525,7 +526,7 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        result = self._result.apply_grouping(
+        result = disagg_result.apply_grouping(
             grouping_function, self.control_levels, errors=errors
         )
 
