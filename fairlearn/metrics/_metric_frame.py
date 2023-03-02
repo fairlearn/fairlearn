@@ -34,6 +34,8 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
     "Keys in 'sample_params' do not match those in 'metric'"
 )
 
+_COMPARE_METHODS = ['between_groups', 'to_overall']
+_INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
@@ -362,13 +364,12 @@ class MetricFrame:
                     self._result_cache[k][err_string] = e
 
         # Differences
-        aggregation_options = ['to_overall', 'between_groups']
         self._result_cache['difference'] = dict()
-        for ao in aggregation_options:
-            self._result_cache['difference'][ao] = dict()
+        for c_m in _COMPARE_METHODS:
+            self._result_cache['difference'][c_m] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    tmp = raw_result.difference(self.control_levels, method=ao, errors=err_string)
+                    tmp = raw_result.difference(self.control_levels, method=c_m, errors=err_string)
 
                     if isinstance(tmp, pd.Series):
                         result = tmp.map(lambda x: x if x is not None else np.nan)
@@ -377,21 +378,21 @@ class MetricFrame:
 
                     if self._user_supplied_callable:
                         if self.control_levels:
-                            self._result_cache['difference'][ao][err_string] = result.iloc[:, 0]
+                            self._result_cache['difference'][c_m][err_string] = result.iloc[:, 0]
                         else:
-                            self._result_cache['difference'][ao][err_string] = result.iloc[0]
+                            self._result_cache['difference'][c_m][err_string] = result.iloc[0]
                     else:
-                        self._result_cache['difference'][ao][err_string] = result
+                        self._result_cache['difference'][c_m][err_string] = result
                 except Exception as e:
-                    self._result_cache['difference'][ao][err_string] = e
+                    self._result_cache['difference'][c_m][err_string] = e
                 
         # Ratios
         self._result_cache['ratio'] = dict()
-        for ao in aggregation_options:
-            self._result_cache['ratio'][ao] = dict()
+        for c_m in _COMPARE_METHODS:
+            self._result_cache['ratio'][c_m] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    tmp = raw_result.ratio(self.control_levels, method=ao, errors=err_string)
+                    tmp = raw_result.ratio(self.control_levels, method=c_m, errors=err_string)
 
                     if isinstance(tmp, pd.Series):
                         result = tmp.map(lambda x: x if x is not None else np.nan)
@@ -400,13 +401,13 @@ class MetricFrame:
 
                     if self._user_supplied_callable:
                         if self.control_levels:
-                            self._result_cache['ratio'][ao][err_string] = result.iloc[:, 0]
+                            self._result_cache['ratio'][c_m][err_string] = result.iloc[:, 0]
                         else:
-                            self._result_cache['ratio'][ao][err_string] = result.iloc[0]
+                            self._result_cache['ratio'][c_m][err_string] = result.iloc[0]
                     else:
-                        self._result_cache['ratio'][ao][err_string] = result
+                        self._result_cache['ratio'][c_m][err_string] = result
                 except Exception as e:
-                    self._result_cache['ratio'][ao][err_string] = e
+                    self._result_cache['ratio'][c_m][err_string] = e
 
 
     @property
@@ -645,6 +646,9 @@ class MetricFrame:
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
         
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
         value = self._result_cache['difference'][method][errors]
         if isinstance(value, Exception):
             raise value
@@ -693,6 +697,9 @@ class MetricFrame:
         """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+        
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
         
         value = self._result_cache['ratio'][method][errors]
         if isinstance(value, Exception):
