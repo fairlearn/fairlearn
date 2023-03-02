@@ -350,13 +350,15 @@ class MetricFrame:
         else:
             self._result_cache['by_group'] = result.by_group
 
-        # Next up, group_max
-        self._result_cache['group_max'] = dict()
-        for err_string in _VALID_ERROR_STRING:
-            try:
-                self._result_cache['group_max'][err_string] = self.__group("max", err_string)
-            except Exception as e:
-                self._result_cache['group_max'][err_string] = e
+        # Next up, group_min and group_max
+        group_functions = { 'group_min':'min', 'group_max':'max'}
+        for k, v in group_functions.items():
+            self._result_cache[k] = dict()
+            for err_string in _VALID_ERROR_STRING:
+                try:
+                    self._result_cache[k][err_string] = self.__group(v, err_string)
+                except Exception as e:
+                    self._result_cache[k][err_string] = e
 
 
     @property
@@ -545,7 +547,14 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("min", errors)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+        
+        value = self._result_cache['group_min'][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
 
     def difference(
         self, method: str = "between_groups", errors: str = "coerce"
