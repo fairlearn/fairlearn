@@ -368,6 +368,7 @@ class MetricFrame:
                         raw_result, v, err_string
                     )
                 except Exception as e:  # noqa: B902
+                    # Store any exception for later
                     self._result_cache[k][err_string] = e
 
         # Differences
@@ -397,6 +398,7 @@ class MetricFrame:
                     else:
                         self._result_cache["difference"][c_m][err_string] = result
                 except Exception as e:  # noqa: B902
+                    # Store any exception for later
                     self._result_cache["difference"][c_m][err_string] = e
 
         # Ratios
@@ -426,6 +428,7 @@ class MetricFrame:
                     else:
                         self._result_cache["ratio"][c_m][err_string] = result
                 except Exception as e:  # noqa: B902
+                    # Store any exception for later
                     self._result_cache["ratio"][c_m][err_string] = e
 
     @property
