@@ -331,6 +331,22 @@ class MetricFrame:
             control_feature_names=self._cf_names,
         )
 
+        self._result_cache=dict()
+        self._populate_results(self._result)
+
+    def _populate_results(self, result: DisaggregatedResult):
+        # Start with overall
+        if self._user_supplied_callable:
+            if self.control_levels:
+                self._result_cache['overall'] = result.overall.iloc[:, 0]
+            else:
+                self._result_cache['overall'] = result.overall.iloc[0]
+        else:
+            self._result_cache['overall'] = result.overall
+
+        # Now
+
+
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
@@ -364,13 +380,7 @@ class MetricFrame:
             interface when calling programatically, while also reducing
             typing for those using Fairlearn interactively.
         """
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return self._result.overall.iloc[:, 0]
-            else:
-                return self._result.overall.iloc[0]
-        else:
-            return self._result.overall
+        return self._result_cache['overall']
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
