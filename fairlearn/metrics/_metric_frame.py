@@ -360,6 +360,31 @@ class MetricFrame:
                 except Exception as e:
                     self._result_cache[k][err_string] = e
 
+        # Differences
+        aggregation_options = ['to_overall', 'between_groups']
+        self._result_cache['difference'] = dict()
+        for ao in aggregation_options:
+            self._result_cache['difference'][ao] = dict()
+            for err_string in _VALID_ERROR_STRING:
+                try:
+                    tmp = self._result.difference(self.control_levels, method=ao, errors=err_string)
+
+                    if isinstance(tmp, pd.Series):
+                        result = tmp.map(lambda x: x if x is not None else np.nan)
+                    else:
+                        result = tmp.applymap(lambda x: x if x is not None else np.nan)
+
+                    if self._user_supplied_callable:
+                        if self.control_levels:
+                            self._result_cache['difference'][ao][err_string] = result.iloc[:, 0]
+                        else:
+                            self._result_cache['difference'][ao][err_string] = result.iloc[0]
+                    else:
+                        self._result_cache['difference'][ao][err_string] = result
+                except Exception as e:
+                    self._result_cache['difference'][ao][err_string] = e
+                
+
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -593,20 +618,16 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        tmp = self._result.difference(self.control_levels, method=method, errors=errors)
 
-        if isinstance(tmp, pd.Series):
-            result = tmp.map(lambda x: x if x is not None else np.nan)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+        
+        value = self._result_cache['difference'][method][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            result = tmp.applymap(lambda x: x if x is not None else np.nan)
+            return value
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
-        else:
-            return result
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
