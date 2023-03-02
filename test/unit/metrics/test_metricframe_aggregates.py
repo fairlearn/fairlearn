@@ -143,7 +143,7 @@ class Test1m1sf0cf:
             self.target.difference(method="some_string")
         assert "Unrecognised comparison method: some_string" == exc.value.args[0]
 
-    def test_difference_bad_method(self):
+    def test_ratio_bad_method(self):
         self._prepare(skm.accuracy_score)
 
         with pytest.raises(ValueError) as exc:
