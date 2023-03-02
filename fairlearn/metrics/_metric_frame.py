@@ -13,7 +13,11 @@ from sklearn.utils import check_consistent_length
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_result import DisaggregatedResult, _VALID_ERROR_STRING, _INVALID_ERRORS_VALUE_ERROR_MESSAGE
+from ._disaggregated_result import (
+    DisaggregatedResult,
+    _VALID_ERROR_STRING,
+    _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
+)
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -34,8 +38,9 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
     "Keys in 'sample_params' do not match those in 'metric'"
 )
 
-_COMPARE_METHODS = ['between_groups', 'to_overall']
+_COMPARE_METHODS = ["between_groups", "to_overall"]
 _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
+
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
@@ -334,42 +339,46 @@ class MetricFrame:
         )
 
         # Build into cache
-        self._result_cache=dict()
+        self._result_cache = dict()
         self._populate_results(result)
 
     def _populate_results(self, raw_result: DisaggregatedResult):
         # Start with overall
         if self._user_supplied_callable:
             if self.control_levels:
-                self._result_cache['overall'] = raw_result.overall.iloc[:, 0]
+                self._result_cache["overall"] = raw_result.overall.iloc[:, 0]
             else:
-                self._result_cache['overall'] = raw_result.overall.iloc[0]
+                self._result_cache["overall"] = raw_result.overall.iloc[0]
         else:
-            self._result_cache['overall'] = raw_result.overall
+            self._result_cache["overall"] = raw_result.overall
 
         # Now do by_group
         if self._user_supplied_callable:
-            self._result_cache['by_group'] = raw_result.by_group.iloc[:, 0]
+            self._result_cache["by_group"] = raw_result.by_group.iloc[:, 0]
         else:
-            self._result_cache['by_group'] = raw_result.by_group
+            self._result_cache["by_group"] = raw_result.by_group
 
         # Next up, group_min and group_max
-        group_functions = { 'group_min':'min', 'group_max':'max'}
+        group_functions = {"group_min": "min", "group_max": "max"}
         for k, v in group_functions.items():
             self._result_cache[k] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    self._result_cache[k][err_string] = self.__group(raw_result, v, err_string)
+                    self._result_cache[k][err_string] = self.__group(
+                        raw_result, v, err_string
+                    )
                 except Exception as e:
                     self._result_cache[k][err_string] = e
 
         # Differences
-        self._result_cache['difference'] = dict()
+        self._result_cache["difference"] = dict()
         for c_m in _COMPARE_METHODS:
-            self._result_cache['difference'][c_m] = dict()
+            self._result_cache["difference"][c_m] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    tmp = raw_result.difference(self.control_levels, method=c_m, errors=err_string)
+                    tmp = raw_result.difference(
+                        self.control_levels, method=c_m, errors=err_string
+                    )
 
                     if isinstance(tmp, pd.Series):
                         result = tmp.map(lambda x: x if x is not None else np.nan)
@@ -378,21 +387,27 @@ class MetricFrame:
 
                     if self._user_supplied_callable:
                         if self.control_levels:
-                            self._result_cache['difference'][c_m][err_string] = result.iloc[:, 0]
+                            self._result_cache["difference"][c_m][
+                                err_string
+                            ] = result.iloc[:, 0]
                         else:
-                            self._result_cache['difference'][c_m][err_string] = result.iloc[0]
+                            self._result_cache["difference"][c_m][
+                                err_string
+                            ] = result.iloc[0]
                     else:
-                        self._result_cache['difference'][c_m][err_string] = result
+                        self._result_cache["difference"][c_m][err_string] = result
                 except Exception as e:
-                    self._result_cache['difference'][c_m][err_string] = e
-                
+                    self._result_cache["difference"][c_m][err_string] = e
+
         # Ratios
-        self._result_cache['ratio'] = dict()
+        self._result_cache["ratio"] = dict()
         for c_m in _COMPARE_METHODS:
-            self._result_cache['ratio'][c_m] = dict()
+            self._result_cache["ratio"][c_m] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    tmp = raw_result.ratio(self.control_levels, method=c_m, errors=err_string)
+                    tmp = raw_result.ratio(
+                        self.control_levels, method=c_m, errors=err_string
+                    )
 
                     if isinstance(tmp, pd.Series):
                         result = tmp.map(lambda x: x if x is not None else np.nan)
@@ -401,14 +416,17 @@ class MetricFrame:
 
                     if self._user_supplied_callable:
                         if self.control_levels:
-                            self._result_cache['ratio'][c_m][err_string] = result.iloc[:, 0]
+                            self._result_cache["ratio"][c_m][err_string] = result.iloc[
+                                :, 0
+                            ]
                         else:
-                            self._result_cache['ratio'][c_m][err_string] = result.iloc[0]
+                            self._result_cache["ratio"][c_m][err_string] = result.iloc[
+                                0
+                            ]
                     else:
-                        self._result_cache['ratio'][c_m][err_string] = result
+                        self._result_cache["ratio"][c_m][err_string] = result
                 except Exception as e:
-                    self._result_cache['ratio'][c_m][err_string] = e
-
+                    self._result_cache["ratio"][c_m][err_string] = e
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -443,7 +461,7 @@ class MetricFrame:
             interface when calling programatically, while also reducing
             typing for those using Fairlearn interactively.
         """
-        return self._result_cache['overall']
+        return self._result_cache["overall"]
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
@@ -472,7 +490,7 @@ class MetricFrame:
             (likely to occur as more sensitive and control features
             are specified), then the corresponding entry will be NaN.
         """
-        return self._result_cache['by_group']
+        return self._result_cache["by_group"]
 
     @property
     def control_levels(self) -> Optional[List[str]]:
@@ -508,7 +526,10 @@ class MetricFrame:
         return self._sf_names
 
     def __group(
-        self, disagg_result: DisaggregatedResult, grouping_function: str, errors: str = "raise"
+        self,
+        disagg_result: DisaggregatedResult,
+        grouping_function: str,
+        errors: str = "raise",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -565,8 +586,8 @@ class MetricFrame:
         """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
-        
-        value = self._result_cache['group_max'][errors]
+
+        value = self._result_cache["group_max"][errors]
         if isinstance(value, Exception):
             raise value
         else:
@@ -598,8 +619,8 @@ class MetricFrame:
         """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
-        
-        value = self._result_cache['group_min'][errors]
+
+        value = self._result_cache["group_min"][errors]
         if isinstance(value, Exception):
             raise value
         else:
@@ -645,16 +666,15 @@ class MetricFrame:
 
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
-        
+
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache['difference'][method][errors]
+        value = self._result_cache["difference"][method][errors]
         if isinstance(value, Exception):
             raise value
         else:
             return value
-
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -697,11 +717,11 @@ class MetricFrame:
         """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
-        
+
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
-        
-        value = self._result_cache['ratio'][method][errors]
+
+        value = self._result_cache["ratio"][method][errors]
         if isinstance(value, Exception):
             raise value
         else:
