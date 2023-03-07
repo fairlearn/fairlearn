@@ -117,7 +117,7 @@ def fetch_boston(
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`. 
     This dataset consists of 506 samples and 13 features. It is notorious for the fairness
     issues related to the `B` column. There's more information in the references.
