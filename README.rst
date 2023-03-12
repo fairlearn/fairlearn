@@ -103,7 +103,7 @@ guide <https://fairlearn.org/main/quickstart.html>`__.
 Usage
 -----
 
-For common usage refer to the `Jupyter notebooks <./notebooks>`__ and
+For common usage refer to the `Jupyter notebooks <https://fairlearn.org/main/auto_examples/index.html>`__ and
 our `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
 Please note that our APIs are subject to change, so notebooks downloaded
 from ``main`` may not be compatible with Fairlearn installed with
