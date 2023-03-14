@@ -5,3 +5,4 @@ codecov:
   notify:
     after_n_builds: 12
     wait_for_ci: true
+  token: 363a2bcc-6585-4bdf-ac2d-3d9cb1bfdecf
