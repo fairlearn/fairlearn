@@ -92,7 +92,7 @@ Fairlearn algorithms
 ~~~~~~~~~~~~~~~~~~~~
 
 For an overview of our algorithms please refer to our
-`website <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+`website <https://fairlearn.org/main/user_guide/mitigation/index.html>`__.
 
 Install Fairlearn
 -----------------
