@@ -6,10 +6,10 @@ import warnings
 
 from sklearn.datasets import fetch_openml
 
+import fairlearn.utils._compatibility as compat
 from fairlearn.exceptions import DataFairnessWarning
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
-import fairlearn.utils._compatibility as compat
 
 
 def fetch_boston(
@@ -113,12 +113,12 @@ def fetch_boston(
             value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
         frame : pandas DataFrame
             Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
-        
+
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
     -----
-    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`. 
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
     This dataset consists of 506 samples and 13 features. It is notorious for the fairness
     issues related to the `B` column. There's more information in the references.
 

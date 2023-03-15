@@ -4,8 +4,10 @@
 from pathlib import Path
 
 from sklearn.datasets import fetch_openml
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
+
 import fairlearn.utils._compatibility as compat
+
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
@@ -70,7 +72,7 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
             value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
         frame : pandas DataFrame
             Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
-        
+
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
