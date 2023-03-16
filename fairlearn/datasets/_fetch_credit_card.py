@@ -4,8 +4,10 @@
 from pathlib import Path
 
 from sklearn.datasets import fetch_openml
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
+
 import fairlearn.utils._compatibility as compat
+
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
@@ -65,6 +67,17 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the UCI Default of Credit Card
+        categories : dict or None
+            Maps each categorical feature name to a list of values, such that the
+            value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+        frame : pandas DataFrame
+            Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
+
+    (data, target) : tuple if ``return_X_y`` is True
+
+    Notes
+    ----------
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     """
     if not data_home:
