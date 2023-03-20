@@ -3,6 +3,11 @@
 
 """Metrics for measuring fairness."""
 
+import numpy as np
+from sklearn.metrics import roc_curve
+import math
+from scipy.stats import t
+
 from ._base_metrics import false_positive_rate, selection_rate, true_positive_rate
 from ._metric_frame import MetricFrame
 
@@ -197,3 +202,149 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
         sample_params=sp,
     )
     return eo
+
+def significance_level(
+    y_true_1, y_pred_1, y_true_2, y_pred_2
+) -> float:
+    """Calculate the significance level of the difference between two metrics.
+
+    The significance level is the probability of obtaining a difference between
+    the two metrics that is as large as or larger than the observed difference
+    between the metrics, assuming that the two metrics are equal.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    Parameters
+    ----------
+    y_true_1 : array-like
+        Ground truth (correct) labels for the first set of predictions.
+
+    y_pred_1 : array-like
+        Predicted labels :math:`h(X)` returned by the classifier for the first set of predictions.
+
+    y_true_2 : array-like
+        Ground truth (correct) labels for the second set of predictions.
+
+    y_pred_2 : array-like
+        Predicted labels :math:`h(X)` returned by the classifier for the second set of predictions.
+
+    Returns
+    -------
+    float
+        The significance level of the difference between the two metrics
+    """
+    control_case_1 = _get_control_case(y_true_1, y_pred_1)
+    control_case_2 = _get_control_case(y_true_2, y_pred_2)
+
+    nR = len(control_case_1['controls'])
+    mR = len(control_case_1['cases'])
+
+    nS = len(control_case_2['controls'])
+    mS = len(control_case_2['cases'])
+
+    VR = _delong_placements(control_case_1)
+    VS = _delong_placements(control_case_2)
+
+    SRX = sum((x - VR['theta']) ** 2 for x in VR['X']) / (mR - 1)
+    SSX = sum((x - VS['theta']) ** 2 for x in VS['X']) / (mS - 1)
+
+    SRY = sum((VR["Y"] - VR["theta"]) ** 2) / (nR-1)
+    SSY = sum((VS["Y"] - VS["theta"]) ** 2) / (nS-1)
+
+    SR = SRX/mR + SRY/nR
+    SS = SSX/mS + SSY/nS
+
+    ntotR = nR + mR
+    ntotS = nS + mS
+    SSR = math.sqrt((SR) + (SS))
+    
+    t_ = (VR["theta"] - VS["theta"]) / SSR
+    df = ((SR) + (SS))**2 / (((SR)**2 / (ntotR-1)) + ((SS)**2 / (ntotS -1 )))
+    p_value = 2 * t.sf(abs(t_), df)
+    
+    return p_value
+
+def _get_control_case(y_true, y_pred):
+    controls = []
+    cases = []
+    for i in range(len(y_true)):
+        if y_true[i] == 0:
+            controls.append(y_pred[i])
+        else:
+            cases.append(y_pred[i])
+    control_case = {'controls': controls, 'cases': cases}
+
+    fpr, tpr, _ = roc_curve(y_true[:], y_pred[:])
+    if np.median(fpr) > np.median(tpr):
+        control_case['direction'] = ">"
+    else:
+        control_case['direction'] = "<"
+
+    return control_case
+
+def _delong_placements(control_case):
+    cases = control_case["cases"]
+    controls = control_case["controls"]
+    direction = control_case["direction"]
+    
+    m = len(cases)
+    n = len(controls)
+    L = m + n
+
+    if direction == ">":
+        cases = [-x for x in cases]
+        controls = [-x for x in controls]
+        
+    Z = []
+    labels = []
+
+    for i in range(m):
+        Z.append((i, cases[i]))
+        labels.append(True)
+        
+    for j in range(n):
+        Z.append((m+j, controls[j]))
+        labels.append(False)
+
+    Z = sorted(Z, key = lambda x: x[1])
+
+    XY = np.zeros(L)
+    X_inds, Y_inds = [], []
+    
+    m,n,i = 0,0,0
+    
+    while i < L:
+        X_inds.clear()
+        Y_inds.clear()
+        mdupl, ndupl = 0, 0
+        while True:
+            j = Z[i][0]
+            if labels[j]:
+                mdupl += 1
+                X_inds.append(j)
+            else:
+                ndupl += 1
+                Y_inds.append(j)
+            if i == L - 1:
+                break
+            if Z[i][1] != Z[i+1][1]:
+                break
+            i += 1
+        for k in range(mdupl):
+            XY[X_inds[k]] = n + ndupl/2.0
+        for k in range(ndupl):
+            XY[Y_inds[k]] = m + mdupl/2.0
+        n += ndupl
+        m += mdupl
+        i += 1
+    sum_ = 0.0
+    X, Y = [], []
+    for i in range(L):
+        if labels[i]:
+            sum_ += XY[i]
+            X.append(XY[i]/n)
+        else:
+            Y.append(1 - XY[i]/m)
+    
+    theta = sum_ / m / n
+    return {'X': X, 'Y': Y, 'theta': theta}
