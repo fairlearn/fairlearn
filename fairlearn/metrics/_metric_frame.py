@@ -358,6 +358,16 @@ class MetricFrame:
         else:
             return underlying_result
 
+    def _none_to_nan(
+        self, target: Union[pd.Series, pd.DataFrame]
+    ) -> Union[pd.Series, pd.DataFrame]:
+        """Convert Nones to NaNs."""
+        if isinstance(target, pd.Series):
+            result = target.map(lambda x: x if x is not None else np.nan)
+        else:
+            result = target.applymap(lambda x: x if x is not None else np.nan)
+        return result
+
     def _populate_results(self, raw_result: DisaggregatedResult):
         """
         Populate the :code:`_result_cache`.
@@ -394,49 +404,30 @@ class MetricFrame:
                     # Store any exception for later
                     self._result_cache[k][err_string] = e
 
-        # Differences
-        self._result_cache["difference"] = dict()
-        for c_m in _COMPARE_METHODS:
-            self._result_cache["difference"][c_m] = dict()
-            for err_string in _VALID_ERROR_STRING:
-                try:
-                    tmp = raw_result.difference(
-                        self.control_levels, method=c_m, errors=err_string
-                    )
+        # Differences and ratios
+        for c_t in ["difference", "ratio"]:
+            self._result_cache[c_t] = dict()
+            for c_m in _COMPARE_METHODS:
+                self._result_cache[c_t][c_m] = dict()
+                for err_string in _VALID_ERROR_STRING:
+                    try:
+                        if c_t == "difference":
+                            tmp = raw_result.difference(
+                                self.control_levels, method=c_m, errors=err_string
+                            )
+                        else:
+                            tmp = raw_result.ratio(
+                                self.control_levels, method=c_m, errors=err_string
+                            )
 
-                    if isinstance(tmp, pd.Series):
-                        result = tmp.map(lambda x: x if x is not None else np.nan)
-                    else:
-                        result = tmp.applymap(lambda x: x if x is not None else np.nan)
+                        result = self._none_to_nan(tmp)
 
-                    self._result_cache["difference"][c_m][
-                        err_string
-                    ] = self._extract_result(result, no_control_levels=False)
-                except Exception as e:  # noqa: B902
-                    # Store any exception for later
-                    self._result_cache["difference"][c_m][err_string] = e
-
-        # Ratios
-        self._result_cache["ratio"] = dict()
-        for c_m in _COMPARE_METHODS:
-            self._result_cache["ratio"][c_m] = dict()
-            for err_string in _VALID_ERROR_STRING:
-                try:
-                    tmp = raw_result.ratio(
-                        self.control_levels, method=c_m, errors=err_string
-                    )
-
-                    if isinstance(tmp, pd.Series):
-                        result = tmp.map(lambda x: x if x is not None else np.nan)
-                    else:
-                        result = tmp.applymap(lambda x: x if x is not None else np.nan)
-
-                    self._result_cache["ratio"][c_m][err_string] = self._extract_result(
-                        result, no_control_levels=False
-                    )
-                except Exception as e:  # noqa: B902
-                    # Store any exception for later
-                    self._result_cache["ratio"][c_m][err_string] = e
+                        self._result_cache[c_t][c_m][err_string] = self._extract_result(
+                            result, no_control_levels=False
+                        )
+                    except Exception as e:  # noqa: B902
+                        # Store any exception for later
+                        self._result_cache[c_t][c_m][err_string] = e
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
