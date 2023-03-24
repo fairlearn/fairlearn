@@ -342,6 +342,22 @@ class MetricFrame:
         self._result_cache = dict()
         self._populate_results(result)
 
+    def _extract_result(self, underlying_result, no_control_levels: bool):
+        """
+        Change result types for those who dislike consistency.
+
+        The `no_control_levels` parameter determines whether the presence
+        of control levels will affect the result. This is the case for
+        overall, but not the other cases.
+        """
+        if self._user_supplied_callable:
+            if self.control_levels or no_control_levels:
+                return underlying_result.iloc[:, 0]
+            else:
+                return underlying_result.iloc[0]
+        else:
+            return underlying_result
+
     def _populate_results(self, raw_result: DisaggregatedResult):
         """
         Populate the :code:`_result_cache`.
@@ -355,21 +371,15 @@ class MetricFrame:
         Note that if exceptions are thrown, we cache those, and they are thrown
         if the user calls the corresponding method (and arguments).
         """
-
         # Start with overall
-        if self._user_supplied_callable:
-            if self.control_levels:
-                self._result_cache["overall"] = raw_result.overall.iloc[:, 0]
-            else:
-                self._result_cache["overall"] = raw_result.overall.iloc[0]
-        else:
-            self._result_cache["overall"] = raw_result.overall
+        self._result_cache["overall"] = self._extract_result(
+            raw_result.overall, no_control_levels=False
+        )
 
         # Now do by_group
-        if self._user_supplied_callable:
-            self._result_cache["by_group"] = raw_result.by_group.iloc[:, 0]
-        else:
-            self._result_cache["by_group"] = raw_result.by_group
+        self._result_cache["by_group"] = self._extract_result(
+            raw_result.by_group, no_control_levels=True
+        )
 
         # Next up, group_min and group_max
         group_functions = {"group_min": "min", "group_max": "max"}
@@ -399,17 +409,9 @@ class MetricFrame:
                     else:
                         result = tmp.applymap(lambda x: x if x is not None else np.nan)
 
-                    if self._user_supplied_callable:
-                        if self.control_levels:
-                            self._result_cache["difference"][c_m][
-                                err_string
-                            ] = result.iloc[:, 0]
-                        else:
-                            self._result_cache["difference"][c_m][
-                                err_string
-                            ] = result.iloc[0]
-                    else:
-                        self._result_cache["difference"][c_m][err_string] = result
+                    self._result_cache["difference"][c_m][
+                        err_string
+                    ] = self._extract_result(result, no_control_levels=False)
                 except Exception as e:  # noqa: B902
                     # Store any exception for later
                     self._result_cache["difference"][c_m][err_string] = e
@@ -429,17 +431,9 @@ class MetricFrame:
                     else:
                         result = tmp.applymap(lambda x: x if x is not None else np.nan)
 
-                    if self._user_supplied_callable:
-                        if self.control_levels:
-                            self._result_cache["ratio"][c_m][err_string] = result.iloc[
-                                :, 0
-                            ]
-                        else:
-                            self._result_cache["ratio"][c_m][err_string] = result.iloc[
-                                0
-                            ]
-                    else:
-                        self._result_cache["ratio"][c_m][err_string] = result
+                    self._result_cache["ratio"][c_m][err_string] = self._extract_result(
+                        result, no_control_levels=False
+                    )
                 except Exception as e:  # noqa: B902
                     # Store any exception for later
                     self._result_cache["ratio"][c_m][err_string] = e
@@ -553,6 +547,7 @@ class MetricFrame:
 
         Parameters
         ----------
+        disagg_result: The DisaggregatedResult containing all the metrics
         grouping_function: {'min', 'max'}
         errors: {'raise', 'coerce'}, default 'raise'
         if 'raise', then invalid parsing will raise an exception
@@ -568,13 +563,7 @@ class MetricFrame:
             grouping_function, self.control_levels, errors=errors
         )
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
-        else:
-            return result
+        return self._extract_result(result, no_control_levels=False)
 
     def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
