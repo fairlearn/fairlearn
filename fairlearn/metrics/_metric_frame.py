@@ -343,6 +343,19 @@ class MetricFrame:
         self._populate_results(result)
 
     def _populate_results(self, raw_result: DisaggregatedResult):
+        """
+        Populate the :code:`_result_cache`.
+
+        We cache all possible results from :class:`~MetricFrame` internally
+        (i.e. all possible calls to :meth:`~MetricFrame.difference()` etc.)
+        and this method is responsible for performing those computations.
+        The :code:`_result_cache` is a nested dictionary, with keys given by
+        the method names and arguments being cached.
+
+        Note that if exceptions are thrown, we cache those, and they are thrown
+        if the user calls the corresponding method (and arguments).
+        """
+
         # Start with overall
         if self._user_supplied_callable:
             if self.control_levels:
