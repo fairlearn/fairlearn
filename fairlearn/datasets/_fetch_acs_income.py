@@ -7,8 +7,9 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_openml
 
-from ._constants import _DOWNLOAD_DIRECTORY_NAME
 import fairlearn.utils._compatibility as compat
+
+from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_acs_income(
@@ -86,12 +87,17 @@ def fetch_acs_income(
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the ACSIncome dataset.
+        categories : dict or None
+            Maps each categorical feature name to a list of values, such that the
+            value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+        frame : pandas DataFrame
+            Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
-        if ``return_X_y`` is True and ``as_frame`` is False
+    (data, target) : tuple if ``return_X_y`` is True
 
-    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is True
+    Notes
+    ----------
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
