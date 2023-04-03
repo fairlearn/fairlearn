@@ -93,6 +93,7 @@ than $50,000 a year.
     >>> y_true = (data.target == '>50K') * 1
     >>> sex = data.data['sex']
     >>> sex.value_counts()
+    sex
     Male      32650
     Female    16192
     Name: count, dtype: int64
