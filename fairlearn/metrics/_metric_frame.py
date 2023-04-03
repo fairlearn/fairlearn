@@ -397,7 +397,7 @@ class MetricFrame:
             self._result_cache[k] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    self._result_cache[k][err_string] = self.__group(
+                    self._result_cache[k][err_string] = self._group(
                         raw_result, v, err_string
                     )
                 except Exception as e:  # noqa: B902
@@ -526,7 +526,7 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def __group(
+    def _group(
         self,
         disagg_result: DisaggregatedResult,
         grouping_function: str,
