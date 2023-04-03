@@ -51,6 +51,22 @@ class TestErrorMessages:
             _ = target.difference(control_feature_names=None, method="bad_func")
         assert str(e0.value) == "Unrecognised method 'bad_func' in difference() call"
 
+    def test_bad_difference_errors(self):
+        target = DisaggregatedResult.create(
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
+        with pytest.raises(ValueError) as e0:
+            _ = target.difference(
+                control_feature_names=None, method="between_groups", errors="bad_option"
+            )
+        assert (
+            str(e0.value)
+            == "Invalid error value specified. Valid values are ['raise', 'coerce']"
+        )
+
     def test_bad_ratio_method(self):
         target = DisaggregatedResult.create(
             data=basic_data,
@@ -61,3 +77,19 @@ class TestErrorMessages:
         with pytest.raises(ValueError) as e0:
             _ = target.ratio(control_feature_names=None, method="bad_func")
         assert str(e0.value) == "Unrecognised method 'bad_func' in ratio() call"
+
+    def test_bad_ratio_errors(self):
+        target = DisaggregatedResult.create(
+            data=basic_data,
+            annotated_functions=metric_dict,
+            sensitive_feature_names=["g_1"],
+            control_feature_names=None,
+        )
+        with pytest.raises(ValueError) as e0:
+            _ = target.ratio(
+                control_feature_names=None, method="between_groups", errors="bad_option"
+            )
+        assert (
+            str(e0.value)
+            == "Invalid error value specified. Valid values are ['raise', 'coerce']"
+        )
