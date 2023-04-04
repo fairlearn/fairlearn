@@ -93,9 +93,10 @@ than $50,000 a year.
     >>> y_true = (data.target == '>50K') * 1
     >>> sex = data.data['sex']
     >>> sex.value_counts()
+    sex
     Male      32650
     Female    16192
-    Name: sex, dtype: int64
+    Name: count, dtype: int64
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
     :target: auto_examples/plot_quickstart_selection_rate.html
