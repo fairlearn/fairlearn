@@ -34,7 +34,10 @@ from ._base_metrics import true_negative_rate  # noqa: F401
 from ._base_metrics import true_positive_rate  # noqa: F401; noqa: F401
 from ._fairness_metrics import demographic_parity_difference  # noqa: F401
 from ._fairness_metrics import demographic_parity_ratio  # noqa: F401
-from ._fairness_metrics import equalized_odds_difference, equalized_odds_ratio  # noqa: F401
+from ._fairness_metrics import (
+    equalized_odds_difference,
+    equalized_odds_ratio,
+)  # noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
@@ -49,11 +52,7 @@ for _name, _func in _generated_metric_dict.items():
 # ============================================
 # Build list of items to be listed in the docs
 
-_core = [
-    "MetricFrame",
-    "make_derived_metric",
-    "plot_model_comparison"
-]
+_core = ["MetricFrame", "make_derived_metric", "plot_model_comparison"]
 
 _fairness = [
     "demographic_parity_difference",

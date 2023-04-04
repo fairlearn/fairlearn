@@ -32,7 +32,6 @@ class _DerivedMetric:
         transform: str,
         sample_param_names: List[str],
     ):
-
         if not callable(metric):
             raise ValueError(_METRIC_CALLABLE_ERROR)
         sig = inspect.signature(metric)
