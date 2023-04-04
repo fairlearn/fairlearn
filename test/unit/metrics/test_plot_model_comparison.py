@@ -201,7 +201,6 @@ def random_metric2(yp, yt):
 
 
 def test_named():
-
     ax = plot_model_comparison(
         x_axis_metric=random_metric1,
         y_axis_metric=random_metric2,
