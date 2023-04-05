@@ -5,6 +5,7 @@ preview = true
 extend-exclude = '''
 (
     ^/docs/
+    | ^/examples/
 )
 '''
 
