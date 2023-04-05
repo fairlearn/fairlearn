@@ -481,9 +481,9 @@ def test_check_type_faulty_data():
         [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
     )
     notCat[0, 1] = 0.5
-    notCat[
-        0, 2:
-    ] = 0.0  # Special case because now first row sums to one but is not one-hot
+    notCat[0, 2:] = (
+        0.0  # Special case because now first row sums to one but is not one-hot
+    )
     check_type_helper(
         notCat,
         Keyword_CONTINUOUS,
