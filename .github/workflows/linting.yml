@@ -11,7 +11,7 @@ on:
         type: string
 
 jobs:
-  linting:
+  linting-flake8:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v3
@@ -20,3 +20,8 @@ jobs:
           python-version: ${{ inputs.python }}
       - run: pip install -r requirements-dev.txt
       - run: flake8 .
+  linting-black:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
