@@ -16,7 +16,6 @@ from fairlearn.reductions import BoundedGroupLoss, GridSearch, SquareLoss, ZeroO
 def _simple_regression_data(
     number_a0, number_a1, a0_factor, a1_factor, a0_label, a1_label, A_two_dim=False
 ):
-
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
 

@@ -22,7 +22,6 @@ def _simple_threshold_data(
     a1_label,
     A_two_dim=False,
 ):
-
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
 

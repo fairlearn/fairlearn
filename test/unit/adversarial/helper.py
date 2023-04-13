@@ -95,12 +95,11 @@ class fake_torch:
                 self.a = a
                 self.b = b
 
-        ReLU = lambda: type("ReLU", (), {"__call__": lambda x: np.max(x, 0)})  # noqa: E731
+        def ReLU():
+            return type("ReLU", (), {"__call__": lambda x: np.max(x, 0)})  # noqa: E731
 
         def LeakyReLU():
-            return type(
-                "LeakyReLU", (), {"__call__": lambda x: np.max(x, 0.1 * x)}
-            )
+            return type("LeakyReLU", (), {"__call__": lambda x: np.max(x, 0.1 * x)})
 
         Sigmoid = lambda: type("Sigmoid", (), {"__call__": lambda x: x})  # noqa: E731
         Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
@@ -218,7 +217,7 @@ def generate_data_combinations(n=10):
         Keyword_CONTINUOUS,
     ]
     K = len(datas)
-    total_combinations = K ** 3
+    total_combinations = K**3
     combinations = np.random.choice(total_combinations, size=n).tolist()
     for c in combinations:
         c_orig = c
@@ -250,7 +249,7 @@ class RemoveAll(BackendEngine):
         rows = len(X)
         y = []
         for row in range(rows):
-            rng = np.random.default_rng(int(np.round(np.mean(X[row]) * (2 ** 32))))
+            rng = np.random.default_rng(int(np.round(np.mean(X[row]) * (2**32))))
             y.append(rng.random(cols))
         return np.stack(y)
 

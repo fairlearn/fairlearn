@@ -342,7 +342,7 @@ def test_regressor(torch2):
 @pytest.mark.parametrize("torch3", [True, False])
 def test_fake_models(torch3):
     """Test various data types and see if it is interpreted correctly."""
-    for ((X, Y, Z), (X_type, Y_type, Z_type)) in generate_data_combinations():
+    for (X, Y, Z), (X_type, Y_type, Z_type) in generate_data_combinations():
         mitigator = get_instance(
             fake_training=True, torch=torch3, tensorflow=not torch3
         )
@@ -358,14 +358,14 @@ def test_fake_models(torch3):
 
 def test_fake_models_list_inputs():
     """Test model with lists as input."""
-    for ((X, Y, Z), types) in generate_data_combinations():
+    for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
 
 def test_fake_models_df_inputs():
     """Test model with data frames as input."""
-    for ((X, Y, Z), types) in generate_data_combinations():
+    for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(
             pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z)
@@ -481,9 +481,9 @@ def test_check_type_faulty_data():
         [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
     )
     notCat[0, 1] = 0.5
-    notCat[
-        0, 2:
-    ] = 0.0  # Special case because now first row sums to one but is not one-hot
+    notCat[0, 2:] = (
+        0.0  # Special case because now first row sums to one but is not one-hot
+    )
     check_type_helper(
         notCat,
         Keyword_CONTINUOUS,
@@ -502,7 +502,7 @@ def check_2dnp(X):
 
 def test_validate_data():
     """Test if validate_data properly preprocesses datasets to ndarray."""
-    for ((X, Y, Z), types) in generate_data_combinations():
+    for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X, Y, Z)
         for x in (X, Y, Z):
@@ -511,7 +511,7 @@ def test_validate_data():
 
 def test_validate_data_list_inputs():
     """Test if validate_data properly preprocesses list datasets to ndarray."""
-    for ((X, Y, Z), types) in generate_data_combinations():
+    for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
         for x in (X, Y, Z):
@@ -520,7 +520,7 @@ def test_validate_data_list_inputs():
 
 def test_validate_data_df_inputs():
     """Test if validate_data properly preprocesses dataframes to ndarray."""
-    for ((X, Y, Z), types) in generate_data_combinations():
+    for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(
             pd.DataFrame(X), pd.DataFrame(Y), pd.DataFrame(Z)
@@ -551,7 +551,7 @@ def test_no_backend(backend):
 
 def test_validate_data_ambiguous_rows():
     """Test if an ambiguous number of rows are caught."""
-    for ((X, Y, Z), types) in generate_data_combinations():
+    for (X, Y, Z), types in generate_data_combinations():
         X = X[:5, :]
         mitigator = get_instance(fake_mixin=True)
         with pytest.raises(ValueError) as exc:

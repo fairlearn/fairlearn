@@ -184,14 +184,15 @@ class UtilityParity(ClassificationMoment):
 
         self.U = pd.DataFrame(0, index=self.tags.index, columns=self.index)
         for e, g in self.prob_group_event.index:
-            event_select = 1*(self.tags[_EVENT] == e)
+            event_select = 1 * (self.tags[_EVENT] == e)
             group_event_select = event_select * (self.tags[_GROUP_ID] == g)
-            self.U["+", e, g] = \
-                event_select / self.prob_event[e] + \
-                (-self.ratio) * group_event_select / self.prob_group_event[e, g]
-            self.U["-", e, g] = \
-                (-self.ratio) * event_select / self.prob_event[e] + \
-                group_event_select / self.prob_group_event[e, g]
+            self.U["+", e, g] = (
+                event_select / self.prob_event[e]
+                + (-self.ratio) * group_event_select / self.prob_group_event[e, g]
+            )
+            self.U["-", e, g] = (-self.ratio) * event_select / self.prob_event[
+                e
+            ] + group_event_select / self.prob_group_event[e, g]
 
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].dropna().unique()

@@ -382,7 +382,7 @@ class _AdversarialFairness(BaseEstimator):
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
                             kwname,
-                            ("A valid keyword or a callable"),
+                            "A valid keyword or a callable",
                         )
                     )
                 return _get_type(data, expected_dist)

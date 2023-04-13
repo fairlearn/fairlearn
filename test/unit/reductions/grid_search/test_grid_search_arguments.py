@@ -272,7 +272,6 @@ class ArgumentTests:
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     def test_custom_grid(self, transformX, transformY, transformA):
-
         # Creating a standard grid with the default parameters
         grid_size = 10
         grid_limit = 2.0
@@ -316,7 +315,6 @@ class ArgumentTests:
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
     def test_Y_df_bad_columns(self, transformX, transformA, A_two_dim):
-
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,

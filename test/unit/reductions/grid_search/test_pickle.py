@@ -6,8 +6,12 @@ import pickle
 import pytest
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
-from fairlearn.reductions import DemographicParity, TruePositiveRateParity,\
-    FalsePositiveRateParity, ErrorRateParity
+from fairlearn.reductions import (
+    DemographicParity,
+    TruePositiveRateParity,
+    FalsePositiveRateParity,
+    ErrorRateParity,
+)
 from fairlearn.reductions import BoundedGroupLoss
 from fairlearn.reductions import AbsoluteLoss, SquareLoss, ZeroOneLoss
 from fairlearn.reductions import GridSearch
@@ -19,22 +23,15 @@ classification_moments = [
     DemographicParity,
     TruePositiveRateParity,
     FalsePositiveRateParity,
-    ErrorRateParity
+    ErrorRateParity,
 ]
 
-bgl_losses = [
-    AbsoluteLoss(0, 1),
-    SquareLoss(0, 1),
-    ZeroOneLoss()
-]
+bgl_losses = [AbsoluteLoss(0, 1), SquareLoss(0, 1), ZeroOneLoss()]
 
 
 @pytest.mark.parametrize("moment", classification_moments)
 def test_pickle_classification(moment):
-    gs = GridSearch(
-        LogisticRegression(),
-        constraints=moment()
-    )
+    gs = GridSearch(LogisticRegression(), constraints=moment())
     X, y, A = _quick_data()
 
     gs.fit(X, y, sensitive_features=A)
@@ -47,7 +44,7 @@ def test_pickle_classification(moment):
 def test_pickle_bgl(loss):
     gs = GridSearch(
         LinearRegression(),
-        constraints=BoundedGroupLoss(loss=copy.deepcopy(loss), upper_bound=0.2)
+        constraints=BoundedGroupLoss(loss=copy.deepcopy(loss), upper_bound=0.2),
     )
     X, y, A = _quick_data()
 

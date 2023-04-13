@@ -145,7 +145,8 @@ def plot_model_comparison(
     if isinstance(axis_labels, (list, tuple)):
         if len(axis_labels) != 2:
             raise ValueError(
-                "Key word argument axis_labels should be a list or tuple of two strings."
+                "Key word argument axis_labels should be a list or tuple of two"
+                " strings."
             )
     elif isinstance(axis_labels, bool):
         pass
@@ -158,7 +159,7 @@ def plot_model_comparison(
             )
         )
 
-    for (kwarg, name) in (
+    for kwarg, name in (
         (legend, "legend"),
         (show_plot, "show_plot"),
     ):

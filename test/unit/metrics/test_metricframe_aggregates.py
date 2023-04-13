@@ -136,6 +136,20 @@ class Test1m1sf0cf:
 
         assert mf.ratio(method="to_overall") == 0
 
+    def test_difference_bad_method(self):
+        self._prepare(skm.accuracy_score)
+
+        with pytest.raises(ValueError) as exc:
+            self.target.difference(method="some_string")
+        assert "Unrecognised comparison method: some_string" == exc.value.args[0]
+
+    def test_ratio_bad_method(self):
+        self._prepare(skm.accuracy_score)
+
+        with pytest.raises(ValueError) as exc:
+            self.target.ratio(method="some_other_string")
+        assert "Unrecognised comparison method: some_other_string" == exc.value.args[0]
+
 
 class Test1m1sf0cfFnDict:
     # Key difference is that the function is supplied as a dict
