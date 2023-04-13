@@ -9,6 +9,10 @@ repos:
     -   id: check-case-conflict
     -   id: check-merge-conflict
 -   repo: https://github.com/psf/black
+# Need to keep black version consistent in
+# requirements-dev.txt
+# linting.yml
+# .pre-commit-config.yaml
     rev: 23.3.0
     hooks:
     -   id: black

@@ -21,7 +21,11 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: flake8 .
   linting-black:
+    # Need to keep black version consistent in
+    # requirements-dev.txt
+    # linting.yml
+    # .pre-commit-config.yaml
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v3
-      - uses: psf/black@stable
+      - uses: psf/black@23.3.0
