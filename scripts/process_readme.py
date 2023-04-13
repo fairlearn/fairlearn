@@ -98,7 +98,6 @@ def process_readme(input_file_name, output_file_name):
 
     text_lines = []
     with _LogWrapper("reading file {}".format(input_file_name)):
-
         with open(input_file_name, "r") as input_file:
             text_lines = input_file.readlines()
 

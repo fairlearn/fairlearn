@@ -24,9 +24,14 @@ for e in extras:
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,
-    author="Miroslav Dudik, Richard Edgar, Adrin Jalali, Roman Lutz, Michael Madaio, Hilde Weerts",
+    author=(
+        "Miroslav Dudik, Richard Edgar, Adrin Jalali, Roman Lutz, Michael Madaio, Hilde"
+        " Weerts"
+    ),
     author_email="fairlearn-internal@python.org",
-    description="A Python package to assess and improve fairness of machine learning models.",
+    description=(
+        "A Python package to assess and improve fairness of machine learning models."
+    ),
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/fairlearn/fairlearn",

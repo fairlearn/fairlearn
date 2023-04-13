@@ -10,6 +10,11 @@ flake8-docstrings
 flake8-logging-format
 flake8-rst-docstrings
 requirements-parser
+# Need to keep black version consistent in
+# requirements-dev.txt
+# linting.yml
+# .pre-commit-config.yaml
+black==23.3.0
 
 # Required for test
 pytest==7.2.0

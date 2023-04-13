@@ -15,12 +15,12 @@ DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value
 # true_negatives, false_positives, false_negatives. The fields indicate the counts. They can all
 # be numpy arrays of the same length. Metrics are expected to return NaN where undefined.
 METRIC_DICT = {
-    "selection_rate": (lambda x: x.predicted_positives / x.n),
-    "false_positive_rate": (lambda x: x.false_positives / x.negatives),
-    "false_negative_rate": (lambda x: x.false_negatives / x.positives),
-    "true_positive_rate": (lambda x: x.true_positives / x.positives),
-    "true_negative_rate": (lambda x: x.true_negatives / x.negatives),
-    "accuracy_score": (lambda x: (x.true_positives + x.true_negatives) / x.n),
+    "selection_rate": lambda x: x.predicted_positives / x.n,
+    "false_positive_rate": lambda x: x.false_positives / x.negatives,
+    "false_negative_rate": lambda x: x.false_negatives / x.positives,
+    "true_positive_rate": lambda x: x.true_positives / x.positives,
+    "true_negative_rate": lambda x: x.true_negatives / x.negatives,
+    "accuracy_score": lambda x: (x.true_positives + x.true_negatives) / x.n,
     "balanced_accuracy_score": (
         lambda x: 0.5 * x.true_positives / x.positives
         + 0.5 * x.true_negatives / x.negatives
