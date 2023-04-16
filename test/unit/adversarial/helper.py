@@ -87,7 +87,7 @@ class fake_torch:
                 self.w = weights
 
         BCELoss = type("BCELoss", (BCE,), {})
-        NLLLoss = type("NLLLoss", (CCE,), {})
+        CrossEntropyLoss = type("CrossEntropyLoss", (CCE,), {})
         MSELoss = type("MSELoss", (MSE,), {})
 
         class Linear:  # noqa: D106
