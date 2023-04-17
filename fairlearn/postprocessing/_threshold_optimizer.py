@@ -17,43 +17,39 @@ References
 """
 
 import logging
-import numpy as np
-import pandas as pd
-
 from warnings import warn
 
+import numpy as np
+import pandas as pd
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
-from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import Bunch
+from sklearn.utils.validation import check_is_fitted
 
 from ..utils._common import _get_soft_predictions
-from ..utils._input_validation import (
-    _validate_and_reformat_input,
-    _KW_CONTROL_FEATURES,
-)
+from ..utils._input_validation import _KW_CONTROL_FEATURES, _validate_and_reformat_input
 from ._constants import (
-    LABEL_KEY,
-    SCORE_KEY,
-    SENSITIVE_FEATURE_KEY,
-    OUTPUT_SEPARATOR,
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING,
-)
-from ._tradeoff_curve_utilities import (
-    _interpolate_curve,
-    _tradeoff_curve,
-    _extend_confusion_matrix,
-    METRIC_DICT,
+    LABEL_KEY,
+    OUTPUT_SEPARATOR,
+    SCORE_KEY,
+    SENSITIVE_FEATURE_KEY,
 )
 from ._interpolated_thresholder import InterpolatedThresholder
+from ._tradeoff_curve_utilities import (
+    METRIC_DICT,
+    _extend_confusion_matrix,
+    _interpolate_curve,
+    _tradeoff_curve,
+)
 
 # various error messages
 DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE = "{} need to be of equal length."
 NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = (
-    "Post processing currently only supports a single " "column in {}."
+    "Post processing currently only supports a single column in {}."
 )
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = (
     "A sensitive feature named {} or {} "
@@ -102,9 +98,7 @@ OBJECTIVES_FOR_EQUALIZED_ODDS = {
     "balanced_accuracy_score",
 }
 
-NO_CONTROL_FEATURES = (
-    "Control features are not supported by ThresholdOptimizer"
-)
+NO_CONTROL_FEATURES = "Control features are not supported by ThresholdOptimizer"
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
     "Currently only the following constraints are supported: {}.".format(
         ", ".join(sorted(ALL_CONSTRAINTS))
@@ -128,6 +122,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     The classifier is obtained by applying group-specific thresholds to the
     provided estimator. The thresholds are chosen to optimize the provided
     performance objective subject to the provided fairness constraints.
+
+    Read more in the :ref:`User Guide <postprocessing>`.
 
     Parameters
     ----------
@@ -181,16 +177,23 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         Defines which method of the ``estimator`` is used to get the output
         values.
 
-        - 'auto': use one of ``predict_proba``, ``decision_function``, or
-          ``predict``, in that order.
-        - 'predict_proba': use the second column from the output of
-          `predict_proba`. It is assumed that the second column represents the
-          positive outcome.
-        - 'decision_function': use the raw values given by the
-          `decision_function`.
-        - 'predict': use the hard values reported by the `predict` method if
-          estimator is a classifier, and the regression values if estimator is
-          a regressor. This is equivalent to what is done in [1]_.
+            'auto'
+                use one of :code:`predict_proba`, :code:`decision_function`, or 
+                :code:`predict`, in that order.
+            
+            'predict_proba'
+                use the second column from the output of :code:`predict_proba`. 
+                It is assumed that the second column represents the positive 
+                outcome.
+            
+            'decision_function'
+                use the raw values given by the :code:`decision_function`.
+            
+            'predict'
+                use the hard values reported by the :code:`predict` method if 
+                estimator is a classifier, and the regression values if 
+                estimator is a regressor. This is equivalent to what 
+                is done in [1]_.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
@@ -211,6 +214,25 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
        Supervised Learning," arXiv.org, 07-Oct-2016.
        [Online]. Available: https://arxiv.org/abs/1610.02413.
 
+    Examples
+    --------
+    >>> from fairlearn.postprocessing import ThresholdOptimizer
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> X                  = [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]]
+    >>> y                  = [ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  1 ,  0 ,  0 ,  0 ]
+    >>> sensitive_features = ["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"]
+    >>> unmitigated_lr = LogisticRegression().fit(X, y)
+    >>> postprocess_est = ThresholdOptimizer(
+    ...                    estimator=unmitigated_lr,
+    ...                    constraints="false_negative_rate_parity",
+    ...                    objective="balanced_accuracy_score",
+    ...                    prefit=True,
+    ...                    predict_method='predict_proba')
+    >>> postprocess_est.fit(X, y, sensitive_features=sensitive_features)
+    ThresholdOptimizer(constraints='false_negative_rate_parity',
+                       estimator=LogisticRegression(),
+                       objective='balanced_accuracy_score',
+                       predict_method='predict_proba', prefit=True)
     """
 
     def __init__(
@@ -222,7 +244,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         grid_size=1000,
         flip=False,
         prefit=False,
-        predict_method="deprecated"
+        predict_method="deprecated",
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -268,10 +290,12 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         if self.predict_method == "deprecated":
             warn(
-                "'predict_method' default value is changed from 'predict' to "
-                "'auto'. Explicitly pass `predict_method='predict' to "
-                "replicate the old behavior, or pass `predict_method='auto' "
-                "or other valid values to silence this warning.",
+                (
+                    "'predict_method' default value is changed from 'predict' to "
+                    "'auto'. Explicitly pass `predict_method='predict' to "
+                    "replicate the old behavior, or pass `predict_method='auto' "
+                    "or other valid values to silence this warning."
+                ),
                 FutureWarning,
             )
             self._predict_method = "predict"
@@ -304,16 +328,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             try:
                 check_is_fitted(self.estimator)
             except NotFittedError:
-                warn(
-                    BASE_ESTIMATOR_NOT_FITTED_WARNING.format(
-                        type(self).__name__
-                    )
-                )
+                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__))
             self.estimator_ = self.estimator
 
-        scores = _get_soft_predictions(
-            self.estimator_, X, self._predict_method
-        )
+        scores = _get_soft_predictions(self.estimator_, X, self._predict_method)
         if self.constraints == "equalized_odds":
             self.x_metric_ = "false_positive_rate"
             self.y_metric_ = "true_positive_rate"
@@ -580,9 +598,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         # interpolation per sensitive feature
         interpolation_dict = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
-            roc_result = self._tradeoff_curve[
-                sensitive_feature_value
-            ].transpose()[i_best_EO]
+            roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[
+                i_best_EO
+            ]
             # p_ignore * x_best represent the diagonal of the ROC plot.
             if roc_result.y == roc_result.x:
                 # result is on the diagonal of the ROC plot, i.e. p_ignore is not required
@@ -662,14 +680,10 @@ def _reformat_and_group_data(
     sensitive_feature_name = SENSITIVE_FEATURE_KEY
     if sensitive_feature_names is not None:
         if sensitive_feature_name in [SCORE_KEY, LABEL_KEY]:
-            raise ValueError(
-                SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE
-            )
+            raise ValueError(SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
         sensitive_feature_name = sensitive_feature_names[0]
 
-    _reformat_data_into_dict(
-        sensitive_feature_name, data_dict, sensitive_features
-    )
+    _reformat_data_into_dict(sensitive_feature_name, data_dict, sensitive_features)
     _reformat_data_into_dict(SCORE_KEY, data_dict, scores)
     _reformat_data_into_dict(LABEL_KEY, data_dict, labels)
 
@@ -704,9 +718,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         ):
             # TODO: extend to multiple columns for additional_group data
             raise ValueError(
-                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(
-                    "sensitive_features"
-                )
+                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features")
             )
         else:
             data_dict[key] = additional_data.squeeze()
@@ -721,9 +733,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
                 raise ValueError(
-                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(
-                        "sensitive_features"
-                    )
+                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features")
                 )
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:

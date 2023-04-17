@@ -7,24 +7,29 @@ import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 
-from .data_for_test import y_t, y_p, group_gen, g_1
+from .data_for_test import g_1, group_gen, y_p, y_t
 
-metric = [skm.recall_score,
-          skm.precision_score,
-          skm.accuracy_score,
-          skm.balanced_accuracy_score]
+metric = [
+    skm.recall_score,
+    skm.precision_score,
+    skm.accuracy_score,
+    skm.balanced_accuracy_score,
+]
 
 
 n = len(y_t)
-g_A = np.asarray([group_gen(x, int(n/2), ['aa', 'bb']) for x in range(n)])
-g_B = np.asarray([group_gen(x, 1+int(n/3), ['x', 'y', 'z']) for x in range(n)])
+g_A = np.asarray([group_gen(x, int(n / 2), ["aa", "bb"]) for x in range(n)])
+g_B = np.asarray([group_gen(x, 1 + int(n / 3), ["x", "y", "z"]) for x in range(n)])
 
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_missing_sensitive_feature_combinations(metric_fn):
-
-    target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
-                                 sensitive_features=np.stack([g_A, g_B], axis=1))
+    target = metrics.MetricFrame(
+        metrics=metric_fn,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=np.stack([g_A, g_B], axis=1),
+    )
 
     # Make sure our missing combination is in an expected place
     overall = metric_fn(y_t, y_p)
@@ -33,33 +38,39 @@ def test_missing_sensitive_feature_combinations(metric_fn):
         mask_A = g_A == idx[0]
         mask_B = g_B == idx[1]
         mask = np.logical_and(mask_A, mask_B)
-        if idx == ('bb', 'x'):
-            assert sum(mask) == 0, 'idx={0}'.format(idx)
+        if idx == ("bb", "x"):
+            assert sum(mask) == 0, "idx={0}".format(idx)
         else:
-            assert sum(mask) != 0, 'idx={0}'.format(idx)
+            assert sum(mask) != 0, "idx={0}".format(idx)
             nxt = metric_fn(y_t[mask], y_p[mask])
             direct_eval.append(nxt)
     assert len(direct_eval) == 5
 
     # Check we have expected values
-    assert np.isnan(target.by_group[('bb', 'x')])
+    assert np.isnan(target.by_group[("bb", "x")])
     assert target.group_min() == min(direct_eval)
     assert target.group_max() == max(direct_eval)
-    assert target.difference(method='between_groups') == \
-        max(direct_eval)-min(direct_eval)
-    assert target.difference(method='to_overall') == \
-        max([abs(x-overall) for x in direct_eval])
-    assert target.ratio(method='between_groups') == \
-        min(direct_eval) / max(direct_eval)
-    assert target.ratio(method='to_overall') == \
-        min([x/overall for x in direct_eval] + [overall/x for x in direct_eval])
+    assert target.difference(method="between_groups") == max(direct_eval) - min(
+        direct_eval
+    )
+    assert target.difference(method="to_overall") == max(
+        [abs(x - overall) for x in direct_eval]
+    )
+    assert target.ratio(method="between_groups") == min(direct_eval) / max(direct_eval)
+    assert target.ratio(method="to_overall") == min(
+        [x / overall for x in direct_eval] + [overall / x for x in direct_eval]
+    )
 
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_missing_conditional_feature_combinations(metric_fn):
-    target = metrics.MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p,
-                                 control_features=np.stack([g_A, g_B], axis=1),
-                                 sensitive_features=g_1)
+    target = metrics.MetricFrame(
+        metrics=metric_fn,
+        y_true=y_t,
+        y_pred=y_p,
+        control_features=np.stack([g_A, g_B], axis=1),
+        sensitive_features=g_1,
+    )
 
     # Build all the expected values
     overall = dict()
@@ -73,7 +84,7 @@ def test_missing_conditional_feature_combinations(metric_fn):
             mask_B = g_B == i_B
 
             mask_A_B = np.logical_and(mask_A, mask_B)
-            if i_A == 'bb' and i_B == 'x':
+            if i_A == "bb" and i_B == "x":
                 assert sum(mask_A_B) == 0
             else:
                 assert sum(mask_A_B) != 0
@@ -91,12 +102,12 @@ def test_missing_conditional_feature_combinations(metric_fn):
     for i_A in np.unique(g_A):
         for i_B in np.unique(g_B):
             if i_B in overall[i_A]:
-                assert overall[i_A][i_B] == \
-                    target.overall[(i_A, i_B)]
+                assert overall[i_A][i_B] == target.overall[(i_A, i_B)]
                 for i_1 in np.unique(g_1):
                     if i_1 in by_groups[i_A][i_B]:
-                        assert by_groups[i_A][i_B][i_1] == \
-                            target.by_group[(i_A, i_B, i_1)]
+                        assert (
+                            by_groups[i_A][i_B][i_1] == target.by_group[(i_A, i_B, i_1)]
+                        )
                     else:
                         assert np.isnan(target.by_group[(i_A, i_B, i_1)])
             else:
@@ -110,21 +121,30 @@ def test_missing_conditional_feature_combinations(metric_fn):
                 expected_min = min(by_groups[i_A][i_B].values())
                 assert expected_max == target.group_max()[(i_A, i_B)]
                 assert expected_min == target.group_min()[(i_A, i_B)]
-                assert target.difference(method='between_groups')[(i_A, i_B)] == \
-                    expected_max - expected_min
-                diffs_overall = [abs(x-overall[i_A][i_B]) for x in by_groups[i_A][i_B].values()]
-                assert target.difference(method='to_overall')[(i_A, i_B)] == \
-                    max(diffs_overall)
-                assert target.ratio(method='between_groups')[(i_A, i_B)] == \
-                    expected_min / expected_max
-                ratio_overall = [(x/overall[i_A][i_B]) for x in by_groups[i_A][i_B].values()] + \
-                    [(overall[i_A][i_B]/x) for x in by_groups[i_A][i_B].values()]
-                assert target.ratio(method='to_overall')[(i_A, i_B)] == \
-                    pytest.approx(min(ratio_overall), rel=1e-10, abs=1e-16)
+                assert (
+                    target.difference(method="between_groups")[(i_A, i_B)]
+                    == expected_max - expected_min
+                )
+                diffs_overall = [
+                    abs(x - overall[i_A][i_B]) for x in by_groups[i_A][i_B].values()
+                ]
+                assert target.difference(method="to_overall")[(i_A, i_B)] == max(
+                    diffs_overall
+                )
+                assert (
+                    target.ratio(method="between_groups")[(i_A, i_B)]
+                    == expected_min / expected_max
+                )
+                ratio_overall = [
+                    (x / overall[i_A][i_B]) for x in by_groups[i_A][i_B].values()
+                ] + [(overall[i_A][i_B] / x) for x in by_groups[i_A][i_B].values()]
+                assert target.ratio(method="to_overall")[(i_A, i_B)] == pytest.approx(
+                    min(ratio_overall), rel=1e-10, abs=1e-16
+                )
             else:
                 assert np.isnan(target.group_max()[(i_A, i_B)])
                 assert np.isnan(target.group_min()[(i_A, i_B)])
-                assert np.isnan(target.difference(method='between_groups')[(i_A, i_B)])
-                assert np.isnan(target.difference(method='to_overall')[(i_A, i_B)])
-                assert np.isnan(target.ratio(method='between_groups')[(i_A, i_B)])
-                assert np.isnan(target.ratio(method='to_overall')[(i_A, i_B)])
+                assert np.isnan(target.difference(method="between_groups")[(i_A, i_B)])
+                assert np.isnan(target.difference(method="to_overall")[(i_A, i_B)])
+                assert np.isnan(target.ratio(method="between_groups")[(i_A, i_B)])
+                assert np.isnan(target.ratio(method="to_overall")[(i_A, i_B)])

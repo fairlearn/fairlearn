@@ -1,8 +1,8 @@
 # Requirements for Fairlearn development
 
 # Required for environment
-autopep8
 flake8
+autopep8
 flake8-blind-except
 flake8-builtins
 flake8-copyright
@@ -10,29 +10,28 @@ flake8-docstrings
 flake8-logging-format
 flake8-rst-docstrings
 requirements-parser
+# Need to keep black version consistent in
+# requirements-dev.txt
+# linting.yml
+# .pre-commit-config.yaml
+black==23.3.0
 
 # Required for test
-nbformat
-papermill
-# Pin pytest due to VS Code issue
-pytest==5.0.1
+pytest==7.2.0
 pytest-cov
 pytest-mock
 pytest-mpl>=0.11
-nteract-scrapbook
 wheel
 lightgbm
 xlrd
 
-# Required for notebooks
-jupyter
-nbval
-
 # Required for documentation
 bokeh
 pypandoc
-sphinx
+sphinx==4.5.0
 sphinx-gallery
-git+https://github.com/Holzhaus/sphinx-multiversion.git
-pydata-sphinx-theme==0.6.3
+numpydoc
+pydata-sphinx-theme==0.12.0
 sphinx-autodoc-typehints
+sphinxcontrib-bibtex
+packaging

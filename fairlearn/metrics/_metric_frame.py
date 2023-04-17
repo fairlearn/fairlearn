@@ -1,34 +1,45 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import copy
 import logging
-import numpy as np
-import pandas as pd
-from typing import Any, Callable, Dict, List, Optional, Union
-from sklearn.utils import check_consistent_length
 import warnings
 from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
-from ._function_container import FunctionContainer, _SAMPLE_PARAMS_NOT_DICT
+import numpy as np
+import pandas as pd
+from sklearn.utils import check_consistent_length
+
+from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
+
+from ._annotated_metric_function import AnnotatedMetricFunction
+from ._disaggregated_result import (
+    DisaggregatedResult,
+    _VALID_ERROR_STRING,
+    _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
+)
 from ._group_feature import GroupFeature
-
 
 logger = logging.getLogger(__name__)
 
-_SUBGROUP_COUNT_WARNING_THRESHOLD = 20
-
-_SF_DICT_CONVERSION_FAILURE = "DataFrame.from_dict() failed on sensitive features. " \
-    "Please ensure each array is strictly 1-D."
-_BAD_FEATURE_LENGTH = "Received a feature of length {0} when length {1} was expected"
-_SUBGROUP_COUNT_WARNING = "Found {0} subgroups. Evaluation may be slow"
+_SF_DICT_CONVERSION_FAILURE = (
+    "DataFrame.from_dict() failed on sensitive features. "
+    "Please ensure each array is strictly 1-D. "
+    "The __cause__ field of this exception may contain further information."
+)
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
-_FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
+_FEATURE_DF_COLUMN_BAD_NAME = (
+    "DataFrame column names must be strings. Name '{0}' is of type {1}"
+)
 _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
-_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = \
+_SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
+_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
     "Keys in 'sample_params' do not match those in 'metric'"
+)
+
+_COMPARE_METHODS = ["between_groups", "to_overall"]
+_INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -42,6 +53,7 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
     new_metric_frame_init : callable
         New MetricFrame constructor.
     """
+
     @wraps(new_metric_frame_init)
     def compatible_metric_frame_init(self, *args, metric=None, **kwargs):
         positional_names = ["metrics", "y_true", "y_pred"]
@@ -53,41 +65,48 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         # the error message applicable to the new constructor implementation (with `self`
         # being the only positional argument).
         if len(args) > 3:
-            raise TypeError(f"{new_metric_frame_init.__name__}() takes 1 positional "
-                            f"argument but {1+len(args)} positional arguments "
-                            f"were given")
+            raise TypeError(
+                f"{new_metric_frame_init.__name__}() takes 1 positional "
+                f"argument but {1+len(args)} positional arguments "
+                "were given"
+            )
 
         # If 1-3 positional arguments are provided (apart fom self), issue warning.
         if len(args) > 0:
             args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
-            warnings.warn(f"You have provided {args_msg} as positional arguments. "
-                          f"Please pass them as keyword arguments. From version "
-                          f"{version} passing them as positional arguments "
-                          f"will result in an error.",
-                          FutureWarning)
+            warnings.warn(
+                (
+                    f"You have provided {args_msg} as positional arguments. "
+                    "Please pass them as keyword arguments. From version "
+                    f"{version} passing them as positional arguments "
+                    "will result in an error."
+                ),
+                FutureWarning,
+            )
 
         # If a keyword argument `metric` is provided, issue warning.
         metric_arg_dict = {}
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
-            warnings.warn(f"The positional argument 'metric' has been replaced "
-                          f"by a keyword argument 'metrics'. "
-                          f"From version {version} passing it as a positional argument "
-                          f"or as a keyword argument 'metric' will result in an error",
-                          FutureWarning)
+            warnings.warn(
+                (
+                    "The positional argument 'metric' has been replaced "
+                    "by a keyword argument 'metrics'. "
+                    f"From version {version} passing it as a positional argument "
+                    "or as a keyword argument 'metric' will result in an error"
+                ),
+                FutureWarning,
+            )
 
         # Call the new constructor with positional arguments passed as keyword arguments
         # and with the `metric` keyword argument renamed to `metrics`.
-        new_metric_frame_init(self,
-                              **metric_arg_dict,
-                              **positional_dict,
-                              **kwargs)
+        new_metric_frame_init(self, **metric_arg_dict, **positional_dict, **kwargs)
 
     return compatible_metric_frame_init
 
 
 class MetricFrame:
-    """Collection of disaggregated metric values.
+    r"""Collection of disaggregated metric values.
 
     This data structure stores and manipulates disaggregated values for any number of underlying
     metrics. At least one sensitive feature must be supplied, which is used
@@ -109,7 +128,7 @@ class MetricFrame:
     the aggregation functions will not be well defined in this case.
 
     Group fairness metrics are obtained by methods that implement
-    various aggregators over group-level metrics, such such as the
+    various aggregators over group-level metrics, such as the
     maximum, minimum, or the worst-case difference or ratio.
 
     This data structure also supports the concept of 'control features.' Like the sensitive
@@ -118,6 +137,8 @@ class MetricFrame:
     aggregations produce a result for each subgroup identified by the control
     feature(s). The name 'control features' refers to the statistical practice
     of 'controlling' for a variable.
+
+    Read more in the :ref:`User Guide <assessment>`.
 
     Parameters
     ----------
@@ -158,6 +179,8 @@ class MetricFrame:
         Control features can be specified similarly to the sensitive features.
         However, their default names (if none can be identified in the
         input values) are of the format ``control_feature_[n]``.
+        See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
+        in the User Guide to learn how to use control levels.
 
         **Note** the types returned by members of the class vary based on whether
         control features are present.
@@ -181,30 +204,110 @@ class MetricFrame:
 
         .. deprecated:: 0.7.0
             `metric` will be removed in version 0.10.0, use `metrics` instead.
+
+    Examples
+    --------
+    We will now go through some simple examples (see the :ref:`User Guide <assessment>` for
+    a more in-depth discussion):
+
+    >>> from fairlearn.metrics import MetricFrame, selection_rate
+    >>> from sklearn.metrics import accuracy_score
+    >>> import pandas as pd
+    >>> y_true = [1,1,1,1,1,0,0,1,1,0]
+    >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
+    >>> sex = ['Female']*5 + ['Male']*5
+    >>> metrics = {"selection_rate": selection_rate}
+    >>> mf1 = MetricFrame(
+    ...      metrics=metrics,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas Series
+
+    >>> mf1.by_group # doctest: +NORMALIZE_WHITESPACE
+                        selection_rate
+    sensitive_feature_0
+    Female                         0.8
+    Male                           0.4
+
+    Access the largest difference, smallest ratio, and worst case performance
+
+    >>> print(f"difference: {mf1.difference()[0]:.3}   "
+    ...      f"ratio: {mf1.ratio()[0]:.3}   "
+    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    difference: 0.4   ratio: 0.5   max across groups: 0.8
+
+    You can also evaluate multiple metrics by providing a dictionary
+
+    >>> metrics_dict = {"accuracy":accuracy_score, "selection_rate": selection_rate}
+    >>> mf2 = MetricFrame(
+    ...      metrics=metrics_dict,
+    ...      y_true=y_true,
+    ...      y_pred=y_pred,
+    ...      sensitive_features=sex)
+
+    Access the disaggregated metrics via a pandas DataFrame
+
+    >>> mf2.by_group # doctest: +NORMALIZE_WHITESPACE
+                        accuracy selection_rate
+    sensitive_feature_0
+    Female                   0.8            0.8
+    Male                     0.6            0.4
+
+    The largest difference, smallest ratio, and the maximum and minimum values
+    across the groups are then all pandas Series, for example:
+
+    >>> mf2.difference()
+    accuracy          0.2
+    selection_rate    0.4
+    dtype: float64
+
+    You'll probably want to view them transposed
+
+    >>> pd.DataFrame({'difference': mf2.difference(),
+    ...               'ratio': mf2.ratio(),
+    ...               'group_min': mf2.group_min(),
+    ...               'group_max': mf2.group_max()}).T
+               accuracy selection_rate
+    difference      0.2            0.4
+    ratio          0.75            0.5
+    group_min       0.6            0.4
+    group_max       0.8            0.8
+
+    More information about plotting metrics can be found in the
+    :ref:`plotting section <plot_metricframe>` of the User Guide.
     """
 
     # The deprecation decorator does two things:
     # (1) turns first three positional arguments into keyword arguments
     # (2) renames the 'metric' keyword argument into 'metrics'
     @_deprecate_metric_frame_init
-    def __init__(self,
-                 *,
-                 metrics: Union[Callable, Dict[str, Callable]],
-                 y_true,
-                 y_pred,
-                 sensitive_features,
-                 control_features: Optional = None,
-                 sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None):
+    def __init__(
+        self,
+        *,
+        metrics: Union[Callable, Dict[str, Callable]],
+        y_true,
+        y_pred,
+        sensitive_features,
+        control_features=None,
+        sample_params: Optional[
+            Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
+        ] = None,
+    ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
+
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
 
-        func_dict = self._process_functions(metrics, sample_params)
+        all_data = pd.DataFrame.from_dict({"y_true": list(y_t), "y_pred": list(y_p)})
+
+        annotated_funcs = self._process_functions(metrics, sample_params, all_data)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
-        self._sf_names = [x.name for x in sf_list]
+        self._sf_names = [x.name_ for x in sf_list]
 
         # Prepare the control features
         # Adjust _sf_indices if needed
@@ -212,7 +315,14 @@ class MetricFrame:
         self._cf_names = None
         if control_features is not None:
             cf_list = self._process_features("control_feature_", control_features, y_t)
-            self._cf_names = [x.name for x in cf_list]
+            self._cf_names = [x.name_ for x in cf_list]
+
+        # Add sensitive and conditional features to all_data
+        for sf in sf_list:
+            all_data[sf.name_] = list(sf.raw_feature_)
+        if cf_list is not None:
+            for cf in cf_list:
+                all_data[cf.name_] = list(cf.raw_feature_)
 
         # Check for duplicate feature names
         nameset = set()
@@ -224,57 +334,110 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self._overall = self._compute_overall(func_dict, y_t, y_p, cf_list)
-        self._by_group = self._compute_by_group(func_dict, y_t, y_p, sf_list, cf_list)
+        # Create the basic results
+        result = DisaggregatedResult.create(
+            data=all_data,
+            annotated_functions=annotated_funcs,
+            sensitive_feature_names=self._sf_names,
+            control_feature_names=self._cf_names,
+        )
 
-    def _compute_overall(self, func_dict, y_true, y_pred, cf_list):
-        if cf_list is None:
-            result = pd.Series(index=func_dict.keys(), dtype='object')
-            for func_name in func_dict:
-                metric_value = func_dict[func_name].evaluate_all(y_true, y_pred)
-                result[func_name] = metric_value
+        # Build into cache
+        self._result_cache = dict()
+        self._populate_results(result)
+
+    def _extract_result(self, underlying_result, no_control_levels: bool):
+        """
+        Change result types for those who dislike consistency.
+
+        The `no_control_levels` parameter determines whether the presence
+        of control levels will affect the result. This is the case for
+        overall, but not the other cases.
+        """
+        if self._user_supplied_callable:
+            if self.control_levels or no_control_levels:
+                return underlying_result.iloc[:, 0]
+            else:
+                return underlying_result.iloc[0]
         else:
-            result = self._compute_dataframe_from_rows(func_dict, y_true, y_pred, cf_list)
+            return underlying_result
+
+    def _none_to_nan(
+        self, target: Union[pd.Series, pd.DataFrame]
+    ) -> Union[pd.Series, pd.DataFrame]:
+        """Convert Nones to NaNs."""
+        if isinstance(target, pd.Series):
+            result = target.map(lambda x: x if x is not None else np.nan)
+        else:
+            result = target.applymap(lambda x: x if x is not None else np.nan)
         return result
 
-    def _compute_by_group(self, func_dict, y_true, y_pred, sf_list, cf_list):
-        rows = copy.deepcopy(sf_list)
-        if cf_list is not None:
-            # Prepend the conditional features, so they are 'higher'
-            rows = copy.deepcopy(cf_list) + rows
+    def _populate_results(self, raw_result: DisaggregatedResult):
+        """
+        Populate the :code:`_result_cache`.
 
-        return self._compute_dataframe_from_rows(func_dict, y_true, y_pred, rows)
+        We cache all possible results from :class:`~MetricFrame` internally
+        (i.e. all possible calls to :meth:`~MetricFrame.difference()` etc.)
+        and this method is responsible for performing those computations.
+        The :code:`_result_cache` is a nested dictionary, with keys given by
+        the method names and arguments being cached.
 
-    def _compute_dataframe_from_rows(self, func_dict, y_true, y_pred, rows):
-        if len(rows) == 1:
-            row_index = pd.Index(data=rows[0].classes, name=rows[0].name)
-        else:
-            row_index = pd.MultiIndex.from_product([x.classes for x in rows],
-                                                   names=[x.name for x in rows])
+        Note that if exceptions are thrown, we cache those, and they are thrown
+        if the user calls the corresponding method (and arguments).
+        """
+        # Start with overall
+        self._result_cache["overall"] = self._extract_result(
+            raw_result.overall, no_control_levels=False
+        )
 
-        if len(row_index) > _SUBGROUP_COUNT_WARNING_THRESHOLD:
-            msg = _SUBGROUP_COUNT_WARNING.format(len(row_index))
-            logger.warning(msg)
+        # Now do by_group
+        self._result_cache["by_group"] = self._extract_result(
+            raw_result.by_group, no_control_levels=True
+        )
 
-        result = pd.DataFrame(index=row_index, columns=func_dict.keys())
-        for func_name in func_dict:
-            for row_curr in row_index:
-                mask = None
-                if len(rows) > 1:
-                    mask = self._mask_from_tuple(row_curr, rows)
-                else:
-                    # Have to force row_curr to be an unary tuple
-                    mask = self._mask_from_tuple((row_curr,), rows)
+        # Next up, group_min and group_max
+        group_functions = {"group_min": "min", "group_max": "max"}
+        for k, v in group_functions.items():
+            self._result_cache[k] = dict()
+            for err_string in _VALID_ERROR_STRING:
+                try:
+                    self._result_cache[k][err_string] = self._group(
+                        raw_result, v, err_string
+                    )
+                except Exception as e:  # noqa: B902
+                    # Store any exception for later
+                    self._result_cache[k][err_string] = e
 
-                # Only call the metric function if the mask is non-empty
-                if sum(mask) > 0:
-                    curr_metric = func_dict[func_name].evaluate(y_true, y_pred, mask)
-                    result[func_name][row_curr] = curr_metric
-        return result
+        # Differences and ratios
+        for c_t in ["difference", "ratio"]:
+            self._result_cache[c_t] = dict()
+            for c_m in _COMPARE_METHODS:
+                self._result_cache[c_t][c_m] = dict()
+                for err_string in _VALID_ERROR_STRING:
+                    try:
+                        if c_t == "difference":
+                            tmp = raw_result.difference(
+                                self.control_levels, method=c_m, errors=err_string
+                            )
+                        else:
+                            tmp = raw_result.ratio(
+                                self.control_levels, method=c_m, errors=err_string
+                            )
+
+                        result = self._none_to_nan(tmp)
+
+                        self._result_cache[c_t][c_m][err_string] = self._extract_result(
+                            result, no_control_levels=False
+                        )
+                    except Exception as e:  # noqa: B902
+                        # Store any exception for later
+                        self._result_cache[c_t][c_m][err_string] = e
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the underlying metrics evaluated on the whole dataset.
+
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -303,13 +466,7 @@ class MetricFrame:
             interface when calling programatically, while also reducing
             typing for those using Fairlearn interactively.
         """
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return self._overall.iloc[:, 0]
-            else:
-                return self._overall.iloc[0]
-        else:
-            return self._overall
+        return self._result_cache["overall"]
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
@@ -318,6 +475,8 @@ class MetricFrame:
         The collection is defined by the combination of classes in the
         sensitive and control features. The exact type depends on
         the specification of the metric function.
+
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
 
         Returns
         -------
@@ -336,13 +495,10 @@ class MetricFrame:
             (likely to occur as more sensitive and control features
             are specified), then the corresponding entry will be NaN.
         """
-        if self._user_supplied_callable:
-            return self._by_group.iloc[:, 0]
-        else:
-            return self._by_group
+        return self._result_cache["by_group"]
 
     @property
-    def control_levels(self) -> List[str]:
+    def control_levels(self) -> Optional[List[str]]:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the :attr:`.by_group`
@@ -364,6 +520,8 @@ class MetricFrame:
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
         index, this identifies which elements of the index are sensitive features.
 
+        Read more in the :ref:`User Guide <assessment_quantify_harms>`.
+
         Returns
         -------
         List[str]
@@ -372,7 +530,37 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def group_max(self) -> Union[Any, pd.Series, pd.DataFrame]:
+    def _group(
+        self,
+        disagg_result: DisaggregatedResult,
+        grouping_function: str,
+        errors: str = "raise",
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
+        """Return the minimum/maximum value of the metric over the sensitive features.
+
+        This is a private method, please use .group_min() or .group_max() instead.
+
+        Parameters
+        ----------
+        disagg_result: The DisaggregatedResult containing all the metrics
+        grouping_function: {'min', 'max'}
+        errors: {'raise', 'coerce'}, default 'raise'
+        if 'raise', then invalid parsing will raise an exception
+        if 'coerce', then invalid parsing will be set as NaN
+
+        Returns
+        -------
+        typing.Any pandas.Series or pandas.DataFrame
+            The minimum value over sensitive features. The exact type
+            follows the table in :attr:`.MetricFrame.overall`.
+        """
+        result = disagg_result.apply_grouping(
+            grouping_function, self.control_levels, errors=errors
+        )
+
+        return self._extract_result(result, no_control_levels=False)
+
+    def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -382,30 +570,31 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
+        Parameters
+        ----------
+        errors: {'raise', 'coerce'}, default 'raise'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if not self.control_levels:
-            result = pd.Series(index=self._by_group.columns, dtype='object')
-            for m in result.index:
-                max_val = self._by_group[m].max()
-                result[m] = max_val
-        else:
-            result = self._by_group.groupby(level=self.control_levels).max()
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
+        value = self._result_cache["group_max"][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            return result
+            return value
 
-    def group_min(self) -> Union[Any, pd.Series, pd.DataFrame]:
-        """Return the minimum value of the metric over the sensitive features.
+    def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
+        """Return the maximum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
         sensitive features for each underlying metric function in the :attr:`.by_group`
@@ -414,30 +603,32 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
+        Parameters
+        ----------
+        errors: {'raise', 'coerce'}, default 'raise'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
+
         Returns
         -------
-        typing.Any pandas.Series or pandas.DataFrame
-            The minimum value over sensitive features. The exact type
+        typing.Any or pandas.Series or pandas.DataFrame
+            The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        if not self.control_levels:
-            result = pd.Series(index=self._by_group.columns, dtype='object')
-            for m in result.index:
-                min_val = self._by_group[m].min()
-                result[m] = min_val
-        else:
-            result = self._by_group.groupby(level=self.control_levels).min()
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
+        value = self._result_cache["group_min"][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            return result
+            return value
 
-    def difference(self,
-                   method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
+    def difference(
+        self, method: str = "between_groups", errors: str = "coerce"
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -457,28 +648,36 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
         Parameters
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'raise', 'coerce'}, default 'coerce'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        subtrahend = np.nan
-        if method == 'between_groups':
-            subtrahend = self.group_min()
-        elif method == 'to_overall':
-            subtrahend = self.overall
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        value = self._result_cache["difference"][method][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
+            return value
 
-        return (self.by_group - subtrahend).abs().max(level=self.control_levels)
-
-    def ratio(self,
-              method: str = 'between_groups') -> Union[Any, pd.Series, pd.DataFrame]:
+    def ratio(
+        self, method: str = "between_groups", errors: str = "coerce"
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -500,60 +699,55 @@ class MetricFrame:
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
 
+        Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
         Parameters
         ----------
         method : str
             How to compute the aggregate. Default is :code:`between_groups`
+        errors: {'raise', 'coerce'}, default 'coerce'
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        result = None
-        if method == 'between_groups':
-            result = self.group_min() / self.group_max()
-        elif method == 'to_overall':
-            if self._user_supplied_callable:
-                tmp = self.by_group / self.overall
-                result = tmp.transform(lambda x: min(x, 1/x)).min(level=self.control_levels)
-            else:
-                ratios = None
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-                if self.control_levels:
-                    # It's easiest to give in to the DataFrame columns preference
-                    ratios = self.by_group.unstack(level=self.control_levels) /  \
-                        self.overall.unstack(level=self.control_levels)
-                else:
-                    ratios = self.by_group / self.overall
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-                def ratio_sub_one(x):
-                    if x > 1:
-                        return 1/x
-                    else:
-                        return x
-
-                ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-                if not self.control_levels:
-                    result = ratios.min()
-                else:
-                    result = ratios.min().unstack(0)
+        value = self._result_cache["ratio"][method][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
+            return value
 
-        return result
-
-    def _process_functions(self, metric, sample_params) -> Dict[str, FunctionContainer]:
-        """Get the underlying metrics into :class:`fairlearn.metrics.FunctionContainer` objects."""
+    def _process_functions(
+        self,
+        metric: Union[Callable, Dict[str, Callable]],
+        sample_params,
+        all_data: pd.DataFrame,
+    ) -> Dict[str, AnnotatedMetricFunction]:
+        """Get the metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
         self._user_supplied_callable = True
         func_dict = dict()
+
+        # The supplied 'metric' may be a dictionary of functions
         if isinstance(metric, dict):
             self._user_supplied_callable = False
             s_p = dict()
+
             if sample_params is not None:
+                # If we have sample_params, they had better be a dictionary
                 if not isinstance(sample_params, dict):
                     raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
+                # The keys of the sample_params dictionary must be a
+                # subset of our supplied metric functions
                 sp_keys = set(sample_params.keys())
                 mf_keys = set(metric.keys())
                 if not sp_keys.issubset(mf_keys):
@@ -564,14 +758,52 @@ class MetricFrame:
                 curr_s_p = None
                 if name in s_p:
                     curr_s_p = s_p[name]
-                fc = FunctionContainer(func, name, curr_s_p)
-                func_dict[fc.name_] = fc
+
+                amf = self._process_one_function(func, name, curr_s_p, all_data)
+                func_dict[amf.name] = amf
         else:
-            fc = FunctionContainer(metric, None, sample_params)
-            func_dict[fc.name_] = fc
+            # This is the case where the user has supplied a single metric function
+            amf = self._process_one_function(metric, None, sample_params, all_data)
+            func_dict[amf.name] = amf
         return func_dict
 
-    def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
+    def _process_one_function(
+        self,
+        func: Callable,
+        name: Optional[str],
+        sample_parameters: Optional[Dict[str, Any]],
+        all_data: pd.DataFrame,
+    ) -> AnnotatedMetricFunction:
+        # Deal with the sample parameters
+        _sample_param_arrays = dict()
+        if sample_parameters is not None:
+            if not isinstance(sample_parameters, dict):
+                raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
+            for k, v in sample_parameters.items():
+                if v is not None:
+                    # Coerce any sample_params to being ndarrays for easy masking
+                    _sample_param_arrays[k] = np.asarray(v)
+
+        # Build the kwargs
+        kwarg_dict = dict()
+        for param_name, param_values in _sample_param_arrays.items():
+            col_name = f"{name}_{param_name}"
+            all_data[col_name] = param_values
+            kwarg_dict[param_name] = col_name
+
+        # Construct the return object
+        amf = AnnotatedMetricFunction(
+            func=func,
+            name=name,
+            positional_argument_names=["y_true", "y_pred"],
+            kw_argument_mapping=kwarg_dict,
+        )
+
+        return amf
+
+    def _process_features(
+        self, base_name, features, sample_array
+    ) -> List[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
         result = []
 
@@ -623,22 +855,4 @@ class MetricFrame:
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
-        return result
-
-    def _mask_from_tuple(self, index_tuple, feature_list) -> np.ndarray:
-        """Generate a mask for the ``y_true``, ``y_pred`` and ``sample_params`` arrays.
-
-        Given a tuple of feature values (which indexes the ``by_groups``
-        DataFrame), generate a mask to select the corresponding samples
-        from the input
-        """
-        # Following are internal sanity checks
-        assert isinstance(index_tuple, tuple)
-        assert len(index_tuple) == len(feature_list)
-
-        result = feature_list[0].get_mask_for_class(index_tuple[0])
-        for i in range(1, len(index_tuple)):
-            result = np.logical_and(
-                result,
-                feature_list[i].get_mask_for_class(index_tuple[i]))
         return result

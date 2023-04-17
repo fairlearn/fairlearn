@@ -147,14 +147,9 @@ and follows the
 Maintainers
 ^^^^^^^^^^^
 
-The maintainers of the Fairlearn project are
+The current maintainers of the Fairlearn project are
 
-- `Adrin Jalali <https://github.com/adrinjalali>`_
-- `Hilde Weerts <https://github.com/hildeweerts>`_
-- `Michael Madaio <https://github.com/mmadaio>`_
-- `Miro Dudik <https://github.com/MiroDudik>`_
-- `Richard Edgar <https://github.com/riedgar-ms>`_
-- `Roman Lutz <https://github.com/romanlutz>`_
+.. include:: maintainers.rst
 
 .. _history:
 
@@ -163,7 +158,7 @@ Project history
 
 Fairlearn was started in 2018 by Miro Dudik from Microsoft Research as a
 Python package to accompany the research paper,
-`A Reductions Approach to Fair Classification <http://proceedings.mlr.press/v80/agarwal18a/agarwal18a.pdf>`_.
+A Reductions Approach to Fair Classification :footcite:`agarwal2018reductions`.
 The package provided a reduction algorithm for mitigating unfairness in binary
 classification models --- a setting that was commonly studied in the
 machine learning community.
@@ -212,3 +207,83 @@ Frequently asked questions
 --------------------------
 
 See our :ref:`faq` page.
+
+Funding
+-------
+
+Fairlearn is a community-driven project. However, several companies and
+academic institutions help to assure its sustainability.
+We would like to thank the following funders.
+
+.. raw:: html
+
+   <div class="sponsor-div">
+   <div class="sponsor-div-box">
+
+`Microsoft <https://www.microsoft.com/>`_ has funded various contributors
+including several maintainers (Miro Dudik, Richard Edgar, Roman Lutz, Michael
+Madaio) since the start of the project in 2018.
+
+.. raw:: html
+
+   </div>
+   <div class="sponsor-div-box">
+
+.. image:: ../_static/images/microsoft.png
+   :width: 100pt
+   :align: center
+   :target: https://www.microsoft.com/
+
+.. raw:: html
+
+   </div>
+   </div>
+   <div class="sponsor-div">
+   <div class="sponsor-div-box">
+
+`Eindhoven University of Technology <https://www.tue.nl/en/>`_ has funded
+Hilde Weerts since March 2020.
+
+.. raw:: html
+
+  </div>
+  <div class="sponsor-div-box">
+
+.. image:: ../_static/images/tu_eindhoven.png
+  :width: 100pt
+  :align: center
+  :target: https://www.tue.nl/en/
+
+.. raw:: html
+
+  </div>
+  </div>
+  <div class="sponsor-div">
+  <div class="sponsor-div-box">
+
+`Hugging Face <https://huggingface.co/>`_ has funded Adrin Jalali since
+February 2022.
+
+.. raw:: html
+
+  </div>
+  <div class="sponsor-div-box">
+
+.. image:: ../_static/images/huggingface_logo-noborder.svg
+  :width: 50pt
+  :align: center
+  :target: https://huggingface.co/
+
+.. raw:: html
+
+  </div>
+  </div>
+
+Infrastructure support
+----------------------
+
+We would also like to thank the following for free CPU time on their
+continuous integration servers:
+
+- `GitHub <https://github.com>`_
+- `CircleCI <https://circleci.com/>`_

@@ -7,20 +7,21 @@ MetricFrame visualizations
 ==========================
 """
 
+import pandas as pd
+from fairlearn.datasets import fetch_adult
+from sklearn.metrics import accuracy_score, precision_score
+from sklearn.tree import DecisionTreeClassifier
+
 # %%
 from fairlearn.metrics import (
     MetricFrame,
+    count,
+    false_negative_rate,
     false_positive_rate,
-    true_positive_rate,
     selection_rate,
-    count
 )
-import pandas as pd
-from sklearn.datasets import fetch_openml
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from sklearn.tree import DecisionTreeClassifier
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult()
 X = pd.get_dummies(data.data)
 y_true = (data.target == ">50K") * 1
 sex = data.data["sex"]
@@ -31,17 +32,16 @@ y_pred = classifier.predict(X)
 
 # Analyze metrics using MetricFrame
 metrics = {
-    'accuracy': accuracy_score,
-    'precision': precision_score,
-    'recall': recall_score,
-    'false positive rate': false_positive_rate,
-    'true positive rate': true_positive_rate,
-    'selection rate': selection_rate,
-    'count': count}
-metric_frame = MetricFrame(metrics=metrics,
-                           y_true=y_true,
-                           y_pred=y_pred,
-                           sensitive_features=sex)
+    "accuracy": accuracy_score,
+    "precision": precision_score,
+    "false positive rate": false_positive_rate,
+    "false negative rate": false_negative_rate,
+    "selection rate": selection_rate,
+    "count": count,
+}
+metric_frame = MetricFrame(
+    metrics=metrics, y_true=y_true, y_pred=y_pred, sensitive_features=sex
+)
 metric_frame.by_group.plot.bar(
     subplots=True,
     layout=[3, 3],
@@ -72,12 +72,26 @@ metric_frame.by_group.plot(
     title="Show all metrics in Accent colormap",
 )
 
-# Customize plots with kind
-metric_frame.by_group.plot(
+# Customize plots with kind (note that we are only plotting the "count" metric here because we are showing a pie chart)
+metric_frame.by_group[["count"]].plot(
     kind="pie",
     subplots=True,
-    layout=[3, 3],
+    layout=[1, 1],
     legend=False,
     figsize=[12, 8],
-    title="Show all metrics in pie",
+    title="Show count metric in pie chart",
 )
+
+# Saving plots
+fig = metric_frame.by_group[["count"]].plot(
+    kind="pie",
+    subplots=True,
+    layout=[1, 1],
+    legend=False,
+    figsize=[12, 8],
+    title="Show count metric in pie chart",
+)
+
+# Don't save file during doc build
+if "__file__" in locals():
+    fig[0][0].figure.savefig("filename.png")

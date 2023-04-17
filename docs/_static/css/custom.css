@@ -16,4 +16,54 @@ i.fa-discord:hover {
 
 #navbar-icon-links > li.nav-item > a.nav-link:hover {
    color: rgba(77, 77, 77, 1) !important
-}  
+}
+
+/* sponsors - copied from scikit-learn/scikit-learn */
+
+div.sponsor-div {
+   display: flex;
+   flex-wrap: wrap;
+   -webkit-flex-align: center;
+   -ms-flex-align: center;
+   -webkit-align-items: center;
+   align-items: center;
+}
+ 
+div.sponsor-div-box {
+   width: 100%;
+}
+ 
+@media screen and (min-width: 500px) {
+   div.sponsor-div-box {
+      width: 50%;
+   }
+}
+
+/* maintainers - copied from scikit-learn/scikit-learn */
+.maintainers-container {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+ }
+ 
+ .maintainers-container > div {
+   width: 100px;
+   margin: 5px;
+   font-size: 0.9rem;
+   text-align: center;
+ }
+
+ /* Fix version switcher button margin bottom */
+ button.version-switcher__button {
+   margin-bottom: 0em;
+ }
+
+ /* Fix scrollbars on primary sidebar */
+ .bd-sidebar-primary .sidebar-end-items {
+   margin-top: unset;
+ }
+
+ /* Fix Sphinx-Glr page bottom border */
+ p.sphx-glr-signature a.reference.external {
+   padding-bottom: 0px;
+ }
