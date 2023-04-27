@@ -57,6 +57,7 @@ class OptimalTransport(BaseEstimator, TransformerMixin):
     --------
     >>> import pandas as pd
     >>> import numpy as np
+    >>> from fairlearn.preprocessing import OptimalTransport 
     >>> n = 1000
     >>> is_advantaged_group = np.random.randint(2, size=n)
     >>> predictor_1 = np.random.rand(n)
