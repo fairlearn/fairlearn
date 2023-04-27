@@ -99,6 +99,13 @@ fairlearn.preprocessing
 
    preprocessing.CorrelationRemover
 
+.. autosummary::
+   :nosignatures:
+   :toctree: generated/
+   :template: classes.rst
+
+   preprocessing.OptimalTransport
+
 fairlearn.reductions
 ====================
 
