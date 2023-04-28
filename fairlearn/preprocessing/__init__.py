@@ -6,4 +6,4 @@
 from ._correlation_remover import CorrelationRemover
 from ._optimal_transport import OptimalTransport
 
-__all__ = ["CorrelationRemover","OptimalTransport"]
+__all__ = ["CorrelationRemover", "OptimalTransport"]
