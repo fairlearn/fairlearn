@@ -44,7 +44,7 @@ class OptimalTransport(BaseEstimator, TransformerMixin):
     Notes
     -----
     The procedure is based on the algorithm of
-    `Berk et al. (2022) <https://arxiv.org/abs/1610.02413`_ [1]_.
+    `Berk et al. (2022) <https://arxiv.org/abs/2111.09211`_ [1]_.
 
     References
     ----------
