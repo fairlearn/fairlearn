@@ -39,26 +39,25 @@ What we mean by *fairness*
 
 An AI system can behave unfairly for a variety of reasons. In Fairlearn,
 we define whether an AI system is behaving unfairly in terms of its
-impact on people – i.e., in terms of harms. We focus on two kinds of
-harms:
+impact on people – i.e., in terms of harm. We focus on two kinds:
 
--  *Allocation harms.* These harms can occur when AI systems extend or
+-  *Allocation harm.* This occurs when AI systems extend or
    withhold opportunities, resources, or information. Some of the key
    applications are in hiring, school admissions, and lending.
 
--  *Quality-of-service harms.* Quality of service refers to whether a
+-  *Quality-of-service harm.* Quality of service refers to whether a
    system works as well for one person as it does for another, even if
    no opportunities, resources, or information are extended or withheld.
 
 We follow the approach known as **group fairness**, which asks: *Which
-groups of individuals are at risk for experiencing harms?* The relevant
+groups of individuals are at risk for experiencing harm?* The relevant
 groups need to be specified by the data scientist and are application
 specific.
 
 Group fairness is formalized by a set of constraints, which require that
 some aspect (or aspects) of the AI system's behavior be comparable
-across the groups. The Fairlearn package enables assessment and
-mitigation of unfairness under several common definitions. To learn more
+across the groups. The Fairlearn package enables assessing and
+mitigating unfairness under several common definitions. To learn more
 about our definitions of fairness, please visit our
 `user guide on Fairness of AI Systems <https://fairlearn.org/main/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems>`__.
 
