@@ -67,11 +67,18 @@ def mf_1m_1cf():
         y_pred=y_p,
         sensitive_features=g_1,
         control_features=g_2,
+    )
+    target_boot = MetricFrame(
+        metrics=skm.recall_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        control_features=g_2,
         n_bootstrap_samples=n_samples,
         ci_quantiles=QUANTILES,
         bootstrap_random_state=13489623,
     )
-    return target
+    return target, target_boot
 
 
 class TestOverallQuantiles:
@@ -91,4 +98,19 @@ class TestOverallQuantiles:
         # Overall value should be close to quantile 0.5
         assert boot_mf.overall[1]["recall"] == pytest.approx(
             basic_mf.overall["recall"], abs=0.05
+        )
+
+    def test_1m_1_cf(self, mf_1m_1cf):
+        basic_mf = mf_1m_1cf[0]
+        boot_mf = mf_1m_1cf[1]
+        
+        assert isinstance(boot_mf.overall, list)
+        assert len(boot_mf.overall) == len(QUANTILES)
+
+        # Overall value should be close to quantile 0.5
+        assert boot_mf.overall[1]["f"] == pytest.approx(
+            basic_mf.overall["f"], abs=0.05
+        )
+        assert boot_mf.overall[1]["g"] == pytest.approx(
+            basic_mf.overall["g"], abs=0.05
         )

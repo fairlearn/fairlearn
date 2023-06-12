@@ -108,7 +108,7 @@ def _calc_series_quantiles(
     return result
 
 
-def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFrame]):
+def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFrame]) -> List[pd.DataFrame]:
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)
@@ -116,18 +116,13 @@ def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFr
 
     result_np = np.quantile(samples, q=quantiles, axis=0)
 
-    result_data = dict()
-    for i_c, c in enumerate(samples[0].columns):
-        nxt = []
-        for r in range(len(samples[0].index)):
-            qs = result_np[:, r, i_c]
-            nxt.append(qs)
-        result_data[c] = nxt
-    result = pd.DataFrame(
-        columns=samples[0].columns,
-        index=samples[0].index,
-        data=result_data,
-    )
+    result = []
+    assert result_np.shape[0] == len(quantiles)
+    for i in range(result_np.shape[0]):
+        nxt = pd.DataFrame(
+            columns=samples[0].columns, index=samples[0].index, data=result_np[i, :, :]
+        )
+        result.append(nxt)
 
     return result
 
