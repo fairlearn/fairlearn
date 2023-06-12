@@ -13,7 +13,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._bootstrap import generate_bootstrap_samples
+from ._bootstrap import calculate_pandas_quantiles, generate_bootstrap_samples
 from ._disaggregated_result import (
     DisaggregatedResult,
     _VALID_ERROR_STRING,
@@ -366,6 +366,14 @@ class MetricFrame:
                 sensitive_feature_names=self._sf_names,
                 control_feature_names=self._cf_names,
             )
+
+            result_overall = calculate_pandas_quantiles(
+                ci_quantiles, [x.overall for x in _bootstrap_samples]
+            )
+
+            self._result_cache["overall"] = [
+                self._extract_result(x, no_control_levels=False) for x in result_overall
+            ]
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """

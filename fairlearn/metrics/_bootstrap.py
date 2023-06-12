@@ -89,18 +89,22 @@ def generate_bootstrap_samples(
     return result
 
 
-def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]):
+def _calc_series_quantiles(
+    *, quantiles: List[float], samples: List[pd.Series]
+) -> List[pd.Series]:
     for s in samples:
         assert isinstance(s, pd.Series)
         assert s.name == samples[0].name
         assert all(s.index == samples[0].index)
 
     result_np = np.quantile(samples, q=quantiles, axis=0)
-    result = pd.Series(
-        name=samples[0].name,
-        index=samples[0].index,
-        data=[result_np[:, i] for i in range(result_np.shape[1])],
-    )
+    result = []
+    assert result_np.shape[0] == len(quantiles)
+    for i in range(result_np.shape[0]):
+        nxt = pd.Series(
+            name=samples[0].name, index=samples[0].index, data=result_np[i, :]
+        )
+        result.append(nxt)
     return result
 
 
@@ -130,7 +134,7 @@ def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFr
 
 def calculate_pandas_quantiles(
     quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
-) -> Union[pd.Series, pd.DataFrame]:
+) -> Union[List[pd.Series], List[pd.DataFrame]]:
     """Calculate quantiles for a list of pandas objects."""
     if isinstance(bootstrap_samples[0], pd.Series):
         result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)
