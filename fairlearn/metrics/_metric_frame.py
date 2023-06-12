@@ -294,6 +294,11 @@ class MetricFrame:
         sample_params: Optional[
             Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
         ] = None,
+        n_boot: Optional[int] = None,
+        ci_quantiles: Optional[List[float]] = None,
+        random_state: Union[
+            int, np.random.RandomState, List[int], List[np.random.RandomState]
+        ] = 123456,
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -334,17 +339,23 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        # Create the basic results
-        result = DisaggregatedResult.create(
-            data=all_data,
-            annotated_functions=annotated_funcs,
-            sensitive_feature_names=self._sf_names,
-            control_feature_names=self._cf_names,
-        )
-
-        # Build into cache
         self._result_cache = dict()
-        self._populate_results(result)
+        if n_boot is None:
+            assert ci_quantiles is None, "Can't have ci_quantiles not None"
+            # Create the basic results
+            result = DisaggregatedResult.create(
+                data=all_data,
+                annotated_functions=annotated_funcs,
+                sensitive_feature_names=self._sf_names,
+                control_feature_names=self._cf_names,
+            )
+
+            # Build into cache
+            self._populate_results(result)
+        else:
+            assert ci_quantiles is not None
+            assert isinstance(ci_quantiles, list)
+            assert all([isinstance(x, float) for x in ci_quantiles])
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
