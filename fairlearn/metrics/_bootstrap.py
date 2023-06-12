@@ -108,7 +108,9 @@ def _calc_series_quantiles(
     return result
 
 
-def _calc_dataframe_quantiles(*, quantiles: List[float], samples: List[pd.DataFrame]) -> List[pd.DataFrame]:
+def _calc_dataframe_quantiles(
+    *, quantiles: List[float], samples: List[pd.DataFrame]
+) -> List[pd.DataFrame]:
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)

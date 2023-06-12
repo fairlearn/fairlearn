@@ -103,14 +103,10 @@ class TestOverallQuantiles:
     def test_1m_1_cf(self, mf_1m_1cf):
         basic_mf = mf_1m_1cf[0]
         boot_mf = mf_1m_1cf[1]
-        
+
         assert isinstance(boot_mf.overall, list)
         assert len(boot_mf.overall) == len(QUANTILES)
 
         # Overall value should be close to quantile 0.5
-        assert boot_mf.overall[1]["f"] == pytest.approx(
-            basic_mf.overall["f"], abs=0.05
-        )
-        assert boot_mf.overall[1]["g"] == pytest.approx(
-            basic_mf.overall["g"], abs=0.05
-        )
+        assert boot_mf.overall[1]["f"] == pytest.approx(basic_mf.overall["f"], abs=0.05)
+        assert boot_mf.overall[1]["g"] == pytest.approx(basic_mf.overall["g"], abs=0.05)
