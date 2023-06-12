@@ -13,6 +13,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
+from ._bootstrap import generate_bootstrap_samples
 from ._disaggregated_result import (
     DisaggregatedResult,
     _VALID_ERROR_STRING,
@@ -294,9 +295,9 @@ class MetricFrame:
         sample_params: Optional[
             Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
         ] = None,
-        n_boot: Optional[int] = None,
+        n_bootstrap_samples: Optional[int] = None,
         ci_quantiles: Optional[List[float]] = None,
-        random_state: Union[
+        bootstrap_random_state: Union[
             int, np.random.RandomState, List[int], List[np.random.RandomState]
         ] = 123456,
     ):
@@ -340,7 +341,7 @@ class MetricFrame:
             nameset.add(name)
 
         self._result_cache = dict()
-        if n_boot is None:
+        if n_bootstrap_samples is None:
             assert ci_quantiles is None, "Can't have ci_quantiles not None"
             # Create the basic results
             result = DisaggregatedResult.create(
@@ -356,6 +357,15 @@ class MetricFrame:
             assert ci_quantiles is not None
             assert isinstance(ci_quantiles, list)
             assert all([isinstance(x, float) for x in ci_quantiles])
+
+            _bootstrap_samples = generate_bootstrap_samples(
+                n_samples=n_bootstrap_samples,
+                random_state=bootstrap_random_state,
+                data=all_data,
+                annotated_functions=annotated_funcs,
+                sensitive_feature_names=self._sf_names,
+                control_feature_names=self._cf_names,
+            )
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
