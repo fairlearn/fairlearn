@@ -370,9 +370,15 @@ class MetricFrame:
             result_overall = calculate_pandas_quantiles(
                 ci_quantiles, [x.overall for x in _bootstrap_samples]
             )
-
             self._result_cache["overall"] = [
                 self._extract_result(x, no_control_levels=False) for x in result_overall
+            ]
+
+            result_group = calculate_pandas_quantiles(
+                ci_quantiles, [x.by_group for x in _bootstrap_samples]
+            )
+            self._result_cache["by_group"] = [
+                self._extract_result(x, no_control_levels=True) for x in result_group
             ]
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
@@ -463,7 +469,11 @@ class MetricFrame:
                         self._result_cache[c_t][c_m][err_string] = e
 
     @property
-    def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
+    def overall(
+        self,
+    ) -> Union[
+        Any, pd.Series, pd.DataFrame, List[Any], List[pd.Series], List[pd.DataFrame]
+    ]:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Read more in the :ref:`User Guide <assessment_quantify_harms>`.
@@ -498,7 +508,9 @@ class MetricFrame:
         return self._result_cache["overall"]
 
     @property
-    def by_group(self) -> Union[pd.Series, pd.DataFrame]:
+    def by_group(
+        self,
+    ) -> Union[pd.Series, pd.DataFrame, List[pd.Series], List[pd.DataFrame]]:
         """Return the collection of metrics evaluated for each subgroup.
 
         The collection is defined by the combination of classes in the
