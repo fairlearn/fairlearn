@@ -18,7 +18,13 @@ def demographic_parity_difference(
     The demographic parity difference of 0 means that all groups have the same selection rate.
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     y_true : array-like

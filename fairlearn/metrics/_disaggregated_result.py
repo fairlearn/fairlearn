@@ -69,7 +69,13 @@ class DisaggregatedResult:
     is that no account is made of whether the user supplied
     a bare function or a dictionary. Hence the results are
     always Series or DataFrame.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     overall: Series or DataFrame

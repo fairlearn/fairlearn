@@ -25,7 +25,13 @@ class AnnotatedMetricFunction:
     `DataFrame.apply()`. The net result of this is that it is useful
     to have a function wrapper which can be invoked with a DataFrame
     argument, and extract its arguments from that DataFrame.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     func : callable

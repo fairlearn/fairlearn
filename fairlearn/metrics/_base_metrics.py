@@ -32,7 +32,13 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
     This method prepares the `labels` argument of
     :py:func:`sklearn.metrics.confusion_matrix` based on the
     user's specifications.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     labels : array-like

@@ -34,7 +34,13 @@ def _build_legend(ax, kind, legend_label):
     """Take an axis and builds a custom legend.
 
     Adds a legend item based off of `legend_label` for confidence intervals
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     ax : :class:`matplotlib.axes.Axes`
@@ -58,7 +64,13 @@ def _build_legend(ax, kind, legend_label):
 
 def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
     r"""Plot the data with or without errors.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     df : pd.DataFrame
@@ -144,7 +156,13 @@ def plot_metric_frame(
 
     The items at each index of the given `metrics` array and given `errors` or `conf_intervals`
     array should correspond to a pair of the same metric and metric error, respectively.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     metric_frame : fairlearn.metrics.MetricFrame

@@ -38,7 +38,13 @@ def plot_model_comparison(
     A typical use case is when one of the metrics is a performance metric
     (e.g., balanced_accuracy) and the other is a fairness metric
     (e.g., false_negative_rate_difference).
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     y_preds : array-like, dict of array-like

@@ -139,7 +139,13 @@ class MetricFrame:
     of 'controlling' for a variable.
 
     Read more in the :ref:`User Guide <assessment>`.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     metrics : callable or dict

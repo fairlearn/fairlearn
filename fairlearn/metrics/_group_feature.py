@@ -28,7 +28,13 @@ class GroupFeature:
 
     It also holds the feature name, which can be supplied by the caller,
     or generated from a base and and index.
-
+    .. versionadded:: 0.7
+            In previous versions only the ``predict`` method was used
+            implicitly.
+    .. versionchanged:: 0.7
+            From version 0.7, 'predict' is deprecated and the default will
+            change to 'auto' from v0.10.
+  
     Parameters
     ----------
     base_name : str
