@@ -39,7 +39,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     tolerance.
 
     The method amounts to finding the set of (potentially randomized) 
-    group-specific decision thresholds that maximize some goal (e.g., accuracy),
+    group-specific decision thresholds that maximize some objective (e.g., accuracy),
     given a maximum tolerance (or slack) on the fairness constraint fulfillment.
     
     This optimization problem amounts to a Linear Program (LP) as detailed in 
