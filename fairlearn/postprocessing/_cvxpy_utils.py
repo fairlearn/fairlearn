@@ -113,7 +113,7 @@ def compute_halfspace_inequality(
     # > the halfspace's b intercept value will correspond to this value of x;
     if np.isinf(slope):
 
-        # Sanity check for vertical line
+        # Validating vertical line
         if not np.isclose(p1x, p2x):
             raise RuntimeError(
                 "Got infinite slope for line containing two points with "
@@ -131,7 +131,7 @@ def compute_halfspace_inequality(
     # > the halfspace's b intercept value will correspond to this value of y;
     elif np.isclose(slope, 0.0):
 
-        # Sanity checks for horizontal line
+        # Validating horizontal line
         if not np.isclose(p1y, p2y) or not np.isclose(p1y, intercept):
             raise RuntimeError(
                 f"Invalid horizontal line; points p1 and p2 should have same "
@@ -220,7 +220,7 @@ def make_cvxpy_point_in_polygon_constraints(
     ]
 
 
-def compute_equal_odds_optimum(
+def compute_equalized_odds_optimum(
         groupwise_roc_hulls: dict[int, np.ndarray],
         fairness_tolerance: float,
         group_sizes_label_pos: np.ndarray,
@@ -333,7 +333,7 @@ def compute_equal_odds_optimum(
     groupwise_roc_points = np.vstack([p.value for p in groupwise_roc_points_vars])
     global_roc_point = global_roc_point_var.value
 
-    # Sanity check solution cost
+    # Validating solution cost
     solution_cost = calc_cost_of_point(
         fpr=global_roc_point[0],
         fnr=1-global_roc_point[1],
@@ -344,11 +344,11 @@ def compute_equal_odds_optimum(
 
     if not np.isclose(solution_cost, prob.value):
         logging.error(
-            f"Solution was found but cost did not pass sanity check! "
+            f"Solution was found but cost did not pass validation! "
             f"Found solution ROC point {global_roc_point} with theoretical cost "
             f"{prob.value}, but actual cost is {solution_cost};")
 
-    # Sanity check congruency between group-wise ROC points and global ROC point
+    # Validating congruency between group-wise ROC points and global ROC point
     global_roc_from_groupwise = compute_global_roc_from_groupwise(
         groupwise_roc_points=groupwise_roc_points,
         groupwise_label_pos_weight=group_sizes_label_pos,

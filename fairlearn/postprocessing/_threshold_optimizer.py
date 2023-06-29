@@ -130,6 +130,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     estimator : object
         A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
         whose output is postprocessed.
+        The estimator should output real-valued scores, as postprocessing 
+        results will be extremely poor when performed over binarized 
+        predictions.
 
     constraints : str, default='demographic_parity'
         Fairness constraints under which threshold optimization is performed.

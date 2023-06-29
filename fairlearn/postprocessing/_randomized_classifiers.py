@@ -270,7 +270,7 @@ class RandomizedClassifier(Classifier):
         # Calculate weights for P upwards and P downwards
         weight_P_upwards = (target_tpr - point_P_downwards[1]) / (point_P_upwards[1] - point_P_downwards[1])
 
-        # Sanity checks...
+        # Validating triangulation results
         all_points = np.vstack((point_A, point_B, point_P_downwards))
         all_weights = np.hstack((weight_P_upwards * weights_AB, 1 - weight_P_upwards))
 

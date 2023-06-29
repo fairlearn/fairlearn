@@ -4,15 +4,10 @@
 import numpy as np
 import pandas as pd
 
+from fairlearn.utils._common import _MESSAGE_BAD_COSTS
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 from .moment import _ALL, _LABEL, ClassificationMoment
-
-_MESSAGE_BAD_COSTS = (
-    "costs needs to be a dictionary with keys "
-    "'fp' and 'fn' containing non-negative values, which are not both zero"
-)
-
 
 class ErrorRate(ClassificationMoment):
     r"""Misclassification error as a moment.

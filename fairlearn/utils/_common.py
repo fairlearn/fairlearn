@@ -2,6 +2,12 @@
 # Licensed under the MIT License.
 
 
+_MESSAGE_BAD_COSTS = (
+    "costs needs to be a dictionary with keys "
+    "'fp' and 'fn' containing non-negative values, which are not both zero"
+)
+
+
 def _get_soft_predictions(estimator, X, predict_method):
     r"""Return soft predictions of a classifier.
 

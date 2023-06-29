@@ -17,6 +17,7 @@ def calc_cost_of_point(
         fpr: float,
         fnr: float,
         prevalence: float,
+        *,
         false_pos_cost: float = 1.,
         false_neg_cost: float = 1.,
     ) -> float:
@@ -104,7 +105,7 @@ def compute_global_roc_from_groupwise(
     """
     n_groups, _ = groupwise_roc_points.shape
 
-    # Some initial sanity checks
+    # Validating input shapes
     if (len(groupwise_label_pos_weight) != len(groupwise_label_neg_weight) or
         len(groupwise_label_pos_weight) != n_groups):
        raise ValueError(
