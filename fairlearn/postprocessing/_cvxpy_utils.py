@@ -11,6 +11,18 @@ from ._constants import _CVXPY_IMPORT_ERROR_MESSAGE
 from ._roc_utils import calc_cost_of_point, compute_global_roc_from_groupwise
 
 
+# Set of all fairness constraints with a cvxpy LP implementation
+ALL_CONSTRAINTS = {
+    "equalized_odds",
+}
+
+NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
+    "Currently only the following constraints are supported: {}.".format(
+        ", ".join(sorted(ALL_CONSTRAINTS))
+    )
+)
+
+
 # Maximum distance from solution to feasibility or optimality
 SOLUTION_TOLERANCE = 1e-9
 
@@ -220,9 +232,11 @@ def make_cvxpy_point_in_polygon_constraints(
     ]
 
 
-def compute_equalized_odds_optimum(
+def compute_fair_optimum(
+        *,
+        fairness_constraint: str,
+        tolerance: float,
         groupwise_roc_hulls: dict[int, np.ndarray],
-        fairness_tolerance: float,
         group_sizes_label_pos: np.ndarray,
         group_sizes_label_neg: np.ndarray,
         global_prevalence: float,
@@ -235,22 +249,34 @@ def compute_equalized_odds_optimum(
 
     Parameters
     ----------
+    fairness_constraint : str
+        The name of the fairness constraint under which the LP will be 
+        optimized. Possible inputs are:
+
+            'equalized_odds'
+                match true positive and false positive rates across groups
+
+    tolerance : float
+        A value for the tolerance when enforcing the fairness constraint.
+
     groupwise_roc_hulls : dict[int, np.ndarray]
         A dict mapping each group to the convex hull of the group's ROC curve.
         The convex hull is an np.array of shape (n_points, 2), containing the 
         points that form the convex hull of the ROC curve, sorted in COUNTER
         CLOCK-WISE order.
-    fairness_tolerance : float
-        A value for the tolerance when enforcing the equal odds fairness 
-        constraint, i.e., equality of TPR and FPR among groups.
+
     group_sizes_label_pos : np.ndarray
         The relative or absolute number of positive samples in each group.
+
     group_sizes_label_neg : np.ndarray
         The relative or absolute number of negative samples in each group.
+
     global_prevalence : float
         The global prevalence of positive samples.
+
     false_positive_cost : float, optional
         The cost of a FALSE POSITIVE error, by default 1.
+
     false_negative_cost : float, optional
         The cost of a FALSE NEGATIVE error, by default 1.
 
@@ -262,6 +288,10 @@ def compute_equalized_odds_optimum(
         2: an array with the single global ROC point for the solution.
     """
     _import_cvxpy_if_available()
+    import cvxpy as cp
+
+    if fairness_constraint not in ALL_CONSTRAINTS:
+        raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
     n_groups = len(groupwise_roc_hulls)
     if n_groups != len(group_sizes_label_neg) or n_groups != len(group_sizes_label_pos):
@@ -285,14 +315,19 @@ def compute_equalized_odds_optimum(
         global_roc_point_var[1] == group_sizes_label_pos @ np.array([p[1] for p in groupwise_roc_points_vars]),
     ]
 
-    # Relaxed equal odds constraints
-    # 1st option - CONSTRAINT FOR: l-inf distance between any two group's ROCs being less than epsilon
-    constraints += [
-        cp.norm_inf(groupwise_roc_points_vars[i] - groupwise_roc_points_vars[j]) <= fairness_tolerance
-        for i, j in product(range(n_groups), range(n_groups))
-        if i < j
-        # if i != j
-    ]
+    ### APPLY FAIRNESS CONSTRAINTS
+    # IF "equalized_odds"
+    # > i.e., CONSTRAIN l-inf distance between any two group's ROCs being less than `tolerance`
+    if fairness_constraint == "equalized_odds":
+        constraints += [
+            cp.norm_inf(groupwise_roc_points_vars[i] - groupwise_roc_points_vars[j]) <= tolerance
+            for i, j in product(range(n_groups), range(n_groups))
+            if i < j
+        ]
+    
+    else:
+        # TODO: implement other constraints here
+        raise NotImplementedError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
     # Constraints for points in respective group-wise ROC curves
     for idx in range(n_groups):

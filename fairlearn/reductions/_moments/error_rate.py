@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 
-from fairlearn.utils._common import _MESSAGE_BAD_COSTS
+from fairlearn.utils._common import unpack_fp_fn_costs
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 from .moment import _ALL, _LABEL, ClassificationMoment
@@ -43,17 +43,8 @@ class ErrorRate(ClassificationMoment):
         if costs is None:
             self.fp_cost = 1.0
             self.fn_cost = 1.0
-        elif (
-            type(costs) is dict
-            and costs.keys() == {"fp", "fn"}
-            and costs["fp"] >= 0.0
-            and costs["fn"] >= 0.0
-            and costs["fp"] + costs["fn"] > 0.0
-        ):
-            self.fp_cost = costs["fp"]
-            self.fn_cost = costs["fn"]
         else:
-            raise ValueError(_MESSAGE_BAD_COSTS)
+            self.fp_cpst, self.fn_cost = unpack_fp_fn_costs(costs)
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""

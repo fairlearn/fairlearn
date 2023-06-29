@@ -1,11 +1,50 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from __future__ import annotations
 
 _MESSAGE_BAD_COSTS = (
     "costs needs to be a dictionary with keys "
     "'fp' and 'fn' containing non-negative values, which are not both zero"
 )
+
+
+def unpack_fp_fn_costs(costs: dict) -> tuple[float, float]:
+    """Validates and unpacks the given `costs`.
+
+    Parameters
+    ----------
+    costs : dict
+        A dictionary detailing the cost for false positives and false negatives,
+        of the form :code:`{'fp': <fp_cost>, 'fn': <fn_cost>}`.
+        
+    Returns
+    -------
+    tuple[float, float]
+        A tuple respectively composed of the cost of false positives and the
+        cost of false negatives, i.e., a tuple with 
+        :code:`(fp_cost, fn_cost)`.
+
+    Raises
+    ------
+    ValueError
+        Raised when the provided costs are invalid (e.g., missing keys
+        in the provided dict, or negative costs).
+    """
+    if (
+        type(costs) is dict
+        and costs.keys() == {"fp", "fn"}
+        and costs["fp"] >= 0.0
+        and costs["fn"] >= 0.0
+        and costs["fp"] + costs["fn"] > 0.0
+    ):
+        fp_cost = costs["fp"]
+        fn_cost = costs["fn"]
+
+    else:
+        raise ValueError(_MESSAGE_BAD_COSTS)
+    
+    return fp_cost, fn_cost
 
 
 def _get_soft_predictions(estimator, X, predict_method):

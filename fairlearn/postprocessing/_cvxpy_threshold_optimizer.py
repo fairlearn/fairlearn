@@ -15,17 +15,21 @@ from __future__ import annotations
 
 import logging
 from itertools import product
-from typing import Callable
 
 import numpy as np
 from sklearn.metrics import roc_curve
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
+from fairlearn.postprocessing._cvxpy_utils import 
 
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 from fairlearn.utils._common import _get_soft_predictions
-from fairlearn.utils._common import _MESSAGE_BAD_COSTS
+from fairlearn.utils._common import unpack_fp_fn_costs
 
-from ._cvxpy_utils import compute_equalized_odds_optimum
+from ._cvxpy_utils import (
+    compute_fair_optimum,
+    ALL_CONSTRAINTS,
+    NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE,
+)
 from ._roc_utils import (
     roc_convex_hull,
     calc_cost_of_point,
@@ -44,7 +48,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     The method amounts to finding the set of (potentially randomized) 
     group-specific decision thresholds that maximize some objective (e.g., accuracy),
     given a maximum tolerance (or slack) on the fairness constraint fulfillment.
-    
+
     This optimization problem amounts to a Linear Program (LP) as detailed in 
     :footcite:ct:`cruz2023reductions`. Solving the LP requires installing 
     `cvxpy`.
@@ -53,12 +57,19 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
     Parameters
     ----------
-    estimator : object
-        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+    predictor : object
+        A prefit `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
         whose output will be postprocessed.
-        The estimator should output real-valued scores, as postprocessing 
+        The predictor should output real-valued scores, as postprocessing 
         results will be extremely poor when performed over binarized 
         predictions.
+
+    constraint : str, default='equalized_odds'
+        Fairness constraint under which threshold optimization is performed. 
+        Possible inputs currently are:
+
+            'equalized_odds'
+                match true positive and false positive rates across groups
 
     tolerance : float
         The absolute tolerance for the equalized odds fairness constraint.
@@ -67,7 +78,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         value must be in range [0, 1] (closed interval).
 
 
-    objective_costs : dict
+    objective_costs : dict, optional
         A dictionary detailing the cost for false positives and false negatives,
         of the form :code:`{'fp': <fp_cost>, 'fn': <fn_cost>}`. Will use the 0-1
         loss by default (maximum accuracy).
@@ -77,9 +88,40 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         default 1000. This corresponds to the maximum number of different 
         thresholds to use over a predictor.
 
-    seed : int
+    predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
+            }, default='auto'
+
+        Defines which method of the ``estimator`` is used to get the output
+        values.
+
+            'auto'
+                use one of :code:`predict_proba`, :code:`decision_function`, or 
+                :code:`predict`, in that order.
+            
+            'predict_proba'
+                use the second column from the output of :code:`predict_proba`. 
+                It is assumed that the second column represents the positive 
+                outcome.
+            
+            'decision_function'
+                use the raw values given by the :code:`decision_function`.
+            
+            'predict'
+                use the hard values reported by the :code:`predict` method if 
+                estimator is a classifier, and the regression values if 
+                estimator is a regressor.
+                Warning: postprocessing may lead to poor results when using 
+                :code:`predict_method='predict'` with classifiers, as that will
+                binarize predictions.
+
+    random_state : int, optional
         A random seed used for reproducibility when producing randomized
         classifiers, by default None (default: non-reproducible behavior).
+
+    Raises
+    ------
+    ValueError
+        A ValueError will be raised if constructor arguments are not valid.
 
     Notes
     -----
@@ -91,12 +133,15 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
     This method is also implemented in its 
     `standalone Python package <https://github.com/socialfoundations/error-parity>`_.    # noqa
+
     """
 
     def __init__(
             self,
+            *,
             predictor: BaseEstimator,
-            tolerance: float,
+            constraint: str = "equalized_odds",
+            tolerance: float = 0.0,
             objective_costs: dict = None,
             grid_size: int = 1000,
             predict_method: str = "auto",
@@ -105,7 +150,17 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         # Save arguments
         self.predictor = predictor
+        self.constraint = constraint
         self.tolerance = tolerance
+        self.max_grid_size = grid_size
+        self.predict_method = predict_method
+        self.random_state = random_state
+
+        # Validate constraint
+        if self.constraint not in ALL_CONSTRAINTS:
+            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+
+        # Validate constraint tolerance
         if (
             not isinstance(self.tolerance, (float, int)) 
             or self.tolerance < 0 or self.tolerance > 1
@@ -115,17 +170,13 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 f"tolerance={self.tolerance}, but value should be in range "
                 f"[0, 1].")
 
-        self.max_grid_size = grid_size
-        self.predict_method = predict_method
-        self.random_state = random_state
-
         # Unpack objective costs
         if objective_costs is None:
             self.false_pos_cost = 1.0
             self.false_neg_cost = 1.0
         else:
             self.false_pos_cost, self.false_neg_cost = \
-                self.unpack_objective_costs(objective_costs)
+                unpack_fp_fn_costs(objective_costs)
 
         # Initialize instance variables
         self._all_roc_data: dict = None
@@ -134,44 +185,6 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self._global_roc_point: np.ndarray = None
         self._global_prevalence: float = None
         self._realized_classifier: EnsembleGroupwiseClassifiers = None
-
-    @staticmethod
-    def unpack_objective_costs(objective_costs: dict) -> tuple[float, float]:
-        """Validates and unpacks the given `objective_costs`.
-
-        Parameters
-        ----------
-        objective_costs : dict
-            A dictionary detailing the cost for false positives and false negatives,
-            of the form :code:`{'fp': <fp_cost>, 'fn': <fn_cost>}`. Will use the 0-1
-            loss by default (maximum accuracy).
-            
-        Returns
-        -------
-        tuple[float, float]
-            A tuple respectively composed of the cost of false positives and the
-            cost of false negatives, i.e., a tuple with 
-            :code:`(fp_cost, fn_cost)`.
-
-        Raises
-        ------
-        ValueError
-            Raised when the provided costs are invalid (e.g., missing keys
-            in the provided dict, or negative costs).
-        """
-        if (
-            type(objective_costs) is dict
-            and objective_costs.keys() == {"fp", "fn"}
-            and objective_costs["fp"] >= 0.0
-            and objective_costs["fn"] >= 0.0
-            and objective_costs["fp"] + objective_costs["fn"] > 0.0
-        ):
-            fp_cost = objective_costs["fp"]
-            fn_cost = objective_costs["fn"]
-        else:
-            raise ValueError(_MESSAGE_BAD_COSTS)
-        
-        return fp_cost, fn_cost
 
     @property
     def groupwise_roc_points(self) -> np.ndarray:
@@ -230,7 +243,10 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         float
             The fairness constraint violation.
         """
-        return self.equalized_odds_violation()
+        if self.constraint == "equalized_odds":
+            return self.equalized_odds_violation()
+        else:
+            raise NotImplementedError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
     def equalized_odds_violation(self) -> float:
         """Computes the theoretical violation of the equal odds constraint 
@@ -351,9 +367,10 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             self._all_roc_hulls[g] = roc_convex_hull(curr_roc_points)
 
         # Find the group-wise optima that fulfill the fairness criteria
-        self._groupwise_roc_points, self._global_roc_point = compute_equalized_odds_optimum(
+        self._groupwise_roc_points, self._global_roc_point = compute_fair_optimum(
+            fairness_constraint=self.constraint,
             groupwise_roc_hulls=self._all_roc_hulls,
-            fairness_tolerance=self.tolerance,
+            tolerance=self.tolerance,
             group_sizes_label_pos=group_sizes_label_pos,
             group_sizes_label_neg=group_sizes_label_neg,
             global_prevalence=self._global_prevalence,
@@ -363,7 +380,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         # Construct each group-specific classifier
         all_rand_clfs = {
-            g: RandomizedClassifier.construct_at_target_ROC(
+            g: RandomizedClassifier.construct_at_target_ROC(    # TODO: check InterpolatedThresholder
                 predictor=self.predictor,
                 roc_curve_data=self._all_roc_data[g],
                 target_roc_point=self._groupwise_roc_points[g],
@@ -373,7 +390,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         }
 
         # Construct the global classifier (can be used for all groups)
-        self._realized_classifier = EnsembleGroupwiseClassifiers(group_to_clf=all_rand_clfs)
+        self._realized_classifier = EnsembleGroupwiseClassifiers(group_to_clf=all_rand_clfs)    # TODO: check InterpolatedThresholder
         return self
     
     def _check_fit_status(self, raise_error: bool = True) -> bool:
