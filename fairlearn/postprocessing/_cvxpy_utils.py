@@ -316,7 +316,7 @@ def compute_fair_optimum(
     ]
 
     ### APPLY FAIRNESS CONSTRAINTS
-    # IF "equalized_odds"
+    # If "equalized_odds"
     # > i.e., CONSTRAIN l-inf distance between any two group's ROCs being less than `tolerance`
     if fairness_constraint == "equalized_odds":
         constraints += [
@@ -324,9 +324,29 @@ def compute_fair_optimum(
             for i, j in product(range(n_groups), range(n_groups))
             if i < j
         ]
-    
+
+    # If some rate parity, i.e., parity of one of {TPR, FPR, TNR, FNR}
+    elif fairness_constraint.endswith("rate_parity"):
+
+        roc_idx_of_interest: int
+        if fairness_constraint == "true_positive_rate_parity" or fairness_constraint == "false_negative_rate_parity":
+            roc_idx_of_interest = 1
+
+        elif fairness_constraint == "false_positive_rate_parity" or fairness_constraint == "false_negative_rate_parity":
+            roc_idx_of_interest = 0
+        
+        else:
+            # This point should never be reached as fairness constraint was previously validated
+            raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+
+        constraints += [
+            cp.abs(groupwise_roc_points_vars[roc_idx_of_interest][i] - groupwise_roc_points_vars[roc_idx_of_interest][j]) <= tolerance
+            for i, j in product(range(n_groups), range(n_groups))
+            if i < j
+        ]
+
+    # TODO: implement other constraints here
     else:
-        # TODO: implement other constraints here
         raise NotImplementedError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
     # Constraints for points in respective group-wise ROC curves

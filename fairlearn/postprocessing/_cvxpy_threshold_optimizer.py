@@ -3,7 +3,7 @@
 TODO
 ----
 - Add option for constraining only equality of FPR or TPR (currently it must be 
-both -> equal odds);
+both -> equalized odds);
 - Add option for constraining equality of positive predictions (independence
 criterion, aka demographic parity);
 - Add option to use l1 or linf distances for maximum tolerance between points.
@@ -249,7 +249,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             raise NotImplementedError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
     def equalized_odds_violation(self) -> float:
-        """Computes the theoretical violation of the equal odds constraint 
+        """Computes the theoretical violation of the equalized odds constraint 
         (i.e., the maximum l-inf distance between the ROC point of any pair
         of groups).
 
@@ -283,8 +283,8 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
 
     def fit(self, X: np.ndarray, y: np.ndarray, *, sensitive_features: np.ndarray, y_scores: np.ndarray = None):
-        """Fit this predictor to achieve the (possibly relaxed) equal odds 
-        constraint on the provided data.
+        """Find the optimal postprocessing that fulfills the (possibly relaxed) 
+        fairness constraint on the provided data.
 
         Parameters
         ----------
