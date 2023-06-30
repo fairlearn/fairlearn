@@ -41,9 +41,7 @@ def generate_single_bootstrap_sample(
 def generate_bootstrap_samples(
     *,
     n_samples: int,
-    random_state: Optional[Union[
-        int, np.random.RandomState
-    ]],
+    random_state: Optional[Union[int, np.random.RandomState]],
     data: pd.DataFrame,
     annotated_functions: Dict[str, AnnotatedMetricFunction],
     sensitive_feature_names: List[str],
@@ -61,14 +59,13 @@ def generate_bootstrap_samples(
     if random_state is None:
         generator = np.random.default_rng()
         rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+    elif isinstance(random_state, np.random.RandomState):
+        rs = random_state.randint(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+    elif isinstance(random_state, int):
+        generator = np.random.default_rng(seed=random_state)
+        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
     else:
-        if isinstance(random_state, np.random.RandomState):
-            rs = random_state.randint(
-                low=0, high=np.iinfo(np.uint32).max, size=n_samples
-            )
-        else:
-            generator = np.random.default_rng(seed=random_state)
-            rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        raise ValueError(f"Unsupported random_state: {random_state}")
 
     result = []
     for i in range(n_samples):
