@@ -297,9 +297,7 @@ class MetricFrame:
         ] = None,
         n_boot: Optional[int] = None,
         ci_quantiles: Optional[List[float]] = None,
-        bootstrap_random_state: Union[
-            int, np.random.RandomState, List[int], List[np.random.RandomState]
-        ] = 123456,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -360,7 +358,7 @@ class MetricFrame:
 
             _bootstrap_samples = generate_bootstrap_samples(
                 n_samples=n_boot,
-                random_state=bootstrap_random_state,
+                random_state=random_state,
                 data=all_data,
                 annotated_functions=annotated_funcs,
                 sensitive_feature_names=self._sf_names,

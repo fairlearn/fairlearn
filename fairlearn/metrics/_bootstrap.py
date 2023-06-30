@@ -41,9 +41,9 @@ def generate_single_bootstrap_sample(
 def generate_bootstrap_samples(
     *,
     n_samples: int,
-    random_state: Union[
-        int, np.random.RandomState, List[int], List[np.random.RandomState]
-    ],
+    random_state: Optional[Union[
+        int, np.random.RandomState
+    ]],
     data: pd.DataFrame,
     annotated_functions: Dict[str, AnnotatedMetricFunction],
     sensitive_feature_names: List[str],
@@ -53,19 +53,14 @@ def generate_bootstrap_samples(
 
     The list will contain n_samples, and a random_state must be supplied.
 
-    If random_state is a list (assumed to be of integers of numpy generators),
-    then it must be of length n_samples, and each will be used for the corresponding
-    sample.
-
     If random_state is an integer or a numpy generator, it will be used to
     create a list of num_samples random integers, which will then be used as
     the seeds for each bootstrap sample
     """
     assert n_samples >= 1
-    assert random_state is not None, "Must specify random_state"
-    if isinstance(random_state, list):
-        assert len(random_state) == n_samples, "Must have one state per desired sample"
-        rs = random_state
+    if random_state is None:
+        generator = np.random.default_rng()
+        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
     else:
         if isinstance(random_state, np.random.RandomState):
             rs = random_state.randint(

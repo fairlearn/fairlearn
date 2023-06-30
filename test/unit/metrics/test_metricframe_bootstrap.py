@@ -32,7 +32,7 @@ def mf_1m_0cf():
         sensitive_features=g_1,
         n_boot=n_samples,
         ci_quantiles=QUANTILES,
-        bootstrap_random_state=13489623,
+        random_state=13489623,
     )
     return target, target_boot
 
@@ -53,7 +53,7 @@ def mf_1mdict_0cf():
         sensitive_features=g_1,
         n_boot=n_samples,
         ci_quantiles=QUANTILES,
-        bootstrap_random_state=13489623,
+        random_state=13489623,
     )
     return target, target_boot
 
@@ -76,7 +76,7 @@ def mf_1m_1cf():
         control_features=g_2,
         n_boot=n_samples,
         ci_quantiles=QUANTILES,
-        bootstrap_random_state=13489623,
+        random_state=13489623,
     )
     return target, target_boot
 
@@ -100,7 +100,7 @@ def mf_2m_1cf():
         control_features=g_2,
         n_boot=n_samples,
         ci_quantiles=QUANTILES,
-        bootstrap_random_state=13489623,
+        random_state=13489623,
     )
     return target, target_boot
 
