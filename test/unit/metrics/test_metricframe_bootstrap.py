@@ -111,6 +111,7 @@ class TestOverallQuantiles:
         boot_mf = mf_1m_0cf[1]
         assert isinstance(boot_mf.overall, list)
         assert len(boot_mf.overall) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
         # Overall value should be close to quantile 0.5
         assert boot_mf.overall[1] == pytest.approx(basic_mf.overall, abs=0.05)
 
@@ -119,6 +120,7 @@ class TestOverallQuantiles:
         boot_mf = mf_1mdict_0cf[1]
         assert isinstance(boot_mf.overall, list)
         assert len(boot_mf.overall) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
         # Overall value should be close to quantile 0.5
         assert boot_mf.overall[1]["recall"] == pytest.approx(
             basic_mf.overall["recall"], abs=0.05
@@ -130,6 +132,7 @@ class TestOverallQuantiles:
 
         assert isinstance(boot_mf.overall, list)
         assert len(boot_mf.overall) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
 
         # Overall value should be close to quantile 0.5
         assert boot_mf.overall[1]["f"] == pytest.approx(basic_mf.overall["f"], abs=0.05)
@@ -141,6 +144,7 @@ class TestOverallQuantiles:
 
         assert isinstance(boot_mf.overall, list)
         assert len(boot_mf.overall) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
 
         # Overall value should be close to quantile 0.5
         for m in ["recall", "prec"]:
@@ -156,6 +160,7 @@ class TestByGroupQuantiles:
         boot_mf = mf_1m_0cf[1]
         assert isinstance(boot_mf.by_group, list)
         assert len(boot_mf.by_group) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
         for g in np.unique(g_1):
             # Check median close to nominal
             assert boot_mf.by_group[1][g] == pytest.approx(
@@ -167,6 +172,7 @@ class TestByGroupQuantiles:
         boot_mf = mf_1mdict_0cf[1]
         assert isinstance(boot_mf.by_group, list)
         assert len(boot_mf.by_group) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
         for g in np.unique(g_1):
             # Check median close to nominal
             assert boot_mf.by_group[1]["recall"][g] == pytest.approx(
@@ -179,6 +185,7 @@ class TestByGroupQuantiles:
 
         assert isinstance(boot_mf.by_group, list)
         assert len(boot_mf.by_group) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
         for cf in np.unique(g_2):
             for g in np.unique(g_1):
                 # Check median close to nominal
@@ -192,6 +199,7 @@ class TestByGroupQuantiles:
 
         assert isinstance(boot_mf.by_group, list)
         assert len(boot_mf.by_group) == len(QUANTILES)
+        assert boot_mf.ci_quantiles == QUANTILES
 
         for m in ["recall", "prec"]:
             for cf in np.unique(g_2):

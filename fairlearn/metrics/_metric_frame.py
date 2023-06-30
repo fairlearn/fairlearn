@@ -339,6 +339,7 @@ class MetricFrame:
             nameset.add(name)
 
         self._result_cache = dict()
+        self._ci_quantiles = None
         if n_boot is None:
             assert ci_quantiles is None, "Can't have ci_quantiles not None"
             # Create the basic results
@@ -355,6 +356,7 @@ class MetricFrame:
             assert ci_quantiles is not None
             assert isinstance(ci_quantiles, list)
             assert all([isinstance(x, float) for x in ci_quantiles])
+            self._ci_quantiles = ci_quantiles
 
             _bootstrap_samples = generate_bootstrap_samples(
                 n_samples=n_boot,
@@ -568,6 +570,11 @@ class MetricFrame:
             :meth:`pandas.DataFrame.groupby` etc.
         """
         return self._sf_names
+
+    @property
+    def ci_quantiles(self) -> Optional[List[float]]:
+        """Return the quantiles specified for bootstrapping."""
+        return self._ci_quantiles
 
     def _group(
         self,
