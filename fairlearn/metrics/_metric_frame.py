@@ -295,7 +295,7 @@ class MetricFrame:
         sample_params: Optional[
             Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
         ] = None,
-        n_bootstrap_samples: Optional[int] = None,
+        n_boot: Optional[int] = None,
         ci_quantiles: Optional[List[float]] = None,
         bootstrap_random_state: Union[
             int, np.random.RandomState, List[int], List[np.random.RandomState]
@@ -341,7 +341,7 @@ class MetricFrame:
             nameset.add(name)
 
         self._result_cache = dict()
-        if n_bootstrap_samples is None:
+        if n_boot is None:
             assert ci_quantiles is None, "Can't have ci_quantiles not None"
             # Create the basic results
             result = DisaggregatedResult.create(
@@ -359,7 +359,7 @@ class MetricFrame:
             assert all([isinstance(x, float) for x in ci_quantiles])
 
             _bootstrap_samples = generate_bootstrap_samples(
-                n_samples=n_bootstrap_samples,
+                n_samples=n_boot,
                 random_state=bootstrap_random_state,
                 data=all_data,
                 annotated_functions=annotated_funcs,

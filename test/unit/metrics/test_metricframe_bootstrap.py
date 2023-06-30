@@ -30,7 +30,7 @@ def mf_1m_0cf():
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
-        n_bootstrap_samples=n_samples,
+        n_boot=n_samples,
         ci_quantiles=QUANTILES,
         bootstrap_random_state=13489623,
     )
@@ -51,7 +51,7 @@ def mf_1mdict_0cf():
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
-        n_bootstrap_samples=n_samples,
+        n_boot=n_samples,
         ci_quantiles=QUANTILES,
         bootstrap_random_state=13489623,
     )
@@ -74,7 +74,7 @@ def mf_1m_1cf():
         y_pred=y_p,
         sensitive_features=g_1,
         control_features=g_2,
-        n_bootstrap_samples=n_samples,
+        n_boot=n_samples,
         ci_quantiles=QUANTILES,
         bootstrap_random_state=13489623,
     )
@@ -98,7 +98,7 @@ def mf_2m_1cf():
         y_pred=y_p,
         sensitive_features=g_1,
         control_features=g_2,
-        n_bootstrap_samples=n_samples,
+        n_boot=n_samples,
         ci_quantiles=QUANTILES,
         bootstrap_random_state=13489623,
     )
