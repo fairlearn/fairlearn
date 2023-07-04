@@ -1,11 +1,14 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Helper functions for threshold optimization methods.
 
 NOTE
 ----
 - Most utils defined here likely have a similar counter-part already implemented
-somewhere in the fairlearn code-base.
+  somewhere in the `fairlearn` code-base.
 - With time they will probably be substituted by that counter-part, and these
-implementations removed.
+  implementations removed.
 """
 import logging
 import numpy as np
@@ -14,14 +17,14 @@ from sklearn.metrics import confusion_matrix
 
 
 def calc_cost_of_point(
-        fpr: float,
-        fnr: float,
-        prevalence: float,
-        *,
-        false_pos_cost: float = 1.,
-        false_neg_cost: float = 1.,
-    ) -> float:
-    """Calculates the cost of the given ROC point.
+    fpr: float,
+    fnr: float,
+    prevalence: float,
+    *,
+    false_pos_cost: float = 1.0,
+    false_neg_cost: float = 1.0,
+) -> float:
+    """Calculate the cost of the given ROC point.
 
     Parameters
     ----------
@@ -48,7 +51,7 @@ def calc_cost_of_point(
 
 
 def compute_roc_point_from_predictions(y_true, y_pred_binary):
-    """Computes the ROC point associated with the provided binary predictions.
+    """Compute the ROC point associated with the provided binary predictions.
 
     Parameters
     ----------
@@ -66,21 +69,20 @@ def compute_roc_point_from_predictions(y_true, y_pred_binary):
 
     # FPR = FP / LN
     fpr = fp / (fp + tn)
-    
+
     # TPR = TP / LP
     tpr = tp / (tp + fn)
-    
+
     return (fpr, tpr)
 
 
 def compute_global_roc_from_groupwise(
-        groupwise_roc_points: np.ndarray,
-        groupwise_label_pos_weight: np.ndarray,
-        groupwise_label_neg_weight: np.ndarray,
-    ) -> np.ndarray:
-    """Computes the global ROC point that corresponds to the provided group-wise
-    ROC points.
-    
+    groupwise_roc_points: np.ndarray,
+    groupwise_label_pos_weight: np.ndarray,
+    groupwise_label_neg_weight: np.ndarray,
+) -> np.ndarray:
+    """Compute the global ROC point that corresponds to the provided group-wise ROC points.
+
     The global ROC is a linear combination of the group-wise points, with
     different weights for computing FPR and TPR -- the first related to LNs, and
     the second to LPs.
@@ -106,11 +108,14 @@ def compute_global_roc_from_groupwise(
     n_groups, _ = groupwise_roc_points.shape
 
     # Validating input shapes
-    if (len(groupwise_label_pos_weight) != len(groupwise_label_neg_weight) or
-        len(groupwise_label_pos_weight) != n_groups):
-       raise ValueError(
-           "Invalid input shapes: length of all arguments must be equal (the "
-           "number of different sensitive groups).")
+    if (
+        len(groupwise_label_pos_weight) != len(groupwise_label_neg_weight)
+        or len(groupwise_label_pos_weight) != n_groups
+    ):
+        raise ValueError(
+            "Invalid input shapes: length of all arguments must be equal (the "
+            "number of different sensitive groups)."
+        )
 
     # Normalize group LP (/LN) weights by their size
     if not np.isclose(groupwise_label_pos_weight.sum(), 1.0):
@@ -129,21 +134,20 @@ def compute_global_roc_from_groupwise(
 
 
 def roc_convex_hull(roc_points: np.ndarray) -> np.ndarray:
-    """Computes the convex hull of the provided ROC points.
-    
+    """Compute the convex hull of the provided ROC points.
+
     Parameters
     ----------
     roc_points : np.ndarray
         An array of shape (n_points, n_dims) containing all points
         of a provided ROC curve.
-    
+
     Returns
     -------
     hull_points : np.ndarray
         An array of shape (n_hull_points, n_dim) containing all
         points in the convex hull of the ROC curve.
     """
-
     # Save init data just for logging
     init_num_points, _dims = roc_points.shape
 
@@ -159,7 +163,8 @@ def roc_convex_hull(roc_points: np.ndarray) -> np.ndarray:
     hull_indices = hull.vertices
 
     logging.info(
-        f"ROC convex hull contains {len(hull_indices) / init_num_points:.1%} "
-        f"of the original points.")
+        "ROC convex hull contains %.1f%% of the original points.",
+        (len(hull_indices) / init_num_points) * 100,
+    )
 
     return roc_points[hull_indices]

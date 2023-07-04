@@ -10,19 +10,19 @@ _MESSAGE_BAD_COSTS = (
 
 
 def unpack_fp_fn_costs(costs: dict) -> tuple[float, float]:
-    """Validates and unpacks the given `costs`.
+    """Validate and unpacks the given `costs`.
 
     Parameters
     ----------
     costs : dict
         A dictionary detailing the cost for false positives and false negatives,
         of the form :code:`{'fp': <fp_cost>, 'fn': <fn_cost>}`.
-        
+
     Returns
     -------
     tuple[float, float]
         A tuple respectively composed of the cost of false positives and the
-        cost of false negatives, i.e., a tuple with 
+        cost of false negatives, i.e., a tuple with
         :code:`(fp_cost, fn_cost)`.
 
     Raises
@@ -43,7 +43,7 @@ def unpack_fp_fn_costs(costs: dict) -> tuple[float, float]:
 
     else:
         raise ValueError(_MESSAGE_BAD_COSTS)
-    
+
     return fp_cost, fn_cost
 
 

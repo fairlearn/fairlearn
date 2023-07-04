@@ -18,7 +18,7 @@ class ThresholdOperation:
     """
 
     def __init__(self, operator, threshold):
-        if operator not in [">", "<"]:          # NOTE for PR: sklearn uses >= for ROC threshold; see: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html
+        if operator not in [">", "<"]:
             raise ValueError("Unrecognized operator: " + operator)
         self._operator = operator
         self._threshold = threshold

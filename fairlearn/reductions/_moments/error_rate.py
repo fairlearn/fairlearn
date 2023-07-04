@@ -9,6 +9,7 @@ from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 from .moment import _ALL, _LABEL, ClassificationMoment
 
+
 class ErrorRate(ClassificationMoment):
     r"""Misclassification error as a moment.
 
@@ -44,7 +45,7 @@ class ErrorRate(ClassificationMoment):
             self.fp_cost = 1.0
             self.fn_cost = 1.0
         else:
-            self.fp_cpst, self.fn_cost = unpack_fp_fn_costs(costs)
+            self.fp_cost, self.fn_cost = unpack_fp_fn_costs(costs)
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""

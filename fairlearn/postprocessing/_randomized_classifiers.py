@@ -1,3 +1,6 @@
+# Copyright (c) Fairlearn contributors.
+# Licensed under the MIT License.
+
 """Helper functions to construct and use randomized classifiers.
 
 TODO: this module will probably be substituted by the InterpolatedThresholder
@@ -14,39 +17,49 @@ import numpy as np
 from scipy.spatial import ConvexHull
 
 
-class Classifier(ABC):
+class _Classifier(ABC):
+    """Public API for a classifier."""
+
     @abstractmethod
-    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> np.ndarray:
-        """Return predicted class, Y, for the given input features, X.
-        """
+    def __call__(
+        self, X: np.ndarray, *, sensitive_features: np.ndarray = None
+    ) -> np.ndarray:
+        """Return predicted class, Y, for the given input features, X."""
         raise NotImplementedError
 
 
-class BinaryClassifier(Classifier):
-    """Constructs a deterministic binary classifier, by thresholding a
-    real-valued score predictor.
-    """
+class BinaryClassifier(_Classifier):
+    """A deterministic binary classifier."""
 
     def __init__(
-            self,
-            score_predictor: callable,
-            threshold: float,
-        ):
-        """Constructs a deterministic binary classifier from the given
-        real-valued score predictor and a threshold in {0, 1}.
+        self,
+        score_predictor: Callable,
+        threshold: float,
+    ):
+        """Construct a binary classifier by thresholding score predictor.
+
+        Parameters
+        ----------
+        score_predictor : Callable
+            A real-valued score predictor.
+
+        threshold : float
+            A threshold value.
         """
         self.score_predictor = score_predictor
         self.threshold = threshold
 
-    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> np.ndarray:
-        """Computes predictions for the given samples, X.
+    def __call__(
+        self, X: np.ndarray, *, sensitive_features: np.ndarray = None
+    ) -> np.ndarray:
+        """Compute predictions for the given samples, X.
 
         Parameters
         ----------
         X : np.ndarray
             The input samples, in shape (num_samples, num_features).
         sensitive_features : None, optional
-            None. This argument will be ignored by this classifier as it does 
+            None. This argument will be ignored by this classifier as it does
             not consider sensitive attributes.
 
         Returns
@@ -57,19 +70,22 @@ class BinaryClassifier(Classifier):
         return (self.score_predictor(X) >= self.threshold).astype(int)
 
 
-class BinaryClassifierAtROCDiagonal(Classifier):
-    """A dummy classifier whose predictions have no correlation with the input
-    features, but achieves whichever target FPR or TPR you want (on ROC diag.)
+class BinaryClassifierAtROCDiagonal(_Classifier):
+    """A dummy classifier with FPR=TPR.
+
+    That is, a classifier whose predictions have no correlation with the input
+    features, but achieves whichever target FPR or TPR you want (on ROC
+    diagonal).
     """
 
     def __init__(
-            self,
-            target_fpr: float = None,
-            target_tpr: float = None,
-            seed: int = 42,
-        ):
+        self,
+        target_fpr: float = None,
+        target_tpr: float = None,
+        seed: int = 42,
+    ):
         err_msg = (
-            f"Must provide exactly one of 'target_fpr' or 'target_tpr', "
+            "Must provide exactly one of 'target_fpr' or 'target_tpr', "
             f"got target_fpr={target_fpr}, target_tpr={target_tpr}."
         )
         if target_fpr is not None and target_tpr is not None:
@@ -84,43 +100,66 @@ class BinaryClassifierAtROCDiagonal(Classifier):
         elif target_tpr is not None:
             self.target_tpr = target_tpr
             self.target_fpr = target_tpr
-        
+
         # Provided neither!
         else:
             raise ValueError(err_msg)
-        
+
         # Initiate random number generator
         self.rng = np.random.default_rng(seed)
 
-    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> np.ndarray:
+    def __call__(
+        self,
+        X: np.ndarray,
+        *,
+        sensitive_features: np.ndarray = None,
+    ) -> np.ndarray:
+        """Compute (randomized) predictions.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            Input features (will be ignored as predictions are random).
+
+        sensitive_features : np.ndarray, optional
+            Sensitive features (will be ignored if passed).
+
+        Returns
+        -------
+        np.ndarray
+            The predicted classes for each input sample.
+        """
         return (self.rng.random(size=len(X)) >= (1 - self.target_fpr)).astype(int)
 
 
-class EnsembleGroupwiseClassifiers(Classifier):
-    """Constructs a classifier from a set of group-specific classifiers.
-    """
+class EnsembleGroupwiseClassifiers(_Classifier):
+    """Construct a classifier from a set of group-specific classifiers."""
 
     def __init__(self, group_to_clf: dict[int | str, Callable]):
-        """Constructs a classifier from a set of group-specific classifiers.
+        """Construct a classifier from a set of group-specific classifiers.
 
         Must be provided exactly one classifier per unique group value.
 
         Parameters
         ----------
         group_to_clf : dict[int | str, callable]
-            A mapping of group value to the classifier that should handle 
+            A mapping of group value to the classifier that should handle
             predictions for that specific group.
         """
         self.group_to_clf = group_to_clf
 
     def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray) -> np.ndarray:
-        """Compute predictions for the given input samples X, given their
-        sensitive attributes, `sensitive_features`.
+        """Compute predictions for the given input samples.
+
+        For the given samples :code:`X` and their sensitive group membership
+        :code:`sensitive_features`, compute their predicted classes using
+        group-specific classifiers.
 
         Parameters
         ----------
         X : np.ndarray
             Input samples, with shape (num_samples, num_features).
+
         group : np.ndarray, optional
             The sensitive attribute value for each input sample.
 
@@ -131,7 +170,7 @@ class EnsembleGroupwiseClassifiers(Classifier):
             to a group-specific classifier for that sample.
         """
         if len(X) != len(sensitive_features):
-            raise ValueError(f"Invalid input sizes len(X) != len(group)")
+            raise ValueError("Invalid input sizes len(X) != len(group)")
 
         # Array to store predictions
         num_samples = len(X)
@@ -141,91 +180,89 @@ class EnsembleGroupwiseClassifiers(Classifier):
         cumulative_filter = np.zeros(num_samples).astype(bool)
 
         for group_value, group_clf in self.group_to_clf.items():
-            group_filter = (sensitive_features == group_value)
+            group_filter = sensitive_features == group_value
             y_pred[group_filter] = group_clf(X[group_filter])
             cumulative_filter |= group_filter
 
         if np.sum(cumulative_filter) != num_samples:
             raise RuntimeError(
                 f"Computed group-wise predictions for {np.sum(cumulative_filter)} "
-                f"samples, but got {num_samples} input samples.")
+                f"samples, but got {num_samples} input samples."
+            )
 
         return y_pred
 
 
-class RandomizedClassifier(Classifier):
-    """Constructs a randomized classifier from the given  classifiers and 
-    their probabilities.
-    """
+class RandomizedClassifier(_Classifier):
+    """A randomized classifier that interpolates multiple classifiers."""
 
     def __init__(
-            self,
-            classifiers: list[Classifier],
-            probabilities: list[float],
-            seed: int = 42,
-        ):
-        """Constructs a randomized classifier from the given  classifiers and 
-        their probabilities.
-        
-        This classifier will compute predictions for the whole input dataset at 
-        once, which will in general be faster for larger inputs (when compared 
-        to predicting each sample separately).
+        self,
+        classifiers: list[Callable],
+        probabilities: list[float],
+        seed: int = 42,
+    ):
+        """Construct a randomized classifier that interpolates multiple classifiers.
 
         Parameters
         ----------
-        classifiers : list[callable]
+        classifiers : list[Callable]
             A list of classifiers
         probabilities : list[float]
-            A list of probabilities for each given classifier, where 
-            probabilities[idx] is the probability of using the prediction from 
+            A list of probabilities for each given classifier, where
+            probabilities[idx] is the probability of using the prediction from
             classifiers[idx].
         seed : int, optional
             A random seed, by default 42.
 
         Returns
         -------
-        callable
+        Callable
             The corresponding randomized classifier.
         """
         if len(classifiers) != len(probabilities):
             raise ValueError(
-                f"Invalid arguments: len(classifiers) != len(probabilities); "
-                f"({len(classifiers)} != {len(probabilities)});")
+                "Invalid arguments: len(classifiers) != len(probabilities); "
+                f"({len(classifiers)} != {len(probabilities)});"
+            )
 
         self.classifiers = classifiers
         self.probabilities = probabilities
         self.rng = np.random.default_rng(seed)
-    
+
     def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> int:
+        """Compute interpolated predictions."""
         # Assign each sample to a classifier
         clf_idx = self.rng.choice(
-            np.arange(len(self.classifiers)),       # possible choices
-            size=len(X),                            # size of output array
-            p=self.probabilities,                   # prob. of each choice
+            np.arange(len(self.classifiers)),  # possible choices
+            size=len(X),  # size of output array
+            p=self.probabilities,  # prob. of each choice
         )
-        
+
         # Run predictions for all classifiers on all samples
         y_pred_choices = [clf(X) for clf in self.classifiers]
         # TODO:
         # we could actually just run the classifier for the samples that get
         # matched with it... similar to the EnsembleGroupwiseClassifiers call
         # method.
-        
-        return np.choose(clf_idx, y_pred_choices)
 
+        return np.choose(clf_idx, y_pred_choices)
 
     @staticmethod
     def find_weights_given_two_points(
-            point_A: np.ndarray,
-            point_B: np.ndarray,
-            target_point: np.ndarray,
-        ):
-        """Given two ROC points corresponding to existing binary classifiers,
-        find the weights that result in a classifier whose ROC point is target_point.
-        
+        point_A: np.ndarray,
+        point_B: np.ndarray,
+        target_point: np.ndarray,
+    ):
+        """Find the interpolation of points that achieves the target point.
+
+        That is, given two ROC points corresponding to existing binary
+        classifiers, :code:`point_A, point_B`, finds the weights that result in
+        a classifier whose ROC point is the target :code:`target_point`.
+
         May need to interpolate the two given points with a third point corresponding
         to a random classifier (random uniform distribution with different thresholds).
-        
+
         Returns
         -------
         tuple[np.ndarray, np.ndarray]
@@ -238,16 +275,17 @@ class RandomizedClassifier(Classifier):
 
         if all(np.isclose(point_B, target_point)):
             return np.array([1]), np.expand_dims(point_B, axis=0)
-        
+
         # If not, we'll have to triangulate the target using A and B
         point_A_fpr, point_A_tpr = point_A
         point_B_fpr, point_B_tpr = point_B
         target_fpr, target_tpr = target_point
         if not (point_A_fpr <= target_fpr <= point_B_fpr):
             raise ValueError(
-                f"Invalid input. FPR should fulfill: "
+                "Invalid input. FPR should fulfill: "
                 f"({point_A_fpr} point_A_FPR) <= ({target_fpr} target_fpr) <= "
-                f"({point_B_fpr} point_B_fpr)")
+                f"({point_B_fpr} point_B_fpr)"
+            )
 
         # Calculate weights for points A and B
         weight_A = (target_fpr - point_B_fpr) / (point_A_fpr - point_B_fpr)
@@ -258,8 +296,9 @@ class RandomizedClassifier(Classifier):
         if not np.isclose(point_P_upwards[0], target_fpr):
             raise RuntimeError(
                 "Failed projecting target_fpr to ROC hull frontier. "
-                f"Got proj. FPR={point_P_upwards[0]}; target FPR={target_fpr};")
-        
+                f"Got proj. FPR={point_P_upwards[0]}; target FPR={target_fpr};"
+            )
+
         # Check if the target point lies in the AB line (and return if so)
         if all(np.isclose(point_P_upwards, target_point)):
             return weights_AB, np.vstack((point_A, point_B))
@@ -268,7 +307,9 @@ class RandomizedClassifier(Classifier):
         point_P_downwards = np.array([target_fpr, target_fpr])
 
         # Calculate weights for P upwards and P downwards
-        weight_P_upwards = (target_tpr - point_P_downwards[1]) / (point_P_upwards[1] - point_P_downwards[1])
+        weight_P_upwards = (target_tpr - point_P_downwards[1]) / (
+            point_P_upwards[1] - point_P_downwards[1]
+        )
 
         # Validating triangulation results
         all_points = np.vstack((point_A, point_B, point_P_downwards))
@@ -277,39 +318,45 @@ class RandomizedClassifier(Classifier):
         if not np.isclose(all_weights.sum(), 1):
             raise RuntimeError(
                 f"Sum of linear interpolation weights was {all_weights.sum()}, "
-                f"should be 1!")
+                "should be 1!"
+            )
 
         if not all(np.isclose(target_point, all_weights @ all_points)):
             raise RuntimeError(
-                f"Triangulation of target point failed. "
-                f"Target was {target_point}; got {all_weights @ all_points}.")
+                "Triangulation of target point failed. "
+                f"Target was {target_point}; got {all_weights @ all_points}."
+            )
 
         return all_weights, all_points
 
     @staticmethod
     def construct_at_target_ROC(
-            predictor: callable,
-            roc_curve_data: tuple,
-            target_roc_point: np.ndarray,
-            seed: int = 42,
-        ) -> "RandomizedClassifier":
-        """Constructs a randomized classifier in the interior of the
-        convex hull of the classifier's ROC curve, at a given target
-        ROC point.
-        
+        predictor: Callable,
+        roc_curve_data: tuple,
+        target_roc_point: np.ndarray,
+        seed: int = 42,
+    ) -> "RandomizedClassifier":
+        """Construct a classifier at the target ROC point.
+
+        That is, constructs a (possibly randomized) classifier in the interior
+        of the convex hull of the predictor's ROC curve, at a given target ROC
+        point.
+
         Parameters
         ----------
-        predictor : callable
+        predictor : Callable
             A predictor that outputs real-valued scores in range [0; 1].
+
         roc_curve_data : tuple[np.array...]
             The ROC curve of the given classifier, as a tuple of
             (FPR values; TPR values; threshold values).
+
         target_roc_point : np.ndarray
             The target ROC point in (FPR, TPR).
-        
+
         Returns
         -------
-        rand_clf : callable
+        rand_clf : Callable
             A (randomized) binary classifier whose expected FPR and TPR
             corresponds to the given target ROC point.
         """
@@ -321,15 +368,21 @@ class RandomizedClassifier(Classifier):
         # (3 minimum to compute convex hull)
         if len(fpr) <= 1:
             raise ValueError(
-                f"Invalid ROC curve data (only has one point): "
-                f"fpr:{fpr}; tpr:{tpr}.")
+                f"Invalid ROC curve data (only has one point): fpr:{fpr}; tpr:{tpr}."
+            )
 
         if len(fpr) == 2:
-            logging.warning(f"Got ROC data with only 2 points: producing a random classifier...")
+            logging.warning(
+                "Got ROC data with only 2 points: producing a random classifier..."
+            )
             if not np.isclose(target_roc_point[0], target_roc_point[1]):
                 logging.error(
-                    f"Invalid target ROC point ({target_roc_point}) is not in "
-                    "diagonal ROC line, but a random-classifier ROC was provided.")
+                    (
+                        "Invalid target ROC point (%s) is not in diagonal ROC line, "
+                        "but a random-classifier ROC was provided."
+                    ),
+                    target_roc_point,
+                )
 
             return BinaryClassifierAtROCDiagonal(target_fpr=target_roc_point[0])
 
@@ -339,7 +392,9 @@ class RandomizedClassifier(Classifier):
 
         # Filter out ROC points in the interior of the convex hull and other suboptimal points
         points_above_diagonal = np.argwhere(tpr >= fpr).ravel()
-        useful_points_idx = np.array(sorted(set(hull.vertices) & set(points_above_diagonal)))
+        useful_points_idx = np.array(
+            sorted(set(hull.vertices) & set(points_above_diagonal))
+        )
 
         fpr = fpr[useful_points_idx]
         tpr = tpr[useful_points_idx]
@@ -363,7 +418,7 @@ class RandomizedClassifier(Classifier):
         )
 
         if max(weights) > 1:
-            logging.error(f"Got triangulation weights over 100%: w={weights};")
+            logging.error("Got triangulation weights over 100%: w=%s;", weights)
 
         # Instantiate classifiers for points A and B
         clf_a = BinaryClassifier(predictor, threshold=thrs[point_A_idx])
@@ -376,7 +431,7 @@ class RandomizedClassifier(Classifier):
 
             elif all(np.isclose(target_roc_point, point_B_roc)):
                 return clf_b
-            
+
             else:
                 # differences from target point to A or B are significant enough
                 # to warrant triangulating between multiple points
@@ -386,7 +441,7 @@ class RandomizedClassifier(Classifier):
         # (hence, should've been caught by the previous if statement)
         if len(weights) == 1:
             raise RuntimeError("Invalid triangulation.")
-        
+
         # If there are two points, return a randomized classifier between the two
         elif len(weights) == 2:
             return RandomizedClassifier(
@@ -395,13 +450,15 @@ class RandomizedClassifier(Classifier):
                 seed=seed,
             )
 
-        # If it's in the interior of the ROC curve, requires instantiating a randomized classifier at the diagonal
+        # If it's in the interior of the ROC curve, requires instantiating a
+        # randomized classifier at the diagonal
         elif len(weights) == 3:
             fpr_rand, tpr_rand = points[2]
             if not np.isclose(fpr_rand, tpr_rand):
                 raise RuntimeError(
-                    f"Triangulation point at ROC diagonal has FPR != TPR "
-                    f"({fpr_rand} != {tpr_rand}); ")
+                    "Triangulation point at ROC diagonal has FPR != TPR "
+                    f"({fpr_rand} != {tpr_rand}); "
+                )
 
             # >>> BUG this would be better but for some reason it doesn't work!
             # rng = np.random.default_rng(42)
@@ -409,23 +466,26 @@ class RandomizedClassifier(Classifier):
             # # or...
             # clf_rand = BinaryClassifierAtROCDiagonal(target_fpr=fpr_rand)
             # <<<
-            clf_rand = lambda X: (np.random.random(size=len(X)) >= (1 - fpr_rand)).astype(int)
+            def clf_rand(X):
+                return (np.random.random(size=len(X)) >= (1 - fpr_rand)).astype(int)
 
             return RandomizedClassifier(
-                classifiers=[clf_a, clf_b, clf_rand],
-                probabilities=weights,
-                seed=seed)
-        
+                classifiers=[clf_a, clf_b, clf_rand], probabilities=weights, seed=seed
+            )
+
         else:
             raise RuntimeError(
-                f"Invalid triangulation of classifiers; "
-                f"weights: {weights}; points: {points};")
+                "Invalid triangulation of classifiers; "
+                f"weights: {weights}; points: {points};"
+            )
 
     @staticmethod
     def find_points_for_target_ROC(roc_curve_data, target_roc_point):
-        """Retrieves a set of realizable points (and respective weights) in the
-        provided ROC curve that can be used to realize any target ROC in the
-        interior of the ROC curve.
+        """Retrieve the realizable points that interpolate the target ROC point.
+
+        That is, retrieves a set of realizable points (and respective weights)
+        in the provided ROC curve that can be used to realize any target ROC in
+        the interior of the ROC curve.
 
         NOTE: this method is a bit redundant -- has functionality in common with
         RandomizedClassifier.construct_at_target_ROC()
@@ -440,7 +500,9 @@ class RandomizedClassifier(Classifier):
 
         # Filter out ROC points in the interior of the convex hull and other suboptimal points
         points_above_diagonal = np.argwhere(tpr >= fpr).ravel()
-        useful_points_idx = np.array(sorted(set(hull.vertices) & set(points_above_diagonal)))
+        useful_points_idx = np.array(
+            sorted(set(hull.vertices) & set(points_above_diagonal))
+        )
 
         fpr = fpr[useful_points_idx]
         tpr = tpr[useful_points_idx]
