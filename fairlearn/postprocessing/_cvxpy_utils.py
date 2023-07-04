@@ -14,6 +14,10 @@ from ._roc_utils import calc_cost_of_point, compute_global_roc_from_groupwise
 # Set of all fairness constraints with a cvxpy LP implementation
 ALL_CONSTRAINTS = {
     "equalized_odds",
+    # "true_positive_rate_parity",
+    # "false_positive_rate_parity",
+    # "true_negative_rate_parity",
+    # "false_negative_rate_parity",
 }
 
 NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE = (
@@ -341,7 +345,7 @@ def compute_fair_optimum(
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
         constraints += [
-            cp.abs(groupwise_roc_points_vars[roc_idx_of_interest][i] - groupwise_roc_points_vars[roc_idx_of_interest][j]) <= tolerance
+            cp.abs(groupwise_roc_points_vars[i][roc_idx_of_interest] - groupwise_roc_points_vars[j][roc_idx_of_interest]) <= tolerance
             for i, j in product(range(n_groups), range(n_groups))
             if i < j
         ]
