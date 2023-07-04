@@ -317,7 +317,7 @@ def compute_fair_optimum(
 
     ### APPLY FAIRNESS CONSTRAINTS
     # If "equalized_odds"
-    # > i.e., CONSTRAIN l-inf distance between any two group's ROCs being less than `tolerance`
+    # > i.e., constrain l-inf distance between any two groups' ROCs being less than `tolerance`
     if fairness_constraint == "equalized_odds":
         constraints += [
             cp.norm_inf(groupwise_roc_points_vars[i] - groupwise_roc_points_vars[j]) <= tolerance
@@ -326,6 +326,7 @@ def compute_fair_optimum(
         ]
 
     # If some rate parity, i.e., parity of one of {TPR, FPR, TNR, FNR}
+    # i.e., constrain absolute distance between any two groups' rate metric
     elif fairness_constraint.endswith("rate_parity"):
 
         roc_idx_of_interest: int

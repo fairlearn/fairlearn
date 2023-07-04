@@ -19,7 +19,6 @@ from itertools import product
 import numpy as np
 from sklearn.metrics import roc_curve
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
-from fairlearn.postprocessing._cvxpy_utils import 
 
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 from fairlearn.utils._common import _get_soft_predictions
@@ -152,7 +151,8 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.predictor = predictor
         self.constraint = constraint
         self.tolerance = tolerance
-        self.max_grid_size = grid_size
+        self.objective_costs = objective_costs
+        self.grid_size = grid_size
         self.predict_method = predict_method
         self.random_state = random_state
 
@@ -170,13 +170,8 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 f"tolerance={self.tolerance}, but value should be in range "
                 f"[0, 1].")
 
-        # Unpack objective costs
-        if objective_costs is None:
-            self.false_pos_cost = 1.0
-            self.false_neg_cost = 1.0
-        else:
-            self.false_pos_cost, self.false_neg_cost = \
-                unpack_fp_fn_costs(objective_costs)
+        # Check objective costs
+        unpack_fp_fn_costs(self.objective_costs)
 
         # Initialize instance variables
         self._all_roc_data: dict = None
@@ -185,6 +180,16 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self._global_roc_point: np.ndarray = None
         self._global_prevalence: float = None
         self._realized_classifier: EnsembleGroupwiseClassifiers = None
+
+    @property
+    def false_pos_cost(self) -> np.ndarray:
+        fp_cost, _fn_cost = unpack_fp_fn_costs(self.objective_costs)
+        return fp_cost
+    
+    @property
+    def false_neg_cost(self) -> np.ndarray:
+        _fp_cost, fn_cost = unpack_fp_fn_costs(self.objective_costs)
+        return fn_cost
 
     @property
     def groupwise_roc_points(self) -> np.ndarray:
@@ -347,8 +352,8 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
             # Check if max_roc_ticks is exceeded
             fpr, tpr, thrs = roc_curve_data
-            if self.max_grid_size is not None and len(fpr) > self.max_grid_size:
-                indices_to_keep = np.arange(0, len(fpr), len(fpr) / self.max_grid_size).astype(int)
+            if self.grid_size is not None and len(fpr) > self.grid_size:
+                indices_to_keep = np.arange(0, len(fpr), len(fpr) / self.grid_size).astype(int)
 
                 # Bottom-left (0,0) and top-right (1,1) points must be kept
                 indices_to_keep[-1] = len(fpr) - 1

@@ -16,7 +16,7 @@ from scipy.spatial import ConvexHull
 
 class Classifier(ABC):
     @abstractmethod
-    def __call__(self, X: np.ndarray, group: np.ndarray = None) -> np.ndarray:
+    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> np.ndarray:
         """Return predicted class, Y, for the given input features, X.
         """
         raise NotImplementedError
@@ -38,14 +38,14 @@ class BinaryClassifier(Classifier):
         self.score_predictor = score_predictor
         self.threshold = threshold
 
-    def __call__(self, X: np.ndarray, group: np.ndarray = None) -> np.ndarray:
+    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> np.ndarray:
         """Computes predictions for the given samples, X.
 
         Parameters
         ----------
         X : np.ndarray
             The input samples, in shape (num_samples, num_features).
-        group : None, optional
+        sensitive_features : None, optional
             None. This argument will be ignored by this classifier as it does 
             not consider sensitive attributes.
 
@@ -92,7 +92,7 @@ class BinaryClassifierAtROCDiagonal(Classifier):
         # Initiate random number generator
         self.rng = np.random.default_rng(seed)
 
-    def __call__(self, X: np.ndarray, group: np.ndarray = None) -> np.ndarray:
+    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> np.ndarray:
         return (self.rng.random(size=len(X)) >= (1 - self.target_fpr)).astype(int)
 
 
@@ -113,9 +113,9 @@ class EnsembleGroupwiseClassifiers(Classifier):
         """
         self.group_to_clf = group_to_clf
 
-    def __call__(self, X: np.ndarray, group: np.ndarray) -> np.ndarray:
+    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray) -> np.ndarray:
         """Compute predictions for the given input samples X, given their
-        sensitive attributes, group.
+        sensitive attributes, `sensitive_features`.
 
         Parameters
         ----------
@@ -130,7 +130,7 @@ class EnsembleGroupwiseClassifiers(Classifier):
             The predictions, where the prediction for each sample is handed off
             to a group-specific classifier for that sample.
         """
-        if len(X) != len(group):
+        if len(X) != len(sensitive_features):
             raise ValueError(f"Invalid input sizes len(X) != len(group)")
 
         # Array to store predictions
@@ -141,7 +141,7 @@ class EnsembleGroupwiseClassifiers(Classifier):
         cumulative_filter = np.zeros(num_samples).astype(bool)
 
         for group_value, group_clf in self.group_to_clf.items():
-            group_filter = (group == group_value)
+            group_filter = (sensitive_features == group_value)
             y_pred[group_filter] = group_clf(X[group_filter])
             cumulative_filter |= group_filter
 
@@ -196,7 +196,7 @@ class RandomizedClassifier(Classifier):
         self.probabilities = probabilities
         self.rng = np.random.default_rng(seed)
     
-    def __call__(self, X: np.ndarray, group: np.ndarray = None) -> int:
+    def __call__(self, X: np.ndarray, *, sensitive_features: np.ndarray = None) -> int:
         # Assign each sample to a classifier
         clf_idx = self.rng.choice(
             np.arange(len(self.classifiers)),       # possible choices
