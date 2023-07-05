@@ -339,22 +339,19 @@ class MetricFrame:
             nameset.add(name)
 
         self._result_cache = dict()
-        self._ci_quantiles = None
-        if n_boot is None:
-            assert ci_quantiles is None, "Can't have ci_quantiles not None"
-            # Create the basic results
-            result = DisaggregatedResult.create(
-                data=all_data,
-                annotated_functions=annotated_funcs,
-                sensitive_feature_names=self._sf_names,
-                control_feature_names=self._cf_names,
-            )
 
-            # Build into cache
-            self._populate_results(result)
-        else:
-            assert ci_quantiles is not None
-            assert isinstance(ci_quantiles, list)
+        # Create the basic results
+        result = DisaggregatedResult.create(
+            data=all_data,
+            annotated_functions=annotated_funcs,
+            sensitive_feature_names=self._sf_names,
+            control_feature_names=self._cf_names,
+        )
+        # Build into cache
+        self._populate_results(result)
+
+        # Handle bootstrapping
+        if n_boot is not None and len(ci_quantiles) > 0:
             assert all([isinstance(x, float) for x in ci_quantiles])
             self._ci_quantiles = ci_quantiles
 
@@ -370,14 +367,14 @@ class MetricFrame:
             result_overall = calculate_pandas_quantiles(
                 ci_quantiles, [x.overall for x in _bootstrap_samples]
             )
-            self._result_cache["overall"] = [
+            self._result_cache["overall_ci"] = [
                 self._extract_result(x, no_control_levels=False) for x in result_overall
             ]
 
             result_group = calculate_pandas_quantiles(
                 ci_quantiles, [x.by_group for x in _bootstrap_samples]
             )
-            self._result_cache["by_group"] = [
+            self._result_cache["by_group_ci"] = [
                 self._extract_result(x, no_control_levels=True) for x in result_group
             ]
 
@@ -471,9 +468,7 @@ class MetricFrame:
     @property
     def overall(
         self,
-    ) -> Union[
-        Any, pd.Series, pd.DataFrame, List[Any], List[pd.Series], List[pd.DataFrame]
-    ]:
+    ) -> Union[Any, pd.Series, pd.DataFrame,]:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Read more in the :ref:`User Guide <assessment_quantify_harms>`.
@@ -508,9 +503,13 @@ class MetricFrame:
         return self._result_cache["overall"]
 
     @property
+    def overall_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        return self._result_cache["overall_ci"]
+
+    @property
     def by_group(
         self,
-    ) -> Union[pd.Series, pd.DataFrame, List[pd.Series], List[pd.DataFrame]]:
+    ) -> Union[pd.Series, pd.DataFrame]:
         """Return the collection of metrics evaluated for each subgroup.
 
         The collection is defined by the combination of classes in the
@@ -537,6 +536,10 @@ class MetricFrame:
             are specified), then the corresponding entry will be NaN.
         """
         return self._result_cache["by_group"]
+
+    @property
+    def by_group_ci(self) -> Union[List[pd.Series], List[pd.DataFrame]]:
+        return self._result_cache["by_group_ci"]
 
     @property
     def control_levels(self) -> Optional[List[str]]:
