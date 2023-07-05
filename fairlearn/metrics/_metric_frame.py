@@ -351,6 +351,7 @@ class MetricFrame:
         self._populate_results(result)
 
         # Handle bootstrapping
+        self._ci_quantiles = None
         if n_boot is not None and len(ci_quantiles) > 0:
             assert all([isinstance(x, float) for x in ci_quantiles])
             self._ci_quantiles = ci_quantiles
