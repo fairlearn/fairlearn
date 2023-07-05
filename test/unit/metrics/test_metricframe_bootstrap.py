@@ -102,8 +102,12 @@ class TestOverallQuantiles:
         assert mf_1m_1cf.ci_quantiles == QUANTILES
 
         # Overall value should be close to quantile 0.5
-        assert mf_1m_1cf.overall_ci[1]["f"] == pytest.approx(mf_1m_1cf.overall["f"], abs=0.05)
-        assert mf_1m_1cf.overall_ci[1]["g"] == pytest.approx(mf_1m_1cf.overall["g"], abs=0.05)
+        assert mf_1m_1cf.overall_ci[1]["f"] == pytest.approx(
+            mf_1m_1cf.overall["f"], abs=0.05
+        )
+        assert mf_1m_1cf.overall_ci[1]["g"] == pytest.approx(
+            mf_1m_1cf.overall["g"], abs=0.05
+        )
 
     def test_2m_1_cf(self, mf_2m_1cf):
         assert isinstance(mf_2m_1cf.overall_ci, list)
