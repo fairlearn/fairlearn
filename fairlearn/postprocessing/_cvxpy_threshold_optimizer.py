@@ -10,6 +10,19 @@ TODO
 - Add option to use l1 or other distance functions for maximum tolerance between
   points (currently l-inf is in use).
 
+TODO for PR #1248
+-----------------
+- [ ] Adapt all data inputs to common fairlearn accepted types (e.g., numpy
+      arrays, pandas DFs, lists, ...)
+- [ ] Try to substitute the classifier helpers under `_randomized_classifiers`
+      with the InterpolatedThresholder.
+      - Triangulating target ROC points should still be necessary, but the
+      returned classifier can now be of type `InterpolatedThresholder` instead
+      of our own classifier types.
+- [ ] Currently the use of our `_randomized_classifiers` API is only compatible
+      with `predict_method="__call__"`, this should be fixed either in our API
+      our by substituting out classes with the `InterpolatedThresholder`.
+
 """
 from __future__ import annotations
 
@@ -154,7 +167,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.predictor = predictor
         self.constraint = constraint
         self.tolerance = tolerance
-        self.objective_costs = objective_costs
+        self.objective_costs = objective_costs or {"fp": 1, "fn": 1}
         self.grid_size = grid_size
         self.predict_method = predict_method
         self.random_state = random_state
