@@ -48,8 +48,7 @@ X_raw
 # a format suitable for the ML algorithms
 
 A = X_raw["sex"]
-X = X_raw.drop(labels=["sex"], axis=1)
-X = pd.get_dummies(X)
+X = pd.get_dummies(X_raw)
 
 sc = StandardScaler()
 X_scaled = sc.fit_transform(X)
@@ -131,26 +130,12 @@ fair_clf = _RelaxedThresholdOptimizer(
     tolerance=0,
 )
 
-
 # %%
-# NOTE: in the future the relaxed thresholder will be compatible with string sensitive features
-# TODO: this can be omitted when that happens!
-def parse_sensitive_features(series) -> np.ndarray:
-    return np.array([
-        1 if str(elem) == "Female" else 0 for elem in series
-    ])
-
-
-A_train_np = parse_sensitive_features(A_train)
-A_test_np = parse_sensitive_features(A_test)
+fair_clf.fit(X_train, Y_train, sensitive_features=A_train)
 
 
 # %%
-fair_clf.fit(X_train, Y_train, sensitive_features=A_train_np)
-
-
-# %%
-y_test_pred_postprocessed = fair_clf.predict(X_test, sensitive_features=A_test_np)
+y_test_pred_postprocessed = fair_clf.predict(X_test, sensitive_features=A_test)
 
 # %%
 postprocessed_equalized_odds_diff = equalized_odds_difference(
@@ -176,9 +161,9 @@ def compute_test_predictions_with_relaxed_constraints(tolerance: float) -> np.nd
     )
 
     # Fit
-    clf.fit(X_train, Y_train, sensitive_features=A_train_np)
+    clf.fit(X_train, Y_train, sensitive_features=A_train)
 
-    return clf.predict(X_test, sensitive_features=A_test_np)
+    return clf.predict(X_test, sensitive_features=A_test)
 
 
 # Compute predictions at different levels of tolerance

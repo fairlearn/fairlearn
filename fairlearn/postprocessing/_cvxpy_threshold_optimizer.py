@@ -27,14 +27,15 @@ TODO for PR #1248
 from __future__ import annotations
 
 import logging
+from typing import Any
 from itertools import product
+from collections import abc
 
 import numpy as np
 from sklearn.metrics import roc_curve
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 
-# TODO: use this to validate input
-# from fairlearn.utils._input_validation import _validate_and_reformat_input
+from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 from fairlearn.utils._common import _get_soft_predictions
 from fairlearn.utils._common import unpack_fp_fn_costs
@@ -192,6 +193,8 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         unpack_fp_fn_costs(self.objective_costs)
 
         # Initialize instance variables
+        self._idx_to_sensitive: dict[int, Any] = None
+        self._sensitive_to_idx: dict[Any, int] = None
         self._all_roc_data: dict = None
         self._all_roc_hulls: dict = None
         self._groupwise_roc_points: np.ndarray = None
@@ -369,13 +372,81 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         return max_violation
 
+    def _parse_sensitive_features(
+        self,
+        sensitive_features: abc.Iterable[abc.Hashable],
+        expect_prebuilt_mapping: bool = False,
+    ) -> np.ndarray:
+        """Convert the given sensitive_features to the expected format.
+
+        Expected format is composed of integer elements, sequentially numbered,
+        starting at zero. That is, if there are four different sensitive groups,
+        these will take the values: [0, 1, 2, 3].
+
+        Parameters
+        ----------
+        sensitive_features : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            The sensitive features in any format (numeric, string, etc.).
+            Elements of `sensitive_features` must be hashable.
+
+        expect_prebuilt_mapping : bool
+            Whether to expect the sensitive features mapping to have already
+            been built before this call.
+
+        Returns
+        -------
+        sensitive_features_numeric : np.ndarray[int]
+            The sensitive features in numeric format, with values sequentially
+            numbered from zero up to `num_groups-1`, [0, 1, ..., num_groups-1].
+        """
+        # Check if sensitive_features have the expected format
+        if (
+            isinstance(sensitive_features, np.ndarray)
+            and np.issubdtype(sensitive_features.dtype, np.number)
+            and len(np.unique(sensitive_features)) == np.max(sensitive_features) + 1
+        ):
+            return sensitive_features
+
+        # Otherwise, convert to expected format
+        # Check if mapping has been built
+        if self._sensitive_to_idx is None:
+            if expect_prebuilt_mapping:
+                raise RuntimeError(
+                    "Trying to parse `sensitive_features` but mapping has not "
+                    "yet been built; must call `classifier.fit(...)` before."
+                )
+
+            self._build_sensitive_to_idx_mapping(sensitive_features)
+
+        return np.array(
+            [self._sensitive_to_idx[sens_val] for sens_val in sensitive_features],
+            dtype=int,
+        )
+
+    def _build_sensitive_to_idx_mapping(self, sensitive_features):
+        """Build an inner mapping from sensitive feature names to indices."""
+        if self._sensitive_to_idx is not None or self._idx_to_sensitive is not None:
+            logging.warning("Re-building sensitive feature map!")
+
+        # Sorted unique groups
+        unique_groups = sorted(np.unique(sensitive_features))
+
+        # Mapping (index: int) -> (sensitive_value: Any)
+        self._idx_to_sensitive = dict(enumerate(unique_groups))
+
+        # Mapping (sensitive_value: Any) -> (index: int)
+        self._sensitive_to_idx = {
+            group: idx for idx, group in self._idx_to_sensitive.items()
+        }
+
     def fit(
         self,
-        X: np.ndarray,
-        y: np.ndarray,
+        X,
+        y,
         *,
-        sensitive_features: np.ndarray,  # TODO validate input and convert to proper format
+        sensitive_features,
         y_scores: np.ndarray = None,
+        **kwargs,
     ):
         """Find the optimal fair postprocessing.
 
@@ -385,13 +456,15 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         Parameters
         ----------
-        X : np.ndarray
-            The input features.
-        y : np.ndarray
+        X : numpy.ndarray or pandas.DataFrame
+            The feature matrix.
+
+        y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
             The input labels.
-        sensitive_features : np.ndarray
+
+        sensitive_features : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
             The sensitive features (group membership) of each sample.
-            Assumes groups are numbered [0, 1, ..., num_groups-1].
+
         y_scores : np.ndarray, optional
             The pre-computed model predictions on this data.
 
@@ -400,6 +473,17 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         callable
             Returns self.
         """
+        # Validate input
+        _, y, sensitive_feature_vector, _ = _validate_and_reformat_input(
+            X,
+            y,
+            sensitive_features=sensitive_features,
+            enforce_binary_labels=True,
+        )
+
+        # Parse sensitive_features to numeric format
+        sensitive_features = self._parse_sensitive_features(sensitive_feature_vector)
+
         # Compute group stats
         self._global_prevalence = np.sum(y) / len(y)
 
@@ -433,10 +517,23 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             group_sizes_label_pos
         )
 
-        # Compute group-wise ROC curves
+        # Compute predictions (if `y_scores` not provided)
         if y_scores is None:
-            y_scores = _get_soft_predictions(self.predictor, X, self.predict_method)
+            y_scores = _get_soft_predictions(
+                self.predictor, X, self.predict_method, **kwargs
+            )
 
+        else:
+            if not isinstance(y_scores, np.ndarray):
+                y_scores = np.array(y_scores)
+
+            if y_scores.shape != y.shape:
+                raise ValueError(
+                    f"`y_scores.shape={y_scores.shape}` must match labels shape "
+                    f"`y.shape={y.shape}`;"
+                )
+
+        # Compute group-wise ROC curves
         self._all_roc_data = dict()
         for g in unique_groups:
             group_filter = sensitive_features == g
@@ -536,5 +633,30 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         return True
 
-    def predict(self, X: np.ndarray, *, sensitive_features: np.ndarray) -> np.ndarray:
+    def predict(self, X, *, sensitive_features) -> np.ndarray:
+        """Compute predicted binary labels using the fitted postprocessing.
+
+        Parameters
+        ----------
+        X : numpy.ndarray or pandas.DataFrame
+            The feature matrix.
+
+        sensitive_features : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+            The sensitive features (group membership) of each sample.
+
+        Returns
+        -------
+        np.ndarray
+            The predicted binary labels.
+        """
+        sensitive_features_vector = _validate_and_reformat_input(
+            X=X,
+            sensitive_features=sensitive_features,
+            expect_y=False,
+            expect_sensitive_features=True,
+        )
+        sensitive_features = self._parse_sensitive_features(
+            sensitive_features_vector,
+            expect_prebuilt_mapping=True,
+        )
         return self._realized_classifier(X, sensitive_features=sensitive_features)

@@ -70,7 +70,7 @@ def _raise_if_not_threshold_optimizer(obj):
     elif isinstance(obj, _RelaxedThresholdOptimizer):
         # TODO: implement plotting functionality for postprocessing w/ relaxed constraints
         raise NotImplementedError(
-            f"Plotting functionality is not yet implemented for objects of "
+            "Plotting functionality is not yet implemented for objects of "
             f"type {_RelaxedThresholdOptimizer.__name__}."
         )
 
