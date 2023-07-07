@@ -649,7 +649,7 @@ class _RelaxedThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         np.ndarray
             The predicted binary labels.
         """
-        sensitive_features_vector = _validate_and_reformat_input(
+        _, _, sensitive_features_vector, _ = _validate_and_reformat_input(
             X=X,
             sensitive_features=sensitive_features,
             expect_y=False,

@@ -58,10 +58,14 @@ le = LabelEncoder()
 Y = le.fit_transform(Y)
 
 # %%
-# Finally, we split the data into training and test sets:
+# Finally, we split the data into training, validation, and test sets:
+X_train, X_other, Y_train, Y_other, A_train, A_other = train_test_split(
+    X_scaled, Y, A, test_size=0.4, random_state=0, stratify=Y,
+)
 
-X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(
-    X_scaled, Y, A, test_size=0.4, random_state=0, stratify=Y
+# Split (X_other, Y_other, A_other) into validation and test
+X_test, X_val, Y_test, Y_val, A_test, A_val = train_test_split(
+    X_other, Y_other, A_other, test_size=0.5, random_state=0, stratify=Y_other,
 )
 
 # Work around indexing bug
@@ -69,6 +73,8 @@ X_train = X_train.reset_index(drop=True)
 A_train = A_train.reset_index(drop=True)
 X_test = X_test.reset_index(drop=True)
 A_test = A_test.reset_index(drop=True)
+X_val = X_val.reset_index(drop=True)
+A_val = A_val.reset_index(drop=True)
 
 # %%
 # Training a fairness-unaware predictor
@@ -77,7 +83,7 @@ A_test = A_test.reset_index(drop=True)
 # that does not incorporate fairness. For speed of demonstration, we use the
 # simple :class:`sklearn.linear_model.LogisticRegression` class:
 
-unmitigated_predictor = GradientBoostingClassifier(n_estimators=1000)
+unmitigated_predictor = GradientBoostingClassifier(n_estimators=500)
 
 # %%time
 unmitigated_predictor.fit(X_train, Y_train)
@@ -131,7 +137,7 @@ fair_clf = _RelaxedThresholdOptimizer(
 )
 
 # %%
-fair_clf.fit(X_train, Y_train, sensitive_features=A_train)
+fair_clf.fit(X_val, Y_val, sensitive_features=A_val)
 
 
 # %%
