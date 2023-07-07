@@ -29,7 +29,7 @@ from fairlearn.metrics import (
     true_positive_rate,
     false_positive_rate,
     count,
-    # plot_model_comparison,
+    plot_model_comparison,
 )
 
 # %%
@@ -160,4 +160,41 @@ postprocessed_equalized_odds_diff = equalized_odds_difference(
 print(f"Equalized odds difference after postprocessing: {postprocessed_equalized_odds_diff:.3}")
 
 # %%
-# TODO: plot both models, plot all postprocessings with different tolerances, etc.
+# Add the unconstrained/unmitigated classifier predictions
+all_model_predictions = {"unconstrained": y_test_pred_binary}
+
+
+# Helper to get different thresholdings for different tolerance values
+def compute_test_predictions_with_relaxed_constraints(tolerance: float) -> np.ndarray:
+    # Instantiate
+    clf = _RelaxedThresholdOptimizer(
+        predictor=lambda *args, **kwargs: unmitigated_predictor.predict(*args, **kwargs),
+        predict_method="__call__",
+        constraint="equalized_odds",
+        tolerance=tolerance,
+        random_state=23,
+    )
+
+    # Fit
+    clf.fit(X_train, Y_train, sensitive_features=A_train_np)
+
+    return clf.predict(X_test, sensitive_features=A_test_np)
+
+
+# Compute predictions at different levels of tolerance
+all_model_predictions.update({
+    f"train tolerance={tol:.1}": compute_test_predictions_with_relaxed_constraints(tol)
+    for tol in np.arange(0, unmitigated_equalized_odds_diff, 1e-2)
+})
+
+# %%
+# Plot all models in the fairness-accuracy landscape
+plot_model_comparison(
+    x_axis_metric=skm.accuracy_score,
+    y_axis_metric=equalized_odds_difference,
+    y_true=Y_test,
+    y_preds=all_model_predictions,
+    sensitive_features=A_test,
+    point_labels=True,
+    show_plot=True,
+)
