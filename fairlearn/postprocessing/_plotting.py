@@ -7,6 +7,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._threshold_optimizer import ThresholdOptimizer
+from ._cvxpy_threshold_optimizer import _RelaxedThresholdOptimizer
 
 _debug_colors = None
 _debug_ncolors = 10
@@ -63,7 +64,17 @@ def _plot_curve(ax, sensitive_feature, x_col, y_col, points):
 
 
 def _raise_if_not_threshold_optimizer(obj):
-    if not isinstance(obj, ThresholdOptimizer):
+    if isinstance(obj, ThresholdOptimizer):
+        return  # OK
+
+    elif isinstance(obj, _RelaxedThresholdOptimizer):
+        # TODO: implement plotting functionality for postprocessing w/ relaxed constraints
+        raise NotImplementedError(
+            f"Plotting functionality is not yet implemented for objects of "
+            f"type {_RelaxedThresholdOptimizer.__name__}."
+        )
+
+    else:
         raise ValueError(
             "Argument {} needs to be of type {}.".format(
                 obj.__name__, ThresholdOptimizer.__name__
