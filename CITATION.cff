@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- given-names: "Fairlearn contributors"
+title: "Fairlearn"
+url: "https://fairlearn.org/"
+preferred-citation:
+  type: generic
+  authors:
+  - given-names: "Hilde"
+    family-names: "Weerts"
+  - given-names: "Miroslav"
+    family-names: "Dudík"
+  - given-names: "Richard"
+    family-names: "Edgar"
+  - given-names: "Adrin"
+    family-names: "Jalali"
+  - given-names: "Roman"
+    family-names: "Lutz"
+  - given-names: "Michael"
+    family-names: "Madaio"
+  title: "Fairlearn: Assessing and Improving Fairness of AI Systems"
+  year: 2023
+  identifiers:
+  - type: other
+    value: 'arXiv:2303.16626'
