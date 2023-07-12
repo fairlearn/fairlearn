@@ -5,7 +5,7 @@ authors:
 title: "Fairlearn"
 url: "https://fairlearn.org/"
 preferred-citation:
-  type: generic
+  type: article
   authors:
   - given-names: "Hilde"
     family-names: "Weerts"
@@ -21,6 +21,5 @@ preferred-citation:
     family-names: "Madaio"
   title: "Fairlearn: Assessing and Improving Fairness of AI Systems"
   year: 2023
-  identifiers:
-  - type: other
-    value: 'arXiv:2303.16626'
+  journal: "arXiv preprint arXiv:2303.16626"
+  url: "https://arxiv.org/abs/2303.16626"
