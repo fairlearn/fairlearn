@@ -6,7 +6,6 @@
 Adapted from :py:func:`pandas.show_versions` and :py:func:`sklearn.show_versions`.
 """  # noqa: RST304
 
-import importlib
 import platform
 import sys
 
