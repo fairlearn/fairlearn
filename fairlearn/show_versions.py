@@ -57,9 +57,6 @@ def _get_deps_info():
         ]
     )
 
-    def get_version(module):
-        return module.__version__
-
     from fairlearn import __version__
     deps_info = {
         "fairlearn": __version__
