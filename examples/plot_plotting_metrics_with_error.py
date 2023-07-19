@@ -33,7 +33,7 @@ from fairlearn.metrics import MetricFrame
 # We use a pipeline to preprocess the data then use a
 # :py:class:`sklearn.tree.DecisionTreeClassifier` to make predictions
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X = data.data
 y = (data.target == ">50K").astype(int)
 X_train, X_test, y_train_true, y_test_true = train_test_split(

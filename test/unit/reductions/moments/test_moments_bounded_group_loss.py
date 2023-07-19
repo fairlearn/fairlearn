@@ -30,7 +30,6 @@ class TestBoundedGroupLoss:
         assert np.all(np.isclose(loss - eps, loss_eps))
 
     def test_bgl_gpa_data(self):
-
         names = [
             "gender",
             "physics",

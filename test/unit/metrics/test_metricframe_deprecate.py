@@ -82,16 +82,15 @@ def test_keyword_metric():
     assert mf.difference() == pytest.approx(accuracy_score_difference)
 
 
-def test_no_warnings():
-    with pytest.warns(None) as record:
-        mf = metrics.MetricFrame(
-            metrics=skm.accuracy_score,
-            y_true=y_true,
-            y_pred=y_pred,
-            sensitive_features=sf,
-        )
+def test_no_warnings(recwarn):
+    mf = metrics.MetricFrame(
+        metrics=skm.accuracy_score,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sf,
+    )
 
-    assert len(record) == 0
+    assert len(recwarn) == 0
     assert mf.difference() == pytest.approx(accuracy_score_difference)
 
 

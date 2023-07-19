@@ -2,7 +2,7 @@
 
 Preprocessing
 =============
-   
+
 .. currentmodule:: fairlearn.preprocessing
 
 Preprocessing algorithms transform the dataset to mitigate possible unfairness

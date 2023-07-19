@@ -21,7 +21,7 @@ from fairlearn.metrics import (
     selection_rate,
 )
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X = pd.get_dummies(data.data)
 y_true = (data.target == ">50K") * 1
 sex = data.data["sex"]
@@ -91,4 +91,7 @@ fig = metric_frame.by_group[["count"]].plot(
     figsize=[12, 8],
     title="Show count metric in pie chart",
 )
-fig[0][0].figure.savefig("filename.png")
+
+# Don't save file during doc build
+if "__file__" in locals():
+    fig[0][0].figure.savefig("filename.png")

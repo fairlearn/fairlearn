@@ -10,10 +10,14 @@ import numpy as np
 import pandas as pd
 from sklearn.utils import check_consistent_length
 
-from fairlearn.metrics._input_manipulations import _convert_to_ndarray_and_squeeze
+from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
-from ._disaggregated_result import DisaggregatedResult
+from ._disaggregated_result import (
+    DisaggregatedResult,
+    _VALID_ERROR_STRING,
+    _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
+)
 from ._group_feature import GroupFeature
 
 logger = logging.getLogger(__name__)
@@ -33,6 +37,9 @@ _SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
     "Keys in 'sample_params' do not match those in 'metric'"
 )
+
+_COMPARE_METHODS = ["between_groups", "to_overall"]
+_INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
@@ -68,10 +75,12 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if len(args) > 0:
             args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
             warnings.warn(
-                f"You have provided {args_msg} as positional arguments. "
-                "Please pass them as keyword arguments. From version "
-                f"{version} passing them as positional arguments "
-                "will result in an error.",
+                (
+                    f"You have provided {args_msg} as positional arguments. "
+                    "Please pass them as keyword arguments. From version "
+                    f"{version} passing them as positional arguments "
+                    "will result in an error."
+                ),
                 FutureWarning,
             )
 
@@ -80,10 +89,12 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
             warnings.warn(
-                "The positional argument 'metric' has been replaced "
-                "by a keyword argument 'metrics'. "
-                f"From version {version} passing it as a positional argument "
-                "or as a keyword argument 'metric' will result in an error",
+                (
+                    "The positional argument 'metric' has been replaced "
+                    "by a keyword argument 'metrics'. "
+                    f"From version {version} passing it as a positional argument "
+                    "or as a keyword argument 'metric' will result in an error"
+                ),
                 FutureWarning,
             )
 
@@ -323,13 +334,104 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        # Create the 'overall' results
-        self._result = DisaggregatedResult.create(
+        # Create the basic results
+        result = DisaggregatedResult.create(
             data=all_data,
             annotated_functions=annotated_funcs,
             sensitive_feature_names=self._sf_names,
             control_feature_names=self._cf_names,
         )
+
+        # Build into cache
+        self._result_cache = dict()
+        self._populate_results(result)
+
+    def _extract_result(self, underlying_result, no_control_levels: bool):
+        """
+        Change result types for those who dislike consistency.
+
+        The `no_control_levels` parameter determines whether the presence
+        of control levels will affect the result. This is the case for
+        overall, but not the other cases.
+        """
+        if self._user_supplied_callable:
+            if self.control_levels or no_control_levels:
+                return underlying_result.iloc[:, 0]
+            else:
+                return underlying_result.iloc[0]
+        else:
+            return underlying_result
+
+    def _none_to_nan(
+        self, target: Union[pd.Series, pd.DataFrame]
+    ) -> Union[pd.Series, pd.DataFrame]:
+        """Convert Nones to NaNs."""
+        if isinstance(target, pd.Series):
+            result = target.map(lambda x: x if x is not None else np.nan)
+        else:
+            result = target.applymap(lambda x: x if x is not None else np.nan)
+        return result
+
+    def _populate_results(self, raw_result: DisaggregatedResult):
+        """
+        Populate the :code:`_result_cache`.
+
+        We cache all possible results from :class:`~MetricFrame` internally
+        (i.e. all possible calls to :meth:`~MetricFrame.difference()` etc.)
+        and this method is responsible for performing those computations.
+        The :code:`_result_cache` is a nested dictionary, with keys given by
+        the method names and arguments being cached.
+
+        Note that if exceptions are thrown, we cache those, and they are thrown
+        if the user calls the corresponding method (and arguments).
+        """
+        # Start with overall
+        self._result_cache["overall"] = self._extract_result(
+            raw_result.overall, no_control_levels=False
+        )
+
+        # Now do by_group
+        self._result_cache["by_group"] = self._extract_result(
+            raw_result.by_group, no_control_levels=True
+        )
+
+        # Next up, group_min and group_max
+        group_functions = {"group_min": "min", "group_max": "max"}
+        for k, v in group_functions.items():
+            self._result_cache[k] = dict()
+            for err_string in _VALID_ERROR_STRING:
+                try:
+                    self._result_cache[k][err_string] = self._group(
+                        raw_result, v, err_string
+                    )
+                except Exception as e:  # noqa: B902
+                    # Store any exception for later
+                    self._result_cache[k][err_string] = e
+
+        # Differences and ratios
+        for c_t in ["difference", "ratio"]:
+            self._result_cache[c_t] = dict()
+            for c_m in _COMPARE_METHODS:
+                self._result_cache[c_t][c_m] = dict()
+                for err_string in _VALID_ERROR_STRING:
+                    try:
+                        if c_t == "difference":
+                            tmp = raw_result.difference(
+                                self.control_levels, method=c_m, errors=err_string
+                            )
+                        else:
+                            tmp = raw_result.ratio(
+                                self.control_levels, method=c_m, errors=err_string
+                            )
+
+                        result = self._none_to_nan(tmp)
+
+                        self._result_cache[c_t][c_m][err_string] = self._extract_result(
+                            result, no_control_levels=False
+                        )
+                    except Exception as e:  # noqa: B902
+                        # Store any exception for later
+                        self._result_cache[c_t][c_m][err_string] = e
 
     @property
     def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -364,13 +466,7 @@ class MetricFrame:
             interface when calling programatically, while also reducing
             typing for those using Fairlearn interactively.
         """
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return self._result.overall.iloc[:, 0]
-            else:
-                return self._result.overall.iloc[0]
-        else:
-            return self._result.overall
+        return self._result_cache["overall"]
 
     @property
     def by_group(self) -> Union[pd.Series, pd.DataFrame]:
@@ -399,10 +495,7 @@ class MetricFrame:
             (likely to occur as more sensitive and control features
             are specified), then the corresponding entry will be NaN.
         """
-        if self._user_supplied_callable:
-            return self._result.by_group.iloc[:, 0]
-        else:
-            return self._result.by_group
+        return self._result_cache["by_group"]
 
     @property
     def control_levels(self) -> Optional[List[str]]:
@@ -437,8 +530,11 @@ class MetricFrame:
         """
         return self._sf_names
 
-    def __group(
-        self, grouping_function: str, errors: str = "raise"
+    def _group(
+        self,
+        disagg_result: DisaggregatedResult,
+        grouping_function: str,
+        errors: str = "raise",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -446,6 +542,7 @@ class MetricFrame:
 
         Parameters
         ----------
+        disagg_result: The DisaggregatedResult containing all the metrics
         grouping_function: {'min', 'max'}
         errors: {'raise', 'coerce'}, default 'raise'
         if 'raise', then invalid parsing will raise an exception
@@ -457,17 +554,11 @@ class MetricFrame:
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        result = self._result.apply_grouping(
+        result = disagg_result.apply_grouping(
             grouping_function, self.control_levels, errors=errors
         )
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
-        else:
-            return result
+        return self._extract_result(result, no_control_levels=False)
 
     def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -493,7 +584,14 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("max", errors)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        value = self._result_cache["group_max"][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
 
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -519,7 +617,14 @@ class MetricFrame:
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
-        return self.__group("min", errors)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        value = self._result_cache["group_min"][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
 
     def difference(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -558,20 +663,17 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        tmp = self._result.difference(self.control_levels, method=method, errors=errors)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        if isinstance(tmp, pd.Series):
-            result = tmp.map(lambda x: x if x is not None else np.nan)
-        else:
-            result = tmp.applymap(lambda x: x if x is not None else np.nan)
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
+        value = self._result_cache["difference"][method][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            return result
+            return value
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -612,20 +714,17 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The exact type follows the table in :attr:`.MetricFrame.overall`.
         """
-        tmp = self._result.ratio(self.control_levels, method=method, errors=errors)
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        if isinstance(tmp, pd.Series):
-            result = tmp.map(lambda x: x if x is not None else np.nan)
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        value = self._result_cache["ratio"][method][errors]
+        if isinstance(value, Exception):
+            raise value
         else:
-            result = tmp.applymap(lambda x: x if x is not None else np.nan)
-
-        if self._user_supplied_callable:
-            if self.control_levels:
-                return result.iloc[:, 0]
-            else:
-                return result.iloc[0]
-
-        return result
+            return value
 
     def _process_functions(
         self,

@@ -1,8 +1,8 @@
 # Requirements for Fairlearn development
 
 # Required for environment
-flake8<6  # Having strange issue with latest release
-autopep8<2.0.1 # To ensure compatibility with flake8<6
+flake8
+autopep8
 flake8-blind-except
 flake8-builtins
 flake8-copyright
@@ -10,23 +10,20 @@ flake8-docstrings
 flake8-logging-format
 flake8-rst-docstrings
 requirements-parser
+# Need to keep black version consistent in
+# requirements-dev.txt
+# linting.yml
+# .pre-commit-config.yaml
+black==23.3.0
 
 # Required for test
-nbformat
-papermill
-# Pin pytest due to VS Code issue
-pytest==7.1.1
+pytest==7.2.0
 pytest-cov
 pytest-mock
 pytest-mpl>=0.11
-nteract-scrapbook
 wheel
 lightgbm
 xlrd
-
-# Required for notebooks
-jupyter
-nbval
 
 # Required for documentation
 bokeh

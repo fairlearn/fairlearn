@@ -10,6 +10,7 @@ from sklearn.pipeline import Pipeline
 import torch
 from numpy import mean, number
 
+import fairlearn.utils._compatibility as compat
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
     MetricFrame,
@@ -28,7 +29,7 @@ step = 1
 
 def test_examples():
     # EXAMPLE 1
-    X, y = fetch_adult(as_frame=True, return_X_y=True)
+    X, y = fetch_adult(return_X_y=True)
     pos_label = y[0]
 
     z = X["sex"]  # In this example, we consider 'sex' the sensitive feature.
@@ -47,7 +48,10 @@ def test_examples():
             Pipeline(
                 [
                     ("imputer", SimpleImputer(strategy="most_frequent")),
-                    ("encoder", OneHotEncoder(drop="if_binary", sparse=False)),
+                    (
+                        "encoder",
+                        OneHotEncoder(drop="if_binary", **compat._SPARSE_OUTPUT_FALSE),
+                    ),
                 ]
             ),
             make_column_selector(dtype_include="category"),
@@ -65,7 +69,7 @@ def test_examples():
         backend="torch",
         predictor_model=[50, "leaky_relu"],
         adversary_model=[3, "leaky_relu"],
-        batch_size=2 ** 8,
+        batch_size=2**8,
         progress_updates=0.5,
         random_state=123,
     )
@@ -147,7 +151,7 @@ def test_examples():
         predictor_optimizer=optimizer_constructor,
         adversary_optimizer=optimizer_constructor,
         epochs=10,
-        batch_size=2 ** 7,
+        batch_size=2**7,
         shuffle=True,
         callbacks=callbacks,
         random_state=123,
@@ -177,7 +181,7 @@ def test_examples():
                     backend="torch",
                     predictor_model=[50, "leaky_relu"],
                     adversary_model=[3, "leaky_relu"],
-                    batch_size=2 ** 8,
+                    batch_size=2**8,
                     random_state=123,
                 ),
             ),

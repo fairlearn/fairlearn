@@ -16,7 +16,6 @@ from fairlearn.reductions import BoundedGroupLoss, GridSearch, SquareLoss, ZeroO
 def _simple_regression_data(
     number_a0, number_a1, a0_factor, a1_factor, a0_label, a1_label, A_two_dim=False
 ):
-
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
 
@@ -128,7 +127,7 @@ def test_bgl_unmitigated_same(A_two_dim):
     unmitigated_estimator.fit(X, y)
 
     # Do the grid search with a zero Lagrange multiplier
-    idx = pd.Int64Index(sorted([a0_label, a1_label]))
+    idx = pd.Index(sorted([a0_label, a1_label]))
     lagrange_balanced_series = pd.Series([1.0, 1.0], index=idx)
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
@@ -163,7 +162,7 @@ def test_bgl_lagrange_specifications(A_two_dim):
     estimator = LinearRegression()
 
     # Do the grid search with a zero Lagrange multiplier
-    idx = pd.Int64Index(sorted([a0_label, a1_label]))
+    idx = pd.Index(sorted([a0_label, a1_label]))
     l0_series = pd.Series([2.0, 0.0], index=idx)
     l1_series = pd.Series([1.5, 0.5], index=idx)
     l2_series = pd.Series([1.0, 1.0], index=idx)

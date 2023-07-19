@@ -6,7 +6,7 @@ import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
-from fairlearn.metrics._extra_metrics import _get_labels_for_confusion_matrix
+from fairlearn.metrics._base_metrics import _get_labels_for_confusion_matrix
 
 # =============================================
 

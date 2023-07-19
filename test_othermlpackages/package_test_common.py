@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
 from sklearn.compose import make_column_selector, make_column_transformer
 
+import fairlearn.utils._compatibility as compat
 import fairlearn.datasets as fld
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def fetch_adult():
     """Grab dataset for testing."""
-    data = fld.fetch_adult(as_frame=True)
+    data = fld.fetch_adult()
     X = data.data.drop(labels=["sex"], axis=1)
     X = pd.get_dummies(X)
     Y = (data.target == ">50K") * 1
@@ -127,7 +128,7 @@ def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
     random.seed(123)
 
-    X, y = fld.fetch_adult(as_frame=True, return_X_y=True)
+    X, y = fld.fetch_adult(return_X_y=True)
 
     non_NaN_rows = ~X.isna().any(axis=1)
 
@@ -143,7 +144,7 @@ def run_AdversarialFairness_classification(estimator):
         ct = make_column_transformer(
             (StandardScaler(), make_column_selector(dtype_include=number)),
             (
-                OneHotEncoder(drop="if_binary", sparse=False),
+                OneHotEncoder(drop="if_binary", **compat._SPARSE_OUTPUT_FALSE),
                 make_column_selector(dtype_include="category"),
             ),
         )
@@ -158,7 +159,7 @@ def run_AdversarialFairness_classification(estimator):
     )
 
     estimator.epochs = 100
-    estimator.batch_size = 2 ** 9
+    estimator.batch_size = 2**10
     estimator.shuffle = True
     estimator.progress_updates = None
 
@@ -174,11 +175,10 @@ def run_AdversarialFairness_classification(estimator):
 
     # This might give problems as it is a bit random (though we set a seed,
     # it may depend on other factors such as version).
-    if not (accuracy > 0.6 and dp_diff < 0.3):
+    if not (accuracy > 0.8 and dp_diff < 0.2):
         logger.warning(
             "Training of AdversarialFairness is worse than usual."  # noqa
             + f"Accuracy {str(accuracy)} with a disparity difference of"  # noqa
             + f"{str(dp_diff)}."  # noqa
         )
-
     assert estimator is not None
