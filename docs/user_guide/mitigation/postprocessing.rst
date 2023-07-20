@@ -21,7 +21,7 @@ satisfy the specified fairness criteria exactly and with no remaining
 disparity.
 In many cases this comes at the expense of performance, for example, with
 significantly lower accuracy.
-Regardless, it provides and interesting data point for comparison with other
+Regardless, it provides an interesting data point for comparison with other
 models.
 Importantly, :class:`ThresholdOptimizer` requires the sensitive features to be
 available at deployment time (i.e., for the :code:`predict` method).
