@@ -52,14 +52,13 @@ def _get_deps_info():
             "sklearn",
             "lightgbm",
             "pytorch",
-            "tensorflow"
+            "tensorflow",
         ]
     )
 
     from fairlearn import __version__
-    deps_info = {
-        "fairlearn": __version__
-    }
+
+    deps_info = {"fairlearn": __version__}
 
     from importlib.metadata import PackageNotFoundError, version
 

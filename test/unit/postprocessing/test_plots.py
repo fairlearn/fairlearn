@@ -45,6 +45,7 @@ def is_mpl_installed():
     try:
         import pytest_mpl  # noqa: F401
         import matplotlib.pyplot as plt  # noqa: F401
+
         return True
     except PackageNotFoundError:
         return False
