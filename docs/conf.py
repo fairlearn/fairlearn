@@ -85,7 +85,7 @@ intersphinx_mapping = {
 }
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = ["templates"]
 
 
 # generate autosummary even if no references
@@ -192,7 +192,9 @@ html_sidebars = {
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_member_order = "groupwise"
+autodoc_default_options = {
+    "member-order": "groupwise"
+}
 
 
 # Linking Code
