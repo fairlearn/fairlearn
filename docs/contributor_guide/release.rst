@@ -5,8 +5,7 @@ Release Process
 
 This page outlines the process for creating a new Fairlearn release.
 The following steps assume git remote's `origin` points to
-`fairlearn/fairlearn` (in practical terms, that the work is being
-done on a clone of `fairlearn/fairlearn` and not on a fork).
+`fairlearn/fairlearn`.
 
 #. Ensure the maintainers listed in `scripts/generate_maintainers_table.py`
    are up to date. Run `python scripts/generate_maintainers_table.py` from the
@@ -66,7 +65,7 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
     #. Create a new file `vx.y+1.z.rst` in `docs/user_guide/installation_and_version_guide`
    
 .. note::
-    Make sure to add a note to this second PR:
+    Make sure to add a note to this PR:
     "Do not merge until the release is completed. Otherwise a new website will
     be published that points to the new version which doesn't exist yet." 
 
