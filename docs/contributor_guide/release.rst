@@ -29,7 +29,7 @@ The following steps assume git remote's `origin` points to
 
         :code:`git push -u origin release/v<x.y>.X`
 
-       You may need to temporarilly add an exception to the 
+       You may need to temporarily add an exception to the 
        `branch protection rules <https://github.com/fairlearn/fairlearn/settings/branches>`_ 
        by adding a new branch protection rule for `release/v<x.y>.X`.
 
