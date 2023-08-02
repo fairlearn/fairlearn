@@ -1,4 +1,6 @@
-# %% Copyright (c) Fairlearn contributors. Licensed under CC-BY 4.0 license.
+# %%
+# Copyright (c) Fairlearn contributors.
+# Licensed under CC-BY 4.0 license.
 
 """
 =======================================
