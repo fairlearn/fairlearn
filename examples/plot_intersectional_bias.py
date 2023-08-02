@@ -203,7 +203,7 @@ Intersectionality in Mental Health Care
 #   :alt: A visualization that shows the average height of different countries in 1914 and 2014.
 #         The Netherlands has the tallest average body height for men, Iran the biggest height gain
 #         for men, South Korea the biggest height gain for women, and Guatamala the smallest average
-#         body height for woman.
+#         body height for women.
 #
 # On the basis of what population definitions are these comparisons being made? In this case,
 # comparisons are being made between genders, nationalities, and time frames.
@@ -364,7 +364,7 @@ Intersectionality in Mental Health Care
 # In practice, the focus on these intersectional comparisons within the ML field has been on
 # protected groups :footcite:`justiceCanadianHuman`, such as:
 #
-# - Race, national or ethnic origin, colour
+# - Race, national or ethnic origin, color
 # - Religion
 # - Age
 # - Sex
