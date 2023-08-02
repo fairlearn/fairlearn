@@ -198,10 +198,10 @@ Intersectionality in Mental Health Care
 #
 # .. image:: ../_static/images/imhc_bodyheight.png
 #   :width: 600
-#   :alt: A visualization that shows the average height of different countries in 1914 and 2014. The
-#   Netherlands has the tallest average body height for men, Iran the biggest height gain for men,
-#   South Korea the biggest height gain for women, and Guatamala the smallest average body height for
-#   woman.
+#   :alt: A visualization that shows the average height of different countries in 1914 and 2014.
+#         The Netherlands has the tallest average body height for men, Iran the biggest height gain
+#         for men, South Korea the biggest height gain for women, and Guatamala the smallest average
+#         body height for woman.
 #
 # On the basis of what population definitions are these comparisons being made? In this case,
 # comparisons are being made between genders, nationalities, and time frames.
@@ -237,11 +237,14 @@ Intersectionality in Mental Health Care
 # diverse from one another, but solutions that are designed with the population mean in mind are
 # increasingly ineffective. :footcite:`treviranus2019InclusiveDesign``
 #
-# .. image:: ../_static/images/imhc_design.png :width: 400 :alt: A visualization that shows
-#   scattered dots. The further you move away from the middle, the more scattered the points are.
-#   Around the points in the center, a blue circle is drawn that points to 'design works'. Moving
-#   further from the center, a second yellow circle points to 'design is difficult to use'. Moving
-#   even further from the center, a third orange circle points to 'can't use design'.
+# .. image:: ../_static/images/imhc_design.png
+#    :width: 400
+#    :alt: A visualization that shows scattered dots.
+#          The further you move away from the middle, the more scattered the points are.
+#          Around the points in the center, a blue circle is drawn that points to 'design works'.
+#          Moving further from the center, a second yellow circle points to 'design is difficult
+#          to use'. Moving even further from the center, a third orange circle points to 'can't
+#          use design'.
 #
 # Notice the parallel we are drawing throughout here - we must always be thinking about how we
 # compare people, and how we can make those comparisons meaningful.
@@ -286,19 +289,25 @@ Intersectionality in Mental Health Care
 #   locks and intersects. It is the acknowledgement that everyone has their own unique experiences
 #   of discrimination and privilege.* --Kimberle Crenshaw
 #
-# .. image:: ../_static/images/imhc_intersectionality.jpg :width: 600 :alt: In the graphic above,
-#   Sylvia Duckworth uses a Spirograph to illustrate the multitude of ways that social identities
-#   might intersect. The Spirograph is split into 12 overlapping circles, each numbered, connected
-#   to a specific social identity, and assigned a unique colour. To illustrate the intersections of
-#   the different social identities, where each circle intersects, a new shade of the original
-#   colour is visible (as would happen when mixing paint colours together). At a glance the graphic
-#   shows all colours of the rainbow in different shades. The 12 social identities listed are:
-#   race, ethnicity, gender identity, class, language, religion, ability, sexuality, mental health,
-#   age, education, and body size. A quote from Kimberlé Crenshaw appears beneath the spirograph
-#   that reads “Intersectionality is a lens through which you can see where power comes and
-#   collides, where it locks and intersects. It is the acknowledgement that everyone has their own
-#   unique experiences of discrimination and privilege.” "Intersectionality" by Sylvia Duckworth,
-#   licensed under a `CC-BY-NC-ND`<https://creativecommons.org/licenses/by-nc-nd/2.0/> license.
+# .. image:: ../_static/images/imhc_intersectionality.jpg
+#    :width: 600
+#    :alt: In the graphic above, Sylvia Duckworth uses a Spirograph to illustrate the multitude of
+#          ways that social identities might intersect. The Spirograph is split into 12 overlapping
+#          circles, each numbered, connected to a specific social identity, and assigned a unique
+#          colour. To illustrate the intersections of the different social identities, where each
+#          circle intersects, a new shade of the original colour is visible (as would happen when
+#          mixing paint colours together). At a glance the graphic shows all colours of the rainbow
+#          in different shades.
+#          The 12 social identities listed are: race, ethnicity, gender identity,
+#          class, language, religion, ability, sexuality, mental health, age, education,
+#          and body size.
+#          A quote from Kimberlé Crenshaw appears beneath the spirograph that reads
+#          “Intersectionality
+#          is a lens through which you can see where power comes and collides, where it locks and
+#          intersects.
+#          It is the acknowledgement that everyone has their own unique experiences of
+#          discrimination and privilege.” "Intersectionality" by Sylvia Duckworth, licensed under a
+#          `CC-BY-NC-ND`<https://creativecommons.org/licenses/by-nc-nd/2.0/> license.
 #
 # Critical race theory
 # ====================
@@ -425,7 +434,7 @@ Intersectionality in Mental Health Care
 #
 # A similar issue is presented by Buolamwini and Gebru in the gender shades project, which analyzed
 # fairness issues in facial detection software and found that the AI system led to larger errors
-# for dark-skinned women than for other groups.:footcite:`buolamwini2018gender`
+# for dark-skinned women than for other groups. :footcite:`buolamwini2018gender`
 #
 # With the problems that Obermeyer and colleagues investigated related to using proxies as labels
 # and keeping intersectionality in mind, let’s move forward with an applied problem of our own.
