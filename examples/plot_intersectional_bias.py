@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors. Licensed under the MIT License.
+# %% Copyright (c) Fairlearn contributors. Licensed under CC-BY 4.0 license.
 
 """
 =======================================
@@ -6,7 +6,8 @@ Intersectionality in Mental Health Care
 =======================================
 """
 
-# %% *This notebook was written by Yifan Wang and Marta Maslej and is licenced under a* `Creative
+# %%
+# *This notebook was written by Yifan Wang and Marta Maslej and is licenced under a* `Creative
 # Commons Attribution 4.0 International License <http://creativecommons.org/licenses/by/4.0/>`_.
 #
 # ---------
@@ -510,7 +511,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn.metrics as skm
 import seaborn as sns
-from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_openml
 
 # Read in dataset
@@ -638,7 +638,7 @@ testy = test.Diagnosis
 #
 
 # %%
-from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 # Perform one hot encoding
 categories = ["Sex", "Race", "Housing", "Delay"]  # Categorial variables
