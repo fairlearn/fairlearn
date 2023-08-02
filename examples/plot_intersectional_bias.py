@@ -1,6 +1,6 @@
 # %%
 # Copyright (c) Fairlearn contributors.
-# Licensed under CC-BY 4.0 license.
+# Licensed under the MIT License.
 
 """
 =======================================
