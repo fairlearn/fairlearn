@@ -364,7 +364,7 @@ Intersectionality in Mental Health Care
 # In practice, the focus on these intersectional comparisons within the ML field has been on
 # protected groups :footcite:`justiceCanadianHuman`, such as:
 #
-# - Race, national or ethnic origin, colour
+# - Race, national or ethnic origin, color
 # - Religion
 # - Age
 # - Sex
