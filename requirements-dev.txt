@@ -1,5 +1,10 @@
 # Requirements for Fairlearn development
 
+# Changes to this file (especially in the 'test' section) should be cross-checked against the
+# release workflow in
+# .github/workflows/release-wheel.yml
+# Since that file does its own testing setup
+
 # Required for environment
 flake8
 autopep8
@@ -22,7 +27,7 @@ pytest-cov
 pytest-mock
 pytest-mpl>=0.11
 wheel
-lightgbm
+lightgbm<4.0.0  # 4.0.0 is incompatible with latest numpy https://github.com/microsoft/LightGBM/issues/5990  Needs to sync with .github/workflows/release-wheel.yml
 xlrd
 
 # Required for documentation
@@ -31,7 +36,7 @@ pypandoc
 sphinx==4.5.0
 sphinx-gallery
 numpydoc
-pydata-sphinx-theme==0.12.0
+pydata-sphinx-theme==0.13.3
 sphinx-autodoc-typehints
 sphinxcontrib-bibtex
 packaging

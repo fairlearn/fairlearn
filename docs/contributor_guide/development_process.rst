@@ -57,13 +57,14 @@ To verify that the code works as expected run
 
 Fairlearn currently includes plotting functionality that requires the
 :code:`matplotlib` package to be installed. Since this is for a niche use case
-Fairlearn comes without :code:`matplotlib` by default. To install Fairlearn
-with its full feature set simply append :code:`customplots` to the install
-command
+Fairlearn comes without :code:`matplotlib` by default. To get Fairlearn's
+plotting capabilities simply run `pip install matplotlib` after installing
+Fairlearn.
 
 .. code-block::
 
-    pip install -e .[customplots]
+    pip install -e .
+    pip install matplotlib
 
 The Requirements Files
 """"""""""""""""""""""
@@ -73,21 +74,16 @@ The prerequisites for Fairlearn are split between three separate files:
     -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
        contains the prerequisites for the core Fairlearn package
 
-    -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-customplots.txt>`_
-       contains additional prerequisites for the :code:`[customplots]` extension for Fairlearn
-
     -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
        the prerequisites for Fairlearn development (such as flake8 and pytest)
 
 The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
-and
-`requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-customplots.txt>`_
-files are consumed
+file is consumed
 by `setup.py <https://github.com/fairlearn/fairlearn/blob/main/setup.py>`_ to specify the dependencies to be
 documented in the wheel files.
 To help simplify installation of the prerequisites, we have the
 `install_requirements.py <https://github.com/fairlearn/fairlearn/blob/main/scripts/install_requirements.py>`_
-script which runs :code:`pip install` on all three of the above files.
+script which runs :code:`pip install` on both the above files.
 This script will also optionally pin the requirements to any lower bound specified (by changing any
 occurrences of :code:`>=` to :code:`==` in each file).
 
