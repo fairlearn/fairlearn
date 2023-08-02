@@ -221,7 +221,7 @@ Intersectionality in Mental Health Care
 # Black individuals :footcite:`endocrine2009widely`, and an underestimation of health risks for
 # asian individuals :footcite:`racette2003obesity`. Even more interestingly, BMI was never meant to
 # be a way of measuring health at an individual level.
-# :footcite:`psychologytoday2016AdolpheQuetelet`
+# :footcite:`karasu2016adolphe`
 #
 # The point is this: **social relations, not just individual traits, shape population distributions
 # of health.**
@@ -237,7 +237,7 @@ Intersectionality in Mental Health Care
 # Treviranus points out that the further you get from a population mean, the more heterogeneous the
 # population gets. And as you move away from this "average mean" - not only do people get more
 # diverse from one another, but solutions that are designed with the population mean in mind are
-# increasingly ineffective. :footcite:`treviranus2019InclusiveDesign``
+# increasingly ineffective. :footcite:`treviranus2019inclusivedesign`
 #
 # .. image:: ../_static/images/imhc_design.png
 #    :width: 400
@@ -346,7 +346,7 @@ Intersectionality in Mental Health Care
 #
 #   **Critical race theory** is an iterative methodology that draws on the collective wisdom of
 #   activists and scholars to study and transform the relationship between race, racism, and power.
-#   --:footcite:ct:`Ford2010`
+#   -- :footcite:ct:`ford2010critical`
 #
 # Intersectionality is one tool within the critical race theory toolkit, among many others, and
 # there has already been some great work :footcite:`hanna2020towards` done on how critical race
@@ -446,7 +446,7 @@ Intersectionality in Mental Health Care
 #
 # Our case scenario for this practice component of the tutorial is based on the finding that
 # **Black patients (and men in particular) are diagnosed with schizophrenia at a higher rate than
-# other demographic groups** (for example, white men). :footcite:`Olbert2018`
+# other demographic groups** (for example, white men). :footcite:`olbert2018meta`
 #
 #   **Schizophrenia is a severe, chronic, and debilitating illness** characterized by various
 #   symptoms, which are broadly divided into positive and negative symptoms. Positive symptoms
@@ -457,16 +457,17 @@ Intersectionality in Mental Health Care
 # It’s unclear why Black patients are more likely to be diagnosed with this disorder, but it’s
 # likely that different factors play a role, such as genetics or being more likely to reside in
 # stressful environments (which can be a risk factor for developing schizophrenia). However, there
-# is also some pretty compelling evidence :footcite:`Gara2019` that this effect is **due to
-# diagnostic bias**, or clinicians misdiagnosing black patients with schizophrenia when they have
-# another illness, like an affective disorder or depression instead. Clinicians may be
+# is also some pretty compelling evidence :footcite:`gara2019naturalistic` that this effect is
+# **due todiagnostic bias**, or clinicians misdiagnosing black patients with schizophrenia when they
+# have another illness, like an affective disorder or depression instead. Clinicians may be
 # underemphasizing symptoms of depression in black patients and overemphasizing psychotic symptoms,
 # leading to misdiagnosis (and higher rates of schizophrenia). This tendency may be **particularly
 # pronounced for black men.**
 #
 # Why is this important?
 #
-# **Misdiagnosis can have negative downstream effects** :footcite:`Gara2012`, leading to inequities
+# **Misdiagnosis can have negative downstream effects** :footcite:`gara2012influence`, leading to
+# inequities
 # in care. Schizophrenia is a more serious and stigmatized illness than affective disorder, it has
 # a poorer prognosis, and involves treatments with greater side effects. Misdiagnosis can delay
 # getting the right treatment, increase patient frustration and distrust, and worsen illness, all
@@ -557,14 +558,16 @@ def grouppivot(labelgroup, yvalue, dataset, SZonly=False):
     return pivot
 
 
-# %% Exploring the data
+# %%
+# Exploring the data
 # ~~~~~~~~~~~~~~~~~~
 #
 
 # %%
 train.head()
 
-# %% By examining the first few cases, we can broadly get a sense of what the data looks like:
+# %%
+# By examining the first few cases, we can broadly get a sense of what the data looks like:
 #
 # - Diagnosis is binary, with 1 corresponding to schizophrenia, and 0 corresponding to affective
 #   disorder.
@@ -586,7 +589,8 @@ train.head()
 #     responses for a categorical variable, a negative value for a variable that must be positive,
 #     such as a wait time)
 # *   variables that are much more complex (e.g., race or ethnicity coded in a multitude of ways,
-#     :footcite:`Maslej2022` with many individuals having mixed racial backgrounds, psychosocial
+#     :footcite:`maslej2022race` with many individuals having mixed racial backgrounds,
+#     psychosocial
 #     variables never cleanly separate into *stable* or *unstable* housing or *yes* or *no* for
 #     delay (in reality, these constructs are rarely even captured, and they may be inferred, e.g.,
 #     based on location or income)
@@ -618,7 +622,8 @@ race.plot.bar(stacked=True, ax=axs[2])
 axs[2].set_title("Race across train and test sets")
 fig.show()
 
-# %% These plots show that the train and test sets have similar proportions of data across
+# %%
+# These plots show that the train and test sets have similar proportions of data across
 # diagnosis, sex, and race, so the way our data is partitioned seems fine.
 #
 # We observe a substantially higher proportion of white and Black individuals compared to Asian and
@@ -644,7 +649,8 @@ trainy = train.Diagnosis
 testx = test.drop("Diagnosis", axis=1)
 testy = test.Diagnosis
 
-# %% Next, we do some minimal preprocessing to one hot encode the categorical variables, bearing in
+# %%
+# Next, we do some minimal preprocessing to one hot encode the categorical variables, bearing in
 # mind that preprocessing real-world hospital record data is typically much more laborious.
 #
 
@@ -676,7 +682,8 @@ testx = testx.reset_index(drop=True).join(onehot(testx))
 trainx = trainx.drop(categories, axis=1)
 testx = testx.drop(categories, axis=1)
 
-# %% Training
+# %%
+# Training
 # ~~~~~~~~
 #
 # For this model, we'll use a simple logistic regression model with elastic net for regularization
@@ -695,7 +702,8 @@ from sklearn.linear_model import LogisticRegression
 
 model = LogisticRegression(penalty="elasticnet", max_iter=1000, solver="saga", l1_ratio=1)
 
-# %% We train the model and apply it to generate predictions on our test set.
+# %%
+# We train the model and apply it to generate predictions on our test set.
 #
 
 # %%
@@ -711,7 +719,8 @@ print("Training accuracy: ", skm.accuracy_score(trainy, train_predictions))  # T
 predictions = model.predict(testx)
 print("Test accuracy: ", skm.accuracy_score(testy, predictions))  # Test accuracy
 
-# %% We notice that the train and test accuracy are all fairly good. We can visualize the
+# %%
+# We notice that the train and test accuracy are all fairly good. We can visualize the
 # performance of the model further by looking at a confusion matrix.
 
 # %%
@@ -736,7 +745,8 @@ def confusionmatrix(truelabels, predictions):
 
 confusionmatrix(testy, predictions)
 
-# %% Again, we notice very solid performance. The model is correctly identifying positive cases
+# %%
+# Again, we notice very solid performance. The model is correctly identifying positive cases
 # (Sensitivity), while rejecting negative ones (Specificity). The hospital executives probably took
 # a look at the model, and believed that it was ready for deployment.
 #
@@ -748,7 +758,8 @@ confusionmatrix(testy, predictions)
 # schizophrenia (such as a lack of emotion and motivation, cognitive impairment, and even
 # psychosis) can overlap with symptoms of depression. Another reason ML often falls short in
 # predicting psychiatric outcomes is when these outcomes tend to be rare (such as in the case of
-# suicide :footcite:`Belsher2019`). Although our simulated data is fairly balanced with respect to
+# suicide :footcite:`belsher2019prediction`). Although our simulated data is fairly balanced with
+# respect to
 # the two diagnoses, in reality, Schizophrenia is much less common than Affective Disorder. If
 # collected naturally based on different patients seen at a health system, our classes would be
 # very imbalanced.
@@ -765,7 +776,7 @@ confusionmatrix(testy, predictions)
 # rate for darker-skinned females to be 34% higher than for lighter-skinned males
 # :footcite:`buolamwini2018gender`. When translating into a gendered language, Google Translate
 # skews towards masculine translations for words like “strong” or “doctor,” while skewing feminine
-# for words like “beautiful” or “nurse.” :footcite:`blogReducingGender`
+# for words like “beautiful” or “nurse.” :footcite:`kuczmarski2018reducing`
 #
 # These are clear problems which we aim to avoid by performing a proper fairness assessment. Let's
 # do that now.
@@ -793,7 +804,7 @@ confusionmatrix(testy, predictions)
 #
 # There is a study suggesting that, when diagnosing the nature of tumours from medical images,
 # false negative rates are higher for disadvantaged or underserved groups defined by intersecting
-# features (e.g., low-income, Black women). :footcite:`SeyyedKalantari2021` This is an excellent,
+# features (e.g., low-income, Black women). :footcite:`seyyedkalantari2021underdiagnosis` This is an excellent,
 # real-world example of how the application of ML in healthcare can *amplify harms*, if deployed
 # without concern for fairness.
 #
@@ -926,7 +937,8 @@ def f(truelabels, predictions):
 
 f(testy, predictions)
 
-# %% In the table above, the first row shows the metric (false positive rates), while the second
+# %%
+# In the table above, the first row shows the metric (false positive rates), while the second
 # row shows the ratio of the metric between specified group and reference. These values are all
 # expressed as percentages.
 #
@@ -947,7 +959,7 @@ f(testy, predictions)
 # ~~~~~~~~~~~~~~~~~~~
 #
 # However, we suspect this bias might only extend to identities defined by the intersecting
-# features of sex and race (i.e., Black men :footcite:`Gara2019`).
+# features of sex and race (i.e., Black men :footcite:`gara2019naturalistic`).
 #
 # Let's repeat this assessment then.
 #
@@ -976,7 +988,8 @@ def intersectionalf(truelabels, predictions):
 
 intersectionalf(testy, predictions)
 
-# %% What do we notice?
+# %%
+# What do we notice?
 #
 # * Both the FPR and Relative FPR of Black men is much higher than that of Black women and men
 #   combined. Black men are now misdiagnosed at a rate that is almost 5.18x that of White men. This
@@ -996,7 +1009,8 @@ intersectionalf(testy, predictions)
 m = sns.FacetGrid(train, row="Sex", col="Race")
 m.map(sns.histplot, "Diagnosis", discrete=True, shrink=0.8)
 
-# %% We see that the frequency of the two diagnoses (of affective disorder or 0 and schizophrenia
+# %%
+# We see that the frequency of the two diagnoses (of affective disorder or 0 and schizophrenia
 # or 1) are fairly similar among all intersectional subgroups, except Black men, who have a much
 # higher rate of schizophrenia diagnosis.
 #
@@ -1013,13 +1027,13 @@ m.map(sns.histplot, "Diagnosis", discrete=True, shrink=0.8)
 # predictions cannot be unfair with respect to that feature.
 
 # %%
-
 # Define and drop race-related variables
 race_cat = ["Race_Asian", "Race_Black", "Race_Hispanic", "Race_White"]
 trainx_norace = trainx.drop(race_cat, axis=1)
 testx_norace = testx.drop(race_cat, axis=1)
 
-# %% Now that we've dropped the variables, we'll train a second model that is identical to the
+# %%
+# Now that we've dropped the variables, we'll train a second model that is identical to the
 # first one, except it no longer uses Race as a feature.
 
 # %%
@@ -1034,7 +1048,8 @@ print("Training accuracy: ", skm.accuracy_score(trainy, train_predictions))  # T
 predictions = model2.predict(testx_norace)
 print("Test accuracy: ", skm.accuracy_score(testy, predictions))  # Test accuracy
 
-# %% We'll note that the accuracy is still solid. It has decreased slightly, which makes sense
+# %%
+# We'll note that the accuracy is still solid. It has decreased slightly, which makes sense
 # given that our model has access to fewer features with which to maximize predictive accuracy.
 #
 # That said, our most important objective is to analyze whether fairness has increased as a result
@@ -1043,7 +1058,8 @@ print("Test accuracy: ", skm.accuracy_score(testy, predictions))  # Test accurac
 # %%
 f(testy, predictions)
 
-# %% Oh yikes - by removing race from our model, the FPR for the Black population has increased to
+# %%
+# Oh yikes - by removing race from our model, the FPR for the Black population has increased to
 # 3.8x that of our reference group.
 #
 # Does intersectional fairness show a similar trend?
@@ -1052,7 +1068,8 @@ f(testy, predictions)
 
 intersectionalf(testy, predictions)
 
-# %% If we analyze this problem through an intersectional lens, we notice that the relative FPR has
+# %%
+# If we analyze this problem through an intersectional lens, we notice that the relative FPR has
 # increased even further, and Black men are now being misdiagnosed at a rate that is 7x higher than
 # white men.
 #
@@ -1093,7 +1110,7 @@ intersectionalf(testy, predictions)
 #
 # Recall that there is much evidence to support **diagnostic bias**, or the tendency for clinicians
 # to under-emphasize depressive symptoms and over-emphasize psychotic symptoms when assessing black
-# men. But one interesting 2004 study :footcite:`Arnold2004` shows that this effect is not
+# men. But one interesting 2004 study :footcite:`arnold2004ethnicity` shows that this effect is not
 # necessarily due to the appearance of race. In this study, the researchers examined whether
 # blinding clinicians to a patient’s race would remove this diagnostic bias. Black and white
 # patients presenting to the hospital with psychosis were evaluated with structured rating scales,
@@ -1153,7 +1170,6 @@ intersectionalf(testy, predictions)
 #
 
 # %%
-
 # Gets the weights associated with each feature, and scales them from 0-100
 
 weights = pd.DataFrame(model.coef_[0], trainx.columns, columns=["Weight"])
@@ -1163,7 +1179,8 @@ scaled_weights = pd.DataFrame(
 )
 scaled_weights.sort_values(by=["Weight"], ascending=False)
 
-# %% When we examine features that are most important for prediction in our first model (i.e., the
+# %%
+# When we examine features that are most important for prediction in our first model (i.e., the
 # model that included race), it indeed shows that although race is among the important features,
 # there are also other features related to clinical presentation that are contributing to
 # predicting the diagnosis or outcome.
@@ -1208,6 +1225,7 @@ axs[1].set_title("Rumination vs Intersect across groups with AD (test)")
 
 plt.show()
 
+# %%
 # The first graph (left) shows average rumination scores stratified by diagnosis. Rumination is a
 # cognitive feature of depression, referring to repetitive, persistent thinking about the
 # depressive episode. As you can see, rumination is more common in affective disorder than
@@ -1242,7 +1260,8 @@ axs[1].set_title("Tension vs Intersect across groups with AD (test)")
 
 plt.show()
 
-# %% In the training set, people with schizophrenia are more likely to report tension at their
+# %%
+# In the training set, people with schizophrenia are more likely to report tension at their
 # clinical assessment (left graph). Again, looking at how Black men with affective disorder compare
 # to White men on this particular feature in the test set, they are more likely to report tension
 # at the clinical interview. But it's interesting to see that other groups also report high tension
