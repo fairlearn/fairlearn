@@ -62,9 +62,36 @@ touch .nojekyll
 # landing page on fairlearn.org
 if [ "$CIRCLE_BRANCH" = "main" ]
 then
-    echo "Copying landing_page.js into js directory"
+    echo "Copying all the newly generated  files for the static landing page"
     ls $GENERATED_DOC_DIR/..
+    #js
     cp $GENERATED_DOC_DIR/../landing_page.js js/
+    #css
+    cp $GENERATED_DOC_DIR/../landing_page_style.css css/
+    #fonts
+    cp $GENERATED_DOC_DIR/../SourceCodePro-Bold.ttf fonts/
+    cp $GENERATED_DOC_DIR/../SourceCodePro-Medium.ttf fonts/
+    cp $GENERATED_DOC_DIR/../SourceCodePro-Regular.ttf fonts/
+    #images
+    cp $GENERATED_DOC_DIR/../Button_GH_Default.svg images/
+    cp $GENERATED_DOC_DIR/../Button_GH_Hover.svg images/
+    cp $GENERATED_DOC_DIR/../Discord_Color.svg images/
+    cp $GENERATED_DOC_DIR/../Discord_Inverse.svg images/
+    cp $GENERATED_DOC_DIR/../fairlearn_logo.svg images/
+    cp $GENERATED_DOC_DIR/../fairlearn-favicon.ico images/
+    cp $GENERATED_DOC_DIR/../fairlearn-meta-image.jpg images/
+    cp $GENERATED_DOC_DIR/../Github_Color.svg images/
+    cp $GENERATED_DOC_DIR/../Github_Inverse.svg images/
+    cp $GENERATED_DOC_DIR/../Nav_Discord_Default.svg images/
+    cp $GENERATED_DOC_DIR/../Nav_Discord_Hover.svg images/
+    cp $GENERATED_DOC_DIR/../Nav_GH_Default.svg images/
+    cp $GENERATED_DOC_DIR/../Nav_GH_Hover.svg images/
+    cp $GENERATED_DOC_DIR/../Stack_Overflow_Color.svg images/
+    cp $GENERATED_DOC_DIR/../Stack_Overflow_Inverse.svg images/
+    cp $GENERATED_DOC_DIR/../Twitter_Color.svg images/
+    cp $GENERATED_DOC_DIR/../Twitter_Inverse.svg images/
+
+
 fi
 
 echo "fairlearn.org" > CNAME
