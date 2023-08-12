@@ -68,6 +68,8 @@ then
     cp $GENERATED_DOC_DIR/../landing_page.js js/
     #css
     cp $GENERATED_DOC_DIR/../landing_page_style.css css/
+    #html
+    cp $GENERATED_DOC_DIR/../index.html  .
     #fonts
     cp $GENERATED_DOC_DIR/../SourceCodePro-Bold.ttf fonts/
     cp $GENERATED_DOC_DIR/../SourceCodePro-Medium.ttf fonts/
