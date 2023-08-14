@@ -266,3 +266,22 @@ class TestGroupComparisons:
         # Check median close to nominal
         print(f"result={result}")
         assert result[1] == pytest.approx(nominal, abs=ABS_TOL)
+
+    @pytest.mark.parametrize("comparator", ["difference", "ratio"])
+    @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
+    def test_1m_0cf_dict(
+        self,
+        mf_1mdict_0cf: MetricFrame,
+        comparator: str,
+        error_handling: str,
+        method: str,
+    ):
+        result, nominal = self._get_comparators(
+            mf_1mdict_0cf, comparator, method, error_handling
+        )
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_1mdict_0cf.ci_quantiles == QUANTILES
+        # Check median close to nominal
+        assert result[1]["recall"] == pytest.approx(nominal["recall"], abs=ABS_TOL)
