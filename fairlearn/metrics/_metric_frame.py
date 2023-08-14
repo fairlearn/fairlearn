@@ -379,6 +379,21 @@ class MetricFrame:
                 self._extract_result(x, no_control_levels=True) for x in result_group
             ]
 
+            group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
+            for k, v in group_functions.items():
+                self._result_cache[k] = dict()
+                for err_string in _VALID_ERROR_STRING:
+                    try:
+                        self._result_cache[k][err_string] = self._group_ci(
+                            bootstrap_samples=_bootstrap_samples,
+                            ci_quantiles=ci_quantiles,
+                            grouping_function=v,
+                            errors=err_string,
+                        )
+                    except Exception as e:  # noqa: B902
+                        # Store any exception for later
+                        self._result_cache[k][err_string] = e
+
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
         Change result types for those who dislike consistency.
@@ -610,6 +625,25 @@ class MetricFrame:
 
         return self._extract_result(result, no_control_levels=False)
 
+    def _group_ci(
+        self,
+        bootstrap_samples: List[DisaggregatedResult],
+        ci_quantiles: List[float],
+        grouping_function: str,
+        errors: str = "raise",
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        samples = [
+            r.apply_grouping(grouping_function, self.control_levels, errors=errors)
+            for r in bootstrap_samples
+        ]
+
+        raw_result = calculate_pandas_quantiles(
+            quantiles=ci_quantiles, bootstrap_samples=samples
+        )
+
+        result = [self._extract_result(x, no_control_levels=False) for x in raw_result]
+        return result
+
     def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
@@ -671,6 +705,18 @@ class MetricFrame:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         value = self._result_cache["group_min"][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
+
+    def group_min_ci(
+        self, errors: str = "raise"
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        value = self._result_cache["group_min_ci"][errors]
         if isinstance(value, Exception):
             raise value
         else:
