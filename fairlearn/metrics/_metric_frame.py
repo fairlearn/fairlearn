@@ -677,6 +677,18 @@ class MetricFrame:
         else:
             return value
 
+    def group_max_ci(
+        self, errors: str = "raise"
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        value = self._result_cache["group_max_ci"][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
+
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 

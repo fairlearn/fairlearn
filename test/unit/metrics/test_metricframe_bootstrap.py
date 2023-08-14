@@ -14,6 +14,7 @@ from .data_for_test import g_1, g_2, y_p, y_t
 # constantly recomputing the same bootstrapping
 
 QUANTILES = [0.05, 0.5, 0.95]
+ERROR_OPTIONS = ["raise", "coerce"]
 
 ABS_TOL = 0.1
 
@@ -175,13 +176,16 @@ class TestGroupExtremes:
         if aggregation == "min":
             actual = mf.group_min_ci(errors=error_handling)
             nominal = mf.group_min(errors=error_handling)
+        elif aggregation == "max":
+            actual = mf.group_max_ci(errors=error_handling)
+            nominal = mf.group_max(errors=error_handling)
         else:
             raise ValueError(f"Unrecognised option: {aggregation}")
 
         return actual, nominal
 
-    @pytest.mark.parametrize("aggregation", ["min"])
-    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    @pytest.mark.parametrize("aggregation", ["min", "max"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_1m_0cf(
         self, mf_1m_0cf: MetricFrame, aggregation: str, error_handling: str
     ):
@@ -192,8 +196,8 @@ class TestGroupExtremes:
         # Check median close to nominal
         assert result[1] == pytest.approx(nominal, abs=ABS_TOL)
 
-    @pytest.mark.parametrize("aggregation", ["min"])
-    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    @pytest.mark.parametrize("aggregation", ["min", "max"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_1m_0cf_dict(
         self, mf_1mdict_0cf: MetricFrame, aggregation: str, error_handling: str
     ):
@@ -206,8 +210,8 @@ class TestGroupExtremes:
         # Check median close to nominal
         assert result[1]["recall"] == pytest.approx(nominal["recall"], abs=ABS_TOL)
 
-    @pytest.mark.parametrize("aggregation", ["min"])
-    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    @pytest.mark.parametrize("aggregation", ["min", "max"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_1m_1_cf(
         self, mf_1m_1cf: MetricFrame, aggregation: str, error_handling: str
     ):
@@ -219,8 +223,8 @@ class TestGroupExtremes:
             # Check median close to nominal
             assert result[1][cf] == pytest.approx(nominal[cf], abs=ABS_TOL)
 
-    @pytest.mark.parametrize("aggregation", ["min"])
-    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    @pytest.mark.parametrize("aggregation", ["min", "max"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_2m_1_cf(
         self, mf_2m_1cf: MetricFrame, aggregation: str, error_handling: str
     ):
