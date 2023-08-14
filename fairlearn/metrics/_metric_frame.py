@@ -365,74 +365,7 @@ class MetricFrame:
                 control_feature_names=self._cf_names,
             )
 
-            result_overall = calculate_pandas_quantiles(
-                ci_quantiles, [x.overall for x in _bootstrap_samples]
-            )
-            self._result_cache["overall_ci"] = [
-                self._extract_result(x, no_control_levels=False) for x in result_overall
-            ]
-
-            result_group = calculate_pandas_quantiles(
-                ci_quantiles, [x.by_group for x in _bootstrap_samples]
-            )
-            self._result_cache["by_group_ci"] = [
-                self._extract_result(x, no_control_levels=True) for x in result_group
-            ]
-
-            group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
-            for k, v in group_functions.items():
-                self._result_cache[k] = dict()
-                for err_string in _VALID_ERROR_STRING:
-                    try:
-                        self._result_cache[k][err_string] = self._group_ci(
-                            bootstrap_samples=_bootstrap_samples,
-                            ci_quantiles=ci_quantiles,
-                            grouping_function=v,
-                            errors=err_string,
-                        )
-                    except Exception as e:  # noqa: B902
-                        # Store any exception for later
-                        self._result_cache[k][err_string] = e
-
-            # Differences and ratios
-            for c_t in ["difference_ci", "ratio_ci"]:
-                self._result_cache[c_t] = dict()
-                for c_m in _COMPARE_METHODS:
-                    self._result_cache[c_t][c_m] = dict()
-                    for err_string in _VALID_ERROR_STRING:
-                        try:
-                            if c_t == "difference_ci":
-                                raw_samples = [
-                                    r.difference(
-                                        self.control_levels,
-                                        method=c_m,
-                                        errors=err_string,
-                                    )
-                                    for r in _bootstrap_samples
-                                ]
-                            else:
-                                raw_samples = [
-                                    r.ratio(
-                                        self.control_levels,
-                                        method=c_m,
-                                        errors=err_string,
-                                    )
-                                    for r in _bootstrap_samples
-                                ]
-
-                            samples = [self._none_to_nan(x) for x in raw_samples]
-
-                            raw_result = calculate_pandas_quantiles(
-                                quantiles=ci_quantiles, bootstrap_samples=samples
-                            )
-
-                            self._result_cache[c_t][c_m][err_string] = result = [
-                                self._extract_result(x, no_control_levels=False)
-                                for x in raw_result
-                            ]
-                        except Exception as e:  # noqa: B902
-                            # Store any exception for later
-                            self._result_cache[c_t][c_m][err_string] = e
+            self._populate_results_ci(_bootstrap_samples, ci_quantiles)
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
@@ -517,6 +450,78 @@ class MetricFrame:
                         self._result_cache[c_t][c_m][err_string] = self._extract_result(
                             result, no_control_levels=False
                         )
+                    except Exception as e:  # noqa: B902
+                        # Store any exception for later
+                        self._result_cache[c_t][c_m][err_string] = e
+
+    def _populate_results_ci(
+        self, bootstrap_samples: List[DisaggregatedResult], ci_quantiles: List[float]
+    ):
+        result_overall = calculate_pandas_quantiles(
+            ci_quantiles, [x.overall for x in bootstrap_samples]
+        )
+        self._result_cache["overall_ci"] = [
+            self._extract_result(x, no_control_levels=False) for x in result_overall
+        ]
+
+        result_group = calculate_pandas_quantiles(
+            ci_quantiles, [x.by_group for x in bootstrap_samples]
+        )
+        self._result_cache["by_group_ci"] = [
+            self._extract_result(x, no_control_levels=True) for x in result_group
+        ]
+
+        group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
+        for k, v in group_functions.items():
+            self._result_cache[k] = dict()
+            for err_string in _VALID_ERROR_STRING:
+                try:
+                    self._result_cache[k][err_string] = self._group_ci(
+                        bootstrap_samples=bootstrap_samples,
+                        ci_quantiles=ci_quantiles,
+                        grouping_function=v,
+                        errors=err_string,
+                    )
+                except Exception as e:  # noqa: B902
+                    # Store any exception for later
+                    self._result_cache[k][err_string] = e
+
+        # Differences and ratios
+        for c_t in ["difference_ci", "ratio_ci"]:
+            self._result_cache[c_t] = dict()
+            for c_m in _COMPARE_METHODS:
+                self._result_cache[c_t][c_m] = dict()
+                for err_string in _VALID_ERROR_STRING:
+                    try:
+                        if c_t == "difference_ci":
+                            raw_samples = [
+                                r.difference(
+                                    self.control_levels,
+                                    method=c_m,
+                                    errors=err_string,
+                                )
+                                for r in bootstrap_samples
+                            ]
+                        else:
+                            raw_samples = [
+                                r.ratio(
+                                    self.control_levels,
+                                    method=c_m,
+                                    errors=err_string,
+                                )
+                                for r in bootstrap_samples
+                            ]
+
+                        samples = [self._none_to_nan(x) for x in raw_samples]
+
+                        raw_result = calculate_pandas_quantiles(
+                            quantiles=ci_quantiles, bootstrap_samples=samples
+                        )
+
+                        self._result_cache[c_t][c_m][err_string] = result = [
+                            self._extract_result(x, no_control_levels=False)
+                            for x in raw_result
+                        ]
                     except Exception as e:  # noqa: B902
                         # Store any exception for later
                         self._result_cache[c_t][c_m][err_string] = e
