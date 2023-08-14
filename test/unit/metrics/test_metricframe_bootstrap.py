@@ -168,15 +168,46 @@ class TestByGroupQuantiles:
                     )
 
 
-class TestGroupMin:
+class TestGroupExtremes:
+    @pytest.mark.parametrize("aggregation", ["min"])
     @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
-    def test_1m_0cf(self, mf_1m_0cf: MetricFrame, error_handling: str):
-        result = mf_1m_0cf.group_min_ci(errors=error_handling)
+    def test_1m_0cf(
+        self, mf_1m_0cf: MetricFrame, aggregation: str, error_handling: str
+    ):
+        if aggregation == "min":
+            result = mf_1m_0cf.group_min_ci(errors=error_handling)
+            nominal = mf_1m_0cf.group_min(errors=error_handling)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1m_0cf.ci_quantiles == QUANTILES
-        for g in np.unique(g_1):
+        # Check median close to nominal
+        assert result[1] == pytest.approx(nominal, abs=0.05)
+
+    @pytest.mark.parametrize("aggregation", ["min"])
+    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    def test_1m_0cf_dict(
+        self, mf_1mdict_0cf: MetricFrame, aggregation: str, error_handling: str
+    ):
+        if aggregation == "min":
+            result = mf_1mdict_0cf.group_min_ci(errors=error_handling)
+            nominal = mf_1mdict_0cf.group_min(errors=error_handling)
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_1mdict_0cf.ci_quantiles == QUANTILES
+        # Check median close to nominal
+        assert result[1]["recall"] == pytest.approx(nominal["recall"], abs=0.05)
+
+    @pytest.mark.parametrize("aggregation", ["min"])
+    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    def test_1m_1_cf(
+        self, mf_1m_1cf: MetricFrame, aggregation: str, error_handling: str
+    ):
+        if aggregation == "min":
+            result = mf_1m_1cf.group_min_ci(errors=error_handling)
+            nominal = mf_1m_1cf.group_min(errors=error_handling)
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_1m_1cf.ci_quantiles == QUANTILES
+        for cf in np.unique(g_2):
             # Check median close to nominal
-            assert result[1] == pytest.approx(
-                mf_1m_0cf.group_min(errors=error_handling), abs=0.05
-            )
+            assert result[1][cf] == pytest.approx(nominal[cf], abs=0.05)
