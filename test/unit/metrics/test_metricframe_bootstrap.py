@@ -237,3 +237,34 @@ class TestGroupExtremes:
             for cf in np.unique(g_2):
                 # Check median close to nominal
                 assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=ABS_TOL)
+
+
+class TestGroupComparisons:
+    def _get_comparators(
+        self, mf: MetricFrame, comparator: str, method: str, error_handling: str
+    ):
+        if comparator == "difference":
+            actual = mf.difference_ci(method=method, errors=error_handling)
+            nominal = mf.difference(method=method, errors=error_handling)
+        elif comparator == "ratio":
+            actual = mf.ratio_ci(method=method, errors=error_handling)
+            nominal = mf.ratio(method=method, errors=error_handling)
+        else:
+            raise ValueError(f"Unrecognised option: {comparator}")
+
+        return actual, nominal
+
+    @pytest.mark.parametrize("comparator", ["difference", "ratio"])
+    @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
+    def test_1m_0cf(
+        self, mf_1m_0cf: MetricFrame, comparator: str, error_handling: str, method: str
+    ):
+        result, nominal = self._get_comparators(
+            mf_1m_0cf, comparator, method, error_handling
+        )
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_1m_0cf.ci_quantiles == QUANTILES
+        # Check median close to nominal
+        assert result[1] == pytest.approx(nominal, abs=ABS_TOL)

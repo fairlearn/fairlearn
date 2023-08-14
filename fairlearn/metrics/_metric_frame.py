@@ -823,6 +823,21 @@ class MetricFrame:
         else:
             return value
 
+    def difference_ci(
+        self, method: str = "between_groups", errors: str = "coerce"
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        value = self._result_cache["difference_ci"][method][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
+
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
     ) -> Union[Any, pd.Series, pd.DataFrame]:
@@ -869,6 +884,21 @@ class MetricFrame:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
         value = self._result_cache["ratio"][method][errors]
+        if isinstance(value, Exception):
+            raise value
+        else:
+            return value
+
+    def ratio_ci(
+        self, method: str = "between_groups", errors: str = "coerce"
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        if errors not in _VALID_ERROR_STRING:
+            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
+
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        value = self._result_cache["ratio_ci"][method][errors]
         if isinstance(value, Exception):
             raise value
         else:
