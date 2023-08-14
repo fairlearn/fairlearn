@@ -5,8 +5,7 @@ Release Process
 
 This page outlines the process for creating a new Fairlearn release.
 The following steps assume git remote's `origin` points to
-`fairlearn/fairlearn` (in practical terms, that the work is being
-done on a clone of `fairlearn/fairlearn` and not on a fork).
+`fairlearn/fairlearn`.
 
 #. Ensure the maintainers listed in `scripts/generate_maintainers_table.py`
    are up to date. Run `python scripts/generate_maintainers_table.py` from the
@@ -30,6 +29,10 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
         :code:`git push -u origin release/v<x.y>.X`
 
+       You may need to temporarily add an exception to the 
+       `branch protection rules <https://github.com/fairlearn/fairlearn/settings/branches>`_ 
+       by adding a new branch protection rule for `release/v<x.y>.X`.
+
 #. On the release branch, create a PR to update the version in `__init__.py`
    to `x.y.z` (where `z=0` for the first release from a branch)
 
@@ -48,22 +51,21 @@ done on a clone of `fairlearn/fairlearn` and not on a fork).
 
     :code:`git push origin v<x.y.z>`
 
-#. On `GitHub's release page <https://github.com/fairlearn/fairlearn/releases>`_
-   there should be a new release named `v<x.y.z>`.
-   Open it and post the changes from the release file within
-   `docs/user_guide/installation_and_version_guide` into the description, then
-   hit "publish".
+#. On `GitHub's release page <https://github.com/fairlearn/fairlearn/releases>`_,
+   draft a new release. Choose the new tag, title the release `v<x.y.z>`, 
+   and post the changes from the release file within `docs/user_guide/installation_and_version_guide` 
+   into the description, then hit "publish".
 
 #. On the `main` branch, create a PR to:
 
-    #. Update the version in `__init__.py` to `x.y.z+1.dev0`
+    #. Update the version in `__init__.py` to `x.y+1.z.dev0`
     #. Update the version in `docs/static_landing_page/js/landing_page.js`
        so that all the links point to the new release
-    #. Update the `docs\_static\versions.json` file
-    #. Create a new file `vx.y.z+1.rst` in `docs/user_guide/installation_and_version_guide`
+    #. Update the `docs/_static/versions.json` file
+    #. Create a new file `vx.y+1.z.rst` in `docs/user_guide/installation_and_version_guide`
    
 .. note::
-    Make sure to add a note to this second PR:
+    Make sure to add a note to this PR:
     "Do not merge until the release is completed. Otherwise a new website will
     be published that points to the new version which doesn't exist yet." 
 

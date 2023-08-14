@@ -38,7 +38,9 @@ jobs:
 
       - run:
           name: 'Install required packages'
-          command: python scripts/install_requirements.py --pinned False
+          command: |
+            python scripts/install_requirements.py --pinned False
+            pip install matplotlib>=3.2.1
 
       - run:
           name: "Build Documentation"
@@ -90,7 +92,9 @@ jobs:
 
       - run:
           name: 'Install required packages'
-          command: python scripts/install_requirements.py --pinned False
+          command: |
+            python scripts/install_requirements.py --pinned False
+            pip install matplotlib>=3.2.1
 
       - run:
           name: 'Build doctest'

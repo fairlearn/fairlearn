@@ -13,14 +13,6 @@ with open("README.rst", "r") as fh:
 with open("requirements.txt") as f:
     install_requires = [line.strip() for line in f]
 
-# Fetch separate requirements file for each extension
-extras = ["customplots"]
-extras_require = dict()
-for e in extras:
-    req_file = "requirements-{0}.txt".format(e)
-    with open(req_file) as f:
-        extras_require[e] = [line.strip() for line in f]
-
 setuptools.setup(
     name=fairlearn.__name__,
     version=fairlearn.__version__,
@@ -38,7 +30,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires=">=3.8",
     install_requires=install_requires,
-    extras_require=extras_require,
     classifiers=[
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
