@@ -394,6 +394,46 @@ class MetricFrame:
                         # Store any exception for later
                         self._result_cache[k][err_string] = e
 
+            # Differences and ratios
+            for c_t in ["difference_ci", "ratio_ci"]:
+                self._result_cache[c_t] = dict()
+                for c_m in _COMPARE_METHODS:
+                    self._result_cache[c_t][c_m] = dict()
+                    for err_string in _VALID_ERROR_STRING:
+                        try:
+                            if c_t == "difference":
+                                raw_samples = [
+                                    r.difference(
+                                        self.control_levels,
+                                        method=c_m,
+                                        errors=err_string,
+                                    )
+                                    for r in _bootstrap_samples
+                                ]
+                            else:
+                                raw_samples = [
+                                    r.ratio(
+                                        self.control_levels,
+                                        method=c_m,
+                                        errors=err_string,
+                                    )
+                                    for r in _bootstrap_samples
+                                ]
+
+                            samples = [self._none_to_nan(x) for x in raw_samples]
+
+                            raw_result = calculate_pandas_quantiles(
+                                quantiles=ci_quantiles, bootstrap_samples=samples
+                            )
+
+                            self._result_cache[c_t][c_m][err_string] = result = [
+                                self._extract_result(x, no_control_levels=False)
+                                for x in raw_result
+                            ]
+                        except Exception as e:  # noqa: B902
+                            # Store any exception for later
+                            self._result_cache[c_t][c_m][err_string] = e
+
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
         Change result types for those who dislike consistency.
