@@ -17,6 +17,7 @@ QUANTILES = [0.05, 0.5, 0.95]
 
 ABS_TOL = 0.1
 
+
 @pytest.fixture(scope="session")
 def mf_1m_0cf():
     n_samples = 100
@@ -176,7 +177,7 @@ class TestGroupExtremes:
             nominal = mf.group_min(errors=error_handling)
         else:
             raise ValueError(f"Unrecognised option: {aggregation}")
-        
+
         return actual, nominal
 
     @pytest.mark.parametrize("aggregation", ["min"])
@@ -196,7 +197,9 @@ class TestGroupExtremes:
     def test_1m_0cf_dict(
         self, mf_1mdict_0cf: MetricFrame, aggregation: str, error_handling: str
     ):
-        result, nominal = self._get_comparators(mf_1mdict_0cf, aggregation, error_handling)
+        result, nominal = self._get_comparators(
+            mf_1mdict_0cf, aggregation, error_handling
+        )
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
@@ -215,3 +218,18 @@ class TestGroupExtremes:
         for cf in np.unique(g_2):
             # Check median close to nominal
             assert result[1][cf] == pytest.approx(nominal[cf], abs=ABS_TOL)
+
+    @pytest.mark.parametrize("aggregation", ["min"])
+    @pytest.mark.parametrize("error_handling", ["raise", "coerce"])
+    def test_2m_1_cf(
+        self, mf_2m_1cf: MetricFrame, aggregation: str, error_handling: str
+    ):
+        result, nominal = self._get_comparators(mf_2m_1cf, aggregation, error_handling)
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_2m_1cf.ci_quantiles == QUANTILES
+
+        for m in ["recall", "prec"]:
+            for cf in np.unique(g_2):
+                # Check median close to nominal
+                assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=ABS_TOL)
