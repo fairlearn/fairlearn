@@ -401,7 +401,7 @@ class MetricFrame:
                     self._result_cache[c_t][c_m] = dict()
                     for err_string in _VALID_ERROR_STRING:
                         try:
-                            if c_t == "difference":
+                            if c_t == "difference_ci":
                                 raw_samples = [
                                     r.difference(
                                         self.control_levels,
