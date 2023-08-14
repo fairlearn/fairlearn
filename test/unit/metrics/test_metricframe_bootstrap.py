@@ -13,6 +13,7 @@ from .data_for_test import g_1, g_2, y_p, y_t
 # Have fixtures so that tests can be specific without
 # constantly recomputing the same bootstrapping
 
+N_BOOTSTRAP = 100
 QUANTILES = [0.05, 0.5, 0.95]
 ERROR_OPTIONS = ["raise", "coerce"]
 
@@ -21,13 +22,12 @@ ABS_TOL = 0.1
 
 @pytest.fixture(scope="session")
 def mf_1m_0cf():
-    n_samples = 100
     target_boot = MetricFrame(
         metrics=skm.recall_score,
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
-        n_boot=n_samples,
+        n_boot=N_BOOTSTRAP,
         ci_quantiles=QUANTILES,
         random_state=13489623,
     )
@@ -36,13 +36,12 @@ def mf_1m_0cf():
 
 @pytest.fixture(scope="session")
 def mf_1mdict_0cf():
-    n_samples = 100
     target_boot = MetricFrame(
         metrics={"recall": skm.recall_score},
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
-        n_boot=n_samples,
+        n_boot=N_BOOTSTRAP,
         ci_quantiles=QUANTILES,
         random_state=13489623,
     )
@@ -51,14 +50,13 @@ def mf_1mdict_0cf():
 
 @pytest.fixture(scope="session")
 def mf_1m_1cf():
-    n_samples = 100
     target_boot = MetricFrame(
         metrics=skm.recall_score,
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
         control_features=g_2,
-        n_boot=n_samples,
+        n_boot=N_BOOTSTRAP,
         ci_quantiles=QUANTILES,
         random_state=13489623,
     )
@@ -67,7 +65,6 @@ def mf_1m_1cf():
 
 @pytest.fixture(scope="session")
 def mf_2m_1cf():
-    n_samples = 100
     metric_dict = {"recall": skm.recall_score, "prec": skm.precision_score}
     target_boot = MetricFrame(
         metrics=metric_dict,
@@ -75,7 +72,7 @@ def mf_2m_1cf():
         y_pred=y_p,
         sensitive_features=g_1,
         control_features=g_2,
-        n_boot=n_samples,
+        n_boot=N_BOOTSTRAP,
         ci_quantiles=QUANTILES,
         random_state=13489623,
     )
@@ -267,4 +264,5 @@ class TestGroupComparisons:
         assert len(result) == len(QUANTILES)
         assert mf_1m_0cf.ci_quantiles == QUANTILES
         # Check median close to nominal
+        print(f"result={result}")
         assert result[1] == pytest.approx(nominal, abs=ABS_TOL)
