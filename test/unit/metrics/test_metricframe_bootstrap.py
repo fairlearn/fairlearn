@@ -96,7 +96,7 @@ class TestOverallQuantiles:
             mf_1mdict_0cf.overall["recall"], abs=ABS_TOL
         )
 
-    def test_1m_1_cf(self, mf_1m_1cf):
+    def test_1m_1cf(self, mf_1m_1cf):
         assert isinstance(mf_1m_1cf.overall_ci, list)
         assert len(mf_1m_1cf.overall_ci) == len(QUANTILES)
         assert mf_1m_1cf.ci_quantiles == QUANTILES
@@ -109,7 +109,7 @@ class TestOverallQuantiles:
             mf_1m_1cf.overall["g"], abs=ABS_TOL
         )
 
-    def test_2m_1_cf(self, mf_2m_1cf):
+    def test_2m_1cf(self, mf_2m_1cf):
         assert isinstance(mf_2m_1cf.overall_ci, list)
         assert len(mf_2m_1cf.overall_ci) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
@@ -143,7 +143,7 @@ class TestByGroupQuantiles:
                 mf_1mdict_0cf.by_group["recall"][g], abs=ABS_TOL
             )
 
-    def test_1m_1_cf(self, mf_1m_1cf: MetricFrame):
+    def test_1m_1cf(self, mf_1m_1cf: MetricFrame):
         assert isinstance(mf_1m_1cf.by_group_ci, list)
         assert len(mf_1m_1cf.by_group_ci) == len(QUANTILES)
         assert mf_1m_1cf.ci_quantiles == QUANTILES
@@ -154,7 +154,7 @@ class TestByGroupQuantiles:
                     mf_1m_1cf.by_group[cf][g], abs=ABS_TOL
                 )
 
-    def test_2m_1_cf(self, mf_2m_1cf: MetricFrame):
+    def test_2m_1cf(self, mf_2m_1cf: MetricFrame):
         assert isinstance(mf_2m_1cf.by_group_ci, list)
         assert len(mf_2m_1cf.by_group_ci) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
@@ -209,7 +209,7 @@ class TestGroupExtremes:
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
     @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_1m_1_cf(
+    def test_1m_1cf(
         self, mf_1m_1cf: MetricFrame, aggregation: str, error_handling: str
     ):
         result, nominal = self._get_comparators(mf_1m_1cf, aggregation, error_handling)
@@ -222,7 +222,7 @@ class TestGroupExtremes:
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
     @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_2m_1_cf(
+    def test_2m_1cf(
         self, mf_2m_1cf: MetricFrame, aggregation: str, error_handling: str
     ):
         result, nominal = self._get_comparators(mf_2m_1cf, aggregation, error_handling)
@@ -285,3 +285,45 @@ class TestGroupComparisons:
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
         # Check median close to nominal
         assert result[1]["recall"] == pytest.approx(nominal["recall"], abs=ABS_TOL)
+
+    @pytest.mark.parametrize("comparator", ["difference", "ratio"])
+    @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
+    def test_1m_1cf(
+        self,
+        mf_1m_1cf: MetricFrame,
+        comparator: str,
+        error_handling: str,
+        method: str,
+    ):
+        result, nominal = self._get_comparators(
+            mf_1m_1cf, comparator, method, error_handling
+        )
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_1m_1cf.ci_quantiles == QUANTILES
+        for cf in np.unique(g_2):
+            # Check median close to nominal
+            assert result[1][cf] == pytest.approx(nominal[cf], abs=ABS_TOL)
+
+    @pytest.mark.parametrize("comparator", ["difference", "ratio"])
+    @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
+    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
+    def test_2m_1cf(
+        self,
+        mf_2m_1cf: MetricFrame,
+        comparator: str,
+        error_handling: str,
+        method: str,
+    ):
+        result, nominal = self._get_comparators(
+            mf_2m_1cf, comparator, method, error_handling
+        )
+        assert isinstance(result, list)
+        assert len(result) == len(QUANTILES)
+        assert mf_2m_1cf.ci_quantiles == QUANTILES
+
+        for m in ["recall", "prec"]:
+            for cf in np.unique(g_2):
+                # Check median close to nominal
+                assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=ABS_TOL)
