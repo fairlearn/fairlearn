@@ -518,10 +518,12 @@ class MetricFrame:
                             quantiles=ci_quantiles, bootstrap_samples=samples
                         )
 
-                        self._result_cache[c_t][c_m][err_string] = result = [
+                        result = [
                             self._extract_result(x, no_control_levels=False)
                             for x in raw_result
                         ]
+
+                        self._result_cache[c_t][c_m][err_string] = result
                     except Exception as e:  # noqa: B902
                         # Store any exception for later
                         self._result_cache[c_t][c_m][err_string] = e
