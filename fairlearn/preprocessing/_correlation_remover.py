@@ -59,8 +59,6 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     .. versionadded:: 0.6
 
-    .. versionchanged:: 0.8
-        Added the _more_tags_ method
     """
 
     def __init__(self, *, sensitive_feature_ids, alpha=1):
