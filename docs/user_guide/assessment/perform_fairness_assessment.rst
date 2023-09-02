@@ -199,6 +199,11 @@ These are accessed through the :attr:`MetricFrame.by_group` property:
 
 All of these values can be checked against the original arrays above.
 
+Note that :class:`MetricFrame` is intended for analyzing the differences 
+between groups with regard to a base metric, and consequently cannot take 
+predefined fairness metrics, such as :func:`demographic_parity_difference`, 
+as input to the `metrics` parameter.
+
 .. _assessment_compare_harms:
 
 Compare quantified harms across the groups
@@ -277,3 +282,46 @@ overall values for the data:
     dtype: float64
 
 In every case, the *largest* difference and *smallest* ratio are returned.
+
+
+.. _assessment_predefined_fairness_metrics:
+
+Predefined fairness metrics
+---------------------------
+
+In addition to the disaggregated analysis of base metrics enabled by
+:class:`MetricFrame`, Fairlearn also provides a set of predefined fairness 
+metrics that output a single score. These metrics take as input 
+`sensitive_features` to compute the maximum difference or ratio between 
+subgroups of a sensitive variable. The predefined fairness metrics offered 
+by Fairlearn are **demographic parity** ratio/difference and **equalized odds** 
+ratio/difference. Note that because these metrics are calculated using 
+aggregations between groups (unlike, say, accuracy, the demographic parity 
+for one subgroup versus another does not make sense), they are meant to be 
+called directly, rather than used within the instantiation of a MetricFrame.
+
+Below, we show an example of calculating demographic parity ratio using the 
+sample data defined above.
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import demographic_parity_ratio
+    >>> print(demographic_parity_ratio(y_true,
+    ...                                y_pred,
+    ...                                sensitive_features=sf_data))
+    0.66666...
+
+Note that to achieve a one-number score for a standard performance metric,
+like false positive rate or selection rate, the user must use the MetricFrame 
+data structure. Under the hood, the fairness assessment metrics also use 
+:class:`MetricFrame` to compute a particular base rate across sensitive 
+groups and subsequently perform an aggregation (the difference or ratio) 
+on the base metric values across groups. For example, 
+:func:`equalized_odds_ratio` uses both the :func:`false_positive_rate` and
+:func:`false_negative_rate` within a MetricFrame on the backend to generate 
+an output.
+
+:ref:`common_fairness_metrics` provides an overview of common metrics used 
+in fairness analyses. For a deep dive into how to extend the capabilities of 
+fairness metrics provided by Fairlearn, review :ref:`custom_fairness_metrics`.
