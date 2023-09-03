@@ -313,11 +313,11 @@ sample data defined above.
     0.66666...
 
 Note that to achieve a one-number score for a standard performance metric,
-like false positive rate or selection rate, the user must use the MetricFrame 
-data structure. Under the hood, the fairness assessment metrics also use 
-:class:`MetricFrame` to compute a particular base rate across sensitive 
-groups and subsequently perform an aggregation (the difference or ratio) 
-on the base metric values across groups. For example, 
+like false positive rate or selection rate, the user must use 
+:func:`make_derived_metric`. Under the hood, the fairness assessment metrics 
+also use :class:`MetricFrame` to compute a particular base rate across 
+sensitive groups and subsequently perform an aggregation (the difference 
+or ratio) on the base metric values across groups. For example, 
 :func:`equalized_odds_ratio` uses both the :func:`false_positive_rate` and
 :func:`false_negative_rate` within a MetricFrame on the backend to generate 
 an output.
