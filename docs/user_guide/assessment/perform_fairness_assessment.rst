@@ -296,8 +296,7 @@ metrics that output a single score. These metrics take as input
 subgroups of a sensitive variable. The predefined fairness metrics offered 
 by Fairlearn are **demographic parity** ratio/difference and **equalized odds** 
 ratio/difference. Note that because these metrics are calculated using 
-aggregations between groups (unlike, say, accuracy, the demographic parity 
-for one subgroup versus another does not make sense), they are meant to be 
+aggregations between groups, they are meant to be 
 called directly, rather than used within the instantiation of a MetricFrame.
 
 Below, we show an example of calculating demographic parity ratio using the 
