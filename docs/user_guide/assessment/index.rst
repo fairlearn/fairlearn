@@ -15,7 +15,10 @@ Fairlean provides two primary ways of assessing fairness: :class:`MetricFrame`,
 which can be used to perform disaggregated analysis of a particular performance 
 metric (such as accuracy, false positive rate, etc.) across sensitive 
 groups, and a set of predefined fairness metrics that output an aggregate 
-number. In the :ref:`perform_fairness_assessment`, we will dive further into
+number. MetricFrame can also be used to output an aggregate number, 
+but the predefined fairness metrics can be used when direct by-group 
+comparison is not necessary.
+In the :ref:`perform_fairness_assessment`, we will dive further into
 each of these types of fairness assessments. 
 
 In the mathematical definitions below, :math:`X` denotes a feature vector 
