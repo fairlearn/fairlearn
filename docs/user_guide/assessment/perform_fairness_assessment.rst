@@ -318,8 +318,31 @@ also use :class:`MetricFrame` to compute a particular base rate across
 sensitive groups and subsequently perform an aggregation (the difference 
 or ratio) on the base metric values across groups. For example, 
 :func:`equalized_odds_ratio` uses both the :func:`false_positive_rate` and
-:func:`false_negative_rate` within a MetricFrame on the backend to generate 
-an output.
+:func:`false_negative_rate` within a :class:`MetricFrame` on the backend 
+to generate an output. As demonstrated below, 
+using :func:`equalized_odds_ratio` and :meth:`MetricFrame.ratio` method 
+produces the same outcome. 
+
+.. doctest:: assessment_metrics
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import equalized_odds_ratio
+    >>> print(equalized_odds_difference(y_true,
+    ...                                y_pred,
+    ...                                sensitive_features=sf_data))
+    0
+    >>> my_metrics = {
+    ...     'tpr' : recall_score,
+    ...     'fpr' : false_positive_rate
+    ... }
+    >>> mf = MetricFrame(
+    ...     metrics=my_metrics,
+    ...     y_true=y_true,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=sf_data
+    ... )
+    >>> min(mf.ratio(method="between_groups"))
+    0
 
 :ref:`common_fairness_metrics` provides an overview of common metrics used 
 in fairness analyses. For a deep dive into how to extend the capabilities of 
