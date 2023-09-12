@@ -166,7 +166,7 @@ Intersectionality in Mental Health Care
 # caused this difference between populations. To this end, **populations can be compared on the
 # basis of their means because they are caused by comparable differences.**
 #
-# This idea that humans have **innate and comparable** was largely derived from  Adolphe Quetelet's
+# This idea that humans have **innate and comparable** attributes was largely derived from  Adolphe Quetelet's
 # invention of the **"Average Man,"** :footcite:`eknoyan2007adolphe` establishing the notion of a
 # population mean.
 #
