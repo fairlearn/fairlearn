@@ -56,6 +56,9 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     Note that the lack of correlation does not imply anything about statistical dependence.
     Therefore, we expect this to be most appropriate as a preprocessing step for
     (generalized) linear models.
+
+    .. versionadded:: 0.6
+
     """
 
     def __init__(self, *, sensitive_feature_ids, alpha=1):
