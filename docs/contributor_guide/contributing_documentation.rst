@@ -5,12 +5,11 @@ Contributing documentation
 
 Documentation is formatted in restructured text (ReST) and the website is
 built using `Sphinx <https://www.sphinx-doc.org/en/master/>`_ and some of its
-extensions. Specifically, the website is available for all our releases to
-allow users to check the documentation of the version of the package that they
-are using.
+extensions.
+Specifically, the website is available for all our releases to allow users to
+check the documentation of the version of the package that they are using.
 
-To contribute, make sure to install sphinx and its
-add-ons by running
+To contribute, make sure to install sphinx and its add-ons by running
 
 .. code-block::
 
@@ -18,6 +17,14 @@ add-ons by running
 
 in the repository root directory.
 You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
+
+Since plotting is an optional addition to Fairlearn, you may also need to
+install matplotlib
+
+.. code-block::
+
+    pip install matplotlib>=3.2.1
+
 You can contribute updates to existing documentation by navigating to the
 relevant part of the repository (typically in the `docs` directory), and
 editing the restructured text files (`.rst`) corresponding to your updates.
