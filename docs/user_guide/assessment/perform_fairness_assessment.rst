@@ -295,9 +295,8 @@ metrics that output a single score. These metrics take as input
 `sensitive_features` to compute the maximum difference or ratio between 
 subgroups of a sensitive variable. The predefined fairness metrics offered 
 by Fairlearn are **demographic parity** ratio/difference and **equalized odds** 
-ratio/difference. Either the ratio or difference can be calculated as the max, 
-min or max-min between subgroups (:class:`MetricFrame` also 
-has the capability to calculate these metrics).
+ratio/difference. The ratio and difference can be calculated `between_groups` 
+or `to_overall`, but `to_overall` results in more than 1 number being returned.
 Note that because these metrics are calculated using 
 aggregations between groups, they are meant to be 
 called directly, rather than used within the instantiation of a MetricFrame.
