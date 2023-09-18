@@ -297,6 +297,10 @@ subgroups of a sensitive variable. The predefined fairness metrics offered
 by Fairlearn are **demographic parity** ratio/difference and **equalized odds** 
 ratio/difference. The ratio and difference can be calculated `between_groups` 
 or `to_overall`, but `to_overall` results in more than 1 number being returned.
+:class:`MetricFrame` can also calculate differences and ratios between groups 
+using these methods. For more information on available method of computing 
+ratios or differences, view the documentation for :meth:`MetricFrame.ratio` 
+and :meth:`MetricFrame.difference`, respectively.
 Note that because these metrics are calculated using 
 aggregations between groups, they are meant to be 
 called directly, rather than used within the instantiation of a MetricFrame.
