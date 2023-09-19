@@ -1210,7 +1210,7 @@ test.loc[(test["Sex"] == "Female") & (test["Race"] == "Black"), "intersect"] = "
 test.loc[(test["Sex"] == "Female") & (test["Race"] == "Hispanic"), "intersect"] = "HispanicF"
 test.loc[(test["Sex"] == "Female") & (test["Race"] == "Asian"), "intersect"] = "AsianF"
 
-fig, axs = plt.subplots(1, 2, figsize=(20, 4))
+fig, axs = plt.subplots(2, 1, figsize=(8, 10))
 sns.barplot(x="Diagnosis", y="Rumination", data=train, ax=axs[0])
 axs[0].set_title("Rumination vs Diagnosis (train)")
 
@@ -1245,7 +1245,7 @@ plt.show()
 
 # %%
 
-fig, axs = plt.subplots(1, 2, figsize=(20, 4))
+fig, axs = plt.subplots(2, 1, figsize=(8, 10))
 sns.barplot(x="Diagnosis", y="Tension", data=train, ax=axs[0])
 axs[0].set_title("Tension vs Diagnosis (train)")
 
