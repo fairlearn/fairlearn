@@ -196,10 +196,12 @@ If you wish to cite Fairlearn in your work, please use the following:
     @misc{weerts2023fairlearn,
           title={Fairlearn: Assessing and Improving Fairness of AI Systems}, 
           author={Hilde Weerts and Miroslav Dudík and Richard Edgar and Adrin Jalali and Roman Lutz and Michael Madaio},
+          journal={Journal of Machine Learning Research},
           year={2023},
-          eprint={2303.16626},
-          archivePrefix={arXiv},
-          primaryClass={cs.LG}
+          volume={24},
+          number={257},
+          pages={1--8},
+          url={http://jmlr.org/papers/v24/23-0389.html}
     }
 
 Frequently asked questions
