@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_openml
 
-import fairlearn.utils._compatibility as compat
-
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
@@ -187,11 +185,11 @@ def fetch_acs_income(
     # fetch data for all 50 US states and Puerto Rico
     data_dict = fetch_openml(
         data_id=43141,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=True,
         return_X_y=False,
-        **compat._PARSER_KWARG,
+        parser='auto',
     )
 
     # filter by state

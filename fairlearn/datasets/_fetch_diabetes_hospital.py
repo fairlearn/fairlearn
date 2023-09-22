@@ -5,8 +5,6 @@ import pathlib
 
 from sklearn.datasets import fetch_openml
 
-import fairlearn.utils._compatibility as compat
-
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
@@ -108,9 +106,9 @@ def fetch_diabetes_hospital(
 
     return fetch_openml(
         data_id=43874,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        **compat._PARSER_KWARG,
+        parser="auto",
     )
