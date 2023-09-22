@@ -172,7 +172,7 @@ class DisaggregatedResult:
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self.by_group.copy()
-                mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+                mf = mf.map(lambda x: x if np.isscalar(x) else np.nan)
                 if grouping_function == "min":
                     result = mf.groupby(level=control_feature_names).min()
                 else:
