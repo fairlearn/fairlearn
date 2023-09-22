@@ -12,6 +12,11 @@ from .data_for_test import g_1, g_2, y_p, y_t
 # Have fixtures so that tests can be specific without
 # constantly recomputing the same bootstrapping
 
+# Use regression metrics since they are a little better behaved
+# when testing that median \approx nominal
+# The ratios in many metrics can wreak havoc with bootstrapping
+# due to skewed distributions
+
 N_BOOTSTRAP = 100
 QUANTILES = [0.05, 0.5, 0.95]
 ERROR_OPTIONS = ["raise", "coerce"]
