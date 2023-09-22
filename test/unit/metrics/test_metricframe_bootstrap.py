@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 import sklearn.metrics as skm
 
-from fairlearn.metrics import MetricFrame
+from fairlearn.metrics import MetricFrame, count
 
 from .data_for_test import g_1, g_2, y_p, y_t
 
@@ -22,7 +22,7 @@ ABS_TOL = 0.1
 @pytest.fixture(scope="session")
 def mf_1m_0cf():
     target_boot = MetricFrame(
-        metrics=skm.recall_score,
+        metrics=skm.mean_squared_error,
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
@@ -36,7 +36,7 @@ def mf_1m_0cf():
 @pytest.fixture(scope="session")
 def mf_1mdict_0cf():
     target_boot = MetricFrame(
-        metrics={"recall": skm.recall_score},
+        metrics={"mse": skm.mean_squared_error},
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
@@ -50,7 +50,7 @@ def mf_1mdict_0cf():
 @pytest.fixture(scope="session")
 def mf_1m_1cf():
     target_boot = MetricFrame(
-        metrics=skm.recall_score,
+        metrics=skm.mean_squared_error,
         y_true=y_t,
         y_pred=y_p,
         sensitive_features=g_1,
@@ -64,7 +64,10 @@ def mf_1m_1cf():
 
 @pytest.fixture(scope="session")
 def mf_2m_1cf():
-    metric_dict = {"recall": skm.recall_score, "prec": skm.precision_score}
+    metric_dict = {
+        "mse": skm.mean_squared_error,
+        "group_frac": lambda y_true, y_pred: count(y_true, y_pred) / len(y_t),
+    }
     target_boot = MetricFrame(
         metrics=metric_dict,
         y_true=y_t,
@@ -91,8 +94,8 @@ class TestOverallQuantiles:
         assert len(mf_1mdict_0cf.overall_ci) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
         # Overall value should be close to quantile 0.5
-        assert mf_1mdict_0cf.overall_ci[1]["recall"] == pytest.approx(
-            mf_1mdict_0cf.overall["recall"], abs=ABS_TOL
+        assert mf_1mdict_0cf.overall_ci[1]["mse"] == pytest.approx(
+            mf_1mdict_0cf.overall["mse"], abs=ABS_TOL
         )
 
     def test_1m_1cf(self, mf_1m_1cf):
@@ -114,7 +117,7 @@ class TestOverallQuantiles:
         assert mf_2m_1cf.ci_quantiles == QUANTILES
 
         # Overall value should be close to quantile 0.5
-        for m in ["recall", "prec"]:
+        for m in ["mse", "group_frac"]:
             for cf in np.unique(g_2):
                 assert mf_2m_1cf.overall_ci[1][m][cf] == pytest.approx(
                     mf_2m_1cf.overall[m][cf], abs=ABS_TOL
@@ -138,8 +141,8 @@ class TestByGroupQuantiles:
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
         for g in np.unique(g_1):
             # Check median close to nominal
-            assert mf_1mdict_0cf.by_group_ci[1]["recall"][g] == pytest.approx(
-                mf_1mdict_0cf.by_group["recall"][g], abs=ABS_TOL
+            assert mf_1mdict_0cf.by_group_ci[1]["mse"][g] == pytest.approx(
+                mf_1mdict_0cf.by_group["mse"][g], abs=ABS_TOL
             )
 
     def test_1m_1cf(self, mf_1m_1cf: MetricFrame):
@@ -158,7 +161,7 @@ class TestByGroupQuantiles:
         assert len(mf_2m_1cf.by_group_ci) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
 
-        for m in ["recall", "prec"]:
+        for m in ["mse", "group_frac"]:
             for cf in np.unique(g_2):
                 for g in np.unique(g_1):
                     # Check median close to nominal
@@ -204,7 +207,7 @@ class TestGroupExtremes:
         assert len(result) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
         # Check median close to nominal
-        assert result[1]["recall"] == pytest.approx(nominal["recall"], abs=ABS_TOL)
+        assert result[1]["mse"] == pytest.approx(nominal["mse"], abs=ABS_TOL)
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
     @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
@@ -229,7 +232,7 @@ class TestGroupExtremes:
         assert len(result) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
 
-        for m in ["recall", "prec"]:
+        for m in ["mse", "group_frac"]:
             for cf in np.unique(g_2):
                 # Check median close to nominal
                 assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=ABS_TOL)
@@ -242,13 +245,15 @@ class TestGroupComparisons:
         if comparator == "difference":
             actual = mf.difference_ci(method=method, errors=error_handling)
             nominal = mf.difference(method=method, errors=error_handling)
+            tol = ABS_TOL
         elif comparator == "ratio":
             actual = mf.ratio_ci(method=method, errors=error_handling)
             nominal = mf.ratio(method=method, errors=error_handling)
+            tol = 2 * ABS_TOL  # Ratios tend to be poorly behaved
         else:
             raise ValueError(f"Unrecognised option: {comparator}")
 
-        return actual, nominal
+        return actual, nominal, tol
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
@@ -256,7 +261,7 @@ class TestGroupComparisons:
     def test_1m_0cf(
         self, mf_1m_0cf: MetricFrame, comparator: str, error_handling: str, method: str
     ):
-        result, nominal = self._get_comparators(
+        result, nominal, _ = self._get_comparators(
             mf_1m_0cf, comparator, method, error_handling
         )
         assert isinstance(result, list)
@@ -276,14 +281,14 @@ class TestGroupComparisons:
         error_handling: str,
         method: str,
     ):
-        result, nominal = self._get_comparators(
+        result, nominal, _ = self._get_comparators(
             mf_1mdict_0cf, comparator, method, error_handling
         )
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
         # Check median close to nominal
-        assert result[1]["recall"] == pytest.approx(nominal["recall"], abs=ABS_TOL)
+        assert result[1]["mse"] == pytest.approx(nominal["mse"], abs=ABS_TOL)
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
@@ -295,7 +300,7 @@ class TestGroupComparisons:
         error_handling: str,
         method: str,
     ):
-        result, nominal = self._get_comparators(
+        result, nominal, tol = self._get_comparators(
             mf_1m_1cf, comparator, method, error_handling
         )
         assert isinstance(result, list)
@@ -303,7 +308,7 @@ class TestGroupComparisons:
         assert mf_1m_1cf.ci_quantiles == QUANTILES
         for cf in np.unique(g_2):
             # Check median close to nominal
-            assert result[1][cf] == pytest.approx(nominal[cf], abs=ABS_TOL)
+            assert result[1][cf] == pytest.approx(nominal[cf], abs=tol)
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
@@ -315,14 +320,14 @@ class TestGroupComparisons:
         error_handling: str,
         method: str,
     ):
-        result, nominal = self._get_comparators(
+        result, nominal, tol = self._get_comparators(
             mf_2m_1cf, comparator, method, error_handling
         )
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
 
-        for m in ["recall", "prec"]:
+        for m in ["mse", "group_frac"]:
             for cf in np.unique(g_2):
                 # Check median close to nominal
-                assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=ABS_TOL)
+                assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=tol)
