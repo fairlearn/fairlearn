@@ -579,7 +579,9 @@ class MetricFrame:
         return self._result_cache["overall"]
 
     @property
-    def overall_ci(self) -> List[Union[Any, pd.Series, pd.DataFrame,]]:
+    def overall_ci(
+        self,
+    ) -> List[Union[Any, pd.Series, pd.DataFrame,]]:
         """Return the underlying bootstrapped metrics evaluated on the whole dataset.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
