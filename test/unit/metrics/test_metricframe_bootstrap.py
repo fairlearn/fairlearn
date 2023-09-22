@@ -89,6 +89,8 @@ def mf_2m_1cf():
 class TestOverallQuantiles:
     def test_1m_0cf(self, mf_1m_0cf: MetricFrame):
         assert isinstance(mf_1m_0cf.overall_ci, list)
+        for item in mf_1m_0cf.overall_ci:
+            assert isinstance(item, type(mf_1m_0cf.overall))
         assert len(mf_1m_0cf.overall_ci) == len(QUANTILES)
         assert mf_1m_0cf.ci_quantiles == QUANTILES
         # Overall value should be close to quantile 0.5
@@ -96,6 +98,8 @@ class TestOverallQuantiles:
 
     def test_1m_0cf_dict(self, mf_1mdict_0cf):
         assert isinstance(mf_1mdict_0cf.overall_ci, list)
+        for item in mf_1mdict_0cf.overall_ci:
+            assert isinstance(item, type(mf_1mdict_0cf.overall))
         assert len(mf_1mdict_0cf.overall_ci) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
         # Overall value should be close to quantile 0.5
@@ -105,6 +109,8 @@ class TestOverallQuantiles:
 
     def test_1m_1cf(self, mf_1m_1cf):
         assert isinstance(mf_1m_1cf.overall_ci, list)
+        for item in mf_1m_1cf.overall_ci:
+            assert isinstance(item, type(mf_1m_1cf.overall))
         assert len(mf_1m_1cf.overall_ci) == len(QUANTILES)
         assert mf_1m_1cf.ci_quantiles == QUANTILES
 
@@ -118,6 +124,8 @@ class TestOverallQuantiles:
 
     def test_2m_1cf(self, mf_2m_1cf):
         assert isinstance(mf_2m_1cf.overall_ci, list)
+        for item in mf_2m_1cf.overall_ci:
+            assert isinstance(item, type(mf_2m_1cf.overall))
         assert len(mf_2m_1cf.overall_ci) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
 

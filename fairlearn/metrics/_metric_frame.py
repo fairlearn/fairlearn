@@ -194,6 +194,19 @@ class MetricFrame:
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array-like dictionaries.
 
+    n_boot : Optional[int]
+        If set to a postive integer, generate this number of bootstrap samples of the
+        supplied data, and use to estimate confidence intervals for all of the metrics.
+        Must be set with `ci_quantiles`.
+
+    ci_quantiles : Optional[List[float]]
+        A list of confidence interval quantiles to extract from the bootstrap samples.
+        For example, the list `[0.159, 0.5, 0.841]` would extract the median and
+        standard deviations.
+
+    random_state : Optional[Union[int, np.random.RandomState]]
+        Used to control the generation of the bootstrap samples
+
     metric : callable or dict
         The underlying metric functions which are to be calculated. This
         can either be a single metric function or a dictionary of functions.
@@ -566,7 +579,16 @@ class MetricFrame:
         return self._result_cache["overall"]
 
     @property
-    def overall_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+    def overall_ci(self) -> List[Union[Any, pd.Series, pd.DataFrame,]]:
+        """Return the underlying bootstrapped metrics evaluated on the whole dataset.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list of the same underlying type as that returned by
+        :attr:`MetricFrame.overall` property.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
         return self._result_cache["overall_ci"]
 
     @property
