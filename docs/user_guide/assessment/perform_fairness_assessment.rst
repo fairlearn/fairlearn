@@ -199,10 +199,11 @@ These are accessed through the :attr:`MetricFrame.by_group` property:
 
 All of these values can be checked against the original arrays above.
 
-Note that :class:`MetricFrame` is intended for analyzing the disparities 
-between groups with regard to a base metric, and consequently cannot take 
-predefined fairness metrics, such as :func:`demographic_parity_difference`, 
-as input to the `metrics` parameter.
+.. note::
+  Note that :class:`MetricFrame` is intended for analyzing the disparities 
+  between groups with regard to a base metric, and consequently cannot take 
+  predefined fairness metrics, such as :func:`demographic_parity_difference`, 
+  as input to the `metrics` parameter.
 
 .. _assessment_compare_harms:
 
@@ -294,11 +295,14 @@ In addition to the disaggregated analysis of base metrics enabled by
 metrics that output a single score. These metrics take as input 
 `sensitive_features` to compute the maximum difference or ratio between 
 subgroups of a sensitive variable. The predefined fairness metrics offered 
-by Fairlearn are **demographic parity** ratio/difference and **equalized odds** 
-ratio/difference. The ratio and difference can be calculated `between_groups` 
-or `to_overall`, but `to_overall` results in more than 1 value being returned.
-:class:`MetricFrame` can also calculate differences and ratios between groups 
-using these methods. For more information on available method of computing 
+by Fairlearn are :func:`demographic_parity_difference`, 
+:func:`demographic_parity_ratio`, :func:`equalized_odds_difference`, 
+and :func:`equalized_odds_ratio`. 
+The ratio and difference can be calculated `between_groups` 
+or `to_overall`, but `to_overall` results in more than 1 value being 
+returned (when the `control_features` parameter is not `None`.
+:class:`MetricFrame` can also calculate differences and ratios between 
+groups. For more information on available method of computing 
 ratios or differences, view the documentation for :meth:`MetricFrame.ratio` 
 and :meth:`MetricFrame.difference`, respectively.
 Note that because these metrics are calculated using 
@@ -317,9 +321,10 @@ sample data defined above.
     ...                                sensitive_features=sf_data))
     0.66666...
 
-Note that to achieve a one-number score for a standard performance metric,
-like false positive rate or selection rate, the user must use 
-:func:`make_derived_metric`. Under the hood, the fairness assessment metrics 
+It is also possible to define custom fairness metrics based on any 
+standard performance metric (e.g., the false positive rate or AUC) 
+using :func:make_derived_metric. 
+Under the hood, the fairness assessment metrics 
 also use :class:`MetricFrame` to compute a particular base rate across 
 sensitive groups and subsequently perform an aggregation (the difference 
 or ratio) on the base metric values across groups. For example, 
