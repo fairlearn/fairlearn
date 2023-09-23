@@ -200,6 +200,7 @@ These are accessed through the :attr:`MetricFrame.by_group` property:
 All of these values can be checked against the original arrays above.
 
 .. note::
+
   Note that :class:`MetricFrame` is intended for analyzing the disparities 
   between groups with regard to a base metric, and consequently cannot take 
   predefined fairness metrics, such as :func:`demographic_parity_difference`, 
