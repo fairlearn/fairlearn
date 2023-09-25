@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
@@ -167,7 +168,7 @@ def test_single_bound(sample_metric_frame):
 
 def test_single_ax_input(sample_metric_frame):
     """Tests plotting function works with single axis input."""
-    ax = matplotlib.pyplot.subplot()
+    ax = plt.subplot()
     ax = plot_metric_frame(
         sample_metric_frame,
         metrics=["Recall"],
@@ -180,7 +181,7 @@ def test_single_ax_input(sample_metric_frame):
 
 def test_multi_ax_input(sample_metric_frame):
     """Tests plotting function works with multiple axis input."""
-    fig, ax = matplotlib.pyplot.subplots(nrows=1, ncols=2)
+    fig, ax = plt.subplots(nrows=1, ncols=2)
     ax[0].set_title("Recall Plot")
     ax[0].set_ylabel("Recall")
     ax[0].set_xlabel("Race")
