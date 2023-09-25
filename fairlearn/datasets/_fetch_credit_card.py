@@ -81,6 +81,8 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
     if not data_home:
         data_home = Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=42477,
         data_home=str(data_home),

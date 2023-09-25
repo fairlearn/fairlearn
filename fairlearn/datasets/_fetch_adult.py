@@ -99,9 +99,11 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=1590,
-        data_home=str(data_home),
+        data_home=str(data_home), 
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,

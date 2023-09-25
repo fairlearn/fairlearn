@@ -183,6 +183,8 @@ def fetch_acs_income(
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
     # fetch data for all 50 US states and Puerto Rico
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     data_dict = fetch_openml(
         data_id=43141,
         data_home=str(data_home),
