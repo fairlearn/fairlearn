@@ -178,21 +178,21 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         values.
 
             'auto'
-                use one of :code:`predict_proba`, :code:`decision_function`, or 
+                use one of :code:`predict_proba`, :code:`decision_function`, or
                 :code:`predict`, in that order.
-            
+
             'predict_proba'
-                use the second column from the output of :code:`predict_proba`. 
-                It is assumed that the second column represents the positive 
+                use the second column from the output of :code:`predict_proba`.
+                It is assumed that the second column represents the positive
                 outcome.
-            
+
             'decision_function'
                 use the raw values given by the :code:`decision_function`.
-            
+
             'predict'
-                use the hard values reported by the :code:`predict` method if 
-                estimator is a classifier, and the regression values if 
-                estimator is a regressor. This is equivalent to what 
+                use the hard values reported by the :code:`predict` method if
+                estimator is a classifier, and the regression values if
+                estimator is a regressor. This is equivalent to what
                 is done in [1]_.
 
         .. versionadded:: 0.7
@@ -290,12 +290,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         if self.predict_method == "deprecated":
             warn(
-                (
-                    "'predict_method' default value is changed from 'predict' to "
-                    "'auto'. Explicitly pass `predict_method='predict' to "
-                    "replicate the old behavior, or pass `predict_method='auto' "
-                    "or other valid values to silence this warning."
-                ),
+                "'predict_method' default value is changed from 'predict' to "
+                "'auto'. Explicitly pass `predict_method='predict' to "
+                "replicate the old behavior, or pass `predict_method='auto' "
+                "or other valid values to silence this warning.",
                 FutureWarning,
             )
             self._predict_method = "predict"
