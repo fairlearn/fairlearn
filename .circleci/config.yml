@@ -63,7 +63,7 @@ jobs:
 
   build-doctest:
     docker:
-      - image: cimg/python:3.8.12
+      - image: cimg/python:3.11.5
 
     working_directory: ~/tmp-fairlearn
     steps:
@@ -103,7 +103,7 @@ jobs:
 
   deploy-doc:
     docker:
-      - image: cimg/python:3.8.12
+      - image: cimg/python:3.11.5
     steps:
       - checkout
       - add_ssh_keys:
