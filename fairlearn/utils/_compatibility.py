@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from sklearn.datasets import fetch_openml
 from sklearn.preprocessing import OneHotEncoder
 import inspect
 
