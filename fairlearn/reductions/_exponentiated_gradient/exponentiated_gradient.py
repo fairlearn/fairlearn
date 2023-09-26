@@ -211,10 +211,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 gaps.append(gap_LP)
 
             logger.debug(
-                (
-                    "%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f, gap=%.6f, disp=%.3f, "
-                    "err=%.3f, gap_LP=%.6f"
-                ),
+                "%seta=%.6f, L_low=%.3f, L=%.3f, L_high=%.3f, gap=%.6f, disp=%.3f, "
+                "err=%.3f, gap_LP=%.6f",
                 _INDENTATION,
                 eta,
                 result_EG.L_low,
