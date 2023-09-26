@@ -124,7 +124,7 @@ class _Lagrangian:
             violations, and `error` is the empirical error
         """
         if callable(Q):
-            error = self.obj.gamma(Q)[0]
+            error = self.obj.gamma(Q).iloc[0]
             gamma = self.constraints.gamma(Q)
         else:
             error = self.errors[Q.index].dot(Q)
