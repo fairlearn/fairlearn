@@ -243,7 +243,7 @@ class _Lagrangian:
 
         h = _PredictorAsCallable(classifier)
 
-        h_error = self.obj.gamma(h)[0]
+        h_error = self.obj.gamma(h).iloc[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
 
