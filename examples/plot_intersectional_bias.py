@@ -786,9 +786,14 @@ confusionmatrix(testy, predictions)
 #
 # Many fairness metrics are calculated from basic performance metrics, like sensitivity,
 # specificity, TPR, FPR, etc. There are many performance metrics available, so we need to select
-# one that is most relevant to our task.
+# one that is most relevant to our task:
+# decision trees like
+# `this <http://www.datasciencepublicpolicy.org/our-work/tools-guides/aequitas/>`_ 
+# one provided by Aequitas provide an easy way to understand the use cases 
+# for different metrics.
 #
-# One common (and arguably most successful to date) application of ML in healthcare is in the
+# As an example, 
+# one common (and arguably most successful to date) application of ML in healthcare is in the
 # diagnosis of tumours from medical images (like chest x-rays) as being cancerous or non-cancerous.
 #
 # **In this task, which performance metrics are most relevant?**
