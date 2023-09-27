@@ -905,13 +905,15 @@ confusionmatrix(testy, predictions)
 # **3) How do we compare populations?**
 #
 # Finally, the performance of a ML model cannot be analyzed in isolation, but rather in comparison
-# between different demographic subgroups. In order to do this, a reference group is required. As
-# we explained, we will use white individuals as a reference group, but this assessment could be
-# conducted with any reference group. It is important to note that this approach can be
-# problematic; there are concerns that using white groups as reference groups centers their
-# perspectives or experiences, and represents other groups as *other* or outliers. Keeping this in
-# mind, we should carefully consider which group we use as a reference and the implications of this
-# choice.
+# between different demographic subgroups. In order to do this, a reference group is required.
+#
+# As we explained, we will use white individuals as a reference group, but this assessment could be
+# conducted with any reference group, or compared to an overall score across all groups. It is
+# important to note that both approaches can be problematic: there are concerns that using white
+# groups as reference groups centers their perspectives or experiences and represents other groups
+# as *other* or outliers, or that using overall averages may mask disparities (especially
+# intersectional ones) and ignore important historical and social context. Keeping this in mind,
+# we should carefully consider which group we use as a reference and the implications of this choice.
 #
 # Here, we apply Fairlearn to compare performance in the test set among the different racial
 # groups, with a focus on evaluating false positive rate ratio.
