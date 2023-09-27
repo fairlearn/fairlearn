@@ -458,7 +458,7 @@ Intersectionality in Mental Health Care
 # likely that different factors play a role, such as genetics or being more likely to reside in
 # stressful environments (which can be a risk factor for developing schizophrenia). However, there
 # is also some pretty compelling evidence :footcite:`gara2019naturalistic` that this effect is
-# **due todiagnostic bias**, or clinicians misdiagnosing black patients with schizophrenia when they
+# **due to diagnostic bias**, or clinicians misdiagnosing black patients with schizophrenia when they
 # have another illness, like an affective disorder or depression instead. Clinicians may be
 # underemphasizing symptoms of depression in black patients and overemphasizing psychotic symptoms,
 # leading to misdiagnosis (and higher rates of schizophrenia). This tendency may be **particularly
