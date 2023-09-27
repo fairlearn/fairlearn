@@ -1130,7 +1130,7 @@ intersectionalf(testy, predictions)
 # health settings, leading them to exhibit paranoia, tension, or distrust at assessment (especially
 # if being assessed by a white clinician). The diagnostic instruments we have are also likely
 # culturally biased, having been developed on mostly white populations, making it difficult to pick
-# up on symptoms of depression in black patients or men, in particular. (This article
+# up on symptoms of depression in Black patients or men, in particular. (This article
 # :footcite:ct:`herbst2022schizophrenia`presents a nice overview of these various concerns)
 #
 # Unfortunately then, it’s not as simple as removing race from the equation, because of these
