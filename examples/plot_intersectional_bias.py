@@ -1301,7 +1301,7 @@ plt.show()
 # Some final points
 # =================
 #
-# Researchers have developed algorithmic methods to mitigate the fairness-relate dharms that may
+# Researchers have developed algorithmic methods to mitigate the fairness-related harms that may
 # result from ML models (by adjusting model parameters or modifying training data), **but this does
 # not do anything to address the systemic factors** contributing to bias. For example, if we fix
 # our model to reduce false positive predictions in Black men, will this increase their access to
