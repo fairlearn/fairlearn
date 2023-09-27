@@ -767,7 +767,7 @@ confusionmatrix(testy, predictions)
 # Fairness Assessment
 # ===================
 #
-# While seemingly naive, many ML algorithms deployed in the past have indeed failed to properly
+# Many ML algorithms deployed in the past have failed to properly
 # address fairness. Perhaps the most infamous example of this is the COMPAS algorithm
 # :footcite:`angwin2016machine` for prediction criminal recidivism, where Black defendants were
 # found to have higher risk scores, a higher false positive rate, and a lower false negative rate
