@@ -788,11 +788,11 @@ confusionmatrix(testy, predictions)
 # specificity, TPR, FPR, etc. There are many performance metrics available, so we need to select
 # one that is most relevant to our task:
 # decision trees like
-# `this <http://www.datasciencepublicpolicy.org/our-work/tools-guides/aequitas/>`_ 
-# one provided by Aequitas provide an easy way to understand the use cases 
+# `this <http://www.datasciencepublicpolicy.org/our-work/tools-guides/aequitas/>`_
+# one provided by Aequitas provide an easy way to understand the use cases
 # for different metrics.
 #
-# As an example, 
+# As an example,
 # one common (and arguably most successful to date) application of ML in healthcare is in the
 # diagnosis of tumours from medical images (like chest x-rays) as being cancerous or non-cancerous.
 #
@@ -843,7 +843,8 @@ confusionmatrix(testy, predictions)
 #
 # If this ratio is less than 1, then the metric is lower in the group of interest vs reference.
 #
-# Fairness metrics themselves can be broadly divided into 3 categories:
+# Fairness metrics themselves can be broadly divided into 3 categories
+# :footcite:`barocas2019fairness`:
 #
 # * Independence: Outcomes should be evenly distributed between subgroups
 # * Separation: Errors should be evenly distributed between subgroups
