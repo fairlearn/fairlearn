@@ -219,7 +219,7 @@ Intersectionality in Mental Health Care
 # of defining obesity, but comparing individuals on the basis of their BMI is problematic: the
 # scale was built by and for white populations, leading to an overestimation of health risks for
 # Black individuals :footcite:`endocrine2009widely`, and an underestimation of health risks for
-# asian individuals :footcite:`racette2003obesity`. Even more interestingly, BMI was never meant to
+# Asian individuals :footcite:`racette2003obesity`. Even more interestingly, BMI was never meant to
 # be a way of measuring health at an individual level.
 # :footcite:`karasu2016adolphe`
 #
