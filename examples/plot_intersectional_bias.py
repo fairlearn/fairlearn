@@ -462,7 +462,7 @@ Intersectionality in Mental Health Care
 # have another illness, like an affective disorder or depression instead. Clinicians may be
 # underemphasizing symptoms of depression in black patients and overemphasizing psychotic symptoms,
 # leading to misdiagnosis (and higher rates of schizophrenia). This tendency may be **particularly
-# pronounced for black men.**
+# pronounced for Black men.**
 #
 # Why is this important?
 #
