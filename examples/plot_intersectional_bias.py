@@ -894,7 +894,7 @@ confusionmatrix(testy, predictions)
 # which groups may face and that we seek to minimize. As we mentioned, various fairness metrics may
 # be relevant, but we are primarily concerned about misdiagnosing individuals with affective
 # disorder as having schizophrenia. We examine false positive rates (i.e., false diagnoses of
-# schizophrenia), with the help of FairLearn.
+# schizophrenia), with the help of Fairlearn.
 #
 # **3) How do we compare populations?**
 #
