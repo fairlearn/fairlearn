@@ -109,11 +109,9 @@ def marriage_transform(m_s_string):
 def occupation_transform(occ_string):
     """Perform some simple manipulations."""
     result = "Small"
-    if isinstance(occ_string, float):
-        # Had missing data
-        assert np.isnan(occ_string)
-        result = "Low"
-    elif occ_string.startswith("Machine"):
+    # The isinstance check is to guard against 'missing'
+    # data marked with NaN
+    if not isinstance(occ_string, float) and occ_string.startswith("Machine"):
         result = "Large"
     return result
 
