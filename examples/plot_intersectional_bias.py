@@ -51,7 +51,7 @@ Intersectionality in Mental Health Care
 # What is a fair machine learning model?
 # --------------------------------------
 #
-# There are 3 general pillars of fairness as it pertains to ML: Transparency, Inclusion, and
+# Sikstrom et al (2022) identify 3 general pillars of fairness as it pertains to ML: Transparency, Inclusion, and
 # Impartiality :footcite:`sikstrom2022conceptualising`
 #
 # **Transparency**: A range of methods designed to see, understand, and hold complex algorithmic
