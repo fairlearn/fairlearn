@@ -320,7 +320,7 @@ Intersectionality in Mental Health Care
 # Note that although this intersectional approach has only recently been applied to ML, it is not a
 # novel concept. Rather, it’s a well-established idea that stretches back nearly 200 years to the
 # Black feminist and the suffragette movement, when white women were fighting for the right to
-# vote, but Black women seemed to be left out of this call for reform. There were a range of Black
+# vote, but Black women were left out of this call for reform. There were a range of Black
 # activists and scholars who responded to this - wondering "What about me? Don't I matter?"
 #
 # For example, let us consider a quote from Sojourner Truth - an enslaved person at the time.
