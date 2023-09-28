@@ -3,11 +3,11 @@ channels:
 - defaults
 - conda-forge
 dependencies:
-- python==3.8
+- python==3.11
 - pip>=19.1.1
 - numpy
 - pandas
 - pytest
 - pytest-cov
 - scikit-learn
-- lightgbm<4.0.0  # 4.0.0 is incompatible with latest numpy https://github.com/microsoft/LightGBM/issues/5990
+- lightgbm
