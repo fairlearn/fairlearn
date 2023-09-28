@@ -110,6 +110,12 @@ for the social context of the problem you seek to solve.
 In particular, be careful of falling into one of the
 :ref:`abstraction traps <abstraction_traps>`.
 
+
+.. _assessment_disaggregated_metrics:
+
+Disaggregated metrics
+---------------------
+
 The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
 which are metrics evaluated on slices of data.
 For example, to measure gender-based harms due to errors, we would begin by
@@ -117,6 +123,16 @@ evaluating the errors separately for males, females and nonbinary persons
 in our dataset.
 If we found that males were experiencing errors at a much lower rate than
 females and nonbinary persons, we would flag this as a potential fairness harm.
+
+Note that by "errors" here, we are referring to the methods we use to 
+assess the performance of the machine learning model overall, for 
+example accuracy or precision in the classification case. 
+We distiniguish these model performance metrics from fairness metrics, 
+which operationalize different definitions of fairness 
+(such as demographic parity or equal opportunity).
+We will review those metrics in a subseqent section of the User Guide. 
+For more information on fairness metrics, 
+review :ref:`common_fairness_metrics`.
 
 Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
 with this quantification.
