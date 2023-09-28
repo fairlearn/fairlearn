@@ -362,7 +362,10 @@ class MetricFrame:
         self, target: Union[pd.Series, pd.DataFrame]
     ) -> Union[pd.Series, pd.DataFrame]:
         """Convert Nones to NaNs."""
-        result = target.map(lambda x: x if x is not None else np.nan)
+        if isinstance(target, pd.Series):
+            result = target.map(lambda x: x if x is not None else np.nan)
+        else:
+            result = target.applymap(lambda x: x if x is not None else np.nan)
         return result
 
     def _populate_results(self, raw_result: DisaggregatedResult):
