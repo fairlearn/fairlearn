@@ -3,11 +3,10 @@ channels:
 - defaults
 - conda-forge
 dependencies:
-- python==3.8
+- python>=3.10
 - pip>=19.1.1
 - pytest
 - pytest-cov
 - tensorflow
 - pip:
-   - numpy==1.21  # latest numpy is incompatible with TF, see https://stackoverflow.com/questions/74852225/attributeerror-module-numpy-has-no-attribute-typedict
    - scikeras[tensorflow-cpu]
