@@ -18,7 +18,7 @@ setuptools.setup(
     version=fairlearn.__version__,
     author=(
         "Miroslav Dudik, Richard Edgar, Adrin Jalali, Roman Lutz, Michael Madaio, Hilde"
-        " Weerts"
+        " Weerts, Allie Saizan"
     ),
     author_email="fairlearn-internal@python.org",
     description=(
