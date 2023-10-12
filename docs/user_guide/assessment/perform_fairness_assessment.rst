@@ -130,7 +130,7 @@ example accuracy or precision in the classification case.
 We distiniguish these model performance metrics from fairness metrics, 
 which operationalize different definitions of fairness 
 (such as demographic parity or equal opportunity).
-We will review those metrics in a subseqent section of the User Guide. 
+We will review those metrics in a subsequent section of the User Guide. 
 For more information on fairness metrics, 
 review :ref:`common_fairness_metrics`.
 
