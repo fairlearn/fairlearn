@@ -368,7 +368,9 @@ class MetricFrame:
         if isinstance(target, pd.Series):
             result = target.map(lambda x: x if x is not None else np.nan)
         else:
-            result = target.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
+            result = target.apply(
+                lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
+            )
         return result
 
     def _populate_results(self, raw_result: DisaggregatedResult):
