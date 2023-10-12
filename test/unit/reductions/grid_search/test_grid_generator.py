@@ -24,13 +24,15 @@ def test_grid_generator_demographic_parity(grid_size, grid_limit):
         [["+", "-"], events, [0, 1]], names=[_SIGN, _EVENT, _GROUP_ID]
     )
     assert (expected_index == grid.index).all()
-    expected_grid = pd.DataFrame()
     grid_size_or_next_smaller_even_number = int(grid_size / 2) * 2
     step_size = 2 * grid_limit / grid_size_or_next_smaller_even_number
+    columns = []
     for i in range(grid_size):
-        expected_grid[i] = pd.Series(0.0, index=expected_index)
-        expected_grid[i]["-", _ALL, 1] = max(grid_limit - step_size * i, 0)
-        expected_grid[i]["+", _ALL, 1] = max(-grid_limit + step_size * i, 0)
+        column = pd.Series(0.0, index=expected_index)
+        column["-", _ALL, 1] = max(grid_limit - step_size * i, 0)
+        column["+", _ALL, 1] = max(-grid_limit + step_size * i, 0)
+        columns.append(column)
+    expected_grid = pd.concat(columns, axis=1)
     assert np.isclose(expected_grid.values, grid.values).all()
 
 
