@@ -230,6 +230,10 @@ The code below visualizes the threshold selection process with an ROC curve.
 The ROC curves consist of the true and false positive rates for each
 of the thresholding rules, with separate ones per sensitive feature value.
 Note that the plot omits points that are within the convex hull of points.
+Also note that we use race as the sensitive feature here to illustrate
+ROC curves that are somewhat different from each other.
+Using gender as we did above would result in very similar curves for the
+two groups.
 
 .. _printed_thresholds:
 
@@ -237,6 +241,15 @@ Note that the plot omits points that are within the convex hull of points.
    :context: close-figs
    :format: doctest
 
+    >>> A = X_raw["race"]
+    >>> (X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+    ...     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y.astype(str) + "_" + A.astype(str))
+    >>> X_train = X_train.reset_index(drop=True)
+    >>> X_test = X_test.reset_index(drop=True)
+    >>> y_train = y_train.reset_index(drop=True)
+    >>> y_test = y_test.reset_index(drop=True)
+    >>> A_train = A_train.reset_index(drop=True)
+    >>> A_test = A_test.reset_index(drop=True)
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=pipeline,
     ...     constraints="equalized_odds",
@@ -262,21 +275,53 @@ Note that the plot omits points that are within the convex hull of points.
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
     {
-        "Female": {
-            "p_ignore": 0.0,
-            "prediction_constant": 0.495,
-            "p0": 0.991...,
-            "operation0": "[>0.096...]",
-            "p1": 0.008...,
-            "operation1": "[>0.093...]"
+        "AfricanAmerican": {
+            "p_ignore": 0.10790632257574126,
+            "prediction_constant": 0.511,
+            "p0": 0.9878042253521122,
+            "operation0": "[>0.09336587704480723]",
+            "p1": 0.012195774647887792,
+            "operation1": "[>0.08129143699038417]"
         },
-        "Male": {
-            "p_ignore": 0.012...,
-            "prediction_constant": 0.495,
-            "p0": 0.210...,
-            "operation0": "[>0.097...]",
-            "p1": 0.789...,
-            "operation1": "[>0.093...]"
+        "Asian": {
+            "p_ignore": 0.4452623977766165,
+            "prediction_constant": 0.511,
+            "p0": 0.9211666666666666,
+            "operation0": "[>0.0841282166042002]",
+            "p1": 0.07883333333333342,
+            "operation1": "[>0.06681031202657442]"
+        },
+        "Caucasian": {
+            "p_ignore": 0.07157956646886036,
+            "prediction_constant": 0.511,
+            "p0": 0.7089031671858772,
+            "operation0": "[>0.09756360579682358]",
+            "p1": 0.2910968328141228,
+            "operation1": "[>0.08855360184450284]"
+        },
+        "Hispanic": {
+            "p_ignore": 0.3114878558726502,
+            "prediction_constant": 0.511,
+            "p0": 0.8642692307692299,
+            "operation0": "[>0.08445742321431376]",
+            "p1": 0.1357307692307701,
+            "operation1": "[>0.08083403984491996]"
+        },
+        "Other": {
+            "p_ignore": 0.0,
+            "prediction_constant": 0.511,
+            "p0": 0.37377083333333333,
+            "operation0": "[>0.11334616348189946]",
+            "p1": 0.6262291666666666,
+            "operation1": "[>0.06939325063729292]"
+        },
+        "Unknown": {
+            "p_ignore": 0.00047576185785999935,
+            "prediction_constant": 0.511,
+            "p0": 0.1832064965197217,
+            "operation0": "[>0.0949242881013221]",
+            "p1": 0.8167935034802782,
+            "operation1": "[>0.0658997928169448]"
         }
     }
     >>> plot_threshold_optimizer(threshold_optimizer)
@@ -318,8 +363,8 @@ representing the two thresholding rules, and :math:`p_0+p_1=1`.
 :math:`p_{\text{ignore}}` is :math:`0` if the curve does not need to be "pulled"
 towards the diagonal, i.e., when the selected solution lies on the curve
 itself as opposed to below.
-Above, the curve for "Male" is strictly below the curve for "Female", so
-:math:`p_{\text{ignore}}=0` for "Male" and non-zero for "Female".
+Above, the curve for "Asian" is strictly above the other curves, so
+:math:`p_{\text{ignore}}` is highest for "Asian" and lower for other groups.
 
 Importantly, :math:`p_{\text{ignore}}` is only required for equalized odds.
 We want to stress on the fact that it is crucial to understand the
@@ -327,34 +372,13 @@ implications of such a result.
 Predictions of the resulting :class:`ThresholdOptimizer` model are determined
 randomly based on the probabilities to predict label 1 that the formula
 produces.
-In this particular example :code:`operation1` will always be true since every
-score is larger than negative infinity.
-For "Male" that means
 
-.. math::
-
-    0.99993 \cdot \mathbb{I}(\text{score} > 0.5) + 0.00007 \cdot \mathbb{I}(\text{score} > \infty)
-
-- predict 1 with probability :math:`1-0.999926=0.000074` if the score is less
-  or equal to :math:`0.5`. This means that there is a very low probability
-  (less than a hundredth of a percent) of getting label 1 regardless of the
-  features.
-- predict 1 if the score is greater than :math:`0.5`.
-
-For "Female" the result includes the :math:`p_{\text{ignore}}` term, and one
-of the thresholds is set to always be true:
-
-.. math::
-
-    0.13186 \cdot 0.035 + (1-0.13186) \cdot \left(0.99437 \cdot \mathbb{I}(\text{score}>0.5) + 0.00563 \cdot \mathbb{I}(\text{score}>\infty)\right)
-
-
-- predict 1 with probability
-  :math:`0.13186 \cdot 0.035 + (1-0.13186) \cdot 0.00563 = 0.0095` if the
-  score is less or equal to :math:`0.5`. This represents a 1% chance of
-  getting label 1 regardless of the features.
-- predict 1 if the score is greater than :math:`0.5`
-
+In some cases, one of the thresholds are defined to always be true or false
+(e.g., `>-infty` or `<infty`) resulting in base probabilities for getting a 0
+or 1 regardless of the features.
+In our example above, this might mean that members of one group might have a
+base probability of being predicted to be readmitted that is higher than
+the base probability for members of another group.
 We want to emphasize that a non-zero probability to get label 1 is not
 acceptable in some application contexts, so it needs to be carefully evaluated
 whether :class:`ThresholdOptimizer` should be used.
