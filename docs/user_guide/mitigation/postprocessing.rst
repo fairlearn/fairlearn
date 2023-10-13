@@ -60,15 +60,25 @@ true positive rate parity as the fairness constraint.
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.pipeline import Pipeline
     >>> from sklearn.preprocessing import OneHotEncoder, StandardScaler
-    >>> from fairlearn.datasets import fetch_adult
+    >>> from fairlearn.datasets import fetch_diabetes_hospital
     >>> from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
     >>> from fairlearn.reductions import DemographicParity, ExponentiatedGradient
-    >>> data = fetch_adult(as_frame=True)
-    >>> X_raw = data.data
-    >>> y = (data.target == ">50K") * 1
-    >>> A = X_raw["sex"]
+    >>> data = fetch_diabetes_hospital(as_frame=True)
+    >>> # Drop 3 rows of Unknown gender since it's not representative of that group.
+    >>> # In a real application, this would be a red flag to investigate data collection.
+    >>> keep_idx = (data.data['gender'] == "Male") | (data.data['gender'] == "Female")
+    >>> X_raw = data.data[keep_idx]
+    >>> y = data.target[keep_idx]
+    >>> categorical_columns = [
+    ...     'race', 'gender', 'age', 'discharge_disposition_id', 'admission_source_id',
+    ...     'medical_specialty', 'primary_diagnosis', 'readmitted', 'max_glu_serum',
+    ...     'A1Cresult', 'insulin', 'change', 'diabetesMed']
+    >>> X_raw[categorical_columns] = X_raw[categorical_columns].astype('category')
+    >>> # Remove readmission columns from data as they would leak the target information.
+    >>> X_raw.drop(columns=["readmitted", "readmit_binary"], inplace=True)
+    >>> A = X_raw["gender"]
     >>> (X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
-    ...     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y)
+    ...     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y.astype(str) + "_" + A.astype(str))
     >>> X_train = X_train.reset_index(drop=True)
     >>> X_test = X_test.reset_index(drop=True)
     >>> y_train = y_train.reset_index(drop=True)
@@ -83,7 +93,7 @@ true positive rate parity as the fairness constraint.
     ... )
     >>> categorical_transformer = Pipeline(
     ...     [
-    ...         ("impute", SimpleImputer(strategy="most_frequent")),
+    ...         # ("impute", SimpleImputer(strategy="most_frequent")),
     ...         ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ...     ]
     ... )
@@ -104,12 +114,14 @@ true positive rate parity as the fairness constraint.
     ... )
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=pipeline,
-    ...     constraints="demographic_parity",
+    ...     constraints="true_positive_rate_parity",
+    ...     objective="balanced_accuracy_score",
     ...     predict_method="predict_proba",
     ...     prefit=False,
     ... )
     >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
-    ThresholdOptimizer(estimator=Pipeline(steps=[('preprocessor',
+    ThresholdOptimizer(constraints='true_positive_rate_parity',
+                       estimator=Pipeline(steps=[('preprocessor',
                                                   ColumnTransformer(transformers=[('num',
                                                                                    Pipeline(steps=[('impute',
                                                                                                     SimpleImputer()),
@@ -117,30 +129,29 @@ true positive rate parity as the fairness constraint.
                                                                                                     StandardScaler())]),
                                                                                    <sklearn.compose._column_transformer.make_column_selector object at 0x...>),
                                                                                   ('cat',
-                                                                                   Pipeline(steps=[('impute',
-                                                                                                    SimpleImputer(strategy='most_frequent')),
-                                                                                                   ('ohe',
+                                                                                   Pipeline(steps=[('ohe',
                                                                                                     OneHotEncoder(handle_unknown='ignore'))]),
                                                                                    <sklearn.compose._column_transformer.make_column_selector object at 0x...>)])),
                                                  ('classifier',
                                                   LogisticRegression(solver='liblinear'))]),
+                       objective='balanced_accuracy_score',
                        predict_method='predict_proba')
-    >>> threshold_optimizer.predict(X_test, sensitive_features=A_test)
-    array([0, 0, 1, ..., 0, 0, 1])
+    >>> threshold_optimizer.predict(X_test, sensitive_features=A_test, random_state=12345)
+    array([0, 0, 0, ..., 0, 1, 0])
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
     {
         "Female": {
-            "p0": 0.800...,
-            "operation0": "[>0.203...]",
-            "p1": 0.199...,
-            "operation1": "[>0.187...]"
+            "p0": 0.628...,
+            "operation0": "[>0.110...]",
+            "p1": 0.371...,
+            "operation1": "[>0.096...]"
         },
         "Male": {
-            "p0": 0.036...,
-            "operation0": "[>0.682...]",
-            "p1": 0.963...,
-            "operation1": "[>0.666...]"
+            "p0": 0.997...,
+            "operation0": "[>0.104...]",
+            "p1": 0.002...,
+            "operation1": "[>0.099...]"
         }
     }
     >>> plot_threshold_optimizer(threshold_optimizer)
@@ -155,22 +166,17 @@ the probability to predict label 1:
     p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})
 
 
-- "Male": :math:`0.99989 \cdot \mathbb{I}(\text{score}>0.5) + 0.00011 \cdot \mathbb{I}(\text{score}>-\infty)`
+- "Female: :math:`0.628 \cdot \mathbb{I}(\text{score}>0.110) + 0.371 \cdot \mathbb{I}(\text{score}>0.096)`
 
-  - if the score is less or equal to :math:`0.5` predict 1 with probability
-    :math:`0.00011`
-  - if the score is above :math:`0.5` predict 1
+  - if the score is above :math:`0.110` predict 1
+  - if the score is between :math:`0.110` and :math:`0.096` predict 1 with
+    probability :math:`0.371`
 
-- "Female: :math:`0.95272 \cdot \mathbb{I}(\text{score}>0.5) + 0.04728 \cdot \mathbb{I}(\text{score}>-\infty)`
+- "Male": :math:`0.997 \cdot \mathbb{I}(\text{score}>0.104) + 0.002 \cdot \mathbb{I}(\text{score}>0.099)`
 
-  - if the score is less or equal to :math:`0.5` predict 1 with probability
-    :math:`0.04728`
-  - if the score is above :math:`0.5` predict 1
-
-The thresholds are actually the same for both groups here, which
-does not always have to be true. As a consequence, the only difference is
-the probability to predict label 1 in the case where the score is below
-:math:`0.5`.
+  - if the score is above :math:`0.104` predict 1
+  - if the score is between :math:`0.104` and :math:`0.099` predict 1 with
+    probability :math:`0.002`
 
 .. note::
 
@@ -234,7 +240,8 @@ Note that the plot omits points that are within the convex hull of points.
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=pipeline,
     ...     constraints="equalized_odds",
-    ...     objective="accuracy_score")
+    ...     predict_method="predict_proba",
+    ...     objective="balanced_accuracy_score")
     >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
     ThresholdOptimizer(constraints='equalized_odds',
                        estimator=Pipeline(steps=[('preprocessor',
@@ -243,36 +250,33 @@ Note that the plot omits points that are within the convex hull of points.
                                                                                                     SimpleImputer()),
                                                                                                    ('scaler',
                                                                                                     StandardScaler())]),
-                                                                                   <sklearn.compose._column_transformer.make_column_selector object at ...),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>),
                                                                                   ('cat',
-                                                                                   Pipeline(steps=[('impute',
-                                                                                                    SimpleImputer(strategy='most_frequent')),
-                                                                                                   ('ohe',
+                                                                                   Pipeline(steps=[('ohe',
                                                                                                     OneHotEncoder(handle_unknown='ignore'))]),
-                                                                                   <sklearn.compose._column_transformer.make_column_selector object at ...)])),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>)])),
                                                  ('classifier',
-                                                  LogisticRegression(solver='liblinear'))]))
+                                                  LogisticRegression(solver='liblinear'))]),
+                       objective='balanced_accuracy_score',
+                       predict_method='predict_proba')
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
-    >>> print(json.dumps(
-    ...     threshold_rules_by_group,
-    ...     default=str,
-    ...     indent=4))
+    >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
     {
         "Female": {
             "p_ignore": 0.0,
-            "prediction_constant": 0.086...,
-            "p0": 0.933...,
-            "operation0": "[>0.5]",
-            "p1": 0.066...,
-            "operation1": "[>-inf]"
+            "prediction_constant": 0.495,
+            "p0": 0.991...,
+            "operation0": "[>0.096...]",
+            "p1": 0.008...,
+            "operation1": "[>0.093...]"
         },
         "Male": {
-            "p_ignore": 0.006...,
-            "prediction_constant": 0.086...,
-            "p0": 0.098...,
-            "operation0": "[>inf]",
-            "p1": 0.901...,
-            "operation1": "[>0.5]"
+            "p_ignore": 0.012...,
+            "prediction_constant": 0.495,
+            "p0": 0.210...,
+            "operation0": "[>0.097...]",
+            "p1": 0.789...,
+            "operation1": "[>0.093...]"
         }
     }
     >>> plot_threshold_optimizer(threshold_optimizer)
@@ -379,13 +383,11 @@ assumes that it is already trained.
                                                                        SimpleImputer()),
                                                                       ('scaler',
                                                                        StandardScaler())]),
-                                                      <sklearn.compose._column_transformer.make_column_selector object at ...),
+                                                      <sklearn.compose._column_transformer.make_column_selector object at 0x...),
                                                      ('cat',
-                                                      Pipeline(steps=[('impute',
-                                                                       SimpleImputer(strategy='most_frequent')),
-                                                                      ('ohe',
+                                                      Pipeline(steps=[('ohe',
                                                                        OneHotEncoder(handle_unknown='ignore'))]),
-                                                      <sklearn.compose._column_transformer.make_column_selector object at ...)])),
+                                                      <sklearn.compose._column_transformer.make_column_selector object at 0x...)])),
                     ('classifier', LogisticRegression(solver='liblinear'))])
     >>> threshold_optimizer = ThresholdOptimizer(
     ...     estimator=pipeline,
@@ -399,13 +401,11 @@ assumes that it is already trained.
                                                                                                     SimpleImputer()),
                                                                                                    ('scaler',
                                                                                                     StandardScaler())]),
-                                                                                   <sklearn.compose._column_transformer.make_column_selector object at ...>),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...>),
                                                                                   ('cat',
-                                                                                   Pipeline(steps=[('impute',
-                                                                                                    SimpleImputer(strategy='most_frequent')),
-                                                                                                   ('ohe',
+                                                                                   Pipeline(steps=[('ohe',
                                                                                                     OneHotEncoder(handle_unknown='ignore'))]),
-                                                                                   <sklearn.compose._column_transformer.make_column_selector object at ...)])),
+                                                                                   <sklearn.compose._column_transformer.make_column_selector object at 0x...)])),
                                                  ('classifier',
                                                   LogisticRegression(solver='liblinear'))]),
                        prefit=True)
