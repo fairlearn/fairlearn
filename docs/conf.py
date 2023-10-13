@@ -16,7 +16,6 @@ import inspect
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sphinx.ext.doctest
 import sys
 from datetime import datetime
 
@@ -206,13 +205,6 @@ plot_include_source = True
 plot_html_show_formats = False
 plot_html_show_source_link = False
 
-# This option will make doctest ignore whitespace when testing code.
-# doctest_default_flags = 0 | sphinx.ext.doctest.doctest.NORMALIZE_WHITESPACE | sphinx.ext.doctest.doctest.ELLIPSIS
-
-
-# Option to hide doctests comments in the documentation (like # doctest:
-# +NORMALIZE_WHITESPACE for instance)
-trim_doctest_flags = True
 
 # Linking Code
 # ------------
