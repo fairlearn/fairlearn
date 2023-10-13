@@ -1,4 +1,4 @@
 numpy>=1.18.0
-pandas>=0.25.2
+pandas>=2
 scikit-learn>=1.2.1
 scipy>=1.5.0
