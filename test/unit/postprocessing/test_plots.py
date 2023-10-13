@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from importlib.metadata import PackageNotFoundError
 import pytest
 
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
@@ -42,10 +43,11 @@ def _fit_and_plot(constraints, plotting_data):
 
 def is_mpl_installed():
     try:
-        import pytest_mpl
-        import matplotlib.pyplot as plt
+        import pytest_mpl  # noqa: F401
+        import matplotlib.pyplot as plt  # noqa: F401
+
         return True
-    except pkg_resources.DistributionNotFound:
+    except PackageNotFoundError:
         return False
 
 

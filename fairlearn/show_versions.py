@@ -6,7 +6,6 @@
 Adapted from :py:func:`pandas.show_versions` and :py:func:`sklearn.show_versions`.
 """  # noqa: RST304
 
-import importlib
 import platform
 import sys
 
@@ -53,14 +52,13 @@ def _get_deps_info():
             "sklearn",
             "lightgbm",
             "pytorch",
-            "tensorflow"
+            "tensorflow",
         ]
     )
 
     from fairlearn import __version__
-    deps_info = {
-        "fairlearn": __version__
-    }
+
+    deps_info = {"fairlearn": __version__}
 
     from importlib.metadata import PackageNotFoundError, version
 

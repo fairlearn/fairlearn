@@ -27,6 +27,7 @@ jobs:
           python-version: ${{ inputs.python }}
       - run: python scripts/install_requirements.py --pinned ${{ inputs.requirementsPinned }}
       - run: pip install .
+      - run: pip install matplotlib
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

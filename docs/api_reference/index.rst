@@ -56,8 +56,8 @@ fairlearn.metrics
 .. autosummary::
    :nosignatures:
    :toctree: generated/
-   :template: classes.rst
-   
+   :template: class.rst
+
    metrics.MetricFrame
 
 fairlearn.postprocessing
@@ -72,7 +72,7 @@ fairlearn.postprocessing
 .. autosummary::
    :nosignatures:
    :toctree: generated/
-   :template: classes.rst
+   :template: class.rst
 
    postprocessing.ThresholdOptimizer
 
@@ -95,7 +95,7 @@ fairlearn.preprocessing
 .. autosummary::
    :nosignatures:
    :toctree: generated/
-   :template: classes.rst
+   :template: class.rst
 
    preprocessing.CorrelationRemover
 
@@ -111,7 +111,7 @@ fairlearn.reductions
 .. autosummary::
    :nosignatures:
    :toctree: generated/
-   :template: classes.rst
+   :template: class.rst
 
    reductions.AbsoluteLoss
    reductions.BoundedGroupLoss
@@ -143,7 +143,7 @@ fairlearn.adversarial
 .. autosummary::
    :nosignatures:
    :toctree: generated/
-   :template: classes.rst
+   :template: class.rst
    
    adversarial.AdversarialFairnessClassifier
    adversarial.AdversarialFairnessRegressor
