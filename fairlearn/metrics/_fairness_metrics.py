@@ -7,84 +7,6 @@ from ._base_metrics import false_positive_rate, selection_rate, true_positive_ra
 from ._metric_frame import MetricFrame
 
 
-def average_odds_difference(
-        y_true,
-        y_pred,
-        *,
-        sensitive_features,
-        method='between_groups',
-        sample_weight=None) -> float:
-    """Calculate the average odds difference.
-
-    The average of two metrics: `true_positive_rate_difference` and
-    `false_positive_rate_difference`. The former is the difference between the
-    largest and smallest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
-    of the sensitive feature(s). The latter is defined similarly, but for
-    :math:`P[h(X)=1 | A=a, Y=0]`.
-    The average odds difference of 0 means that all groups have the same
-    true positive, true negative, false positive, and false negative rates.
-
-    Parameters
-    ----------
-    y_true : array-like
-        Ground truth (correct) labels.
-    y_pred : array-like
-        Predicted labels :math:`h(X)` returned by the classifier.
-    sensitive_features :
-        The sensitive features over which demographic parity should be assessed
-    method : str
-        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
-        for details.
-    sample_weight : array-like
-        The sample weights
-    Returns
-    -------
-    float
-        The average odds difference
-    """
-    eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
-
-    return sum(eo.difference(method=method))/2
-
-def average_odds_ratio(
-        y_true,
-        y_pred,
-        *,
-        sensitive_features,
-        method='between_groups',
-        sample_weight=None) -> float:
-    """Calculate the average odds ratio.
-
-    The average of two metrics: `true_positive_rate_ratio` and
-    `false_positive_rate_ratio`. The former is the ratio between the
-    largest and smallest of :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a`
-    of the sensitive feature(s). The latter is defined similarly, but for
-    :math:`P[h(X)=1 | A=a, Y=0]`.
-    The average odds ratio of 1 means that all groups have the same
-    true positive, true negative, false positive, and false negative rates.
-
-    Parameters
-    ----------
-    y_true : array-like
-        Ground truth (correct) labels.
-    y_pred : array-like
-        Predicted labels :math:`h(X)` returned by the classifier.
-    sensitive_features :
-        The sensitive features over which demographic parity should be assessed
-    method : str
-        How to compute the ratios. See :func:`fairlearn.metrics.MetricFrame.ratio`
-        for details.
-    sample_weight : array-like
-        The sample weights
-    Returns
-    -------
-    float
-        The average odds ratio
-    """
-    eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
-
-    return sum(eo.difference(method=method))/2
-    
 def demographic_parity_difference(
     y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
 ) -> float:
@@ -155,7 +77,7 @@ def demographic_parity_ratio(
         The sensitive features over which demographic parity should be assessed
 
     method : str
-        How to compute the ratios. See :func:`fairlearn.metrics.MetricFrame.ratio`
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
     sample_weight : array-like
@@ -247,7 +169,7 @@ def equalized_odds_ratio(
         The sensitive features over which demographic parity should be assessed
 
     method : str
-        How to compute the ratios. See :func:`fairlearn.metrics.MetricFrame.ratio`
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
     sample_weight : array-like
