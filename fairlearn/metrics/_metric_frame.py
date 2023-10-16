@@ -15,9 +15,9 @@ from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 from ._annotated_metric_function import AnnotatedMetricFunction
 from ._bootstrap import calculate_pandas_quantiles, generate_bootstrap_samples
 from ._disaggregated_result import (
-    DisaggregatedResult,
-    _VALID_ERROR_STRING,
     _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
+    _VALID_ERROR_STRING,
+    DisaggregatedResult,
 )
 from ._group_feature import GroupFeature
 
@@ -76,12 +76,10 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if len(args) > 0:
             args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
             warnings.warn(
-                (
-                    f"You have provided {args_msg} as positional arguments. "
-                    "Please pass them as keyword arguments. From version "
-                    f"{version} passing them as positional arguments "
-                    "will result in an error."
-                ),
+                f"You have provided {args_msg} as positional arguments. "
+                "Please pass them as keyword arguments. From version "
+                f"{version} passing them as positional arguments "
+                "will result in an error.",
                 FutureWarning,
             )
 
@@ -90,12 +88,10 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
             warnings.warn(
-                (
-                    "The positional argument 'metric' has been replaced "
-                    "by a keyword argument 'metrics'. "
-                    f"From version {version} passing it as a positional argument "
-                    "or as a keyword argument 'metric' will result in an error"
-                ),
+                "The positional argument 'metric' has been replaced "
+                "by a keyword argument 'metrics'. "
+                f"From version {version} passing it as a positional argument "
+                "or as a keyword argument 'metric' will result in an error",
                 FutureWarning,
             )
 
@@ -400,10 +396,15 @@ class MetricFrame:
         self, target: Union[pd.Series, pd.DataFrame]
     ) -> Union[pd.Series, pd.DataFrame]:
         """Convert Nones to NaNs."""
+        # Ideally, we wouldn't care about Series vs DataFrame
+        # However, DataFrame.map() didn't appear until Pandas 2.1
+        # Before, it was DataFrame.applymap() which then got deprecated
         if isinstance(target, pd.Series):
             result = target.map(lambda x: x if x is not None else np.nan)
         else:
-            result = target.applymap(lambda x: x if x is not None else np.nan)
+            result = target.apply(
+                lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
+            )
         return result
 
     def _populate_results(self, raw_result: DisaggregatedResult):

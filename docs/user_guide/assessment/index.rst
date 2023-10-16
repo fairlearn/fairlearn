@@ -33,6 +33,7 @@ indicate that a property holds for all identified groups.
    error_estimation
    advanced_metricframe
    plotting
+   saving_loading_metricframe
 
 
 .. _dashboard:
