@@ -3,11 +3,9 @@
 
 import numpy as np
 import pandas as pd
-
 from sklearn.utils import Bunch
 
-from ._constants import (
-    LABEL_KEY, SCORE_KEY, P0_KEY, P1_KEY)
+from ._constants import LABEL_KEY, P0_KEY, P1_KEY, SCORE_KEY
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
@@ -17,24 +15,22 @@ DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value
 # true_negatives, false_positives, false_negatives. The fields indicate the counts. They can all
 # be numpy arrays of the same length. Metrics are expected to return NaN where undefined.
 METRIC_DICT = {
-    'selection_rate': (
-        lambda x: x.predicted_positives / x.n),
-    'false_positive_rate': (
-        lambda x: x.false_positives / x.negatives),
-    'false_negative_rate': (
-        lambda x: x.false_negatives / x.positives),
-    'true_positive_rate': (
-        lambda x: x.true_positives / x.positives),
-    'true_negative_rate': (
-        lambda x: x.true_negatives / x.negatives),
-    'accuracy_score': (
-        lambda x: (x.true_positives + x.true_negatives) / x.n),
-    'balanced_accuracy_score': (
-        lambda x: 0.5 * x.true_positives / x.positives + 0.5 * x.true_negatives / x.negatives),
+    "selection_rate": lambda x: x.predicted_positives / x.n,
+    "false_positive_rate": lambda x: x.false_positives / x.negatives,
+    "false_negative_rate": lambda x: x.false_negatives / x.positives,
+    "true_positive_rate": lambda x: x.true_positives / x.positives,
+    "true_negative_rate": lambda x: x.true_negatives / x.negatives,
+    "accuracy_score": lambda x: (x.true_positives + x.true_negatives) / x.n,
+    "balanced_accuracy_score": (
+        lambda x: 0.5 * x.true_positives / x.positives
+        + 0.5 * x.true_negatives / x.negatives
+    ),
 }
 
 
-def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
+def _extend_confusion_matrix(
+    *, true_positives, false_positives, true_negatives, false_negatives
+):
     """Extend the provided confusion matrix counts with additional implied fields.
 
     Parameters
@@ -66,8 +62,13 @@ def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives,
     )
 
 
-def _tradeoff_curve(data, sensitive_feature_value, flip=False,
-                    x_metric="false_positive_rate", y_metric="true_positive_rate"):
+def _tradeoff_curve(
+    data,
+    sensitive_feature_value,
+    flip=False,
+    x_metric="false_positive_rate",
+    y_metric="true_positive_rate",
+):
     """Get a convex hull of achievable trade-offs between the two provided metrics.
 
     The metrics are based on considering all possible thresholds of 'score' column of `data` and
@@ -93,9 +94,10 @@ def _tradeoff_curve(data, sensitive_feature_value, flip=False,
         'x', 'y', and 'operation'.
     """
     points_sorted = _calculate_tradeoff_points(
-        data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric)
+        data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric
+    )
     points_selected = _filter_points_to_get_convex_hull(points_sorted)
-    convex_hull = pd.DataFrame(points_selected)[['x', 'y', 'operation']]
+    convex_hull = pd.DataFrame(points_selected)[["x", "y", "operation"]]
     return convex_hull
 
 
@@ -164,8 +166,8 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
     """
     data_transpose = data.transpose()
 
-    content_col_0 = content_col + '0'
-    content_col_1 = content_col + '1'
+    content_col_0 = content_col + "0"
+    content_col_1 = content_col + "1"
 
     i = 0
     dict_list = []
@@ -181,23 +183,35 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
         # Calculate the y value at x based on the slope between data points i and i + 1
         x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
-        x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
-        p0 = x_distance_from_next_data_point/x_distance_between_data_points
+        x_distance_between_data_points = (
+            data_transpose[i + 1][x_col] - data_transpose[i][x_col]
+        )
+        p0 = x_distance_from_next_data_point / x_distance_between_data_points
         p1 = 1 - p0
         y = p0 * data_transpose[i][y_col] + p1 * data_transpose[i + 1][y_col]
-        dict_list.append({
-            x_col: x,
-            y_col: y,
-            P0_KEY: p0,
-            content_col_0: data_transpose[i][content_col],
-            P1_KEY: p1,
-            content_col_1: data_transpose[i + 1][content_col]})
+        dict_list.append(
+            {
+                x_col: x,
+                y_col: y,
+                P0_KEY: p0,
+                content_col_0: data_transpose[i][content_col],
+                P1_KEY: p1,
+                content_col_1: data_transpose[i + 1][content_col],
+            }
+        )
 
-    return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
+    return pd.DataFrame(dict_list)[
+        [x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]
+    ]
 
 
-def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
-                               x_metric="false_positive_rate", y_metric="true_positive_rate"):
+def _calculate_tradeoff_points(
+    data,
+    sensitive_feature_value,
+    flip=False,
+    x_metric="false_positive_rate",
+    y_metric="true_positive_rate",
+):
     """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible
@@ -216,7 +230,9 @@ def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError(DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value))
+        raise ValueError(
+            DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value)
+        )
 
     scores.append(-np.inf)
     labels.append(np.nan)
@@ -249,16 +265,18 @@ def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
             false_positives=count[0],
             true_positives=count[1],
             true_negatives=(n_negative - count[0]),
-            false_negatives=(n_positive - count[1]))
+            false_negatives=(n_positive - count[1]),
+        )
         flipped_counts = _extend_confusion_matrix(
             false_positives=(n_negative - count[0]),
             true_positives=(n_positive - count[1]),
             true_negatives=count[0],
-            false_negatives=count[1])
+            false_negatives=count[1],
+        )
         if flip:
-            operations = [('>', actual_counts), ('<', flipped_counts)]
+            operations = [(">", actual_counts), ("<", flipped_counts)]
         else:
-            operations = [('>', actual_counts)]
+            operations = [(">", actual_counts)]
 
         for operation_string, counts in operations:
             x = METRIC_DICT[x_metric](counts)
@@ -268,8 +286,11 @@ def _calculate_tradeoff_points(data, sensitive_feature_value, flip=False,
             y_list.append(y)
             operation_list.append(operation)
 
-    return pd.DataFrame({'x': x_list, 'y': y_list, 'operation': operation_list}) \
-        .sort_values(by=['x', 'y']).reset_index(drop=True)
+    return (
+        pd.DataFrame({"x": x_list, "y": y_list, "operation": operation_list})
+        .sort_values(by=["x", "y"])
+        .reset_index(drop=True)
+    )
 
 
 def _get_scores_labels_and_counts(data):

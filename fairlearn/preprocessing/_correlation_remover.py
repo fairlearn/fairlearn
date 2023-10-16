@@ -16,6 +16,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     in order to remove their correlation with the sensitive feature columns while retaining
     as much information as possible (as measured by the least-squares error).
 
+    Read more in the :ref:`User Guide <preprocessing>`.
+
     Parameters
     ----------
         sensitive_feature_ids : list
@@ -54,6 +56,9 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     Note that the lack of correlation does not imply anything about statistical dependence.
     Therefore, we expect this to be most appropriate as a preprocessing step for
     (generalized) linear models.
+
+    .. versionadded:: 0.6
+
     """
 
     def __init__(self, *, sensitive_feature_ids, alpha=1):
@@ -71,15 +76,22 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         if isinstance(X, pd.DataFrame):
             self.lookup_ = {c: i for i, c in enumerate(X.columns)}
             return X.values
+        # correctly handle a 1d input
+        if len(X.shape) == 1:
+            return {0: 0}
         self.lookup_ = {i: i for i in range(X.shape[1])}
         return X
 
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
         self._create_lookup(X)
-        X = check_array(X, estimator=self)
+        X = self._validate_data(X)
         X_use, X_sensitive = self._split_X(X)
-        self.sensitive_mean_ = X_sensitive.mean()
+        # correctly handle zero provided sensitive features
+        if X_sensitive.shape[1] == 0:
+            self.sensitive_mean_ = np.array([])
+        else:
+            self.sensitive_mean_ = X_sensitive.mean()
         X_s_center = X_sensitive - self.sensitive_mean_
         self.beta_, _, _, _ = np.linalg.lstsq(X_s_center, X_use, rcond=None)
         self.X_shape_ = X.shape
@@ -91,8 +103,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         check_is_fitted(self, ["beta_", "X_shape_", "lookup_", "sensitive_mean_"])
         if self.X_shape_[1] != X.shape[1]:
             raise ValueError(
-                f"The trained data has {self.X_shape_[1]} features while this dataset has "
-                f"{X.shape[1]}."
+                f"The trained data has {self.X_shape_[1]} features while this dataset"
+                f" has {X.shape[1]}."
             )
         X_use, X_sensitive = self._split_X(X)
         X_s_center = X_sensitive - self.sensitive_mean_
@@ -100,3 +112,17 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         X_use = np.atleast_2d(X_use)
         X_filtered = np.atleast_2d(X_filtered)
         return self.alpha * X_filtered + (1 - self.alpha) * X_use
+
+    def _more_tags(self):
+        return {
+            "_xfail_checks": {
+                "check_parameters_default_constructible": (
+                    "sensitive_feature_ids has to be explicitly set to "
+                    "instantiate this estimator"
+                ),
+                "check_transformer_data_not_an_array": (
+                    "this estimator only accepts pandas dataframes or numpy "
+                    "ndarray as input."
+                ),
+            }
+        }

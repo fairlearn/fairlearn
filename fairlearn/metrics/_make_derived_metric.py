@@ -8,29 +8,30 @@ from typing import Callable, List, Union
 from ._metric_frame import MetricFrame
 
 transform_options = [
-    'difference',
-    'group_min',
-    'group_max',
-    'ratio',
+    "difference",
+    "group_min",
+    "group_max",
+    "ratio",
 ]
 
-parameters_for_transforms = [
-    'method'
-]
+parameters_for_transforms = ["method"]
 
 _METRIC_CALLABLE_ERROR = "Supplied metric object must be callable"
-_METHOD_ARG_ERROR = "Callables which accept a '{0}' argument " \
+_METHOD_ARG_ERROR = (
+    "Callables which accept a '{0}' argument "
     "may not be passed to make_derived_metric(). Please use functools.partial()"
+)
 _INVALID_TRANSFORM = "Transform must be one of {0}".format(transform_options)
 
 
 class _DerivedMetric:
-    def __init__(self,
-                 *,
-                 metric: Callable[..., Union[float, int]],
-                 transform: str,
-                 sample_param_names: List[str]):
-
+    def __init__(
+        self,
+        *,
+        metric: Callable[..., Union[float, int]],
+        transform: str,
+        sample_param_names: List[str],
+    ):
         if not callable(metric):
             raise ValueError(_METRIC_CALLABLE_ERROR)
         sig = inspect.signature(metric)
@@ -48,12 +49,9 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(self,
-                 y_true,
-                 y_pred,
-                 *,
-                 sensitive_features,
-                 **other_params) -> Union[float, int]:
+    def __call__(
+        self, y_true, y_pred, *, sensitive_features, **other_params
+    ) -> Union[float, int]:
         sample_params = dict()
         params = dict()
         transform_parameters = dict()
@@ -70,22 +68,24 @@ class _DerivedMetric:
         # a nameless metric
         bound_fn_name = self._metric_fn.__name__
         for k, v in sorted(params.items()):
-            bound_fn_name = bound_fn_name + '_' + k + '_' + str(v)
+            bound_fn_name = bound_fn_name + "_" + k + "_" + str(v)
         dispatch_fn.__name__ = bound_fn_name
 
-        all_metrics = MetricFrame(metrics=dispatch_fn,
-                                  y_true=y_true,
-                                  y_pred=y_pred,
-                                  sensitive_features=sensitive_features,
-                                  sample_params=sample_params)
+        all_metrics = MetricFrame(
+            metrics=dispatch_fn,
+            y_true=y_true,
+            y_pred=y_pred,
+            sensitive_features=sensitive_features,
+            sample_params=sample_params,
+        )
 
-        if self._transform == 'difference':
+        if self._transform == "difference":
             result = all_metrics.difference(**transform_parameters)
-        elif self._transform == 'ratio':
+        elif self._transform == "ratio":
             result = all_metrics.ratio(**transform_parameters)
-        elif self._transform == 'group_min':
+        elif self._transform == "group_min":
             result = all_metrics.group_min()
-        elif self._transform == 'group_max':
+        elif self._transform == "group_max":
             result = all_metrics.group_max()
         else:
             raise ValueError(_INVALID_TRANSFORM)
@@ -97,7 +97,7 @@ def make_derived_metric(
     *,
     metric: Callable[..., Union[float, int]],
     transform: str,
-    sample_param_names: List[str] = ['sample_weight']
+    sample_param_names: List[str] = ["sample_weight"],
 ) -> Callable[..., Union[float, int]]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
@@ -121,7 +121,7 @@ def make_derived_metric(
     by the :code:`transform=` argument (with the :code:`method=` argument, if
     required).
 
-    See the :ref:`scalar_metric_results` section in the :ref:`user_guide` for more
+    See the :ref:`custom_fairness_metrics` section in the :ref:`user_guide` for more
     details.
     A :ref:`sample notebook <sphx_glr_auto_examples_plot_make_derived_metric.py>` is
     also available.
@@ -132,7 +132,9 @@ def make_derived_metric(
         The metric function from which the new function should be derived
 
     transform : str
-        Selects the transformation aggregation the resultant function should use
+        Selects the transformation aggregation the resultant function should use.
+        The list of possible options is:
+        ['difference', 'group_min', 'group_max', 'ratio'].
 
     sample_param_names : List[str]
         A list of parameters names of the underlying :code:`metric` which should
@@ -146,10 +148,10 @@ def make_derived_metric(
     -------
     callable
         Function with the same signature as the :code:`metric` but with additional
-        :code:`sensitive_feature=` and :code:`method=` arguments, to enable the
+        :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
-    dm = _DerivedMetric(metric=metric,
-                        transform=transform,
-                        sample_param_names=sample_param_names)
+    dm = _DerivedMetric(
+        metric=metric, transform=transform, sample_param_names=sample_param_names
+    )
     return dm

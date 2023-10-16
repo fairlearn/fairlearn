@@ -4,26 +4,32 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_adult(*, cache=True, data_home=None,
-                as_frame=False, return_X_y=False):
+def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     """Load the UCI Adult dataset (binary classification).
+
+    Read more in the :ref:`User Guide <boston_housing_data>`.
 
     Download it if necessary.
 
-    ==============   ==============
-    Samples total             48842
-    Dimensionality               14
-    Features                   real
-    Classes                       2
-    ==============   ==============
+    ==============   ====================
+    Samples total                   48842
+    Dimensionality                     14
+    Features         numeric, categorical
+    Classes                             2
+    ==============   ====================
 
     Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
+
+    Read more in the :ref:`User Guide <adult_data>`.
+
+    .. versionadded:: 0.5.0
 
     Parameters
     ----------
@@ -32,16 +38,19 @@ def fetch_adult(*, cache=True, data_home=None,
 
     data_home : str, default=None
         Specify another download and cache folder for the datasets.
-        By default, all scikit-learn data is stored in '~/.fairlearn-data'
+        By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
-    as_frame : bool, default=False
+    as_frame : bool, default=True
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.
         The Bunch will contain a ``frame`` attribute with the target and the
         data. If ``return_X_y`` is True, then ``(data, target)`` will be pandas
         DataFrames or Series as describe above.
+
+        .. versionchanged:: 0.9.0
+            Default value changed to True.
 
     return_X_y : bool, default=False
         If True, returns ``(data.data, data.target)`` instead of a Bunch
@@ -63,12 +72,17 @@ def fetch_adult(*, cache=True, data_home=None,
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the UCI Adult dataset.
+        categories : dict or None
+            Maps each categorical feature name to a list of values, such that the
+            value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+        frame : pandas DataFrame
+            Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray) or (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is False
+    (data, target) : tuple if ``return_X_y`` is True
 
-    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is True
+    Notes
+    ----------
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
@@ -85,10 +99,13 @@ def fetch_adult(*, cache=True, data_home=None,
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=1590,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
+        parser="auto",
     )

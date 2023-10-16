@@ -4,12 +4,14 @@ channels:
 - conda-forge
 - pytorch
 dependencies:
-- python==3.7
+- python==3.11
 - pip>=19.1.1
 - pytest
+- pytest-cov
 - pytorch
 - cpuonly
-- skorch
+- pip:
+   - skorch>=0.12.1
 
 # Note pytorch will not install cuda. If you do not want that, please
 # use conda install pytorch -c pytorch

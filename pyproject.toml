@@ -1,11 +1,26 @@
 [tool.black]
-line-length = 79
+line-length = 88
+target_version = ['py38', 'py39', 'py310', 'py311']
+preview = true
+extend-exclude = '''
+(
+    ^/docs/
+    | ^/examples/
+)
+'''
+
+[tool.isort]
+profile = "black"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "error::DeprecationWarning",
-    "error::FutureWarning",
-    'ignore:the imp module is deprecated:DeprecationWarning',
-    'ignore:Using or importing the ABCs from:DeprecationWarning',
-    "ignore:tostring:DeprecationWarning",
+    "error",
+
+    # Warnings in all-deps
+    "default:You are about to use a dataset with known fairness issues:Warning",
+    "default:Auto-removal of overlapping axes is deprecated:Warning",
+    "default:DataFrame is highly fragmented:Warning",
+
+    # Warnings in other-ml (tensorflow)
+    "default:The initializer GlorotNormal is unseeded:UserWarning",
 ]

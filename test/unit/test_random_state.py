@@ -3,10 +3,11 @@
 
 import pandas as pd
 from sklearn.datasets import fetch_openml
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
 from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.reductions import ExponentiatedGradient, EqualizedOdds
+from fairlearn.reductions import EqualizedOdds, ExponentiatedGradient
 
 
 def test_random_state_threshold_optimizer():
@@ -23,16 +24,24 @@ def test_random_state_threshold_optimizer():
     lr.fit(X_train, y_train)
 
     # Train threshold optimizer
-    to = ThresholdOptimizer(estimator=lr, constraints='equalized_odds',
-                            grid_size=1000, predict_method='predict')
+    to = ThresholdOptimizer(
+        estimator=lr,
+        constraints="equalized_odds",
+        grid_size=1000,
+        predict_method="predict",
+    )
     to.fit(X_train, y_train, sensitive_features=race_train)
 
     # score groups
     y_pred_test = to.predict(X_test, sensitive_features=race_test, random_state=0)
     for _ in range(100):
-        assert (y_pred_test ==
-                to.predict(X_test, sensitive_features=race_test, random_state=0)).all()
-    assert (y_pred_test != to.predict(X_test, sensitive_features=race_test, random_state=1)).any()
+        assert (
+            y_pred_test
+            == to.predict(X_test, sensitive_features=race_test, random_state=0)
+        ).all()
+    assert (
+        y_pred_test != to.predict(X_test, sensitive_features=race_test, random_state=1)
+    ).any()
 
 
 def test_random_state_exponentiated_gradient():
@@ -55,21 +64,24 @@ def test_random_state_exponentiated_gradient():
     # score groups
     y_pred_test = expgrad.predict(X_test, random_state=0)
     for _ in range(100):
-        assert (y_pred_test ==
-                expgrad.predict(X_test, random_state=0)).all()
-    assert (y_pred_test !=
-            expgrad.predict(X_test, random_state=1)).any()
+        assert (y_pred_test == expgrad.predict(X_test, random_state=0)).all()
+    assert (y_pred_test != expgrad.predict(X_test, random_state=1)).any()
 
 
 def _get_test_data():
     # fetch data from OpenML
-    data = fetch_openml(data_id=42193)
-    X = pd.DataFrame(data['data'], columns=data['feature_names']) \
-        .drop(columns=['race_Caucasian', 'c_charge_degree_F']).astype(float)
-    y = data['target'].astype(int)
+    data = fetch_openml(data_id=42193, parser="auto")
+    X = (
+        pd.DataFrame(data["data"], columns=data["feature_names"])
+        .drop(columns=["race_Caucasian", "c_charge_degree_F"])
+        .astype(float)
+    )
+    y = data["target"].astype(int)
 
     # split the data in train-validation-test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
-    race_train = X_train['race_African-American']
-    race_test = X_test['race_African-American']
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.20, random_state=0
+    )
+    race_train = X_train["race_African-American"]
+    race_test = X_test["race_African-American"]
     return X_train, X_test, y_train, y_test, race_train, race_test

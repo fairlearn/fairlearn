@@ -1,4 +1,4 @@
-|Build Status| |MIT license| |PyPI| |Discord| |StackOverflow|
+|MIT license| |PyPI| |Discord| |StackOverflow|
 
 Fairlearn
 =========
@@ -31,7 +31,8 @@ Current release
 
 -  Our current version may differ substantially from earlier versions.
    Users of earlier versions should visit our
-   `migration guide <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`_
+   to navigate significant changes and find information on how to migrate.
 
 What we mean by *fairness*
 --------------------------
@@ -85,13 +86,13 @@ Fairlearn metrics
 ~~~~~~~~~~~~~~~~~
 
 Check out our in-depth `guide on the Fairlearn
-metrics <https://fairlearn.org/main/user_guide/assessment.html>`__.
+metrics <https://fairlearn.org/main/user_guide/assessment>`__.
 
 Fairlearn algorithms
 ~~~~~~~~~~~~~~~~~~~~
 
 For an overview of our algorithms please refer to our
-`website <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+`website <https://fairlearn.org/main/user_guide/mitigation/index.html>`__.
 
 Install Fairlearn
 -----------------
@@ -102,7 +103,7 @@ guide <https://fairlearn.org/main/quickstart.html>`__.
 Usage
 -----
 
-For common usage refer to the `Jupyter notebooks <./notebooks>`__ and
+For common usage refer to the `Jupyter notebooks <https://fairlearn.org/main/auto_examples/index.html>`__ and
 our `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
 Please note that our APIs are subject to change, so notebooks downloaded
 from ``main`` may not be compatible with Fairlearn installed with
@@ -119,17 +120,8 @@ guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
 Maintainers
 -----------
 
-The Fairlearn project is maintained by:
-
--  **@adrinjalali**
--  **@hildeweerts**
--  **@MiroDudik**
--  **@mmadaio**
--  **@riedgar-ms**
--  **@romanlutz**
-
-For a full list of contributors refer to the `authors
-page <./AUTHORS.md>`__
+A list of current maintainers is
+`on our website <https://fairlearn.org/main/about/index.html>`__.
 
 Issues
 ------
@@ -158,8 +150,6 @@ Reporting security issues
 To report security issues please send an email to
 ``fairlearn-internal@python.org``.
 
-.. |Build Status| image:: https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=main
-   :target: https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main
 .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://github.com/fairlearn/fairlearn/blob/main/LICENSE
 .. |PyPI| image:: https://img.shields.io/pypi/v/fairlearn?color=blue
