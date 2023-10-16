@@ -11,11 +11,7 @@ import sys
 
 from _utils import _LogWrapper
 
-_REQUIREMENTS_STEMS = [
-    "requirements",
-    "requirements-customplots",
-    "requirements-dev"
-]
+_REQUIREMENTS_STEMS = ["requirements", "requirements-dev"]
 
 _INSERTION_FIXED = "-fixed"
 
@@ -30,33 +26,36 @@ def _build_argument_parser():
     desc = "Install requirements using pip"
 
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--pinned",
-                        help="Whether to convert '>=' to '==' in files",
-                        type=lambda x: (str(x).lower() == 'true'),  # type=bool doesn't work
-                        required=True)
-    parser.add_argument("--loglevel",
-                        help="Set log level",
-                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'])
+    parser.add_argument(
+        "--pinned",
+        help="Whether to convert '>=' to '==' in files",
+        type=lambda x: (str(x).lower() == "true"),  # type=bool doesn't work
+        required=True,
+    )
+    parser.add_argument(
+        "--loglevel",
+        help="Set log level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    )
 
     return parser
 
 
 def _process_line(src_line):
-    return src_line.replace('>=', '==')
+    return src_line.replace(">=", "==")
 
 
 def _pin_requirements(src_file, dst_file):
     with _LogWrapper("Pinning {0} into {1}".format(src_file, dst_file)):
-
         _logger.debug("Reading file %s", src_file)
         text_lines = []
-        with open(src_file, 'r') as f:
+        with open(src_file, "r") as f:
             text_lines = f.readlines()
 
         result_lines = [_process_line(current_line) for current_line in text_lines]
 
         _logger.debug("Writing file %s", dst_file)
-        with open(dst_file, 'w') as f:
+        with open(dst_file, "w") as f:
             f.writelines(result_lines)
 
 
@@ -65,9 +64,9 @@ def _install_requirements_file(file_stem, fix_requirements):
 
     if fix_requirements:
         source_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)
-        requirements_file = "{0}{1}.{2}".format(file_stem,
-                                                _INSERTION_FIXED,
-                                                _REQUIREMENTS_EXTENSION)
+        requirements_file = "{0}{1}.{2}".format(
+            file_stem, _INSERTION_FIXED, _REQUIREMENTS_EXTENSION
+        )
         _pin_requirements(source_file, requirements_file)
     else:
         requirements_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)

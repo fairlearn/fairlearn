@@ -9,50 +9,41 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import inspect
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
 import sys
-import inspect
 from datetime import datetime
-rootdir = os.path.join(os.getenv("SPHINX_MULTIVERSION_SOURCEDIR", default=os.getcwd()), "..")
+
+from packaging.version import parse
+
+rootdir = os.path.join(os.getcwd(), "..")
 sys.path.insert(0, rootdir)
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 [print(p) for p in sys.path]
 print("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
 import fairlearn  # noqa: E402
+
 print(fairlearn.__version__)
 print("================================")
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'Fairlearn'
-copyright = f'2018 - {datetime.now().year}, Fairlearn contributors'
-author = 'Fairlearn contributors'
+project = "Fairlearn"
+copyright = f"2018 - {datetime.now().year}, Fairlearn contributors"
+author = "Fairlearn contributors"
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
-
-
-def check_if_v046():
-    """Check to see if current version being built is v0.4.6."""
-    result = False
-
-    if fairlearn.__version__ == "0.4.6":
-        print("Detected 0.4.6 in fairlearn.__version__")
-        result = True
-
-    smv_name = os.getenv("SPHINX_MULTIVERSION_NAME")
-    if smv_name is not None:
-        print("Found SPHINX_MULTIVERSION_NAME: ", smv_name)
-        result = smv_name == "v0.4.6"
-    else:
-        print("SPHINX_MULTIVERSION_NAME not in environment")
-
-    return result
+if "dev" in fairlearn.__version__:
+    tag_or_branch = "main"
+else:
+    tag_or_branch = fairlearn.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -61,83 +52,101 @@ def check_if_v046():
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'bokeh.sphinxext.bokeh_plot',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.linkcode',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery',
-    'sphinx_multiversion',
-    'sphinx_autodoc_typehints',  # needs to be AFTER napoleon
+    "bokeh.sphinxext.bokeh_plot",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.linkcode",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
+    "sphinx_gallery.gen_gallery",
+    "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
+    "numpydoc",
 ]
 
-source_suffix = ['.rst']
+source_suffix = [".rst"]
 
-intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
-                       'numpy': ('https://numpy.org/doc/stable/', None),
-                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-                       'sklearn': ('https://scikit-learn.org/stable/', None),
-                       'matplotlib': ('https://matplotlib.org/', None)}
+intersphinx_mapping = {
+    "python3": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "sklearn": ("https://scikit-learn.org/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "pytorch": ("https://pytorch.org/docs/stable/", None),
+    "tensorflow": (
+        "https://www.tensorflow.org/api_docs/python",
+        (
+            "https://raw.githubusercontent.com/GPflow/"
+            "tensorflow-intersphinx/master/tf2_py_objects.inv"
+        ),
+    ),
+}
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["templates"]
+
+
+# generate autosummary even if no references
+autosummary_generate = True
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.rst']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.rst"]
 
-master_doc = 'index'
+master_doc = "index"
 
-# Multiversion settings
-# Show only the highest patch versions of each minor version.
-# Example: include 0.4.6, but not 0.4.0 to 0.4.5
-smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.0|^v0\.6\.2|^v0\.7\.0+$'
-smv_branch_whitelist = r'^main$'
-
-if check_if_v046():
+if fairlearn.__version__ == "0.4.6":
     print("Current version is v0.4.6, will apply overrides")
-    master_doc = 'index'
+    master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme'
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "logo_link": "https://fairlearn.org",
-
+    "logo": {
+        "link": "https://fairlearn.org",
+    },
     "icon_links": [
         {
             "name": "GitHub",
             "url": "https://github.com/fairlearn/fairlearn",
-            "icon": "fab fa-github",
+            "icon": "fa-brands fa-github",
         },
         {
             "name": "Twitter",
             "url": "https://twitter.com/fairlearn",
-            "icon": "fab fa-twitter",
+            "icon": "fa-brands fa-twitter",
         },
         {
             "name": "StackOverflow",
             "url": "https://stackoverflow.com/questions/tagged/fairlearn",
-            "icon": "fab fa-stack-overflow",
+            "icon": "fa-brands fa-stack-overflow",
         },
         {
             "name": "Discord",
             "url": "https://discord.gg/R22yCfgsRn",
-            "icon": "fab fa-discord",
+            "icon": "fa-brands fa-discord",
         },
     ],
-    "show_prev_next": False
+    "show_prev_next": False,
+    "switcher": {
+        "json_url": "https://fairlearn.org/main/_static/versions.json",
+        "version_match": tag_or_branch,
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_persistent": [],
+    "header_links_before_dropdown": 7,
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -146,8 +155,7 @@ html_logo = "_static/images/fairlearn_full_color.svg"
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
-html_additional_pages = {
-}
+html_additional_pages = {}
 
 # If false, no index is generated.
 html_use_index = False
@@ -155,32 +163,38 @@ html_use_index = False
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
-html_css_files = ['css/custom.css']
+html_css_files = ["css/custom.css"]
+
+# Remove source link
+html_show_sourcelink = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # Use filename_pattern so that plot_adult_dataset is not
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
-    'examples_dirs': '../examples',
-    'gallery_dirs': 'auto_examples',
+    "reference_url": {"fairlearn": None},
+    "examples_dirs": "../examples",
+    "gallery_dirs": "auto_examples",
     # pypandoc enables rst to md conversion in downloadable notebooks
-    'pypandoc': True,
+    "pypandoc": True,
 }
 
 html_sidebars = {
-    "**": ["version-sidebar.html", "search-field.html", "sidebar-nav-bs.html"],
+    "**": ["search-field", "sidebar-nav-bs.html"],
 }
 
 # Auto-Doc Options
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_member_order = 'groupwise'
+autodoc_default_options = {
+    "member-order": "groupwise"
+}
 
 
 # Linking Code
@@ -224,9 +238,20 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
-    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="main")
-    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
-    return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
+    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
+        os.sep, "/"
+    )
+    if tag_or_branch == "main":
+        return (
+            "http://github.com/fairlearn/fairlearn/blob"
+            f"/{tag_or_branch}/fairlearn/{fn}{linespec}"
+        )
+
+    else:
+        return (
+            "http://github.com/fairlearn/fairlearn/blob/"
+            f"v{tag_or_branch}/fairlearn/{fn}{linespec}"
+        )
 
 
 # -- LaTeX macros ------------------------------------------------------------
@@ -234,9 +259,30 @@ def linkcode_resolve(domain, info):
 mathjax3_config = {
     "tex": {
         "macros": {
-            "E": '{\\mathbb{E}}',
-            "P": '{\\mathbb{P}}',
-            "given": '\\mathbin{\\vert}'
+            "E": "{\\mathbb{E}}",
+            "P": "{\\mathbb{P}}",
+            "given": "\\mathbin{\\vert}",
         }
     }
 }
+
+
+def check_if_v07():
+    """Check to see if current version being built is > v0.7."""
+    result = False
+
+    if parse(fairlearn.__version__) > parse("0.7"):
+        print("Detected version > 0.7 in fairlearn.__version__")
+        result = True
+
+    return result
+
+
+# Setup for sphinx-bibtex
+
+# Only use sphinx-bibtex if version is above 0.7
+if check_if_v07():
+    extensions += [
+        "sphinxcontrib.bibtex",
+    ]
+    bibtex_bibfiles = ["refs.bib"]

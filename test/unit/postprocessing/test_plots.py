@@ -1,14 +1,16 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import pkg_resources
+from importlib.metadata import PackageNotFoundError
 import pytest
+
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 
-from .conftest import scores_ex, ExamplePredictor, _data_ex1, _data_ex2, _data_ex3
+from .conftest import ExamplePredictor, _data_ex1, _data_ex2, _data_ex3, scores_ex
 
-
-PYTEST_MPL_NOT_INSTALLED_MSG = "skipping plotting tests because pytest-mpl is not installed"
+PYTEST_MPL_NOT_INSTALLED_MSG = (
+    "skipping plotting tests because pytest-mpl is not installed"
+)
 
 """Right now the baseline plot comparison doesn't succeed consistently on every
 platform and is therefore disabled. To generate the baseline plots run the
@@ -24,11 +26,16 @@ generated images with the baseline plots (using pytest --mpl)."""
 def _fit_and_plot(constraints, plotting_data):
     import matplotlib.pyplot as plt
 
-    adjusted_predictor = ThresholdOptimizer(estimator=ExamplePredictor(scores_ex),
-                                            constraints=constraints,
-                                            predict_method='predict')
-    adjusted_predictor.fit(plotting_data.X, plotting_data.y,
-                           sensitive_features=plotting_data.sensitive_features)
+    adjusted_predictor = ThresholdOptimizer(
+        estimator=ExamplePredictor(scores_ex),
+        constraints=constraints,
+        predict_method="predict",
+    )
+    adjusted_predictor.fit(
+        plotting_data.X,
+        plotting_data.y,
+        sensitive_features=plotting_data.sensitive_features,
+    )
     fig, (ax) = plt.subplots(1, 1)
     plot_threshold_optimizer(adjusted_predictor, ax=ax, show_plot=False)
     return fig
@@ -36,10 +43,11 @@ def _fit_and_plot(constraints, plotting_data):
 
 def is_mpl_installed():
     try:
-        pkg_resources.get_distribution("pytest-mpl")
-        pkg_resources.get_distribution("matplotlib")
+        import pytest_mpl  # noqa: F401
+        import matplotlib.pyplot as plt  # noqa: F401
+
         return True
-    except pkg_resources.DistributionNotFound:
+    except PackageNotFoundError:
         return False
 
 
@@ -47,24 +55,24 @@ def is_mpl_installed():
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex1.png")
     def test_plot_equalized_odds_ex1(self):
-        return _fit_and_plot('equalized_odds', _data_ex1)
+        return _fit_and_plot("equalized_odds", _data_ex1)
 
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex2.png")
     def test_plot_equalized_odds_ex2(self):
-        return _fit_and_plot('equalized_odds', _data_ex2)
+        return _fit_and_plot("equalized_odds", _data_ex2)
 
     @pytest.mark.mpl_image_compare(filename="equalized_odds_ex3.png")
     def test_plot_equalized_odds_ex3(self):
-        return _fit_and_plot('equalized_odds', _data_ex3)
+        return _fit_and_plot("equalized_odds", _data_ex3)
 
     @pytest.mark.mpl_image_compare(filename="demographic_parity_ex1.png")
     def test_plot_demographic_parity_ex1(self):
-        return _fit_and_plot('demographic_parity', _data_ex1)
+        return _fit_and_plot("demographic_parity", _data_ex1)
 
     @pytest.mark.mpl_image_compare(filename="demographic_parity_ex2.png")
     def test_plot_demographic_parity_ex2(self):
-        return _fit_and_plot('demographic_parity', _data_ex2)
+        return _fit_and_plot("demographic_parity", _data_ex2)
 
     @pytest.mark.mpl_image_compare(filename="demographic_parity_ex3.png")
     def test_plot_demographic_parity_ex3(self):
-        return _fit_and_plot('demographic_parity', _data_ex3)
+        return _fit_and_plot("demographic_parity", _data_ex3)

@@ -1,43 +1,28 @@
-# This file is a citation metadata file in the Citation File Format
-# (http://citation-file-format.github.io/).
-
-cff-version: 1.0.3
-message: "If you use Fairlearn in your work, please cite it using the following metadata"
-title: Fairlearn
-references:
-  - type: article
-    authors:
-     - affiliation: "Microsoft Corporation"
-       family-names: Bird
-       given-names: Sarah
-     - affiliation: "Microsoft Research"
-       family-names: Dudik
-       given-names: Miro
-     - affiliation: "Microsoft Corporation"
-       family-names: Edgar
-       given-names: Richard
-     - affiliation: "Microsoft Corporation"
-       family-names: Horn
-       given-names: Brandon
-     - affiliation: "Microsoft Corporation"
-       family-names: Lutz
-       given-names: Roman
-     - affiliation: "Microsoft Corporation"
-       family-names: Milan
-       given-names: Vanessa
-     - affiliation: "Microsoft Corporation"
-       family-names: Sameki
-       given-names: Mehrnoosh
-     - affiliation: "Microsoft Research"
-       family-names: Wallach
-       given-names: Hanna
-     - affiliation: "Microsoft Corporation"
-       family-names: Walker
-       given-names: Kathleen
-    institution: Microsoft
-    month: 5
-    year: 2020
-    repository-code: "https://github.com/fairlearn/fairlearn"
-    title: Fairlearn: A toolkit for assessing and improving fairness in AI
-    url: https://www.microsoft.com/en-us/research/publication/fairlearn-a-toolkit-for-assessing-and-improving-fairness-in-ai/
-    number: MSR-TR-2020-32
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - given-names: "Fairlearn contributors"
+title: "Fairlearn"
+url: "https://fairlearn.org/"
+preferred-citation:
+  type: article
+  authors:
+    - given-names: "Hilde"
+      family-names: "Weerts"
+    - given-names: "Miroslav"
+      family-names: "Dudík"
+    - given-names: "Richard"
+      family-names: "Edgar"
+    - given-names: "Adrin"
+      family-names: "Jalali"
+    - given-names: "Roman"
+      family-names: "Lutz"
+    - given-names: "Michael"
+      family-names: "Madaio"
+  title: "Fairlearn: Assessing and Improving Fairness of AI Systems"
+  year: 2023
+  journal: "Journal of Machine Learning Research"
+  url: "http://jmlr.org/papers/v24/23-0389.html"
+  volume: 24
+  number: 257
+  pages: "1--8"

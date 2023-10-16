@@ -3,9 +3,10 @@ channels:
 - defaults
 - conda-forge
 dependencies:
-- python==3.8
+- python>=3.10
 - pip>=19.1.1
 - pytest
-- tensorflow>=2.4
+- pytest-cov
+- tensorflow
 - pip:
-   - scikeras
+   - scikeras[tensorflow-cpu]

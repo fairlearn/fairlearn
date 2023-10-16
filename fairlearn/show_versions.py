@@ -8,20 +8,21 @@ Adapted from :py:func:`pandas.show_versions` and :py:func:`sklearn.show_versions
 
 import platform
 import sys
-import importlib
 
 
 def _get_sys_info():
     """System information.
 
-    :returns: system and Python version information
-    :rtype: dict
+    Returns
+    -------
+    sys_info : dict
+        system and Python version information
     """
-    python = sys.version.replace('\n', ' ')
+    python = sys.version.replace("\n", " ")
 
     blob = [
         ("python", python),
-        ('executable', sys.executable),
+        ("executable", sys.executable),
         ("machine", platform.platform()),
     ]
 
@@ -31,37 +32,41 @@ def _get_sys_info():
 def _get_deps_info():
     """Overview of the installed version of main dependencies.
 
-    :return: version information on relevant Python libraries
-    :rtype: dict
+    This function does not import the modules to collect the version numbers
+    but instead relies on standard Python package metadata.
+
+    Returns
+    -------
+    deps_info: dict
+        version information on relevant Python libraries
     """
-    deps = sorted([
-        "pip",
-        "setuptools",
-        "sklearn",
-        "numpy",
-        "scipy",
-        "Cython",
-        "pandas",
-        "matplotlib",
-        "tempeh"
-        ])
+    deps = sorted(
+        [
+            "pip",
+            "setuptools",
+            "numpy",
+            "scipy",
+            "Cython",
+            "pandas",
+            "matplotlib",
+            "sklearn",
+            "lightgbm",
+            "pytorch",
+            "tensorflow",
+        ]
+    )
 
-    def get_version(module):
-        return module.__version__
+    from fairlearn import __version__
 
-    deps_info = {}
+    deps_info = {"fairlearn": __version__}
+
+    from importlib.metadata import PackageNotFoundError, version
 
     for modname in deps:
         try:
-            if modname in sys.modules:
-                mod = sys.modules[modname]
-            else:
-                mod = importlib.import_module(modname)
-            ver = get_version(mod)
-            deps_info[modname] = ver
-        except ImportError:
+            deps_info[modname] = version(modname)
+        except PackageNotFoundError:
             deps_info[modname] = None
-
     return deps_info
 
 
@@ -70,10 +75,10 @@ def show_versions():
     sys_info = _get_sys_info()
     deps_info = _get_deps_info()
 
-    print('\nSystem:')
+    print("\nSystem:")
     for k, stat in sys_info.items():
         print("{k:>10}: {stat}".format(k=k, stat=stat))
 
-    print('\nPython dependencies:')
+    print("\nPython dependencies:")
     for k, stat in deps_info.items():
-        print("{k:>10}: {stat}".format(k=k, stat=stat))
+        print("{k:>13}: {stat}".format(k=k, stat=stat))

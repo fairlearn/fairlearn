@@ -1,17 +1,23 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from .moment import ClassificationMoment
-from .moment import _GROUP_ID, _LABEL, _PREDICTION, _ALL, _EVENT, _SIGN
 from fairlearn.utils._input_validation import (
     _MESSAGE_RATIO_NOT_IN_RANGE,
-    _validate_and_reformat_input
+    _validate_and_reformat_input,
 )
-from .error_rate import ErrorRate
 
+from .error_rate import ErrorRate
+from .moment import (
+    _ALL,
+    _EVENT,
+    _GROUP_ID,
+    _LABEL,
+    _SIGN,
+    ClassificationMoment,
+)
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
@@ -65,6 +71,8 @@ class UtilityParity(ClassificationMoment):
     - The characters `+` and `-`, corresponding to the Lagrange multipliers
       for positive and negative violations of the constraint
 
+    Read more in the :ref:`User Guide <constraints_binary_classification>`.
+
     Parameters
     ----------
     difference_bound : float
@@ -87,7 +95,9 @@ class UtilityParity(ClassificationMoment):
         Default 0.0
     """
 
-    def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
+    def __init__(
+        self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0
+    ):
         """Initialize with the ratio value."""
         super(UtilityParity, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
@@ -109,20 +119,21 @@ class UtilityParity(ClassificationMoment):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
 
-    def load_data(self,
-                  X,
-                  y: pd.Series,
-                  *,
-                  sensitive_features: pd.Series,
-                  event: pd.Series = None,
-                  utilities=None):
+    def load_data(
+        self,
+        X,
+        y: pd.Series,
+        *,
+        sensitive_features: pd.Series,
+        event: pd.Series = None,
+        utilities=None,
+    ):
         """Load the specified data into this object.
 
         This adds a column `event` to the `tags` field.
 
-        The `utilities` is a 2-d array which corresponds to g(X,A,Y,h(X)) as
-        mentioned in the paper
-        `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>` [2]_.
+        The `utilities` is a 2-d array which corresponds to g(X,A,Y,h(X))
+        from :footcite:t:`agarwal2018reductions`.
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
@@ -130,27 +141,58 @@ class UtilityParity(ClassificationMoment):
         .. math::
             utilities = [g(X,A,Y,h(X)=0), g(X,A,Y,h(X)=1)]
 
-        References
-        ----------
-        .. [2] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-           H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-           16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
-
         """
         super().load_data(X, y, sensitive_features=sensitive_features)
         self.tags[_EVENT] = event
         if utilities is None:
-            utilities = np.vstack([np.zeros(y.shape, dtype=np.float64),
-                                   np.ones(y.shape, dtype=np.float64)]).T
+            utilities = np.vstack(
+                [
+                    np.zeros(y.shape, dtype=np.float64),
+                    np.ones(y.shape, dtype=np.float64),
+                ]
+            ).T
         self.utilities = utilities
+        self.utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
-        self.prob_group_event = self.tags.groupby(
-            [_EVENT, _GROUP_ID]).size() / self.total_samples
-        signed = pd.concat([self.prob_group_event, self.prob_group_event],
-                           keys=["+", "-"],
-                           names=[_SIGN, _EVENT, _GROUP_ID])
+        self.prob_group_event = (
+            self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
+        )
+        signed = pd.concat(
+            [self.prob_group_event, self.prob_group_event],
+            keys=["+", "-"],
+            names=[_SIGN, _EVENT, _GROUP_ID],
+        )
         self.index = signed.index
         self.default_objective_lambda_vec = None
+
+        # Fill information about the matrix U, which is used to calculate signed weights
+        # and gamma vector. The matrix has a row corresponding to each example and column
+        # corresponding to each component of lambda, the signed weights and gamma are
+        # calculated as:
+        #
+        # signed_weights = utility_diff * U.dot(lambda_vec)
+        # gamma = -U.T.dot(utilities[y_pred]) / total_samples
+        #
+        # If the i-th example's event and group are "e" and "g" then the entries in the
+        # i-th row of the matrix, indexed by tuples (sign, event, group), are defined as:
+        #
+        # U_i,(+,e',g') =      1[e=e']/P(e) - rho*1[e=e',g=g']/P(g,e)
+        # U_i,(-,e',g') = -rho*1[e=e']/P(e) +     1[e=e',g=g']/P(g,e)
+        #
+        # This corresponds to the expression given right above Theorem 1 of the paper
+        # "A Reductions Approach to Fair Classification" by Agarwal et al. (2018).
+
+        self.U = pd.DataFrame(0, index=self.tags.index, columns=self.index)
+        for e, g in self.prob_group_event.index:
+            event_select = 1 * (self.tags[_EVENT] == e)
+            group_event_select = event_select * (self.tags[_GROUP_ID] == g)
+            self.U["+", e, g] = (
+                event_select / self.prob_event[e]
+                + (-self.ratio) * group_event_select / self.prob_group_event[e, g]
+            )
+            self.U["-", e, g] = (-self.ratio) * event_select / self.prob_event[
+                e
+            ] + group_event_select / self.prob_group_event[e, g]
 
         # fill in the information about the basis
         event_vals = self.tags[_EVENT].dropna().unique()
@@ -161,41 +203,28 @@ class UtilityParity(ClassificationMoment):
         # speed up GridSearch.
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
-        self.neg_basis_present = pd.Series(dtype='float64')
+        self.neg_basis_present = pd.Series(dtype="float64")
         zero_vec = pd.Series(0.0, self.index)
         i = 0
-        for event_val in event_vals:
+        for e in event_vals:
             # Constraints on the final group are redundant, so they are not included in the basis.
-            for group in group_vals[:-1]:
+            for g in group_vals[:-1]:
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
-                self.pos_basis[i]["+", event_val, group] = 1
-                self.neg_basis[i]["-", event_val, group] = 1
+                self.pos_basis[i]["+", e, g] = 1
+                self.neg_basis[i]["-", e, g] = 1
                 self.neg_basis_present.at[i] = True
                 i += 1
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
-        utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         predictions = predictor(self.X)
         if isinstance(predictions, np.ndarray):
             # TensorFlow seems to return an (n,1) array instead of an (n) array
             predictions = np.squeeze(predictions)
-        pred = utility_diff.T * predictions + self.utilities[:, 0]
-        self.tags[_PREDICTION] = pred
-        expect_event = self.tags.groupby(_EVENT).mean()
-        expect_group_event = self.tags.groupby(
-            [_EVENT, _GROUP_ID]).mean()
-        expect_group_event[_UPPER_BOUND_DIFF] = self.ratio * expect_group_event[_PREDICTION] - \
-            expect_event[_PREDICTION]
-        expect_group_event[_LOWER_BOUND_DIFF] = - expect_group_event[_PREDICTION] \
-            + self.ratio * expect_event[_PREDICTION]
-        g_signed = pd.concat([expect_group_event[_UPPER_BOUND_DIFF],
-                              expect_group_event[_LOWER_BOUND_DIFF]],
-                             keys=["+", "-"],
-                             names=[_SIGN, _EVENT, _GROUP_ID])
-        self._gamma_descr = str(expect_group_event[[_PREDICTION, _UPPER_BOUND_DIFF,
-                                                    _LOWER_BOUND_DIFF]])
+        pred = self.utility_diff.T * predictions + self.utilities[:, 0]
+        g_signed = -self.U.T.dot(pred) / self.total_samples
+        self._gamma_descr = str(g_signed)
         return g_signed
 
     def bound(self):
@@ -221,9 +250,11 @@ class UtilityParity(ClassificationMoment):
             lambda_neg = -lambda_pos
             lambda_pos[lambda_pos < 0.0] = 0.0
             lambda_neg[lambda_neg < 0.0] = 0.0
-            lambda_projected = pd.concat([lambda_pos, lambda_neg],
-                                         keys=["+", "-"],
-                                         names=[_SIGN, _EVENT, _GROUP_ID])
+            lambda_projected = pd.concat(
+                [lambda_pos, lambda_neg],
+                keys=["+", "-"],
+                names=[_SIGN, _EVENT, _GROUP_ID],
+            )
             return lambda_projected
         return lambda_vec
 
@@ -231,34 +262,18 @@ class UtilityParity(ClassificationMoment):
         """Compute the signed weights.
 
         Uses the equations for :math:`C_i^0` and :math:`C_i^1` as defined
-        in Section 3.2 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_
+        in Section 3.2 of :footcite:t:`agarwal2018reductions`
         in the 'best response of the Q-player' subsection to compute the
         signed weights to be applied to the data by the next call to the underlying
-        estimator [3]_.
+        estimator.
 
         Parameters
         ----------
         lambda_vec : :class:`pandas:pandas.Series`
             The vector of Lagrange multipliers indexed by `index`
 
-        References
-        ----------
-        .. [3] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-           H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-           16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
-
         """
-        lambda_event = (lambda_vec["+"] - self.ratio * lambda_vec["-"]) \
-            .groupby(level=_EVENT).sum() / self.prob_event
-        lambda_group_event = (self.ratio * lambda_vec["+"] - lambda_vec["-"]) / \
-            self.prob_group_event
-        adjust = lambda_event - lambda_group_event
-        signed_weights = self.tags.apply(
-            lambda row: 0 if pd.isna(row[_EVENT]) else adjust[row[_EVENT], row[_GROUP_ID]], axis=1
-        )
-        utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
-        signed_weights = utility_diff.T * signed_weights
-        return signed_weights
+        return self.utility_diff * self.U.dot(lambda_vec)
 
 
 # Ensure that UtilityParity shows up in correct place in documentation
@@ -279,10 +294,10 @@ class DemographicParity(UtilityParity):
     :class:`pandas:pandas.Series`
     will only have a single entry, which will be equal to 1.
     Similarly, the `index` property will have twice as many entries
-    (corresponding to the Lagrange multipliers for positive and negative constraints)
-    as there are unique values for the sensitive feature.
-    The :meth:`signed_weights` method will compute the costs according
-    to Example 3 of `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [4]_.
+    (corresponding to the Lagrange multipliers for positive and negative
+    constraints) as there are unique values for the sensitive feature.
+    The :meth:`UtilityParity.signed_weights` method will compute the costs
+    according to Example 3 of :footcite:t:`agarwal2018reductions`.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the Demographic Parity constraint applied within
@@ -292,11 +307,7 @@ class DemographicParity(UtilityParity):
     .. math::
       P[h(X) = 1 | A = a, C = c] = P[h(X) = 1 | C = c] \; \forall a, c
 
-    References
-    ----------
-    .. [4] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+    Read more in the :ref:`User Guide <demographic_parity>`.
 
     """
 
@@ -304,11 +315,13 @@ class DemographicParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         base_event = pd.Series(data=_ALL, index=y_train.index)
         event = _merge_event_and_control_columns(base_event, cf_train)
@@ -341,20 +354,16 @@ class TruePositiveRateParity(UtilityParity):
     by two (for the Lagrange multipliers for positive and negative
     constraints).
 
-    With these definitions, the :meth:`signed_weights` method will calculate
-    the costs for `Y=1` as they are calculated in Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`, but will use
-    the weights equal to zero for `Y=0` [5]_.
+    With these definitions, the :meth:`UtilityParity.signed_weights` method
+    will calculate the costs for `Y=1` as they are calculated in Example 4 of
+    :footcite:t:`agarwal2018reductions`, but will use
+    the weights equal to zero for `Y=0`.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
-    References
-    ----------
-    .. [5] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+    Read more in the :ref:`User Guide <true_positive_rate_parity>`.
 
     """
 
@@ -362,11 +371,13 @@ class TruePositiveRateParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 1)
@@ -394,20 +405,16 @@ class FalsePositiveRateParity(UtilityParity):
     either NaN or `label=0` (so only one unique non-NaN value), multiplied by
     two (for the Lagrange multipliers for positive and negative constraints).
 
-    With these definitions, the :meth:`signed_weights` method will calculate
+    With these definitions, the :meth:`UtilityParity.signed_weights` method will calculate
     the costs for `Y=0` as they are calculated in Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_,
-    but will use the weights equal to zero for `Y=1` [6]_.
+    :footcite:t:`agarwal2018reductions`,
+    but will use the weights equal to zero for `Y=1`.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
-    References
-    ----------
-    .. [6] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+    Read more in the :ref:`User Guide <false_positive_rate_parity>`.
 
     """
 
@@ -415,11 +422,13 @@ class FalsePositiveRateParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v)).where(y_train == 0)
@@ -447,19 +456,15 @@ class EqualizedOdds(UtilityParity):
     the number of unique values of the `Y` array, multiplied by two (for
     the Lagrange multipliers for positive and negative constraints).
 
-    With these definitions, the :meth:`signed_weights` method
+    With these definitions, the :meth:`UtilityParity.signed_weights` method
     will calculate the costs according to Example 4 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [7]_.
+    :footcite:t:`agarwal2018reductions`.
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
-    References
-    ----------
-    .. [7] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+    Read more in the :ref:`User Guide <equalized_odds>`.
 
     """
 
@@ -467,11 +472,13 @@ class EqualizedOdds(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
 
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
         event = _merge_event_and_control_columns(base_event, cf_train)
@@ -494,19 +501,15 @@ class ErrorRateParity(UtilityParity):
     The `index` property will have twice as many entries (corresponding to the Lagrange multipliers
     for positive and negative constraints) as there are unique values for the sensitive feature.
 
-    The :meth:`signed_weights` method will compute the costs according to Example 3 of
-    `Agarwal et al. (2018) <https://arxiv.org/abs/1803.02453>`_ [8]_.
+    The :meth:`UtilityParity.signed_weights` method will compute the costs according to Example 3
+    of :footcite:t:`agarwal2018reductions`.
     However, in this scenario, g = abs(h(x)-y), rather than g = h(x)
 
     This :class:`~Moment` also supports control features, which can be used to
     stratify the data, with the constraint applied within
     each stratum, but not between strata.
 
-    References
-    ----------
-    .. [8] A. Agarwal, A. Beygelzimer, M. Dudík, J. Langford, and
-       H. Wallach, "A Reductions Approach to Fair Classification," arXiv.org,
-       16-Jul-2018. [Online]. Available: https://arxiv.org/abs/1803.02453.
+    Read more in the :ref:`User Guide <error_rate_parity>`.
 
     """
 
@@ -514,16 +517,16 @@ class ErrorRateParity(UtilityParity):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None):
         """Load the specified data into the object."""
-        _, y_train, sf_train, cf_train = \
-            _validate_and_reformat_input(X, y,
-                                         enforce_binary_labels=True,
-                                         sensitive_features=sensitive_features,
-                                         control_features=control_features)
-        utilities = np.vstack([y_train, 1-y_train]).T
+        _, y_train, sf_train, cf_train = _validate_and_reformat_input(
+            X,
+            y,
+            enforce_binary_labels=True,
+            sensitive_features=sensitive_features,
+            control_features=control_features,
+        )
+        utilities = np.vstack([y_train, 1 - y_train]).T
         base_event = pd.Series(data=_ALL, index=y_train.index)
         event = _merge_event_and_control_columns(base_event, cf_train)
         super().load_data(
-            X, y_train,
-            event=event,
-            utilities=utilities,
-            sensitive_features=sf_train)
+            X, y_train, event=event, utilities=utilities, sensitive_features=sf_train
+        )

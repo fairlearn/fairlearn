@@ -1,4 +1,4 @@
-|Build Status| |MIT license| |PyPI| |Discord| |StackOverflow|
+|MIT license| |PyPI| |Discord| |StackOverflow|
 
 Fairlearn
 =========
@@ -86,13 +86,13 @@ Fairlearn metrics
 ~~~~~~~~~~~~~~~~~
 
 Check out our in-depth `guide on the Fairlearn
-metrics <https://fairlearn.org/main/user_guide/assessment.html>`__.
+metrics <https://fairlearn.org/main/user_guide/assessment>`__.
 
 Fairlearn algorithms
 ~~~~~~~~~~~~~~~~~~~~
 
 For an overview of our algorithms please refer to our
-`website <https://fairlearn.org/main/user_guide/mitigation.html>`__.
+`website <https://fairlearn.org/main/user_guide/mitigation/index.html>`__.
 
 Install Fairlearn
 -----------------
@@ -103,7 +103,7 @@ guide <https://fairlearn.org/main/quickstart.html>`__.
 Usage
 -----
 
-For common usage refer to the `Jupyter notebooks <./notebooks>`__ and
+For common usage refer to the `Jupyter notebooks <https://fairlearn.org/main/auto_examples/index.html>`__ and
 our `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
 Please note that our APIs are subject to change, so notebooks downloaded
 from ``main`` may not be compatible with Fairlearn installed with
@@ -150,8 +150,6 @@ Reporting security issues
 To report security issues please send an email to
 ``fairlearn-internal@python.org``.
 
-.. |Build Status| image:: https://dev.azure.com/responsibleai/fairlearn/_apis/build/status/Nightly?branchName=main
-   :target: https://dev.azure.com/responsibleai/fairlearn/_build/latest?definitionId=23&branchName=main
 .. |MIT license| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://github.com/fairlearn/fairlearn/blob/main/LICENSE
 .. |PyPI| image:: https://img.shields.io/pypi/v/fairlearn?color=blue

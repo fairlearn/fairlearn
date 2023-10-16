@@ -5,12 +5,11 @@ Contributing documentation
 
 Documentation is formatted in restructured text (ReST) and the website is
 built using `Sphinx <https://www.sphinx-doc.org/en/master/>`_ and some of its
-extensions. Specifically, the website is available for all our releases to
-allow users to check the documentation of the version of the package that they
-are using.
+extensions.
+Specifically, the website is available for all our releases to allow users to
+check the documentation of the version of the package that they are using.
 
-To contribute, make sure to install sphinx and its
-add-ons by running 
+To contribute, make sure to install sphinx and its add-ons by running
 
 .. code-block::
 
@@ -18,6 +17,14 @@ add-ons by running
 
 in the repository root directory.
 You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
+
+Since plotting is an optional addition to Fairlearn, you may also need to
+install matplotlib
+
+.. code-block::
+
+    pip install matplotlib>=3.2.1
+
 You can contribute updates to existing documentation by navigating to the
 relevant part of the repository (typically in the `docs` directory), and
 editing the restructured text files (`.rst`) corresponding to your updates.
@@ -32,7 +39,7 @@ directory:
 or use the shortcut
 
 .. code-block::
-    
+
         make doc
 
 This will generate the website in the directory mentioned at the end of the
@@ -40,7 +47,7 @@ command. Rerunning this after making changes to individual files only
 rebuilds the changed pages, so the build time should be a lot shorter.
 
 You can check that the document(s) render properly by inspecting the HTML with
-the following commands: 
+the following commands:
 
 .. code-block::
 
@@ -61,7 +68,7 @@ For Linux users, use :code: `xdg-open docs/_build/html/index.html`
 :code:`plot_*` can be replaced with any of the notebooks in the
 :code:`auto_examples` folder. To view your changes, simply navigate to the
 relevant part of the website and check that your updates render properly
-and links work as expected. 
+and links work as expected.
 
 Note that some changes to documentation may involve modifying several files
 (i.e: index files, other documents in which the current one should be linked).
@@ -74,24 +81,23 @@ ensure that they all render properly.
     pull request) and need help, simply @mention
     :code:`@fairlearn/fairlearn-maintainers` to get help.
 
-Building the website for all versions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Citations
+^^^^^^^^^
 
-Our documentation build runs for each pull request and upon merging pull
-requests. There should not be a need to run this locally except for very rare
-cases.
+Citations are built using the `sphinxcontrib-bibtex <https://pypi.org/project/sphinxcontrib-bibtex/>`_ 
+extension. This allows us to use the `refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ BibTeX file to generate our citations.
 
-To fully build the website for all versions use the following script:
+To add a citation:
 
-.. code-block::
+1. Check if your required BibTex entry already exists in the 
+   `docs/refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ file. If not, simply paste your entry at the end.
+2. Change your bibtex id to the format ``<author-last-name><4digit-year><keyword>``.
+3. Use the :code:`:footcite:`bibtex-id`` role to create an inline citation rendered as :code:`[CitationNumber]`.
+   For example, :code:`:footcite:`agarwal2018reductions`` will be rendered as :footcite:`agarwal2018reductions`.
+4. You can also use :code:`:footcite:t:`bibtex-id`` to create a textual citation. The role :code:`:footcite:t:`agarwal2018reductions`` will be rendered as :footcite:t:`agarwal2018reductions`.
+5. To add the bibliography use :code:`.. footbibliography::` directive at the bottom of your file if not already present.
+   This will list all the citations for the current document.
 
-    python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
+   For example :code:`.. footbibliography::` will be rendered as shown below:
 
-or the shortcut
-
-.. code-block::
-
-    make doc-multiversion
-
-The comprehensive set of commands to build the website is in our CircleCI
-configuration file in the `.circleci` directory of the repository.
+   .. footbibliography::

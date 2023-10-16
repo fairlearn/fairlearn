@@ -7,34 +7,28 @@ import pytest
 
 import fairlearn.metrics as metrics
 
-
-raw_feature = ['a', 'b', 'c', 'a']
-expected_classes = ['a', 'b', 'c']
+raw_feature = ["a", "b", "c", "a"]
+expected_classes = ["a", "b", "c"]
 
 
 def common_validations(sf):
-    assert np.array_equal(expected_classes, sf.classes)
-
-    mask = sf.get_mask_for_class('a')
-    assert np.array_equal(mask,  [True, False, False, True])
-    mask_b = sf.get_mask_for_class('b')
-    assert np.array_equal(mask_b, [False, True, False, False])
-    mask_c = sf.get_mask_for_class('c')
-    assert np.array_equal(mask_c, [False, False, True, False])
+    assert np.array_equal(expected_classes, sf.classes_)
 
 
 def test_list():
     target = metrics._group_feature.GroupFeature("Sens", raw_feature, 0, None)
 
-    assert target.name == "Sens0"
+    assert target.name_ == "Sens0"
     common_validations(target)
 
 
 def test_named_list():
     expected_name = "My Named List"
-    target = metrics._group_feature.GroupFeature("Ignored", raw_feature, 2, expected_name)
+    target = metrics._group_feature.GroupFeature(
+        "Ignored", raw_feature, 2, expected_name
+    )
 
-    assert target.name == expected_name
+    assert target.name_ == expected_name
     common_validations(target)
 
 
@@ -43,7 +37,7 @@ def test_ndarray():
 
     target = metrics._group_feature.GroupFeature("SF", rf, 1, None)
 
-    assert target.name == "SF1"
+    assert target.name_ == "SF1"
     common_validations(target)
 
 
@@ -52,7 +46,7 @@ def test_unnamed_Series():
 
     target = metrics._group_feature.GroupFeature("SF", rf, 2, None)
 
-    assert target.name == "SF2"
+    assert target.name_ == "SF2"
     common_validations(target)
 
 
@@ -62,7 +56,7 @@ def test_named_Series():
 
     target = metrics._group_feature.GroupFeature("Ignored", rf, 2, None)
 
-    assert target.name == name
+    assert target.name_ == name
     common_validations(target)
 
 
@@ -73,7 +67,7 @@ def test_named_Series_override_name():
     rf = pd.Series(data=raw_feature, name=series_name)
     target = metrics._group_feature.GroupFeature("Not seen", rf, 2, expected_name)
 
-    assert target.name == expected_name
+    assert target.name_ == expected_name
     common_validations(target)
 
 
