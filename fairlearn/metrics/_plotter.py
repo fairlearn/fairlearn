@@ -212,7 +212,7 @@ def plot_metric_frame(
     if metrics is None:
         metrics = []
         for metric in list(df):
-            if not _is_arraylike(df[metric][0]):
+            if not _is_arraylike(df[metric].iloc[0]):
                 metrics.append(metric)
 
     check_consistent_length(metrics, conf_intervals)

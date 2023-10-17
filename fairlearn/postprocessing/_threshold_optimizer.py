@@ -178,21 +178,21 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         values.
 
             'auto'
-                use one of :code:`predict_proba`, :code:`decision_function`, or 
+                use one of :code:`predict_proba`, :code:`decision_function`, or
                 :code:`predict`, in that order.
-            
+
             'predict_proba'
-                use the second column from the output of :code:`predict_proba`. 
-                It is assumed that the second column represents the positive 
+                use the second column from the output of :code:`predict_proba`.
+                It is assumed that the second column represents the positive
                 outcome.
-            
+
             'decision_function'
                 use the raw values given by the :code:`decision_function`.
-            
+
             'predict'
-                use the hard values reported by the :code:`predict` method if 
-                estimator is a classifier, and the regression values if 
-                estimator is a regressor. This is equivalent to what 
+                use the hard values reported by the :code:`predict` method if
+                estimator is a classifier, and the regression values if
+                estimator is a regressor. This is equivalent to what
                 is done in [1]_.
 
         .. versionadded:: 0.7
@@ -290,12 +290,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         if self.predict_method == "deprecated":
             warn(
-                (
-                    "'predict_method' default value is changed from 'predict' to "
-                    "'auto'. Explicitly pass `predict_method='predict' to "
-                    "replicate the old behavior, or pass `predict_method='auto' "
-                    "or other valid values to silence this warning."
-                ),
+                "'predict_method' default value is changed from 'predict' to "
+                "'auto'. Explicitly pass `predict_method='predict' to "
+                "replicate the old behavior, or pass `predict_method='auto' "
+                "or other valid values to silence this warning.",
                 FutureWarning,
             )
             self._predict_method = "predict"
@@ -538,7 +536,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         n = len(labels)
 
-        if type(labels) == pd.DataFrame:
+        if isinstance(labels, pd.DataFrame):
             n_positive = labels.sum().loc[0]
         else:
             n_positive = sum(labels)
@@ -712,7 +710,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
     dict
         The updated `data_dict` with reformatted data at the `key` slot
     """
-    if type(additional_data) == np.ndarray:
+    if isinstance(additional_data, np.ndarray):
         if len(additional_data.shape) > 2 or (
             len(additional_data.shape) == 2 and additional_data.shape[1] > 1
         ):
@@ -722,14 +720,14 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             )
         else:
             data_dict[key] = additional_data.squeeze()
-    elif type(additional_data) == pd.DataFrame:
+    elif isinstance(additional_data, pd.DataFrame):
         # TODO: extend to multiple columns for additional_data by using column names
         for attribute_column in additional_data.columns:
             data_dict[key] = additional_data[attribute_column].values
-    elif type(additional_data) == pd.Series:
+    elif isinstance(additional_data, pd.Series):
         data_dict[key] = additional_data.values
-    elif type(additional_data) == list:
-        if type(additional_data[0]) == list:
+    elif isinstance(additional_data, list):
+        if isinstance(additional_data[0], list):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
                 raise ValueError(
