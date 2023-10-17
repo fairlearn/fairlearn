@@ -156,7 +156,8 @@ true positive rate parity as the fairness constraint.
     }
     >>> plot_threshold_optimizer(threshold_optimizer)
 
-When calling :code:`predict` :class:`ThresholdOptimizer` uses one of the
+When calling :code:`predict`, :class:`ThresholdOptimizer` uses one of the
+
 thresholds at random based on the probabilities :math:`p_0` and :math:`p_1`.
 The results can be interpreted as follows based on the following formula for
 the probability to predict label 1:
