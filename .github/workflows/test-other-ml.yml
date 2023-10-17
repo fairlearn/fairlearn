@@ -42,7 +42,8 @@ jobs:
           source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
           conda list
-          python -m pytest --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
+          # Override the filterwarnings set in the TOML file
+          python -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
