@@ -34,8 +34,8 @@ jobs:
       - run: pip install matplotlib
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
         if: ${{ inputs.codeCovPython == inputs.python }}
+        uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
