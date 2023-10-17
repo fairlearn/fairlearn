@@ -354,7 +354,7 @@ produces the same outcome.
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import equalized_odds_ratio
+    >>> from fairlearn.metrics import equalized_odds_difference
     >>> print(equalized_odds_difference(y_true,
     ...                                y_pred,
     ...                                sensitive_features=sf_data))
