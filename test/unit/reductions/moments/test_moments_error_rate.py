@@ -4,7 +4,7 @@
 import pytest
 
 from fairlearn.reductions import ErrorRate
-from fairlearn.reductions._moments.error_rate import _MESSAGE_BAD_COSTS
+from fairlearn.utils._common import _MESSAGE_BAD_COSTS
 
 BAD_COSTS_EXAMPLES = [
     {"fp": 0.0, "fn": 0.0},
