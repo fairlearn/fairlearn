@@ -358,7 +358,7 @@ produces the same outcome.
     >>> print(equalized_odds_ratio(y_true,
     ...                                y_pred,
     ...                                sensitive_features=sf_data))
-    0
+    0.0
     >>> my_metrics = {
     ...     'tpr' : recall_score,
     ...     'fpr' : false_positive_rate
