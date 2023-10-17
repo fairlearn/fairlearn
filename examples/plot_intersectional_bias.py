@@ -495,9 +495,12 @@ Intersectionality in Mental Health Care
 # don’t want to do any further assessment after classification, and they are **planning to
 # administer treatments to patients following this automated triage.**
 #
-# But first, they must provide some evidence to stakeholders that this classifier works well in
-# diagnosing patients, so they have a test sample of 1000 patients, on which they must evaluate the
-# model. They argue that their classifier works very well, based on some impressive sensitivity and
+# But first, hospital executives must provide must provide some evidence to stakeholders that this
+# classifier works well in
+# diagnosing patients, so they ask the data science team to collect
+# a test sample of 1000 patients, on which they must evaluate the
+# model. The executives argue that the classifier works very well, based on some impressive
+# sensitivity and
 # specificity values. The stakeholders are not fully convinced (thinking that the executives may be
 # a little too eager to get this model deployed), so they hire us (an independent consulting firm)
 # to evaluate the model.
