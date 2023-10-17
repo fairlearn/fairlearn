@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: "false"
+      codeCovPython:
+        required: true
+        type: string
+        default: "3.11"
 
 jobs:
   all-deps:
@@ -30,6 +34,7 @@ jobs:
       - run: pip install matplotlib
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
+        if: ${{ inputs.codeCovPython == inputs.python }}
         uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
