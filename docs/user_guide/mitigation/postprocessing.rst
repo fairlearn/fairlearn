@@ -375,6 +375,10 @@ implications of such a result.
 Predictions of the resulting :class:`ThresholdOptimizer` model are determined
 randomly based on the probabilities to predict label 1 that the formula
 produces.
+Another important implication is that using randomized thresholds in this way
+results in what philosophers refer to as "leveling down", i.e., decreasing
+performance for the better-off group without making the worse-off group any
+better off in absolute terms.:footcite:`weerts2022does` :footcite:`mittelstadt2023unfairness``
 
 In some cases, one of the thresholds are defined to always be true or false
 (e.g., `>-infty` or `<infty`) resulting in base probabilities for getting a 0
