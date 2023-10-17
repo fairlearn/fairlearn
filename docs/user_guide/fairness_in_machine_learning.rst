@@ -71,6 +71,8 @@ visit multiple harms on a single group of people.
 The Fairlearn package is most applicable to allocation and quality of service harms,
 since these are easiest to measure.
 
+.. _concept_glossary:
+
 Concept glossary
 ----------------------------
 

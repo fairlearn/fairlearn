@@ -1320,6 +1320,8 @@ plt.show()
 # and interventions that can address them. For example, some evidence suggests that forcing
 # clinicians to carry out more consistent and structured assessments can reduce diagnostic bias
 # (though not completely).
+# Put differently, machine learning systems are of a **sociotechnical nature** (see also our
+# :ref:`user guide<concept_glossary>` and :footcite:ct:`selbst2019fairness`).
 #
 # The point is **not** that we shouldn’t be using ML to automate or inform clinical tasks (this
 # will likely happen whether we like it or not). Rather, ML can potentially help us **better
