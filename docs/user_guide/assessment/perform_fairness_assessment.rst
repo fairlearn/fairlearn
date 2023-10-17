@@ -355,7 +355,7 @@ produces the same outcome.
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import equalized_odds_difference
-    >>> print(equalized_odds_difference(y_true,
+    >>> print(equalized_odds_ratio(y_true,
     ...                                y_pred,
     ...                                sensitive_features=sf_data))
     0
