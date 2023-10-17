@@ -188,13 +188,16 @@ the probability to predict label 1:
 .. note::
 
     :class:`ThresholdOptimizer` expects an estimator that provides it with
-    scores. While the output of :class:`ThresholdOptimizer` is binary, the
-    input need not be. In fact, real valued input, e.g. from a regressor,
-    provides it with many more options to create thresholds. For :math:`n`
-    input data points with :math:`m \leq n` different score values it has
-    :math:`m+1` different thresholds. At each threshold one can create one of
-    two thresholding rules, i.e. functions that indicate which data points
-    get label :code:`1` based on their score.
+    scores.
+    While the output of :class:`ThresholdOptimizer` is binary, the
+    input is not limited to scores dervied from binary classifiers.
+    In fact, real valued input, e.g. from a regressor,
+    provides it with many more options to create thresholds.
+    For :math:`n` input data points with :math:`m \leq n` different score
+    values it has :math:`m+1` different thresholds.
+    At each threshold one can create one of two thresholding rules, i.e.,
+    functions that indicate which data points get label :code:`1` based on
+    their score.
 
 The following combinations of fairness criteria and objectives are available:
 
