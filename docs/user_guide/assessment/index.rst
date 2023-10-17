@@ -32,6 +32,7 @@ indicate that a property holds for all identified groups.
    intersecting_groups
    advanced_metricframe
    plotting
+   saving_loading_metricframe
 
 
 .. _dashboard:
