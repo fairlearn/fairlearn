@@ -370,7 +370,7 @@ produces the same outcome.
     ...     sensitive_features=sf_data
     ... )
     >>> min(mf.ratio(method="between_groups"))
-    0
+    0.0
 
 :ref:`common_fairness_metrics` provides an overview of common metrics used 
 in fairness analyses. For a deep dive into how to extend the capabilities of 
