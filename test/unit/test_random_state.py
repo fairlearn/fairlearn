@@ -6,7 +6,6 @@ from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
-import fairlearn.utils._compatibility as compat
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import EqualizedOdds, ExponentiatedGradient
 
@@ -71,7 +70,7 @@ def test_random_state_exponentiated_gradient():
 
 def _get_test_data():
     # fetch data from OpenML
-    data = fetch_openml(data_id=42193, **compat._PARSER_KWARG)
+    data = fetch_openml(data_id=42193, parser="auto")
     X = (
         pd.DataFrame(data["data"], columns=data["feature_names"])
         .drop(columns=["race_Caucasian", "c_charge_degree_F"])

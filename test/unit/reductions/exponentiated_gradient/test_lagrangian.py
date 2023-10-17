@@ -82,7 +82,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     def h(X):
         return fitted_estimator.predict(X)
 
-    best_h_error = lagrangian.obj.gamma(h)[0]
+    best_h_error = lagrangian.obj.gamma(h).iloc[0]
     best_h_gamma = lagrangian.constraints.gamma(h)
 
     # opt_lambda affects only the calculation of L
