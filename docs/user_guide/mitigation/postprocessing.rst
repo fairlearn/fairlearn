@@ -392,8 +392,9 @@ whether :class:`ThresholdOptimizer` should be used.
 
 Due to the separate thresholding rules per sensitive feature value, one might
 argue that this constitutes
-`disparate treatment <https://en.wikipedia.org/wiki/Disparate_treatment>`_ in
-certain contexts where this is legally relevant.
+`disparate treatment <https://en.wikipedia.org/wiki/Disparate_treatment>`_
+under US anti-discrimination law or direct discrimination under
+EU non-discrimination law.
 
 Using a pre-trained estimator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
