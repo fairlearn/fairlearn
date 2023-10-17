@@ -100,7 +100,8 @@ def demographic_parity_ratio(
 
 
 def equalized_odds_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true, y_pred, *, sensitive_features, method="between_groups",
+    sample_weight=None, agg="worst_case"
 ) -> float:
     """Calculate the equalized odds difference.
 
@@ -123,27 +124,40 @@ def equalized_odds_difference(
         Predicted labels :math:`h(X)` returned by the classifier.
 
     sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which equalized odds should be assessed
 
     method : str
-        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
-        for details.
+        How to compute the differences.
+        See :func:`fairlearn.metrics.MetricFrame.difference` for details.
 
     sample_weight : array-like
         The sample weights
+
+    agg : str
+        The aggregation method. One of `"worst_case"` or `"mean"`.
+        If `"worst_case"`, the greater one of the false positive rate
+        difference and true positive rate difference is returned.
+        If `"mean"`, the mean of the differences is returned.
 
     Returns
     -------
     float
         The equalized odds difference
     """
+    if agg not in ["worst_case", "mean"]:
+        return ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return max(eo.difference(method=method))
+    if agg == "worst_case":
+        return max(eo.difference(method=method))
+    else:
+        return eo.difference(method=method).mean()
 
 
 def equalized_odds_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true, y_pred, *, sensitive_features, method="between_groups",
+    sample_weight=None, agg="worst_case"
 ) -> float:
     """Calculate the equalized odds ratio.
 
@@ -166,7 +180,7 @@ def equalized_odds_ratio(
         Predicted labels :math:`h(X)` returned by the classifier.
 
     sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which equalized odds should be assessed
 
     method : str
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
@@ -175,14 +189,26 @@ def equalized_odds_ratio(
     sample_weight : array-like
         The sample weights
 
+    agg : str
+        The aggregation method. One of `"worst_case"` or `"mean"`.
+        If `"worst_case"`, the smaller one of the false positive rate ratio
+        and true positive rate ratio is returned.
+        If `"mean"`, the mean of the ratios is returned.
+
     Returns
     -------
     float
         The equalized odds ratio
     """
+    if agg not in ["worst_case", "mean"]:
+        return ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return min(eo.ratio(method=method))
+    if agg == "worst_case":
+        return min(eo.ratio(method=method))
+    else:
+        return eo.ratio(method=method).mean()
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
