@@ -395,7 +395,7 @@ Due to the separate thresholding rules per sensitive feature value, one might
 argue that this constitutes
 `disparate treatment <https://en.wikipedia.org/wiki/Disparate_treatment>`_
 under US anti-discrimination law or direct discrimination under
-EU non-discrimination law.
+EU non-discrimination law in contexts covered by these laws.
 
 Using a pre-trained estimator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
