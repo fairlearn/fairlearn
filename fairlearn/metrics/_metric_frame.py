@@ -2,8 +2,6 @@
 # Licensed under the MIT License.
 
 import logging
-import warnings
-from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
@@ -40,65 +38,6 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
 
 _COMPARE_METHODS = ["between_groups", "to_overall"]
 _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
-
-
-def _deprecate_metric_frame_init(new_metric_frame_init):
-    """Issue deprecation warnings for the `MetricFrame` constructor.
-
-    Decorator to issue warnings if called with positional arguments
-    or with the keyword argument `metric` instead of `metrics`.
-
-    Parameters
-    ----------
-    new_metric_frame_init : callable
-        New MetricFrame constructor.
-    """
-
-    @wraps(new_metric_frame_init)
-    def compatible_metric_frame_init(self, *args, metric=None, **kwargs):
-        positional_names = ["metrics", "y_true", "y_pred"]
-        version = "0.10.0"
-
-        positional_dict = dict(zip(positional_names, args))
-
-        # If more than 3 positional arguments are provided (apart from self), show
-        # the error message applicable to the new constructor implementation (with `self`
-        # being the only positional argument).
-        if len(args) > 3:
-            raise TypeError(
-                f"{new_metric_frame_init.__name__}() takes 1 positional "
-                f"argument but {1+len(args)} positional arguments "
-                "were given"
-            )
-
-        # If 1-3 positional arguments are provided (apart fom self), issue warning.
-        if len(args) > 0:
-            args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
-            warnings.warn(
-                f"You have provided {args_msg} as positional arguments. "
-                "Please pass them as keyword arguments. From version "
-                f"{version} passing them as positional arguments "
-                "will result in an error.",
-                FutureWarning,
-            )
-
-        # If a keyword argument `metric` is provided, issue warning.
-        metric_arg_dict = {}
-        if metric is not None:
-            metric_arg_dict = {"metrics": metric}
-            warnings.warn(
-                "The positional argument 'metric' has been replaced "
-                "by a keyword argument 'metrics'. "
-                f"From version {version} passing it as a positional argument "
-                "or as a keyword argument 'metric' will result in an error",
-                FutureWarning,
-            )
-
-        # Call the new constructor with positional arguments passed as keyword arguments
-        # and with the `metric` keyword argument renamed to `metrics`.
-        new_metric_frame_init(self, **metric_arg_dict, **positional_dict, **kwargs)
-
-    return compatible_metric_frame_init
 
 
 class MetricFrame:
@@ -189,18 +128,6 @@ class MetricFrame:
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array-like dictionaries.
 
-    metric : callable or dict
-        The underlying metric functions which are to be calculated. This
-        can either be a single metric function or a dictionary of functions.
-        These functions must be callable as
-        ``fn(y_true, y_pred, **sample_params)``.
-        If there are any other arguments required (such as ``beta`` for
-        :func:`sklearn.metrics.fbeta_score`) then
-        :func:`functools.partial` must be used.
-
-        .. deprecated:: 0.7.0
-            `metric` will be removed in version 0.10.0, use `metrics` instead.
-
     Examples
     --------
     We will now go through some simple examples (see the :ref:`User Guide <assessment>` for
@@ -275,10 +202,6 @@ class MetricFrame:
     :ref:`plotting section <plot_metricframe>` of the User Guide.
     """
 
-    # The deprecation decorator does two things:
-    # (1) turns first three positional arguments into keyword arguments
-    # (2) renames the 'metric' keyword argument into 'metrics'
-    @_deprecate_metric_frame_init
     def __init__(
         self,
         *,
