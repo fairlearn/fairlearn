@@ -17,7 +17,7 @@ We are then generally interested in the difference or ratio
 of function evaluations on these groups, and errors always
 accumulate, even when the target values (the difference or ratio
 in this case) are getting smaller.
-:ref:`Intersecting groups <intersecting_groups>` make the
+:ref:`Intersecting groups <assessment_intersecting_groups>` make the
 problem worse, since some intersections can have very low
 sample counts, or even be empty.
 
@@ -83,9 +83,154 @@ Bootstrapping :code:`MetricFrame`
 
 We will now work through a short example of using :class:`MetricFrame`'s
 bootstrapping capabilities.
+We start by setting up a very simple and small dataset, and a couple
+of metrics:
 
-Need to write some more here
+.. doctest:: error_estimation
+    :options:  +NORMALIZE_WHITESPACE
 
+    >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+    >>> y_pred = [0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0]
+    >>> sf_data = ['b', 'b', 'a', 'b', 'b', 'a', 'a', 'a', 'b',
+    ...            'a', 'b', 'a', 'b', 'b', 'a', 'b', 'b', 'b']
+    >>>
+    >>> import pandas as pd
+    >>> pd.set_option('display.max_columns', 20)
+    >>> pd.set_option('display.width', 80)
+    >>> from fairlearn.metrics import MetricFrame
+    >>> from fairlearn.metrics import count, selection_rate
+    >>> # Construct a function dictionary
+    >>> my_metrics = {
+    ...     'sel' : selection_rate,
+    ...     'count' : count
+    ... }
+
+With everything set up, we can now construct a :class:`MetricFrame` with
+bootstrapping enabled.
+There are three relevant arguments for the constructor:
+`n_boot` (which indicates how many bootstrap samples we desire),
+`ci_quantiles` (which specifies where we want our confidence intervals computed)
+and `random_state` (which controls the random bootstrap sampling).
+We create our :class:`MetricFrame` thus:
+
+.. doctest:: error_estimation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> # Construct a MetricFrame with bootstrapping
+    >>> mf = MetricFrame(
+    ...     metrics=my_metrics,
+    ...     y_true=y_true,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=sf_data,
+    ...     n_boot=100,
+    ...     ci_quantiles=[0.159, 0.5, 0.841],
+    ...     random_state=20231019
+    ... )
+
+The quantiles we have chosen (in `ci_quantiles`) correspond to the standard
+deviation and median of the distribution.
+The 'normal' functionality of :class:`MetricFrame` is still available.
+For example:
+
+.. doctest:: error_estimation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.overall
+    sel       0.555556
+    count    18.000000
+    dtype: float64
+    >>> mf.by_group
+                              sel  count
+    sensitive_feature_0
+    a                    0.714286    7.0
+    b                    0.454545   11.0
+
+Let us look at the features bootstrapping makes available.
+First, the :attr:`MetricFrame.ci_quantiles` property records
+the confidence interval quantiles which we requested:
+
+.. doctest:: error_estimation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> mf.ci_quantiles
+    [0.159, 0.5, 0.841]
+
+Now, we can start looking at the quantities we have computed.
+These are obtained by adding :code:`_ci` to the existing
+functionality.
+The result is an array, indexed by :attr:`MetricFrame.ci_quantiles`
+where each element is of the same type as the non-bootstrapped
+function.
+For example, consider :attr:`MetricFrame.overall_ci`:
+
+.. doctest:: error_estimation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> _ = [print(x, '\n--') for x in mf.overall_ci]
+    sel       0.444444
+    count    18.000000
+    dtype: float64
+    --
+    sel       0.555556
+    count    18.000000
+    dtype: float64
+    --
+    sel       0.666667
+    count    18.000000
+    dtype: float64
+    --
+
+We see that, for the overall metrics, the bootstrapped
+:code:`count()` value is unchanged in each case.
+This is as we would expect: each sample is constructed to have
+the same number of entries as the original.
+However, the :code:`selection_rate()` metric has been found
+to have values of 0.444, 0.556 and 0.667 for the quantiles
+specified.
+These values are inline with expectations (although note that
+with small numbers and 'rate' metrics, the median can quickly
+deviate from the nominal value).
+Next, we can examine :attr:`MetricFrame.by_group_ci`:
+
+.. doctest:: error_estimation
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> _ = [print(x, '\n--') for x in mf.by_group_ci]
+                              sel  count
+    sensitive_feature_0
+    a                    0.500000    5.0
+    b                    0.333333    9.0
+    --
+                              sel  count
+    sensitive_feature_0
+    a                    0.700000    6.5
+    b                    0.440972   11.5
+    --
+                              sel  count
+    sensitive_feature_0
+    a                    0.891767    9.0
+    b                    0.583333   13.0
+    --
+
+We now have much more to dig into.
+Firstly, the :code:`count()` metric is showing
+a variation, reflecting the fact that the resampled
+data are certain to have different proportions of labels
+:code:`a` and :code:`b`.
+Also, the sum of the :code:`count` column no longer
+has to be an integer, or equal to the total number of samples.
+For the median the sum is as expected, but the individual counts
+are no longer integers; this is expected, since we requested
+an even number of bootstrap samples.
+When we inspect the :code:`sel` column, we see that the
+estimates of the median, while *close* to the nominal
+values (from :attr:`MetricFrame.by_group` above), are not
+equal to them.
+In all cases, though, the numbers reported are intuitively reasonable.
+
+We provide methods such as :meth:`MetricFrame.group_min_ci`,
+which take the same arguments as their non-bootstrapped
+equivalents, but return results similar to the above.
 
 Summary
 -------
