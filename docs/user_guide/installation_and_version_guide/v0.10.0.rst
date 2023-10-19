@@ -5,3 +5,6 @@ v0.10.0
 
    v0.10.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.10.0.
+
+* Added bootstrapping to :class:`MetricFrame`, along with a new section
+  in the user guide
