@@ -46,6 +46,7 @@ _BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
 _BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
 _BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
 
+
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
 
@@ -79,12 +80,10 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if len(args) > 0:
             args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
             warnings.warn(
-                (
-                    f"You have provided {args_msg} as positional arguments. "
-                    "Please pass them as keyword arguments. From version "
-                    f"{version} passing them as positional arguments "
-                    "will result in an error."
-                ),
+                f"You have provided {args_msg} as positional arguments. "
+                "Please pass them as keyword arguments. From version "
+                f"{version} passing them as positional arguments "
+                "will result in an error.",
                 FutureWarning,
             )
 
@@ -93,12 +92,10 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
             warnings.warn(
-                (
-                    "The positional argument 'metric' has been replaced "
-                    "by a keyword argument 'metrics'. "
-                    f"From version {version} passing it as a positional argument "
-                    "or as a keyword argument 'metric' will result in an error"
-                ),
+                "The positional argument 'metric' has been replaced "
+                "by a keyword argument 'metrics'. "
+                f"From version {version} passing it as a positional argument "
+                "or as a keyword argument 'metric' will result in an error",
                 FutureWarning,
             )
 
