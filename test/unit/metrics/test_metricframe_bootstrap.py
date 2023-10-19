@@ -344,3 +344,75 @@ class TestGroupComparisons:
             for cf in np.unique(g_2):
                 # Check median close to nominal
                 assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=tol)
+
+
+class TestErrors:
+    def test_n_boot_none(self):
+        msg = "Must specify both n_boot and ci_quantiles"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=None,
+                ci_quantiles=[0.1, 0.5, 0.9],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg
+
+    def test_ci_quantiles_none(self):
+        msg = "Must specify both n_boot and ci_quantiles"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=None,
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg
+
+    def test_ci_quantiles_empty(self):
+        msg = "Must specify both n_boot and ci_quantiles"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=[],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg
+
+    def test_n_boot_not_int(self):
+        msg = "Must have n_boot be a positive integer"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=0.1,
+                ci_quantiles=[0.1, 0.5, 0.9],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg
+
+    def test_n_boot_not_positive(self):
+        msg = "Must have n_boot be a positive integer"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=0,
+                ci_quantiles=[0.1, 0.5, 0.9],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg

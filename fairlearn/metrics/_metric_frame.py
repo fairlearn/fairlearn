@@ -42,6 +42,8 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
 _COMPARE_METHODS = ["between_groups", "to_overall"]
 _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 
+_BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
+_BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
@@ -365,7 +367,9 @@ class MetricFrame:
 
         # Handle bootstrapping
         self._ci_quantiles = None
-        if n_boot is not None and len(ci_quantiles) > 0:
+        if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
+            if not isinstance(n_boot, int) or n_boot < 1:
+                raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
             assert all([isinstance(x, float) for x in ci_quantiles])
             self._ci_quantiles = ci_quantiles
 
@@ -379,6 +383,10 @@ class MetricFrame:
             )
 
             self._populate_results_ci(_bootstrap_samples, ci_quantiles)
+        elif (n_boot is not None) ^ (
+            (ci_quantiles is not None) and (len(ci_quantiles)) > 0
+        ):
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
