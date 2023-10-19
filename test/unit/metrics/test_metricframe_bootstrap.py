@@ -458,3 +458,17 @@ class TestErrors:
                 random_state=13489623,
             )
         assert execInfo.value.args[0] == msg
+
+    def test_bad_random_state(self):
+        msg = "Unsupported random_state: abd"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=[0.5],
+                random_state="abd",
+            )
+        assert execInfo.value.args[0] == msg

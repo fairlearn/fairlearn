@@ -87,7 +87,9 @@ def _calc_series_quantiles(
     for s in samples:
         assert isinstance(s, pd.Series)
         assert s.name == samples[0].name
-        assert all(s.index == samples[0].index)
+        assert all(
+            s.index == samples[0].index
+        ), "Sanity check shape of bootstrap sample"
 
     result_np = np.quantile(samples, q=quantiles, axis=0)
     result = []
@@ -106,7 +108,9 @@ def _calc_dataframe_quantiles(
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)
-        assert all(s.index == samples[0].index)
+        assert all(
+            s.index == samples[0].index
+        ), "Sanity check shape of bootstrap sample"
 
     result_np = np.quantile(samples, q=quantiles, axis=0)
 
@@ -132,5 +136,5 @@ def calculate_pandas_quantiles(
             quantiles=quantiles, samples=bootstrap_samples
         )
     else:
-        assert False
+        assert False, "Should not be possible to get here"
     return result
