@@ -76,10 +76,12 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if len(args) > 0:
             args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
             warnings.warn(
-                f"You have provided {args_msg} as positional arguments. "
-                "Please pass them as keyword arguments. From version "
-                f"{version} passing them as positional arguments "
-                "will result in an error.",
+                (
+                    f"You have provided {args_msg} as positional arguments. "
+                    "Please pass them as keyword arguments. From version "
+                    f"{version} passing them as positional arguments "
+                    "will result in an error."
+                ),
                 FutureWarning,
             )
 
@@ -88,10 +90,12 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
             warnings.warn(
-                "The positional argument 'metric' has been replaced "
-                "by a keyword argument 'metrics'. "
-                f"From version {version} passing it as a positional argument "
-                "or as a keyword argument 'metric' will result in an error",
+                (
+                    "The positional argument 'metric' has been replaced "
+                    "by a keyword argument 'metrics'. "
+                    f"From version {version} passing it as a positional argument "
+                    "or as a keyword argument 'metric' will result in an error"
+                ),
                 FutureWarning,
             )
 
@@ -471,6 +475,10 @@ class MetricFrame:
     def _populate_results_ci(
         self, bootstrap_samples: List[DisaggregatedResult], ci_quantiles: List[float]
     ):
+        """Similar to _populate_results, but computes confidence intervals from bootstrap.
+
+        Most of the work is done in :meth:`calculate_pandas_quantiles`.
+        """
         result_overall = calculate_pandas_quantiles(
             ci_quantiles, [x.overall for x in bootstrap_samples]
         )
@@ -627,6 +635,15 @@ class MetricFrame:
 
     @property
     def by_group_ci(self) -> Union[List[pd.Series], List[pd.DataFrame]]:
+        """Return the confidence intervals for the metrics, evaluated on each subgroup.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :attr:`MetricFrame.by_group` property.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
         return self._result_cache["by_group_ci"]
 
     @property
@@ -752,6 +769,15 @@ class MetricFrame:
     def group_max_ci(
         self, errors: str = "raise"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_max`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :meth:`MetricFrame.group_max` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
@@ -797,6 +823,15 @@ class MetricFrame:
     def group_min_ci(
         self, errors: str = "raise"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_min`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :meth:`MetricFrame.group_min` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
@@ -858,6 +893,15 @@ class MetricFrame:
     def difference_ci(
         self, method: str = "between_groups", errors: str = "coerce"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :meth:`MetricFrame.difference`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :func:`MetricFrame.difference` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
@@ -924,6 +968,15 @@ class MetricFrame:
     def ratio_ci(
         self, method: str = "between_groups", errors: str = "coerce"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :meth:`MetricFrame.ratio`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :func:`MetricFrame.ratio` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
