@@ -416,3 +416,45 @@ class TestErrors:
                 random_state=13489623,
             )
         assert execInfo.value.args[0] == msg
+
+    def test_ci_not_float(self):
+        msg = "Must have all ci_quantiles be floats in (0, 1)"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=["a"],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg
+
+    def test_ci_zero(self):
+        msg = "Must have all ci_quantiles be floats in (0, 1)"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=[0.0],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg
+
+    def test_ci_one(self):
+        msg = "Must have all ci_quantiles be floats in (0, 1)"
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics={"mse": skm.mean_squared_error},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=[1.0],
+                random_state=13489623,
+            )
+        assert execInfo.value.args[0] == msg

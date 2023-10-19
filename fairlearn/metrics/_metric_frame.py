@@ -44,6 +44,7 @@ _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 
 _BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
 _BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
+_BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
 
 def _deprecate_metric_frame_init(new_metric_frame_init):
     """Issue deprecation warnings for the `MetricFrame` constructor.
@@ -370,7 +371,9 @@ class MetricFrame:
         if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
             if not isinstance(n_boot, int) or n_boot < 1:
                 raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
-            assert all([isinstance(x, float) for x in ci_quantiles])
+            for _ci in ci_quantiles:
+                if not isinstance(_ci, float) or _ci <= 0 or _ci >= 1:
+                    raise ValueError(_BOOTSTRAP_CI_INVALID)
             self._ci_quantiles = ci_quantiles
 
             _bootstrap_samples = generate_bootstrap_samples(
