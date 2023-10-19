@@ -25,7 +25,7 @@ black==23.9.1
 pytest==7.2.0
 pytest-cov
 pytest-mock
-pytest-mpl>=0.11
+pytest-mpl
 wheel
 lightgbm<4.0.0  # 4.0.0 is incompatible with latest numpy https://github.com/microsoft/LightGBM/issues/5990  Needs to sync with .github/workflows/release-wheel.yml
 xlrd

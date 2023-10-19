@@ -98,8 +98,10 @@ def plot_heatmap(df, title):
     ax.imshow(round(df.corr(), 2), cmap="coolwarm")
 
     # Show all ticks and label them with the respective list entries
-    ax.set_xticks(np.arange(len(cols)), labels=cols)
-    ax.set_yticks(np.arange(len(cols)), labels=cols)
+    ax.set_xticks(np.arange(len(cols)))
+    ax.set_xticklabels(cols)
+    ax.set_yticks(np.arange(len(cols)))
+    ax.set_yticklabels(cols)
 
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=15, ha="right", rotation_mode="anchor")
