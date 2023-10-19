@@ -68,7 +68,8 @@ is about binary classification, but we similarly support regression.
 Prerequisites
 ^^^^^^^^^^^^^
 
-In order to run the code samples in the Quickstart tutorial, you need to install the following dependencies:
+In order to run the code samples in the Quickstart tutorial, you need to 
+install the following dependencies:
 
 .. code-block:: bash
 
@@ -77,35 +78,52 @@ In order to run the code samples in the Quickstart tutorial, you need to install
 Loading the dataset
 ^^^^^^^^^^^^^^^^^^^
 
-For this example we use the
-`UCI adult dataset <https://archive.ics.uci.edu/ml/datasets/Adult>`_ where the
-objective is to predict whether a person makes more (label 1) or less (0)
-than $50,000 a year.
+For this example, we use a `clincial dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_ 
+of hospital re-admissions over a ten-year period (1998-2008) for 
+diabetic patients across 130 different hospitals in the U.S. This scenario 
+builds upon prior research on how racial disparities impact health care 
+resource allocation in the U.S. For an in-depth analysis of this dataset,
+review the `Scipy tutorial <https://github.com/fairlearn/talks/tree/main/2021_scipy_tutorial>`_
+that the Fairlearn team presented in 2021.
+
+We will use machine learning to predict whether an individual in the dataset 
+is readmnitted to the hospital within 30 days of hospital release. 
+A hospital readmission within 30 days can be viewed as a proxy that the 
+patients needed more assistance at the release time.
+In the next section, we build a classification model to accomplish the 
+prediction task.
 
 .. doctest:: quickstart
 
     >>> import numpy as np
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt
-    >>> from fairlearn.datasets import fetch_adult
-    >>> data = fetch_adult(as_frame=True)
-    >>> X = pd.get_dummies(data.data)
-    >>> y_true = (data.target == '>50K') * 1
-    >>> sex = data.data['sex']
-    >>> sex.value_counts()
-    sex
-    Male      32650
-    Female    16192
-    Name: count, dtype: int64
+    >>> data = fetch_diabetes_hospital(as_frame=True)
+    >>> keep_idx = (data.data['gender'] == "Male") | (data.data['gender'] == "Female")
+    >>> X = data.data[keep_idx]
+    >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
+    >>> y_true = data.target[keep_idx]
+    >>> 
+    >>> X_ohe = pd.get_dummies(X)
+    >>> race = data.data.loc[keep_idx, 'race']
+    >>> race.value_counts()
+    Caucasian          76099
+    AfricanAmerican    19210
+    Unknown             2271
+    Hispanic            2037
+    Other               1505
+    Asian                641
+    Name: race, dtype: int64
 
-.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_diabetes_001.png
     :target: auto_examples/plot_quickstart_selection_rate.html
     :align: center
+
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Firstly, Fairlearn provides fairness-related metrics that can be compared
+First, Fairlearn provides fairness-related metrics that can be compared
 between groups and for the overall population. Using existing metric
 definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
@@ -117,18 +135,26 @@ we can evaluate metrics for subgroups within the data as below:
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
+    >>> from sklearn.model_selection import train_test_split
+    >>>
+    >>> X_train, X_test, y_train, y_test, \
+    A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
     >>>
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-    >>> classifier.fit(X, y_true)
+    >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
-    >>> y_pred = classifier.predict(X)
-    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
+    >>> y_pred = classifier.predict(X_test)
+    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
     >>> mf.overall
-    0.8443...
+    0.8896269800715381
     >>> mf.by_group
-    sex
-    Female    0.9251...
-    Male      0.8042...
+    race
+    AfricanAmerican    0.890012
+    Asian              0.929032
+    Caucasian          0.887959
+    Hispanic           0.894309
+    Other              0.912921
+    Unknown            0.911864
     Name: accuracy_score, dtype: float64
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
@@ -141,11 +167,15 @@ their label:
     >>> from fairlearn.metrics import selection_rate
     >>> sr = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
     >>> sr.overall
-    0.1638...
+    0
     >>> sr.by_group
-    sex
-    Female    0.0635...
-    Male      0.2135...
+    race
+    AfricanAmerican    0.0
+    Asian              0.0
+    Caucasian          0.0
+    Hispanic           0.0
+    Other              0.0
+    Unknown            0.0
     Name: selection_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
@@ -156,7 +186,7 @@ Fairlearn also allows us to quickly plot these metrics from the
     :start-after: # Analyze metrics using MetricFrame
     :end-before: # Customize plots with ylim
 
-.. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_diabetes_001.png
     :target: auto_examples/plot_quickstart.html
     :align: center
 
@@ -184,17 +214,21 @@ a vastly reduced difference in selection rate:
     >>> constraint = DemographicParity()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
-    >>> mitigator.fit(X, y_true, sensitive_features=sex)
+    >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
-    >>> y_pred_mitigated = mitigator.predict(X)
+    >>> y_pred_mitigated = mitigator.predict(X_test)
     >>>
-    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred_mitigated, sensitive_features=sex)
+    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> sr_mitigated.overall
-    0.1661...
+    0
     >>> sr_mitigated.by_group
-    sex
-    Female    0.1552...
-    Male      0.1715...
+    race
+    AfricanAmerican    0.0
+    Asian              0.0
+    Caucasian          0.0
+    Hispanic           0.0
+    Other              0.0
+    Unknown            0.0
     Name: selection_rate, dtype: float64
 
 
