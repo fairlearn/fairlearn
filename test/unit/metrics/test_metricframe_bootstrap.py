@@ -19,7 +19,6 @@ from .data_for_test import g_1, g_2, y_p, y_t
 
 N_BOOTSTRAP = 100
 QUANTILES = [0.05, 0.5, 0.95]
-ERROR_OPTIONS = ["raise", "coerce"]
 
 ABS_TOL = 0.1
 
@@ -184,24 +183,21 @@ class TestByGroupQuantiles:
 
 
 class TestGroupExtremes:
-    def _get_comparators(self, mf: MetricFrame, aggregation: str, error_handling: str):
+    def _get_comparators(self, mf: MetricFrame, aggregation: str):
         if aggregation == "min":
-            actual = mf.group_min_ci(errors=error_handling)
-            nominal = mf.group_min(errors=error_handling)
+            actual = mf.group_min_ci()
+            nominal = mf.group_min()
         elif aggregation == "max":
-            actual = mf.group_max_ci(errors=error_handling)
-            nominal = mf.group_max(errors=error_handling)
+            actual = mf.group_max_ci()
+            nominal = mf.group_max()
         else:
             raise ValueError(f"Unrecognised option: {aggregation}")
 
         return actual, nominal
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_1m_0cf(
-        self, mf_1m_0cf: MetricFrame, aggregation: str, error_handling: str
-    ):
-        result, nominal = self._get_comparators(mf_1m_0cf, aggregation, error_handling)
+    def test_1m_0cf(self, mf_1m_0cf: MetricFrame, aggregation: str):
+        result, nominal = self._get_comparators(mf_1m_0cf, aggregation)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1m_0cf.ci_quantiles == QUANTILES
@@ -209,13 +205,8 @@ class TestGroupExtremes:
         assert result[1] == pytest.approx(nominal, abs=ABS_TOL)
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_1m_0cf_dict(
-        self, mf_1mdict_0cf: MetricFrame, aggregation: str, error_handling: str
-    ):
-        result, nominal = self._get_comparators(
-            mf_1mdict_0cf, aggregation, error_handling
-        )
+    def test_1m_0cf_dict(self, mf_1mdict_0cf: MetricFrame, aggregation: str):
+        result, nominal = self._get_comparators(mf_1mdict_0cf, aggregation)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
@@ -223,11 +214,8 @@ class TestGroupExtremes:
         assert result[1]["mse"] == pytest.approx(nominal["mse"], abs=ABS_TOL)
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_1m_1cf(
-        self, mf_1m_1cf: MetricFrame, aggregation: str, error_handling: str
-    ):
-        result, nominal = self._get_comparators(mf_1m_1cf, aggregation, error_handling)
+    def test_1m_1cf(self, mf_1m_1cf: MetricFrame, aggregation: str):
+        result, nominal = self._get_comparators(mf_1m_1cf, aggregation)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1m_1cf.ci_quantiles == QUANTILES
@@ -236,11 +224,8 @@ class TestGroupExtremes:
             assert result[1][cf] == pytest.approx(nominal[cf], abs=ABS_TOL)
 
     @pytest.mark.parametrize("aggregation", ["min", "max"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_2m_1cf(
-        self, mf_2m_1cf: MetricFrame, aggregation: str, error_handling: str
-    ):
-        result, nominal = self._get_comparators(mf_2m_1cf, aggregation, error_handling)
+    def test_2m_1cf(self, mf_2m_1cf: MetricFrame, aggregation: str):
+        result, nominal = self._get_comparators(mf_2m_1cf, aggregation)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
@@ -252,16 +237,14 @@ class TestGroupExtremes:
 
 
 class TestGroupComparisons:
-    def _get_comparators(
-        self, mf: MetricFrame, comparator: str, method: str, error_handling: str
-    ):
+    def _get_comparators(self, mf: MetricFrame, comparator: str, method: str):
         if comparator == "difference":
-            actual = mf.difference_ci(method=method, errors=error_handling)
-            nominal = mf.difference(method=method, errors=error_handling)
+            actual = mf.difference_ci(method=method)
+            nominal = mf.difference(method=method)
             tol = ABS_TOL
         elif comparator == "ratio":
-            actual = mf.ratio_ci(method=method, errors=error_handling)
-            nominal = mf.ratio(method=method, errors=error_handling)
+            actual = mf.ratio_ci(method=method)
+            nominal = mf.ratio(method=method)
             tol = 2 * ABS_TOL  # Ratios tend to be poorly behaved
         else:
             raise ValueError(f"Unrecognised option: {comparator}")
@@ -270,13 +253,8 @@ class TestGroupComparisons:
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
-    def test_1m_0cf(
-        self, mf_1m_0cf: MetricFrame, comparator: str, error_handling: str, method: str
-    ):
-        result, nominal, _ = self._get_comparators(
-            mf_1m_0cf, comparator, method, error_handling
-        )
+    def test_1m_0cf(self, mf_1m_0cf: MetricFrame, comparator: str, method: str):
+        result, nominal, _ = self._get_comparators(mf_1m_0cf, comparator, method)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1m_0cf.ci_quantiles == QUANTILES
@@ -286,17 +264,13 @@ class TestGroupComparisons:
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_1m_0cf_dict(
         self,
         mf_1mdict_0cf: MetricFrame,
         comparator: str,
-        error_handling: str,
         method: str,
     ):
-        result, nominal, _ = self._get_comparators(
-            mf_1mdict_0cf, comparator, method, error_handling
-        )
+        result, nominal, _ = self._get_comparators(mf_1mdict_0cf, comparator, method)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1mdict_0cf.ci_quantiles == QUANTILES
@@ -305,17 +279,13 @@ class TestGroupComparisons:
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_1m_1cf(
         self,
         mf_1m_1cf: MetricFrame,
         comparator: str,
-        error_handling: str,
         method: str,
     ):
-        result, nominal, tol = self._get_comparators(
-            mf_1m_1cf, comparator, method, error_handling
-        )
+        result, nominal, tol = self._get_comparators(mf_1m_1cf, comparator, method)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_1m_1cf.ci_quantiles == QUANTILES
@@ -325,17 +295,13 @@ class TestGroupComparisons:
 
     @pytest.mark.parametrize("comparator", ["difference", "ratio"])
     @pytest.mark.parametrize("method", ["between_groups", "to_overall"])
-    @pytest.mark.parametrize("error_handling", ERROR_OPTIONS)
     def test_2m_1cf(
         self,
         mf_2m_1cf: MetricFrame,
         comparator: str,
-        error_handling: str,
         method: str,
     ):
-        result, nominal, tol = self._get_comparators(
-            mf_2m_1cf, comparator, method, error_handling
-        )
+        result, nominal, tol = self._get_comparators(mf_2m_1cf, comparator, method)
         assert isinstance(result, list)
         assert len(result) == len(QUANTILES)
         assert mf_2m_1cf.ci_quantiles == QUANTILES
@@ -472,3 +438,25 @@ class TestErrors:
                 random_state="abd",
             )
         assert execInfo.value.args[0] == msg
+
+    def test_nonscalar_metric(self):
+        msg = (
+            "Error calling numpy.quantiles. Most likely due to a metric returning a"
+            " non-scalar result"
+        )
+        with pytest.raises(ValueError) as execInfo:
+            _ = MetricFrame(
+                metrics=skm.confusion_matrix,
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_1,
+                n_boot=N_BOOTSTRAP,
+                ci_quantiles=[0.5],
+                random_state=20231020,
+            )
+        assert execInfo.value.args[0] == msg
+        assert (
+            execInfo.value.__cause__.args[0]
+            == "The truth value of an array with more than one element is ambiguous."
+            " Use a.any() or a.all()"
+        )

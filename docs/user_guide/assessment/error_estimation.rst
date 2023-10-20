@@ -229,8 +229,9 @@ equal to them.
 In all cases, though, the numbers reported are intuitively reasonable.
 
 We provide methods such as :meth:`MetricFrame.group_min_ci`,
-which take the same arguments as their non-bootstrapped
-equivalents, but return results similar to the above.
+which are similar to their non-bootstrapped counterparts.
+However, they have no :code:`errors` parameter, since if bootstrapping
+is active, then all metrics must return scalars anyway.
 
 Summary
 -------

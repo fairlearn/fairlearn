@@ -80,10 +80,12 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if len(args) > 0:
             args_msg = ", ".join([f"'{name}'" for name in positional_dict.keys()])
             warnings.warn(
-                f"You have provided {args_msg} as positional arguments. "
-                "Please pass them as keyword arguments. From version "
-                f"{version} passing them as positional arguments "
-                "will result in an error.",
+                (
+                    f"You have provided {args_msg} as positional arguments. "
+                    "Please pass them as keyword arguments. From version "
+                    f"{version} passing them as positional arguments "
+                    "will result in an error."
+                ),
                 FutureWarning,
             )
 
@@ -92,10 +94,12 @@ def _deprecate_metric_frame_init(new_metric_frame_init):
         if metric is not None:
             metric_arg_dict = {"metrics": metric}
             warnings.warn(
-                "The positional argument 'metric' has been replaced "
-                "by a keyword argument 'metrics'. "
-                f"From version {version} passing it as a positional argument "
-                "or as a keyword argument 'metric' will result in an error",
+                (
+                    "The positional argument 'metric' has been replaced "
+                    "by a keyword argument 'metrics'. "
+                    f"From version {version} passing it as a positional argument "
+                    "or as a keyword argument 'metric' will result in an error"
+                ),
                 FutureWarning,
             )
 
@@ -503,60 +507,46 @@ class MetricFrame:
 
         group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = dict()
-            for err_string in _VALID_ERROR_STRING:
-                try:
-                    self._result_cache[k][err_string] = self._group_ci(
-                        bootstrap_samples=bootstrap_samples,
-                        ci_quantiles=ci_quantiles,
-                        grouping_function=v,
-                        errors=err_string,
-                    )
-                except Exception as e:  # noqa: B902
-                    # Store any exception for later
-                    self._result_cache[k][err_string] = e
+            self._result_cache[k] = self._result_cache[k] = self._group_ci(
+                bootstrap_samples=bootstrap_samples,
+                ci_quantiles=ci_quantiles,
+                grouping_function=v,
+            )
 
         # Differences and ratios
         for c_t in ["difference_ci", "ratio_ci"]:
             self._result_cache[c_t] = dict()
             for c_m in _COMPARE_METHODS:
-                self._result_cache[c_t][c_m] = dict()
-                for err_string in _VALID_ERROR_STRING:
-                    try:
-                        if c_t == "difference_ci":
-                            raw_samples = [
-                                r.difference(
-                                    self.control_levels,
-                                    method=c_m,
-                                    errors=err_string,
-                                )
-                                for r in bootstrap_samples
-                            ]
-                        else:
-                            raw_samples = [
-                                r.ratio(
-                                    self.control_levels,
-                                    method=c_m,
-                                    errors=err_string,
-                                )
-                                for r in bootstrap_samples
-                            ]
-
-                        samples = [self._none_to_nan(x) for x in raw_samples]
-
-                        raw_result = calculate_pandas_quantiles(
-                            quantiles=ci_quantiles, bootstrap_samples=samples
+                if c_t == "difference_ci":
+                    raw_samples = [
+                        r.difference(
+                            self.control_levels,
+                            method=c_m,
+                            errors="raise",
                         )
+                        for r in bootstrap_samples
+                    ]
+                else:
+                    raw_samples = [
+                        r.ratio(
+                            self.control_levels,
+                            method=c_m,
+                            errors="raise",
+                        )
+                        for r in bootstrap_samples
+                    ]
 
-                        result = [
-                            self._extract_result(x, no_control_levels=False)
-                            for x in raw_result
-                        ]
+                samples = [self._none_to_nan(x) for x in raw_samples]
 
-                        self._result_cache[c_t][c_m][err_string] = result
-                    except Exception as e:  # noqa: B902
-                        # Store any exception for later
-                        self._result_cache[c_t][c_m][err_string] = e
+                raw_result = calculate_pandas_quantiles(
+                    quantiles=ci_quantiles, bootstrap_samples=samples
+                )
+
+                result = [
+                    self._extract_result(x, no_control_levels=False) for x in raw_result
+                ]
+
+                self._result_cache[c_t][c_m] = result
 
     @property
     def overall(
@@ -727,10 +717,11 @@ class MetricFrame:
         bootstrap_samples: List[DisaggregatedResult],
         ci_quantiles: List[float],
         grouping_function: str,
-        errors: str = "raise",
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        # There is no 'errors' argument because everything must have been a scalar for
+        # np.quantiles
         samples = [
-            r.apply_grouping(grouping_function, self.control_levels, errors=errors)
+            r.apply_grouping(grouping_function, self.control_levels, errors="raise")
             for r in bootstrap_samples
         ]
 
@@ -774,9 +765,7 @@ class MetricFrame:
         else:
             return value
 
-    def group_max_ci(
-        self, errors: str = "raise"
-    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+    def group_max_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_max`.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -785,15 +774,12 @@ class MetricFrame:
         returned by the :meth:`MetricFrame.group_max` function.
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
-        """
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        value = self._result_cache["group_max_ci"][errors]
-        if isinstance(value, Exception):
-            raise value
-        else:
-            return value
+        Unlike :meth:`MetricFrame.group_max` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
+        value = self._result_cache["group_max_ci"]
+        return value
 
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -828,9 +814,7 @@ class MetricFrame:
         else:
             return value
 
-    def group_min_ci(
-        self, errors: str = "raise"
-    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+    def group_min_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_min`.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -839,15 +823,12 @@ class MetricFrame:
         returned by the :meth:`MetricFrame.group_min` function.
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
-        """
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        value = self._result_cache["group_min_ci"][errors]
-        if isinstance(value, Exception):
-            raise value
-        else:
-            return value
+        Unlike :meth:`MetricFrame.group_min` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
+        value = self._result_cache["group_min_ci"]
+        return value
 
     def difference(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -899,7 +880,7 @@ class MetricFrame:
             return value
 
     def difference_ci(
-        self, method: str = "between_groups", errors: str = "coerce"
+        self, method: str = "between_groups"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         """Return the bootstrapped confidence intervals for :meth:`MetricFrame.difference`.
 
@@ -909,18 +890,15 @@ class MetricFrame:
         returned by the :func:`MetricFrame.difference` function.
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
-        """
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
+        Unlike :meth:`MetricFrame.difference` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache["difference_ci"][method][errors]
-        if isinstance(value, Exception):
-            raise value
-        else:
-            return value
+        value = self._result_cache["difference_ci"][method]
+        return value
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -974,7 +952,7 @@ class MetricFrame:
             return value
 
     def ratio_ci(
-        self, method: str = "between_groups", errors: str = "coerce"
+        self, method: str = "between_groups"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         """Return the bootstrapped confidence intervals for :meth:`MetricFrame.ratio`.
 
@@ -984,18 +962,15 @@ class MetricFrame:
         returned by the :func:`MetricFrame.ratio` function.
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
-        """
-        if errors not in _VALID_ERROR_STRING:
-            raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
+        Unlike :meth:`MetricFrame.ratio` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache["ratio_ci"][method][errors]
-        if isinstance(value, Exception):
-            raise value
-        else:
-            return value
+        value = self._result_cache["ratio_ci"][method]
+        return value
 
     def _process_functions(
         self,

@@ -13,6 +13,11 @@ from ._disaggregated_result import DisaggregatedResult
 
 logger = logging.getLogger(__name__)
 
+BOOTSTRAP_QUANTILE_ERROR = (
+    "Error calling numpy.quantiles. Most likely due to a metric returning a non-scalar"
+    " result"
+)
+
 
 def generate_single_bootstrap_sample(
     *,
@@ -91,7 +96,10 @@ def _calc_series_quantiles(
             s.index == samples[0].index
         ), "Sanity check shape of bootstrap sample"
 
-    result_np = np.quantile(samples, q=quantiles, axis=0)
+    try:
+        result_np = np.quantile(samples, q=quantiles, axis=0)
+    except ValueError as ve:
+        raise ValueError(BOOTSTRAP_QUANTILE_ERROR) from ve
     result = []
     assert result_np.shape[0] == len(quantiles)
     for i in range(result_np.shape[0]):
@@ -112,7 +120,10 @@ def _calc_dataframe_quantiles(
             s.index == samples[0].index
         ), "Sanity check shape of bootstrap sample"
 
-    result_np = np.quantile(samples, q=quantiles, axis=0)
+    try:
+        result_np = np.quantile(samples, q=quantiles, axis=0)
+    except ValueError as ve:
+        raise ValueError(BOOTSTRAP_QUANTILE_ERROR) from ve
 
     result = []
     assert result_np.shape[0] == len(quantiles)
