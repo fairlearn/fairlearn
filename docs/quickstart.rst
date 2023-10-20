@@ -99,19 +99,18 @@ prediction task.
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt
     >>> data = fetch_diabetes_hospital(as_frame=True)
-    >>> keep_idx = (data.data['gender'] == "Male") | (data.data['gender'] == "Female")
-    >>> X = data.data[keep_idx]
+    >>> X = data.data
     >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
-    >>> y_true = data.target[keep_idx]
+    >>> y_true = data.target
     >>> 
     >>> X_ohe = pd.get_dummies(X)
-    >>> race = data.data.loc[keep_idx, 'race']
+    >>> race = X['race']
     >>> race.value_counts()
     Caucasian          76099
     AfricanAmerican    19210
-    Unknown             2271
+    Unknown             2273
     Hispanic            2037
-    Other               1505
+    Other               1506
     Asian                641
     Name: race, dtype: int64
 
@@ -147,15 +146,15 @@ we can evaluate metrics for subgroups within the data as below:
     >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, \
     sensitive_features=A_test)
     >>> mf.overall
-    0.529185173538776
+    0.514...
     >>> mf.by_group
     race
-    AfricanAmerican    0.542303
-    Asian              0.690323
-    Caucasian          0.520261
-    Hispanic           0.595528
-    Other              0.561798
-    Unknown            0.591525
+    AfricanAmerican    0.530935
+    Asian              0.658683
+    Caucasian          0.503535
+    Hispanic           0.612524
+    Other              0.591549
+    Unknown            0.574576
     Name: accuracy_score, dtype: float64
 
 Note that above, because the outcome variable exhibits label imbalance, we set 
@@ -172,15 +171,15 @@ their label:
     >>> sr = MetricFrame(metrics=selection_rate, y_true=y_test, y_pred=y_pred, \
     sensitive_features=A_test)
     >>> sr.overall
-    0.5124012420895405
+    0.527...
     >>> sr.by_group
     race
-    AfricanAmerican    0.494635
-    Asian              0.316129
-    Caucasian          0.524208
-    Hispanic           0.432927
-    Other              0.446629
-    Unknown            0.435593
+    AfricanAmerican    0.514080
+    Asian              0.341317
+    Caucasian          0.539675
+    Hispanic           0.426614
+    Other              0.445070
+    Unknown            0.438983
     Name: selection_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
