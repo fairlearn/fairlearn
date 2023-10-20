@@ -115,7 +115,7 @@ prediction task.
     Asian                641
     Name: race, dtype: int64
 
-.. figure:: auto_examples/images/sphx_glr_plot_quickstart_diabetes_001.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
     :target: auto_examples/plot_quickstart_selection_rate.html
     :align: center
 
@@ -143,21 +143,25 @@ we can evaluate metrics for subgroups within the data as below:
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
-    >>> y_pred = classifier.predict(X_test)
-    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
+    >>> y_pred = (classifier.predict_proba(X_test)[:,1] >= 0.1)
+    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, \
+    sensitive_features=A_test)
     >>> mf.overall
-    0.8896269800715381
+    0.529185173538776
     >>> mf.by_group
     race
-    AfricanAmerican    0.890012
-    Asian              0.929032
-    Caucasian          0.887959
-    Hispanic           0.894309
-    Other              0.912921
-    Unknown            0.911864
+    AfricanAmerican    0.542303
+    Asian              0.690323
+    Caucasian          0.520261
+    Hispanic           0.595528
+    Other              0.561798
+    Unknown            0.591525
     Name: accuracy_score, dtype: float64
 
-Additionally, Fairlearn has lots of other standard metrics built-in, such as
+Note that above, because the outcome variable exhibits label imbalance, we set 
+the threshold for triggering a positive prediction lower (to a probability of 0.1 
+or greater).
+Fairlearn has many standard metrics built-in, such as
 selection rate, i.e., the percentage of the population which have '1' as
 their label:
 
@@ -165,17 +169,18 @@ their label:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import selection_rate
-    >>> sr = MetricFrame(metrics=selection_rate, y_true=y_true, y_pred=y_pred, sensitive_features=sex)
+    >>> sr = MetricFrame(metrics=selection_rate, y_true=y_test, y_pred=y_pred, \
+    sensitive_features=A_test)
     >>> sr.overall
-    0
+    0.5124012420895405
     >>> sr.by_group
     race
-    AfricanAmerican    0.0
-    Asian              0.0
-    Caucasian          0.0
-    Hispanic           0.0
-    Other              0.0
-    Unknown            0.0
+    AfricanAmerican    0.494635
+    Asian              0.316129
+    Caucasian          0.524208
+    Hispanic           0.432927
+    Other              0.446629
+    Unknown            0.435593
     Name: selection_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
@@ -218,7 +223,8 @@ a vastly reduced difference in selection rate:
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>>
-    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
+    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, \
+    y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> sr_mitigated.overall
     0
     >>> sr_mitigated.by_group
@@ -229,7 +235,11 @@ a vastly reduced difference in selection rate:
     Hispanic           0.0
     Other              0.0
     Unknown            0.0
-    Name: selection_rate, dtype: float64
+    Name: accuracy_score, dtype: float64
+
+Note that because :class:`ExponentiatedGradient` does not have a `predict_proba`
+method, we cannot set a lower threshold for a positive prediction to deal with the 
+label imbalance in the outcome variable.
 
 
 What's next?
