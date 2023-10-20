@@ -460,3 +460,21 @@ class TestErrors:
             == "The truth value of an array with more than one element is ambiguous."
             " Use a.any() or a.all()"
         )
+
+    def test_bad_difference_method(
+        self,
+        mf_1mdict_0cf: MetricFrame,
+    ):
+        msg = "Unrecognised comparison method: Random String"
+        with pytest.raises(ValueError) as execInfo:
+            _ = mf_1mdict_0cf.difference_ci(method="Random String")
+        assert execInfo.value.args[0] == msg
+
+    def test_bad_ratio_method(
+        self,
+        mf_1mdict_0cf: MetricFrame,
+    ):
+        msg = "Unrecognised comparison method: Another Random String"
+        with pytest.raises(ValueError) as execInfo:
+            _ = mf_1mdict_0cf.difference_ci(method="Another Random String")
+        assert execInfo.value.args[0] == msg
