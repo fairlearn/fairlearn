@@ -77,7 +77,6 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
     References
     ----------
-
     .. footbibliography::
 
     """

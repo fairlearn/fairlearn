@@ -126,7 +126,6 @@ def fetch_boston(
 
     References
     ----------
-
     .. [SKLGH] J. Sykes, "- B 1000(Bk - 0.63)^2 where Bk is the proportion of blacks
        by town · Issue #16155 · scikit-learn/scikit-learn," GitHub, 18-Jan-2020.
        [Online]. Available:

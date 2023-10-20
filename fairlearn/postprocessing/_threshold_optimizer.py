@@ -9,7 +9,6 @@ for binary classification with one categorical sensitive feature.
 
 References
 ----------
-
 .. footbibliography::
 
 """
@@ -126,7 +125,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Parameters
     ----------
     estimator : object
-        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
+        A `scikit-learn compatible estimator
+        <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
         whose output is postprocessed.
 
     constraints : str, default='demographic_parity'
@@ -208,7 +208,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
     References
     ----------
-
     .. footbibliography::
 
     Examples

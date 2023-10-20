@@ -38,7 +38,6 @@ def _get_soft_predictions(estimator, X, predict_method):
 
     References
     ----------
-
     .. footbibliography::
 
     """

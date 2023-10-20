@@ -101,7 +101,6 @@ def fetch_acs_income(
 
     References
     ----------
-
     .. [ACSPUMS] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
 
     .. footbibliography::
