@@ -159,8 +159,8 @@ we can evaluate metrics for subgroups within the data as below:
     Name: accuracy_score, dtype: float64
 
 Note that above, because the outcome variable exhibits label imbalance, we set 
-the threshold for triggering a positive prediction lower (to a probability of 0.1 
-or greater).
+the threshold for triggering a positive prediction lower 
+(to a probability of 0.1 or greater).
 Fairlearn has many standard metrics built-in, such as
 selection rate, i.e., the percentage of the population which have '1' as
 their label:
