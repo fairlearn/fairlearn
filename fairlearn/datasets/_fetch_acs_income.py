@@ -29,8 +29,10 @@ def fetch_acs_income(
     Target                        numeric
     ==============   ====================
 
-    Source: Paper: Ding et al. (2021) [1]_
-            and corresponding repository https://github.com/zykls/folktables/
+    Source:
+
+    - Paper: Ding et al. (2021) :footcite:`ding2021retiring`
+    - Repository: https://github.com/zykls/folktables/
 
     Read more in the :ref:`User Guide <acsincome_data>`.
 
@@ -66,7 +68,7 @@ def fetch_acs_income(
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
         The state abbreviations and codes can be found on page 1 of the data
-        dictionary at ACS PUMS [2]_.
+        dictionary at ACS PUMS [ACSPUMS]_.
 
     Returns
     -------
@@ -99,11 +101,10 @@ def fetch_acs_income(
 
     References
     ----------
-    .. [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021).
-       "Retiring Adult: New Datasets for Fair Machine Learning."
-       Advances in Neural Information Processing Systems, 34.
 
-    .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
+    .. [ACSPUMS] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
+
+    .. footbibliography::
 
     """
     # State Code based on 2010 Census definitions
