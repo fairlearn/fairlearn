@@ -476,5 +476,5 @@ class TestErrors:
     ):
         msg = "Unrecognised comparison method: Another Random String"
         with pytest.raises(ValueError) as execInfo:
-            _ = mf_1mdict_0cf.difference_ci(method="Another Random String")
+            _ = mf_1mdict_0cf.ratio_ci(method="Another Random String")
         assert execInfo.value.args[0] == msg
