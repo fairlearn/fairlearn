@@ -161,26 +161,29 @@ Note that above, because the outcome variable exhibits label imbalance, we set
 the threshold for triggering a positive prediction lower 
 (to a probability of 0.1 or greater).
 Fairlearn has many standard metrics built-in, such as
-selection rate, i.e., the percentage of the population which have '1' as
-their label:
+false negative rate, i.e., the rate of occurrence of negative classifications
+when the true value of the outcome label is positive. 
+In the context of this dataset, the false positive rate captures the 
+individuals who in reality would be readmitted to the hospital, but 
+the model does not predict that outcome.
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import selection_rate
-    >>> sr = MetricFrame(metrics=selection_rate, y_true=y_test, y_pred=y_pred, \
-    sensitive_features=A_test)
-    >>> sr.overall
-    0.527...
-    >>> sr.by_group
+    >>> from fairlearn.metrics import false_negative_rate
+    >>> mf = MetricFrame(metrics=false_negative_rate, y_true=y_test, \
+    y_pred=y_pred, sensitive_features=A_test)
+    >>> mf.overall
+    0.309...
+    >>> mf.by_group
     race
-    AfricanAmerican    0.514080
-    Asian              0.341317
-    Caucasian          0.539675
-    Hispanic           0.426614
-    Other              0.445070
-    Unknown            0.438983
-    Name: selection_rate, dtype: float64
+    AfricanAmerican    0.296089
+    Asian              0.500000
+    Caucasian          0.308555
+    Hispanic           0.307692
+    Other              0.333333
+    Unknown            0.420000
+    Name: false_negative_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`
