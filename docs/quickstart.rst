@@ -132,7 +132,7 @@ we can evaluate metrics for subgroups within the data as below:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import MetricFrame
-    >>> from sklearn.metrics import accuracy_score
+    >>> from sklearn.metrics import accuracy_score, balanced_accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> from sklearn.model_selection import train_test_split
     >>>
@@ -204,40 +204,40 @@ Mitigating disparity
 If we observe disparities between groups we may want to create a new model
 while specifying an appropriate fairness constraint. Note that the choice of
 fairness constraints is crucial for the resulting model, and varies based on
-application context. If selection rate is highly relevant for fairness in this
+application context. If balanced accuracy is highly relevant for fairness in this
 contrived example, we can attempt to mitigate the observed disparity using the
-corresponding fairness constraint called Demographic Parity. In real world
+corresponding fairness constraint called Equalized Odds. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
-provided classifier using Demographic Parity as the objective, leading to
-a vastly reduced difference in selection rate:
+provided classifier using Equalized Odds as the objective, leading to
+a vastly reduced difference in  balanced accuracy:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.reductions import DemographicParity, ExponentiatedGradient
+    >>> from fairlearn.reductions import EqualizedOdds, ExponentiatedGradient
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>>
-    >>> constraint = DemographicParity()
+    >>> constraint = EqualizedOdds()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint)
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>>
-    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, \
+    >>> mf_mitigated = MetricFrame(metrics=balanced_accuracy_score, y_true=y_test, \
     y_pred=y_pred_mitigated, sensitive_features=A_test)
-    >>> sr_mitigated.overall
-    0
-    >>> sr_mitigated.by_group
+    >>> mf_mitigated.overall
+    0.500...
+    >>> mf_mitigated.by_group
     race
-    AfricanAmerican    0.0
-    Asian              0.0
-    Caucasian          0.0
-    Hispanic           0.0
-    Other              0.0
-    Unknown            0.0
-    Name: accuracy_score, dtype: float64
+    AfricanAmerican    0.500000
+    Asian              0.500000
+    Caucasian          0.500523
+    Hispanic           0.498911
+    Other              0.500000
+    Unknown            0.500000
+    Name: balanced_accuracy_score, dtype: float64
 
 Note that because :class:`ExponentiatedGradient` does not have a `predict_proba`
 method, we cannot set a lower threshold for a positive prediction to deal with the 
