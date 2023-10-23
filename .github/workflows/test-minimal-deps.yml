@@ -9,6 +9,10 @@ on:
       python:
         required: true
         type: string
+      codeCovPython:
+        required: true
+        type: string
+        default: "3.11"
 
 jobs:
   minimal-deps:
@@ -26,6 +30,7 @@ jobs:
       - run: pytest --cov=fairlearn --cov-report=xml test/install
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
+        if: ${{ inputs.codeCovPython == inputs.python }}
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
