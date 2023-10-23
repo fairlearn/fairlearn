@@ -35,11 +35,12 @@ def fetch_boston(
 
     Referenced in Belsley, Kuh & Welsch :footcite:`belsley2005regression`.
 
-    This dataset has known fairness issues [SKLGH]_. There's a "lower status of
-    population" (LSTAT) parameter that you need to look out for and a column
-    that is a derived from the proportion of people with a black skin color
-    that live in a neighborhood (B) [RDD]_. See the references at the bottom for
-    more detailed information.
+    This dataset has known fairness issues :footcite:`sykes2020boston`.
+    There's a "lower status of population" (LSTAT) parameter that you need
+    to look out for and a column that is a derived from the proportion of
+    people with a black skin color that live in a neighborhood (B)
+    :footcite:`carlisle2019racist`.
+    See the references at the bottom for  more detailed information.
 
     Here's a table of all the variables in order:
 
@@ -126,15 +127,6 @@ def fetch_boston(
 
     References
     ----------
-    .. [SKLGH] J. Sykes, "- B 1000(Bk - 0.63)^2 where Bk is the proportion of blacks
-       by town · Issue #16155 · scikit-learn/scikit-learn," GitHub, 18-Jan-2020.
-       [Online]. Available:
-       https://github.com/scikit-learn/scikit-learn/issues/16155.
-
-    .. [RDD] M. Carlisle, "racist data destruction?," Medium, 13-Jun-2019.
-       [Online]. Available:
-       https://medium.com/@docintangible/racist-data-destruction-113e3eff54a8.
-
     .. footbibliography::
 
     """

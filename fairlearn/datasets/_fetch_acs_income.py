@@ -68,7 +68,7 @@ def fetch_acs_income(
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
         The state abbreviations and codes can be found on page 1 of the data
-        dictionary at ACS PUMS [ACSPUMS]_.
+        dictionary at ACS PUMS :footcite:`census2019pums`.
 
     Returns
     -------
@@ -101,8 +101,6 @@ def fetch_acs_income(
 
     References
     ----------
-    .. [ACSPUMS] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
-
     .. footbibliography::
 
     """

@@ -97,10 +97,10 @@ The dataset contains 1,664,500 rows. Each row describes a person and contains
          5. Never married or under 15 years old
 
    *  - OCCP
-      - Occupation. There are over 500 categories. Please see data dictionary at `ACS PUMS documentation <https://www.census.gov/programs-surveys/acs/microdata/documentation.2018.html>`_ for the full list of occupation codes.
+      - Occupation. There are over 500 categories. Please see data dictionary at ACS PUMS documentation :footcite:`census2019pums` for the full list of occupation codes.
 
    *  - POBP
-      - Place of birth. There are over 200 categories, including the 50 US states and several countries. Please see the data dictionary at `ACS PUMS documentation <https://www.census.gov/programs-surveys/acs/microdata/documentation.2018.html>`_ for the full list.
+      - Place of birth. There are over 200 categories, including the 50 US states and several countries. Please see the data dictionary at ACS PUMS documentation :footcite:`census2019pums` for the full list.
 
    *  - RELP
       - Relationship to householder:
@@ -120,8 +120,8 @@ The dataset contains 1,664,500 rows. Each row describes a person and contains
          13. Unmarried partner
          14. Foster child
          15. Other nonrelative
-         16. Institutionalized group quarters population. Includes correctional facilities, nursing homes, and mental hospitals. [CENSUS]_
-         17. Noninstitutionalized group quarters population. Includes college dormitories, military barracks, group homes, missions, and shelters. [CENSUS]_
+         16. Institutionalized group quarters population. Includes correctional facilities, nursing homes, and mental hospitals. :footcite:`census2023group`
+         17. Noninstitutionalized group quarters population. Includes college dormitories, military barracks, group homes, missions, and shelters. :footcite:`census2023group`
 
    *  - WKHP
       - Usual hours worked per week in the past 12 months. Values are an integer from 1 to 99. Any hours above 99 are rounded down to 99
@@ -161,8 +161,5 @@ classification task.
 
 
 .. topic:: References:
-
-  .. [CENSUS] `"Group Quarters and Residence Rules for Poverty" <https://www.census.gov/topics/income-poverty/poverty/guidance/group-quarters.html>`_,
-      United States Census Bureau.
 
    .. footbibliography::
