@@ -66,8 +66,8 @@ jobs:
     - name: Install testing requirements
       # LightGBM 4.0.0 is incompatible with latest numpy https://github.com/microsoft/LightGBM/issues/5990
       run: |
-        echo "Using pip to install test requirements"
-        pip install "pytest==7.4.2" pytest-mock "pytest-mpl" "lightgbm<4.0.0"
+        echo "Using pip to install test requirements subject to constraints in requirements-dev.txt"
+        pip install pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
     - name: Run tests
       run: pytest --ignore=test/install test/
 
