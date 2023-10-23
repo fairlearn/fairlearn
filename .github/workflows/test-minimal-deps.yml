@@ -9,6 +9,10 @@ on:
       python:
         required: true
         type: string
+      codeCovPython:
+        required: true
+        type: string
+        default: "3.11"
 
 jobs:
   minimal-deps:
