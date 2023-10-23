@@ -40,6 +40,7 @@ jobs:
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
+      codeCovPython: "3.11"
 
   
   other-ml:
