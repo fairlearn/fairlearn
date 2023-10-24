@@ -52,7 +52,6 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "bokeh.sphinxext.bokeh_plot",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
@@ -99,10 +98,6 @@ autosummary_generate = True
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.rst"]
 
 master_doc = "index"
-
-if fairlearn.__version__ == "0.4.6":
-    print("Current version is v0.4.6, will apply overrides")
-    master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 

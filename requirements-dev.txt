@@ -22,7 +22,7 @@ requirements-parser
 black==23.9.1
 
 # Required for test
-pytest==7.2.0
+pytest==7.4.2
 pytest-cov
 pytest-mock
 pytest-mpl
@@ -31,12 +31,12 @@ lightgbm<4.0.0  # 4.0.0 is incompatible with latest numpy https://github.com/mic
 xlrd
 
 # Required for documentation
-bokeh
 pypandoc
-sphinx==4.5.0
+sphinx==7.1.2; python_version=="3.8"
+sphinx==7.2.6; python_version>"3.8"
 sphinx-gallery
 numpydoc
-pydata-sphinx-theme==0.13.3
+pydata-sphinx-theme==0.14.1
 sphinx-autodoc-typehints
 sphinxcontrib-bibtex
 packaging

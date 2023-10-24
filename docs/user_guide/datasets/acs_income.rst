@@ -1,4 +1,5 @@
 .. _acsincome_data:
+
 ACSIncome
 ---------
 
