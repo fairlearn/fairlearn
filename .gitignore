@@ -121,3 +121,6 @@ docbuild/
 
 # Generated API stub files
 docs/api_reference/generated/
+
+# Doc build generated files
+*.pkl
