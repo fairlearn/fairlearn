@@ -29,6 +29,7 @@ jobs:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
       requirementsPinned: ${{ matrix.requirementsPinned }}
+      codeCovPython: "3.11"
   
   minimal-deps:
     strategy:
@@ -39,6 +40,7 @@ jobs:
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
+      codeCovPython: "3.11"
 
   
   other-ml:
