@@ -66,7 +66,7 @@ bootstrapping is a reasonable approach.
 
 We then need to determine how many bootstrap samples are required.
 Bootstrapping is a
-[Monte Carlo approach](https://en.wikipedia.org/wiki/Monte_Carlo_method),
+`Monte Carlo approach <https://en.wikipedia.org/wiki/Monte_Carlo_method>`_,
 so it introduces its own noise and reducing this will require more
 bootstrap samples (assuming that a poor random number generator does not
 render the exercise futile).
