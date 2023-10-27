@@ -1,28 +1,28 @@
-.. _error_estimation:
+.. _ci_estimation:
 
-Error Estimation
-================
+Confidence Interval Estimation
+==============================
 
 .. currentmodule:: fairlearn.metrics
 
 It is a fact universally acknowledged that a person in possession
-of a metric must be in want of an error bar.
+of a metric must be in want of a confidence interval.
 Indeed, the omnipresence of random noise means that anything purporting
 to represent the real world which does not feature an accompanying
-error estimate should be regarded with suspicion.
+confidence interval should be regarded with suspicion.
 When performing a fairness analysis this concern becomes acute,
 since we divide our sample into smaller groups, increasing
 the relative effects of random noise.
 We are then generally interested in the difference or ratio
-of function evaluations on these groups, and errors always
-accumulate, even when the target values (the difference or ratio
+of function evaluations on these groups, and noise always
+accumulates, even when the target values (the difference or ratio
 in this case) are getting smaller.
 :ref:`Intersecting groups <assessment_intersecting_groups>` make the
 problem worse, since some intersections can have very low
 sample counts, or even be empty.
 
 In Fairlearn, we offer bootstrapping as a means of estimating
-errors.
+confidence intervals.
 
 
 Bootstrapping
@@ -30,7 +30,8 @@ Bootstrapping
 
 When analysing data, we do not (usually) have access to the
 entire population; instead we have a sample.
-How then should we estimate errors?
+How then should we estimate the confidence intervals associated with
+the metrics we compute?
 Bootstrapping is a simple approach based on
 *resampling with replacement*.
 The process is as follows:
@@ -45,7 +46,7 @@ The process is as follows:
 #. Compute the distribution function of the set
    of bootstrap samples
 
-#. Estimate errors based on this distribution function
+#. Estimate confidence intervals based on this distribution function
 
 This is an easy and simple solution to a complex question,
 so we must immediately ask ourselves "*Is this also wrong?*"
@@ -64,17 +65,18 @@ it turns out that
 bootstrapping is a reasonable approach.
 
 We then need to determine how many bootstrap samples are required.
-Bootstrapping is a Monte Carlo approach, so it introduces its own
-noise and reducing this will require more bootstrap samples
-(assuming that a poor random number generator does not render
-the exercise futile).
+Bootstrapping is a
+[Monte Carlo approach](https://en.wikipedia.org/wiki/Monte_Carlo_method),
+so it introduces its own noise and reducing this will require more
+bootstrap samples (assuming that a poor random number generator does not
+render the exercise futile).
 In practice, it has been found that around 100 bootstrap samples
 can give reasonable estimates.
 While the number of bootstrap samples is trivial to increase,
 always remember that while this may make the answers more
 *precise* (by reducing the noise due to the bootstrap sampling),
 it will not necessarily make them more *accurate*.
-This is because the accuracy of the bootstrapped error estimates
+This is because the accuracy of the bootstrapped confidence interval estimates
 *depends on how well the data sample reflects the underlying population*.
 
 
@@ -86,7 +88,7 @@ bootstrapping capabilities.
 We start by setting up a very simple and small dataset, and a couple
 of metrics:
 
-.. doctest:: error_estimation
+.. doctest:: bootstrap_doc_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> y_true = [0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1]
@@ -108,12 +110,22 @@ of metrics:
 With everything set up, we can now construct a :class:`MetricFrame` with
 bootstrapping enabled.
 There are three relevant arguments for the constructor:
-`n_boot` (which indicates how many bootstrap samples we desire),
-`ci_quantiles` (which specifies where we want our confidence intervals computed)
-and `random_state` (which controls the random bootstrap sampling).
+
+- :code:`n_boot`
+- :code:`ci_quantiles`
+- :code:`random_state`
+
+Internally, :class:`MetricFrame` will construct :code:`n_boot` bootstrap
+samples (i.e. samples-with-replacements), according to the supplied
+:code:`random_state`.
+Each quantity available (such as :attr:`MetricFrame.overall` or
+:meth:`MetricFrame.difference`), is then evaluated for each of the
+bootstrap samples.
+The distribution of each is estimated via :func:`numpy.quantile`
+and the quantiles specified in :code:`ci_quantiles` extracted.
 We create our :class:`MetricFrame` thus:
 
-.. doctest:: error_estimation
+.. doctest:: bootstrap_doc_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> # Construct a MetricFrame with bootstrapping
@@ -132,7 +144,7 @@ deviation and median of the distribution.
 The 'normal' functionality of :class:`MetricFrame` is still available.
 For example:
 
-.. doctest:: error_estimation
+.. doctest:: bootstrap_doc_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> mf.overall
@@ -149,7 +161,7 @@ Let us look at the features bootstrapping makes available.
 First, the :attr:`MetricFrame.ci_quantiles` property records
 the confidence interval quantiles which we requested:
 
-.. doctest:: error_estimation
+.. doctest:: bootstrap_doc_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> mf.ci_quantiles
@@ -163,7 +175,7 @@ where each element is of the same type as the non-bootstrapped
 function.
 For example, consider :attr:`MetricFrame.overall_ci`:
 
-.. doctest:: error_estimation
+.. doctest:: bootstrap_doc_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> _ = [print(x, '\n--') for x in mf.overall_ci]
@@ -187,12 +199,12 @@ the same number of entries as the original.
 However, the :code:`selection_rate()` metric has been found
 to have values of 0.444, 0.556 and 0.667 for the quantiles
 specified.
-These values are inline with expectations (although note that
-with small numbers and 'rate' metrics, the median can quickly
-deviate from the nominal value).
+These values are in line with expectations (although note that
+with small numbers and 'proportion' metrics like :code:`selection_rate()`,
+the median can quickly deviate from the nominal value).
 Next, we can examine :attr:`MetricFrame.by_group_ci`:
 
-.. doctest:: error_estimation
+.. doctest:: bootstrap_doc_code
     :options:  +NORMALIZE_WHITESPACE
 
     >>> _ = [print(x, '\n--') for x in mf.by_group_ci]
