@@ -265,7 +265,7 @@ However, since equalized odds is based on both the true positive and
 false positive rates, there is an extra step in order to return
 a single scalar result.
 For :func:`equalized_odds_difference`, we first calculate the
-true positive rate difference and the true negative rate difference
+true positive rate difference and the false positive rate difference
 separately.
 We then return the larger of these two differences.
 *Mutatis mutandis*, :func:`equalized_odds_ratio` works similarly.
