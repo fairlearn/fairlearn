@@ -48,14 +48,14 @@ jobs:
           no_output_timeout: 30m
 
       - run:
-          name: "Copy landing_page.js"
-          command: cp docs/static_landing_page/js/landing_page.js docs/_build/
+          name: "Copy static pages"
+          command: cp -r docs/static_landing_page/ docs/_build/
 
       - persist_to_workspace:
           root: docs/_build
           paths: 
             - html
-            - landing_page.js
+            - static_landing_page
 
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
