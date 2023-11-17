@@ -41,6 +41,7 @@ indicate that a property holds for all identified groups.
    common_fairness_metrics
    custom_fairness_metrics
    intersecting_groups
+   confidence_interval_estimation
    advanced_metricframe
    plotting
    saving_loading_metricframe

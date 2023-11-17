@@ -11,6 +11,7 @@ from sklearn.utils import check_consistent_length
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
 
 from ._annotated_metric_function import AnnotatedMetricFunction
+from ._bootstrap import calculate_pandas_quantiles, generate_bootstrap_samples
 from ._disaggregated_result import (
     _INVALID_ERRORS_VALUE_ERROR_MESSAGE,
     _VALID_ERROR_STRING,
@@ -38,6 +39,10 @@ _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
 
 _COMPARE_METHODS = ["between_groups", "to_overall"]
 _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
+
+_BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
+_BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
+_BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
 
 
 class MetricFrame:
@@ -128,6 +133,19 @@ class MetricFrame:
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array-like dictionaries.
 
+    n_boot : Optional[int]
+        If set to a postive integer, generate this number of bootstrap samples of the
+        supplied data, and use to estimate confidence intervals for all of the metrics.
+        Must be set with `ci_quantiles`.
+
+    ci_quantiles : Optional[List[float]]
+        A list of confidence interval quantiles to extract from the bootstrap samples.
+        For example, the list `[0.159, 0.5, 0.841]` would extract the median and
+        standard deviations.
+
+    random_state : Optional[Union[int, np.random.RandomState]]
+        Used to control the generation of the bootstrap samples
+
     Examples
     --------
     We will now go through some simple examples (see the :ref:`User Guide <assessment>` for
@@ -213,6 +231,9 @@ class MetricFrame:
         sample_params: Optional[
             Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
         ] = None,
+        n_boot: Optional[int] = None,
+        ci_quantiles: Optional[List[float]] = None,
+        random_state: Optional[Union[int, np.random.RandomState]] = None,
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -253,6 +274,8 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
+        self._result_cache = dict()
+
         # Create the basic results
         result = DisaggregatedResult.create(
             data=all_data,
@@ -260,10 +283,33 @@ class MetricFrame:
             sensitive_feature_names=self._sf_names,
             control_feature_names=self._cf_names,
         )
-
         # Build into cache
-        self._result_cache = dict()
         self._populate_results(result)
+
+        # Handle bootstrapping
+        self._ci_quantiles = None
+        if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
+            if not isinstance(n_boot, int) or n_boot < 1:
+                raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
+            for _ci in ci_quantiles:
+                if not isinstance(_ci, float) or _ci <= 0 or _ci >= 1:
+                    raise ValueError(_BOOTSTRAP_CI_INVALID)
+            self._ci_quantiles = ci_quantiles
+
+            _bootstrap_samples = generate_bootstrap_samples(
+                n_samples=n_boot,
+                random_state=random_state,
+                data=all_data,
+                annotated_functions=annotated_funcs,
+                sensitive_feature_names=self._sf_names,
+                control_feature_names=self._cf_names,
+            )
+
+            self._populate_results_ci(_bootstrap_samples, ci_quantiles)
+        elif (n_boot is not None) ^ (
+            (ci_quantiles is not None) and (len(ci_quantiles)) > 0
+        ):
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
         """
@@ -357,8 +403,74 @@ class MetricFrame:
                         # Store any exception for later
                         self._result_cache[c_t][c_m][err_string] = e
 
+    def _populate_results_ci(
+        self, bootstrap_samples: List[DisaggregatedResult], ci_quantiles: List[float]
+    ):
+        """Similar to _populate_results, but computes confidence intervals from bootstrap.
+
+        Most of the work is done in :meth:`calculate_pandas_quantiles`.
+        """
+        result_overall = calculate_pandas_quantiles(
+            ci_quantiles, [x.overall for x in bootstrap_samples]
+        )
+        self._result_cache["overall_ci"] = [
+            self._extract_result(x, no_control_levels=False) for x in result_overall
+        ]
+
+        result_group = calculate_pandas_quantiles(
+            ci_quantiles, [x.by_group for x in bootstrap_samples]
+        )
+        self._result_cache["by_group_ci"] = [
+            self._extract_result(x, no_control_levels=True) for x in result_group
+        ]
+
+        group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
+        for k, v in group_functions.items():
+            self._result_cache[k] = self._result_cache[k] = self._group_ci(
+                bootstrap_samples=bootstrap_samples,
+                ci_quantiles=ci_quantiles,
+                grouping_function=v,
+            )
+
+        # Differences and ratios
+        for c_t in ["difference_ci", "ratio_ci"]:
+            self._result_cache[c_t] = dict()
+            for c_m in _COMPARE_METHODS:
+                if c_t == "difference_ci":
+                    raw_samples = [
+                        r.difference(
+                            self.control_levels,
+                            method=c_m,
+                            errors="raise",
+                        )
+                        for r in bootstrap_samples
+                    ]
+                else:
+                    raw_samples = [
+                        r.ratio(
+                            self.control_levels,
+                            method=c_m,
+                            errors="raise",
+                        )
+                        for r in bootstrap_samples
+                    ]
+
+                samples = [self._none_to_nan(x) for x in raw_samples]
+
+                raw_result = calculate_pandas_quantiles(
+                    quantiles=ci_quantiles, bootstrap_samples=samples
+                )
+
+                result = [
+                    self._extract_result(x, no_control_levels=False) for x in raw_result
+                ]
+
+                self._result_cache[c_t][c_m] = result
+
     @property
-    def overall(self) -> Union[Any, pd.Series, pd.DataFrame]:
+    def overall(
+        self,
+    ) -> Union[Any, pd.Series, pd.DataFrame,]:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Read more in the :ref:`User Guide <assessment_quantify_harms>`.
@@ -393,7 +505,24 @@ class MetricFrame:
         return self._result_cache["overall"]
 
     @property
-    def by_group(self) -> Union[pd.Series, pd.DataFrame]:
+    def overall_ci(
+        self,
+    ) -> List[Union[Any, pd.Series, pd.DataFrame,]]:
+        """Return the underlying bootstrapped metrics evaluated on the whole dataset.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list of the same underlying type as that returned by
+        :attr:`MetricFrame.overall` property.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
+        return self._result_cache["overall_ci"]
+
+    @property
+    def by_group(
+        self,
+    ) -> Union[pd.Series, pd.DataFrame]:
         """Return the collection of metrics evaluated for each subgroup.
 
         The collection is defined by the combination of classes in the
@@ -420,6 +549,19 @@ class MetricFrame:
             are specified), then the corresponding entry will be NaN.
         """
         return self._result_cache["by_group"]
+
+    @property
+    def by_group_ci(self) -> Union[List[pd.Series], List[pd.DataFrame]]:
+        """Return the confidence intervals for the metrics, evaluated on each subgroup.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :attr:`MetricFrame.by_group` property.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+        """
+        return self._result_cache["by_group_ci"]
 
     @property
     def control_levels(self) -> Optional[List[str]]:
@@ -454,6 +596,11 @@ class MetricFrame:
         """
         return self._sf_names
 
+    @property
+    def ci_quantiles(self) -> Optional[List[float]]:
+        """Return the quantiles specified for bootstrapping."""
+        return self._ci_quantiles
+
     def _group(
         self,
         disagg_result: DisaggregatedResult,
@@ -483,6 +630,26 @@ class MetricFrame:
         )
 
         return self._extract_result(result, no_control_levels=False)
+
+    def _group_ci(
+        self,
+        bootstrap_samples: List[DisaggregatedResult],
+        ci_quantiles: List[float],
+        grouping_function: str,
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        # There is no 'errors' argument because everything must have been a scalar for
+        # np.quantiles
+        samples = [
+            r.apply_grouping(grouping_function, self.control_levels, errors="raise")
+            for r in bootstrap_samples
+        ]
+
+        raw_result = calculate_pandas_quantiles(
+            quantiles=ci_quantiles, bootstrap_samples=samples
+        )
+
+        result = [self._extract_result(x, no_control_levels=False) for x in raw_result]
+        return result
 
     def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
@@ -517,6 +684,22 @@ class MetricFrame:
         else:
             return value
 
+    def group_max_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_max`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :meth:`MetricFrame.group_max` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+
+        Unlike :meth:`MetricFrame.group_max` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
+        value = self._result_cache["group_max_ci"]
+        return value
+
     def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
@@ -549,6 +732,22 @@ class MetricFrame:
             raise value
         else:
             return value
+
+    def group_min_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_min`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :meth:`MetricFrame.group_min` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+
+        Unlike :meth:`MetricFrame.group_min` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
+        value = self._result_cache["group_min_ci"]
+        return value
 
     def difference(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -598,6 +797,27 @@ class MetricFrame:
             raise value
         else:
             return value
+
+    def difference_ci(
+        self, method: str = "between_groups"
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :meth:`MetricFrame.difference`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :func:`MetricFrame.difference` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+
+        Unlike :meth:`MetricFrame.difference` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        value = self._result_cache["difference_ci"][method]
+        return value
 
     def ratio(
         self, method: str = "between_groups", errors: str = "coerce"
@@ -649,6 +869,27 @@ class MetricFrame:
             raise value
         else:
             return value
+
+    def ratio_ci(
+        self, method: str = "between_groups"
+    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        """Return the bootstrapped confidence intervals for :meth:`MetricFrame.ratio`.
+
+        When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
+        constructor), this property will be available.
+        The contents will be a list, with each element having the same type as that
+        returned by the :func:`MetricFrame.ratio` function.
+        The elements of the list are indexed by the `ci_quantiles` array supplied
+        to the constructor.
+
+        Unlike :meth:`MetricFrame.ratio` there is no :code:`errors` parameter, because
+        a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+        """
+        if method not in _COMPARE_METHODS:
+            raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        value = self._result_cache["ratio_ci"][method]
+        return value
 
     def _process_functions(
         self,
