@@ -13,10 +13,6 @@ on:
         required: true
         type: string
         default: "3.11"
-      codeCovOS:
-        required: true
-        type: string
-        default: "ubuntu-latest"
 
 jobs:
   minimal-deps:
@@ -26,6 +22,13 @@ jobs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v3
+      - name: Get commit date
+        id: get_date
+        run: |
+          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
+          CURRENT_DATE=$(date +%s)
+          AGE=$((CURRENT_DATE - COMMIT_DATE))
+          echo "::set-output name=age::$AGE"
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ inputs.python }}
@@ -34,7 +37,7 @@ jobs:
       - run: pytest --cov=fairlearn --cov-report=xml test/install
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        if: ${{ (inputs.codeCovPython == inputs.python) && (inputs.codeCovOS == inputs.os) }}
+        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.age < 172800) }}
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
