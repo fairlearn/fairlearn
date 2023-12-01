@@ -13,6 +13,10 @@ on:
         required: true
         type: string
         default: "3.11"
+      codeCovOS:
+        required: true
+        type: string
+        default: "ubuntu-latest"
 
 jobs:
   minimal-deps:
@@ -30,7 +34,7 @@ jobs:
       - run: pytest --cov=fairlearn --cov-report=xml test/install
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        if: ${{ inputs.codeCovPython == inputs.python }}
+        if: ${{ (inputs.codeCovPython == inputs.python) && (inputs.codeCovOS == inputs.os) }}
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true

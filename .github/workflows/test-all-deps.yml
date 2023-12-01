@@ -17,6 +17,10 @@ on:
         required: true
         type: string
         default: "3.11"
+      codeCovOS:
+        required: true
+        type: string
+        default: "ubuntu-latest"
 
 jobs:
   all-deps:
@@ -34,7 +38,7 @@ jobs:
       - run: pip install matplotlib
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
       - name: Upload coverage to Codecov
-        if: ${{ inputs.codeCovPython == inputs.python }}
+        if: ${{ (inputs.codeCovPython == inputs.python) && (inputs.codeCovOS == inputs.os) }}
         uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
