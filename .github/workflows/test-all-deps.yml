@@ -21,6 +21,8 @@ on:
 jobs:
   all-deps:
     # This job installs all dependencies and runs most tests.
+    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
+    # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     env:
       MPLBACKEND: Agg

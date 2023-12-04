@@ -19,6 +19,8 @@ jobs:
     # This job installs minimal dependencies and runs tests for the minimal
     # dependency cases. This also covers the case where matplotlib is not
     # installed, i.e., fairlearn without extras.
+    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
+    # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v3
