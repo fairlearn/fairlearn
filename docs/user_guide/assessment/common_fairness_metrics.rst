@@ -95,7 +95,7 @@ by :footcite:cts:`barocas2019fairness`:
 
     "However, decisions based on a classifier that satisfies independence can 
     have undesirable properties (and similar arguments apply to other 
-    statistical critiera). Here is one way in which this can happen, 
+    statistical criteria). Here is one way in which this can happen,
     which is easiest to illustrate if we imagine a callous or ill-intentioned 
     decision maker. Imagine a company that in *group A* hires diligently 
     selected applicants at some rate p>0. In *group B*, the company 
@@ -123,7 +123,7 @@ but that trend may disappear or reverse when groups are combined. Known as
 `Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
 outcome may appear when observing disparate outcomes across groups. A 
 famous example of Simpson's Paradox is a study of 1973 graduate school 
-admissions to the University of California, Berkley :footcite:ps:`bickel1975biasinadmissions`. 
+admissions to the University of California, Berkeley :footcite:ps:`bickel1975biasinadmissions`.
 The study showed that when observing admissions by gender, men applying were 
 more likely than women to be accepted. However, drilling down into admissions 
 by department revealed that women tended to apply to departments with more 
@@ -205,7 +205,7 @@ The goal of the equalized odds fairness metric is to ensure a machine
 learning model performs equally well for different groups. It is stricter 
 than demographic parity because it requires that the machine learning 
 model's predictions are not only independent of sensitive group membership, 
-but that groups have the same false positive rates and and true positive 
+but that groups have the same false positive rates and true positive
 rates. This distinction is important because a model could achieve 
 demographic parity (i.e., its predictions could be independent of 
 sensitive group membership), but still generate more false positive 

@@ -111,7 +111,7 @@ to control the level of filtering between the sensitive and non-sensitive featur
     CorrelationRemover(alpha=0.5, sensitive_feature_ids=['race_AfricanAmerican'])
     >>> X_transform = cr.transform(X)
 
-As we can see in the visulization below, not all correlation between
+As we can see in the visualization below, not all correlation between
 'race_AfricanAmerican' and the other columns was removed. This is exactly what
 we would expect with :math:`\alpha=0.5`.
 
