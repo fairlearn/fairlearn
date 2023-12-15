@@ -379,7 +379,7 @@ Besides, other benchmark datasets exist that do not present these issues.
 
 
 It's important to keep the differences between the way Harrison and Rubenfield
-used the dataset and the way modern machine learning practicioners have used
+used the dataset and the way modern machine learning practitioners have used
 it in focus.
 Harrison and Rubenfield conducted an empirical study,
 the goal of which was to determine the causal impacts of these variables on

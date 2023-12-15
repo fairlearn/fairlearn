@@ -50,7 +50,7 @@ The Fairlearn package has two components:
 Fairlearn in 10 minutes
 -----------------------
 
-The Fairlearn tookit can assist in assessing and mitigation unfairness in
+The Fairlearn toolkit can assist in assessing and mitigation unfairness in
 Machine Learning models. It's impossible to provide a sufficient overview of
 fairness in ML in this Quickstart tutorial, so we highly recommend starting
 with our :ref:`user_guide`. Fairness is a fundamentally sociotechnical

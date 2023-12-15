@@ -80,7 +80,7 @@ Intersectionality in Mental Health Care
 # -----------------------------
 #
 # When we do a fairness assessment, we need to decide which groups of people to compare to identify
-# whether there is some kind of fairness-related harm occuring.
+# whether there is some kind of fairness-related harm occurring.
 #
 # The key question in being able to do so is this: **Who and what is a population?** It may seem
 # like this question is trivial, and has a clear-cut meaning in no need of further clarification.
@@ -202,7 +202,7 @@ Intersectionality in Mental Health Care
 #   :width: 600
 #   :alt: A visualization that shows the average height of different countries in 1914 and 2014.
 #         The Netherlands has the tallest average body height for men, Iran the biggest height gain
-#         for men, South Korea the biggest height gain for women, and Guatamala the smallest average
+#         for men, South Korea the biggest height gain for women, and Guatemala the smallest average
 #         body height for women.
 #
 # On the basis of what population definitions are these comparisons being made? In this case,
@@ -230,7 +230,7 @@ Intersectionality in Mental Health Care
 # illuminate. This could include anything from gender dynamics, to class disparities, to differing
 # economic systems - all of which can have differing impacts on human health.
 #
-# This point is especially important because of how **heterogenous humans are**, across space and
+# This point is especially important because of how **heterogeneous humans are**, across space and
 # time, both between groups and within groups. Someone who has written extensively about this in
 # relation to ML, disability, and design is Jutta Treviranus.
 #

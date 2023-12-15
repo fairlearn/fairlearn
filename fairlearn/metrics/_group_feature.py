@@ -27,7 +27,7 @@ class GroupFeature:
     to the subgroups it identifies.
 
     It also holds the feature name, which can be supplied by the caller,
-    or generated from a base and and index.
+    or generated from a base and index.
 
     Parameters
     ----------
