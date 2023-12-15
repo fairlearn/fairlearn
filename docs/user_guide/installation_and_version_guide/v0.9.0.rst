@@ -9,7 +9,7 @@ v0.9.0
   compatibility with scikit-learn 1.2.
 * Set default value of :code:`parser` of :code:`sklearn.datasets.fetch_openml` in
   :mod:`fairlearn.datasets` to :code:`liac-arff` to match behavior before scikit-learn 1.2.
-* Replace calculations in :mod:`fairlearn.reductions` by matrix multiplication which can lead to
+* Replaced calculations in :mod:`fairlearn.reductions` by matrix multiplication which can lead to
   substantial speed-ups for :class:`~fairlearn.reductions.ExponentiatedGradient` for simple
   estimators like logistic regression.
 * Added :code:`as_frame` (with default :code:`True`) argument to
@@ -21,3 +21,5 @@ v0.9.0
   :code:`CrossEntropyLoss`.
 * Various documentation tweaks and enhancements, including restructuring of the user guide and
   breaking out information in the API reference to separate pages.
+* Removed `customplots` extra. To use our plotting capabilities, please install `matplotlib`
+  if it is not already part of your environment.
