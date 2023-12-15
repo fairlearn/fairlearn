@@ -206,38 +206,38 @@ while specifying an appropriate fairness constraint. Note that the choice of
 fairness constraints is crucial for the resulting model, and varies based on
 application context. If balanced accuracy is highly relevant for fairness in this
 contrived example, we can attempt to mitigate the observed disparity using the
-corresponding fairness constraint called Demographic Parity. In real world
+corresponding fairness constraint called Equalized Odds. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
-provided classifier using Demographic Parity as the constraint and Error Rate
+provided classifier using Equalized Odds as the constraint and Error Rate
 as the objective, leading to a vastly reduced difference in  the selection rate:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.reductions import ErrorRateParity, DemographicParity, ExponentiatedGradient
+    >>> from fairlearn.reductions import ErrorRateParity, EqualizedOdds, ExponentiatedGradient
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.5, 'fn': 0.5})
-    >>> constraint = DemographicParity()
+    >>> constraint = EqualizedOdds()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective = objective)
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>>
-    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, \
+    >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, \
     y_pred=y_pred_mitigated, sensitive_features=A_test)
-    >>> sr_mitigated.overall
-    0.0004...
-    >>> sr_mitigated.by_group
+    >>> mf_mitigated.overall
+    0.889...
+    >>> mf_mitigated.by_group
     race
-    AfricanAmerican    0.000000
-    Asian              0.000000
-    Caucasian          0.000475
-    Hispanic           0.001957
-    Other              0.000000
-    Unknown            0.000000
-    Name: selection_rate, dtype: float64
+    AfricanAmerican    0.889620
+    Asian              0.916168
+    Caucasian          0.886990
+    Hispanic           0.896282
+    Other              0.890141
+    Unknown            0.915254
+    Name: accuracy_score, dtype: float64
 
 Note that because :class:`ExponentiatedGradient` does not have a `predict_proba`
 method, we cannot set a lower threshold for a positive prediction to deal with the 
