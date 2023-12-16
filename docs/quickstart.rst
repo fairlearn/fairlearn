@@ -160,6 +160,7 @@ we can evaluate metrics for subgroups within the data as below:
 Note that above, because the outcome variable exhibits label imbalance, we set 
 the threshold for triggering a positive prediction lower 
 (to a probability of 0.1 or greater).
+We chose this threshold to match the fraction of positive labels in the dataset.
 Fairlearn has many standard metrics built-in, such as
 false negative rate, i.e., the rate of occurrence of negative classifications
 when the true value of the outcome label is positive. 
