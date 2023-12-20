@@ -27,7 +27,7 @@ def demographic_parity_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -73,7 +73,7 @@ def demographic_parity_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -122,7 +122,7 @@ def equalized_odds_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -165,7 +165,7 @@ def equalized_odds_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -219,7 +219,7 @@ def equal_opportunity_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which equal opportunity should be assessed
 
     method : str
@@ -265,7 +265,7 @@ def equal_opportunity_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which equal opportunity should be assessed
 
     method : str
