@@ -1,6 +1,11 @@
 [
     {
-        "name": "v0.9.0 (stable)",
+        "name": "v0.10.0 (stable)",
+        "version": "0.10.0",
+        "url": "https://fairlearn.org/v0.10/"
+    },
+    {
+        "name": "v0.9.0",
         "version": "0.9.0",
         "url": "https://fairlearn.org/v0.9/"
     },
@@ -30,8 +35,8 @@
         "url": "https://fairlearn.org/v0.4.6/"
     },
     {
-        "name": "v0.10.0 (dev)",
-        "version": "0.10.0",
+        "name": "v0.11.0 (dev)",
+        "version": "0.11.0",
         "url": "https://fairlearn.org/main/"
     }
 ]
