@@ -9,6 +9,8 @@ from fairlearn.metrics import (
     demographic_parity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio,
+    equal_opportunity_difference,
+    equal_opportunity_ratio,
     false_positive_rate,
     selection_rate,
     true_positive_rate,
@@ -143,3 +145,63 @@ def test_equalized_odds_ratio_weighted(agg_method):
 
     ratios = gm.ratio(method=agg_method)
     assert actual == ratios.min()
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_difference(agg_method):
+    actual = equal_opportunity_difference(
+        y_t, y_p, sensitive_features=g_1, method=agg_method
+    )
+
+    gm = MetricFrame(
+        metrics=true_positive_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1
+    )
+
+    assert actual == gm.difference(method=agg_method)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_difference_weighted(agg_method):
+    actual = equal_opportunity_difference(
+        y_t, y_p, sensitive_features=g_1, sample_weight=s_w, method=agg_method
+    )
+
+    gm = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        sample_params={"sample_weight": s_w},
+    )
+
+    assert actual == gm.difference(method=agg_method)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_ratio(agg_method):
+    actual = equal_opportunity_ratio(
+        y_t, y_p, sensitive_features=g_1, method=agg_method
+    )
+
+    gm = MetricFrame(
+        metrics=true_positive_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1
+    )
+
+    assert actual == gm.ratio(method=agg_method)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_ratio_weighted(agg_method):
+    actual = equal_opportunity_ratio(
+        y_t, y_p, sensitive_features=g_1, sample_weight=s_w, method=agg_method
+    )
+
+    gm = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        sample_params={"sample_weight": s_w},
+    )
+
+    assert actual == gm.ratio(method=agg_method)

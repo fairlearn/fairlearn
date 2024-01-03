@@ -36,6 +36,8 @@ from ._fairness_metrics import demographic_parity_difference  # noqa: F401
 from ._fairness_metrics import demographic_parity_ratio  # noqa: F401
 from ._fairness_metrics import equalized_odds_difference  # noqa: F401
 from ._fairness_metrics import equalized_odds_ratio  # noqa: F401
+from ._fairness_metrics import equal_opportunity_difference  # noqa: F401
+from ._fairness_metrics import equal_opportunity_ratio  # noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
@@ -57,6 +59,8 @@ _fairness = [
     "demographic_parity_ratio",
     "equalized_odds_difference",
     "equalized_odds_ratio",
+    "equal_opportunity_difference",
+    "equal_opportunity_ratio",
 ]
 
 _base_metrics = [
