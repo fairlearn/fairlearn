@@ -12,3 +12,7 @@ adding new ones please consult the guide on
 
     The Fairlearn API is still evolving, so if you want to run these
     on your local Fairlearn installation, make sure to match versions.
+
+
+.. note::
+   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/README.rst>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.
