@@ -1338,3 +1338,7 @@ plt.show()
 #
 # .. footbibliography::
 #
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_intersectional_bias.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

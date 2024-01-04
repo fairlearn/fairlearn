@@ -119,3 +119,7 @@ exponentiated_gradient = ExponentiatedGradient(
 )
 exponentiated_gradient.fit(X_train, y_train, sensitive_features=A_train)
 print(exponentiated_gradient.predict(X_test))
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_mitigation_pipeline.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

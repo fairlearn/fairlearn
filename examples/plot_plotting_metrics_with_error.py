@@ -253,3 +253,7 @@ axs[0][1].set_ylabel("Accuracy")
 # Set the y-scale for both metrics to [0, 1]
 axs[0][0].set_ylim((0, 1))
 axs[0][1].set_ylim((0, 1))
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_plotting_metrics_with_error.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

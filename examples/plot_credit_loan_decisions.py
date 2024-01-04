@@ -1267,3 +1267,7 @@ metricframe_postprocess.overall[metrics_to_report]
 #
 # .. footbibliography::
 #
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_credit_loan_decisions.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.
