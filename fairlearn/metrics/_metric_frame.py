@@ -154,7 +154,7 @@ class MetricFrame:
     >>> from fairlearn.metrics import MetricFrame, selection_rate
     >>> from sklearn.metrics import accuracy_score
     >>> import pandas as pd
-    >>> y_true = [1,1,1,1,1,0,0,1,1,0]
+    >>> y_true = [1,1,1,1,1,0,0,0,0,0]
     >>> y_pred = [0,1,1,1,1,0,0,0,1,1]
     >>> sex = ['Female']*5 + ['Male']*5
     >>> metrics = {"selection_rate": selection_rate}
