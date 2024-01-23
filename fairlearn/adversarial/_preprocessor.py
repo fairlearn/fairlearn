@@ -112,7 +112,8 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
                 raise ValueError("Dimension of data is inconsistent with previous call")
         if X.ndim == 1:
             X = X.reshape(-1, 1)
-        assert X.ndim == 2
+        if X.ndim != 2:
+            raise SystemError("Data must be two dimensional at this point.")
 
         return X
 
