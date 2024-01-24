@@ -363,7 +363,9 @@ class DisaggregatedResult:
             overall = apply_to_dataframe(data, metric_functions=annotated_functions)
         else:
             temp = data.groupby(by=control_feature_names).apply(
-                apply_to_dataframe, metric_functions=annotated_functions
+                apply_to_dataframe,
+                metric_functions=annotated_functions,
+                include_groups=False,
             )
             # If there are multiple control features, might have missing combinations
             if len(control_feature_names) > 1:
@@ -383,7 +385,9 @@ class DisaggregatedResult:
             all_grouping_names = control_feature_names + all_grouping_names
 
         temp = data.groupby(all_grouping_names).apply(
-            apply_to_dataframe, metric_functions=annotated_functions
+            apply_to_dataframe,
+            metric_functions=annotated_functions,
+            include_groups=False,
         )
         if len(all_grouping_names) > 1:
             # We might have missing combinations in the input, so expand to fill

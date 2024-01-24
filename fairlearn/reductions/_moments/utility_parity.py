@@ -10,14 +10,7 @@ from fairlearn.utils._input_validation import (
 )
 
 from .error_rate import ErrorRate
-from .moment import (
-    _ALL,
-    _EVENT,
-    _GROUP_ID,
-    _LABEL,
-    _SIGN,
-    ClassificationMoment,
-)
+from .moment import _ALL, _EVENT, _GROUP_ID, _LABEL, _SIGN, ClassificationMoment
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
@@ -211,8 +204,8 @@ class UtilityParity(ClassificationMoment):
             for g in group_vals[:-1]:
                 self.pos_basis[i] = 0 + zero_vec
                 self.neg_basis[i] = 0 + zero_vec
-                self.pos_basis[i]["+", e, g] = 1
-                self.neg_basis[i]["-", e, g] = 1
+                self.pos_basis.loc[("+", e, g), i] = 1
+                self.neg_basis.loc[("-", e, g), i] = 1
                 self.neg_basis_present.at[i] = True
                 i += 1
 
