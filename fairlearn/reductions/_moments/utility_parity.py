@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -199,15 +201,26 @@ class UtilityParity(ClassificationMoment):
         self.neg_basis_present = pd.Series(dtype="float64")
         zero_vec = pd.Series(0.0, self.index)
         i = 0
-        for e in event_vals:
-            # Constraints on the final group are redundant, so they are not included in the basis.
-            for g in group_vals[:-1]:
-                self.pos_basis[i] = 0 + zero_vec
-                self.neg_basis[i] = 0 + zero_vec
-                self.pos_basis.loc[("+", e, g), i] = 1
-                self.neg_basis.loc[("-", e, g), i] = 1
-                self.neg_basis_present.at[i] = True
-                i += 1
+
+        # the way we're creating the dataframes here means the indices are not sorted
+        # and indexing on them is not ideal. To fix this, one would usually call
+        # sort_index() on the dataframe, but here we would need to do that on every
+        # single iteration of the inner loop. Instead, we suppress the warning and
+        # sort the indices at the end of the loop.
+        with warnings.catch_warnings(record=False):
+            warnings.simplefilter("ignore", category=pd.errors.PerformanceWarning)
+            for e in event_vals:
+                # Constraints on the final group are redundant, so they are not
+                # included in the basis.
+                for g in group_vals[:-1]:
+                    self.pos_basis[i] = 0 + zero_vec
+                    self.neg_basis[i] = 0 + zero_vec
+                    self.pos_basis.loc[("+", e, g), i] = 1
+                    self.neg_basis.loc[("-", e, g), i] = 1
+                    self.neg_basis_present.at[i] = True
+                    i += 1
+        # self.pos_basis - self.pos_basis.sort_index()
+        # self.neg_basis - self.neg_basis.sort_index()
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
