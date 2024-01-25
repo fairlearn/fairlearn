@@ -100,10 +100,12 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
         if self.predict_method == "deprecated":
             warn(
-                "'predict_method' default value is changed from 'predict' to "
-                "'auto'. Explicitly pass `predict_method='predict' to "
-                "replicate the old behavior, or pass `predict_method='auto' "
-                "or other valid values to silence this warning.",
+                (
+                    "'predict_method' default value is changed from 'predict' to "
+                    "'auto'. Explicitly pass `predict_method='predict' to "
+                    "replicate the old behavior, or pass `predict_method='auto' "
+                    "or other valid values to silence this warning."
+                ),
                 FutureWarning,
             )
             self._predict_method = "predict"
