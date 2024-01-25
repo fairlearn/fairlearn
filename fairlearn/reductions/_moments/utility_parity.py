@@ -212,8 +212,10 @@ class UtilityParity(ClassificationMoment):
             # Constraints on the final group are redundant, so they are not
             # included in the basis.
             for g in group_vals[:-1]:
-                self.pos_basis.loc[("+", e, g), i] = 1
-                self.neg_basis.loc[("-", e, g), i] = 1
+                if ("+", e, g) in self.index:
+                    self.pos_basis.loc[("+", e, g), i] = 1
+                if ("-", e, g) in self.index:
+                    self.neg_basis.loc[("-", e, g), i] = 1
                 self.neg_basis_present.at[i] = True
                 i += 1
 
