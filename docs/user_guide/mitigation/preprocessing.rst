@@ -119,39 +119,3 @@ we would expect with :math:`\alpha=0.5`.
     :align: center
     :target: ../../auto_examples/plot_correlationremover_before_after.html
 
-
-Optimized Preprocessor(Calmon et al., 2017)
--------------------------------------------
-
-We have a dataset with n i.i.d. samples {(Di, Xi, Yi)} from a joint distribution pD,X,Y with domain D × X × Y. D includes discriminatory variables (e.g., gender, race), X includes non-protected variables, and Y is an outcome variable (binary). Our goal is to create a randomized mapping pX, ˆ Yˆ |X,Y,D that transforms the dataset and test data, retaining discriminatory variables. The mapping satisfies discrimination control, distortion control, and utility preservation.
-
-Discrimination Control
-------------------------
-
-Our objective is to limit the dependence of the transformed outcome Yˆ on discriminatory variables D. We propose two formulations: (1) close to a target distribution pYT and (2) similar for any two values of D. The distance function J(·, ·) measures the difference. Discrimination control can also be applied within segments of the population using additional variables B.
-
-Distortion Control
--------------------
-
-The mapping should satisfy distortion constraints in X × Y. The conditional expectation of distortion is constrained to avoid certain large changes. The constraints promote individual fairness and apply to every individual in the original dataset and those to which the model is applied.
-
-Utility Preservation
----------------------
-
-We require the distribution of (X, ˆ Yˆ ) to be statistically close to the distribution of (X, Y ) using a dissimilarity measure ∆ (e.g., KL-divergence).
-
-Optimization Formulation
--------------------------
-
-The goal is to determine pX, ˆ Yˆ |X,Y,D to minimize utility loss subject to constraints on individual distortion and discrimination:
-
-.. code-block:: rst
-
-   .. math::
-
-      min \Delta(pX, ˆ Yˆ , pX,Y)
-      s.t. J(pYˆ |D(y|d), pYT(y)) ≤ εy,d
-           E[δ((x, y), (X, ˆ Yˆ )) | D = d, X = x, Y = y] ≤ cd,x,y
-
-
-The optimization problem ensures fairness-preserving data augmentation while controlling discrimination, distortion, and preserving utility.
