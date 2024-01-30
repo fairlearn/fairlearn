@@ -225,8 +225,8 @@ conditionally independent of the sensitive feature :math:`A` given the label
 :footcite:cts:`agarwal2018reductions` show that this is equivalent to
 :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
 Equalized odds requires that the true 
-positive rate, :math:`\P(h(X)=1 | Y=1`, and the false positive rate, 
-:math:`\P(h(X)=1 | Y=0`, be equal across groups. 
+positive rate, :math:`\P(h(X)=1 | Y=1)`, and the false positive rate, 
+:math:`\P(h(X)=1 | Y=0)`, be equal across groups. 
 
 The inclusion of false positive rates acknowledges that different groups 
 experience different costs from misclassification. For example, in the case of 

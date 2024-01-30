@@ -61,7 +61,7 @@ class ConditionalLossMoment(LossMoment):
         for attr in attr_vals:
             self.pos_basis[i] = 0 + zero_vec
             self.neg_basis[i] = 0 + zero_vec
-            self.pos_basis[i][attr] = 1
+            self.pos_basis.loc[attr, i] = 1
             self.neg_basis_present.at[i] = False
             i += 1
 
