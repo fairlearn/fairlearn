@@ -132,7 +132,7 @@ optim_options = {
     "clist": [0.99, 1.99, 2.99],
     "dlist": [0.1, 0.05, 0],
 }
-opt = OptimizedPreprocessor(optimizer=DTools, optim_options=optim_options)
+opt = OptimizedPreprocessor(distortion_function=get_distortion_adult)
 opt.fit(df=df, D_features=D_features, X_features=X_features, Y_features=Y_features)
 df_transformed = opt.transform(
     df=df, D_features=D_features, X_features=X_features, Y_features=Y_features

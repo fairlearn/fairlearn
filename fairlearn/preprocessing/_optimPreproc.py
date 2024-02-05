@@ -20,12 +20,16 @@ class OptimizedPreprocessor:
     Based on code available at: https://github.com/fair-preprocessing/nips2017
     """
 
-    def __init__(self, optimizer, optim_options, verbose=False, seed=None) -> None:
+    def __init__(self, distortion_function, epsilon=0.05, clist=[0.99, 1.99, 2.99], dlist=[0.1, 0.05, 0], verbose=False, seed=None) -> None:
         super().__init__()
 
         self.seed = seed
-        self.optimizer = optimizer
-        self.optim_options = optim_options
+        self.optim_options = {
+            "distortion_fun": distortion_function,
+            "epsilon": epsilon,
+            "clist": clist,
+            "dlist": dlist,
+        }
         self.verbose = verbose
 
     def fit(self, df, X_features, Y_features, D_features):
