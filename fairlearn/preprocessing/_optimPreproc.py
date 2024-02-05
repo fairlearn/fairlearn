@@ -40,7 +40,7 @@ class OptimizedPreprocessor:
 
         self.opt.setFeatures(D=self.D_features, X=self.X_features, Y=self.Y_features)
 
-        self.opt.setDistortion(
+        self.opt.set_distortion(
             self.optim_options["distortion_fun"], self.optim_options["clist"]
         )
 

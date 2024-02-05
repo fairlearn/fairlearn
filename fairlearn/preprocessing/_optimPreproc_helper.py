@@ -193,7 +193,7 @@ class DTools:
         self.dfMask_Pxyd_to_Pd = self.getMask(self.dfMask_Pxyd_to_Pd)
 
     # method for passing the distortion value
-    def setDistortion(self, Dclass, clist=[]):
+    def set_distortion(self, Dclass, clist=[]):
         """
         Inputs:
         * 'Dclass' is a class with a method 'getDistortion' that computes the distortion between two dictionaries of features
