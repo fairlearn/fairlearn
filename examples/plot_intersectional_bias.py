@@ -659,7 +659,7 @@ testy = test.Diagnosis
 #
 
 # %%
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, Binarizer
 
 # Perform one hot encoding
 categories = ["Sex", "Race", "Housing", "Delay"]  # Categorial variables
