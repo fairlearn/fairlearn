@@ -125,6 +125,7 @@ A list of current maintainers is
 
 Issues
 ------
+https://github.com/fairlearn/fairlearn/labels/help%20wanted
 
 Usage Questions
 ~~~~~~~~~~~~~~~
