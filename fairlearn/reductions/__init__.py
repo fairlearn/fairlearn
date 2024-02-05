@@ -7,6 +7,7 @@ In this approach, disparity constraints are cast as Lagrange multipliers, which 
 reweighting and relabelling of the input data. This *reduces* the problem back to standard machine
 learning training.
 """
+import os 
 
 from ._exponentiated_gradient import ExponentiatedGradient  # noqa: F401
 from ._grid_search import GridSearch  # noqa: F401
