@@ -6,6 +6,20 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class OptimizedPreprocessor:
+    """Optimized preprocessing is a preprocessing technique that learns a
+    probabilistic transformation that edits the features and labels in the data
+    with group fairness, individual distortion, and data fidelity constraints
+    and objectives [3]_.
+
+    References:
+        .. [3] F. P. Calmon, D. Wei, B. Vinzamuri, K. Natesan Ramamurthy, and
+           K. R. Varshney. "Optimized Pre-Processing for Discrimination
+           Prevention." Conference on Neural Information Processing Systems,
+           2017.
+
+    Based on code available at: https://github.com/fair-preprocessing/nips2017
+    """
+
     def __init__(self, optimizer, optim_options, verbose=False, seed=None) -> None:
         super().__init__()
 
@@ -37,34 +51,6 @@ class OptimizedPreprocessor:
         )
 
         self.opt.computeMarginals()
-
-        """
-        self.protected_feature_names = protected_features
-        self.Y_feature_names = Y_label_name
-        self.X_feature_names = [
-            n
-            for n in df.columns.tolist()
-            if n not in self.Y_feature_names and n not in self.protected_feature_names
-        ]
-        self.feature_names = (
-            self.X_feature_names + self.Y_feature_names + self.protected_feature_names
-        )
-        self.opt = self.optimizer(df=df, features=self.feature_names)
-        self.opt.set_features(
-            D=self.protected_feature_names,
-            X=self.X_feature_names,
-            Y=self.Y_feature_names,
-        )
-        self.opt.set_distortion(
-            self.optim_options["distortion_fun"], clist=self.optim_options["clist"]
-        )
-        self.opt.optimize(
-            epsilon=self.optim_options["epsilon"],
-            dlist=self.optim_options["dlist"],
-            verbose=self.verbose,
-        )
-        self.opt.compute_marginals()
-        """
 
     def transform(self, df, X_features, Y_features, D_features, transform_Y=False):
         features = X_features + Y_features + D_features
@@ -102,75 +88,6 @@ class OptimizedPreprocessor:
                 random_seed=self.seed,
             )
         return df_transformed
-        """
-        d1 = self.opt.dfFull.reset_index().groupby(D_features + X_features).sum()
-        d2 = d1.transpose().reset_index().groupby(X_features).sum()
-        dTest = d2.transpose()
-        dTest = dTest.drop(Y_features, 1)
-        dTest = dTest.applymap(lambda x: x if x > 1e-8 else 0)
-        dTest = dTest / dTest.sum()
-
-        # this is the dataframe with the randomization for the tranformation set
-        dfPtest = dTest.divide(dTest.sum(axis=1), axis=0)
-
-        print("Randomizing test set...")
-        df_test_new = randomize(df_test, dfPtest, features=D_features + X_features)
-
-        Y_feature_names = Y_label_name
-        D_feature_names = protected_features
-        X_feature_names = [
-            n
-            for n in df.columns.tolist()
-            if n not in self.Y_feature_names and n not in D_feature_names
-        ]
-        if (
-            X_feature_names != self.X_feature_names
-            or D_feature_names != self.protected_feature_names
-        ):
-            raise ValueError(
-                "The feature names of inputs and protected "
-                "attributes must match with the training dataset."
-            )
-
-        if transform_Y and (Y_feature_names != self.Y_feature_names):
-            raise ValueError(
-                "The label name must match with that in the training dataset"
-            )
-
-        if transform_Y:
-            # randomized mapping when Y is requested to be transformed
-            dfP_withY = self.opt.dfP.applymap(lambda x: 0 if x < 1e-8 else x)
-            dfP_withY = dfP_withY.divide(dfP_withY.sum(axis=1), axis=0)
-
-            df_transformed = _apply_randomized_mapping(
-                df,
-                dfP_withY,
-                features=D_feature_names + X_feature_names + Y_feature_names,
-                random_seed=self.seed,
-            )
-        else:
-            # randomized mapping when Y is not requested to be transformed
-            d1 = (
-                self.opt.dfFull.reset_index()
-                .groupby(D_feature_names + X_feature_names)
-                .sum()
-            )
-            d2 = d1.transpose().reset_index().groupby(X_feature_names).sum()
-            dfP_noY = d2.transpose()
-            dfP_noY = dfP_noY.drop(Y_feature_names, 1)
-            dfP_noY = dfP_noY.applymap(lambda x: x if x > 1e-8 else 0)
-            dfP_noY = dfP_noY / dfP_noY.sum()
-
-            dfP_noY = dfP_noY.divide(dfP_noY.sum(axis=1), axis=0)
-
-            df_transformed = _apply_randomized_mapping(
-                df,
-                dfP_noY,
-                features=D_feature_names + X_feature_names,
-                random_seed=self.seed,
-            )
-        return df_transformed
-        """
 
 
 def _apply_randomized_mapping(df, dfMap, features=[], random_seed=None):

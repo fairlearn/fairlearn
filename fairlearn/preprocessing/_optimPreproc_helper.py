@@ -233,8 +233,6 @@ class DTools:
 
         self.CMlist = [np.zeros(Dmatrix.shape) for i in range(len(self.clist))]
 
-        # This part of the code is slow and stupid.
-        # It can be improved.
         for x in range(len(self.CMlist)):
             c = self.clist[x]
             for i in range(Dmatrix.shape[0]):
@@ -250,7 +248,6 @@ class DTools:
         Pmap = Variable(
             shape=(self.dfP.shape[0], self.dfP.shape[1])
         )  # main conditional map
-        # PmapXY = Variable(dfP.shape[1],dfP.shape[1])  # main conditional map
         PXhYh = Variable(
             self.dfMask_Pxyd_to_Pxy.shape[1]
         )  # marginal distribution of (Xh Yh)
@@ -316,27 +313,13 @@ class DTools:
 
         # Discrimination control
         for d in range(self.dfMask_Pxyd_to_Pd.shape[1]):
-            # constraints.append(sum(kl_div(PYhgD[d,:].T,PyMarginal))<=self.epsilon)
-            # constraints.append(norm(PYhgD[d,:].T-PyMarginal,1)<=disc)
-            # constraints.append(PYhgD[d,:].T-PyMarginal<=PyMarginal*(self.epsilon))
-            # constraints.append(PYhgD[d,:].T-PyMarginal>=-PyMarginal*(self.epsilon))
             for d2 in range(self.dfMask_Pxyd_to_Pd.shape[1]):
                 if d > d2:
                     continue
                 constraints.append(PYhgD[d, :].T <= PYhgD[d2, :].T * (1 + self.epsilon))
                 constraints.append(PYhgD[d2, :].T <= PYhgD[d, :].T * (1 + self.epsilon))
 
-        # Mean distortion
-        # Pxy_xhyhJoint = (self.dfMask_Pxyd_to_Pxy.values.T).dot(np.diag(PxydMarginal))*Pmap
-        # constraints.append(sum(multiply(self.dfD.as_matrix(),Pxy_xhyhJoint),axis=1)<=self.mean_distortion)
-
-        # constraints.append(disc<=self.epsilon)
-
-        # add objective
-        # constraints.append(norm(PXhYh-PxyMarginal, 1)<=self.epsilon)
-
         obj = Minimize(norm(PXhYh - PxyMarginal, 1) / 2)
-        # obj = Minimize(sum(kl_div(PXhYh,PxyMarginal)))
 
         prob = Problem(obj, constraints)
         prob.solve(verbose=verbose)

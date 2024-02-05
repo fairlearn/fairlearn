@@ -5,9 +5,6 @@ from fairlearn.datasets import fetch_adult
 from fairlearn.preprocessing import OptimizedPreprocessor
 from fairlearn.preprocessing._optimPreproc_helper import DTools
 
-# import warnings
-# warnings.filterwarnings("ignore")
-
 
 def get_distortion_adult(vold, vnew):
     """Distortion function for the adult dataset. We set the distortion
