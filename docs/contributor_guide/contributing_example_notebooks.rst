@@ -20,7 +20,7 @@ A good example notebook exhibits the following attributes:
    Describes why using particular Fairlearn functionalities makes sense.
 5. **For developers**: Speaks the language of developers and data scientists.
    Considers real practitioner needs.
-   Fits within the lifecycle of real practioner work.
+   Fits within the lifecycle of real practitioner work.
    See `Holstein et al (2019) <https://arxiv.org/pdf/1812.05239.pdf>`_,
    `Madaio et al. (2020) <http://www.jennwv.com/papers/checklists.pdf>`_.
 

@@ -191,7 +191,7 @@ the probability to predict label 1:
     :class:`ThresholdOptimizer` expects an estimator that provides it with
     scores.
     While the output of :class:`ThresholdOptimizer` is binary, the
-    input is not limited to scores dervied from binary classifiers.
+    input is not limited to scores derived from binary classifiers.
     In fact, real valued input, e.g. from a regressor,
     provides it with many more options to create thresholds.
     For :math:`n` input data points with :math:`m \leq n` different score

@@ -64,18 +64,16 @@ if [ "$CIRCLE_BRANCH" = "main" ]
 then
     echo "Copying all the newly generated files for the static landing page"
     ls $GENERATED_DOC_DIR/..
-    # js
-    cp $GENERATED_DOC_DIR/../landing_page.js js/
-    # css
-    cp $GENERATED_DOC_DIR/../landing_page_style.css css/
     # html
-    cp $GENERATED_DOC_DIR/../index.html .
+    cp $GENERATED_DOC_DIR/../static_landing_page/index.html .
+    # js
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/js/ .
+    # css
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/css/ .
     # fonts
-    cp $GENERATED_DOC_DIR/../*.ttf fonts/
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/fonts .
     # images
-    cp $GENERATED_DOC_DIR/../*.svg images/
-    cp $GENERATED_DOC_DIR/../*.ico images/
-    cp $GENERATED_DOC_DIR/../*.jpg images/
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/images .
 fi
 
 echo "fairlearn.org" > CNAME

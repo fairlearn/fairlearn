@@ -43,6 +43,8 @@ fairlearn.metrics
     metrics.demographic_parity_ratio
     metrics.equalized_odds_difference
     metrics.equalized_odds_ratio
+    metrics.equal_opportunity_difference
+    metrics.equal_opportunity_ratio
     metrics.false_negative_rate
     metrics.false_positive_rate
     metrics.make_derived_metric

@@ -27,7 +27,7 @@ def demographic_parity_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -73,7 +73,7 @@ def demographic_parity_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -122,7 +122,7 @@ def equalized_odds_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -165,7 +165,7 @@ def equalized_odds_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -197,3 +197,95 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
         sample_params=sp,
     )
     return eo
+
+
+def equal_opportunity_difference(
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
+    """Calculate the equal opportunity difference.
+
+    The equal opportunity difference is defined as the difference
+    between the largest and the smallest group-level true positive rates,
+    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
+    The equal opportunity difference of 0 means that all groups have the same true positive rate.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    Parameters
+    ----------
+    y_true : array-like
+        Ground truth (correct) labels.
+
+    y_pred : array-like
+        Predicted labels :math:`h(X)` returned by the classifier.
+
+    sensitive_features : array-like
+        The sensitive features over which equal opportunity should be assessed
+
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
+
+    sample_weight : array-like
+        The sample weights
+
+    Returns
+    -------
+    float
+        The equal opportunity difference
+    """
+    tpr = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": sample_weight},
+    )
+    result = tpr.difference(method=method)
+    return result
+
+
+def equal_opportunity_ratio(
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
+    """Calculate the equal opportunity ratio.
+
+    The equal opportunity ratio is defined as the ratio
+    between the smallest and the largest group-level true positive rate,
+    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
+    The equal opportunity ratio of 1 means that all groups have the same true positive rate.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    Parameters
+    ----------
+    y_true : array-like
+        Ground truth (correct) labels.
+
+    y_pred : array-like
+        Predicted labels :math:`h(X)` returned by the classifier.
+
+    sensitive_features : array-like
+        The sensitive features over which equal opportunity should be assessed
+
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
+        for details.
+
+    sample_weight : array-like
+        The sample weights
+
+    Returns
+    -------
+    float
+        The equal opportunity ratio
+    """
+    tpr = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": sample_weight},
+    )
+    result = tpr.ratio(method=method)
+    return result

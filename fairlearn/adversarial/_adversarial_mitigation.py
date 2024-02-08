@@ -42,8 +42,7 @@ class _AdversarialFairness(BaseEstimator):
     r"""Train PyTorch or TensorFlow predictors while mitigating unfairness .
 
     This model implements the supervised learning method proposed in
-    `"Mitigating Unwanted Biases with Adversarial Learning"
-    <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
+    "Mitigating Unwanted Biases with Adversarial Learning". :footcite:`zhang2018mitigating`
     This algorithm takes as input two neural network
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
@@ -204,9 +203,7 @@ class _AdversarialFairness(BaseEstimator):
 
     References
     ----------
-    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
-       Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
-       AIES, 2018.
+    .. footbibliography::
 
     """  # noqa : E501
 
@@ -805,8 +802,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     r"""Train PyTorch or TensorFlow classifiers while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
-    `"Mitigating Unwanted Biases with Adversarial Learning"
-    <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
+    "Mitigating Unwanted Biases with Adversarial Learning". :footcite:`zhang2018mitigating`
     The training algorithm takes as input two neural network
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
@@ -948,9 +944,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
     References
     ----------
-    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
-       Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
-       AIES, 2018.
+    .. footbibliography::
 
     """  # noqa : E501
 
@@ -1006,8 +1000,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     r"""Train PyTorch or TensorFlow regressors while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
-    `"Mitigating Unwanted Biases with Adversarial Learning"
-    <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_ [1]_.
+    "Mitigating Unwanted Biases with Adversarial Learning". :footcite:`zhang2018mitigating`
     The training algorithm takes as input two neural network
     models, a predictor model and an adversarial model, defined either as a
     `PyTorch module
@@ -1140,9 +1133,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
 
     References
     ----------
-    .. [1] Zhang, Lemoine, Mitchell `"Mitigating Unwanted Biases with
-       Adversarial Learning" <https://dl.acm.org/doi/pdf/10.1145/3278721.3278779>`_,
-       AIES, 2018.
+    .. footbibliography::
 
     """  # noqa : E501
 

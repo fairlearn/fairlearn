@@ -65,7 +65,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         - 'predict': use the hard values reported by the `predict` method if
           estimator is a classifier, and the regression values if estimator is
           a regressor.
-          This is equivalent to what is done in [1]_.
+          This is equivalent to what is done in :footcite:`hardt2016equality`.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
@@ -77,9 +77,8 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
     References
     ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-       Supervised Learning," arXiv.org, 07-Oct-2016.
-       [Online]. Available: https://arxiv.org/abs/1610.02413.
+    .. footbibliography::
+
     """
 
     def __init__(
