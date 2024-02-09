@@ -4,5 +4,6 @@ pandas>=2.0.3
 # this explicit dependency is only for the sake removing the DeprecationWarning
 # from pandas in this regard while that happens.
 pyarrow>=15
-scikit-learn>=1.2.1
+# Upper bound on scikit-learn pending investigation
+scikit-learn>=1.2.1,<1.4
 scipy>=1.9.3
