@@ -6,8 +6,8 @@ dependencies:
 - python==3.11
 - pip>=19.1.1
 - numpy
-- pandas<2.2
+- pandas
 - pytest
 - pytest-cov
 - scikit-learn<1.4
-- lightgbm<4.3
+- lightgbm
