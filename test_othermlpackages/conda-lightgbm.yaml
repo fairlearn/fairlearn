@@ -10,4 +10,4 @@ dependencies:
 - pytest
 - pytest-cov
 - scikit-learn<1.4
-- lightgbm
+- lightgbm<4.3
