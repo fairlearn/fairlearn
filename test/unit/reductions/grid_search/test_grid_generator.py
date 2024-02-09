@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import warnings
-
 from test.unit.reductions.grid_search.utilities import _quick_data
 
 import numpy as np
