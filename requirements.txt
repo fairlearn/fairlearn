@@ -5,5 +5,6 @@ pandas>=2.0.3
 # from pandas in this regard while that happens.
 pyarrow>=15
 # Upper bound on scikit-learn pending investigation
+# MetricFrame failing in CI
 scikit-learn>=1.2.1,<1.4
 scipy>=1.9.3
