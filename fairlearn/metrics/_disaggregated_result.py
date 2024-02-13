@@ -53,8 +53,9 @@ def apply_to_dataframe(
     introduced it as an argument in v2.2, and immediately deprecated
     it (dependent on when this is being read, may need to adjust):
     https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.apply.html
+    We don't use this argument, and only include it so that we can be
+    compatible with pandas<2.2
     """
-    assert not include_groups, "Unexpected change to include_groups"
     values = dict()
     for function_name, metric_function in metric_functions.items():
         values[function_name] = metric_function(data)
@@ -373,6 +374,7 @@ class DisaggregatedResult:
             temp = data.groupby(by=control_feature_names).apply(
                 apply_to_dataframe,
                 metric_functions=annotated_functions,
+                # See note in apply_to_dataframe about include_groups
                 include_groups=False,
             )
             # If there are multiple control features, might have missing combinations
@@ -395,6 +397,7 @@ class DisaggregatedResult:
         temp = data.groupby(all_grouping_names).apply(
             apply_to_dataframe,
             metric_functions=annotated_functions,
+            # See note in apply_to_dataframe about include_groups
             include_groups=False,
         )
         if len(all_grouping_names) > 1:
