@@ -197,15 +197,25 @@ class UtilityParity(ClassificationMoment):
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series(dtype="float64")
-        zero_vec = pd.Series(0.0, self.index)
+        # zero_vec = pd.Series(0.0, self.index)
+        col_count = len(event_vals) * (len(group_vals) - 1)
+        self.pos_basis = pd.DataFrame(
+            0.0, index=self.index, columns=range(col_count)
+        ).sort_index()
+        self.neg_basis = pd.DataFrame(
+            0.0, index=self.index, columns=range(col_count)
+        ).sort_index()
+
         i = 0
+
         for e in event_vals:
-            # Constraints on the final group are redundant, so they are not included in the basis.
+            # Constraints on the final group are redundant, so they are not
+            # included in the basis.
             for g in group_vals[:-1]:
-                self.pos_basis[i] = 0 + zero_vec
-                self.neg_basis[i] = 0 + zero_vec
-                self.pos_basis.loc[("+", e, g), i] = 1
-                self.neg_basis.loc[("-", e, g), i] = 1
+                if ("+", e, g) in self.index:
+                    self.pos_basis.loc[("+", e, g), i] = 1
+                if ("-", e, g) in self.index:
+                    self.neg_basis.loc[("-", e, g), i] = 1
                 self.neg_basis_present.at[i] = True
                 i += 1
 
