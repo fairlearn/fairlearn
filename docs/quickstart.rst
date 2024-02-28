@@ -221,7 +221,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     >>> objective = ErrorRate(costs={'fp': 0.5, 'fn': 0.5})
     >>> constraint = EqualizedOdds()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-    >>> mitigator = ExponentiatedGradient(classifier, constraint, objective = objective)
+    >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
