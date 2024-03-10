@@ -5,14 +5,14 @@ from ._optimPreproc_helper import DTools
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
-class OptimizedPreprocessor:
+class OptimizedPreprocessor(BaseEstimator, TransformerMixin):
     """Optimized preprocessing is a preprocessing technique that learns a
     probabilistic transformation that edits the features and labels in the data
     with group fairness, individual distortion, and data fidelity constraints
-    and objectives [3]_.
+    and objectives [1]_.
 
     References:
-        .. [3] F. P. Calmon, D. Wei, B. Vinzamuri, K. Natesan Ramamurthy, and
+        .. [1] F. P. Calmon, D. Wei, B. Vinzamuri, K. Natesan Ramamurthy, and
            K. R. Varshney. "Optimized Pre-Processing for Discrimination
            Prevention." Conference on Neural Information Processing Systems,
            2017.
@@ -20,7 +20,16 @@ class OptimizedPreprocessor:
     Based on code available at: https://github.com/fair-preprocessing/nips2017
     """
 
-    def __init__(self, distortion_function, epsilon=0.05, clist=[0.99, 1.99, 2.99], dlist=[0.1, 0.05, 0], verbose=False, seed=None) -> None:
+    def __init__(
+        self,
+        sensitive_feature_ids,
+        distortion_function,
+        epsilon=0.05,
+        clist=[0.99, 1.99, 2.99],
+        dlist=[0.1, 0.05, 0],
+        verbose=False,
+        seed=None,
+    ) -> None:
         super().__init__()
 
         self.seed = seed
@@ -31,19 +40,36 @@ class OptimizedPreprocessor:
             "dlist": dlist,
         }
         self.verbose = verbose
+        self.sensitive_feature_ids = sensitive_feature_ids
 
-    def fit(self, df, X_features, Y_features, D_features):
-        self.X_features = X_features
-        self.Y_features = Y_features
-        self.D_features = D_features
-        self.features = self.X_features + self.Y_features + self.D_features
+    def createDataframe(self, X, y, prefix="column"):
+        n_cols = X.shape[1]
+        if isinstance(X, pd.DataFrame):
+            df_sensitive = X[self.sensitive_feature_ids]
+            df_x = X.drop(columns=self.sensitive_feature_ids)
+            return df_x, y, df_sensitive
+        elif isinstance(X, np.ndarray):
+            column_names = [f"{prefix}_{i}" for i in range(1, n_cols + 1)]
+            sensitive_columns = []
+            for ids in self.sensitive_feature_ids:
+                sensitive_columns.append(column_names[ids])
+            df_x = pd.DataFrame(X, columns=column_names)
+            df_sensitive = df_x[sensitive_columns]
+            df_x = df_x.drop(columns=sensitive_columns)
+            df_y = pd.DataFrame(y, columns=[f"{prefix}_{n_cols+1}"])
+            return df_x, df_y, df_sensitive
 
-        df = df[self.features]
+    def fit(self, X, y):
+        df_x, df_y, df_sensitive = self.createDataframe(X, y)
+        X_features = df_x.columns.to_list()
+        Y_features = df_y.columns.to_list()
+        D_features = df_sensitive.columns.to_list()
+        features = X_features + D_features + Y_features
+        df = pd.concat([df_x, df_sensitive], axis=1)
+        df = pd.concat([df, df_y], axis=1)
 
-        self.opt = DTools(df=df, features=self.features)
-
-        self.opt.setFeatures(D=self.D_features, X=self.X_features, Y=self.Y_features)
-
+        self.opt = DTools(df=df, features=features)
+        self.opt.setFeatures(D=D_features, X=X_features, Y=Y_features)
         self.opt.set_distortion(
             self.optim_options["distortion_fun"], self.optim_options["clist"]
         )
@@ -56,12 +82,17 @@ class OptimizedPreprocessor:
 
         self.opt.computeMarginals()
 
-    def transform(self, df, X_features, Y_features, D_features, transform_Y=False):
-        features = X_features + Y_features + D_features
+        return self
 
-        df = df[features]
+    def transform(self, X, y, transform_y=False):
+        df_x, df_y, df_sensitive = self.createDataframe(X, y)
+        X_features = df_x.columns.to_list()
+        Y_features = df_y.columns.to_list()
+        D_features = df_sensitive.columns.to_list()
+        df = pd.concat([df_x, df_sensitive], axis=1)
+        df = pd.concat([df, df_y], axis=1)
 
-        if transform_Y:
+        if transform_y:
             dfP_withY = self.opt.dfP.applymap(lambda x: 0 if x < 1e-8 else x)
             dfP_withY = dfP_withY.divide(dfP_withY.sum(axis=1), axis=0)
 
@@ -92,6 +123,9 @@ class OptimizedPreprocessor:
                 random_seed=self.seed,
             )
         return df_transformed
+
+    def fit_transform(self, X, y, transform_y=False):
+        return self.fit(X, y).transform(X, y, transform_y)
 
 
 def _apply_randomized_mapping(df, dfMap, features=[], random_seed=None):

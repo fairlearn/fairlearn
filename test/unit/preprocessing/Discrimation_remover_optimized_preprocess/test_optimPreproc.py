@@ -3,10 +3,8 @@ import numpy as np
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.preprocessing import OptimizedPreprocessor
-from fairlearn.preprocessing._optimPreproc_helper import DTools
 
-
-def get_distortion_adult(vold, vnew):
+def get_distortion_adult_dataframe(vold, vnew):
     """Distortion function for the adult dataset. We set the distortion
     metric here. See section 4.3 in supplementary material of
     http://papers.nips.cc/paper/6988-optimized-pre-processing-for-discrimination-prevention
@@ -80,6 +78,80 @@ def get_distortion_adult(vold, vnew):
         return 0.0
 
 
+def get_distortion_adult_numpy(vold, vnew):
+    """Distortion function for the adult dataset. We set the distortion
+    metric here. See section 4.3 in supplementary material of
+    http://papers.nips.cc/paper/6988-optimized-pre-processing-for-discrimination-prevention
+    for an example
+
+    Note:
+        Users can use this as templates to create other distortion functions.
+
+    Args:
+        vold (dict) : {attr:value} with old values
+        vnew (dict) : dictionary of the form {attr:value} with new values
+
+    Returns:
+        d (value) : distortion value
+    """
+
+    # Define local functions to adjust education and age
+    def adjustEdu(v):
+        if v == ">12":
+            return 13
+        elif v == "<6":
+            return 5
+        else:
+            return int(v)
+
+    def adjustAge(a):
+        if a == ">=70":
+            return 70.0
+        else:
+            return float(a)
+
+    def adjustInc(a):
+        if a == "<=50K":
+            return 0
+        elif a == ">50K":
+            return 1
+        else:
+            return int(a)
+
+    # value that will be returned for events that should not occur
+    bad_val = 3.0
+
+    # Adjust education years
+    eOld = adjustEdu(vold["column_2"])
+    eNew = adjustEdu(vnew["column_2"])
+
+    # Education cannot be lowered or increased in more than 1 year
+    if (eNew < eOld) | (eNew > eOld + 1):
+        return bad_val
+
+    # adjust age
+    aOld = adjustAge(vold["column_1"])
+    aNew = adjustAge(vnew["column_1"])
+
+    # Age cannot be increased or decreased in more than a decade
+    if np.abs(aOld - aNew) > 10.0:
+        return bad_val
+
+    # Penalty of 2 if age is decreased or increased
+    if np.abs(aOld - aNew) > 0:
+        return 2.0
+
+    # Adjust income
+    incOld = adjustInc(vold["column_4"])
+    incNew = adjustInc(vnew["column_4"])
+
+    # final penalty according to income
+    if incOld > incNew:
+        return 1.0
+    else:
+        return 0.0
+
+
 def preprocessed_adult_data():
     df = pd.merge(
         fetch_adult()["data"],
@@ -127,15 +199,32 @@ D_features = ["sex"]
 Y_features = ["Income Binary"]
 X_features = ["Age (decade)", "Education Years"]
 optim_options = {
-    "distortion_fun": get_distortion_adult,
+    "distortion_fun": get_distortion_adult_dataframe,
     "epsilon": 0.05,
     "clist": [0.99, 1.99, 2.99],
     "dlist": [0.1, 0.05, 0],
 }
-opt = OptimizedPreprocessor(distortion_function=get_distortion_adult)
-opt.fit(df=df, D_features=D_features, X_features=X_features, Y_features=Y_features)
+opt = OptimizedPreprocessor(['sex'], distortion_function=get_distortion_adult_dataframe)
+y = df[["Income Binary"]]
+X = df.drop(columns=["Income Binary"])
+opt.fit(X, y)
 df_transformed = opt.transform(
-    df=df, D_features=D_features, X_features=X_features, Y_features=Y_features
+    X, y
 )
 assert df_transformed.shape == df.shape
-print("Test Passed!")
+print("Test Passed for dataframe!")
+
+op = OptimizedPreprocessor([2], get_distortion_adult_numpy)
+
+df_1 = preprocessed_adult_data()
+y = df_1["Income Binary"]
+df1 = df_1.drop(columns=["Income Binary"])
+
+X = df1.to_numpy()
+y = y.to_numpy()
+
+op.fit(X, y)
+dfx = op.transform(X, y)
+
+assert dfx.shape == df_1.shape
+print("Test Passed for Numpy")

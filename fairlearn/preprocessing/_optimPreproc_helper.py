@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from cvxpy import *
+from cvxpy import Variable, Minimize, norm, multiply, Problem, sum
 
 
 class DTools:
@@ -254,10 +254,11 @@ class DTools:
         PYhgD = Variable(
             shape=(self.dfD_to_Y_address.shape[1], self.dfD_to_Y_address.shape[0])
         )  # rows represent p_(y|D)
+        """
         PYhD = Variable(
             shape=(self.dfD_to_Y_address.shape[1], self.dfD_to_Y_address.shape[0])
         )
-
+        """
         # marginal distribution
         dfMarginal = self.dfJoint.groupby(self.DXY_features, observed=False)[
             "Frequency"
@@ -266,7 +267,9 @@ class DTools:
             pd.concat([self.dfP, dfMarginal], axis=1).fillna(0)["Frequency"].values
         )
         self.PxydMarginal = PxydMarginal
+        """
         PyMarginal = PxydMarginal.dot(self.dfMask_Pxyd_to_Py).T
+        """
         PdMarginal = PxydMarginal.dot(self.dfMask_Pxyd_to_Pd).T
         PxyMarginal = PxydMarginal.dot(self.dfMask_Pxyd_to_Pxy).T
         # add constraints
