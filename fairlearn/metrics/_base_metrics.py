@@ -8,12 +8,10 @@ These are metrics which are not part of `scikit-learn`.
 
 import numpy as np
 import sklearn.metrics as skm
-from typing import Any, Optional, TypeVar
+from typing import Any
 
 from ._metric_frame import check_consistent_length
 from fairlearn.utils._input_manipulations import _convert_to_ndarray_and_squeeze
-
-ArrayLike = TypeVar("ArrayLike")
 
 _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = (
     "Empty y_pred passed to selection_rate function."
@@ -83,25 +81,20 @@ def _get_labels_for_confusion_matrix(labels, pos_label):
     return unique_labels
 
 
-def true_positive_rate(
-    y_true: ArrayLike,
-    y_pred: ArrayLike,
-    sample_weight: Optional[ArrayLike] = None,
-    pos_label=None,
-) -> float:
+def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> float:
     r"""Calculate the true positive rate (also called sensitivity, recall, or hit rate).
 
     Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
     Parameters
     ----------
-    y_true : ArrayLike
+    y_true : array-like
         The list of true values
 
-    y_pred : ArrayLike
+    y_pred : array-like
         The list of predicted values
 
-    sample_weight : Optional[ArrayLike]
+    sample_weight : array-like, optional
         A list of weights to apply to each sample. By default all samples are weighted
         equally
 
