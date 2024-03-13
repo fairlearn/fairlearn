@@ -1212,7 +1212,7 @@ train["Diagnosis"] = train["Diagnosis"].astype(int)
 test["Diagnosis"] = test["Diagnosis"].astype(int)
 
 # Create new intersect column for plotting
-test["intersect"] = np.nan
+test["intersect"] = ""
 test.loc[(test["Sex"] == "Male") & (test["Race"] == "White"), "intersect"] = "WhiteM"
 test.loc[(test["Sex"] == "Male") & (test["Race"] == "Black"), "intersect"] = "BlackM"
 test.loc[(test["Sex"] == "Male") & (test["Race"] == "Hispanic"), "intersect"] = "HispanicM"
