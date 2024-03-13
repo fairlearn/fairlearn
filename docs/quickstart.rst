@@ -218,7 +218,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
 
     >>> from fairlearn.reductions import ErrorRateParity, EqualizedOdds, ExponentiatedGradient
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
-    >>> objective = ErrorRate(costs={'fp': 0.5, 'fn': 0.5})
+    >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
     >>> constraint = EqualizedOdds()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
