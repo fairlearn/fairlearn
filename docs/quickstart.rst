@@ -78,7 +78,7 @@ install the following dependencies:
 Loading the dataset
 ^^^^^^^^^^^^^^^^^^^
 
-For this example, we use a `clincial dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_ 
+For this example, we use a `clinical dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_ 
 of hospital re-admissions over a ten-year period (1998-2008) for 
 diabetic patients across 130 different hospitals in the U.S. This scenario 
 builds upon prior research on how racial disparities impact health care 
