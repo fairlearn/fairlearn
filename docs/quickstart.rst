@@ -207,7 +207,7 @@ while specifying an appropriate fairness constraint. Note that the choice of
 fairness constraints is crucial for the resulting model, and varies based on
 application context. Since both false positives and false negatives are relevant for fairness in this
 hypothetical example, we can attempt to mitigate the observed disparity using the
-corresponding fairness constraint called Equalized Odds. In real world
+fairness constraint called Equalized Odds, which bounds disparities in both types of error. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
 provided classifier using Equalized Odds as the constraint and a suitably weighted Error Rate
