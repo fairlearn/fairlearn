@@ -210,7 +210,7 @@ hypothetical example, we can attempt to mitigate the observed disparity using th
 corresponding fairness constraint called Equalized Odds. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
-provided classifier using Equalized Odds as the constraint and Error Rate
+provided classifier using Equalized Odds as the constraint and a suitably weighted Error Rate
 as the objective, leading to a vastly reduced difference in  the selection rate:
 
 .. doctest:: quickstart
