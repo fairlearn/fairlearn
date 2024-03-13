@@ -206,7 +206,7 @@ If we observe disparities between groups we may want to create a new model
 while specifying an appropriate fairness constraint. Note that the choice of
 fairness constraints is crucial for the resulting model, and varies based on
 application context. Since both false positives and false negatives are relevant for fairness in this
-contrived example, we can attempt to mitigate the observed disparity using the
+hypothetical example, we can attempt to mitigate the observed disparity using the
 corresponding fairness constraint called Equalized Odds. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
