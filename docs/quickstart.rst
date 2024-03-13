@@ -83,7 +83,7 @@ of hospital re-admissions over a ten-year period (1998-2008) for
 diabetic patients across 130 different hospitals in the U.S. This scenario 
 builds upon prior research on how racial disparities impact health care 
 resource allocation in the U.S. For an in-depth analysis of this dataset,
-review the `Scipy tutorial <https://github.com/fairlearn/talks/tree/main/2021_scipy_tutorial>`_
+review the `SciPy tutorial <https://github.com/fairlearn/talks/tree/main/2021_scipy_tutorial>`_
 that the Fairlearn team presented in 2021.
 
 We will use machine learning to predict whether an individual in the dataset 
