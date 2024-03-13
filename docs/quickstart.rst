@@ -240,9 +240,13 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     Unknown            0.915254
     Name: accuracy_score, dtype: float64
 
-Note that because :class:`ExponentiatedGradient` does not have a `predict_proba`
-method, we cannot set a lower threshold for a positive prediction to deal with the 
-label imbalance in the outcome variable.
+Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
+method, but we can adjust the target decision threshold by specifying
+(possibly unequal) costs for false positives and false negatives.
+In our example we use the cost of 0.1 for false positives and 0.9 for false negatives.
+Without fairness constraints, this would exactly correspond to
+referring patients with the readmission risk of 10% or higher
+(as we used earlier).
 
 
 What's next?
