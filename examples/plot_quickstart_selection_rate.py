@@ -6,20 +6,22 @@
 Selection rates in census dataset
 =================================
 """
-from fairlearn.datasets import fetch_adult
+from fairlearn.datasets import fetch_diabetes_hospital
+import matplotlib.pyplot as plt
+
 
 # %%
-from fairlearn.metrics import MetricFrame, selection_rate
+fig, ax = plt.subplots()
 
-data = fetch_adult()
+data = fetch_diabetes_hospital(as_frame=True)
 X = data.data
-y_true = (data.target == ">50K") * 1
-sex = X["sex"]
+X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
+y_true = data.target
+race = X['race']
 
-selection_rates = MetricFrame(
-    metrics=selection_rate, y_true=y_true, y_pred=y_true, sensitive_features=sex
-)
+df = race.value_counts().reset_index()
 
-fig = selection_rates.by_group.plot.bar(
-    legend=False, rot=0, title="Fraction earning over $50,000"
-)
+ax.bar(df["race"], df["count"])
+ax.set_title('Counts by race')
+
+plt.show()
