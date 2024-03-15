@@ -98,6 +98,7 @@ prediction task.
     >>> import numpy as np
     >>> import pandas as pd
     >>> import matplotlib.pyplot as plt
+    >>> from fairlearn.datasets import fetch_diabetes_hospital
     >>> data = fetch_diabetes_hospital(as_frame=True)
     >>> X = data.data
     >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
