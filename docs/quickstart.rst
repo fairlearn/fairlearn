@@ -113,7 +113,7 @@ prediction task.
     Hispanic            2037
     Other               1506
     Asian                641
-    Name: race, dtype: int64
+    Name: count, dtype: int64
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
     :target: auto_examples/plot_quickstart_selection_rate.html
@@ -139,7 +139,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>>
     >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
     >>>
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
     >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
     >>> y_pred = (classifier.predict_proba(X_test)[:,1] >= 0.1)
@@ -222,7 +222,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
@@ -230,15 +230,15 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     >>>
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
-    0.889...
+    0..525...
     >>> mf_mitigated.by_group
     race
-    AfricanAmerican    0.889620
-    Asian              0.916168
-    Caucasian          0.886990
-    Hispanic           0.896282
-    Other              0.890141
-    Unknown            0.915254
+    AfricanAmerican    0.523124
+    Asian              0.580838
+    Caucasian          0.523900
+    Hispanic           0.567515
+    Other              0.521127
+    Unknown            0.510169
     Name: accuracy_score, dtype: float64
 
 Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
