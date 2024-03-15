@@ -218,7 +218,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.reductions import ErrorRateParity, EqualizedOdds, ExponentiatedGradient
+    >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
