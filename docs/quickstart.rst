@@ -137,15 +137,13 @@ we can evaluate metrics for subgroups within the data as below:
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> from sklearn.model_selection import train_test_split
     >>>
-    >>> X_train, X_test, y_train, y_test, \
-    A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
+    >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
     >>>
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
     >>> y_pred = (classifier.predict_proba(X_test)[:,1] >= 0.1)
-    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, \
-    sensitive_features=A_test)
+    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
     >>> mf.overall
     0.514...
     >>> mf.by_group
@@ -177,8 +175,7 @@ the model does not predict that outcome.
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import false_negative_rate
-    >>> mf = MetricFrame(metrics=false_negative_rate, y_true=y_test, \
-    y_pred=y_pred, sensitive_features=A_test)
+    >>> mf = MetricFrame(metrics=false_negative_rate, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
     >>> mf.overall
     0.309...
     >>> mf.by_group
@@ -231,8 +228,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>>
-    >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, \
-    y_pred=y_pred_mitigated, sensitive_features=A_test)
+    >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
     0.889...
     >>> mf_mitigated.by_group
