@@ -102,7 +102,7 @@ prediction task.
     >>> data = fetch_diabetes_hospital(as_frame=True)
     >>> X = data.data
     >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
-    >>> y_true = data.target
+    >>> y = data.target
     >>> 
     >>> X_ohe = pd.get_dummies(X)
     >>> race = X['race']
