@@ -147,14 +147,13 @@ we can evaluate metrics for subgroups within the data as below:
     >>> mf.overall
     0.514...
     >>> mf.by_group
-    race
-    AfricanAmerican    0.530935
-    Asian              0.658683
-    Caucasian          0.503535
-    Hispanic           0.612524
-    Other              0.591549
-    Unknown            0.574576
-    Name: accuracy_score, dtype: float64
+    Caucasian          76099
+    AfricanAmerican    19210
+    Unknown             2273
+    Hispanic            2037
+    Other               1506
+    Asian                641
+    Name: count, dtype: int64
 
 Note that above, because the outcome variable exhibits label imbalance, we set 
 the threshold for triggering a positive prediction lower 
@@ -219,7 +218,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
-    >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
+    >>> np.random.seed(42)  # set seed for consistent results with ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
@@ -230,7 +229,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     >>>
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
-    0..525...
+    0..523...
     >>> mf_mitigated.by_group
     race
     AfricanAmerican    0.523124
