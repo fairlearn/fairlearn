@@ -23,3 +23,7 @@ selection_rates = MetricFrame(
 fig = selection_rates.by_group.plot.bar(
     legend=False, rot=0, title="Fraction earning over $50,000"
 )
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_quickstart_selection_rate.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

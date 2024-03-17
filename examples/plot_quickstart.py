@@ -95,3 +95,7 @@ fig = metric_frame.by_group[["count"]].plot(
 # Don't save file during doc build
 if "__file__" in locals():
     fig[0][0].figure.savefig("filename.png")
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_quickstart.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

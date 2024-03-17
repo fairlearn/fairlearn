@@ -253,3 +253,7 @@ print(mf_bb.by_group)
 # be of any type (although methods such as
 # :meth:`~fairlearn.metrics.MetricFrame.group_min` may not
 # work).
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_metricframe_beyond_binary_classification.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

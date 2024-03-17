@@ -131,3 +131,7 @@ plot_heatmap(X_cr_alpha, "Correlation values after CorrelationRemover with alpha
 # 'race_AfricanAmerican' and the other columns while retaining the correlation
 # between the other features. Using a lower value of alpha results in
 # not all the correlation being projected away.
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_correlationremover_before_after.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

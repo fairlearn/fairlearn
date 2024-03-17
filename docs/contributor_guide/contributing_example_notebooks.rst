@@ -64,3 +64,7 @@ ReST to markdown by sphinx-gallery. This currently only works for basic ReST
 functionality, so try to limit use of ReST directives (e.g., `.. note::`),
 internal links (e.g., `:ref:`), and other functionality that won't render well
 in markdown.
+
+
+.. note::
+   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/docs/contributor_guide/contributing_example_notebooks.rst>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

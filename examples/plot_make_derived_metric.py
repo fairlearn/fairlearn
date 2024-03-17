@@ -260,3 +260,7 @@ from_pregen = accuracy_score_group_min(
 print("From my function :", from_myacc)
 print("From pregenerated:", from_pregen)
 assert from_myacc == from_pregen
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_make_derived_metric.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.

@@ -269,3 +269,7 @@ plot_model_comparison(
     show_plot=True,
 )
 # End model comparison
+
+
+#.. note::
+#   |edit| `View source <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_grid_search_census.py>`to the code file or `open issue <https://github.com/fairlearn/fairlearn/issues/new?>`__.
