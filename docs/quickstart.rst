@@ -229,7 +229,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     >>>
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
-    0..523...
+    0.526...
     >>> mf_mitigated.by_group
     race
     AfricanAmerican    0.523124
