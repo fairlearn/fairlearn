@@ -1,8 +1,11 @@
 v0.10.0
 =======
 
+<<<<<<< HEAD
 .. note::
 
+=======
+>>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
 * Added bootstrapping to :class:`MetricFrame`, along with a new section
   in the user guide
 * Added intersectionality in mental health care example notebook.

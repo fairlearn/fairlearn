@@ -9,8 +9,9 @@ Intersectionality in Mental Health Care
 """
 
 # %%
-# *This notebook was written by Yifan Wang and Marta Maslej and is licenced under a* `Creative
-# Commons Attribution 4.0 International License <http://creativecommons.org/licenses/by/4.0/>`_.
+# *This notebook was written by Yifan Wang, Marta Maslej, and Laura Sikstrom and is licenced
+# under a* `Creative Commons Attribution 4.0 International
+# License <http://creativecommons.org/licenses/by/4.0/>`_.
 #
 # ---------
 #

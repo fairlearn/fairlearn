@@ -78,12 +78,12 @@ install the following dependencies:
 Loading the dataset
 ^^^^^^^^^^^^^^^^^^^
 
-For this example, we use a `clincial dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_ 
+For this example, we use a `clinical dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_ 
 of hospital re-admissions over a ten-year period (1998-2008) for 
 diabetic patients across 130 different hospitals in the U.S. This scenario 
 builds upon prior research on how racial disparities impact health care 
 resource allocation in the U.S. For an in-depth analysis of this dataset,
-review the `Scipy tutorial <https://github.com/fairlearn/talks/tree/main/2021_scipy_tutorial>`_
+review the `SciPy tutorial <https://github.com/fairlearn/talks/tree/main/2021_scipy_tutorial>`_
 that the Fairlearn team presented in 2021.
 
 We will use machine learning to predict whether an individual in the dataset 
@@ -102,7 +102,7 @@ prediction task.
     >>> data = fetch_diabetes_hospital(as_frame=True)
     >>> X = data.data
     >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
-    >>> y_true = data.target
+    >>> y = data.target
     >>> 
     >>> X_ohe = pd.get_dummies(X)
     >>> race = X['race']
@@ -113,7 +113,7 @@ prediction task.
     Hispanic            2037
     Other               1506
     Asian                641
-    Name: race, dtype: int64
+    Name: count, dtype: int64
 
 .. figure:: auto_examples/images/sphx_glr_plot_quickstart_selection_rate_001.png
     :target: auto_examples/plot_quickstart_selection_rate.html
@@ -133,19 +133,22 @@ we can evaluate metrics for subgroups within the data as below:
     :options:  +NORMALIZE_WHITESPACE
 
     >>> from fairlearn.metrics import MetricFrame
-    >>> from sklearn.metrics import accuracy_score
+    >>> from sklearn.metrics import accuracy_score, balanced_accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> from sklearn.model_selection import train_test_split
     >>>
+<<<<<<< HEAD
     >>> X_train, X_test, y_train, y_test, \
     A_train, A_test = train_test_split(X_ohe, y_true, race, random_state=123)
+=======
+    >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
+>>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
     >>>
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
     >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
     >>> y_pred = (classifier.predict_proba(X_test)[:,1] >= 0.1)
-    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, \
-    sensitive_features=A_test)
+    >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
     >>> mf.overall
     0.514...
     >>> mf.by_group
@@ -161,27 +164,34 @@ we can evaluate metrics for subgroups within the data as below:
 Note that above, because the outcome variable exhibits label imbalance, we set 
 the threshold for triggering a positive prediction lower 
 (to a probability of 0.1 or greater).
+In practice, this threshold would be driven by risk or capacity 
+considerations. For this example, we set the threshold based on the risk 
+of readmission. The threshold of 0.1 corresponds to saying that a
+10% risk of readmission is viewed as sufficient for referral to a 
+post-discharge care program. 
 Fairlearn has many standard metrics built-in, such as
-selection rate, i.e., the percentage of the population which have '1' as
-their label:
+false negative rate, i.e., the rate of occurrence of negative classifications
+when the true value of the outcome label is positive. 
+In the context of this dataset, the false positive rate captures the 
+individuals who in reality would be readmitted to the hospital, but 
+the model does not predict that outcome.
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.metrics import selection_rate
-    >>> sr = MetricFrame(metrics=selection_rate, y_true=y_test, y_pred=y_pred, \
-    sensitive_features=A_test)
-    >>> sr.overall
-    0.527...
-    >>> sr.by_group
+    >>> from fairlearn.metrics import false_negative_rate
+    >>> mf = MetricFrame(metrics=false_negative_rate, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
+    >>> mf.overall
+    0.309...
+    >>> mf.by_group
     race
-    AfricanAmerican    0.514080
-    Asian              0.341317
-    Caucasian          0.539675
-    Hispanic           0.426614
-    Other              0.445070
-    Unknown            0.438983
-    Name: selection_rate, dtype: float64
+    AfricanAmerican    0.296089
+    Asian              0.500000
+    Caucasian          0.308555
+    Hispanic           0.307692
+    Other              0.333333
+    Unknown            0.420000
+    Name: false_negative_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`
@@ -202,27 +212,42 @@ Mitigating disparity
 If we observe disparities between groups we may want to create a new model
 while specifying an appropriate fairness constraint. Note that the choice of
 fairness constraints is crucial for the resulting model, and varies based on
-application context. If selection rate is highly relevant for fairness in this
-contrived example, we can attempt to mitigate the observed disparity using the
-corresponding fairness constraint called Demographic Parity. In real world
+application context. Since both false positives and false negatives are relevant for fairness in this
+hypothetical example, we can attempt to mitigate the observed disparity using the
+fairness constraint called Equalized Odds, which bounds disparities in both types of error. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
+<<<<<<< HEAD
 provided classifier using Demographic Parity as the constraint, leading to
 a vastly reduced difference in selection rate:
+=======
+provided classifier using Equalized Odds as the constraint and a suitably weighted Error Rate
+as the objective, leading to a vastly reduced difference in  the selection rate:
+>>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
+<<<<<<< HEAD
     >>> from fairlearn.reductions import ErrorRateParity, DemographicParity, ExponentiatedGradient
     >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.5, 'fn': 0.5})
     >>> constraint = DemographicParity()
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective = objective)
+=======
+    >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
+    >>> np.random.seed(42)  # set seed for consistent results with ExponentiatedGradient
+    >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
+    >>> constraint = EqualizedOdds(difference_bound=0.01)
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
+    >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
+>>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>>
+<<<<<<< HEAD
     >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, \
     y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> sr_mitigated.overall
@@ -236,10 +261,28 @@ a vastly reduced difference in selection rate:
     Other              0.000000
     Unknown            0.000000
     Name: selection_rate, dtype: float64
+=======
+    >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
+    >>> mf_mitigated.overall
+    0.526...
+    >>> mf_mitigated.by_group
+    race
+    AfricanAmerican    0.523124
+    Asian              0.580838
+    Caucasian          0.523900
+    Hispanic           0.567515
+    Other              0.521127
+    Unknown            0.510169
+    Name: accuracy_score, dtype: float64
+>>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
 
-Note that because :class:`ExponentiatedGradient` does not have a `predict_proba`
-method, we cannot set a lower threshold for a positive prediction to deal with the 
-label imbalance in the outcome variable.
+Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
+method, but we can adjust the target decision threshold by specifying
+(possibly unequal) costs for false positives and false negatives.
+In our example we use the cost of 0.1 for false positives and 0.9 for false negatives.
+Without fairness constraints, this would exactly correspond to
+referring patients with the readmission risk of 10% or higher
+(as we used earlier).
 
 
 What's next?
