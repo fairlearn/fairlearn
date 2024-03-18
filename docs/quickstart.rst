@@ -147,13 +147,14 @@ we can evaluate metrics for subgroups within the data as below:
     >>> mf.overall
     0.514...
     >>> mf.by_group
-    Caucasian          76099
-    AfricanAmerican    19210
-    Unknown             2273
-    Hispanic            2037
-    Other               1506
-    Asian                641
-    Name: count, dtype: int64
+    race
+    AfricanAmerican    0.530935
+    Asian              0.658683
+    Caucasian          0.503535
+    Hispanic           0.612524
+    Other              0.591549
+    Unknown            0.574576
+    Name: accuracy_score, dtype: float64
 
 Note that above, because the outcome variable exhibits label imbalance, we set 
 the threshold for triggering a positive prediction lower 
