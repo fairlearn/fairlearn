@@ -87,7 +87,7 @@ review the `SciPy tutorial <https://github.com/fairlearn/talks/tree/main/2021_sc
 that the Fairlearn team presented in 2021.
 
 We will use machine learning to predict whether an individual in the dataset 
-is readmnitted to the hospital within 30 days of hospital release. 
+is readmitted to the hospital within 30 days of hospital release. 
 A hospital readmission within 30 days can be viewed as a proxy that the 
 patients needed more assistance at the release time.
 In the next section, we build a classification model to accomplish the 
@@ -103,7 +103,6 @@ prediction task.
     >>> X = data.data
     >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
     >>> y = data.target
-    >>> 
     >>> X_ohe = pd.get_dummies(X)
     >>> race = X['race']
     >>> race.value_counts()
@@ -137,13 +136,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> from sklearn.model_selection import train_test_split
     >>> np.random.seed(42)  # set seed for consistent results
-<<<<<<< HEAD
-    >>> X_train, X_test, y_train, y_test, \
-    A_train, A_test = train_test_split(X_ohe, y_true, race, random_state=123)
-=======
     >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
->>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
-    >>>
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
@@ -216,50 +209,20 @@ hypothetical example, we can attempt to mitigate the observed disparity using th
 fairness constraint called Equalized Odds, which bounds disparities in both types of error. In real world
 applications we need to be mindful of the sociotechnical context when making
 such decisions. The Exponentiated Gradient mitigation technique used fits the
-<<<<<<< HEAD
-provided classifier using Demographic Parity as the constraint, leading to
-a vastly reduced difference in selection rate:
-=======
 provided classifier using Equalized Odds as the constraint and a suitably weighted Error Rate
-as the objective, leading to a vastly reduced difference in  the accuracy:
->>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
+as the objective, leading to a vastly reduced difference in accuracy:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
 
-<<<<<<< HEAD
-    >>> from fairlearn.reductions import ErrorRateParity, DemographicParity, ExponentiatedGradient
-    >>> np.random.seed(0)  # set seed for consistent results with ExponentiatedGradient
-    >>> objective = ErrorRate(costs={'fp': 0.5, 'fn': 0.5})
-    >>> constraint = DemographicParity()
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-    >>> mitigator = ExponentiatedGradient(classifier, constraint, objective = objective)
-=======
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
     >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
->>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
-    >>>
-<<<<<<< HEAD
-    >>> sr_mitigated = MetricFrame(metrics=selection_rate, y_true=y_test, \
-    y_pred=y_pred_mitigated, sensitive_features=A_test)
-    >>> sr_mitigated.overall
-    0.0004...
-    >>> sr_mitigated.by_group
-    race
-    AfricanAmerican    0.000000
-    Asian              0.000000
-    Caucasian          0.000475
-    Hispanic           0.001957
-    Other              0.000000
-    Unknown            0.000000
-    Name: selection_rate, dtype: float64
-=======
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
     0.5257...
@@ -272,7 +235,6 @@ as the objective, leading to a vastly reduced difference in  the accuracy:
     Other              0.521127
     Unknown            0.510169
     Name: accuracy_score, dtype: float64
->>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
 
 Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
 method, but we can adjust the target decision threshold by specifying
