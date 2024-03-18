@@ -136,7 +136,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>> from sklearn.metrics import accuracy_score, balanced_accuracy_score
     >>> from sklearn.tree import DecisionTreeClassifier
     >>> from sklearn.model_selection import train_test_split
-    >>>
+    >>> np.random.seed(42)  # set seed for consistent results
 <<<<<<< HEAD
     >>> X_train, X_test, y_train, y_test, \
     A_train, A_test = train_test_split(X_ohe, y_true, race, random_state=123)
@@ -144,7 +144,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X_ohe, y, race, random_state=123)
 >>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
     >>>
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> classifier.fit(X_train, y_train)
     DecisionTreeClassifier(...)
     >>> y_pred = (classifier.predict_proba(X_test)[:,1] >= 0.1)
@@ -152,7 +152,6 @@ we can evaluate metrics for subgroups within the data as below:
     >>> mf.overall
     0.514...
     >>> mf.by_group
-    race
     AfricanAmerican    0.530935
     Asian              0.658683
     Caucasian          0.503535
@@ -222,7 +221,7 @@ provided classifier using Demographic Parity as the constraint, leading to
 a vastly reduced difference in selection rate:
 =======
 provided classifier using Equalized Odds as the constraint and a suitably weighted Error Rate
-as the objective, leading to a vastly reduced difference in  the selection rate:
+as the objective, leading to a vastly reduced difference in  the accuracy:
 >>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
 
 .. doctest:: quickstart
@@ -237,10 +236,9 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective = objective)
 =======
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
-    >>> np.random.seed(42)  # set seed for consistent results with ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4, random_state=42)
+    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
 >>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
@@ -264,7 +262,7 @@ as the objective, leading to a vastly reduced difference in  the selection rate:
 =======
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
-    0.526...
+    0.5257...
     >>> mf_mitigated.by_group
     race
     AfricanAmerican    0.523124
