@@ -23,5 +23,6 @@ df = race.value_counts().reset_index()
 
 ax.bar(df["race"], df["count"])
 ax.set_title('Counts by race')
+ax.tick_params(axis='x', labelrotation=45)
 
 plt.show()
