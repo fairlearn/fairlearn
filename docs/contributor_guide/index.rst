@@ -7,7 +7,7 @@ This project welcomes contributions and suggestions. Check the sections below
 to find out how to connect to our community of users and developers.
 Also make sure to read and respect our community's :ref:`code_of_conduct`.
 The contribution guide explains how to structure your contributions. Please
-:ref:`reach out <communication>` if you encouter any issues.
+:ref:`reach out <communication>` if you encounter any issues.
 
 .. toctree::
    :maxdepth: 1

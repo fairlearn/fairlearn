@@ -227,7 +227,7 @@ plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 # %%
 # Customizing plots
 # -----------------
-# :func:`plot_metric_frame` returns an :class:`Axes` object that we can customize futher.
+# :func:`plot_metric_frame` returns an :class:`Axes` object that we can customize further.
 
 axs = plot_metric_frame(
     metric_frame,

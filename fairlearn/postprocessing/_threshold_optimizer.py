@@ -4,15 +4,12 @@
 """Threshold Optimization Post Processing algorithm.
 
 This is based on M. Hardt, E. Price, N. Srebro's paper
-"`Equality of Opportunity in Supervised Learning
-<https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
-classification with one categorical sensitive feature [1]_.
+"Equality of Opportunity in Supervised Learning" :footcite:`hardt2016equality`
+for binary classification with one categorical sensitive feature.
 
 References
 ----------
-.. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-   Supervised Learning," arXiv.org, 07-Oct-2016. [Online]. Available:
-   https://arxiv.org/abs/1610.02413.
+.. footbibliography::
 
 """
 
@@ -128,7 +125,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Parameters
     ----------
     estimator : object
-        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+        A `scikit-learn compatible estimator
+        <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
         whose output is postprocessed.
 
     constraints : str, default='demographic_parity'
@@ -193,7 +191,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 use the hard values reported by the :code:`predict` method if
                 estimator is a classifier, and the regression values if
                 estimator is a regressor. This is equivalent to what
-                is done in [1]_.
+                is done in :footcite:`hardt2016equality`.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
@@ -206,13 +204,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Notes
     -----
     The procedure is based on the algorithm of
-    `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_ [1]_.
+    Hardt et al. :footcite:`hardt2016equality`.
 
     References
     ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-       Supervised Learning," arXiv.org, 07-Oct-2016.
-       [Online]. Available: https://arxiv.org/abs/1610.02413.
+    .. footbibliography::
 
     Examples
     --------

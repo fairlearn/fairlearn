@@ -446,7 +446,7 @@ lgb.plot_importance(
 # individual would have successfully paid the loan back. In the United States,
 # the practice of redlining :footcite:`peyton2020redlining`, denying mortgage loans
 # and other financial services to predominantly Black or other minority
-# communites, has resulted in a vast racial wealth gap between white and Black
+# communities, has resulted in a vast racial wealth gap between white and Black
 # Americans.
 # Although the practice of redlining was banned in 1968 with the
 # *Fair Housing Act*, the long-term impact of these practices
@@ -457,7 +457,7 @@ lgb.plot_importance(
 # Define fairness metrics based on harms
 # --------------------------------------
 #
-# Now that we have identified the relevant harms we anticpate users will
+# Now that we have identified the relevant harms we anticipate users will
 # experience, we can define our fairness metrics. In addition to the metrics, we
 # will quantify the uncertainty around each metric using *custom functions* to
 # compute the *standard error* for each metric at the :math:`\alpha=0.95` confidence
@@ -638,7 +638,7 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # mitigation strategies:
 #
 # - *Postprocessing*: In the postprocessing approach, the outputs of a trained
-#   classifer are transformed to satisfy some fairness criterion.
+#   classifier are transformed to satisfy some fairness criterion.
 # - *Reductions*: In the reductions approach, we take in a model class and
 #   iteratively create a sequence of models that optimize some fairness
 #   constraint. Compared to the *postprocessing* approach, the fairness
@@ -650,7 +650,7 @@ equalized_odds_unmitigated = equalized_odds_difference(
 # In the Fairlearn package, *postprocessing* mitigation is offered through
 # the :code:`ThresholdOptimizer` algorithm, following
 # :footcite:cts:`hardt2016equality`.
-# The :code:`ThresholdOptimizer` takes in an exisiting (possibly pre-fit)
+# The :code:`ThresholdOptimizer` takes in an existing (possibly pre-fit)
 # machine learning model whose predictions acts as a scoring function to
 # identify separate thresholds for each *sensitive feature* group.
 # The :code:`ThresholdOptimizer` optimizes a specified objective metric
