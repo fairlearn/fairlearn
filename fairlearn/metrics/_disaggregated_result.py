@@ -39,13 +39,22 @@ def extract_unique_classes(
 
 
 def apply_to_dataframe(
-    data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
+    data: pd.DataFrame,
+    metric_functions: Dict[str, AnnotatedMetricFunction],
+    include_groups: bool = False,
 ) -> pd.Series:
     """Apply metric functions to a DataFrame.
 
     The incoming DataFrame may have been sliced via `groupby()`.
     This function applies each annotated function in turn to the
     supplied DataFrame.
+
+    The include_groups argument is weird. It appears that pandas
+    introduced it as an argument in v2.2, and immediately deprecated
+    it (dependent on when this is being read, may need to adjust):
+    https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.apply.html
+    We don't use this argument, and only include it so that we can be
+    compatible with pandas<2.2
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
@@ -365,6 +374,7 @@ class DisaggregatedResult:
             temp = data.groupby(by=control_feature_names).apply(
                 apply_to_dataframe,
                 metric_functions=annotated_functions,
+                # See note in apply_to_dataframe about include_groups
                 include_groups=False,
             )
             # If there are multiple control features, might have missing combinations
@@ -387,6 +397,7 @@ class DisaggregatedResult:
         temp = data.groupby(all_grouping_names).apply(
             apply_to_dataframe,
             metric_functions=annotated_functions,
+            # See note in apply_to_dataframe about include_groups
             include_groups=False,
         )
         if len(all_grouping_names) > 1:
