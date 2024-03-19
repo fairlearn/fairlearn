@@ -106,6 +106,7 @@ prediction task.
     >>> X_ohe = pd.get_dummies(X)
     >>> race = X['race']
     >>> race.value_counts()
+    race
     Caucasian          76099
     AfricanAmerican    19210
     Unknown             2273
@@ -229,12 +230,12 @@ as the objective, leading to a vastly reduced difference in accuracy:
     0.5251...
     >>> mf_mitigated.by_group
     race
-    AfricanAmerican    0.523124
-    Asian              0.580838
-    Caucasian          0.523900
-    Hispanic           0.567515
-    Other              0.521127
-    Unknown            0.510169
+    AfricanAmerican    0.524358
+    Asian              0.562874
+    Caucasian          0.525588
+    Hispanic           0.549902
+    Other              0.478873
+    Unknown            0.511864
     Name: accuracy_score, dtype: float64
 
 Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
