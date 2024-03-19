@@ -378,6 +378,8 @@ def check_type_helper(data, actual_type, valid_choices, invalid_choices):
         prep = FloatTransformer(transformer=valid_choice)
         prep.fit(data)
         assert prep.dist_type_ == actual_type
+        assert prep.n_features_in_ == data.shape[0]
+        assert prep.n_features_out_ == data.shape[1]
 
     for invalid_choice in invalid_choices:
         with pytest.raises(ValueError) as exc:
