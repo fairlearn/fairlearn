@@ -22,6 +22,9 @@ g_A = np.asarray([group_gen(x, int(n / 2), ["aa", "bb"]) for x in range(n)])
 g_B = np.asarray([group_gen(x, 1 + int(n / 3), ["x", "y", "z"]) for x in range(n)])
 
 
+@pytest.mark.filterwarnings(
+    "default:A single label was found in 'y_true' and 'y_pred'.:UserWarning"
+)
 @pytest.mark.parametrize("metric_fn", metric)
 def test_missing_sensitive_feature_combinations(metric_fn):
     target = metrics.MetricFrame(
@@ -62,6 +65,9 @@ def test_missing_sensitive_feature_combinations(metric_fn):
     )
 
 
+@pytest.mark.filterwarnings(
+    "default:A single label was found in 'y_true' and 'y_pred'.:UserWarning"
+)
 @pytest.mark.parametrize("metric_fn", metric)
 def test_missing_conditional_feature_combinations(metric_fn):
     target = metrics.MetricFrame(

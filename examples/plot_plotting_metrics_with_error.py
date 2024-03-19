@@ -50,7 +50,7 @@ numeric_transformer = Pipeline(
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse=False)),
+        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
     ]
 )
 

@@ -189,7 +189,7 @@ for m in predictors:
     disparity = DemographicParity()
     disparity.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
 
-    errors.append(error.gamma(classifier)[0])
+    errors.append(error.gamma(classifier).iloc[0])
     disparities.append(disparity.gamma(classifier).max())
 
 all_results = pd.DataFrame(
