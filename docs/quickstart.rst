@@ -145,6 +145,7 @@ we can evaluate metrics for subgroups within the data as below:
     >>> mf.overall
     0.514...
     >>> mf.by_group
+    race
     AfricanAmerican    0.530935
     Asian              0.658683
     Caucasian          0.503535
@@ -225,7 +226,7 @@ as the objective, leading to a vastly reduced difference in accuracy:
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall
-    0.5257...
+    0.5251...
     >>> mf_mitigated.by_group
     race
     AfricanAmerican    0.523124
