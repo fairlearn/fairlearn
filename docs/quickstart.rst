@@ -155,9 +155,7 @@ we can evaluate metrics for subgroups within the data as below:
     Unknown            0.574576
     Name: accuracy_score, dtype: float64
 
-Note that above, because the outcome variable exhibits label imbalance, we set 
-the threshold for triggering a positive prediction lower 
-(to a probability of 0.1 or greater).
+Note that our decision threshold for positive predictions is 0.1.
 In practice, this threshold would be driven by risk or capacity 
 considerations. For this example, we set the threshold based on the risk 
 of readmission. The threshold of 0.1 corresponds to saying that a
