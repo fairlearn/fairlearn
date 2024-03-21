@@ -115,7 +115,7 @@ prediction task.
     Asian                641
     Name: count, dtype: int64
 
-.. figure:: auto_examples/images/sphx_glr_plot_quickstart_counts.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_counts_001.png
     :target: auto_examples/plot_quickstart_counts.html
     :align: center
 
