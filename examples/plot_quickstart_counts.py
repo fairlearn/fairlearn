@@ -25,4 +25,5 @@ ax.bar(df["race"], df["count"])
 ax.set_title('Counts by race')
 ax.tick_params(axis='x', labelrotation=45)
 
+plt.tight_layout()
 plt.show()
