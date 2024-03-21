@@ -3,7 +3,7 @@
 
 """
 =================================
-Selection rates in census dataset
+Value counts in census dataset
 =================================
 """
 from fairlearn.datasets import fetch_diabetes_hospital
