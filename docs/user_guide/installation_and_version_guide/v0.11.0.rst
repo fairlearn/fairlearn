@@ -4,11 +4,8 @@ v0.11.0
 .. note::
 
    v0.11.0 is not yet released. This page reflects changes on the current
-<<<<<<< HEAD
-   :code:`main` branch that will eventually be a part of v0.11.0.
-=======
+
    :code:`main` branch that will eventually be a part of v0.11.0.
 
 * Added disparity metric :code:`equal_opportunity_{difference,ratio}` as a frequently used alias
   for :code:`true_positive_rate_{difference,ratio}`.
->>>>>>> 3648b03c8f3dcf695043fa591919410642e1936d
