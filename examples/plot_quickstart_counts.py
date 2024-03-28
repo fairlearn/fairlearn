@@ -2,9 +2,9 @@
 # Licensed under the MIT License.
 
 """
-=================================
-Value counts in census dataset
-=================================
+=============
+Value counts 
+=============
 """
 from fairlearn.datasets import fetch_diabetes_hospital
 import matplotlib.pyplot as plt
