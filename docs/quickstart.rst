@@ -193,7 +193,7 @@ Fairlearn also allows us to quickly plot these metrics from the
     :start-after: # Analyze metrics using MetricFrame
     :end-before: # Customize plots with ylim
 
-.. figure:: _images/sphx_glr_plot_quickstart_diabetes_001.png
+.. figure:: _images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
     :align: center
 
