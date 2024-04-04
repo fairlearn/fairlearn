@@ -1,6 +1,5 @@
 v0.10.0
 =======
-.. note::
 
 * Added bootstrapping to :class:`MetricFrame`, along with a new section
   in the user guide
