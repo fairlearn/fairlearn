@@ -3,7 +3,7 @@
 
 """
 =============
-Value counts 
+Value counts
 =============
 """
 from fairlearn.datasets import fetch_diabetes_hospital
