@@ -173,6 +173,8 @@ pygments_style = "sphinx"
 # included in the gallery, but its plot is available for
 # the quickstart
 sphinx_gallery_conf = {
+    "doc_module" : ('fairlearn.fairlearn.datasets', 'fairlearn.fairlearn.metrics', 'fairlearn.fairlearn.postprocessing', 'fairlearn.fairlearn.preprocessing',  'fairlearn.fairlearn.reductions', 'fairlearn.fairlearn.adversarial', 'fairlearn.fairlearn.experimental'),
+    "backreferences_dir" : "backref_dir",    
     "reference_url": {"fairlearn": None},
     "examples_dirs": "../examples",
     "gallery_dirs": "auto_examples",
