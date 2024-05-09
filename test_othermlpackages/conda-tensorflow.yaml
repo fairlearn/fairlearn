@@ -7,6 +7,6 @@ dependencies:
 - pip>=19.1.1
 - pytest
 - pytest-cov
-- tensorflow
+- tensorflow<2.15
 - pip:
    - scikeras[tensorflow-cpu]
