@@ -21,7 +21,7 @@ jobs:
   all-deps:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-12]
         python: ["3.8", "3.9", "3.10", "3.11"]
         requirementsPinned: ["false"]
     uses: ./.github/workflows/test-all-deps.yml
@@ -34,7 +34,7 @@ jobs:
   minimal-deps:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-12]
         python: ["3.8", "3.9", "3.10", "3.11"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:

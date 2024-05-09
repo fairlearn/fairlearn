@@ -12,7 +12,7 @@ jobs:
       # to see all issues rather than just the first failure.
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-12]
         python: ["3.8", "3.9", "3.10", "3.11"]
         requirementsPinned: ["true", "false"]
     uses: ./.github/workflows/test-all-deps.yml
@@ -28,7 +28,7 @@ jobs:
       # to see all issues rather than just the first failure.
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-12]
         python: ["3.8", "3.9", "3.10", "3.11"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:
