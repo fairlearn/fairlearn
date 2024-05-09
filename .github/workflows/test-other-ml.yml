@@ -48,7 +48,7 @@ jobs:
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
