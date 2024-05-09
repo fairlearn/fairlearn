@@ -52,7 +52,6 @@ def test_multiple_sensitive_features():
     A = np.array(
         [(data.data["sex"] == "Male") * 1, (data.data["race"] == "Black") * 1]
     ).T
-    print(A)
     est = BernoulliNB()
     main_test(est, X, Y, A, assert_improvement=True)
 

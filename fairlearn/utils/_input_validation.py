@@ -187,8 +187,3 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
         )
         .values
     )
-
-
-print(np.array([1, 3]).ndim)
-print(np.array([1, 3]).shape)
-print(_merge_columns(np.array([[1, 2], [3, 4]])))
