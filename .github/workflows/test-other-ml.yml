@@ -42,8 +42,11 @@ jobs:
           source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
           conda list
+          echo
+          # Check something (for the tensorflow tests, will fail elsewhere)
+          python -c "import tensorflow"
           # Override the filterwarnings set in the TOML file
-          python -vv -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
+          python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
