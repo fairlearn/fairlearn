@@ -8,8 +8,9 @@ MetricFrame visualizations
 """
 
 import pandas as pd
-from fairlearn.datasets import fetch_adult
+from fairlearn.datasets import fetch_diabetes_hospital
 from sklearn.metrics import accuracy_score, precision_score
+from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 # %%
@@ -21,14 +22,19 @@ from fairlearn.metrics import (
     selection_rate,
 )
 
-data = fetch_adult()
-X = pd.get_dummies(data.data)
-y_true = (data.target == ">50K") * 1
-sex = data.data["sex"]
+data = fetch_diabetes_hospital(as_frame=True)
+X = data.data
+X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
+y_true = data.target
+X_ohe = pd.get_dummies(X)
+race = X['race']
+
+X_train, X_test, y_train, y_test, \
+    A_train, A_test = train_test_split(X_ohe, y_true, race, random_state=123)
 
 classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-classifier.fit(X, y_true)
-y_pred = classifier.predict(X)
+classifier.fit(X_train, y_train)
+y_pred = classifier.predict(X_test)
 
 # Analyze metrics using MetricFrame
 metrics = {
@@ -40,7 +46,7 @@ metrics = {
     "count": count,
 }
 metric_frame = MetricFrame(
-    metrics=metrics, y_true=y_true, y_pred=y_pred, sensitive_features=sex
+    metrics=metrics, y_true=y_test, y_pred=y_pred, sensitive_features=A_test
 )
 metric_frame.by_group.plot.bar(
     subplots=True,
