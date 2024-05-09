@@ -23,7 +23,7 @@ jobs:
     # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get commit date
         id: get_date
         shell: bash
@@ -33,14 +33,14 @@ jobs:
           AGE=$((CURRENT_DATE - COMMIT_DATE))
           echo "AGE=$AGE" >> $GITHUB_OUTPUT
           echo "AGE in seconds: $AGE"
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
       - run: pip install .
       - run: pip install pytest pytest-cov
       - run: pytest --cov=fairlearn --cov-report=xml test/install
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         with:
           env_vars: OS,PYTHON

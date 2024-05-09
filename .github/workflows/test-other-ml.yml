@@ -21,8 +21,8 @@ jobs:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
       - run: |
@@ -48,7 +48,7 @@ jobs:
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
