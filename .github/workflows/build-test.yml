@@ -49,7 +49,7 @@ jobs:
         os: [ubuntu-latest]
         python: ["3.11"]
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
-      failfast: false
+      fail-fast: false
     uses: ./.github/workflows/test-other-ml.yml
     with:
       os: ${{ matrix.os }}
