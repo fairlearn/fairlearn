@@ -1,4 +1,5 @@
 .. _diabetes_hospital_data:
+
 Diabetes 130-Hospitals Dataset
 ------------------------------
 
@@ -117,8 +118,7 @@ contains 25 features, which we describe below:
          - None
 
    *  - A1Cresult
-      - Indicates the range of the result in percentages or if the A1c test was
-        not taken:
+      - Indicates the range of the result in percentages or if the A1c test was not taken:
          - >7 (greater than 7%, but less than 8%)
          - >8 (greater than 8%)
          - Norm (indicating normal, which is less than 7%)
@@ -190,9 +190,7 @@ are interested in.
 Using the dataset
 ^^^^^^^^^^^^^^^^^
 The dataset can be loaded via the :func:`fairlearn.datasets.fetch_diabetes_hospital`
-function. By default, the dataset is returned as a :class:`pandas.DataFrame`, since
-the dataset contains string attributes that are not supported for array representation.
-Therefore, passing :code:`as_frame=False` would return a :code:`ValueError`.
+function. By default, the dataset is returned as a :class:`pandas.DataFrame`.
 
 .. topic:: References:
 

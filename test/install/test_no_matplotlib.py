@@ -5,14 +5,16 @@ import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 
+from fairlearn.metrics import plot_model_comparison
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 from fairlearn.postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
-from fairlearn.metrics import plot_model_comparison
 from fairlearn.postprocessing._threshold_optimizer import SIMPLE_CONSTRAINTS
 
 
 class FakePredictor(BaseEstimator, ClassifierMixin):
     def fit(self, X, y=None, **kwargs):
+        # We need to ensure that sklearn can tell the estimator is fitted
+        self.fitted_ = True
         return self
 
     def predict(self, X):
@@ -39,7 +41,7 @@ def test_no_matplotlib(constraints):
 
     with pytest.raises(RuntimeError) as exc:
         plot_threshold_optimizer(threshold_optimizer)
-        assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+    assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
 
 def test_no_matplotlib_plot_model_comparison():
@@ -51,4 +53,4 @@ def test_no_matplotlib_plot_model_comparison():
             y_preds={},
             sensitive_features=[],
         )
-        assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+    assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE

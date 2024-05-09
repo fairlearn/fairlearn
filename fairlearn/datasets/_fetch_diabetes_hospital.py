@@ -4,11 +4,12 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
 def fetch_diabetes_hospital(
-    *, cache=True, data_home=None, return_X_y=False
+    *, as_frame=True, cache=True, data_home=None, return_X_y=False
 ):
     """Load the preprocessed Diabetes 130-Hospitals dataset (binary classification).
 
@@ -16,7 +17,7 @@ def fetch_diabetes_hospital(
 
     ==============   ============================
     Samples total                          101766
-    Dimensionality                             25
+    Dimensionality                             24
     Features         numeric, categorical, string
     Classes                                     2
     ==============   ============================
@@ -42,15 +43,20 @@ def fetch_diabetes_hospital(
 
     Read more in the :ref:`User Guide <diabetes_hospital_data>`.
 
-    .. note::
-        The dataset is always returned as a pandas object, because string
-        attributes are not supported for array representation, resulting
-        in a `ValueError`.
-
     .. versionadded:: 0.8.0
 
     Parameters
     ----------
+    as_frame : bool, default=True
+        If True, the data is a pandas DataFrame including columns with
+        appropriate dtypes (numeric, string or categorical).
+
+        .. note::
+            If set to False, this will raise an exception because of a type mismatch
+            in the OpenML dataset.
+
+        .. versionadded:: 0.9.0
+
     cache : bool, default=True
         Whether to cache downloaded datasets using joblib.
 
@@ -66,21 +72,29 @@ def fetch_diabetes_hospital(
     Returns
     -------
     dataset : :obj:`~sklearn.utils.Bunch`
-        Dictionary-like object, with the following attributes.
+        Dictionary-like object, with the following attributes:
 
-        data : ndarray, shape (101766, 25)
-            Each row corresponding to the 25 feature values in order.
+        data : ndarray, shape (101766, 24)
+            Each row corresponding to the 24 feature values in order.
             If ``as_frame`` is True, ``data`` is a pandas object.
         target : numpy array of shape (101766,)
             Each value represents whether readmission of the patient
             occurred within 30 days of the release.
-        feature_names : list of length 25
+        feature_names : list of length 24
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the Diabetes 130-Hospitals dataset.
+        categories : dict or None
+            Maps each categorical feature name to a list of values, such that the
+            value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+        frame : pandas DataFrame
+            Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
 
-    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True
+    (data, target) : tuple if ``return_X_y`` is True
+
+    Notes
+    ----------
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
@@ -90,10 +104,13 @@ def fetch_diabetes_hospital(
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=43874,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
-        as_frame=True,
+        as_frame=as_frame,
         return_X_y=return_X_y,
+        parser="auto",
     )

@@ -14,7 +14,7 @@ def fetch_acs_income(
     *,
     cache=True,
     data_home=None,
-    as_frame=False,
+    as_frame=True,
     return_X_y=False,
     states=None,
 ):
@@ -29,8 +29,10 @@ def fetch_acs_income(
     Target                        numeric
     ==============   ====================
 
-    Source: Paper: Ding et al. (2021) [1]_
-            and corresponding repository https://github.com/zykls/folktables/
+    Source:
+
+    - Paper: Ding et al. (2021) :footcite:`ding2021retiring`
+    - Repository: https://github.com/zykls/folktables/
 
     Read more in the :ref:`User Guide <acsincome_data>`.
 
@@ -46,13 +48,16 @@ def fetch_acs_income(
         By default, all fairlearn data is stored in '~/.fairlearn-data'
         subfolders.
 
-    as_frame : bool, default=False
+    as_frame : bool, default=True
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical). The target is
         a pandas DataFrame or Series depending on the number of target_columns.
         The Bunch will contain a ``frame`` attribute with the target and the
         data. If ``return_X_y`` is True, then ``(data, target)`` will be pandas
         DataFrames or Series as describe above.
+
+        .. versionchanged:: 0.9.0
+            Default value changed to True.
 
     return_X_y : bool, default=False
         If True, returns ``(data.data, data.target)`` instead of a Bunch
@@ -63,7 +68,7 @@ def fetch_acs_income(
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
         The state abbreviations and codes can be found on page 1 of the data
-        dictionary at ACS PUMS [2]_.
+        dictionary at ACS PUMS :footcite:`census2019pums`.
 
     Returns
     -------
@@ -82,20 +87,21 @@ def fetch_acs_income(
             Array of ordered feature names used in the dataset.
         DESCR : string
             Description of the ACSIncome dataset.
+        categories : dict or None
+            Maps each categorical feature name to a list of values, such that the
+            value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+        frame : pandas DataFrame
+            Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
 
-    (data, target) : tuple of (numpy.ndarray, numpy.ndarray)
-        if ``return_X_y`` is True and ``as_frame`` is False
+    (data, target) : tuple if ``return_X_y`` is True
 
-    (data, target) : tuple of (pandas.DataFrame, pandas.Series)
-        if ``return_X_y`` is True and ``as_frame`` is True
+    Notes
+    ----------
+    Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
-    .. [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021).
-       "Retiring Adult: New Datasets for Fair Machine Learning."
-       Advances in Neural Information Processing Systems, 34.
-
-    .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
+    .. footbibliography::
 
     """
     # State Code based on 2010 Census definitions
@@ -175,12 +181,15 @@ def fetch_acs_income(
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
     # fetch data for all 50 US states and Puerto Rico
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     data_dict = fetch_openml(
         data_id=43141,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=True,
         return_X_y=False,
+        parser="auto",
     )
 
     # filter by state

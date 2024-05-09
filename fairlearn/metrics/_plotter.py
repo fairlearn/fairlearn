@@ -212,7 +212,7 @@ def plot_metric_frame(
     if metrics is None:
         metrics = []
         for metric in list(df):
-            if not _is_arraylike(df[metric][0]):
+            if not _is_arraylike(df[metric].iloc[0]):
                 metrics.append(metric)
 
     check_consistent_length(metrics, conf_intervals)
@@ -263,16 +263,16 @@ def plot_metric_frame(
             for i in range(len(temp_axs[j].patches)):
                 temp_axs[j].text(
                     i,
-                    df_all_bounds[metric][i][0] - 0.05 * y_range,
-                    round(df_all_bounds[metric][i][0], ci_labels_precision),
+                    df_all_bounds[metric].iloc[i][0] - 0.05 * y_range,
+                    round(df_all_bounds[metric].iloc[i][0], ci_labels_precision),
                     fontsize=ci_labels_fontsize,
                     color=ci_labels_color,
                     ha=ci_labels_ha,
                 )
                 temp_axs[j].text(
                     i,
-                    df_all_bounds[metric][i][1] + 0.01 * y_range,
-                    round(df_all_bounds[metric][i][1], ci_labels_precision),
+                    df_all_bounds[metric].iloc[i][1] + 0.01 * y_range,
+                    round(df_all_bounds[metric].iloc[i][1], ci_labels_precision),
                     fontsize=ci_labels_fontsize,
                     color=ci_labels_color,
                     ha=ci_labels_ha,

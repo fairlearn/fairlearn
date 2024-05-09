@@ -25,19 +25,19 @@ for each combination of subgroups.
 
 import sys as _sys
 
-from ._disparities import demographic_parity_difference  # noqa: F401
-from ._disparities import demographic_parity_ratio  # noqa: F401
-from ._disparities import equalized_odds_difference, equalized_odds_ratio  # noqa: F401
-from ._extra_metrics import _balanced_root_mean_squared_error  # noqa: F401
-from ._extra_metrics import _mean_overprediction  # noqa: F401
-from ._extra_metrics import _mean_underprediction  # noqa: F401
-from ._extra_metrics import count  # noqa: F401
-from ._extra_metrics import false_negative_rate  # noqa: F401
-from ._extra_metrics import false_positive_rate  # noqa: F401
-from ._extra_metrics import mean_prediction  # noqa: F401
-from ._extra_metrics import selection_rate  # noqa: F401
-from ._extra_metrics import true_negative_rate  # noqa: F401
-from ._extra_metrics import true_positive_rate  # noqa: F401; noqa: F401
+from ._base_metrics import count  # noqa: F401
+from ._base_metrics import false_negative_rate  # noqa: F401
+from ._base_metrics import false_positive_rate  # noqa: F401
+from ._base_metrics import mean_prediction  # noqa: F401
+from ._base_metrics import selection_rate  # noqa: F401
+from ._base_metrics import true_negative_rate  # noqa: F401
+from ._base_metrics import true_positive_rate  # noqa: F401; noqa: F401
+from ._fairness_metrics import demographic_parity_difference  # noqa: F401
+from ._fairness_metrics import demographic_parity_ratio  # noqa: F401
+from ._fairness_metrics import equalized_odds_difference  # noqa: F401
+from ._fairness_metrics import equalized_odds_ratio  # noqa: F401
+from ._fairness_metrics import equal_opportunity_difference  # noqa: F401
+from ._fairness_metrics import equal_opportunity_ratio  # noqa: F401
 from ._generated_metrics import _generated_metric_dict  # noqa: F401
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
@@ -52,20 +52,18 @@ for _name, _func in _generated_metric_dict.items():
 # ============================================
 # Build list of items to be listed in the docs
 
-_core = [
-    "MetricFrame",
-    "make_derived_metric",
-    "plot_model_comparison"
-]
+_core = ["MetricFrame", "make_derived_metric", "plot_model_comparison"]
 
-_disparities = [
+_fairness = [
     "demographic_parity_difference",
     "demographic_parity_ratio",
     "equalized_odds_difference",
     "equalized_odds_ratio",
+    "equal_opportunity_difference",
+    "equal_opportunity_ratio",
 ]
 
-_extra_metrics = [
+_base_metrics = [
     "true_positive_rate",
     "true_negative_rate",
     "false_positive_rate",
@@ -76,5 +74,5 @@ _extra_metrics = [
 ]
 
 __all__ = (
-    _core + _disparities + _extra_metrics + list(sorted(_generated_metric_dict.keys()))
+    _core + _fairness + _base_metrics + list(sorted(_generated_metric_dict.keys()))
 )

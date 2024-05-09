@@ -1,0 +1,61 @@
+name: nightly
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  all-deps:
+    strategy:
+      # Keep running remaining matrix jobs even if one fails
+      # to see all issues rather than just the first failure.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.8", "3.9", "3.10", "3.11"]
+        requirementsPinned: ["true", "false"]
+    uses: ./.github/workflows/test-all-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      requirementsPinned: ${{ matrix.requirementsPinned }}
+      codeCovPython: "3.11"
+  
+  minimal-deps:
+    strategy:
+      # Keep running remaining matrix jobs even if one fails
+      # to see all issues rather than just the first failure.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.8", "3.9", "3.10", "3.11"]
+    uses: ./.github/workflows/test-minimal-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      codeCovPython: "3.11"
+
+  other-ml:
+    strategy:
+      # Keep running remaining matrix jobs even if one fails
+      # to see all issues rather than just the first failure.
+      fail-fast: false
+      matrix:
+        mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
+    uses: ./.github/workflows/test-other-ml.yml
+    with:
+      os: ubuntu-latest
+      python: "3.11"
+      mlpackage: ${{ matrix.mlpackage }}
+
+
+  linting:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11"]
+    uses: ./.github/workflows/linting.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}

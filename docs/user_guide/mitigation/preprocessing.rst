@@ -2,7 +2,7 @@
 
 Preprocessing
 =============
-   
+
 .. currentmodule:: fairlearn.preprocessing
 
 Preprocessing algorithms transform the dataset to mitigate possible unfairness
@@ -57,8 +57,8 @@ The :code:`CorrelationRemover` will drop the sensitive features from the dataset
 
     >>> from fairlearn.preprocessing import CorrelationRemover
     >>> import pandas as pd
-    >>> from sklearn.datasets import fetch_openml
-    >>> data = fetch_openml(data_id=43874, as_frame=True)
+    >>> from fairlearn.datasets import fetch_diabetes_hospital
+    >>> data = fetch_diabetes_hospital()
     >>> X = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
     >>> X = pd.get_dummies(X)
     >>> X = X.drop(["race_Asian",
@@ -111,7 +111,7 @@ to control the level of filtering between the sensitive and non-sensitive featur
     CorrelationRemover(alpha=0.5, sensitive_feature_ids=['race_AfricanAmerican'])
     >>> X_transform = cr.transform(X)
 
-As we can see in the visulization below, not all correlation between
+As we can see in the visualization below, not all correlation between
 'race_AfricanAmerican' and the other columns was removed. This is exactly what
 we would expect with :math:`\alpha=0.5`.
 

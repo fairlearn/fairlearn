@@ -11,6 +11,17 @@ fairness metrics, such as demographic parity and equalized odds.
 We will show how :class:`MetricFrame` can be used to evaluate the metrics
 identified during the course of a fairness assessment.
 
+Fairlean provides two primary ways of assessing fairness: :class:`MetricFrame`,
+which can be used to perform disaggregated analysis of a particular performance 
+metric (such as accuracy, false positive rate, etc.) across sensitive 
+groups, and a set of predefined fairness metrics that use :class:`MetricFrame` 
+internally to output an aggregate value.
+:class:`MetricFrame` can also be used to output an aggregate value, 
+but the predefined fairness metrics can be used when direct by-group 
+comparison is not necessary.
+In the :ref:`perform_fairness_assessment`, we will dive further into
+each of these types of fairness assessments. 
+
 In the mathematical definitions below, :math:`X` denotes a feature vector 
 used for predictions, :math:`A` will be a single sensitive feature (such as age 
 or race), and :math:`Y` will be the true label.
@@ -30,8 +41,10 @@ indicate that a property holds for all identified groups.
    common_fairness_metrics
    custom_fairness_metrics
    intersecting_groups
+   confidence_interval_estimation
    advanced_metricframe
    plotting
+   saving_loading_metricframe
 
 
 .. _dashboard:
@@ -49,6 +62,6 @@ metrics.
     The :code:`FairlearnDashboard` is no longer being developed as
     part of Fairlearn.
     For more information on how to use it refer to
-    `https://github.com/microsoft/responsible-ai-widgets <https://github.com/microsoft/responsible-ai-widgets>`_.
+    `https://github.com/microsoft/responsible-ai-toolbox <https://github.com/microsoft/responsible-ai-toolbox>`_.
     Fairlearn provides some of the existing functionality through
     :code:`matplotlib`-based visualizations. Refer to the :ref:`plot_metricframe` section.

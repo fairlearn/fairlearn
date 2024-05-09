@@ -142,7 +142,7 @@ class PytorchEngine(BackendEngine):
             return torch.nn.BCELoss(reduction="mean")
         elif dist_type == "category":
             # Use logsoftmax as last layer
-            return torch.nn.NLLLoss(reduction="mean")
+            return torch.nn.CrossEntropyLoss(reduction="mean")
         elif dist_type == "continuous":
             return torch.nn.MSELoss(reduction="mean")
         super(PytorchEngine, self).get_loss(dist_type)

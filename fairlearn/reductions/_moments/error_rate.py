@@ -32,8 +32,6 @@ class ErrorRate(ClassificationMoment):
     and false negative errors respectively. The standard misclassification
     error corresponds to :math:`c_{FP}=c_{FN}=1.0`.
 
-    Read more in the :ref:`User Guide <error_rate_parity>`.
-
     Parameters
     ----------
     costs : dict
@@ -75,7 +73,7 @@ class ErrorRate(ClassificationMoment):
         super().load_data(X, y_train, sensitive_features=sf_train)
         self.index = [_ALL]
 
-    def gamma(self, predictor):
+    def gamma(self, predictor) -> pd.Series:
         """Return the gamma values for the given predictor."""
         pred = predictor(self.X)
         if isinstance(pred, np.ndarray):

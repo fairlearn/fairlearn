@@ -4,15 +4,12 @@
 """Threshold Optimization Post Processing algorithm.
 
 This is based on M. Hardt, E. Price, N. Srebro's paper
-"`Equality of Opportunity in Supervised Learning
-<https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
-classification with one categorical sensitive feature [1]_.
+"Equality of Opportunity in Supervised Learning" :footcite:`hardt2016equality`
+for binary classification with one categorical sensitive feature.
 
 References
 ----------
-.. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-   Supervised Learning," arXiv.org, 07-Oct-2016. [Online]. Available:
-   https://arxiv.org/abs/1610.02413.
+.. footbibliography::
 
 """
 
@@ -128,7 +125,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Parameters
     ----------
     estimator : object
-        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+        A `scikit-learn compatible estimator
+        <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
         whose output is postprocessed.
 
     constraints : str, default='demographic_parity'
@@ -177,16 +175,23 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         Defines which method of the ``estimator`` is used to get the output
         values.
 
-        - 'auto': use one of ``predict_proba``, ``decision_function``, or
-          ``predict``, in that order.
-        - 'predict_proba': use the second column from the output of
-          `predict_proba`. It is assumed that the second column represents the
-          positive outcome.
-        - 'decision_function': use the raw values given by the
-          `decision_function`.
-        - 'predict': use the hard values reported by the `predict` method if
-          estimator is a classifier, and the regression values if estimator is
-          a regressor. This is equivalent to what is done in [1]_.
+            'auto'
+                use one of :code:`predict_proba`, :code:`decision_function`, or
+                :code:`predict`, in that order.
+
+            'predict_proba'
+                use the second column from the output of :code:`predict_proba`.
+                It is assumed that the second column represents the positive
+                outcome.
+
+            'decision_function'
+                use the raw values given by the :code:`decision_function`.
+
+            'predict'
+                use the hard values reported by the :code:`predict` method if
+                estimator is a classifier, and the regression values if
+                estimator is a regressor. This is equivalent to what
+                is done in :footcite:`hardt2016equality`.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
@@ -199,13 +204,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Notes
     -----
     The procedure is based on the algorithm of
-    `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_ [1]_.
+    Hardt et al. :footcite:`hardt2016equality`.
 
     References
     ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-       Supervised Learning," arXiv.org, 07-Oct-2016.
-       [Online]. Available: https://arxiv.org/abs/1610.02413.
+    .. footbibliography::
 
     Examples
     --------
@@ -529,7 +532,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         n = len(labels)
 
-        if type(labels) == pd.DataFrame:
+        if isinstance(labels, pd.DataFrame):
             n_positive = labels.sum().loc[0]
         else:
             n_positive = sum(labels)
@@ -703,7 +706,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
     dict
         The updated `data_dict` with reformatted data at the `key` slot
     """
-    if type(additional_data) == np.ndarray:
+    if isinstance(additional_data, np.ndarray):
         if len(additional_data.shape) > 2 or (
             len(additional_data.shape) == 2 and additional_data.shape[1] > 1
         ):
@@ -713,14 +716,14 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             )
         else:
             data_dict[key] = additional_data.squeeze()
-    elif type(additional_data) == pd.DataFrame:
+    elif isinstance(additional_data, pd.DataFrame):
         # TODO: extend to multiple columns for additional_data by using column names
         for attribute_column in additional_data.columns:
             data_dict[key] = additional_data[attribute_column].values
-    elif type(additional_data) == pd.Series:
+    elif isinstance(additional_data, pd.Series):
         data_dict[key] = additional_data.values
-    elif type(additional_data) == list:
-        if type(additional_data[0]) == list:
+    elif isinstance(additional_data, list):
+        if isinstance(additional_data[0], list):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
                 raise ValueError(

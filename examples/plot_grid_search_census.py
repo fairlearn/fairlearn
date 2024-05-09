@@ -34,20 +34,24 @@ GridSearch with Census Data
 
 import pandas as pd
 from sklearn import metrics as skm
-from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+from fairlearn.datasets import fetch_adult
 from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 from fairlearn.metrics import (
-    MetricFrame, selection_rate, count, plot_model_comparison, selection_rate_difference
+    MetricFrame,
+    selection_rate,
+    count,
+    plot_model_comparison,
+    selection_rate_difference,
 )
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult()
 X_raw = data.data
 Y = (data.target == ">50K") * 1
 X_raw
@@ -185,7 +189,7 @@ for m in predictors:
     disparity = DemographicParity()
     disparity.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
 
-    errors.append(error.gamma(classifier)[0])
+    errors.append(error.gamma(classifier).iloc[0])
     disparities.append(disparity.gamma(classifier).max())
 
 all_results = pd.DataFrame(
@@ -262,6 +266,6 @@ plot_model_comparison(
     y_preds=predictions,
     sensitive_features=A_test,
     point_labels=True,
-    show_plot=True
+    show_plot=True,
 )
 # End model comparison

@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from sklearn.datasets import fetch_openml
+from fairlearn.datasets import fetch_diabetes_hospital
 from fairlearn.preprocessing import CorrelationRemover
 
 # %%
@@ -36,20 +36,32 @@ from fairlearn.preprocessing import CorrelationRemover
 # specifically at the African American race.
 # Finally, the columns are rearranged for consistency.
 
-data = fetch_openml(data_id=43874, as_frame=True)
+data = fetch_diabetes_hospital()
 X_raw = data.data[["race", "time_in_hospital", "had_inpatient_days", "medicare"]]
 X_raw = pd.get_dummies(X_raw)
 y = data.target
 
-X_raw = X_raw.drop(["race_Asian",
-                    'race_Caucasian',
-                    'race_Hispanic',
-                    'race_Other',
-                    'race_Unknown',
-                    'had_inpatient_days_False',
-                    'medicare_False'], axis=1)
+X_raw = X_raw.drop(
+    [
+        "race_Asian",
+        "race_Caucasian",
+        "race_Hispanic",
+        "race_Other",
+        "race_Unknown",
+        "had_inpatient_days_False",
+        "medicare_False",
+    ],
+    axis=1,
+)
 
-X_raw = X_raw[['time_in_hospital', 'had_inpatient_days_True', 'medicare_True', 'race_AfricanAmerican']]
+X_raw = X_raw[
+    [
+        "time_in_hospital",
+        "had_inpatient_days_True",
+        "medicare_True",
+        "race_AfricanAmerican",
+    ]
+]
 
 # %%
 # We are now going to fit the CorrelationRemover to the data,
@@ -58,12 +70,16 @@ X_raw = X_raw[['time_in_hospital', 'had_inpatient_days_True', 'medicare_True', '
 
 cr = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"])
 X_cr = cr.fit_transform(X_raw)
-X_cr = pd.DataFrame(X_cr, columns=['time_in_hospital', 'had_inpatient_days_True', 'medicare_True'])
+X_cr = pd.DataFrame(
+    X_cr, columns=["time_in_hospital", "had_inpatient_days_True", "medicare_True"]
+)
 X_cr["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
-cr_alpha = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
+cr_alpha = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"], alpha=0.5)
 X_cr_alpha = cr_alpha.fit_transform(X_raw)
-X_cr_alpha = pd.DataFrame(X_cr_alpha, columns=['time_in_hospital', 'had_inpatient_days_True', 'medicare_True'])
+X_cr_alpha = pd.DataFrame(
+    X_cr_alpha, columns=["time_in_hospital", "had_inpatient_days_True", "medicare_True"]
+)
 X_cr_alpha["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
 # %%
@@ -74,7 +90,7 @@ X_cr_alpha["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
 
 def plot_heatmap(df, title):
-    df['target'] = y
+    df["target"] = y
     df = df.rename(columns={"had_inpatient_days_True": "had_inpatient_days"})
     cols = list(df.columns)
 
@@ -82,8 +98,10 @@ def plot_heatmap(df, title):
     ax.imshow(round(df.corr(), 2), cmap="coolwarm")
 
     # Show all ticks and label them with the respective list entries
-    ax.set_xticks(np.arange(len(cols)), labels=cols)
-    ax.set_yticks(np.arange(len(cols)), labels=cols)
+    ax.set_xticks(np.arange(len(cols)))
+    ax.set_xticklabels(cols)
+    ax.set_yticks(np.arange(len(cols)))
+    ax.set_yticklabels(cols)
 
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=15, ha="right", rotation_mode="anchor")

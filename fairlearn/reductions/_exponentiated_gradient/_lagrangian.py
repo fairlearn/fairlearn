@@ -23,6 +23,14 @@ _MESSAGE_BAD_OBJECTIVE = (
 )
 
 
+class _PredictorAsCallable:
+    def __init__(self, classifier):
+        self._classifier = classifier
+
+    def __call__(self, X):
+        return self._classifier.predict(X)
+
+
 class _Lagrangian:
     """Operations related to the Lagrangian.
 
@@ -116,7 +124,7 @@ class _Lagrangian:
             violations, and `error` is the empirical error
         """
         if callable(Q):
-            error = self.obj.gamma(Q)[0]
+            error = self.obj.gamma(Q).iloc[0]
             gamma = self.constraints.gamma(Q)
         else:
             error = self.errors[Q.index].dot(Q)
@@ -233,15 +241,9 @@ class _Lagrangian:
         """
         classifier = self._call_oracle(lambda_vec)
 
-        def h(X):
-            pred = classifier.predict(X)
-            # Some estimators return an output of the shape (num_preds, 1) - flatten such
-            # results
-            if getattr(pred, "flatten", None) is not None:
-                pred = pred.flatten()
-            return pred
+        h = _PredictorAsCallable(classifier)
 
-        h_error = self.obj.gamma(h)[0]
+        h_error = self.obj.gamma(h).iloc[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
 

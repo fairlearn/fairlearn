@@ -25,6 +25,8 @@ def test_basic(transform_y_t, transform_y_p):
         y_pred=transform_y_p(y_p),
         sensitive_features=g_f,
     )
+    # Check on ci_quantiles
+    assert target.ci_quantiles is None
 
     # Check on the indices properties
     assert target.control_levels is None
@@ -69,6 +71,8 @@ def test_basic_metric_dict(transform_y_t, transform_y_p):
         y_pred=transform_y_p(y_p),
         sensitive_features=g_f,
     )
+    # Check on ci_quantiles
+    assert target.ci_quantiles is None
 
     # Check on the indices properties
     assert target.control_levels is None
@@ -116,6 +120,8 @@ def test_1m_1sf_1cf(transform_y_t, transform_y_p):
         sensitive_features=g_2,
         control_features=g_3,
     )
+    # Check on ci_quantiles
+    assert target.ci_quantiles is None
 
     # Check on the indices properties
     assert isinstance(target.control_levels, list)
@@ -181,6 +187,8 @@ def test_1m_1sf_1cf_metric_dict(transform_y_t, transform_y_p):
         sensitive_features=g_2,
         control_features=g_3,
     )
+    # Check on ci_quantiles
+    assert target.ci_quantiles is None
 
     # Check on the indices properties
     assert isinstance(target.control_levels, list)
@@ -264,6 +272,8 @@ def test_1m_1_sf_sample_weights():
         sensitive_features=g_1,
         sample_params={"p1": param1, "p2": param2},
     )
+    # Check on ci_quantiles
+    assert target.ci_quantiles is None
 
     # Sanity check types
     assert isinstance(target.overall, float)
@@ -339,6 +349,8 @@ def test_2m_1sf_sample_weights():
         sensitive_features=g_2,
         sample_params=sample_params,
     )
+    # Check on ci_quantiles
+    assert target.ci_quantiles is None
 
     # Check we have correct return types
     assert isinstance(target.overall, pd.Series)
@@ -403,7 +415,7 @@ def test_duplicate_cf_sf_names():
 
 def test_single_element_lists():
     mf = metrics.MetricFrame(
-        metrics=skm.balanced_accuracy_score,
+        metrics=skm.recall_score,
         y_true=[1],
         y_pred=[1],
         sensitive_features=[0],

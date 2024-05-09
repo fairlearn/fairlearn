@@ -3,12 +3,12 @@ channels:
 - defaults
 - conda-forge
 dependencies:
-- python==3.8
+- python==3.11
 - pip>=19.1.1
 - pytest
 - pytest-cov
-- xgboost
-- pandas<1.4 # Capped for xgboost only
+- xgboost>=1.7.0
+- pandas
 
 # Note xgboost not available for Windows on conda-forge
 # See

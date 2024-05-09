@@ -5,7 +5,7 @@ from fairlearn.adversarial._preprocessor import FloatTransformer
 import pytest
 from pandas import DataFrame, Series
 from numpy import ndarray, asarray, issubdtype
-from sklearn.datasets import fetch_openml
+from fairlearn.datasets import fetch_adult
 
 
 def data_generator():
@@ -39,7 +39,7 @@ def data_generator():
     yield [[0, 1], [1, 0], [0.1, 2]], "continuous", [Series]
 
     # Larger examples.
-    X, y = fetch_openml(data_id=1590, as_frame=True, return_X_y=True)
+    X, y = fetch_adult(return_X_y=True)
     yield y.tolist(), "binary"
     non_NaN_rows = ~X.isna().any(axis=1)
     X = X[non_NaN_rows]

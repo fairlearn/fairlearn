@@ -39,18 +39,31 @@ def extract_unique_classes(
 
 
 def apply_to_dataframe(
-    data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
+    data: pd.DataFrame,
+    metric_functions: Dict[str, AnnotatedMetricFunction],
+    include_groups: bool = False,
 ) -> pd.Series:
     """Apply metric functions to a DataFrame.
 
     The incoming DataFrame may have been sliced via `groupby()`.
     This function applies each annotated function in turn to the
     supplied DataFrame.
+
+    The include_groups argument is weird. It appears that pandas
+    introduced it as an argument in v2.2, and immediately deprecated
+    it (dependent on when this is being read, may need to adjust):
+    https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.apply.html
+    We don't use this argument, and only include it so that we can be
+    compatible with pandas<2.2
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
         values[function_name] = metric_function(data)
-    result = pd.Series(data=values.values(), index=values.keys())
+    # correctly handle zero provided metrics
+    if len(values) == 0:
+        result = pd.Series(dtype=float)
+    else:
+        result = pd.Series(values)
     return result
 
 
@@ -168,7 +181,9 @@ class DisaggregatedResult:
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self.by_group.copy()
-                mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+                mf = mf.apply(
+                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
+                )
                 if grouping_function == "min":
                     result = mf.groupby(level=control_feature_names).min()
                 else:
@@ -228,7 +243,7 @@ class DisaggregatedResult:
         mf = self.by_group.copy()
         # Can assume errors='coerce', else error would already have been raised in .group_min
         # Fill all non-scalar values with NaN
-        mf = mf.applymap(lambda x: x if np.isscalar(x) else np.nan)
+        mf = mf.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
 
         if control_feature_names is None:
             result = (mf - subtrahend).abs().max()
@@ -357,7 +372,10 @@ class DisaggregatedResult:
             overall = apply_to_dataframe(data, metric_functions=annotated_functions)
         else:
             temp = data.groupby(by=control_feature_names).apply(
-                apply_to_dataframe, metric_functions=annotated_functions
+                apply_to_dataframe,
+                metric_functions=annotated_functions,
+                # See note in apply_to_dataframe about include_groups
+                include_groups=False,
             )
             # If there are multiple control features, might have missing combinations
             if len(control_feature_names) > 1:
@@ -377,7 +395,10 @@ class DisaggregatedResult:
             all_grouping_names = control_feature_names + all_grouping_names
 
         temp = data.groupby(all_grouping_names).apply(
-            apply_to_dataframe, metric_functions=annotated_functions
+            apply_to_dataframe,
+            metric_functions=annotated_functions,
+            # See note in apply_to_dataframe about include_groups
+            include_groups=False,
         )
         if len(all_grouping_names) > 1:
             # We might have missing combinations in the input, so expand to fill

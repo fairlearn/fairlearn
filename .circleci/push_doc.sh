@@ -62,9 +62,18 @@ touch .nojekyll
 # landing page on fairlearn.org
 if [ "$CIRCLE_BRANCH" = "main" ]
 then
-    echo "Copying landing_page.js into js directory"
+    echo "Copying all the newly generated files for the static landing page"
     ls $GENERATED_DOC_DIR/..
-    cp $GENERATED_DOC_DIR/../landing_page.js js/
+    # html
+    cp $GENERATED_DOC_DIR/../static_landing_page/index.html .
+    # js
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/js/ .
+    # css
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/css/ .
+    # fonts
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/fonts .
+    # images
+    cp -r $GENERATED_DOC_DIR/../static_landing_page/images .
 fi
 
 echo "fairlearn.org" > CNAME

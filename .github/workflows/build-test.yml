@@ -1,6 +1,15 @@
 name: build-test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+      - "release/**"
+  workflow_dispatch:
+
 
 concurrency: 
   # this ensures after each commit the old jobs are cancelled and the new ones
@@ -10,104 +19,49 @@ concurrency:
 
 jobs:
   all-deps:
-    # this job installs all dependencies and runs most tests
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.8", "3.9", "3.10"]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python }}
-      - run: pip install .
-      - run: pip install -r requirements-dev.txt
-      - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml -m "not notebooks" test/
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
-
+        python: ["3.8", "3.9", "3.10", "3.11"]
+        requirementsPinned: ["false"]
+    uses: ./.github/workflows/test-all-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      requirementsPinned: ${{ matrix.requirementsPinned }}
+      codeCovPython: "3.11"
+  
   minimal-deps:
-    # this job installs minimal dependencies and runs tests for the minimal
-    # dependency cases.
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.8", "3.9", "3.10"]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python }}
-      - run: pip install .
-      - run: pip install pytest pytest-cov
-      - run: pytest --cov=fairlearn --cov-report=xml test/install
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          path_to_write_report: ./coverage/codecov_report.txt
-          verbose: true
+        python: ["3.8", "3.9", "3.10", "3.11"]
+    uses: ./.github/workflows/test-minimal-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      codeCovPython: "3.11"
 
+  
   other-ml:
     strategy:
       matrix:
-        mlpackage: [ lightgbm, xgboost, tensorflow, pytorch]
-    runs-on: ubuntu-latest
-    env:
-      baseDir: test_othermlpackages
-      condaEnv: test-conda-env
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: 3.8
-      - run: |
-          conda update -n base -c defaults conda
-        name: Update and initialise conda
-      - run: |
-          conda env create --name $condaEnv --file=$baseDir/conda-${{matrix.mlpackage}}.yaml
-        name: Create conda environment
-      - run: |
-          # For some reason, 'conda init bash' doesn't stick so
-          # We have to keep doing the following
-          source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate $condaEnv
-          pip install .
-        name: Install Fairlearn
-      - run: |
-          source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate $condaEnv
-          python -m pytest --cov=fairlearn --cov-report=xml $baseDir/test_${{matrix.mlpackage}}.py 
-        name: Run ${{matrix.mlpackage}} tests
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
+        os: [ubuntu-latest]
+        python: ["3.11"]
+        mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
+    uses: ./.github/workflows/test-other-ml.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      mlpackage: ${{ matrix.mlpackage }}
+
 
   linting:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: 3.9
-      - run: pip install -r requirements-dev.txt
-      - run: flake8 .
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11"]
+    uses: ./.github/workflows/linting.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}

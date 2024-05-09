@@ -22,7 +22,6 @@ def _simple_threshold_data(
     a1_label,
     A_two_dim=False,
 ):
-
     a0s = np.full(number_a0, a0_label)
     a1s = np.full(number_a1, a1_label)
 
@@ -40,7 +39,7 @@ def _simple_threshold_data(
     X = pd.DataFrame(
         {
             "actual_feature": score_feature,
-            "sensitive_feature1": A,
+            "sensitive_features": A,
             "constant_ones_feature": np.ones(len(Y)),
         }
     )

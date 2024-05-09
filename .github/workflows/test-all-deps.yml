@@ -1,0 +1,56 @@
+name: test-all-deps
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+      requirementsPinned:
+        required: false
+        type: string
+        default: "false"
+      codeCovPython:
+        required: true
+        type: string
+        default: "3.11"
+
+jobs:
+  all-deps:
+    # This job installs all dependencies and runs most tests.
+    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
+    # we only upload results if the current commit is under 48 hours old
+    runs-on: ${{ inputs.os }}
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get commit date
+        id: get_date
+        shell: bash
+        run: |
+          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
+          CURRENT_DATE=$(date +%s)
+          AGE=$((CURRENT_DATE - COMMIT_DATE))
+          echo "AGE=$AGE" >> $GITHUB_OUTPUT
+          echo "AGE in seconds: $AGE"
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ inputs.python }}
+      - run: python scripts/install_requirements.py --pinned ${{ inputs.requirementsPinned }}
+      - run: pip install .
+      - run: pip install matplotlib
+      - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml test/
+      - name: Upload coverage to Codecov
+        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
+        uses: codecov/codecov-action@v3
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true

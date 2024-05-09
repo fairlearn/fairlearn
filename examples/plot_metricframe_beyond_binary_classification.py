@@ -138,7 +138,7 @@ def bounding_box_iou(box_A_input, box_B_input):
     if box_B[3] < 0:
         raise ValueError("Bad delta y for box_B")
 
-    # Convert deltas to co-ordinates
+    # Convert deltas to coordinates
     box_A[2:4] = box_A[0:2] + box_A[2:4]
     box_B[2:4] = box_B[0:2] + box_B[2:4]
 

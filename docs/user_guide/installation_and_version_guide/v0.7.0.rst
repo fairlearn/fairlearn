@@ -16,6 +16,6 @@ v0.7.0
 * Removed :code:`fairlearn.widgets` module including the
   :code:`FairlearnDashboard`.
   Instead, the :class:`fairlearn.metrics.MetricFrame` supports plotting as
-  explained in :ref:`plot`.
+  explained in :ref:`plot_metricframe`.
 * Added return value (:code:`self`) to
   :class:`fairlearn.reductions.ExponentiatedGradient`'s :code:`fit` method.

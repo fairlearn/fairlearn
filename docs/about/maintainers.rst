@@ -29,4 +29,8 @@
     <a href='https://github.com/romanlutz'><img src='https://github.com/romanlutz.png' class='avatar' /></a> <br />
     <p>Roman Lutz</p>
     </div>
+    <div>
+    <a href='https://github.com/alliesaizan'><img src='https://github.com/alliesaizan.png' class='avatar' /></a> <br />
+    <p>Allie Saizan</p>
+    </div>
     </div>

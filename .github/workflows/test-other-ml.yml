@@ -1,0 +1,56 @@
+name: test-other-ml
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+      mlpackage:
+        required: true
+        type: string
+      
+
+jobs:
+  other-ml:      
+    runs-on: ${{ inputs.os }}
+    env:
+      baseDir: test_othermlpackages
+      condaEnv: test-conda-env
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ inputs.python }}
+      - run: |
+          conda update -n base -c defaults conda
+        name: Update and initialise conda
+      - run: |
+          conda env create --name $condaEnv --file=$baseDir/conda-${{inputs.mlpackage}}.yaml
+        name: Create conda environment
+      - run: |
+          # For some reason, 'conda init bash' doesn't stick so
+          # We have to keep doing the following
+          source /usr/share/miniconda/etc/profile.d/conda.sh
+          conda activate $condaEnv
+          pip install .
+        name: Install Fairlearn
+      - run: |
+          source /usr/share/miniconda/etc/profile.d/conda.sh
+          conda activate $condaEnv
+          conda list
+          # Override the filterwarnings set in the TOML file
+          python -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
+        name: Run ${{matrix.mlpackage}} tests
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true

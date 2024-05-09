@@ -57,19 +57,19 @@ import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
-from sklearn.datasets import fetch_openml
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import MetricFrame, count, selection_rate
 
 # %%
 # Next, we import the data:
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult()
 X_raw = data.data
 y = (data.target == ">50K") * 1
 
@@ -109,7 +109,9 @@ def marriage_transform(m_s_string):
 def occupation_transform(occ_string):
     """Perform some simple manipulations."""
     result = "Small"
-    if occ_string.startswith("Machine"):
+    # The isinstance check is to guard against 'missing'
+    # data marked with NaN
+    if not isinstance(occ_string, float) and occ_string.startswith("Machine"):
         result = "Large"
     return result
 

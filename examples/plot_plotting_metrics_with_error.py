@@ -9,7 +9,7 @@ Plotting Metrics with Errors
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
-from sklearn.datasets import fetch_openml
+from fairlearn.datasets import fetch_adult
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
 from sklearn.model_selection import train_test_split
@@ -26,14 +26,14 @@ from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_fram
 from fairlearn.metrics import MetricFrame
 
 # %%
-# We download the data set using :meth:`fetch_openml` function in :class:`sklearn.datasets`.
+# We download the data set using the function :func:`fetch_adult` in :mod:`fairlearn.datasets`.
 # The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
 # There are some caveats to using this dataset, but we will use it solely as an example
 # to demonstrate the functionality of plotting metrics with error bars.
 # We use a pipeline to preprocess the data then use a
 # :py:class:`sklearn.tree.DecisionTreeClassifier` to make predictions
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult()
 X = data.data
 y = (data.target == ">50K").astype(int)
 X_train, X_test, y_train_true, y_test_true = train_test_split(
@@ -50,7 +50,7 @@ numeric_transformer = Pipeline(
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse=False)),
+        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
     ]
 )
 
@@ -227,7 +227,7 @@ plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 # %%
 # Customizing plots
 # -----------------
-# :func:`plot_metric_frame` returns an :class:`Axes` object that we can customize futher.
+# :func:`plot_metric_frame` returns an :class:`Axes` object that we can customize further.
 
 axs = plot_metric_frame(
     metric_frame,

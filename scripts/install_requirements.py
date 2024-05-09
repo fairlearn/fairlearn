@@ -11,7 +11,7 @@ import sys
 
 from _utils import _LogWrapper
 
-_REQUIREMENTS_STEMS = ["requirements", "requirements-customplots", "requirements-dev"]
+_REQUIREMENTS_STEMS = ["requirements", "requirements-dev"]
 
 _INSERTION_FIXED = "-fixed"
 
@@ -47,7 +47,6 @@ def _process_line(src_line):
 
 def _pin_requirements(src_file, dst_file):
     with _LogWrapper("Pinning {0} into {1}".format(src_file, dst_file)):
-
         _logger.debug("Reading file %s", src_file)
         text_lines = []
         with open(src_file, "r") as f:

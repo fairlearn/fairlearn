@@ -27,21 +27,21 @@ def create_model():
 
 
 def test_expgrad_classification():
-    estimator = KerasClassifier(build_fn=create_model)
+    estimator = KerasClassifier(model=create_model)
     disparity_moment = DemographicParity()
 
     ptc.run_expgrad_classification(estimator, disparity_moment)
 
 
 def test_gridsearch_classification():
-    estimator = KerasClassifier(build_fn=create_model)
+    estimator = KerasClassifier(model=create_model)
     disparity_moment = DemographicParity()
 
     ptc.run_gridsearch_classification(estimator, disparity_moment)
 
 
 def test_thresholdoptimizer_classification():
-    estimator = KerasClassifier(build_fn=create_model)
+    estimator = KerasClassifier(model=create_model)
 
     ptc.run_thresholdoptimizer_classification(estimator)
 

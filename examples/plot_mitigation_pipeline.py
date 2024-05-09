@@ -32,7 +32,7 @@ from fairlearn.reductions import DemographicParity, ExponentiatedGradient
 # Below we load the "Adult" census dataset and split its features, sensitive
 # features, and labels into train and test sets.
 
-data = fetch_adult(as_frame=True)
+data = fetch_adult()
 X_raw = data.data
 y = (data.target == ">50K") * 1
 A = X_raw["sex"]

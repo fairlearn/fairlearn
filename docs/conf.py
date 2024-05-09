@@ -52,8 +52,8 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "bokeh.sphinxext.bokeh_plot",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
@@ -63,6 +63,7 @@ extensions = [
     "sphinx_gallery.gen_gallery",
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
     "numpydoc",
+    "matplotlib.sphinxext.plot_directive",
 ]
 
 source_suffix = [".rst"]
@@ -72,10 +73,8 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
-    "matplotlib": (
-        "https://matplotlib.org/",
-        None,
-    ),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "pytorch": ("https://pytorch.org/docs/stable/", None),
     "tensorflow": (
         "https://www.tensorflow.org/api_docs/python",
         (
@@ -86,7 +85,12 @@ intersphinx_mapping = {
 }
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = ["templates"]
+
+
+# generate autosummary even if no references
+autosummary_generate = True
+
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -94,10 +98,6 @@ templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.rst"]
 
 master_doc = "index"
-
-if fairlearn.__version__ == "0.4.6":
-    print("Current version is v0.4.6, will apply overrides")
-    master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -188,7 +188,17 @@ html_sidebars = {
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_member_order = "groupwise"
+autodoc_default_options = {
+    "member-order": "groupwise"
+}
+
+# Options for the `::plot` directive
+# ----------------------------------
+# https://matplotlib.org/stable/api/sphinxext_plot_directive_api.html
+plot_formats = ["png"]
+plot_include_source = True
+plot_html_show_formats = False
+plot_html_show_source_link = False
 
 
 # Linking Code
