@@ -43,7 +43,7 @@ jobs:
           conda activate $condaEnv
           conda list
           # Override the filterwarnings set in the TOML file
-          python -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
+          python -vv -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
