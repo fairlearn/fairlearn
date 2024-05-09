@@ -1,14 +1,13 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
-
-from sklearn.naive_bayes import BernoulliNB, CategoricalNB
-from sklearn.datasets import fetch_openml
-from sklearn.metrics import accuracy_score
-import pandas as pd
-
+from fairlearn.metrics import MetricFrame
 from fairlearn.preprocessing import Reweighing
 from fairlearn.preprocessing._reweighing import calculate_weights
-from fairlearn.metrics import MetricFrame
+from sklearn.datasets import fetch_openml
+from sklearn.metrics import accuracy_score
+from sklearn.naive_bayes import BernoulliNB, CategoricalNB
+import numpy as np
+import pandas as pd
 
 
 def main_test(est, X, Y, A, pass_sf=False, assert_improvement=False):
@@ -32,8 +31,6 @@ def main_test(est, X, Y, A, pass_sf=False, assert_improvement=False):
         sensitive_features=A,
     ).difference()
 
-    # FIXME: There is nothing to test right? No errors occured. Don't know if
-    # asserting an improvement in difference makes sense, I would guess not...
     if assert_improvement:
         assert diff_mitigated < diff_original
 
@@ -44,6 +41,18 @@ def test_single_sensitive_feature():
     Y = (data.target == ">50K") * 1
     A = (data.data["sex"] == "Male") * 1
 
+    est = BernoulliNB()
+    main_test(est, X, Y, A, assert_improvement=True)
+
+
+def test_multiple_sensitive_features():
+    data = fetch_openml(data_id=1590, as_frame=True)
+    X = pd.get_dummies(data.data)
+    Y = (data.target == ">50K") * 1
+    A = np.array(
+        [(data.data["sex"] == "Male") * 1, (data.data["race"] == "Black") * 1]
+    ).T
+    print(A)
     est = BernoulliNB()
     main_test(est, X, Y, A, assert_improvement=True)
 
@@ -64,6 +73,11 @@ def test_calculation():
     # for 0,0: w = 4 x 4 / (6 x 3)
     # for 0,1 and 1,0: w = 4 x 2 / (6 x 1)
     # for 1,1: w = 2 x 2 / (6 x 1)
-    assert calculate_weights(
-        [0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 0, 0]
-    ).tolist() == [16 / 18, 8 / 6, 8 / 6, 4 / 6, 16 / 18, 16 / 18]
+    assert calculate_weights([0, 0, 1, 1, 0, 0], [0, 1, 0, 1, 0, 0]).tolist() == [
+        16 / 18,
+        8 / 6,
+        8 / 6,
+        4 / 6,
+        16 / 18,
+        16 / 18,
+    ]

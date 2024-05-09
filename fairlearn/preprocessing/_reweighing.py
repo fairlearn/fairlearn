@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ..utils._input_validation import _KW_SENSITIVE_FEATURES
+from ..utils._input_validation import _KW_SENSITIVE_FEATURES, _merge_columns
 from numpy import unique, zeros
 from numpy import sum as np_sum
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
@@ -38,7 +38,7 @@ def calculate_weights(Y, A):
         One-dimensional array-like containing weights
     """
     Y = column_or_1d(check_array(Y, ensure_2d=False, dtype=None))
-    A = column_or_1d(check_array(A, ensure_2d=False, dtype=None))
+    A = column_or_1d(_merge_columns(check_array(A, ensure_2d=False, dtype=None)))
     check_consistent_length(Y, A)
     Ys = unique(Y)
     As = unique(A)
