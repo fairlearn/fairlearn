@@ -21,8 +21,8 @@ jobs:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
       - run: |
@@ -41,9 +41,11 @@ jobs:
       - run: |
           source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
+          echo
           conda list
+          echo
           # Override the filterwarnings set in the TOML file
-          python -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
+          python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

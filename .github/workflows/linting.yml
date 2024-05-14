@@ -14,8 +14,8 @@ jobs:
   linting-flake8:
     runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
       - run: pip install -r requirements-dev.txt
@@ -27,5 +27,5 @@ jobs:
     # .pre-commit-config.yaml
     runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: psf/black@23.9.1
