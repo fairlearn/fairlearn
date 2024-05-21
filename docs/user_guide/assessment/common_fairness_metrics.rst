@@ -79,7 +79,7 @@ phenomena itself is unjust (e.g., consider the case of predictive policing,
 where a system created to predict crime rates may correctly predict higher crime 
 rates for certain areas, but simultaneously fail to consider that those higher 
 rates may be caused by disproportionate policing and overcriminimalization of those areas). 
-In reality, these assumptions may not be the true. The
+In reality, these assumptions may not be true. The
 dataset might be an accurate representation of the phenomena itself, 
 or the phenomena being modeled may not be unjust. 
 If either assumption is not true, then demographic parity may not provide 
