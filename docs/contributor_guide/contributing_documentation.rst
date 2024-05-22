@@ -56,9 +56,11 @@ the following commands:
     ...
     start docs/_build/html/auto_examples/plot_*.html
 
-The above code block works for Windows users.
-For MacOS users, use :code: `open docs/_build/html/index.html`
-For Linux users, use :code: `xdg-open docs/_build/html/index.html`
+.. line-block::
+
+| The above code block works for Windows users.
+| For MacOS users, use :code:`open docs/_build/html/index.html`.
+| For Linux users, use :code:`xdg-open docs/_build/html/index.html`.
 
 .. note::
 
