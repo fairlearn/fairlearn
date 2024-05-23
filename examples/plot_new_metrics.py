@@ -54,6 +54,7 @@ Metrics with Multiple Features
 import functools
 
 import numpy as np
+import pandas as pd
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
@@ -65,6 +66,8 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import MetricFrame, count, selection_rate
+
+pd.set_option("mode.copy_on_write", True)
 
 # %%
 # Next, we import the data:
