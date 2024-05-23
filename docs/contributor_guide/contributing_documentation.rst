@@ -16,7 +16,9 @@ To contribute, make sure to install sphinx and its add-ons by running
     python scripts/install_requirements.py --pinned False
 
 in the repository root directory.
-You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
+You may also need to `install Pandoc <https://pandoc.org/installing.html>`_, and
+if you are a MacOS user in some cases also `Lightgbm
+<https://lightgbm.readthedocs.io/en/stable/Installation-Guide.html>`_.
 
 Since plotting is an optional addition to Fairlearn, you may also need to
 install matplotlib
@@ -86,12 +88,12 @@ ensure that they all render properly.
 Citations
 ^^^^^^^^^
 
-Citations are built using the `sphinxcontrib-bibtex <https://pypi.org/project/sphinxcontrib-bibtex/>`_ 
+Citations are built using the `sphinxcontrib-bibtex <https://pypi.org/project/sphinxcontrib-bibtex/>`_
 extension. This allows us to use the `refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ BibTeX file to generate our citations.
 
 To add a citation:
 
-1. Check if your required BibTex entry already exists in the 
+1. Check if your required BibTex entry already exists in the
    `docs/refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ file. If not, simply paste your entry at the end.
 2. Change your bibtex id to the format ``<author-last-name><4digit-year><keyword>``.
 3. Use the :code:`:footcite:`bibtex-id`` role to create an inline citation rendered as :code:`[CitationNumber]`.
