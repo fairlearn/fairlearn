@@ -60,9 +60,9 @@ the following commands:
 
 .. line-block::
 
-| The above code block works for Windows users.
-| For MacOS users, use :code:`open docs/_build/html/index.html`.
-| For Linux users, use :code:`xdg-open docs/_build/html/index.html`.
+ The above code block works for Windows users.
+ For MacOS users, use :code:`open docs/_build/html/index.html`.
+ For Linux users, use :code:`xdg-open docs/_build/html/index.html`.
 
 .. note::
 
