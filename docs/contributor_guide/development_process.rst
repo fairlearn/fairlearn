@@ -40,7 +40,7 @@ locally via
 
     git clone git@github.com:fairlearn/fairlearn.git
 
-To install in editable mode using :code:`pip` run 
+To install in editable mode using :code:`pip` run
 
 .. code-block::
 
@@ -75,7 +75,7 @@ The prerequisites for Fairlearn are split between three separate files:
        contains the prerequisites for the core Fairlearn package
 
     -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
-       the prerequisites for Fairlearn development (such as flake8 and pytest)
+       the prerequisites for Fairlearn development (such as ruff and pytest)
 
 The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
 file is consumed
@@ -101,9 +101,9 @@ Follow the steps below to create a pull request.
 3. Look at Fairlearn's issues on GitHub, specifically the ones marked `"help wanted" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22>`_. Within this category we've marked issues with labels:
 
    - `"good first issue" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22good+first+issue%22>`_ means issues are a good fit for first time contributors including people with no prior experience with coding or GitHub. This is an excellent way to get started!
-   
+
    - `"easy" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22easy%22+>`_ means the issue is somewhat harder than a "good first issue", but still quite doable if you have prior experience or you're willing to spend a little bit of time.
-   
+
    - Neither of the two above: this means issues haven't been scoped out properly yet or are more difficult and likely won't be doable within a day or two. If you're still interested just let us know and we'll figure out a way! Once you find an issue you're interested in comment on the issue with any questions you may have and let us know that you'd like to do it. This helps us avoid duplication and we can help you quicker.
 
 4. Whenever questions come up don't hesitate to reach out (see :ref:`communication`). We're here to help!
