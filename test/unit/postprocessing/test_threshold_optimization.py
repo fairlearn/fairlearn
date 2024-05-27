@@ -920,7 +920,7 @@ def test_constraints_objective_pairs(constraints, objective):
         predict_method="predict",
     )
     expected = results[constraints + ", " + objective]
-    if type(expected) is str:
+    if isinstance(expected, str):
         with pytest.raises(ValueError) as error_info:
             thr_optimizer.fit(X, y, sensitive_features=sf)
         assert str(error_info.value).startswith(expected)
