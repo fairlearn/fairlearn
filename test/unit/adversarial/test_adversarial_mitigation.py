@@ -2,36 +2,38 @@
 # Licensed under the MIT License.
 
 import sys
-import pytest
+
 import numpy as np
 import pandas as pd
+import pytest
 from sklearn.utils import estimator_checks
+
 from fairlearn.adversarial import (
     AdversarialFairnessClassifier,
     AdversarialFairnessRegressor,
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
-from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
+from fairlearn.adversarial._preprocessor import FloatTransformer
 
 from .helper import (
-    get_instance,
-    generate_data_combinations,
-    cols,
-    Bin2d,
-    Bin1d,
-    Cat,
-    Cont2d,
-    Cont1d,
     BCE,
     CCE,
     MSE,
-    Keyword_CATEGORY,
-    Keyword_BINARY,
-    Keyword_CONTINUOUS,
-    Keyword_CLASSIFICATION,
+    Bin1d,
+    Bin2d,
+    Cat,
+    Cont1d,
+    Cont2d,
     Keyword_AUTO,
+    Keyword_BINARY,
+    Keyword_CATEGORY,
+    Keyword_CLASSIFICATION,
+    Keyword_CONTINUOUS,
     KeywordToClass,
+    cols,
+    generate_data_combinations,
+    get_instance,
 )
 
 
@@ -274,7 +276,7 @@ def test_model_kw_error_torch():
         estimator_checks.check_estimators_nan_inf,
         # The following two checks do not work, because pickling does not work.
         # estimator_checks.check_estimators_overwrite_params,
-        estimator_checks.check_estimator_sparse_data,
+        estimator_checks.check_estimator_sparse_array,
         # estimator_checks.check_estimators_pickle,
         estimator_checks.check_estimator_get_tags_default_keys,
         # The following check seems impossible, because we cannot have an
