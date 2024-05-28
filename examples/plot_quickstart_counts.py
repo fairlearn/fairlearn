@@ -7,18 +7,14 @@ Value counts
 =============
 """
 import matplotlib.pyplot as plt
-import pandas as pd
 
 from fairlearn.datasets import fetch_diabetes_hospital
-
-pd.set_option("mode.copy_on_write", True)
-
 
 # %%
 fig, ax = plt.subplots()
 
 data = fetch_diabetes_hospital(as_frame=True)
-X = data.data
+X = data.data.copy()
 X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
 y_true = data.target
 race = X["race"]
