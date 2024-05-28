@@ -16,9 +16,7 @@ To contribute, make sure to install sphinx and its add-ons by running
     python scripts/install_requirements.py --pinned False
 
 in the repository root directory.
-You may also need to `install Pandoc <https://pandoc.org/installing.html>`_, and
-if you are a MacOS user in some cases also `Lightgbm
-<https://lightgbm.readthedocs.io/en/stable/Installation-Guide.html>`_.
+You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
 
 Since plotting is an optional addition to Fairlearn, you may also need to
 install matplotlib
