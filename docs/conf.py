@@ -19,7 +19,6 @@ import os
 import sys
 from datetime import datetime
 
-import pandas as pd
 from packaging.version import parse
 
 rootdir = os.path.join(os.getcwd(), "..")
@@ -84,10 +83,6 @@ intersphinx_mapping = {
         ),
     ),
 }
-
-# Setting pandas option for the examples
-pd.set_option("mode.copy_on_write", True)
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["templates"]
