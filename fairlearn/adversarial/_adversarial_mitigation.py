@@ -1,39 +1,32 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import logging
 from math import ceil
 from time import time
 
+from numpy import arange, argmax, zeros
+from sklearn.base import (
+    BaseEstimator,
+    ClassifierMixin,
+    RegressorMixin,
+    TransformerMixin,
+)
+from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_scalar
+from sklearn.utils.validation import check_array, check_is_fitted, check_random_state
 
+from ._backend_engine import BackendEngine
 from ._constants import (
+    _CALLBACK_RETURNS_ERROR,
     _IMPORT_ERROR_MESSAGE,
     _KWARG_ERROR_MESSAGE,
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
-    _CALLBACK_RETURNS_ERROR,
 )
-from ._backend_engine import BackendEngine
+from ._preprocessor import FloatTransformer, _get_type
 from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
-from ._preprocessor import (
-    FloatTransformer,
-    _get_type,
-)
-from sklearn.base import (
-    ClassifierMixin,
-    RegressorMixin,
-    BaseEstimator,
-    TransformerMixin,
-)
-from sklearn.utils.validation import (
-    check_is_fitted,
-    check_random_state,
-    check_array,
-)
-from sklearn.exceptions import NotFittedError
-from numpy import zeros, argmax, arange
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -796,6 +789,16 @@ class _AdversarialFairness(BaseEstimator):
     def __sklearn_is_fitted__(self):
         """Speed up check_is_fitted."""
         return hasattr(self, "_is_setup")
+
+    def _more_tags(self):
+        return {
+            "_xfail_checks": {
+                "check_parameters_default_constructible": (
+                    "cannot have an empty default parameter of a mutable type."
+                ),
+                "check_estimators_pickle": "pickling is not possible.",
+            }
+        }
 
 
 class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
