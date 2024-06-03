@@ -75,9 +75,7 @@ def run_comparisons(moment, metric_fn):
         "\n",
     )
 
-    expgrad_basic = ExponentiatedGradient(
-        LogisticRegression(), constraints=moment(), eps=0.005
-    )
+    expgrad_basic = ExponentiatedGradient(LogisticRegression(), constraints=moment(), eps=0.005)
     expgrad_basic.fit(X_dummy, y, sensitive_features=X["sens"])
     y_pred_basic = expgrad_basic.predict(X_dummy, random_state=8235)
     mf_basic = MetricFrame(
@@ -94,12 +92,8 @@ def run_comparisons(moment, metric_fn):
         "\n",
     )
 
-    expgrad_control = ExponentiatedGradient(
-        LogisticRegression(), constraints=moment(), eps=0.005
-    )
-    expgrad_control.fit(
-        X_dummy, y, sensitive_features=X["sens"], control_features=X["ctrl"]
-    )
+    expgrad_control = ExponentiatedGradient(LogisticRegression(), constraints=moment(), eps=0.005)
+    expgrad_control.fit(X_dummy, y, sensitive_features=X["sens"], control_features=X["ctrl"])
     y_pred_control = expgrad_control.predict(X_dummy, random_state=852)
     mf_control = MetricFrame(
         metrics=metric_fn,
@@ -120,8 +114,7 @@ def run_comparisons(moment, metric_fn):
     ).all()
 
     assert (
-        mf_control.difference(method="to_overall")
-        <= mf_basic.difference(method="to_overall")
+        mf_control.difference(method="to_overall") <= mf_basic.difference(method="to_overall")
     ).all()
 
 
@@ -175,9 +168,7 @@ def test_equalized_odds():
     expgrad_control = ExponentiatedGradient(
         LogisticRegression(), constraints=EqualizedOdds(difference_bound=0.01), eps=0.01
     )
-    expgrad_control.fit(
-        X_dummy, y, sensitive_features=X["sens"], control_features=X["ctrl"]
-    )
+    expgrad_control.fit(X_dummy, y, sensitive_features=X["sens"], control_features=X["ctrl"])
     y_pred_control = expgrad_control.predict(X_dummy, random_state=8152)
     mf_control = MetricFrame(
         metrics=metrics,
@@ -187,9 +178,9 @@ def test_equalized_odds():
         control_features=X["ctrl"],
     )
 
-    compare_unmitigated = mf_control.difference(
+    compare_unmitigated = mf_control.difference(method="to_overall") <= mf_unmitigated.difference(
         method="to_overall"
-    ) <= mf_unmitigated.difference(method="to_overall")
+    )
     print(compare_unmitigated)
 
     compare_basic = mf_control.difference(method="to_overall") <= mf_basic.difference(

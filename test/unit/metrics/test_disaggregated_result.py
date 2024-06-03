@@ -6,7 +6,6 @@ import pytest
 import sklearn.metrics as skm
 
 from fairlearn.metrics._annotated_metric_function import AnnotatedMetricFunction
-
 from fairlearn.metrics._disaggregated_result import DisaggregatedResult
 
 from .data_for_test import g_1, y_p, y_t
@@ -36,8 +35,7 @@ class TestErrorMessages:
         with pytest.raises(ValueError) as e0:
             _ = target.apply_grouping("bad_func")
         assert (
-            str(e0.value)
-            == "Invalid grouping function specified. Valid values are ['min', 'max']"
+            str(e0.value) == "Invalid grouping function specified. Valid values are ['min', 'max']"
         )
 
     def test_bad_difference_method(self):
@@ -63,8 +61,7 @@ class TestErrorMessages:
                 control_feature_names=None, method="between_groups", errors="bad_option"
             )
         assert (
-            str(e0.value)
-            == "Invalid error value specified. Valid values are ['raise', 'coerce']"
+            str(e0.value) == "Invalid error value specified. Valid values are ['raise', 'coerce']"
         )
 
     def test_bad_ratio_method(self):
@@ -90,6 +87,5 @@ class TestErrorMessages:
                 control_feature_names=None, method="between_groups", errors="bad_option"
             )
         assert (
-            str(e0.value)
-            == "Invalid error value specified. Valid values are ['raise', 'coerce']"
+            str(e0.value) == "Invalid error value specified. Valid values are ['raise', 'coerce']"
         )

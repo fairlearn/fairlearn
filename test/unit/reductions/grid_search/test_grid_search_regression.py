@@ -62,9 +62,7 @@ def test_bgl_unfair(A_two_dim):
     )
 
     bgl_square_loss = BoundedGroupLoss(SquareLoss(-np.inf, np.inf))
-    grid_search = GridSearch(
-        LinearRegression(), constraints=bgl_square_loss, grid_size=grid_size
-    )
+    grid_search = GridSearch(LinearRegression(), constraints=bgl_square_loss, grid_size=grid_size)
 
     grid_search.fit(X, Y, sensitive_features=A)
 
@@ -131,9 +129,7 @@ def test_bgl_unmitigated_same(A_two_dim):
     lagrange_balanced_series = pd.Series([1.0, 1.0], index=idx)
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
-    grid_search = GridSearch(
-        estimator, constraints=BoundedGroupLoss(ZeroOneLoss()), grid=grid_df
-    )
+    grid_search = GridSearch(estimator, constraints=BoundedGroupLoss(ZeroOneLoss()), grid=grid_df)
     grid_search.fit(X, y, sensitive_features=A)
 
     raw_coef = unmitigated_estimator.coef_

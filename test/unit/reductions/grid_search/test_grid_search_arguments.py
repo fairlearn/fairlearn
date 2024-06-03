@@ -132,9 +132,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        expected_exception_message = (
-            "Found input variables with inconsistent numbers of samples"
-        )
+        expected_exception_message = "Found input variables with inconsistent numbers of samples"
         assert expected_exception_message in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -156,9 +154,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        expected_exception_message = (
-            "Found input variables with inconsistent numbers of samples"
-        )
+        expected_exception_message = "Found input variables with inconsistent numbers of samples"
         assert expected_exception_message in execInfo.value.args[0]
 
     # ----------------------------
@@ -357,9 +353,7 @@ class ArgumentTests:
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict(X)
 
-        assert (
-            not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
-        )
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
     def test_no_predict_proba_before_fit(self):
         gs = GridSearch(
@@ -372,9 +366,7 @@ class ArgumentTests:
         with pytest.raises(NotFittedError) as execInfo:
             gs.predict_proba(X)
 
-        assert (
-            not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
-        )
+        assert not_fitted_error_msg.format(GridSearch.__name__) == execInfo.value.args[0]
 
 
 # Tests specific to Classification

@@ -95,9 +95,7 @@ def test_threshold_optimizer_multiple_sensitive_features():
 
     X_test = pd.concat(
         [
-            pd.DataFrame(
-                [[5, 4], [7, 2], [0, 3], [1, 2], [-2, 9], [1, 1], [0, 5], [-3, 3]]
-            ),
+            pd.DataFrame([[5, 4], [7, 2], [0, 3], [1, 2], [-2, 9], [1, 1], [0, 5], [-3, 3]]),
             X,
         ]
     )
@@ -153,20 +151,16 @@ def test_threshold_optimizer_multiple_sensitive_features():
     assert (metricframe_combined.overall == metricframe_multi.overall).all()
 
     assert (
-        metricframe_combined.by_group.loc[a1 + a3]
-        == metricframe_multi.by_group.loc[(a1, a3)]
+        metricframe_combined.by_group.loc[a1 + a3] == metricframe_multi.by_group.loc[(a1, a3)]
     ).all()
     assert (
-        metricframe_combined.by_group.loc[a2 + a3]
-        == metricframe_multi.by_group.loc[(a2, a3)]
+        metricframe_combined.by_group.loc[a2 + a3] == metricframe_multi.by_group.loc[(a2, a3)]
     ).all()
     assert (
-        metricframe_combined.by_group.loc[a1 + a4]
-        == metricframe_multi.by_group.loc[(a1, a4)]
+        metricframe_combined.by_group.loc[a1 + a4] == metricframe_multi.by_group.loc[(a1, a4)]
     ).all()
     assert (
-        metricframe_combined.by_group.loc[a2 + a4]
-        == metricframe_multi.by_group.loc[(a2, a4)]
+        metricframe_combined.by_group.loc[a2 + a4] == metricframe_multi.by_group.loc[(a2, a4)]
     ).all()
 
     # comparing string representations of interpolation dicts is sufficient

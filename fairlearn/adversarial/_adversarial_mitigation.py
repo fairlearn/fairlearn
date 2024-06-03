@@ -303,13 +303,9 @@ class _AdversarialFairness(BaseEstimator):
             (self.epochs, "epochs"),
             (self.max_iter, "max_iter"),
         ):
-            check_scalar(
-                kw, kwname, (int, float), min_val=-1, include_boundaries="left"
-            )
+            check_scalar(kw, kwname, (int, float), min_val=-1, include_boundaries="left")
             if kw <= 0.0 and kw != -1:
-                raise ValueError(
-                    _KWARG_ERROR_MESSAGE.format(kwname, "a positive number or -1")
-                )
+                raise ValueError(_KWARG_ERROR_MESSAGE.format(kwname, "a positive number or -1"))
 
         for kw, kwname in (
             (self.shuffle, "shuffle"),
@@ -324,9 +320,7 @@ class _AdversarialFairness(BaseEstimator):
             if not callable(self.callbacks):
                 if not isinstance(self.callbacks, list):
                     raise ValueError(
-                        _KWARG_ERROR_MESSAGE.format(
-                            "callbacks", "a callable or list of callables"
-                        )
+                        _KWARG_ERROR_MESSAGE.format("callbacks", "a callable or list of callables")
                     )
                 else:
                     for cb in self.callbacks:
@@ -381,9 +375,7 @@ class _AdversarialFairness(BaseEstimator):
 
         self.predictor_loss_ = read_kw(Y, self.predictor_loss, "predictor_loss")
         self.adversary_loss_ = read_kw(A, self.adversary_loss, "adversary_loss")
-        self.predictor_function_ = read_kw(
-            Y, self.predictor_function, "predictor_function"
-        )
+        self.predictor_function_ = read_kw(Y, self.predictor_function, "predictor_function")
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
@@ -401,8 +393,7 @@ class _AdversarialFairness(BaseEstimator):
                 raise ValueError(
                     _KWARG_ERROR_MESSAGE.format(
                         kwname,
-                        "a keyword or a sklearn Transformer"
-                        + "(subclass TransformerMixin)",
+                        "a keyword or a sklearn Transformer" + "(subclass TransformerMixin)",
                     )
                 )
 
@@ -498,10 +489,9 @@ class _AdversarialFairness(BaseEstimator):
                             and len(predictor_losses) >= 1
                             and len(adversary_losses) >= 1
                         ):
-                            ETA = (
-                                (last_update_time - start_time + 1e-6)
-                                / (progress + 1e-6)
-                            ) * (1 - progress)
+                            ETA = ((last_update_time - start_time + 1e-6) / (progress + 1e-6)) * (
+                                1 - progress
+                            )
                             # + 1e-6 for numerical stability
                             logger.info(
                                 _PROGRESS_UPDATE.format(  # noqa : G001
@@ -731,9 +721,7 @@ class _AdversarialFairness(BaseEstimator):
         # The keyword self.backend was weird
         if self.backend not in ["torch", "tensorflow", "auto"]:
             raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    "backend", "one of ['auto', 'torch','tensorflow']"
-                )
+                _KWARG_ERROR_MESSAGE.format("backend", "one of ['auto', 'torch','tensorflow']")
             )
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
@@ -765,9 +753,9 @@ class _AdversarialFairness(BaseEstimator):
         elif isinstance(self.predictor_function_, str):
             kw = self.predictor_function_
             if kw == "binary":
-                self.predictor_function_ = lambda pred: (
-                    pred >= self.threshold_value
-                ).astype(float)
+                self.predictor_function_ = lambda pred: (pred >= self.threshold_value).astype(
+                    float
+                )
             elif kw == "category":
 
                 def loss(pred):

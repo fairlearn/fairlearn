@@ -41,9 +41,7 @@ def test_grid_generator_demographic_parity(grid_size, grid_limit):
 @pytest.mark.parametrize(
     "grid_offset", [[0, 0.2, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0], [0, 0, 0, 0.2]]
 )
-def test_grid_generator_demographic_parity_with_center(
-    grid_size, grid_limit, grid_offset
-):
+def test_grid_generator_demographic_parity_with_center(grid_size, grid_limit, grid_offset):
     disparity_moment = DemographicParity()
     events = [_ALL]
 

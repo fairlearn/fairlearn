@@ -49,9 +49,7 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(
-        self, y_true, y_pred, *, sensitive_features, **other_params
-    ) -> Union[float, int]:
+    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params) -> Union[float, int]:
         sample_params = dict()
         params = dict()
         transform_parameters = dict()
@@ -151,7 +149,5 @@ def make_derived_metric(
         :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
-    dm = _DerivedMetric(
-        metric=metric, transform=transform, sample_param_names=sample_param_names
-    )
+    dm = _DerivedMetric(metric=metric, transform=transform, sample_param_names=sample_param_names)
     return dm

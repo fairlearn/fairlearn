@@ -23,9 +23,9 @@ CorrelationRemover visualization
 # 'sex' column to illustrate how the CorrelationRemover works.
 # We start with some`import` statements:
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from fairlearn.datasets import fetch_diabetes_hospital
 from fairlearn.preprocessing import CorrelationRemover
@@ -70,9 +70,7 @@ X_raw = X_raw[
 
 cr = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"])
 X_cr = cr.fit_transform(X_raw)
-X_cr = pd.DataFrame(
-    X_cr, columns=["time_in_hospital", "had_inpatient_days_True", "medicare_True"]
-)
+X_cr = pd.DataFrame(X_cr, columns=["time_in_hospital", "had_inpatient_days_True", "medicare_True"])
 X_cr["race_AfricanAmerican"] = X_raw["race_AfricanAmerican"]
 
 cr_alpha = CorrelationRemover(sensitive_feature_ids=["race_AfricanAmerican"], alpha=0.5)

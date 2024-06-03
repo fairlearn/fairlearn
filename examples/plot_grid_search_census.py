@@ -193,9 +193,7 @@ for m in predictors:
     errors.append(error.gamma(classifier).iloc[0])
     disparities.append(disparity.gamma(classifier).max())
 
-all_results = pd.DataFrame(
-    {"predictor": predictors, "error": errors, "disparity": disparities}
-)
+all_results = pd.DataFrame({"predictor": predictors, "error": errors, "disparity": disparities})
 
 non_dominated = []
 for row in all_results.itertuples():
@@ -227,10 +225,7 @@ for i in range(len(non_dominated)):
 
 
 x = [metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()]
-y = [
-    metric_frame.difference()["selection_rate"]
-    for metric_frame in metric_frames.values()
-]
+y = [metric_frame.difference()["selection_rate"] for metric_frame in metric_frames.values()]
 keys = list(metric_frames.keys())
 plt.scatter(x, y)
 for i in range(len(x)):
