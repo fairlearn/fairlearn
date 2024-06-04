@@ -108,17 +108,39 @@ Follow the steps below to create a pull request.
 
 4. Whenever questions come up don't hesitate to reach out (see :ref:`communication`). We're here to help!
 
-5. Clone the Fairlearn repository onto your machine using :code:`git clone https://github.com/fairlearn/fairlearn.git`
+5. Clone the Fairlearn repository onto your machine using
 
-6. Fork the Fairlearn repository (using the "Fork" button on the Fairlearn repo), then run :code:`git remote add <your-alias> https://github.com/<your-alias>/fairlearn.git` while replacing :code:`<your-alias>` with your actual alias. To check whether it worked run :code:`git remote -v` and it should show both :code:`origin` pointing to the original fairlearn repo and :code:`<your-alias>` pointing to your fork. Now you can create a new branch and start changing the world!
+.. code-block::
 
-7. To check your branch run :code:`git status`. Initially it will point to :code:`main` which is the default. Create a new branch for yourself by running :code:`git checkout -b <branch-name>`. :code:`git checkout` is your way of switching branches, while :code:`-b` creates a new branch and should only be added the first time you check out a (new) branch. Whenever you are ready to commit your changes run :code:`git add --all` and :code:`git commit --all` or use the version control functionality of your IDE (e.g., Visual Studio Code). To push the changes to your fork run :code:`git push <your-alias>`. Note that you cannot push to :code:`origin` (the main fairlean repository) because it is access-restricted.
+ git clone https://github.com/fairlearn/fairlearn.git
 
-8. Build the website following :ref:`contributing_documentation`
+6. Use the "Fork" button to create your own copy of the repository. Run the
+command below, replacing :code:`<your-alias>` with your own GitHub alias:
 
-9. To create a pull request go to the `Fairlearn repo <https://github.com/fairlearn/fairlearn/pulls>`_ and select "New Pull Request". Click "compare across forks" and subsequently configure the "compare" branch to be the one you pushed your changes to. Briefly check the file changes in the resulting view and click "create pull request" when you're confident about your changes. The following view will ask you to add a pull request title and description, and if you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
+.. code-block::
 
-10. Celebrate! You did great by participating. If you would like to be a part of the Fairlearn community we'd be thrilled to discuss ways for you to get involved! Check out our communication channels, :ref:`communication`, for more information.
+ git remote add <your-alias> https://github.com/<your-alias>/fairlearn.git
+
+If the execution was successful, running :code:`git remote -v` will show both
+:code:`origin` and :code:`<your-alias>`, the first poiting to the original repo
+and the second to your fork. Now you can create a new branch and start changing the world!
+
+7.(Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
+
+.. code-block::
+
+ pip install pre-commit
+ pre-commit install
+
+Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
+
+8. To check your branch run :code:`git status`. Initially it will point to :code:`main` which is the default. Create a new branch for yourself by running :code:`git checkout -b <branch-name>`. :code:`git checkout` is your way of switching branches, while :code:`-b` creates a new branch and should only be added the first time you check out a (new) branch. Whenever you are ready to commit your changes run :code:`git add --all` and :code:`git commit --all` or use the version control functionality of your IDE (e.g., Visual Studio Code). To push the changes to your fork run :code:`git push <your-alias>`. Note that you cannot push to :code:`origin` (the main fairlean repository) because it is access-restricted.
+
+9. Build the website following :ref:`contributing_documentation`
+
+10. To create a pull request go to the `Fairlearn repo <https://github.com/fairlearn/fairlearn/pulls>`_ and select "New Pull Request". Click "compare across forks" and subsequently configure the "compare" branch to be the one you pushed your changes to. Briefly check the file changes in the resulting view and click "create pull request" when you're confident about your changes. The following view will ask you to add a pull request title and description, and if you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
+
+11. Celebrate! You did great by participating. If you would like to be a part of the Fairlearn community we'd be thrilled to discuss ways for you to get involved! Check out our communication channels, :ref:`communication`, for more information.
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

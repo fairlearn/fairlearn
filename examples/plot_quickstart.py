@@ -7,6 +7,8 @@ MetricFrame visualizations
 ==========================
 """
 
+from functools import partial
+
 import pandas as pd
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.model_selection import train_test_split
@@ -24,7 +26,7 @@ from fairlearn.metrics import (
 )
 
 data = fetch_diabetes_hospital(as_frame=True)
-X = data.data
+X = data.data.copy()
 X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
 y_true = data.target
 X_ohe = pd.get_dummies(X)
@@ -38,10 +40,12 @@ classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
 classifier.fit(X_train, y_train)
 y_pred = classifier.predict(X_test)
 
+zero_div_precision_score = partial(precision_score, zero_division=0)
+
 # Analyze metrics using MetricFrame
 metrics = {
     "accuracy": accuracy_score,
-    "precision": precision_score,
+    "precision": zero_div_precision_score,
     "false positive rate": false_positive_rate,
     "false negative rate": false_negative_rate,
     "selection rate": selection_rate,
