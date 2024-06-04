@@ -10,3 +10,6 @@
 
 # PR #1083: Lint the code-base with black
 d5950c081a3460660bbf1439ea77d528ee958879
+
+# PR #1365: MNT Replace flake8 with ruff for linting
+cf8bd39c37c2a59b987f3a4b6b0b06dd7e6964a9
