@@ -19,7 +19,7 @@ jobs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: psf/black@23.9.1
+      - uses: psf/black@24.4.2
   ruff:
     runs-on: ${{ inputs.os }}
     steps:
