@@ -14,7 +14,7 @@ from fairlearn.datasets import fetch_diabetes_hospital
 fig, ax = plt.subplots()
 
 data = fetch_diabetes_hospital(as_frame=True)
-X = data.data
+X = data.data.copy()
 X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
 y_true = data.target
 race = X["race"]

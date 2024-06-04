@@ -188,9 +188,7 @@ html_sidebars = {
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_default_options = {
-    "member-order": "groupwise"
-}
+autodoc_default_options = {"member-order": "groupwise"}
 
 # Options for the `::plot` directive
 # ----------------------------------
@@ -203,6 +201,7 @@ plot_html_show_source_link = False
 
 # Linking Code
 # ------------
+
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
