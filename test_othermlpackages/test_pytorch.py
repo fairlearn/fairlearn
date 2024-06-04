@@ -1,18 +1,20 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from fairlearn.adversarial import AdversarialFairnessClassifier
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
+
+from fairlearn.adversarial import AdversarialFairnessClassifier
 
 torch = pytest.importorskip("torch")
 from skorch import NeuralNetClassifier  # noqa
 from torch import nn, optim  # noqa
 
 from fairlearn.reductions import DemographicParity  # noqa
-from . import package_test_common as ptc  # noqa
+
 from . import adversarial_fairness as af  # noqa
+from . import package_test_common as ptc  # noqa
 
 
 def create_model():
@@ -43,15 +45,11 @@ def create_model():
                 X = X.to_numpy().astype("float32")
             if isinstance(y, (pd.DataFrame, pd.Series)):
                 y = y.to_numpy()
-            if sample_weight is not None and isinstance(
-                sample_weight, (pd.DataFrame, pd.Series)
-            ):
+            if sample_weight is not None and isinstance(sample_weight, (pd.DataFrame, pd.Series)):
                 sample_weight = sample_weight.to_numpy()
             y = y.reshape([-1, 1])
 
-            sample_weight = (
-                sample_weight if sample_weight is not None else np.ones_like(y)
-            )
+            sample_weight = sample_weight if sample_weight is not None else np.ones_like(y)
             X = {"X": X, "sample_weight": sample_weight}
             return super().fit(X, y)
 
@@ -62,9 +60,7 @@ def create_model():
 
         def get_loss(self, y_pred, y_true, X, *args, **kwargs):
             # override get_loss to use the sample_weight from X
-            loss_unreduced = super().get_loss(
-                y_pred, y_true.float(), X, *args, **kwargs
-            )
+            loss_unreduced = super().get_loss(y_pred, y_true.float(), X, *args, **kwargs)
             sample_weight = X["sample_weight"]
             sample_weight = sample_weight.to(loss_unreduced.device).unsqueeze(-1)
             # Need to put the sample weights on GPU

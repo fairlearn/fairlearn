@@ -114,12 +114,8 @@ class TestOverallQuantiles:
         assert mf_1m_1cf.ci_quantiles == QUANTILES
 
         # Overall value should be close to quantile 0.5
-        assert mf_1m_1cf.overall_ci[1]["f"] == pytest.approx(
-            mf_1m_1cf.overall["f"], abs=ABS_TOL
-        )
-        assert mf_1m_1cf.overall_ci[1]["g"] == pytest.approx(
-            mf_1m_1cf.overall["g"], abs=ABS_TOL
-        )
+        assert mf_1m_1cf.overall_ci[1]["f"] == pytest.approx(mf_1m_1cf.overall["f"], abs=ABS_TOL)
+        assert mf_1m_1cf.overall_ci[1]["g"] == pytest.approx(mf_1m_1cf.overall["g"], abs=ABS_TOL)
 
     def test_2m_1cf(self, mf_2m_1cf):
         assert isinstance(mf_2m_1cf.overall_ci, list)
@@ -143,9 +139,7 @@ class TestByGroupQuantiles:
         assert mf_1m_0cf.ci_quantiles == QUANTILES
         for g in np.unique(g_1):
             # Check median close to nominal
-            assert mf_1m_0cf.by_group_ci[1][g] == pytest.approx(
-                mf_1m_0cf.by_group[g], abs=ABS_TOL
-            )
+            assert mf_1m_0cf.by_group_ci[1][g] == pytest.approx(mf_1m_0cf.by_group[g], abs=ABS_TOL)
 
     def test_1m_0cf_dict(self, mf_1mdict_0cf: MetricFrame):
         assert isinstance(mf_1mdict_0cf.by_group_ci, list)

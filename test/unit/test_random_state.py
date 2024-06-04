@@ -36,12 +36,9 @@ def test_random_state_threshold_optimizer():
     y_pred_test = to.predict(X_test, sensitive_features=race_test, random_state=0)
     for _ in range(100):
         assert (
-            y_pred_test
-            == to.predict(X_test, sensitive_features=race_test, random_state=0)
+            y_pred_test == to.predict(X_test, sensitive_features=race_test, random_state=0)
         ).all()
-    assert (
-        y_pred_test != to.predict(X_test, sensitive_features=race_test, random_state=1)
-    ).any()
+    assert (y_pred_test != to.predict(X_test, sensitive_features=race_test, random_state=1)).any()
 
 
 def test_random_state_exponentiated_gradient():
@@ -79,9 +76,7 @@ def _get_test_data():
     y = data["target"].astype(int)
 
     # split the data in train-validation-test sets
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.20, random_state=0
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=0)
     race_train = X_train["race_African-American"]
     race_test = X_test["race_African-American"]
     return X_train, X_test, y_train, y_test, race_train, race_test

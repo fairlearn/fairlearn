@@ -20,9 +20,7 @@ metric = [
 
 @pytest.mark.parametrize("metric_fn", metric)
 def test_1m_1sf_0cf(metric_fn):
-    target = MetricFrame(
-        metrics=metric_fn, y_true=y_t, y_pred=y_p, sensitive_features=g_1
-    )
+    target = MetricFrame(metrics=metric_fn, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
     assert target._user_supplied_callable is True
 
     assert isinstance(target.by_group, pd.Series)

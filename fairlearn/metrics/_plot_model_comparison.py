@@ -1,18 +1,19 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import logging
+from typing import Callable, Union
+
+from numpy import array, zeros
+from sklearn.utils.validation import check_array
+
+from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ..utils._input_validation import (
-    _validate_and_reformat_input,
     _INCONSISTENT_ARRAY_LENGTH,
     _INPUT_DATA_FORMAT_ERROR_MESSAGE,
+    _validate_and_reformat_input,
 )
-from ..postprocessing._plotting import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._make_derived_metric import _DerivedMetric
-from typing import Callable, Union
-from numpy import array
-from sklearn.utils.validation import check_array
-from numpy import zeros
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -138,15 +139,12 @@ def plot_model_comparison(
     y_preds = check_array(y_preds)
 
     if not len(y_true) == y_preds.shape[1]:
-        raise ValueError(
-            _INCONSISTENT_ARRAY_LENGTH.format("y_true and the rows of y_preds")
-        )
+        raise ValueError(_INCONSISTENT_ARRAY_LENGTH.format("y_true and the rows of y_preds"))
 
     if isinstance(axis_labels, (list, tuple)):
         if len(axis_labels) != 2:
             raise ValueError(
-                "Key word argument axis_labels should be a list or tuple of two"
-                " strings."
+                "Key word argument axis_labels should be a list or tuple of two strings."
             )
     elif isinstance(axis_labels, bool):
         pass
@@ -165,16 +163,12 @@ def plot_model_comparison(
     ):
         if not isinstance(kwarg, bool):
             raise ValueError(
-                _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                    name, "boolean", type(kwarg).__name__
-                )
+                _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(name, "boolean", type(kwarg).__name__)
             )
 
     if isinstance(point_labels, list):
         if not len(point_labels) == y_preds.shape[0]:
-            raise ValueError(
-                _INCONSISTENT_ARRAY_LENGTH.format("point_labels and y_preds")
-            )
+            raise ValueError(_INCONSISTENT_ARRAY_LENGTH.format("point_labels and y_preds"))
     elif isinstance(point_labels, bool):
         if point_labels:
             point_labels = inferred_point_labels
@@ -187,10 +181,7 @@ def plot_model_comparison(
             )
         )
 
-    if (
-        isinstance(point_labels_position, (list, tuple))
-        and len(point_labels_position) == 2
-    ):
+    if isinstance(point_labels_position, (list, tuple)) and len(point_labels_position) == 2:
         for item in point_labels_position:
             if not isinstance(item, (int, float)):
                 raise ValueError(
@@ -228,9 +219,7 @@ def plot_model_comparison(
 
     # Init ax
     if not ax_supplied_:
-        logger.warning(
-            "No matplotlib.Axes object was provided to draw on, so we create a new one"
-        )
+        logger.warning("No matplotlib.Axes object was provided to draw on, so we create a new one")
         ax = plt.axes()
 
     # Add axis labels

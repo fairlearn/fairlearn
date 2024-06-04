@@ -2,10 +2,7 @@
 # Licensed under the MIT License.
 
 from ._backend_engine import BackendEngine
-from ._constants import (
-    _MODEL_UNRECOGNIZED_STR,
-    _MODEL_UNRECOGNIZED_ITEM,
-)
+from ._constants import _MODEL_UNRECOGNIZED_ITEM, _MODEL_UNRECOGNIZED_STR
 
 # dynamic import.
 torch = None
@@ -92,9 +89,7 @@ class PytorchEngine(BackendEngine):
         LP = self.predictor_loss(Y_hat, Y)
         LP.backward(retain_graph=True)  # Check what this does at some point in time
 
-        dW_LP = [
-            torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()
-        ]
+        dW_LP = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
 
         self.predictor_optimizer.zero_grad()
         self.adversary_optimizer.zero_grad()
@@ -107,9 +102,7 @@ class PytorchEngine(BackendEngine):
         LA = self.adversary_loss(A_hat, A)
         LA.backward()
 
-        dW_LA = [
-            torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()
-        ]
+        dW_LA = [torch.clone(p.grad.detach()) for p in self.predictor_model.parameters()]
 
         for i, p in enumerate(self.predictor_model.parameters()):
             # Normalize dW_LA

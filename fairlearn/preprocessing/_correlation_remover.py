@@ -117,12 +117,10 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         return {
             "_xfail_checks": {
                 "check_parameters_default_constructible": (
-                    "sensitive_feature_ids has to be explicitly set to "
-                    "instantiate this estimator"
+                    "sensitive_feature_ids has to be explicitly set to instantiate this estimator"
                 ),
                 "check_transformer_data_not_an_array": (
-                    "this estimator only accepts pandas dataframes or numpy "
-                    "ndarray as input."
+                    "this estimator only accepts pandas dataframes or numpy ndarray as input."
                 ),
             }
         }

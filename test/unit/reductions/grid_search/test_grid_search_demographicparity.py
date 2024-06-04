@@ -97,9 +97,7 @@ def test_demographicparity_fair_uneven_populations(A_two_dim):
     assert np.array_equal(sample_results, [0, 1])
 
     sample_proba = grid_search.predict_proba(test_X)
-    assert np.allclose(
-        sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]]
-    )
+    assert np.allclose(sample_proba, [[0.53748641, 0.46251359], [0.46688736, 0.53311264]])
 
     sample_results = grid_search.predictors_[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
@@ -155,9 +153,7 @@ def test_demographicparity_fair_uneven_populations_with_grid_offset(A_two_dim, o
     assert np.array_equal(sample_results, [0, 1])
 
     sample_proba = grid_search.predict_proba(test_X)
-    assert np.allclose(
-        sample_proba, [[0.55069845, 0.44930155], [0.41546008, 0.58453992]]
-    )
+    assert np.allclose(sample_proba, [[0.55069845, 0.44930155], [0.41546008, 0.58453992]])
 
     sample_results = grid_search.predictors_[0].predict(test_X)
     assert np.array_equal(sample_results, [1, 0])
@@ -184,9 +180,7 @@ def test_lambda_vec_zero_unchanged_model(A_two_dim):
         A_two_dim,
     )
 
-    estimator = LogisticRegression(
-        solver="liblinear", fit_intercept=True, random_state=97
-    )
+    estimator = LogisticRegression(solver="liblinear", fit_intercept=True, random_state=97)
 
     # Train an unmitigated estimator
     unmitigated_estimator = copy.deepcopy(estimator)
@@ -223,9 +217,7 @@ def test_can_specify_and_generate_lambda_vecs(A_two_dim):
         number_a0, number_a1, score_threshold, score_threshold, a0_label, a1_label
     )
 
-    estimator = LogisticRegression(
-        solver="liblinear", fit_intercept=True, random_state=97
-    )
+    estimator = LogisticRegression(solver="liblinear", fit_intercept=True, random_state=97)
 
     iterables = [["+", "-"], ["all"], sorted([a0_label, a1_label])]
     midx = pd.MultiIndex.from_product(iterables, names=["sign", "event", "group_id"])
@@ -276,9 +268,7 @@ def test_single_y_class():
     y = np.full(10, y_val)
     A = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "b"]
 
-    estimator = LogisticRegression(
-        solver="liblinear", fit_intercept=True, random_state=97
-    )
+    estimator = LogisticRegression(solver="liblinear", fit_intercept=True, random_state=97)
 
     grid_search = GridSearch(
         copy.deepcopy(estimator),

@@ -21,9 +21,7 @@ def _quick_data(A_two_dim=False, n_groups=2):
     elif n_groups == 5:
         A = np.array([3, 0, 2, 0, 3, 4, 2, 1])
     else:
-        raise ValueError(
-            "_quick_data only supports 2, 3, or 4 sensitive feature values."
-        )
+        raise ValueError("_quick_data only supports 2, 3, or 4 sensitive feature values.")
 
     if A_two_dim:
         # Grid Search is still restricted to binary sensitive features.

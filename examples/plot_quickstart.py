@@ -8,10 +8,11 @@ MetricFrame visualizations
 """
 
 import pandas as pd
-from fairlearn.datasets import fetch_diabetes_hospital
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
+
+from fairlearn.datasets import fetch_diabetes_hospital
 
 # %%
 from fairlearn.metrics import (
@@ -27,10 +28,11 @@ X = data.data
 X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
 y_true = data.target
 X_ohe = pd.get_dummies(X)
-race = X['race']
+race = X["race"]
 
-X_train, X_test, y_train, y_test, \
-    A_train, A_test = train_test_split(X_ohe, y_true, race, random_state=123)
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
+    X_ohe, y_true, race, random_state=123
+)
 
 classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
 classifier.fit(X_train, y_train)

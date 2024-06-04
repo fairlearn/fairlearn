@@ -6,14 +6,7 @@
 # Since that file does its own testing setup
 
 # Required for environment
-flake8
-autopep8
-flake8-blind-except
-flake8-builtins
-flake8-copyright
-flake8-docstrings
-flake8-logging-format
-flake8-rst-docstrings
+ruff==0.4.5
 requirements-parser
 # Need to keep black version consistent in
 # requirements-dev.txt

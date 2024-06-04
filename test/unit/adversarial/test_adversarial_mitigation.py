@@ -307,17 +307,11 @@ def test_regressor(torch2):
 def test_fake_models(torch3):
     """Test various data types and see if it is interpreted correctly."""
     for (X, Y, Z), (X_type, Y_type, Z_type) in generate_data_combinations():
-        mitigator = get_instance(
-            fake_training=True, torch=torch3, tensorflow=not torch3
-        )
+        mitigator = get_instance(fake_training=True, torch=torch3, tensorflow=not torch3)
 
         mitigator.fit(X, Y, sensitive_features=Z)
-        assert isinstance(
-            mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type)
-        )
-        assert isinstance(
-            mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type)
-        )
+        assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
+        assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
 
 
 def test_fake_models_list_inputs():
@@ -331,9 +325,7 @@ def test_fake_models_df_inputs():
     """Test model with data frames as input."""
     for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
-        mitigator.fit(
-            pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z)
-        )
+        mitigator.fit(pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z))
 
 
 def check_type_helper(data, actual_type, valid_choices, invalid_choices):
@@ -408,9 +400,7 @@ def test_check_type_correct_data():
     with pytest.raises(ValueError) as exc:
         prep = FloatTransformer(transformer=Keyword_AUTO)
         prep.fit(Bin2d)
-        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
-            Keyword_AUTO, prep.inferred_type_
-        )
+        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(Keyword_AUTO, prep.inferred_type_)
 
 
 def test_check_type_faulty_data():
@@ -447,9 +437,7 @@ def test_check_type_faulty_data():
         [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
     )
     notCat[0, 1] = 0.5
-    notCat[0, 2:] = (
-        0.0  # Special case because now first row sums to one but is not one-hot
-    )
+    notCat[0, 2:] = 0.0  # Special case because now first row sums to one but is not one-hot
     check_type_helper(
         notCat,
         Keyword_CONTINUOUS,
@@ -488,9 +476,7 @@ def test_validate_data_df_inputs():
     """Test if validate_data properly preprocesses dataframes to ndarray."""
     for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
-        X, Y, Z = mitigator._validate_input(
-            pd.DataFrame(X), pd.DataFrame(Y), pd.DataFrame(Z)
-        )
+        X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.DataFrame(Y), pd.DataFrame(Z))
         for x in (X, Y, Z):
             check_2dnp(x)
 

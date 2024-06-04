@@ -11,15 +11,6 @@ on:
         type: string
 
 jobs:
-  linting-flake8:
-    runs-on: ${{ inputs.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python }}
-      - run: pip install -r requirements-dev.txt
-      - run: flake8 .
   linting-black:
     # Need to keep black version consistent in
     # requirements-dev.txt
@@ -29,3 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: psf/black@23.9.1
+  ruff:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chartboost/ruff-action@v1

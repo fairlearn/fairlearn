@@ -81,9 +81,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
     """
 
-    def __init__(
-        self, estimator, interpolation_dict, prefit=False, predict_method="deprecated"
-    ):
+    def __init__(self, estimator, interpolation_dict, prefit=False, predict_method="deprecated"):
         self.estimator = estimator
         self.interpolation_dict = interpolation_dict
         self.prefit = prefit
@@ -192,7 +190,5 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
         random_state = check_random_state(random_state)
-        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features)[
-            :, 1
-        ]
+        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features)[:, 1]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1

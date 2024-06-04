@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 _MESSAGE_BAD_OBJECTIVE = (
-    "Objective needs to be of the same type as constraints. "
-    "Objective is {}, constraints are {}."
+    "Objective needs to be of the same type as constraints. Objective is {}, constraints are {}."
 )
 
 
@@ -82,9 +81,7 @@ class _Lagrangian:
             self.obj = objective
         else:
             raise ValueError(
-                _MESSAGE_BAD_OBJECTIVE.format(
-                    objective._moment_type(), constraints._moment_type()
-                )
+                _MESSAGE_BAD_OBJECTIVE.format(objective._moment_type(), constraints._moment_type())
             )
         self.obj.load_data(X, y, **kwargs)
         self.estimator = estimator
@@ -173,16 +170,13 @@ class _Lagrangian:
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(
-            c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="highs-ds"
-        )
+        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="highs-ds")
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
         dual_bounds = [
-            (None, None) if i == n_constraints else (0, None)
-            for i in range(n_constraints + 1)
+            (None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)
         ]
         result_dual = opt.linprog(
             dual_c,
@@ -201,9 +195,7 @@ class _Lagrangian:
         return self.last_linprog_result
 
     def _call_oracle(self, lambda_vec):
-        signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(
-            lambda_vec
-        )
+        signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
         else:

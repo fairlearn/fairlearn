@@ -160,9 +160,7 @@ A_test = A_test.reset_index(drop=True)
 # missing data could also cause trouble, if particular subgroups
 # have poorer data quality.
 
-numeric_transformer = Pipeline(
-    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())]
-)
+numeric_transformer = Pipeline(steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())])
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
