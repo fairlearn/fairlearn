@@ -12,28 +12,27 @@ Credit Loan Decisions
 # Package Imports
 # ---------------
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import warnings
 
 import lightgbm as lgb
-from sklearn.metrics import balanced_accuracy_score, roc_auc_score
-from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.metrics import balanced_accuracy_score, confusion_matrix, roc_auc_score
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from fairlearn.metrics import MetricFrame
+
 from fairlearn.metrics import (
+    MetricFrame,
     count,
-    selection_rate,
     equalized_odds_difference,
-    false_positive_rate,
     false_negative_rate,
+    false_positive_rate,
+    selection_rate,
 )
 from fairlearn.postprocessing import ThresholdOptimizer
-from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import EqualizedOdds
-from sklearn.model_selection import train_test_split
-import warnings
+from fairlearn.reductions import EqualizedOdds, ExponentiatedGradient
 
 warnings.simplefilter("ignore")
 
@@ -151,9 +150,7 @@ data_url = "http://archive.ics.uci.edu/ml/machine-learning-databases/00350/defau
 dataset = (
     pd.read_excel(io=data_url, header=1)
     .drop(columns=["ID"])
-    .rename(
-        columns={"PAY_0": "PAY_1", "default payment next month": "default"}
-    )
+    .rename(columns={"PAY_0": "PAY_1", "default payment next month": "default"})
 )
 
 dataset.shape
@@ -249,15 +246,11 @@ X.loc[:, "Interest"] = np.random.normal(loc=2 * Y, scale=A)
 # We see that for both sexes, the :code:`Interest` feature is higher for
 # individuals who defaulted on their loan.
 
-fig, (ax_1, ax_2) = plt.subplots(
-    ncols=2, figsize=(10, 4), sharex=True, sharey=True
-)
+fig, (ax_1, ax_2) = plt.subplots(ncols=2, figsize=(10, 4), sharex=True, sharey=True)
 X["Interest"][(A == 1) & (Y == 0)].plot(
     kind="kde", label="Payment on Time", ax=ax_1, title="INTEREST for Men"
 )
-X["Interest"][(A == 1) & (Y == 1)].plot(
-    kind="kde", label="Payment Default", ax=ax_1
-)
+X["Interest"][(A == 1) & (Y == 1)].plot(kind="kde", label="Payment Default", ax=ax_1)
 X["Interest"][(A == 2) & (Y == 0)].plot(
     kind="kde",
     label="Payment on Time",
@@ -278,6 +271,7 @@ X["Interest"][(A == 2) & (Y == 1)].plot(
 # data. However because of the imbalances in the dataset, we will first
 # resample the training data to produce a new balanced training dataset.
 
+
 def resample_training_data(X_train, Y_train, A_train):
     """Down-sample the majority class in the training dataset to produce a
     balanced dataset with a 50/50 split in the predictive labels.
@@ -292,9 +286,7 @@ def resample_training_data(X_train, Y_train, A_train):
     """
     negative_ids = Y_train[Y_train == 0].index
     positive_ids = Y_train[Y_train == 1].index
-    balanced_ids = positive_ids.union(
-        np.random.choice(a=negative_ids, size=len(positive_ids))
-    )
+    balanced_ids = positive_ids.union(np.random.choice(a=negative_ids, size=len(positive_ids)))
 
     X_train = X_train.loc[balanced_ids, :]
     Y_train = Y_train.loc[balanced_ids]
@@ -463,6 +455,7 @@ lgb.plot_importance(
 # compute the *standard error* for each metric at the :math:`\alpha=0.95` confidence
 # level.
 
+
 def compute_error_metric(metric_value, sample_size):
     """Compute standard error of a given metric based on the assumption of
     normal distribution.
@@ -475,11 +468,7 @@ def compute_error_metric(metric_value, sample_size):
     The standard error of the metric
     """
     metric_value = metric_value / sample_size
-    return (
-        1.96
-        * np.sqrt(metric_value * (1.0 - metric_value))
-        / np.sqrt(sample_size)
-    )
+    return 1.96 * np.sqrt(metric_value * (1.0 - metric_value)) / np.sqrt(sample_size)
 
 
 def false_positive_error(y_true, y_pred):
@@ -496,9 +485,9 @@ def false_negative_error(y_true, y_pred):
 
 def balanced_accuracy_error(y_true, y_pred):
     """Compute the standard error for the balanced accuracy estimate."""
-    fpr_error, fnr_error = false_positive_error(
+    fpr_error, fnr_error = false_positive_error(y_true, y_pred), false_negative_error(
         y_true, y_pred
-    ), false_negative_error(y_true, y_pred)
+    )
     return np.sqrt(fnr_error**2 + fpr_error**2) / 2
 
 
@@ -569,9 +558,7 @@ def plot_group_metrics_with_error_bars(metricframe, metric, error_name):
     lower_bounds = point_estimates - error_bars
     upper_bounds = point_estimates + error_bars
 
-    x_axis_names = [
-        str(name) for name in error_bars.index.to_flat_index().tolist()
-    ]
+    x_axis_names = [str(name) for name in error_bars.index.to_flat_index().tolist()]
     plt.vlines(
         x_axis_names,
         lower_bounds,
@@ -613,9 +600,7 @@ metricframe_unmitigated.by_group[metrics_to_report].plot.bar(
 # :code:`equalized_odds_difference`.
 
 balanced_accuracy_unmitigated = balanced_accuracy_score(y_test, Y_pred)
-equalized_odds_unmitigated = equalized_odds_difference(
-    y_test, Y_pred, sensitive_features=A_test
-)
+equalized_odds_unmitigated = equalized_odds_difference(y_test, Y_pred, sensitive_features=A_test)
 
 # %%
 # One key assumption here is we assume that *false positives* and *false
@@ -685,15 +670,14 @@ postprocess_est.fit(X=X_train, y=y_train, sensitive_features=A_train)
 
 postprocess_pred = postprocess_est.predict(X_test, sensitive_features=A_test)
 
-postprocess_pred_proba = postprocess_est._pmf_predict(
-    X_test, sensitive_features=A_test
-)
+postprocess_pred_proba = postprocess_est._pmf_predict(X_test, sensitive_features=A_test)
 
 
 # %%
 # Fairness assessment of postprocessing model
 # ===========================================
 #
+
 
 def compare_metricframe_results(mframe_1, mframe_2, metrics, names):
     """Concatenate the results of two MetricFrames along a subset of metrics.
@@ -796,9 +780,8 @@ metricframe_postprocess.by_group[metrics_to_report].plot.bar(
 # maximal difference of :code:`epsilon` between our largest and smallest
 # *equalized odds* value.
 
-def get_expgrad_models_per_epsilon(
-    estimator, epsilon, X_train, y_train, A_train
-):
+
+def get_expgrad_models_per_epsilon(estimator, epsilon, X_train, y_train, A_train):
     """Instantiate and train an ExponentiatedGradient model on the
     balanced training dataset.
 
@@ -816,7 +799,7 @@ def get_expgrad_models_per_epsilon(
     """
     exp_grad_est = ExponentiatedGradient(
         estimator=estimator,
-        sample_weight_name='classifier__sample_weight',
+        sample_weight_name="classifier__sample_weight",
         constraints=EqualizedOdds(difference_bound=epsilon),
     )
     # Is this an issue - Re-runs
@@ -854,9 +837,7 @@ for eps in epsilons:
 
 # %%
 for epsilon, models in all_models.items():
-    print(
-        f"For epsilon {epsilon}, ExponentiatedGradient learned {len(models)} inner models"
-    )
+    print(f"For epsilon {epsilon}, ExponentiatedGradient learned {len(models)} inner models")
 
 
 # %%
@@ -889,6 +870,7 @@ for epsilon, models in all_models.items():
 # model (we refer to these as *"dominated"* models), and plot just the remaining
 # *"undominated"* models.
 
+
 def is_pareto_efficient(points):
     """Filter a NumPy Matrix to remove rows that are strictly dominated by
     another row in the matrix. Strictly dominated means the all the row values
@@ -908,9 +890,7 @@ def is_pareto_efficient(points):
     is_efficient = np.ones(n, dtype=bool)
     for i, c in enumerate(points):
         if is_efficient[i]:
-            is_efficient[is_efficient] = np.any(
-                points[is_efficient] < c, axis=1
-            )
+            is_efficient[is_efficient] = np.any(points[is_efficient] < c, axis=1)
             is_efficient[i] = True
     return is_efficient
 
@@ -936,9 +916,7 @@ def filter_dominated_rows(points):
 
 
 # %%
-def aggregate_predictor_performances(
-    predictors, metric, X_test, Y_test, A_test=None
-):
+def aggregate_predictor_performances(predictors, metric, X_test, Y_test, A_test=None):
     """Compute the specified metric for all classifiers in predictors.
     If no sensitive features are present, the metric is computed without
     disaggregation.
@@ -958,10 +936,7 @@ def aggregate_predictor_performances(
     """
     all_predictions = [predictor.predict(X_test) for predictor in predictors]
     if A_test is not None:
-        return [
-            metric(Y_test, Y_sweep, sensitive_features=A_test)
-            for Y_sweep in all_predictions
-        ]
+        return [metric(Y_test, Y_sweep, sensitive_features=A_test) for Y_sweep in all_predictions]
     else:
         return [metric(Y_test, Y_sweep) for Y_sweep in all_predictions]
 
@@ -987,14 +962,14 @@ def model_performance_sweep(models_dict, X_test, y_test, A_test):
     performance metrics
     """
     performances = []
-    for (eps, models) in models_dict.items():
+    for eps, models in models_dict.items():
         eq_odds_difference = aggregate_predictor_performances(
             models, equalized_odds_difference, X_test, y_test, A_test
         )
         bal_acc_score = aggregate_predictor_performances(
             models, balanced_accuracy_score, X_test, y_test
         )
-        for (i, score) in enumerate(eq_odds_difference):
+        for i, score in enumerate(eq_odds_difference):
             performances.append((eps, i, score, (1 - bal_acc_score[i])))
     performances_df = pd.DataFrame.from_records(
         performances,
@@ -1007,9 +982,7 @@ def model_performance_sweep(models_dict, X_test, y_test, A_test):
 performance_df = model_performance_sweep(all_models, X_test, y_test, A_test)
 
 # %%
-performance_subset = performance_df.loc[
-    :, ["equalized_odds", "balanced_error"]
-]
+performance_subset = performance_df.loc[:, ["equalized_odds", "balanced_error"]]
 
 # %%
 mask, pareto_subset = filter_dominated_rows(performance_subset)
@@ -1022,9 +995,7 @@ performance_df_masked = performance_df.loc[mask, :]
 for index, row in performance_df_masked.iterrows():
     bal_error, eq_odds_diff = row["balanced_error"], row["equalized_odds"]
     epsilon_, index_ = row["epsilon"], row["index"]
-    plt.scatter(
-        bal_error, eq_odds_diff, color="green", label="ExponentiatedGradient"
-    )
+    plt.scatter(bal_error, eq_odds_diff, color="green", label="ExponentiatedGradient")
     plt.text(
         bal_error + 0.001,
         eq_odds_diff + 0.0001,
@@ -1036,9 +1007,7 @@ plt.scatter(
     equalized_odds_unmitigated,
     label="UnmitigatedModel",
 )
-plt.scatter(
-    1.0 - bal_acc_postprocess, eq_odds_postprocess, label="PostProcess"
-)
+plt.scatter(1.0 - bal_acc_postprocess, eq_odds_postprocess, label="PostProcess")
 plt.xlabel("Weighted Error Rate")
 plt.ylabel("Equalized Odds")
 plt.legend(bbox_to_anchor=(1.85, 1))
@@ -1070,6 +1039,7 @@ plt.legend(bbox_to_anchor=(1.85, 1))
 # thresholding based on the :code:`balanced_error` rate of the unmitigated model, and
 # we choose the least discriminatory model based on the smallest
 # :code:`equalized_odds_difference` value.
+
 
 def filter_models_by_unmitigiated_score(
     all_models,
@@ -1127,9 +1097,7 @@ inprocess_model = best_model.get("model")
 y_pred_inprocess = inprocess_model.predict(X_test)
 
 bal_acc_inprocess = balanced_accuracy_score(y_test, y_pred_inprocess)
-eq_odds_inprocess = equalized_odds_difference(
-    y_test, y_pred_inprocess, sensitive_features=A_test
-)
+eq_odds_inprocess = equalized_odds_difference(y_test, y_pred_inprocess, sensitive_features=A_test)
 
 # %%
 metricframe_inprocess = MetricFrame(
@@ -1165,13 +1133,9 @@ metric_error_pairs = [
 
 def create_metricframe_w_errors(mframe, metrics_to_report, metric_error_pair):
     mframe_by_group = mframe.by_group.copy()
-    for (metric_name, error_name) in metric_error_pair:
-        mframe_by_group[metric_name] = mframe_by_group[metric_name].apply(
-            lambda x: f"{x:.3f}"
-        )
-        mframe_by_group[error_name] = mframe_by_group[error_name].apply(
-            lambda x: f"{x:.3f}"
-        )
+    for metric_name, error_name in metric_error_pair:
+        mframe_by_group[metric_name] = mframe_by_group[metric_name].apply(lambda x: f"{x:.3f}")
+        mframe_by_group[error_name] = mframe_by_group[error_name].apply(lambda x: f"{x:.3f}")
         mframe_by_group[metric_name] = mframe_by_group[metric_name].str.cat(
             mframe_by_group[error_name], sep="±"
         )
@@ -1184,27 +1148,21 @@ def create_metricframe_w_errors(mframe, metrics_to_report, metric_error_pair):
 #
 # **Unmitigated model**
 
-create_metricframe_w_errors(
-    metricframe_unmitigated, metrics_to_report, metric_error_pairs
-)
+create_metricframe_w_errors(metricframe_unmitigated, metrics_to_report, metric_error_pairs)
 
 metricframe_unmitigated.overall[metrics_to_report]
 
 # %%
 # **ExponentiatedGradient model**
 
-create_metricframe_w_errors(
-    metricframe_inprocess, metrics_to_report, metric_error_pairs
-)
+create_metricframe_w_errors(metricframe_inprocess, metrics_to_report, metric_error_pairs)
 
 # %%
 # **ThresholdOptimizer**
 
 metricframe_inprocess.overall[metrics_to_report]
 
-create_metricframe_w_errors(
-    metricframe_postprocess, metrics_to_report, metric_error_pairs
-)
+create_metricframe_w_errors(metricframe_postprocess, metrics_to_report, metric_error_pairs)
 
 metricframe_postprocess.overall[metrics_to_report]
 

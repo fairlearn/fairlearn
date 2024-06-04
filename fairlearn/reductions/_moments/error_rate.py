@@ -49,7 +49,7 @@ class ErrorRate(ClassificationMoment):
             self.fp_cost = 1.0
             self.fn_cost = 1.0
         elif (
-            type(costs) is dict
+            isinstance(costs, dict)
             and costs.keys() == {"fp", "fn"}
             and costs["fp"] >= 0.0
             and costs["fn"] >= 0.0

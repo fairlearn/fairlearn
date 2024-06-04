@@ -75,7 +75,7 @@ The prerequisites for Fairlearn are split between three separate files:
        contains the prerequisites for the core Fairlearn package
 
     -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
-       the prerequisites for Fairlearn development (such as flake8 and pytest)
+       the prerequisites for Fairlearn development (such as ruff and pytest)
 
 The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
 file is consumed

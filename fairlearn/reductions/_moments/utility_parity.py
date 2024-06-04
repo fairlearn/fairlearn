@@ -88,9 +88,7 @@ class UtilityParity(ClassificationMoment):
         Default 0.0
     """
 
-    def __init__(
-        self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0
-    ):
+    def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
         """Initialize with the ratio value."""
         super(UtilityParity, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
@@ -147,9 +145,7 @@ class UtilityParity(ClassificationMoment):
         self.utilities = utilities
         self.utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
-        self.prob_group_event = (
-            self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
-        )
+        self.prob_group_event = self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
         signed = pd.concat(
             [self.prob_group_event, self.prob_group_event],
             keys=["+", "-"],
@@ -199,12 +195,8 @@ class UtilityParity(ClassificationMoment):
         self.neg_basis_present = pd.Series(dtype="float64")
         # zero_vec = pd.Series(0.0, self.index)
         col_count = len(event_vals) * (len(group_vals) - 1)
-        self.pos_basis = pd.DataFrame(
-            0.0, index=self.index, columns=range(col_count)
-        ).sort_index()
-        self.neg_basis = pd.DataFrame(
-            0.0, index=self.index, columns=range(col_count)
-        ).sort_index()
+        self.pos_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
+        self.neg_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
 
         i = 0
 

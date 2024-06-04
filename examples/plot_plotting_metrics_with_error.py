@@ -9,7 +9,6 @@ Plotting Metrics with Errors
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
-from fairlearn.datasets import fetch_adult
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
 from sklearn.model_selection import train_test_split
@@ -17,6 +16,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils import check_consistent_length
+
+from fairlearn.datasets import fetch_adult
 
 # %%
 # Load and preprocess the data set
@@ -110,12 +111,8 @@ def general_wilson(p, n, digits=4, z=1.959964):
     denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
     adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
-    lower_bound = (
-        centre_adjusted_probability - z * adjusted_standard_deviation
-    ) / denominator
-    upper_bound = (
-        centre_adjusted_probability + z * adjusted_standard_deviation
-    ) / denominator
+    lower_bound = (centre_adjusted_probability - z * adjusted_standard_deviation) / denominator
+    upper_bound = (centre_adjusted_probability + z * adjusted_standard_deviation) / denominator
     return np.array([round(lower_bound, digits), round(upper_bound, digits)])
 
 

@@ -15,8 +15,9 @@ def _ensure_cwd_is_fairlearn_root_dir():
         os.path.join(os.getcwd(), "README.rst")
     ):
         raise Exception(
-            "Please run this from the fairlearn root directory. "
-            "Current directory: {}".format(os.getcwd())
+            "Please run this from the fairlearn root directory. Current directory: {}".format(
+                os.getcwd()
+            )
         )
 
 

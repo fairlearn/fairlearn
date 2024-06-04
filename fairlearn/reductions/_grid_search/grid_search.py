@@ -148,9 +148,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         pos_basis = self.constraints.pos_basis
         neg_basis = self.constraints.neg_basis
         neg_allowed = self.constraints.neg_basis_present
-        objective_in_the_span = (
-            self.constraints.default_objective_lambda_vec is not None
-        )
+        objective_in_the_span = self.constraints.default_objective_lambda_vec is not None
 
         if self.grid is None:
             logger.debug("Creating grid of size %i", self.grid_size)

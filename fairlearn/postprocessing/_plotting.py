@@ -65,9 +65,7 @@ def _plot_curve(ax, sensitive_feature, x_col, y_col, points):
 def _raise_if_not_threshold_optimizer(obj):
     if not isinstance(obj, ThresholdOptimizer):
         raise ValueError(
-            "Argument {} needs to be of type {}.".format(
-                obj.__name__, ThresholdOptimizer.__name__
-            )
+            "Argument {} needs to be of type {}.".format(obj.__name__, ThresholdOptimizer.__name__)
         )
 
 

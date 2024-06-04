@@ -8,9 +8,7 @@ from sklearn.datasets import fetch_openml
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_diabetes_hospital(
-    *, as_frame=True, cache=True, data_home=None, return_X_y=False
-):
+def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return_X_y=False):
     """Load the preprocessed Diabetes 130-Hospitals dataset (binary classification).
 
     Download it if necessary.

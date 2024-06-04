@@ -22,15 +22,12 @@ METRIC_DICT = {
     "true_negative_rate": lambda x: x.true_negatives / x.negatives,
     "accuracy_score": lambda x: (x.true_positives + x.true_negatives) / x.n,
     "balanced_accuracy_score": (
-        lambda x: 0.5 * x.true_positives / x.positives
-        + 0.5 * x.true_negatives / x.negatives
+        lambda x: 0.5 * x.true_positives / x.positives + 0.5 * x.true_negatives / x.negatives
     ),
 }
 
 
-def _extend_confusion_matrix(
-    *, true_positives, false_positives, true_negatives, false_negatives
-):
+def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
     """Extend the provided confusion matrix counts with additional implied fields.
 
     Parameters
@@ -183,9 +180,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
         # Calculate the y value at x based on the slope between data points i and i + 1
         x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
-        x_distance_between_data_points = (
-            data_transpose[i + 1][x_col] - data_transpose[i][x_col]
-        )
+        x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
         p0 = x_distance_from_next_data_point / x_distance_between_data_points
         p1 = 1 - p0
         y = p0 * data_transpose[i][y_col] + p1 * data_transpose[i + 1][y_col]
@@ -200,9 +195,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
             }
         )
 
-    return pd.DataFrame(dict_list)[
-        [x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]
-    ]
+    return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
 
 
 def _calculate_tradeoff_points(
@@ -230,9 +223,7 @@ def _calculate_tradeoff_points(
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError(
-            DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value)
-        )
+        raise ValueError(DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value))
 
     scores.append(-np.inf)
     labels.append(np.nan)

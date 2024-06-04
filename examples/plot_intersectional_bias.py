@@ -521,13 +521,18 @@ Intersectionality in Mental Health Care
 
 # %%
 
+import matplotlib.pyplot as plt
+
 # Import relevant libraries
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import sklearn.metrics as skm
 import seaborn as sns
+import sklearn.metrics as skm
 from sklearn.datasets import fetch_openml
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+
+from fairlearn.metrics import MetricFrame, false_positive_rate
 
 # Read in dataset
 data_openml = fetch_openml(data_id=45040)
@@ -659,7 +664,6 @@ testy = test.Diagnosis
 #
 
 # %%
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 # Perform one hot encoding
 categories = ["Sex", "Race", "Housing", "Delay"]  # Categorial variables
@@ -702,7 +706,6 @@ testx = testx.drop(categories, axis=1)
 # %%
 
 # Defining a logistic regression model
-from sklearn.linear_model import LogisticRegression
 
 model = LogisticRegression(penalty="elasticnet", max_iter=1000, solver="saga", l1_ratio=1)
 
@@ -923,7 +926,6 @@ confusionmatrix(testy, predictions)
 # groups, with a focus on evaluating false positive rate ratio.
 
 # %%
-from fairlearn.metrics import MetricFrame, false_positive_rate
 
 
 def f(truelabels, predictions):
@@ -1231,7 +1233,16 @@ sns.barplot(
     y="Rumination",
     data=test.loc[test.Diagnosis == 0],
     ax=axs[1],
-    order=["BlackF", "WhiteF", "HispanicF", "AsianF", "BlackM", "WhiteM", "HispanicM", "AsianM"],
+    order=[
+        "BlackF",
+        "WhiteF",
+        "HispanicF",
+        "AsianF",
+        "BlackM",
+        "WhiteM",
+        "HispanicM",
+        "AsianM",
+    ],
 )
 axs[1].set_title("Rumination vs Intersect across groups with AD (test)")
 
@@ -1266,7 +1277,16 @@ sns.barplot(
     y="Tension",
     data=test.loc[test.Diagnosis == 0],
     ax=axs[1],
-    order=["BlackF", "WhiteF", "HispanicF", "AsianF", "BlackM", "WhiteM", "HispanicM", "AsianM"],
+    order=[
+        "BlackF",
+        "WhiteF",
+        "HispanicF",
+        "AsianF",
+        "BlackM",
+        "WhiteM",
+        "HispanicM",
+        "AsianM",
+    ],
 )
 axs[1].set_title("Tension vs Intersect across groups with AD (test)")
 

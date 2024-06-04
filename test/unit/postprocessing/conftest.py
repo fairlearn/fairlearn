@@ -104,9 +104,10 @@ def is_invalid_transformation(**kwargs):
 
     # Skip combinations where the multi-column sensitive features would have to be compressed
     # into a one-dimensional data structure.
-    if (
-        sensitive_features == sensitive_features_ex3
-    ).all() and sensitive_feature_transform in [ensure_list_1d, ensure_series]:
+    if (sensitive_features == sensitive_features_ex3).all() and sensitive_feature_transform in [
+        ensure_list_1d,
+        ensure_series,
+    ]:
         return True
     return False
 
@@ -114,9 +115,7 @@ def is_invalid_transformation(**kwargs):
 @pytest.fixture(params=candidate_A_transforms)
 def data_sf(data, request):  # sf is an abbreviation for sensitive features
     sensitive_feature_transform = request.param
-    data._replace(
-        sensitive_features=sensitive_feature_transform(data.sensitive_features)
-    )
+    data._replace(sensitive_features=sensitive_feature_transform(data.sensitive_features))
     return data
 
 
@@ -223,9 +222,7 @@ def _get_grouped_data_and_base_points(sensitive_feature_value):
     return grouped_data, expected_roc_points, ignore_for_base_points, x_grid
 
 
-def _get_predictions_by_sensitive_feature(
-    adjusted_predictor, sensitive_features, scores, labels
-):
+def _get_predictions_by_sensitive_feature(adjusted_predictor, sensitive_features, scores, labels):
     labels_and_predictions = defaultdict(list)
     sensitive_features_mapped = _map_into_single_column(sensitive_features)
     for i in range(len(sensitive_features_mapped)):

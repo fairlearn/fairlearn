@@ -197,9 +197,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(
-                    self.nu
-                )
+                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(self.nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -317,9 +315,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             pred = self._pmf_predict(X)
             randomized_pred = np.zeros(pred.shape[0])
             for i in range(pred.shape[0]):
-                randomized_pred[i] = random_state.choice(
-                    pred.iloc[i, :], p=self.weights_
-                )
+                randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
             return randomized_pred
 
     def _pmf_predict(self, X):
