@@ -456,7 +456,11 @@ class MetricFrame:
     @property
     def overall(
         self,
-    ) -> Union[Any, pd.Series, pd.DataFrame,]:
+    ) -> Union[
+        Any,
+        pd.Series,
+        pd.DataFrame,
+    ]:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Read more in the :ref:`User Guide <assessment_quantify_harms>`.
@@ -493,7 +497,13 @@ class MetricFrame:
     @property
     def overall_ci(
         self,
-    ) -> List[Union[Any, pd.Series, pd.DataFrame,]]:
+    ) -> List[
+        Union[
+            Any,
+            pd.Series,
+            pd.DataFrame,
+        ]
+    ]:
         """Return the underlying bootstrapped metrics evaluated on the whole dataset.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the

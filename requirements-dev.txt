@@ -12,7 +12,7 @@ requirements-parser
 # requirements-dev.txt
 # linting.yml
 # .pre-commit-config.yaml
-black==23.9.1
+black==24.4.2
 
 # Required for test
 pytest==7.4.2
