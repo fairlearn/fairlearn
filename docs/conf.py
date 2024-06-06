@@ -65,6 +65,7 @@ extensions = [
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_prompt",
+    "sphinx_copybutton",
 ]
 
 source_suffix = [".rst"]
