@@ -36,13 +36,13 @@ While working on Fairlearn itself you may want to install it in editable mode.
 This allows you to test the changed functionality. First, clone the repository
 locally via
 
-.. code-block::
+.. prompt:: bash
 
     git clone git@github.com:fairlearn/fairlearn.git
 
 To install in editable mode using :code:`pip` run
 
-.. code-block::
+.. prompt:: bash
 
     pip install -e .
 
@@ -50,7 +50,7 @@ from the repository root path.
 
 To verify that the code works as expected run
 
-.. code-block::
+.. prompt:: bash
 
     python ./scripts/install_requirements.py --pinned False
     python -m pytest -s ./test/unit
@@ -61,7 +61,7 @@ Fairlearn comes without :code:`matplotlib` by default. To get Fairlearn's
 plotting capabilities simply run `pip install matplotlib` after installing
 Fairlearn.
 
-.. code-block::
+.. prompt:: bash
 
     pip install -e .
     pip install matplotlib
@@ -110,14 +110,14 @@ Follow the steps below to create a pull request.
 
 5. Clone the Fairlearn repository onto your machine using
 
-.. code-block::
+.. prompt:: bash
 
  git clone https://github.com/fairlearn/fairlearn.git
 
 6. Use the "Fork" button to create your own copy of the repository. Run the
 command below, replacing :code:`<your-alias>` with your own GitHub alias:
 
-.. code-block::
+.. prompt:: bash
 
  git remote add <your-alias> https://github.com/<your-alias>/fairlearn.git
 
@@ -127,7 +127,7 @@ and the second to your fork. Now you can create a new branch and start changing 
 
 7.(Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
 
-.. code-block::
+.. prompt:: bash
 
  pip install pre-commit
  pre-commit install
