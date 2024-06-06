@@ -32,5 +32,6 @@ numpydoc
 pydata-sphinx-theme==0.14.1
 sphinx-autodoc-typehints
 sphinxcontrib-bibtex
+sphinx-prompt
 packaging
 seaborn

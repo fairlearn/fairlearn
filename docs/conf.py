@@ -64,6 +64,7 @@ extensions = [
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
+    "sphinx_prompt",
 ]
 
 source_suffix = [".rst"]
@@ -241,9 +242,7 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
-    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
-        os.sep, "/"
-    )
+    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, "/")
     if tag_or_branch == "main":
         return (
             "http://github.com/fairlearn/fairlearn/blob"
