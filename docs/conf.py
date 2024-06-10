@@ -90,6 +90,7 @@ templates_path = ["templates"]
 
 # generate autosummary even if no references
 autosummary_generate = True
+numpydoc_show_class_members = False
 
 
 # List of patterns, relative to source directory, that match files and
