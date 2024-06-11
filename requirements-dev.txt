@@ -15,7 +15,7 @@ requirements-parser
 black==24.4.2
 
 # Required for test
-pytest==7.4.2
+pytest
 pytest-cov
 pytest-mock
 pytest-mpl
