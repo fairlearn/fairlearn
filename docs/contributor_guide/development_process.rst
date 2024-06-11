@@ -19,9 +19,10 @@ functionality. This includes comments in the code itself, docstrings, and user
 guides. For exceptions to this rule the pull request author should coordinate
 with a maintainer. For changes that fix bugs, add new features, change APIs,
 etc., i.e., for changes that are relevant to developers and/or users please
-also add an entry in CHANGES.md in the section corresponding to the *next*
-release, since that's where your change will be included.
-If you're a new contributor please also add yourself to AUTHORS.md.
+also add an entry in `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`_
+in the section corresponding to the *next* release, since that's where
+your change will be included. If you're a new contributor please also add
+yourself to `AUTHORS.md <https://github.com/fairlearn/fairlearn/blob/main/AUTHORS.md>`_.
 
 Docstrings should follow
 `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
@@ -34,34 +35,29 @@ Advanced installation instructions
 
 While working on Fairlearn itself you may want to install it in editable mode.
 This allows you to test the changed functionality. First, clone the repository
-locally via
+locally via:
 
-.. code-block::
+.. prompt:: bash
 
     git clone git@github.com:fairlearn/fairlearn.git
 
-To install in editable mode using :code:`pip` run
+To install in editable mode, from the repository root path run:
 
-.. code-block::
+.. prompt:: bash
 
     pip install -e .
 
-from the repository root path.
+To verify that the code works as expected run:
 
-To verify that the code works as expected run
-
-.. code-block::
+.. prompt:: bash
 
     python ./scripts/install_requirements.py --pinned False
     python -m pytest -s ./test/unit
 
-Fairlearn currently includes plotting functionality that requires the
-:code:`matplotlib` package to be installed. Since this is for a niche use case
-Fairlearn comes without :code:`matplotlib` by default. To get Fairlearn's
-plotting capabilities simply run `pip install matplotlib` after installing
-Fairlearn.
+Fairlearn currently includes plotting functionality provided by
+:code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
 
-.. code-block::
+.. prompt:: bash
 
     pip install -e .
     pip install matplotlib
@@ -75,7 +71,7 @@ The prerequisites for Fairlearn are split between three separate files:
        contains the prerequisites for the core Fairlearn package
 
     -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
-       the prerequisites for Fairlearn development (such as ruff and pytest)
+       the prerequisites for Fairlearn development (such as :code:`ruff` and :code:`pytest`)
 
 The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
 file is consumed
@@ -94,53 +90,82 @@ Contributing a pull request
 
 Follow the steps below to create a pull request.
 
-1. Get a `GitHub account <https://github.com/>`_
+#. Get a `GitHub account <https://github.com/>`_.
 
-2. Install `git <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_
+#. Install `GIT <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_.
 
-3. Look at Fairlearn's issues on GitHub, specifically the ones marked `"help wanted" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22>`_. Within this category we've marked issues with labels:
+#. Look at Fairlearn's issues on GitHub, specifically the ones marked `"help wanted" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22>`_. Within this category we've marked issues with labels:
 
-   - `"good first issue" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22good+first+issue%22>`_ means issues are a good fit for first time contributors including people with no prior experience with coding or GitHub. This is an excellent way to get started!
+   * `"good first issue" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22good+first+issue%22>`_: issues suitable for first time contributors, including people with no prior experience with coding or GitHub. This is an excellent way to get started!
 
-   - `"easy" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22easy%22+>`_ means the issue is somewhat harder than a "good first issue", but still quite doable if you have prior experience or you're willing to spend a little bit of time.
+   * `"easy" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22easy%22+>`_: issues suitable for folks with at least a bit of experience and/or able to allocate some time to look for a solution.
 
-   - Neither of the two above: this means issues haven't been scoped out properly yet or are more difficult and likely won't be doable within a day or two. If you're still interested just let us know and we'll figure out a way! Once you find an issue you're interested in comment on the issue with any questions you may have and let us know that you'd like to do it. This helps us avoid duplication and we can help you quicker.
+   *  Neither of the two above: issues that are demanding or awaiting scope. Likely to take more than a day or two.
+      If you think this is something for you, please:
 
-4. Whenever questions come up don't hesitate to reach out (see :ref:`communication`). We're here to help!
+      * Identify an issue that you would like to work on.
+      * Leave a comment on the issue indicating interest and outlining possible questions.
+      * Once we know you are working on it, we will support you on your contribution journey!
 
-5. Clone the Fairlearn repository onto your machine using
+#. The communication channels are outlined here: :ref:`communication`.
 
-.. code-block::
+#. Fork the `project repository
+   <https://github.com/fairlearn/fairlearn.git>`__ by clicking on the 'Fork'
+   button near the top of the page. This creates a copy of the code on your GitHub user account.
+   For more details on how to fork a
+   repository see `this guide <https://help.github.com/articles/fork-a-repo/>`_.
 
- git clone https://github.com/fairlearn/fairlearn.git
+#. Clone your fork of the fairlern repo from your GitHub account to your
+   local machine:
 
-6. Use the "Fork" button to create your own copy of the repository. Run the
-command below, replacing :code:`<your-alias>` with your own GitHub alias:
+   .. prompt:: bash
 
-.. code-block::
+      git clone git@github.com:YourLogin/fairlearn.git  # add --depth 1 if your connection is slow
+      cd fairlearn
 
- git remote add <your-alias> https://github.com/<your-alias>/fairlearn.git
+#. Add the ``upstream`` remote. This saves a reference to the main
+   fairlearn repository, which you can use to keep your repository
+   synchronized with the latest changes:
 
-If the execution was successful, running :code:`git remote -v` will show both
-:code:`origin` and :code:`<your-alias>`, the first poiting to the original repo
-and the second to your fork. Now you can create a new branch and start changing the world!
+   .. prompt:: bash
 
-7.(Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
+        git remote add upstream git@github.com:fairlearn/fairlearn.git
 
-.. code-block::
+#. Check that the :code:`upstream` and :code:`origin` remote aliases are configured correctly
+   by running
 
- pip install pre-commit
- pre-commit install
+   :code:`git remote -v` which should display:
 
-Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
+   .. code-block:: text
 
-8. To check your branch run :code:`git status`. Initially it will point to :code:`main` which is the default. Create a new branch for yourself by running :code:`git checkout -b <branch-name>`. :code:`git checkout` is your way of switching branches, while :code:`-b` creates a new branch and should only be added the first time you check out a (new) branch. Whenever you are ready to commit your changes run :code:`git add --all` and :code:`git commit --all` or use the version control functionality of your IDE (e.g., Visual Studio Code). To push the changes to your fork run :code:`git push <your-alias>`. Note that you cannot push to :code:`origin` (the main fairlean repository) because it is access-restricted.
+        origin	git@github.com:YourLogin/fairlearn.git (fetch)
+        origin	git@github.com:YourLogin/fairlearn.git (push)
+        upstream	git@github.com:fairlearn/fairlearn.git (fetch)
+        upstream	git@github.com:fairlearn/fairlearn.git (push)
 
-9. Build the website following :ref:`contributing_documentation`
 
-10. To create a pull request go to the `Fairlearn repo <https://github.com/fairlearn/fairlearn/pulls>`_ and select "New Pull Request". Click "compare across forks" and subsequently configure the "compare" branch to be the one you pushed your changes to. Briefly check the file changes in the resulting view and click "create pull request" when you're confident about your changes. The following view will ask you to add a pull request title and description, and if you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
+#. (Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
 
-11. Celebrate! You did great by participating. If you would like to be a part of the Fairlearn community we'd be thrilled to discuss ways for you to get involved! Check out our communication channels, :ref:`communication`, for more information.
+   .. prompt:: bash
+
+    pip install pre-commit
+    pre-commit install
+
+   Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
+
+#. To contribute, you will need to create a branch on your forked repository and make a pull request to the original fairlearn repository.
+   Detailed description of this process you can find here:
+
+   * `Create a branch <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#creating-a-branch-to-work-on>`_.
+   * `Commit and push changes <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-and-pushing-changes>`_.
+   * `Make a pull request <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-a-pull-request>`_.
+
+      * Build the website following the guidelines in :ref:`contributing_documentation` and run the tests if necessary.
+
+      * Opening a pull request comes with filling up an already provided description template.
+        Please fill it up! If you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
+
+#. Celebration time! We would like to encourage you to become a part of our Fairlearn community. To do so, join our communication channels: :ref:`communication`.
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

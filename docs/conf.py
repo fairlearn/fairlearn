@@ -63,6 +63,8 @@ extensions = [
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
+    "sphinx_prompt",
+    "sphinx_copybutton",
 ]
 
 source_suffix = [".rst"]
