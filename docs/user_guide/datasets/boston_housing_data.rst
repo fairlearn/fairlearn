@@ -32,12 +32,12 @@ Dataset Origin and Use
 ^^^^^^^^^^^^^^^^^^^^^^
 
 :footcite:cts:`harrison1978hedonic`
-developed the dataset to illustrate the issues with using housing market data 
-to measure consumer willingness to pay for clean air. 
+developed the dataset to illustrate the issues with using housing market data
+to measure consumer willingness to pay for clean air.
 The authors use a
 `hedonic pricing <https://www.investopedia.com/terms/h/hedonicpricing.asp>`_
 approach, which assumes that the price of a good or service can be modeled as
-a function of features both internal and external to the good or service. 
+a function of features both internal and external to the good or service.
 The input to this model was a dataset comprising the Boston Standard
 Metropolitan Statistical Area :footcite:`uscensusbureaumetropolitan`, with the
 nitric oxides concentration (*NOX*) serving as a proxy for air quality.
@@ -65,7 +65,7 @@ indexed in the `University of California-Irvine Machine Learning Repository
 Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_,
 and for a time was included as one of scikit-learn's and tensorflow's standard toy datasets
 (see :mod:`tf.keras.datasets.boston_housing`).
-It has also been the benchmark of choice for many machine learning 
+It has also been the benchmark of choice for many machine learning
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_
 :footcite:`al2018comparative`
 :footcite:`shahhosseini2020optimizing`
@@ -154,7 +154,6 @@ Dataset Issues
 
 While the dataset is widely used, it has significant ethical issues.
 
-As explained in :func:`sklearn.datasets.load_boston`,
 Harrison and Rubenfield developed the feature *B* (result of the formula *1000(B_k - 0.63)^2k*)
 under the assumption that racial self-segregation had a positive impact on house prices.
 *B* then encodes systemic racism as a factor in house pricing.
@@ -179,17 +178,17 @@ have later been found to be unsubstantiated.
   One expects, therefore, a parabolic relationship between proportion Black in
   a neighborhood and housing values."
 
-To describe the reasoning behind *B* further, the authors assume that 
+To describe the reasoning behind *B* further, the authors assume that
 self-segregation correlates to higher home values.
 However, other researchers (see :footcite:`kain1975housing`) did not find
-evidence that supports this hypothesis. 
+evidence that supports this hypothesis.
 
-Additionally, though the authors specify a parabolic transformation 
-for *B*, they do not provide evidence that the relationship between *B* and *MEDV* 
-is parabolic. 
-Harrison and Rubenfield set a threshold of 63% as the point in which median house 
-prices flip from declining to increasing, but do not provide the basis for 
-this threshold. 
+Additionally, though the authors specify a parabolic transformation
+for *B*, they do not provide evidence that the relationship between *B* and *MEDV*
+is parabolic.
+Harrison and Rubenfield set a threshold of 63% as the point in which median house
+prices flip from declining to increasing, but do not provide the basis for
+this threshold.
 An analysis of the dataset :footcite:`carlisle2019racist`
 by M. Carlisle further shows that the Boston Housing dataset suffers from serious
 quality and incompleteness issues, as Carlisle was unable to recover the
@@ -235,10 +234,10 @@ been established.
 However, given the time period in which the paper
 was published there may have been a dearth of related measurement models.
 
-Intersectionality also requires consideration. 
+Intersectionality also requires consideration.
 Intersectionality is defined as the intersection between multiple demographic
 groups. :footcite:`crenshaw1991intersectionality`
-The impacts of a technical system on intersectional groups may be different 
+The impacts of a technical system on intersectional groups may be different
 than the impacts experienced by the individual demographic groups (e.g., Black
 people in aggregate and women in aggregate may experience a technical system
 differently than Black women).
@@ -284,8 +283,8 @@ How does that look in a typical machine learning pipeline?
 
 We apply a column transformation to the target feature
 to turn this problem into a classification problem.
-The code below maps *LSTAT* and *MEDV* to binary values where values greater 
-than the median of the column map to TRUE, and otherwise the values are FALSE. 
+The code below maps *LSTAT* and *MEDV* to binary values where values greater
+than the median of the column map to TRUE, and otherwise the values are FALSE.
 This methodology follows scikit-lego's :footcite:`scikitlego2019fairness`
 exploration of the Boston Housing data.
 We also transform *B* into a binary variable where TRUE values are above the
@@ -368,13 +367,13 @@ an outcome for individuals in the "lower status" category.
 Discussion
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Boston housing dataset presents many ethical issues, and in general, we 
-strongly discourage using it in predictive modelling analyses. 
-We've kept it in Fairlearn because of its potential as a teaching tool 
-for how to deal with ethical issues in a dataset. 
+The Boston housing dataset presents many ethical issues, and in general, we
+strongly discourage using it in predictive modelling analyses.
+We've kept it in Fairlearn because of its potential as a teaching tool
+for how to deal with ethical issues in a dataset.
 There are ways to remove correlations between sensitive features and the
-remaining columns :footcite:`scikitlego2019fairness`, 
-but that is by no means a guarantee that fairness-related harms won't occur. 
+remaining columns :footcite:`scikitlego2019fairness`,
+but that is by no means a guarantee that fairness-related harms won't occur.
 Besides, other benchmark datasets exist that do not present these issues.
 
 
