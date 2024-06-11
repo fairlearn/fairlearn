@@ -123,7 +123,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
         :param sensitive_features: A (currently) required keyword argument listing the
             feature used by the constraints object
-        :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list (for now)
+        :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         """
         self.predictors_ = []
         self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)

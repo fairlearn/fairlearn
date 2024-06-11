@@ -236,7 +236,7 @@ as the objective, leading to a vastly reduced difference in accuracy:
     Unknown            0.511864
     Name: accuracy_score, dtype: float64
 
-Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
+Note that :class:`.ExponentiatedGradient` does not have a `predict_proba`
 method, but we can adjust the target decision threshold by specifying
 (possibly unequal) costs for false positives and false negatives.
 In our example we use the cost of 0.1 for false positives and 0.9 for false negatives.
