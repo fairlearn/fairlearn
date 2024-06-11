@@ -115,15 +115,19 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         estimator being made, and the :code:`fit(X)` method
         of each one called.
 
-        :param X: The feature matrix
-        :type X: numpy.ndarray or pandas.DataFrame
+        Parameters
+        ----------
+        X : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`
+            The feature matrix.
 
-        :param y: The label vector
-        :type y: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        y : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`, \
+            :class:`pandas.Series`, list
+            The label vector.
 
-        :param sensitive_features: A (currently) required keyword argument listing the
-            feature used by the constraints object
-        :type sensitive_features: numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+        sensitive_features : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`, \
+            :class:`pandas.Series`, list
+            A (currently) required keyword argument listing the
+            feature used by the constraints object.
         """
         self.predictors_ = []
         self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
@@ -227,8 +231,10 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         This dispatches `X` to the :code:`predict(X)` method of the
         selected estimator, and hence the return type is dependent on that method.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
+        Parameters
+        ----------
+        X : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`
+            Feature data.
         """
         check_is_fitted(self)
         return self.predictors_[self.best_idx_].predict(X)
@@ -239,8 +245,10 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         The underlying estimator must support :code:`predict_proba(X)` for this
         to work. The return type is determined by this method.
 
-        :param X: Feature data
-        :type X: numpy.ndarray or pandas.DataFrame
+        Parameters
+        ----------
+        X : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`
+            Feature data.
         """
         check_is_fitted(self)
         return self.predictors_[self.best_idx_].predict_proba(X)

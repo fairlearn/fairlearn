@@ -140,7 +140,7 @@ class _AdversarialFairness(BaseEstimator):
         The given transformer *must* map data
         to a 2d ndarray containing only floats.
 
-    learning_rate : float, default=0.001
+    learning_rate : float, default = 0.001
         A small number greater than zero to set as a learning rate.
 
     alpha : float, default = 1.0
