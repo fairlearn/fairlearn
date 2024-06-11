@@ -59,7 +59,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
     "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
     "numpydoc",
