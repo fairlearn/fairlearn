@@ -530,7 +530,9 @@ class _AdversarialFairness(BaseEstimator):
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
-                        result = cb(self, self.step_)
+                        result = cb(
+                            self, step=self.step_, X=X, y=y, z=sensitive_features, pos_label=1
+                        )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
                         stop = stop or result
@@ -912,10 +914,16 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     callbacks : callable
         Callback function, called after every batch. For instance useable when
         wanting to validate. A list of callback functions can also be provided.
-        Each callback function is passed two arguments :code:`self` (the
-        estimator instance) and :code:`step` (the completed iteration), and
-        may return a Boolean value. If the returned value is `True`, the
-        optimization algorithm terminates. This can be used to implement
+        Each callback function is called as::
+
+            callback(
+                self, step=self.step_, X=X, y=y, z=sensitive_features, pos_label=1
+            )
+
+        which is passed the ``self`` object, the step number, the inputs ``X``,
+        the targets ``y``, the sensitive features ``z``, and the positive label.
+        The callback may return a Boolean value. If the returned value is `True`,
+        the optimization algorithm terminates. This can be used to implement
         *early stopping*.
 
     cuda : str, default = None
