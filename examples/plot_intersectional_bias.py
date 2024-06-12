@@ -185,7 +185,7 @@ Intersectionality in Mental Health Care
 # The issues
 # ~~~~~~~~~~
 #
-#   **"For a star, the location of the mean referred to the location of a singular real object,
+#   **"For a start, the location of the mean referred to the location of a singular real object,
 #   whereas for a population, the location of a population mean depended on how the population was
 #   defined."**
 #
