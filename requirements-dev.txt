@@ -34,3 +34,4 @@ sphinx-autodoc-typehints
 sphinxcontrib-bibtex
 packaging
 seaborn
+torch
