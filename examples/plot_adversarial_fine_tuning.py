@@ -157,8 +157,6 @@ def optimizer_constructor(model):
     return optimizer
 
 
-step = 1
-
 # %%
 # We make use of a callback function to both update the hyperparameters and to
 # validate the model. We update these hyperparameters at every 10 steps, and we
@@ -168,10 +166,8 @@ step = 1
 from math import sqrt
 
 
-def callbacks(model, X, y, z, pos_label):
-    global step
+def callbacks(model, step, X, y, z, pos_label):
     global schedulers
-    step += 1
     # Update hyperparameters
     model.alpha = 0.3 * sqrt(step // 1)
     for scheduler in schedulers:
