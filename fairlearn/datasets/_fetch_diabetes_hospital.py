@@ -91,7 +91,7 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
