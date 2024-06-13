@@ -68,7 +68,7 @@ is about binary classification, but we similarly support regression.
 Prerequisites
 ^^^^^^^^^^^^^
 
-In order to run the code samples in the Quickstart tutorial, you need to 
+In order to run the code samples in the Quickstart tutorial, you need to
 install the following dependencies:
 
 .. code-block:: bash
@@ -78,19 +78,19 @@ install the following dependencies:
 Loading the dataset
 ^^^^^^^^^^^^^^^^^^^
 
-For this example, we use a `clinical dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_ 
-of hospital re-admissions over a ten-year period (1998-2008) for 
-diabetic patients across 130 different hospitals in the U.S. This scenario 
-builds upon prior research on how racial disparities impact health care 
+For this example, we use a `clinical dataset <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>`_
+of hospital re-admissions over a ten-year period (1998-2008) for
+diabetic patients across 130 different hospitals in the U.S. This scenario
+builds upon prior research on how racial disparities impact health care
 resource allocation in the U.S. For an in-depth analysis of this dataset,
 review the `SciPy tutorial <https://github.com/fairlearn/talks/tree/main/2021_scipy_tutorial>`_
 that the Fairlearn team presented in 2021.
 
-We will use machine learning to predict whether an individual in the dataset 
-is readmitted to the hospital within 30 days of hospital release. 
-A hospital readmission within 30 days can be viewed as a proxy that the 
+We will use machine learning to predict whether an individual in the dataset
+is readmitted to the hospital within 30 days of hospital release.
+A hospital readmission within 30 days can be viewed as a proxy that the
 patients needed more assistance at the release time.
-In the next section, we build a classification model to accomplish the 
+In the next section, we build a classification model to accomplish the
 prediction task.
 
 .. doctest:: quickstart
@@ -115,7 +115,7 @@ prediction task.
     Asian                641
     Name: count, dtype: int64
 
-.. figure:: _images/sphx_glr_plot_quickstart_counts_001.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_counts_001.png
     :target: auto_examples/plot_quickstart_counts.html
     :align: center
 
@@ -156,16 +156,16 @@ we can evaluate metrics for subgroups within the data as below:
     Name: accuracy_score, dtype: float64
 
 Note that our decision threshold for positive predictions is 0.1.
-In practice, this threshold would be driven by risk or capacity 
-considerations. For this example, we set the threshold based on the risk 
+In practice, this threshold would be driven by risk or capacity
+considerations. For this example, we set the threshold based on the risk
 of readmission. The threshold of 0.1 corresponds to saying that a
-10% risk of readmission is viewed as sufficient for referral to a 
-post-discharge care program. 
+10% risk of readmission is viewed as sufficient for referral to a
+post-discharge care program.
 Fairlearn has many standard metrics built-in, such as
 false negative rate, i.e., the rate of occurrence of negative classifications
-when the true value of the outcome label is positive. 
-In the context of this dataset, the false positive rate captures the 
-individuals who in reality would be readmitted to the hospital, but 
+when the true value of the outcome label is positive.
+In the context of this dataset, the false positive rate captures the
+individuals who in reality would be readmitted to the hospital, but
 the model does not predict that outcome.
 
 .. doctest:: quickstart
@@ -193,7 +193,7 @@ Fairlearn also allows us to quickly plot these metrics from the
     :start-after: # Analyze metrics using MetricFrame
     :end-before: # Customize plots with ylim
 
-.. figure:: _images/sphx_glr_plot_quickstart_001.png
+.. figure:: auto_examples/images/sphx_glr_plot_quickstart_001.png
     :target: auto_examples/plot_quickstart.html
     :align: center
 
@@ -236,7 +236,7 @@ as the objective, leading to a vastly reduced difference in accuracy:
     Unknown            0.511864
     Name: accuracy_score, dtype: float64
 
-Note that :class:`ExponentiatedGradient` does not have a `predict_proba`
+Note that :class:`.ExponentiatedGradient` does not have a `predict_proba`
 method, but we can adjust the target decision threshold by specifying
 (possibly unequal) costs for false positives and false negatives.
 In our example we use the cost of 0.1 for false positives and 0.9 for false negatives.

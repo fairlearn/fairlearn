@@ -185,8 +185,8 @@ Intersectionality in Mental Health Care
 # The issues
 # ~~~~~~~~~~
 #
-#   **"For a star, the location of the mean referred to the location of a singular real object,
-#   whereas for a population, the location of a population mean **depended on how the population was
+#   **"For a start, the location of the mean referred to the location of a singular real object,
+#   whereas for a population, the location of a population mean depended on how the population was
 #   defined."**
 #
 # We could define a population as all those who are human, or perhaps all those who are of a
@@ -1133,8 +1133,8 @@ intersectionalf(testy, predictions)
 # they still rated the black men as having increased psychotic symptoms.
 #
 # **So what is going on here?**
-#
-# It’s likely that race is **associated with other factors that are relevant to misdiagnosis.** The
+
+# It’s likely that race is **associated with other factors that are relevant to misdiagnosis**. The
 # diagnostic bias (or a tendency to overemphasize symptoms of schizophrenia and under-emphasize
 # depressive symptoms) may be related to socio-environmental factors, for example, Black men with
 # depression facing more barriers to receiving mental healthcare, which results in more severe
