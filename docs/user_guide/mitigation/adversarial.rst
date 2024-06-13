@@ -250,7 +250,7 @@ to get rid of NaN's::
             Pipeline(
                 [
                     ("imputer", SimpleImputer(strategy="most_frequent")),
-                    ("encoder", OneHotEncoder(drop="if_binary", sparse=False)),
+                    ("encoder", OneHotEncoder(drop="if_binary", sparse_output=False)),
                 ]
             ),
             make_column_selector(dtype_include="category"),
