@@ -61,7 +61,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
-    "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
+    "sphinx_autodoc_typehints",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_prompt",
