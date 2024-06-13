@@ -32,8 +32,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     The exponentiated gradient algorithm is described in detail by
     :footcite:t:`agarwal2018reductions`.
 
-    Read more in the \
-        `User Guide <https://fairlearn.org/main/auto_examples/plot_mitigation_pipeline.html>`_.
+    Read more in :ref:`sphx_glr_auto_examples_plot_mitigation_pipeline.py`.
 
     .. versionchanged:: 0.3.0
         Was a function before, not a class

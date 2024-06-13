@@ -19,10 +19,10 @@ functionality. This includes comments in the code itself, docstrings, and user
 guides. For exceptions to this rule the pull request author should coordinate
 with a maintainer. For changes that fix bugs, add new features, change APIs,
 etc., i.e., for changes that are relevant to developers and/or users please
-also add an entry in `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`_
-in the section corresponding to the *next* release, since that's where
-your change will be included. If you're a new contributor please also add
-yourself to `AUTHORS.md <https://github.com/fairlearn/fairlearn/blob/main/AUTHORS.md>`_.
+also add an entry in :ref:`version_guide` in the section corresponding to the
+*next* release, since that's where your change will be included.
+If you're a new contributor please also add yourself to
+`AUTHORS.md <https://github.com/fairlearn/fairlearn/blob/main/AUTHORS.md>`_.
 
 Docstrings should follow
 `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
