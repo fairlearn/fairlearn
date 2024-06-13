@@ -11,7 +11,7 @@ check the documentation of the version of the package that they are using.
 
 To contribute, make sure to install sphinx and its add-ons by running
 
-.. code-block::
+.. prompt:: bash
 
     python scripts/install_requirements.py --pinned False
 
@@ -21,7 +21,7 @@ You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
 Since plotting is an optional addition to Fairlearn, you may also need to
 install matplotlib
 
-.. code-block::
+.. prompt:: bash
 
     pip install matplotlib>=3.2.1
 
@@ -32,13 +32,13 @@ editing the restructured text files (`.rst`) corresponding to your updates.
 To build the webpage run the following command from the repository root
 directory:
 
-.. code-block::
+.. prompt:: bash
 
     python -m sphinx -v -b html -n -j auto docs docs/_build/html
 
 or use the shortcut
 
-.. code-block::
+.. prompt:: bash
 
         make doc
 
@@ -49,7 +49,7 @@ rebuilds the changed pages, so the build time should be a lot shorter.
 You can check that the document(s) render properly by inspecting the HTML with
 the following commands:
 
-.. code-block::
+.. prompt:: bash
 
     start docs/_build/html/index.html
     start docs/_build/html/quickstart.html
