@@ -86,7 +86,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References

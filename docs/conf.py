@@ -59,7 +59,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
     "sphinx_autodoc_typehints",
     "numpydoc",
@@ -92,6 +91,7 @@ templates_path = ["templates"]
 
 # generate autosummary even if no references
 autosummary_generate = True
+numpydoc_show_class_members = False
 
 
 # List of patterns, relative to source directory, that match files and
