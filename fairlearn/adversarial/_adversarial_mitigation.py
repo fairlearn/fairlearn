@@ -5,7 +5,7 @@ import logging
 from math import ceil
 from time import time
 
-from numpy import arange, argmax, zeros
+from numpy import arange, argmax, unique, zeros
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
@@ -445,6 +445,7 @@ class _AdversarialFairness(BaseEstimator):
             training data.
         """
         X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
+        self.classes_ = unique(y)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
