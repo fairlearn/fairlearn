@@ -556,6 +556,9 @@ class _AdversarialFairness(BaseEstimator):
         sensitive_features : array
             Array-like containing the sensitive feature of the
             training data.
+
+        classes : array
+            An array containing the labels of classes.
         """
         X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=False)
         self.backendEngine_.train_step(X, Y, A)
