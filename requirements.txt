@@ -1,4 +1,4 @@
-numpy>=1.24.4
+numpy<2.0.0
 pandas>=2.0.3
 # pyarrow is going to be a mandatory dependency to pandas
 # this explicit dependency is only for the sake removing the DeprecationWarning
