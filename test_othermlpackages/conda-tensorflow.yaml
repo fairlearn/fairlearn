@@ -10,4 +10,4 @@ dependencies:
 - pytest-cov
 - tensorflow
 - pip:
-   - scikeras[tensorflow-cpu]<0.13
+   - scikeras[tensorflow-cpu]
