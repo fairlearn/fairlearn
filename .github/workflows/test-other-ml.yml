@@ -32,7 +32,12 @@ jobs:
           conda env create --name $condaEnv --file=$baseDir/conda-${{inputs.mlpackage}}.yaml
         name: Create conda environment
       - run: |
-          if [[ ${{ inputs.mlpackage }} == "tensorflow" && ${{ inputs.mlpackage }} == "lightgbm"]]; then
+          if [[ ${{ inputs.mlpackage }} == "tensorflow" ]]; then
+            export NUMPY_DEP="numpy<2"
+          else
+            export NUMPY_DEP="numpy"
+          fi
+          if [[ ${{ inputs.mlpackage }} == "lightgbm" ]]; then
             export NUMPY_DEP="numpy<2"
           else
             export NUMPY_DEP="numpy"
