@@ -18,29 +18,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-#  all-deps:
-#    strategy:
-#      matrix:
-#        os: [ubuntu-latest, windows-latest, macos-12]
-#        python: ["3.8", "3.9", "3.10", "3.11"]
-#        requirementsPinned: ["false"]
-#    uses: ./.github/workflows/test-all-deps.yml
-#    with:
-#      os: ${{ matrix.os }}
-#      python: ${{ matrix.python }}
-#      requirementsPinned: ${{ matrix.requirementsPinned }}
-#      codeCovPython: "3.11"
-#
-#  minimal-deps:
-#    strategy:
-#      matrix:
-#        os: [ubuntu-latest, windows-latest, macos-12]
-#        python: ["3.8", "3.9", "3.10", "3.11"]
-#    uses: ./.github/workflows/test-minimal-deps.yml
-#    with:
-#      os: ${{ matrix.os }}
-#      python: ${{ matrix.python }}
-#      codeCovPython: "3.11"
+  all-deps:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-12]
+        python: ["3.8", "3.9", "3.10", "3.11"]
+        requirementsPinned: ["false"]
+    uses: ./.github/workflows/test-all-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      requirementsPinned: ${{ matrix.requirementsPinned }}
+      codeCovPython: "3.11"
+
+  minimal-deps:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-12]
+        python: ["3.8", "3.9", "3.10", "3.11"]
+    uses: ./.github/workflows/test-minimal-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      codeCovPython: "3.11"
 
 
   other-ml:
@@ -48,8 +48,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python: ["3.11"]
-#        mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
-        mlpackage: [tensorflow]
+        mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
       fail-fast: false
     uses: ./.github/workflows/test-other-ml.yml
     with:
