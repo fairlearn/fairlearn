@@ -99,6 +99,7 @@ numpydoc_show_class_members = False
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.rst"]
 
+
 master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
@@ -180,6 +181,15 @@ sphinx_gallery_conf = {
     "gallery_dirs": "auto_examples",
     # pypandoc enables rst to md conversion in downloadable notebooks
     "pypandoc": True,
+    # binder configuration is used to ru
+    "binder": {
+        "org": "fairlearn",
+        "repo": "fairlearn",
+        "binderhub_url": "https://mybinder.org",
+        "branch": "main",
+        "dependencies": ["../.binder/requirements.txt"],
+        "use_jupyter_lab": True,
+    },
 }
 
 html_sidebars = {
