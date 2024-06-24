@@ -48,7 +48,7 @@ required arguments to the metric function:
     ...                           y_true=y_true,
     ...                           y_pred=y_pred,
     ...                           sensitive_features=sf_data)
-    >>> metric_beta.overall
+    >>> metric_beta.overall.item()
     0.56983...
     >>> metric_beta.by_group
     sensitive_feature_0
@@ -61,7 +61,7 @@ required arguments to the metric function:
 Per-Sample Arguments
 ^^^^^^^^^^^^^^^^^^^^
 
-If there are per-sample arguments (such as sample weights), these can also be 
+If there are per-sample arguments (such as sample weights), these can also be
 provided in a dictionary via the ``sample_params`` argument.
 The keys of this dictionary are the argument names, and the values are 1-D
 arrays equal in length to ``y_true`` etc.:
@@ -80,7 +80,7 @@ arrays equal in length to ``y_true`` etc.:
     ...                        y_pred=y_pred,
     ...                        sensitive_features=pd.Series(sf_data, name='SF 0'),
     ...                        sample_params=s_p)
-    >>> weighted.overall
+    >>> weighted.overall.item()
     0.45...
     >>> weighted.by_group
     SF 0
@@ -89,7 +89,7 @@ arrays equal in length to ``y_true`` etc.:
     c    0.250000
     Name: recall_score, dtype: float64
 
-If multiple metrics are being evaluated, then ``sample_params`` becomes a 
+If multiple metrics are being evaluated, then ``sample_params`` becomes a
 dictionary of dictionaries.
 The first key to this dictionary is the name of the metric as specified
 in the ``metrics`` argument.
@@ -160,7 +160,7 @@ For example:
     ...                              y_true=dummy_y_true,
     ...                              y_pred=y_pred,
     ...                              sensitive_features=pd.Series(sf_data, name='SF 0'))
-    >>> sel_rate_frame.overall
+    >>> sel_rate_frame.overall.item()
     0.55555...
     >>> sel_rate_frame.by_group
     SF 0
@@ -287,7 +287,7 @@ inputs.
     ...      metrics=area_metric,
     ...      y_true=y_rect_true,
     ...      y_pred=y_rect_pred,
-    ...      sensitive_features=rect_groups  
+    ...      sensitive_features=rect_groups
     ... )
     >>> print(mf_non_scalar.overall)
     5.6666...
@@ -306,6 +306,5 @@ As the name implies, this metric takes two rectangles, and computes the area of 
 and divides it by the area of their union.
 If the two rectangles are disjoint, then the IoU will be zero.
 If the two rectangles are identical, then the IoU will be one.
-This is presented in full in our 
+This is presented in full in our
 `example notebook <../auto_examples/plot_metricframe_beyond_binary_classification.html#non-scalar-inputs>`_.
-
