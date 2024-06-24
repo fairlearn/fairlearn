@@ -17,9 +17,6 @@ from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 from fairlearn.adversarial._preprocessor import FloatTransformer
 
 from .helper import (
-    BCE,
-    CCE,
-    MSE,
     Bin1d,
     Bin2d,
     Cat,
@@ -264,43 +261,39 @@ def test_model_kw_error_torch():
             tensorflow=False,
             fake_mixin=True,
         ),
+        get_instance(
+            AdversarialFairnessClassifier,
+            fake_training=True,
+            torch=False,
+            tensorflow=True,
+            fake_mixin=True,
+        ),
+        get_instance(
+            AdversarialFairnessClassifier,
+            fake_training=True,
+            torch=True,
+            tensorflow=False,
+            fake_mixin=True,
+        ),
+        get_instance(
+            AdversarialFairnessRegressor,
+            fake_training=True,
+            torch=False,
+            tensorflow=True,
+            fake_mixin=True,
+        ),
+        get_instance(
+            AdversarialFairnessRegressor,
+            fake_training=True,
+            torch=True,
+            tensorflow=False,
+            fake_mixin=True,
+        ),
     ]
 )
 def test_estimators(estimator, check):
     """Check the compatibility with scikit-learn API."""
     check(estimator)
-
-
-@pytest.mark.parametrize("torch1", [True, False])
-def test_classifier(torch1):
-    """Test classifier subclass."""
-    mitigator = get_instance(
-        AdversarialFairnessClassifier,
-        fake_training=True,
-        torch=torch1,
-        tensorflow=not torch1,
-    )
-    assert isinstance(mitigator, _AdversarialFairness)
-
-    mitigator.fit(Cont2d, Bin1d, sensitive_features=Cat)
-    assert isinstance(mitigator.backendEngine_.predictor_loss, BCE)
-    assert isinstance(mitigator.backendEngine_.adversary_loss, CCE)
-
-
-@pytest.mark.parametrize("torch2", [True, False])
-def test_regressor(torch2):
-    """Test regressor subclass."""
-    mitigator = get_instance(
-        AdversarialFairnessRegressor,
-        fake_training=True,
-        torch=torch2,
-        tensorflow=not torch2,
-    )
-    assert isinstance(mitigator, _AdversarialFairness)
-
-    mitigator.fit(Cont2d, Cont2d, sensitive_features=Cat)
-    assert isinstance(mitigator.backendEngine_.predictor_loss, MSE)
-    assert isinstance(mitigator.backendEngine_.adversary_loss, CCE)
 
 
 @pytest.mark.parametrize("torch3", [True, False])

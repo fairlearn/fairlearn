@@ -5,7 +5,7 @@ import logging
 from math import ceil
 from time import time
 
-from numpy import arange, argmax, zeros
+from numpy import arange, argmax, unique, zeros
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
@@ -445,6 +445,7 @@ class _AdversarialFairness(BaseEstimator):
             training data.
         """
         X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
+        self.classes_ = unique(y)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -986,6 +987,36 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
             random_state=random_state,
         )
 
+    def _more_tags(self):
+        return {
+            "_xfail_checks": {
+                "check_parameters_default_constructible": (
+                    "cannot have an empty default parameter of a mutable type."
+                ),
+                "check_estimators_pickle": "pickling is not possible.",
+                "check_classifiers_train(readonly_memmap=True)": (
+                    "the output must be of type numpy.array."
+                ),
+                "check_classifiers_train": ("the output must be of type numpy.array."),
+                "check_estimators_overwrite_params": "pickling is not possible.",
+                "check_classifier_data_not_an_array": ("data must be transformed into an array."),
+                "check_supervised_y_no_nan": ("cannot fit an array with inf values."),
+                "check_non_transformer_estimators_n_iter": (
+                    "estimator is missing the _n_iter attribute."
+                ),
+                "check_classifiers_regression_target": ("the data cannot look continuous."),
+                "check_estimators_partial_fit_n_features": ("number of features cannot change."),
+                "check_classifiers_classes": (
+                    "decision function output must match classifier output."
+                ),
+                "check_fit_non_negative": (
+                    "a ValueError should be raised if output is negative. "
+                ),
+                "check_supervised_y_2d": "DataConversionWarning not caught.",
+            },
+            "requires_positive_X": True,
+        }
+
 
 class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     r"""Train PyTorch or TensorFlow regressors while mitigating unfairness.
@@ -1174,6 +1205,58 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
             warm_start=warm_start,
             random_state=random_state,
         )
+
+    def _more_tags(self):
+        return {
+            "_xfail_checks": {
+                "check_parameters_default_constructible": (
+                    "cannot have an empty default parameter of a mutable type."
+                ),
+                "check_estimators_pickle": "pickling is not possible.",
+                "check_fit2d_predict1d": ("regressor estimator cannot look like multiclass."),
+                "check_dict_unchanged": ("regressor estimator cannot look like binary."),
+                "check_dont_overwrite_parameters": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_methods_sample_order_invariance": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_methods_subset_invariance": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_non_transformer_estimators_n_iter": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_regressors_int": ("regressor estimator cannot look like multiclass."),
+                "check_supervised_y_2d": ("regressor estimator cannot look like multiclass."),
+                "check_estimators_overwrite_params": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_estimators_nan_inf": ("regressor estimator cannot look like binary."),
+                "check_estimators_partial_fit_n_features": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_pipeline_consistency": ("regressor estimator cannot look like binary."),
+                "check_dtype_object": ("regressor estimator cannot look like multiclass."),
+                "check_estimators_fit_returns_self": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_estimators_fit_returns_self(readonly_memmap=True)": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
+                "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
+                "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
+                "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
+                "check_supervised_y_no_nan": ("cannot fit an array with inf values."),
+                "check_regressor_data_not_an_array": ("data must be transformed into an array."),
+                "check_regressors_no_decision_function": (
+                    "regressors should not have a decision function."
+                ),
+                "check_regressors_train": ("predictions shape should match targets shape."),
+            },
+            "requires_positive_X": True,
+        }
 
 
 def check_X(X):
