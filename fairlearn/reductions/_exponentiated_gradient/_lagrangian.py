@@ -245,7 +245,7 @@ class _Lagrangian:
             best_value = values[best_idx]
         else:
             best_idx = -1
-            best_value = np.inf
+            best_value = np.PINF
 
         if h_value < best_value - _PRECISION:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
