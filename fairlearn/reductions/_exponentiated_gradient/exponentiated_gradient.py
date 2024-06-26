@@ -155,7 +155,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         Qs = []
 
         last_regret_checked = _REGRET_CHECK_START_T
-        last_gap = np.inf
+        last_gap = np.PINF
         for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
@@ -193,7 +193,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             gaps_EG.append(gap_EG)
 
             if t == 0 or not self.run_linprog_step:
-                gap_LP = np.inf
+                gap_LP = np.PINF
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
