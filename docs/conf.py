@@ -91,6 +91,7 @@ templates_path = ["templates"]
 
 # generate autosummary even if no references
 autosummary_generate = True
+class_members_toctree = False
 numpydoc_show_class_members = False
 
 
@@ -180,6 +181,8 @@ sphinx_gallery_conf = {
     "gallery_dirs": "auto_examples",
     # pypandoc enables rst to md conversion in downloadable notebooks
     "pypandoc": True,
+    "backreferences_dir": os.path.join("modules", "generated"),
+    "doc_module": ("fairlearn",),
 }
 
 html_sidebars = {
