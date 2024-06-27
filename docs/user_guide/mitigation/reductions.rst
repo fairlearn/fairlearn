@@ -557,6 +557,39 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     detected by :code:`gamma` is identical to the mean absolute error.
 
 
+Exponentiated Gradient
+----------------------
+
+The ExponentiatedGradient algorithm in Fairlearn is used to produce models that 
+satisfy fairness constraints without needing access to sensitive features at deployment time.
+This algorithm creates a sequence of re-weighted datasets and retrains the 
+wrapped classifier on each of these datasets.
+To instantiate an ExponentiatedGradient model, you need to pass in a base estimator 
+and fairness constraints. The fairness constraints can be specified using an epsilon value,
+which represents the maximum allowed difference or ratio between the largest and smallest value.
+
+Here is an example of how to instantiate an ExponentiatedGradient model:
+
+.. doctest:: mitigation_reductions
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> def get_expgrad_models_per_epsilon(
+    >>>   estimator, epsilon, X_train, y_train, A_train
+    >>> ):
+    >>>   exp_grad_est = ExponentiatedGradient(
+    >>>       estimator=estimator,
+    >>>       sample_weight_name='classifier__sample_weight',
+    >>>       constraints=EqualizedOdds(difference_bound=epsilon),
+    >>>  )
+    >>>   exp_grad_est.fit(X_train, y_train, sensitive_features=A_train)
+    >>>   predictors = exp_grad_est.predictors_
+    >>>   return predictors
+
+The performance-fairness trade-off learned by the ExponentiatedGradient model is 
+sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparameter 
+and iterated over a range of potential values.
+
+
 References
 ----------
 
