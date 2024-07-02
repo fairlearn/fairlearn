@@ -2,10 +2,7 @@
 
 .. currentmodule:: {{ module }}
 
-.. autoclass:: {{ objname }}
-    :members:
-    :undoc-members:
-    :inherited-members:
+.. autofunction:: {{ module }}.{{ objname }}
 
 .. _sphx_glr_backreferences_{{ module }}.{{ objname }}:
 

@@ -60,7 +60,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
     "sphinx_gallery.gen_gallery",
-    "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
+    "sphinx_autodoc_typehints",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_prompt",
@@ -91,6 +91,7 @@ templates_path = ["templates"]
 
 # generate autosummary even if no references
 autosummary_generate = True
+class_members_toctree = False
 numpydoc_show_class_members = False
 
 
@@ -180,6 +181,8 @@ sphinx_gallery_conf = {
     "gallery_dirs": "auto_examples",
     # pypandoc enables rst to md conversion in downloadable notebooks
     "pypandoc": True,
+    "backreferences_dir": os.path.join("modules", "generated"),
+    "doc_module": ("fairlearn",),
 }
 
 html_sidebars = {
