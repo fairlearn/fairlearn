@@ -100,7 +100,7 @@ prediction task.
     >>> import matplotlib.pyplot as plt
     >>> from fairlearn.datasets import fetch_diabetes_hospital
     >>> data = fetch_diabetes_hospital(as_frame=True)
-    >>> X = data.data
+    >>> X = data.data.copy()
     >>> X.drop(columns=["readmitted", "readmit_binary"], inplace=True)
     >>> y = data.target
     >>> X_ohe = pd.get_dummies(X)
@@ -143,7 +143,7 @@ we can evaluate metrics for subgroups within the data as below:
     DecisionTreeClassifier(...)
     >>> y_pred = (classifier.predict_proba(X_test)[:,1] >= 0.1)
     >>> mf = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
-    >>> mf.overall
+    >>> mf.overall.item()
     0.514...
     >>> mf.by_group
     race
@@ -173,7 +173,7 @@ the model does not predict that outcome.
 
     >>> from fairlearn.metrics import false_negative_rate
     >>> mf = MetricFrame(metrics=false_negative_rate, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
-    >>> mf.overall
+    >>> mf.overall.item()
     0.309...
     >>> mf.by_group
     race
@@ -224,7 +224,7 @@ as the objective, leading to a vastly reduced difference in accuracy:
     ExponentiatedGradient(...)
     >>> y_pred_mitigated = mitigator.predict(X_test)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
-    >>> mf_mitigated.overall
+    >>> mf_mitigated.overall.item()
     0.5251...
     >>> mf_mitigated.by_group
     race

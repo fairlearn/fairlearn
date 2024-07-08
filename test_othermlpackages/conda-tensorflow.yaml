@@ -5,8 +5,9 @@ channels:
 dependencies:
 - python>=3.10
 - pip>=19.1.1
+- numpy>=1.24.4, <2
 - pytest
 - pytest-cov
 - tensorflow
 - pip:
-   - scikeras[tensorflow-cpu]<0.13
+   - scikeras[tensorflow-cpu]
