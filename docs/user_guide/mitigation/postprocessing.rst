@@ -68,7 +68,7 @@ true positive rate parity as the fairness constraint.
     >>> # In a real application, this would be a red flag to investigate data collection.
     >>> keep_idx = (data.data['gender'] == "Male") | (data.data['gender'] == "Female")
     >>> X_raw = data.data[keep_idx].copy()
-    >>> y = data.target[keep_idx]
+    >>> y = data.target[keep_idx].copy()
     >>> categorical_columns = [
     ...     'race', 'gender', 'age', 'discharge_disposition_id', 'admission_source_id',
     ...     'medical_specialty', 'primary_diagnosis', 'readmitted', 'max_glu_serum',
