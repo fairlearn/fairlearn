@@ -314,6 +314,7 @@ lgb_params = {
     "max_depth": 3,
     "random_state": rand_seed,
     "n_jobs": 1,
+    "verbose": -1,
 }
 
 estimator = Pipeline(
