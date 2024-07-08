@@ -195,7 +195,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         .. versionchanged:: 0.7
             From version 0.7, 'predict' is deprecated as the default value and
-            the default will change to 'auto' from v0.10.
+            the default changes to 'auto' from v0.10.
 
     Notes
     -----
@@ -236,7 +236,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         grid_size=1000,
         flip=False,
         prefit=False,
-        predict_method="deprecated",
+        predict_method="auto",
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -278,17 +278,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        if self.predict_method == "deprecated":
-            warn(
-                "'predict_method' default value is changed from 'predict' to "
-                "'auto'. Explicitly pass `predict_method='predict' to "
-                "replicate the old behavior, or pass `predict_method='auto' "
-                "or other valid values to silence this warning.",
-                FutureWarning,
-            )
-            self._predict_method = "predict"
-        else:
-            self._predict_method = self.predict_method
+        self._predict_method = self.predict_method
 
         if kwargs.get(_KW_CONTROL_FEATURES) is not None:
             raise ValueError(NO_CONTROL_FEATURES)
