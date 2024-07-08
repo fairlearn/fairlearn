@@ -85,7 +85,7 @@ class ErrorRate(ClassificationMoment):
         total_fn_cost = np.sum(signed_errors[signed_errors > 0] * self.fn_cost)
         total_fp_cost = np.sum(-signed_errors[signed_errors < 0] * self.fp_cost)
         error_value = (total_fn_cost + total_fp_cost) / self.total_samples
-        error = pd.Series(data=error_value, index=self.index).copy()
+        error = pd.Series(data=error_value, index=self.index)
         self._gamma_descr = str(error)
         return error
 
