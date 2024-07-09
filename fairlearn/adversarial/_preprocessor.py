@@ -203,7 +203,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
             # Because we are kind, we try to translate back to the original data
             # type, but we only support DataFrame, Series, list(, ndarray).
-            if self.in_type_ == DataFrame:
+            if self.in_type_ is DataFrame:
                 inverse = DataFrame(inverse, columns=self.columns_)
             elif self.in_type_ is Series:
                 inverse = Series(inverse)
