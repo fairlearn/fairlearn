@@ -1000,7 +1000,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_classifiers_train": ("the output must be of type numpy.array."),
                 "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_classifier_data_not_an_array": ("data must be transformed into an array."),
-                "check_supervised_y_no_nan": ("cannot fit an array with inf values."),
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
@@ -1248,7 +1247,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
                 "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
                 "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
-                "check_supervised_y_no_nan": ("cannot fit an array with inf values."),
                 "check_regressor_data_not_an_array": ("data must be transformed into an array."),
                 "check_regressors_no_decision_function": (
                     "regressors should not have a decision function."
