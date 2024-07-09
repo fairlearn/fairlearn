@@ -105,7 +105,7 @@ def test_examples():
             predictions == pos_label,
             sensitive_features=Z_test,
         )
-        accuracy = mean(predictions.values == Y_test.values)
+        accuracy = mean(predictions == Y_test.values)
         selection_rate = mean(predictions == pos_label)
         return dp_diff, accuracy, selection_rate
 
