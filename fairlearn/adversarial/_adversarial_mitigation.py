@@ -14,7 +14,7 @@ from sklearn.base import (
 )
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_scalar
-from sklearn.utils.validation import check_array, check_is_fitted, check_random_state
+from sklearn.utils.validation import check_is_fitted, check_random_state
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -577,7 +577,9 @@ class _AdversarialFairness(BaseEstimator):
             Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
-        X = check_X(X)
+        X = self._validate_data(
+            X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
+        )
 
         Y_pred = self.backendEngine_.evaluate(X)
         return Y_pred
@@ -601,7 +603,9 @@ class _AdversarialFairness(BaseEstimator):
             the (discrete) :code:`predictor_function`
         """
         check_is_fitted(self)
-        X = check_X(X)
+        X = self._validate_data(
+            X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
+        )
 
         Y_pred = self.backendEngine_.evaluate(X)
         Y_pred = self.predictor_function_(Y_pred)
@@ -617,7 +621,10 @@ class _AdversarialFairness(BaseEstimator):
         then always call `__setup`.
         """
         if not self.skip_validation:
-            X = check_X(X)
+            X = self._validate_data(
+                X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
+            )
+            Y = self._validate_data(Y, ensure_2d=False)
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -1255,24 +1262,3 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
             },
             "requires_positive_X": True,
         }
-
-
-def check_X(X):
-    """
-    Validate the input array, and possible coerce to 2D.
-
-    Calls :code:`sklearn.utils.check_array` on parameter X with the
-    parameters suited for Adversarial Mitigation.
-
-    Returns
-    -------
-    X : numpy.ndarray
-        Cleaned data.
-    """
-    return check_array(
-        X,
-        accept_sparse=False,
-        accept_large_sparse=False,
-        dtype=float,
-        allow_nd=True,
-    ).astype(float)
