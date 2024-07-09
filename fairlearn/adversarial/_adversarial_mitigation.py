@@ -204,8 +204,8 @@ class _AdversarialFairness(BaseEstimator):
         self,
         *,
         backend="auto",
-        predictor_model=[],  # [] is a NN with no hidden layers.
-        adversary_model=[],
+        predictor_model=None,
+        adversary_model=None,
         predictor_loss="auto",
         adversary_loss="auto",
         predictor_function="auto",
@@ -458,6 +458,16 @@ class _AdversarialFairness(BaseEstimator):
                     ),
                 )
             )
+
+        if self.predictor_model is not None:
+            predictor_model = self.predictor_model
+        else:
+            predictor_model = []  # [] is a NN with no hidden layers # noqa: F841
+
+        if self.adversary_model is not None:
+            adversary_model = self.adversary_model
+        else:
+            adversary_model = []  # noqa: F841
 
         if self.batch_size == -1:
             batch_size = X.shape[0]
@@ -782,9 +792,6 @@ class _AdversarialFairness(BaseEstimator):
     def _more_tags(self):
         return {
             "_xfail_checks": {
-                "check_parameters_default_constructible": (
-                    "cannot have an empty default parameter of a mutable type."
-                ),
                 "check_estimators_pickle": "pickling is not possible.",
             }
         }
@@ -944,8 +951,8 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         self,
         *,
         backend="auto",
-        predictor_model=[],  # [] is a NN with no hidden layers (linear NN).
-        adversary_model=[],
+        predictor_model=None,
+        adversary_model=None,
         predictor_optimizer="Adam",
         adversary_optimizer="Adam",
         constraints="demographic_parity",
@@ -990,9 +997,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
-                "check_parameters_default_constructible": (
-                    "cannot have an empty default parameter of a mutable type."
-                ),
                 "check_estimators_pickle": "pickling is not possible.",
                 "check_classifiers_train(readonly_memmap=True)": (
                     "the output must be of type numpy.array."
@@ -1163,8 +1167,8 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         self,
         *,
         backend="auto",
-        predictor_model=[],  # [] is a NN with no hidden layers (linear NN).
-        adversary_model=[],
+        predictor_model=None,
+        adversary_model=None,
         predictor_optimizer="Adam",
         adversary_optimizer="Adam",
         constraints="demographic_parity",
@@ -1209,9 +1213,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
-                "check_parameters_default_constructible": (
-                    "cannot have an empty default parameter of a mutable type."
-                ),
                 "check_estimators_pickle": "pickling is not possible.",
                 "check_fit2d_predict1d": ("regressor estimator cannot look like multiclass."),
                 "check_dict_unchanged": ("regressor estimator cannot look like binary."),
