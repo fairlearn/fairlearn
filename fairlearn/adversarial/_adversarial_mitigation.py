@@ -1005,10 +1005,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
-                "check_classifiers_train(readonly_memmap=True)": (
-                    "the output must be of type numpy.array."
-                ),
-                "check_classifiers_train": ("the output must be of type numpy.array."),
                 "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_classifier_data_not_an_array": ("data must be transformed into an array."),
                 "check_non_transformer_estimators_n_iter": (
