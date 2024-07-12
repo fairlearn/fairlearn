@@ -160,6 +160,13 @@ classification task.
    *  - PINCP
       - Total annual income per person, denoted as an integer ranging from 104 to 1,423,000.
 
+.. _using_acsincome_dataset:
+
+Using the dataset
+^^^^^^^^^^^^^^^^^
+The dataset can be loaded via the :func:`fairlearn.datasets.fetch_acs_income`
+function. By default, the dataset is returned as a :class:`pandas.DataFrame`.
+
 
 .. topic:: References:
 
