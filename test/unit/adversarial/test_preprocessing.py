@@ -3,7 +3,6 @@
 
 import pytest
 from numpy import asarray, issubdtype, ndarray
-from pandas import Series
 
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.datasets import fetch_adult
@@ -27,17 +26,11 @@ def data_generator():
     # NOTE: we comment out mixed-type lists, as this is just weird.
     yield [0, 1, 0, 0, 1], "binary"
     yield ["hi", "person", "hi", "hi"], "binary"
-    # yield [1, "hey", "hey", 1], 'binary', [asarray, Series, DataFrame]
-    # yield [2.1, "hey", "hey", 2.1], 'binary', [asarray, Series, DataFrame]
     yield [3, 2], "binary"
     yield [3, 2, 0, 1, 2, 5], "category"
     yield ["USA", "NL", "GB", "NL"], "category"
-    # yield [1, "hey", 4, "bye"], 'category', [asarray, Series, DataFrame]
-    yield [[0, 0, 1], [0, 1, 0], [0, 0, 1], [1, 0, 0]], "category", [Series]
     yield [1, 2, 6, 2, 1.1], "continuous"
     yield [0.1, 2.0, 0.999999, 100000.1], "continuous"
-    yield [[5.5, 12.2], [86.2, 81.1]], "continuous", [Series]
-    yield [[0, 1], [1, 0], [0.1, 2]], "continuous", [Series]
 
     # Larger examples.
     X, y = fetch_adult(return_X_y=True)

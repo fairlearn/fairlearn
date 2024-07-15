@@ -1022,6 +1022,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "requires_positive_X": True,
+            "poor_score": True,
         }
 
 

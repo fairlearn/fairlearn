@@ -198,8 +198,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         else:
             inverse = self.transform_.inverse_transform(y)
 
-        inverse = inverse.reshape(-1) if self.input_dim_ == 1 else inverse
-        return inverse
+        return inverse.reshape(-1) if self.input_dim_ == 1 else inverse
 
 
 def _get_type(data, assumption):
