@@ -266,6 +266,7 @@ class _AdversarialFairness(BaseEstimator):
         infer something appropriate from data (see interpret_keyword).
         """
         self._validate_backend()
+        # Y = self._validate_data(Y)
 
         # Verify the constraints and set up the corresponding network structure.
         if self.constraints == "demographic_parity":

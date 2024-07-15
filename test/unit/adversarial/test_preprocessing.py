@@ -1,10 +1,11 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from fairlearn.adversarial._preprocessor import FloatTransformer
 import pytest
-from pandas import DataFrame, Series
-from numpy import ndarray, asarray, issubdtype
+from numpy import asarray, issubdtype, ndarray
+from pandas import Series
+
+from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.datasets import fetch_adult
 
 
@@ -63,15 +64,13 @@ def checker(data, dist_type):
         and is_equal
         or isinstance(is_equal, ndarray)
         and is_equal.all()
-        or isinstance(is_equal, Series)
-        and is_equal.all()
-        or isinstance(is_equal, DataFrame)
+        or isinstance(is_equal, ndarray)
         and is_equal.all().all()
     )
 
 
 @pytest.mark.parametrize("data", list(data_generator()))
-@pytest.mark.parametrize("data_type", [None, DataFrame, Series, asarray])
+@pytest.mark.parametrize("data_type", [None, asarray])
 def test_data_as_datatypes(data, data_type):
     data, dist_type, *other = data
     if data_type:

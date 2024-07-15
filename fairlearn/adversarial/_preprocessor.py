@@ -5,7 +5,7 @@ from numpy import all as np_all
 from numpy import isin
 from numpy import sum as np_sum
 from numpy import unique
-from pandas import DataFrame, Series
+from pandas import DataFrame
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
@@ -188,32 +188,17 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
-        inverse = None
-        if isinstance(self.transformer, str):
-            if self.inferred_type_ in ["binary", "multiclass"]:
-                inverse = self.transform_.inverse_transform(y)
-            else:
-                # This is for:
-                # self.inferred_type_ in "continuous", "continuous-multioutput",
-                #                        "multilabel-indicator"
-                inverse = y
-
-            if self.input_dim_ == 1:
-                inverse = inverse.reshape(-1)
-
-            # Because we are kind, we try to translate back to the original data
-            # type, but we only support DataFrame, Series, list(, ndarray).
-            if self.in_type_ is DataFrame:
-                inverse = DataFrame(inverse, columns=self.columns_)
-            elif self.in_type_ is Series:
-                inverse = Series(inverse)
-            elif self.in_type_ is list:
-                inverse = inverse.tolist()
-        elif self.transformer is None:
+        if (
+            self.transformer is None
+            or isinstance(self.transformer, str)
+            and self.inferred_type_
+            in ["continuous", "continuous-multioutput", "multilabel-indicator"]
+        ):
             inverse = y
         else:
             inverse = self.transform_.inverse_transform(y)
 
+        inverse = inverse.reshape(-1) if self.input_dim_ == 1 else inverse
         return inverse
 
 
