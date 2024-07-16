@@ -13,8 +13,7 @@ from sklearn.base import (
     TransformerMixin,
 )
 from sklearn.exceptions import NotFittedError
-from sklearn.utils import check_scalar
-from sklearn.utils.validation import check_is_fitted, check_random_state
+from sklearn.utils.validation import check_is_fitted, check_random_state, check_scalar
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -445,7 +444,7 @@ class _AdversarialFairness(BaseEstimator):
             training data.
         """
         X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
-        self.classes_ = unique(y)
+        self.classes_ = unique(Y)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -1010,7 +1009,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 ),
                 "check_classifiers_train": ("the output must be of type numpy.array."),
                 "check_estimators_overwrite_params": "pickling is not possible.",
-                "check_classifier_data_not_an_array": ("data must be transformed into an array."),
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
