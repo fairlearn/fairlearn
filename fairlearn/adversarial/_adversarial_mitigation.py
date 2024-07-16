@@ -1246,14 +1246,10 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_estimators_fit_returns_self": (
                     "regressor estimator cannot look like multiclass."
                 ),
-                "check_estimators_fit_returns_self(readonly_memmap=True)": (
-                    "regressor estimator cannot look like multiclass."
-                ),
                 "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
                 "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
                 "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
                 "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
-                "check_regressor_data_not_an_array": ("data must be transformed into an array."),
                 "check_regressors_no_decision_function": (
                     "regressors should not have a decision function."
                 ),
