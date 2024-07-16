@@ -8,3 +8,6 @@ v0.11.0
 
 * Added disparity metric :code:`equal_opportunity_{difference,ratio}` as a frequently used alias
   for :code:`true_positive_rate_{difference,ratio}`.
+
+* Removed :code:`_AdversarialFairness.decision_function` because it did not follow the expected contract with
+  :code:`_AdversarialFairness.predict`.
