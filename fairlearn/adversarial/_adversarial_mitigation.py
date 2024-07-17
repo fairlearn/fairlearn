@@ -631,7 +631,11 @@ class _AdversarialFairness(BaseEstimator):
         """
         if not self.skip_validation:
             X = self._validate_data(
-                X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
+                X,
+                accept_sparse=False,
+                accept_large_sparse=False,
+                dtype=float,
+                allow_nd=True,
             )
             Y = self._validate_data(Y, ensure_2d=False)
 
@@ -1017,12 +1021,8 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_classifiers_classes": (
                     "decision function output must match classifier output."
                 ),
-                "check_fit_non_negative": (
-                    "a ValueError should be raised if output is negative. "
-                ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
-            "requires_positive_X": True,
         }
 
 
@@ -1248,12 +1248,11 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 ),
                 "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
                 "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
-                "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
                 "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
+                "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
                 "check_regressors_no_decision_function": (
                     "regressors should not have a decision function."
                 ),
                 "check_regressors_train": ("predictions shape should match targets shape."),
             },
-            "requires_positive_X": True,
         }
