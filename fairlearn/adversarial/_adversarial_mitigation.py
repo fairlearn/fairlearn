@@ -19,6 +19,7 @@ from sklearn.utils.validation import (
     check_is_fitted,
     check_random_state,
 )
+
 from ._backend_engine import BackendEngine
 from ._constants import (
     _CALLBACK_RETURNS_ERROR,
@@ -427,7 +428,7 @@ class _AdversarialFairness(BaseEstimator):
 
         self._is_setup = True
 
-    def fit(self, X, Y, *, sensitive_features=None):
+    def fit(self, X, y, *, sensitive_features=None):
         """
         Fit the model based on the given training data and sensitive features.
 
@@ -447,7 +448,7 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, Y, A = self._validate_input(X, Y, sensitive_features, reinitialize=True)
+        X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
         self.classes_ = unique(Y)
 
         # Not checked in __setup, because partial_fit may not require it.
@@ -1015,9 +1016,11 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_classifiers_classes": (
                     "decision function output must match classifier output."
                 ),
+                "check_fit_non_negative": (
+                    "a ValueError should be raised if output is negative. "
+                ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
-            "requires_positive_X": True,
             "poor_score": True,
         }
 
@@ -1244,9 +1247,8 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 ),
                 "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
                 "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
-                "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
                 "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
-                "check_regressor_data_not_an_array": ("data must be transformed into an array."),
+                "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
                 "check_regressors_train": ("predictions shape should match targets shape."),
             },
         }
