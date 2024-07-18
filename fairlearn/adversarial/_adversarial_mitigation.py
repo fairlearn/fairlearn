@@ -1186,7 +1186,13 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
+<<<<<<< HEAD
                 "check_methods_sample_order_invariance": ("fails for the predict() method."),
+=======
+                "check_methods_sample_order_invariance": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+>>>>>>> 9a97c4d (Fix several failing estimator checks)
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
@@ -1194,12 +1200,15 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_estimators_overwrite_params": ("pickling is not possible."),
                 "check_estimators_partial_fit_n_features": (
 <<<<<<< HEAD
+<<<<<<< HEAD
                     "number of features cannot change between calls of partial_fit"
                 ),
                 "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
             },
             "poor_score": True,
 =======
+=======
+>>>>>>> 9a97c4d (Fix several failing estimator checks)
                     "regressor estimator cannot look like multiclass."
                 ),
                 "check_pipeline_consistency": ("regressor estimator cannot look like binary."),
@@ -1213,5 +1222,15 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
                 "check_regressors_train": ("predictions shape should match targets shape."),
             },
+<<<<<<< HEAD
 >>>>>>> 942d5c5 (Fix check_fit_non_negative failing estimator check (+3 others) (#1398))
+=======
+=======
+                    "number of features cannot change between calls of partial_fit"
+                ),
+                "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
+            },
+            "poor_score": True,
+>>>>>>> c4dcaf7 (Fix several failing estimator checks)
+>>>>>>> 9a97c4d (Fix several failing estimator checks)
         }
