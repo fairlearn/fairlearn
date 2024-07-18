@@ -219,17 +219,20 @@ def _get_type(data, assumption):
     if inferred == "binary" and assumption in [
         "binary",
         "classification",
+        "continuous",
         "auto",
     ]:
         return "binary"
     elif inferred in ["multiclass", "multilabel-indicator"] and assumption in [
         "category",
+        "continuous",
         "classification",
         "auto",
     ]:
         return "category"
     elif inferred in ["continuous", "continuous-multioutput"] and assumption in [
         "continuous",
+        "binary",
         "auto",
     ]:
         return "continuous"

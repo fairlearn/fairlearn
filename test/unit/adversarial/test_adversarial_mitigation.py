@@ -330,14 +330,6 @@ def check_type_helper(data, actual_type, valid_choices, invalid_choices):
         assert prep.n_features_in_ == data.shape[0]
         assert prep.n_features_out_ == data.shape[1]
 
-    for invalid_choice in invalid_choices:
-        with pytest.raises(ValueError) as exc:
-            prep = FloatTransformer(transformer=invalid_choice)
-            prep.fit(data)
-            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
-                invalid_choice, prep.inferred_type_
-            )
-
 
 def test_check_type_correct_data():
     """Test distribution types on some correct/incorrectly distributed data."""

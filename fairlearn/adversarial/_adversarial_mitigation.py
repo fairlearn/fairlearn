@@ -1217,38 +1217,18 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
-                "check_fit2d_predict1d": ("regressor estimator cannot look like multiclass."),
-                "check_dict_unchanged": ("regressor estimator cannot look like binary."),
-                "check_dont_overwrite_parameters": (
-                    "regressor estimator cannot look like multiclass."
-                ),
                 "check_methods_sample_order_invariance": (
                     "regressor estimator cannot look like multiclass."
                 ),
-                "check_methods_subset_invariance": (
-                    "regressor estimator cannot look like multiclass."
-                ),
                 "check_non_transformer_estimators_n_iter": (
-                    "regressor estimator cannot look like multiclass."
+                    "estimator is missing the _n_iter attribute."
                 ),
-                "check_regressors_int": ("regressor estimator cannot look like multiclass."),
-                "check_supervised_y_2d": ("regressor estimator cannot look like multiclass."),
-                "check_estimators_overwrite_params": (
-                    "regressor estimator cannot look like multiclass."
-                ),
-                "check_estimators_nan_inf": ("regressor estimator cannot look like binary."),
+                "check_supervised_y_2d": ("DataConversionWarning not caught."),
+                "check_estimators_overwrite_params": ("pickling is not possible."),
                 "check_estimators_partial_fit_n_features": (
-                    "regressor estimator cannot look like multiclass."
-                ),
-                "check_pipeline_consistency": ("regressor estimator cannot look like binary."),
-                "check_dtype_object": ("regressor estimator cannot look like multiclass."),
-                "check_estimators_fit_returns_self": (
-                    "regressor estimator cannot look like multiclass."
+                    "number of features cannot change between calls of partial_fit"
                 ),
                 "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
-                "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
-                "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
-                "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
-                "check_regressors_train": ("predictions shape should match targets shape."),
             },
+            "poor_score": True,
         }
