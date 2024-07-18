@@ -14,7 +14,11 @@ from sklearn.base import (
 )
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_scalar
-from sklearn.utils.validation import check_is_fitted, check_random_state
+from sklearn.utils.validation import (
+    check_consistent_length,
+    check_is_fitted,
+    check_random_state,
+)
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -572,7 +576,7 @@ class _AdversarialFairness(BaseEstimator):
 
         return self
 
-    def decision_function(self, X):
+    def _raw_predict(self, X):
         """
         Compute predictor output for given test data.
 
@@ -588,9 +592,13 @@ class _AdversarialFairness(BaseEstimator):
         """
         check_is_fitted(self)
         X = self._validate_data(
-            X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
+            X,
+            accept_sparse=False,
+            accept_large_sparse=False,
+            dtype=float,
+            allow_nd=True,
+            reset=False,
         )
-
         Y_pred = self.backendEngine_.evaluate(X)
         return Y_pred
 
@@ -612,12 +620,7 @@ class _AdversarialFairness(BaseEstimator):
             array-like containing the model's predictions fed through
             the (discrete) :code:`predictor_function`
         """
-        check_is_fitted(self)
-        X = self._validate_data(
-            X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
-        )
-
-        Y_pred = self.backendEngine_.evaluate(X)
+        Y_pred = self._raw_predict(X)
         Y_pred = self.predictor_function_(Y_pred)
         Y_pred = self._y_transform.inverse_transform(Y_pred)
         return Y_pred
@@ -632,9 +635,16 @@ class _AdversarialFairness(BaseEstimator):
         """
         if not self.skip_validation:
             X = self._validate_data(
-                X, accept_sparse=False, accept_large_sparse=False, dtype=float, allow_nd=True
+                X,
+                accept_sparse=False,
+                accept_large_sparse=False,
+                dtype=float,
+                allow_nd=True,
             )
             Y = self._validate_data(Y, ensure_2d=False)
+
+        check_consistent_length(X, Y)
+        check_consistent_length(X, A)
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -653,14 +663,6 @@ class _AdversarialFairness(BaseEstimator):
         if not self.skip_validation:
             Y = self._y_transform.transform(Y)
             A = self._sf_transform.transform(A)
-
-        # Check for equal number of samples
-        if not (X.shape[0] == Y.shape[0] and X.shape[0] == A.shape[0]):
-            raise ValueError(
-                "Input data has an ambiguous number of rows: {}, {}, {}.".format(
-                    X.shape[0], Y.shape[0], A.shape[0]
-                )
-            )
 
         if not self.skip_validation:
             # Some backendEngine may want to do some additional preprocessing,
@@ -1005,10 +1007,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
-                "check_classifiers_train(readonly_memmap=True)": (
-                    "the output must be of type numpy.array."
-                ),
-                "check_classifiers_train": ("the output must be of type numpy.array."),
                 "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_classifier_data_not_an_array": ("data must be transformed into an array."),
                 "check_non_transformer_estimators_n_iter": (
@@ -1025,6 +1023,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "requires_positive_X": True,
+            "poor_score": True,
         }
 
 
@@ -1256,9 +1255,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
                 "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
                 "check_regressor_data_not_an_array": ("data must be transformed into an array."),
-                "check_regressors_no_decision_function": (
-                    "regressors should not have a decision function."
-                ),
                 "check_regressors_train": ("predictions shape should match targets shape."),
             },
             "requires_positive_X": True,
