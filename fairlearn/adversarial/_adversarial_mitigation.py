@@ -258,7 +258,7 @@ class _AdversarialFairness(BaseEstimator):
         self.warm_start = warm_start
         self.random_state = random_state
 
-    def __setup(self, X, Y, A):
+    def __setup(self, X, y, A):
         """
         Initialize the entire model from the parameters and the given data.
 
@@ -377,9 +377,9 @@ class _AdversarialFairness(BaseEstimator):
             else:
                 return kw_or_func
 
-        self.predictor_loss_ = read_kw(Y, self.predictor_loss, "predictor_loss")
+        self.predictor_loss_ = read_kw(y, self.predictor_loss, "predictor_loss")
         self.adversary_loss_ = read_kw(A, self.adversary_loss, "adversary_loss")
-        self.predictor_function_ = read_kw(Y, self.predictor_function, "predictor_function")
+        self.predictor_function_ = read_kw(y, self.predictor_function, "predictor_function")
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
@@ -403,7 +403,7 @@ class _AdversarialFairness(BaseEstimator):
 
         self._y_transform = FloatTransformer(transformer=self.y_transform)
         self._sf_transform = FloatTransformer(transformer=self.sf_transform)
-        self._y_transform.fit(Y)
+        self._y_transform.fit(y)
         self._sf_transform.fit(A)
 
         if self.cuda and not isinstance(self.cuda, str):
@@ -420,7 +420,7 @@ class _AdversarialFairness(BaseEstimator):
 
         # Initialize backend
         # here, losses and optimizers are also set up.
-        self.backendEngine_ = self.backend_(self, X, Y, A)
+        self.backendEngine_ = self.backend_(self, X, y, A)
 
         # Sklearn-parameters
         self.n_features_in_ = X.shape[1]
@@ -448,8 +448,8 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
-        self.classes_ = unique(Y)
+        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
+        self.classes_ = unique(y)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -493,7 +493,7 @@ class _AdversarialFairness(BaseEstimator):
         self.step_ = 0
         for epoch in range(epochs):
             if self.shuffle:
-                X, Y, A = self.backendEngine_.shuffle(X, Y, A)
+                X, y, A = self.backendEngine_.shuffle(X, y, A)
             for batch in range(batches):
                 if self.progress_updates:
                     if (time() - last_update_time) > self.progress_updates:
@@ -531,7 +531,7 @@ class _AdversarialFairness(BaseEstimator):
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
                 (LP, LA) = self.backendEngine_.train_step(
-                    X[batch_slice], Y[batch_slice], A[batch_slice]
+                    X[batch_slice], y[batch_slice], A[batch_slice]
                 )
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
@@ -571,8 +571,8 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive feature of the
             training data.
         """
-        X, Y, A = self._validate_input(X, y, sensitive_features, reinitialize=False)
-        self.backendEngine_.train_step(X, Y, A)
+        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=False)
+        self.backendEngine_.train_step(X, y, A)
 
         return self
 
@@ -599,8 +599,8 @@ class _AdversarialFairness(BaseEstimator):
             allow_nd=True,
             reset=False,
         )
-        Y_pred = self.backendEngine_.evaluate(X)
-        return Y_pred
+        y_pred = self.backendEngine_.evaluate(X)
+        return y_pred
 
     def predict(self, X):
         """
@@ -620,12 +620,12 @@ class _AdversarialFairness(BaseEstimator):
             array-like containing the model's predictions fed through
             the (discrete) :code:`predictor_function`
         """
-        Y_pred = self._raw_predict(X)
-        Y_pred = self.predictor_function_(Y_pred)
-        Y_pred = self._y_transform.inverse_transform(Y_pred)
-        return Y_pred
+        y_pred = self._raw_predict(X)
+        y_pred = self.predictor_function_(y_pred)
+        y_pred = self._y_transform.inverse_transform(y_pred)
+        return y_pred
 
-    def _validate_input(self, X, Y, A, reinitialize=False):
+    def _validate_input(self, X, y, A, reinitialize=False):
         """
         Validate the input data and possibly setup this estimator.
 
@@ -641,9 +641,9 @@ class _AdversarialFairness(BaseEstimator):
                 dtype=float,
                 allow_nd=True,
             )
-            Y = self._validate_data(Y, ensure_2d=False)
+            y = self._validate_data(y, ensure_2d=False)
 
-        check_consistent_length(X, Y)
+        check_consistent_length(X, y)
         check_consistent_length(X, A)
 
         try:  # TODO check this
@@ -655,13 +655,13 @@ class _AdversarialFairness(BaseEstimator):
         if A is None:
             logger.warning("No sensitive_features provided")
             logger.warning("Setting sensitive_features to zeros")
-            A = zeros(len(Y))
+            A = zeros(len(y))
 
         if (not is_fitted) or (reinitialize):
-            self.__setup(X, Y, A)
+            self.__setup(X, y, A)
 
         if not self.skip_validation:
-            Y = self._y_transform.transform(Y)
+            y = self._y_transform.transform(y)
             A = self._sf_transform.transform(A)
 
         if not self.skip_validation:
@@ -669,9 +669,9 @@ class _AdversarialFairness(BaseEstimator):
             # such as moving to GPU.
             attr = getattr(self.backendEngine_, "validate_input", None)
             if attr:
-                X, Y, A = attr(X, Y, A)
+                X, y, A = attr(X, y, A)
 
-        return X, Y, A
+        return X, y, A
 
     def _validate_backend(self):
         """
