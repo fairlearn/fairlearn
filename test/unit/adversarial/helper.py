@@ -11,15 +11,15 @@ here. Additionally, we generate data here.
 """
 
 import sys
+
 import numpy as np
 
 from fairlearn.adversarial._adversarial_mitigation import (
     _AdversarialFairness,  # We just test the base class because this covers all
 )
+from fairlearn.adversarial._backend_engine import BackendEngine
 from fairlearn.adversarial._pytorch_engine import PytorchEngine
 from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
-from fairlearn.adversarial._backend_engine import BackendEngine
-
 
 model_class = type("Model", (object,), {})
 
@@ -249,7 +249,7 @@ class RemoveAll(BackendEngine):
         rows = len(X)
         y = []
         for row in range(rows):
-            rng = np.random.default_rng(int(np.round(np.mean(X[row]) * (2**32))))
+            rng = np.random.default_rng(int(np.round(np.mean(abs(X[row])) * (2**32))))
             y.append(rng.random(cols))
         return np.stack(y)
 
