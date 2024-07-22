@@ -1193,9 +1193,25 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_supervised_y_2d": ("DataConversionWarning not caught."),
                 "check_estimators_overwrite_params": ("pickling is not possible."),
                 "check_estimators_partial_fit_n_features": (
+<<<<<<< HEAD
                     "number of features cannot change between calls of partial_fit"
                 ),
                 "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
             },
             "poor_score": True,
+=======
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_pipeline_consistency": ("regressor estimator cannot look like binary."),
+                "check_dtype_object": ("regressor estimator cannot look like multiclass."),
+                "check_estimators_fit_returns_self": (
+                    "regressor estimator cannot look like multiclass."
+                ),
+                "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
+                "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
+                "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
+                "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
+                "check_regressors_train": ("predictions shape should match targets shape."),
+            },
+>>>>>>> 942d5c5 (Fix check_fit_non_negative failing estimator check (+3 others) (#1398))
         }
