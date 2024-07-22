@@ -42,12 +42,11 @@ def data_generator():
     # yield X['capital-loss'], 'continuous' # FIXME: what should this be?
 
 
-def checker(data, dist_type):
+def checker(data):
     transformer = FloatTransformer()
     transformed = transformer.fit_transform(data)
     assert isinstance(transformed, ndarray)
     assert issubdtype(transformed.dtype, float)
-    assert transformer.dist_type_ == dist_type
 
     original = transformer.inverse_transform(transformed)
     print(original)
@@ -65,9 +64,9 @@ def checker(data, dist_type):
 @pytest.mark.parametrize("data", list(data_generator()))
 @pytest.mark.parametrize("data_type", [None, asarray])
 def test_data_as_datatypes(data, data_type):
-    data, dist_type, *other = data
+    data, _, *other = data
     if data_type:
         if len(other) > 0 and data_type in other[0]:
             return
         data = data_type(data)
-    checker(data, dist_type)
+    checker(data)

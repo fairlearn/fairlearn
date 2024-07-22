@@ -14,6 +14,7 @@ from sklearn.base import (
 )
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_scalar
+from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
     check_consistent_length,
     check_is_fitted,
@@ -28,7 +29,7 @@ from ._constants import (
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
 )
-from ._preprocessor import FloatTransformer, _get_type
+from ._preprocessor import FloatTransformer
 from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
 
@@ -341,39 +342,7 @@ class _AdversarialFairness(BaseEstimator):
 
         def read_kw(data, kw_or_func, kwname):
             if isinstance(kw_or_func, str) or kw_or_func is None:
-                # Possible remove some of these keywords in the future
-                if kw_or_func in [
-                    "auto",
-                    "classification",
-                    "binary",
-                    "continuous",
-                    "category",
-                ]:
-                    expected_dist = kw_or_func
-                elif kw_or_func in [
-                    "logistic_loss",
-                    "cross_entropy_loss",
-                    "log_loss",
-                ]:
-                    expected_dist = "classification"
-                elif kw_or_func in [
-                    "multinomial_logistic_loss",
-                    "argmax",
-                    "categorical_cross_entropy_loss",
-                ]:
-                    expected_dist = "category"
-                elif kw_or_func in ["threshold"]:
-                    expected_dist = "binary"
-                elif kw_or_func in ["square_loss", None]:
-                    expected_dist = "continuous"
-                else:
-                    raise ValueError(
-                        _KWARG_ERROR_MESSAGE.format(
-                            kwname,
-                            "A valid keyword or a callable",
-                        )
-                    )
-                return _get_type(data, expected_dist)
+                return type_of_target(data)
             else:
                 return kw_or_func
 
@@ -776,7 +745,7 @@ class _AdversarialFairness(BaseEstimator):
                 self.predictor_function_ = lambda pred: (pred >= self.threshold_value).astype(
                     float
                 )
-            elif kw == "category":
+            elif kw in ["multiclass", "multilabel-indicator"]:
 
                 def loss(pred):
                     shape = pred.shape
@@ -787,7 +756,7 @@ class _AdversarialFairness(BaseEstimator):
                     return b
 
                 self.predictor_function_ = loss
-            elif kw == "continuous":
+            elif kw in ["continuous", "continuous-multioutput"]:
                 self.predictor_function_ = lambda pred: pred
             else:
                 raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
@@ -1217,9 +1186,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
-                "check_methods_sample_order_invariance": (
-                    "regressor estimator cannot look like multiclass."
-                ),
+                "check_methods_sample_order_invariance": ("fails for the predict() method."),
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),

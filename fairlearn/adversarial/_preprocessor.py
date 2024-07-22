@@ -1,25 +1,13 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from numpy import all as np_all
-from numpy import isin
-from numpy import sum as np_sum
 from numpy import unique
-from pandas import DataFrame
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 
 import fairlearn.utils._compatibility as compat
-
-from ._constants import (
-    _ARG_ERROR_MESSAGE,
-    _INVALID_OHE,
-    _TYPE_CHECK_ERROR,
-    _TYPE_COMPLIANCE_ERROR,
-    _TYPE_UNKNOWN_ERROR,
-)
 
 # FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
 
@@ -35,20 +23,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
     numerical columns. The usefulness of this class is that it can
     preprocess different kinds of data (discrete, continuous) to one
     standard format while also remembering what kind of data was inputted.
-    An estimator using this preprocessor can use
-    this classes' :code:`dist_type_` attribute to know what kind of data
-    was originally inputted.
-
-    Attributes
-    ----------
-    in_type_ : Object
-        the type of the input data. Should be either a list, DataFrame,
-        ndarray, or Series.
-    dist_type_ : str
-        A string that in dicates the distribution type of the original data.
-        It is one of :code:`"binary"`, :code:`"category"`,
-        or :code:`"continuous"`
-    """  # noqa : RST306
+    """
 
     def __init__(self, transformer="auto"):
         """
@@ -61,23 +36,6 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             :code:`"auto"`, :code:`"one_hot_encoder"`, :code:`"binarizer"`.
             Or, None, for pass-through. Or, a transformer object.
         """
-        if isinstance(transformer, str) or transformer is None:
-            if transformer in [None, "continuous"]:
-                self.dist_assumption = "continuous"
-            elif transformer == "auto":
-                self.dist_assumption = "auto"
-            elif transformer in ["one_hot_encoder", "category"]:
-                self.dist_assumption = "category"
-            elif transformer in ["binarizer", "binary"]:
-                self.dist_assumption = "binary"
-            elif transformer == "classification":
-                self.dist_assumption = "classification"
-            else:
-                raise ValueError(
-                    "Can not interpret keyword for preprocessing transformer: " + transformer
-                )
-        # TODO perhaps warn that the user is responsible for preprocessing
-        # correctly to float-matrices?
         self.transformer = transformer
 
     def _check(self, X, dtype=None, init=False):
@@ -122,14 +80,8 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         # Sci-kit learn parameter
         if isinstance(self.transformer, str) or self.transformer is None:
             self.inferred_type_ = type_of_target(X)
-            self.dist_type_ = _get_type(X, self.dist_assumption)
-            self.in_type_ = type(X)
-            if self.in_type_ == DataFrame:
-                self.columns_ = X.columns
-
             X = self._check(X, init=True)
-            self.n_features_in_ = X.shape[0]
-            self.n_features_out_ = X.shape[1]
+            self.n_features_in_, self.n_features_out_ = X.shape[0], X.shape[1]
 
             if self.inferred_type_ in ["binary", "multiclass"]:
                 # NOTE: if 'binary' then it could be possible it is already 0/1
@@ -151,7 +103,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             # to the transformer.
             X_temp = self._check(X, init=True)
             self.n_features_in_ = X_temp.shape[0]
-            if _get_type(X_temp, self.dist_assumption) == "category":
+            if type_of_target(X_temp) in ["multiclass", "multilabel-indicator"]:
                 self.n_features_out_ = unique(X_temp)
             else:
                 self.n_features_out_ = self.n_features_in_
@@ -166,23 +118,15 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
         if isinstance(self.transformer, str) or self.transformer is None:
-            if not isinstance(X, self.in_type_):
-                raise ValueError(_ARG_ERROR_MESSAGE.format("X", "of type " + self.in_type_))
-            inferred = type_of_target(X)
-            if not inferred == self.inferred_type_:
+            if not type_of_target(X) == self.inferred_type_:
                 raise ValueError(
                     "Inferred distribution type of X does not match " + self.inferred_type_
                 )
-            if not _get_type(X, self.dist_assumption) == self.dist_type_:
-                raise ValueError(_TYPE_CHECK_ERROR.format(self.dist_type_))
-
-            if self.inferred_type_ in ["binary", "multiclass"]:
-                return self.transform_.transform(self._check(X)).astype(float)
-            else:
-                # This is for:
-                # self.inferred_type_ in "continuous", "continuous-multioutput",
-                #                        "multilabel-indicator"
-                return self._check(X, dtype=float)
+            return (
+                self.transform_.transform(self._check(X)).astype(float)
+                if self.inferred_type_ in ["binary", "multiclass"]
+                else self._check(X, dtype=float)
+            )
         else:
             return self.transform_.transform(X)
 
@@ -199,48 +143,3 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
             inverse = self.transform_.inverse_transform(y)
 
         return inverse.reshape(-1) if self.input_dim_ == 1 else inverse
-
-
-def _get_type(data, assumption):
-    """Get the type (binary, category, continuous) of the data under assump."""
-    inferred = type_of_target(data)
-    if inferred == "multilabel-indicator":
-        #  Design choice: multiple binary columns are not supported.
-        #                 multiple columns may only be one-hot encoding
-        # FIXME provide warning and switch to binary2d
-        # or not? because it could be multiple categorical... who knows!
-        if not np_all(np_sum(data, axis=1) == 1):
-            raise ValueError(_TYPE_CHECK_ERROR.format("category"))
-        u = unique(data)
-        if len(u) != 2 or (not isin([0, 1], u).all()):
-            raise ValueError(_INVALID_OHE)
-
-    # Match inferred with dist_assumption
-    if inferred == "binary" and assumption in [
-        "binary",
-        "classification",
-        "continuous",
-        "auto",
-    ]:
-        return "binary"
-    elif inferred in ["multiclass", "multilabel-indicator"] and assumption in [
-        "category",
-        "continuous",
-        "classification",
-        "auto",
-    ]:
-        return "category"
-    elif inferred in ["continuous", "continuous-multioutput"] and assumption in [
-        "continuous",
-        "binary",
-        "auto",
-    ]:
-        return "continuous"
-    elif inferred == "multiclass-multioutput":
-        raise NotImplementedError("multiclass-multioutput not supported")
-        # NOTE we can actually implement this as concatenations of loss
-        # functions, but that is up to the future user to decide for now.
-    elif inferred == "unknown":
-        raise ValueError(_TYPE_UNKNOWN_ERROR)
-
-    raise ValueError(_TYPE_COMPLIANCE_ERROR.format(assumption, inferred))
