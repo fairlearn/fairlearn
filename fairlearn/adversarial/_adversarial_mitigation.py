@@ -556,7 +556,7 @@ class _AdversarialFairness(BaseEstimator):
 
         Returns
         -------
-        Y_pred : numpy.ndarray
+        y_pred : numpy.ndarray
             Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
@@ -585,7 +585,7 @@ class _AdversarialFairness(BaseEstimator):
 
         Returns
         -------
-        Y_pred : array
+        y_pred : array
             array-like containing the model's predictions fed through
             the (discrete) :code:`predictor_function`
         """
@@ -1187,7 +1187,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
                 "check_methods_sample_order_invariance": ("fails for the predict() method."),
-
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
