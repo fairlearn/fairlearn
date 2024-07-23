@@ -985,9 +985,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_classifiers_classes": (
                     "decision function output must match classifier output."
                 ),
-                "check_fit_non_negative": (
-                    "a ValueError should be raised if output is negative. "
-                ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "poor_score": True,
