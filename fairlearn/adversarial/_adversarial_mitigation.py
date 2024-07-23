@@ -612,8 +612,8 @@ class _AdversarialFairness(BaseEstimator):
             )
             y = self._validate_data(y, ensure_2d=False)
 
-        check_consistent_length(X, y)
-        check_consistent_length(X, A)
+            check_consistent_length(X, y)
+            check_consistent_length(X, A)
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -1192,7 +1192,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_estimators_partial_fit_n_features": (
                     "number of features cannot change between calls of partial_fit"
                 ),
-                "check_fit_score_takes_y": "regressor estimator cannot look like multiclass.",
+                "check_fit_score_takes_y": "y_true and y_pred array lengths are not matching",
             },
             "poor_score": True,
         }
