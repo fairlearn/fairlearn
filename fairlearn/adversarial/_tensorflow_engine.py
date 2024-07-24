@@ -1,8 +1,9 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._backend_engine import BackendEngine
 from numpy import finfo, float32
+
+from ._backend_engine import BackendEngine
 
 # dynamic imports.
 tensorflow = None
@@ -101,10 +102,10 @@ class TensorflowEngine(BackendEngine):
         if dist_type == "binary":
             # Use sigmoid as final layer
             return tensorflow.keras.losses.BinaryCrossentropy(from_logits=False)
-        elif dist_type == "category":
+        elif dist_type in ["multiclass", "multilabel-indicator"]:
             # User softmax as final layer
             return tensorflow.keras.losses.CategoricalCrossentropy(from_logits=False)
-        elif dist_type == "continuous":
+        elif dist_type in ["continuous", "continuous-multioutput"]:
             return tensorflow.keras.losses.MeanSquaredError()
         super(TensorflowEngine, self).get_loss(dist_type)
 

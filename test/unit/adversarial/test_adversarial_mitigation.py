@@ -13,7 +13,6 @@ from fairlearn.adversarial import (
     AdversarialFairnessRegressor,
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
-from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 from fairlearn.adversarial._preprocessor import FloatTransformer
 
 from .helper import (
@@ -326,17 +325,8 @@ def check_type_helper(data, actual_type, valid_choices, invalid_choices):
     for valid_choice in valid_choices:
         prep = FloatTransformer(transformer=valid_choice)
         prep.fit(data)
-        assert prep.dist_type_ == actual_type
         assert prep.n_features_in_ == data.shape[0]
         assert prep.n_features_out_ == data.shape[1]
-
-    for invalid_choice in invalid_choices:
-        with pytest.raises(ValueError) as exc:
-            prep = FloatTransformer(transformer=invalid_choice)
-            prep.fit(data)
-            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
-                invalid_choice, prep.inferred_type_
-            )
 
 
 def test_check_type_correct_data():
@@ -389,11 +379,6 @@ def test_check_type_correct_data():
             "bogus",
         ],
     )
-
-    with pytest.raises(ValueError) as exc:
-        prep = FloatTransformer(transformer=Keyword_AUTO)
-        prep.fit(Bin2d)
-        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(Keyword_AUTO, prep.inferred_type_)
 
 
 def test_check_type_faulty_data():

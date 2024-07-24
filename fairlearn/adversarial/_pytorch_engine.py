@@ -133,10 +133,10 @@ class PytorchEngine(BackendEngine):
         if dist_type == "binary":
             # Use sigmoid as last layer
             return torch.nn.BCELoss(reduction="mean")
-        elif dist_type == "category":
+        elif dist_type in ["multiclass", "multilabel-indicator"]:
             # Use logsoftmax as last layer
             return torch.nn.CrossEntropyLoss(reduction="mean")
-        elif dist_type == "continuous":
+        elif dist_type in ["continuous", "continuous-multioutput"]:
             return torch.nn.MSELoss(reduction="mean")
         super(PytorchEngine, self).get_loss(dist_type)
 
