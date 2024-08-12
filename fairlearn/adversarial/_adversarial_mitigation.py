@@ -340,15 +340,8 @@ class _AdversarialFairness(BaseEstimator):
             else:
                 self.callbacks_ = [self.callbacks]
 
-        def read_kw(data, kw_or_func, kwname):
-            if isinstance(kw_or_func, str) or kw_or_func is None:
-                return type_of_target(data)
-            else:
-                return kw_or_func
-
-        self.predictor_loss_ = read_kw(y, self.predictor_loss, "predictor_loss")
-        self.adversary_loss_ = read_kw(A, self.adversary_loss, "adversary_loss")
-        self.predictor_function_ = read_kw(y, self.predictor_function, "predictor_function")
+        self.predictor_loss_ = self.predictor_function_ = type_of_target(y)
+        self.adversary_loss_ = type_of_target(A)
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
