@@ -39,14 +39,7 @@ jobs:
       - run: pip install .
       - run: pip install pytest pytest-cov
       - run: pytest --cov=fairlearn --cov-report=xml test/install
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
-        with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          path_to_write_report: ./coverage/codecov_report.txt
-          verbose: true
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v4.2.0
+        env:
+           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
