@@ -717,6 +717,9 @@ class _AdversarialFairness(BaseEstimator):
             )
         )
 
+    def _binary_predictor_function(self, pred):
+        return (pred >= self.threshold_value).astype(float)
+
     def _set_predictor_function(self):
         """
         Infer prediction function.
@@ -735,9 +738,11 @@ class _AdversarialFairness(BaseEstimator):
         elif isinstance(self.predictor_function_, str):
             kw = self.predictor_function_
             if kw == "binary":
-                self.predictor_function_ = lambda pred: (pred >= self.threshold_value).astype(
-                    float
-                )
+
+                def binarization(pred):
+                    return (pred >= self.threshold_value).astype(float)
+
+                self.predictor_function_ = self._binary_predictor_function
             elif kw in ["multiclass", "multilabel-indicator"]:
 
                 def loss(pred):
@@ -759,13 +764,6 @@ class _AdversarialFairness(BaseEstimator):
     def __sklearn_is_fitted__(self):
         """Speed up check_is_fitted."""
         return hasattr(self, "_is_setup")
-
-    def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-            }
-        }
 
 
 class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
@@ -968,8 +966,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
@@ -1175,13 +1171,11 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
                 "check_methods_sample_order_invariance": ("fails for the predict() method."),
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_estimators_partial_fit_n_features": (
                     "number of features cannot change between calls of partial_fit"
                 ),
