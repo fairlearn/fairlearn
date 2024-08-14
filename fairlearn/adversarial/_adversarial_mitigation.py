@@ -603,7 +603,7 @@ class _AdversarialFairness(BaseEstimator):
                 dtype=float,
                 allow_nd=True,
             )
-            y = self._validate_data(y, ensure_2d=False)
+            y = self._validate_data(y, dtype=None, ensure_2d=False)
 
             check_consistent_length(X, y)
             check_consistent_length(X, A)
@@ -623,7 +623,6 @@ class _AdversarialFairness(BaseEstimator):
             self.__setup(X, y, A)
 
         if not self.skip_validation:
-            y = self._y_transform.transform(y)
             A = self._sf_transform.transform(A)
 
         if not self.skip_validation:
@@ -971,9 +970,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 ),
                 "check_classifiers_regression_target": ("the data cannot look continuous."),
                 "check_estimators_partial_fit_n_features": ("number of features cannot change."),
-                "check_classifiers_classes": (
-                    "decision function output must match classifier output."
-                ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "poor_score": True,

@@ -10,13 +10,7 @@ _INVALID_DATA = (
     "Data of '{}' can not be interpreted. Only continuous data or array " + "with only 0s and 1s."
 )
 _INVALID_OHE = "One-hot-encoded matrix does not contain precisely 0 and 1"
-_PREDICTION_FUNCTION_AMBIGUOUS = (
-    "Can not interpret prediction_function. Please provide a callable as "
-    + "key-word argument that maps soft-probabilities "
-    + "(or more precisely, predictor_model output) "
-    + "to discrete prediction. Or, pass a "
-    + "key-word such as 'binary', 'category', or 'continuous'."
-)
+_PREDICTION_FUNCTION_AMBIGUOUS = "Unknown label type"
 _DIST_TYPE_NOT_IMPLEMENTED = (
     "BackendEngine {} has no loss function defined for the given " + "distribution type {}."
 )
