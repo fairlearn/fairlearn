@@ -23,6 +23,7 @@ from fairlearn.adversarial._pytorch_engine import PytorchEngine
 from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
 
 model_class = type("Model", (object,), {})
+Model = type("Model", (model_class,), {})
 
 Keyword_BINARY = "binary"
 Keyword_CATEGORY = "category"
@@ -160,7 +161,7 @@ class fake_tensorflow:
             class GlorotNormal:  # noqa: D106
                 pass
 
-        Model = type("Model", (model_class,), {})
+        Model = Model
 
         class losses:
             """Mock of tf.keras.losses."""
