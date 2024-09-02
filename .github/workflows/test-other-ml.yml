@@ -58,4 +58,5 @@ jobs:
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage reports to Codecov with GitHub Action
+        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v4.2.0
