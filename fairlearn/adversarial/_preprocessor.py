@@ -1,7 +1,6 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from numpy import unique
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
@@ -95,24 +94,6 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
                 self.n_features_out_ = sum(
                     len(cat) if len(cat) != 2 else 1 for cat in self.transform_.categories_
                 )
-            # elif "multilabel-indicator" needn't be encoded, so we do not create
-            # an encoder then.
-        else:
-            # It is useful to gather n_features_out_ to use in constructing NN
-            # After, we discard the checked data and just feed unchecked data
-            # to the transformer.
-            X_temp = self._check(X, init=True)
-            self.n_features_in_ = X_temp.shape[0]
-            if type_of_target(X_temp) in ["multiclass", "multilabel-indicator"]:
-                self.n_features_out_ = unique(X_temp)
-            else:
-                self.n_features_out_ = self.n_features_in_
-
-            self.transform_ = self.transformer
-            self.transform_.fit(X)
-            if hasattr(self.transform_, "n_features_out_"):
-                self.n_features_out_ = self.transform_.n_features_out_
-
         return self
 
     def transform(self, X):
