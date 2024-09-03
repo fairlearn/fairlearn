@@ -54,7 +54,7 @@ jobs:
       with:
         path: fairlearn
     - name: Download wheel artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: env.WHEEL_ARTIFACT
     - name: Install Fairlearn from wheel
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download wheel artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: env.WHEEL_ARTIFACT
         path: dist
