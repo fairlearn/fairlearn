@@ -13,7 +13,6 @@ from fairlearn.adversarial import (
     AdversarialFairnessRegressor,
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
-from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 from fairlearn.adversarial._preprocessor import FloatTransformer
 
 from .helper import (
@@ -22,12 +21,10 @@ from .helper import (
     Cat,
     Cont1d,
     Cont2d,
-    Keyword_AUTO,
-    Keyword_BINARY,
-    Keyword_CATEGORY,
-    Keyword_CLASSIFICATION,
-    Keyword_CONTINUOUS,
     KeywordToClass,
+    MultiClass1d,
+    MultiClass2d,
+    MultiLabel,
     cols,
     generate_data_combinations,
     get_instance,
@@ -321,122 +318,25 @@ def test_fake_models_df_inputs():
         mitigator.fit(pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z))
 
 
-def check_type_helper(data, actual_type, valid_choices, invalid_choices):
-    """Help to check if distribution types are interpreted correctly."""
-    for valid_choice in valid_choices:
-        prep = FloatTransformer(transformer=valid_choice)
-        prep.fit(data)
-        assert prep.dist_type_ == actual_type
-        assert prep.n_features_in_ == data.shape[0]
-        assert prep.n_features_out_ == data.shape[1]
-
-    for invalid_choice in invalid_choices:
-        with pytest.raises(ValueError) as exc:
-            prep = FloatTransformer(transformer=invalid_choice)
-            prep.fit(data)
-            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
-                invalid_choice, prep.inferred_type_
-            )
-
-
-def test_check_type_correct_data():
-    """Test distribution types on some correct/incorrectly distributed data."""
-    check_type_helper(
-        Bin1d,
-        Keyword_BINARY,
-        [Keyword_AUTO, Keyword_BINARY, Keyword_CLASSIFICATION],
-        [Keyword_CATEGORY, None, "bogus"],
-    )
-    check_type_helper(
-        Cat,
-        Keyword_CATEGORY,
-        [Keyword_AUTO, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-        [Keyword_BINARY, None, "bogus"],
-    )
-    check_type_helper(
-        Cont1d,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS, None],
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            "bogus",
-        ],
-    )
-    check_type_helper(
-        Cont2d,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS, None],
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            "bogus",
-        ],
-    )
-    # Bin2d is not interpretable as binary 2d, nor continuous, because it is so ambiguous.
-    check_type_helper(
-        Bin2d,
-        None,
-        [],
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            Keyword_CONTINUOUS,
-            None,
-            "bogus",
-        ],
-    )
-
-    with pytest.raises(ValueError) as exc:
-        prep = FloatTransformer(transformer=Keyword_AUTO)
-        prep.fit(Bin2d)
-        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(Keyword_AUTO, prep.inferred_type_)
-
-
-def test_check_type_faulty_data():
-    """Check distribution types on slightly faulty datasets."""
-    notBin1d = Bin1d.copy()
-    notBin1d[0] = 0.1
-    check_type_helper(
-        notBin1d,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],
-        [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-    )
-    notCat = Cat.copy()
-    notCat[0, 0:2] = 1
-    # Special case where values are still {0,1}, but sums arent 1. Then we also
-    # reject continuous
-    check_type_helper(
-        notCat,
-        None,
-        [],  # Auto doesnt work on ambiguous
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            Keyword_CONTINUOUS,
-            Keyword_AUTO,
-        ],
-    )
-    notCat[0, 0] = 0.5
-    check_type_helper(
-        notCat,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],  # Auto does work here
-        [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-    )
-    notCat[0, 1] = 0.5
-    notCat[0, 2:] = 0.0  # Special case because now first row sums to one but is not one-hot
-    check_type_helper(
-        notCat,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],  # Auto does work here
-        [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-    )
+@pytest.mark.parametrize(
+    "data, valid_choice",
+    [
+        (Bin1d, "binary"),
+        (Bin2d, "binary"),
+        (Cat, "binary"),
+        (Cont1d, "continuous"),
+        (Cont2d, "continuous"),
+        (MultiClass1d, "multiclass"),
+        (MultiClass2d, "multiclass"),
+        (MultiLabel, "multilabel-indicator"),
+    ],
+)
+def test_valid_input_data_types(data, valid_choice):
+    """Test if the model processes the right data types"""
+    prep = FloatTransformer(transformer=valid_choice)
+    prep.fit(data)
+    assert prep.n_features_in_ == data.shape[0]
+    assert prep.n_features_out_ == data.shape[1]
 
 
 def check_2dnp(X):

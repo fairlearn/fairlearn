@@ -14,6 +14,7 @@ from sklearn.base import (
 )
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_scalar
+from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
     check_consistent_length,
     check_is_fitted,
@@ -28,7 +29,7 @@ from ._constants import (
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
 )
-from ._preprocessor import FloatTransformer, _get_type
+from ._preprocessor import FloatTransformer
 from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
 
@@ -339,47 +340,8 @@ class _AdversarialFairness(BaseEstimator):
             else:
                 self.callbacks_ = [self.callbacks]
 
-        def read_kw(data, kw_or_func, kwname):
-            if isinstance(kw_or_func, str) or kw_or_func is None:
-                # Possible remove some of these keywords in the future
-                if kw_or_func in [
-                    "auto",
-                    "classification",
-                    "binary",
-                    "continuous",
-                    "category",
-                ]:
-                    expected_dist = kw_or_func
-                elif kw_or_func in [
-                    "logistic_loss",
-                    "cross_entropy_loss",
-                    "log_loss",
-                ]:
-                    expected_dist = "classification"
-                elif kw_or_func in [
-                    "multinomial_logistic_loss",
-                    "argmax",
-                    "categorical_cross_entropy_loss",
-                ]:
-                    expected_dist = "category"
-                elif kw_or_func in ["threshold"]:
-                    expected_dist = "binary"
-                elif kw_or_func in ["square_loss", None]:
-                    expected_dist = "continuous"
-                else:
-                    raise ValueError(
-                        _KWARG_ERROR_MESSAGE.format(
-                            kwname,
-                            "A valid keyword or a callable",
-                        )
-                    )
-                return _get_type(data, expected_dist)
-            else:
-                return kw_or_func
-
-        self.predictor_loss_ = read_kw(y, self.predictor_loss, "predictor_loss")
-        self.adversary_loss_ = read_kw(A, self.adversary_loss, "adversary_loss")
-        self.predictor_function_ = read_kw(y, self.predictor_function, "predictor_function")
+        self.predictor_loss_ = self.predictor_function_ = type_of_target(y)
+        self.adversary_loss_ = type_of_target(A)
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
@@ -587,7 +549,7 @@ class _AdversarialFairness(BaseEstimator):
 
         Returns
         -------
-        Y_pred : numpy.ndarray
+        y_pred : numpy.ndarray
             Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
@@ -616,7 +578,7 @@ class _AdversarialFairness(BaseEstimator):
 
         Returns
         -------
-        Y_pred : array
+        y_pred : array
             array-like containing the model's predictions fed through
             the (discrete) :code:`predictor_function`
         """
@@ -643,8 +605,8 @@ class _AdversarialFairness(BaseEstimator):
             )
             y = self._validate_data(y, ensure_2d=False)
 
-        check_consistent_length(X, y)
-        check_consistent_length(X, A)
+            check_consistent_length(X, y)
+            check_consistent_length(X, A)
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -776,7 +738,7 @@ class _AdversarialFairness(BaseEstimator):
                 self.predictor_function_ = lambda pred: (pred >= self.threshold_value).astype(
                     float
                 )
-            elif kw == "category":
+            elif kw in ["multiclass", "multilabel-indicator"]:
 
                 def loss(pred):
                     shape = pred.shape
@@ -787,7 +749,7 @@ class _AdversarialFairness(BaseEstimator):
                     return b
 
                 self.predictor_function_ = loss
-            elif kw == "continuous":
+            elif kw in ["continuous", "continuous-multioutput"]:
                 self.predictor_function_ = lambda pred: pred
             else:
                 raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
@@ -1016,9 +978,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_classifiers_classes": (
                     "decision function output must match classifier output."
                 ),
-                "check_fit_non_negative": (
-                    "a ValueError should be raised if output is negative. "
-                ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "poor_score": True,
@@ -1217,38 +1176,16 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
-                "check_fit2d_predict1d": ("regressor estimator cannot look like multiclass."),
-                "check_dict_unchanged": ("regressor estimator cannot look like binary."),
-                "check_dont_overwrite_parameters": (
-                    "regressor estimator cannot look like multiclass."
-                ),
-                "check_methods_sample_order_invariance": (
-                    "regressor estimator cannot look like multiclass."
-                ),
-                "check_methods_subset_invariance": (
-                    "regressor estimator cannot look like multiclass."
-                ),
+                "check_methods_sample_order_invariance": ("fails for the predict() method."),
                 "check_non_transformer_estimators_n_iter": (
-                    "regressor estimator cannot look like multiclass."
+                    "estimator is missing the _n_iter attribute."
                 ),
-                "check_regressors_int": ("regressor estimator cannot look like multiclass."),
-                "check_supervised_y_2d": ("regressor estimator cannot look like multiclass."),
-                "check_estimators_overwrite_params": (
-                    "regressor estimator cannot look like multiclass."
-                ),
-                "check_estimators_nan_inf": ("regressor estimator cannot look like binary."),
+                "check_supervised_y_2d": "DataConversionWarning not caught.",
+                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_estimators_partial_fit_n_features": (
-                    "regressor estimator cannot look like multiclass."
+                    "number of features cannot change between calls of partial_fit"
                 ),
-                "check_pipeline_consistency": ("regressor estimator cannot look like binary."),
-                "check_dtype_object": ("regressor estimator cannot look like multiclass."),
-                "check_estimators_fit_returns_self": (
-                    "regressor estimator cannot look like multiclass."
-                ),
-                "check_fit_score_takes_y": ("regressor estimator cannot look like multiclass."),
-                "check_estimators_dtypes": ("regressor estimator cannot look like multiclass."),
-                "check_fit2d_1feature": ("regressor estimator cannot look like binary."),
-                "check_fit2d_1sample": ("regressor estimator cannot look like binary."),
-                "check_regressors_train": ("predictions shape should match targets shape."),
+                "check_fit_score_takes_y": "y_true and y_pred array lengths are not matching",
             },
+            "poor_score": True,
         }
