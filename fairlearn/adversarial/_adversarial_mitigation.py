@@ -606,7 +606,6 @@ class _AdversarialFairness(BaseEstimator):
             y = self._validate_data(y, dtype=None, ensure_2d=False)
 
             check_consistent_length(X, y)
-            check_consistent_length(X, A)
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -618,6 +617,9 @@ class _AdversarialFairness(BaseEstimator):
             logger.warning("No sensitive_features provided")
             logger.warning("Setting sensitive_features to zeros")
             A = zeros(len(y))
+
+        if not self.skip_validation:
+            check_consistent_length(X, A)
 
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
