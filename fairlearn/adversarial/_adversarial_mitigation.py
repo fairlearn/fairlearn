@@ -589,11 +589,32 @@ class _AdversarialFairness(BaseEstimator):
 
     def _validate_input(self, X, y, A, reinitialize=False):
         """
-        Validate the input data and possibly setup this estimator.
+        Validate input data and optionally set up the estimator.
 
-        Important note is that we follow call `__setup` from here, because the
-        setup procedure requires the validated data. If `reintialize` is True,
-        then always call `__setup`.
+        Parameters
+        ----------
+        X : array-like
+            The input features.
+        y : array-like
+            The target values.
+        A : array-like
+            The sensitive features.
+        reinitialize : bool, default=False
+            If True, force reinitialization of the estimator.
+
+        Returns
+        -------
+        X : array-like
+            Validated input features.
+        y : array-like
+            Validated target values.
+        A : array-like
+            Validated sensitive features.
+
+        Notes
+        -----
+        This method calls `__setup` if the estimator is not fitted or if
+        `reinitialize` is True. The setup procedure requires validated data.
         """
         if not self.skip_validation:
             X = self._validate_data(
