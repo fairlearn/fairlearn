@@ -760,10 +760,6 @@ class _AdversarialFairness(BaseEstimator):
         elif isinstance(self.predictor_function_, str):
             kw = self.predictor_function_
             if kw == "binary":
-
-                def binarization(pred):
-                    return (pred >= self.threshold_value).astype(float)
-
                 self.predictor_function_ = self._binary_predictor_function
             elif kw in ["multiclass", "multilabel-indicator"]:
 
