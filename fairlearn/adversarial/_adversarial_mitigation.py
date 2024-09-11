@@ -645,8 +645,7 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        if not self.skip_validation:
-            A = self._sf_transform.transform(A)
+        A = self._sf_transform.transform(A)
 
         if not self.skip_validation:
             # Some backendEngine may want to do some additional preprocessing,
