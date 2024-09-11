@@ -261,14 +261,16 @@ class _AdversarialFairness(BaseEstimator):
 
     def __setup(self, X, y, A):
         """
-        Initialize the entire model from the parameters and the given data.
+        Initialize model from parameters and data.
 
-        Following sklearn API, we do not do intialization in `__init__`, but
-        instead in `fit`. Firstly, we validate the backend. Then, we validate
-        some key-word arguments. Then, we initialize the BackendEngine, which
-        handles the initialization of the losses and optimizers. Among these
-        steps, if a loss or function is not explicitely defined, we try to
-        infer something appropriate from data (see interpret_keyword).
+        Validates backend and arguments, then initializes BackendEngine.
+        Infers appropriate losses and functions if not explicitly defined.
+        Called from `fit` method, not `__init__`, following sklearn API.
+
+        Parameters:
+        X : array-like, input features
+        y : array-like, target values
+        A : array-like, sensitive features
         """
         self._validate_backend()
 
