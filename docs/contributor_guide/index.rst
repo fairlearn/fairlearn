@@ -39,7 +39,7 @@ To report bugs, request features, or ask usage questions please use the
 Community calls
 ---------------
 
-We have a weekly community call every other Wednesday starting on the 11th of September 2024.
+We have a community call every other Wednesday starting on the 11th of September 2024.
 These are held at noon US Eastern time (ET).
 Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
