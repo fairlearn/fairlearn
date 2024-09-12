@@ -40,7 +40,7 @@ Community calls
 ---------------
 
 We have a weekly community call every other Wednesday starting on the 11th of September 2024.
-There are held at noon US Eastern time (ET).
+These are held at noon US Eastern time (ET).
 Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
 All are welcome! Please reach out via
