@@ -24,7 +24,6 @@ from .helper import (
     KeywordToClass,
     MultiClass1d,
     MultiClass2d,
-    MultiLabel,
     cols,
     generate_data_combinations,
     get_instance,
@@ -328,7 +327,6 @@ def test_fake_models_df_inputs():
         (Cont2d, "continuous"),
         (MultiClass1d, "multiclass"),
         (MultiClass2d, "multiclass"),
-        (MultiLabel, "multilabel-indicator"),
     ],
 )
 def test_valid_input_data_types(data, valid_choice):

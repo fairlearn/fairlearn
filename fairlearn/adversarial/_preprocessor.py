@@ -94,6 +94,8 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
                 self.n_features_out_ = sum(
                     len(cat) if len(cat) != 2 else 1 for cat in self.transform_.categories_
                 )
+            if self.inferred_type_ in ["continous-multioutut", "multiclass-multioutput"]:
+                raise ValueError("Multioutput not supported")
         return self
 
     def transform(self, X):
@@ -116,8 +118,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         if (
             self.transformer is None
             or isinstance(self.transformer, str)
-            and self.inferred_type_
-            in ["continuous", "continuous-multioutput", "multilabel-indicator"]
+            and self.inferred_type_ == "continuous"
         ):
             inverse = y
         else:
