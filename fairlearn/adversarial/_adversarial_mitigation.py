@@ -413,7 +413,6 @@ class _AdversarialFairness(BaseEstimator):
             training data.
         """
         X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
-        self.classes_ = unique(y)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -647,6 +646,8 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
+        self.classes_ = unique(y)
+        y = self._y_transform.transform(y)
         A = self._sf_transform.transform(A)
 
         if not self.skip_validation:
