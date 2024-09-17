@@ -125,13 +125,10 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
-        if (
-            self.transformer is None
-            or isinstance(self.transformer, str)
-            and self.inferred_type_ == "continuous"
-        ):
-            inverse = y
-        else:
-            inverse = self.transform_.inverse_transform(y)
+        if self.transformer is None or isinstance(self.transformer, str):
+            if self.inferred_type_ == "continuous":
+                inverse = y
+            else:
+                inverse = self.transform_.inverse_transform(y)
 
         return inverse.reshape(-1) if self.input_dim_ == 1 else inverse
