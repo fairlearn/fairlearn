@@ -412,7 +412,12 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
+        if not hasattr(self, "classes"):
+            reinitialize = True
+        else:
+            reinitialize = False
+
+        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -534,7 +539,18 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive feature of the
             training data.
         """
-        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=False)
+
+        if not hasattr(self, "classes_"):
+            reinitialize = True
+        else:
+            reinitialize = False
+            if self.n_features_in_ != X.shape[1]:
+                raise ValueError(
+                    "Number of features %d does not match previous "
+                    "data %d." % (X.shape[1], self.n_features_in_)
+                )
+
+        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize)
         self.backendEngine_.train_step(X, y, A)
 
         return self
@@ -1194,9 +1210,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                     "estimator is missing the _n_iter attribute."
                 ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
-                "check_estimators_partial_fit_n_features": (
-                    "number of features cannot change between calls of partial_fit"
-                ),
             },
             "poor_score": True,
         }
