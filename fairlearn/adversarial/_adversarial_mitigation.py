@@ -525,34 +525,47 @@ class _AdversarialFairness(BaseEstimator):
 
         return self
 
-    def partial_fit(self, X, y, *, sensitive_features=None):
+    def partial_fit(self, X, y, *, classes=None, sensitive_features=None):
         """
-        Perform one epoch on given samples and update model.
+        Perform one training step on given samples and update model.
+
+        This method allows for incremental fitting on batches of data.
 
         Parameters
         ----------
-        X : numpy.ndarray
-            Two-dimensional numpy array containing training data
+        X : array-like of shape (n_samples, n_features)
+            The training input samples.
 
-        y : array
-            Array-like containing training targets
+        y : array-like of shape (n_samples,)
+            The target values.
 
-        sensitive_features : array
-            Array-like containing the sensitive feature of the
-            training data.
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+            Must be provided at the first call to partial_fit, can be omitted
+            in subsequent calls.
+
+        sensitive_features : array-like of shape (n_samples,), default=None
+            The sensitive features for each sample. If None, a vector of zeros
+            will be used.
+
+        Returns
+        -------
+        self : object
+            Returns self.
         """
 
-        if not hasattr(self, "classes_"):
-            reinitialize = True
-        else:
-            reinitialize = False
+        first_call = not hasattr(self, "classes_")
+
+        if first_call and classes is not None:
+            self.classes_ = classes
+        if not first_call:
             if self.n_features_in_ != X.shape[1]:
                 raise ValueError(
                     "Number of features %d does not match previous "
                     "data %d." % (X.shape[1], self.n_features_in_)
                 )
 
-        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize)
+        X, y, A = self._validate_input(X, y, sensitive_features, first_call)
         self.backendEngine_.train_step(X, y, A)
 
         return self
@@ -682,7 +695,9 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        self.classes_ = unique(y)
+        if not hasattr(self, "classes_"):
+            self.classes_ = unique(y)
+
         y = self._y_transform.transform(y)
         A = self._sf_transform.transform(A)
 
@@ -1025,7 +1040,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
-                "check_estimators_partial_fit_n_features": ("number of features cannot change."),
             },
             "poor_score": True,
         }
