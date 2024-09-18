@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import logging
+import warnings
 from math import ceil
 from time import time
 
@@ -12,7 +13,7 @@ from sklearn.base import (
     RegressorMixin,
     TransformerMixin,
 )
-from sklearn.exceptions import NotFittedError
+from sklearn.exceptions import DataConversionWarning, NotFittedError
 from sklearn.utils import check_scalar
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
@@ -640,10 +641,23 @@ class _AdversarialFairness(BaseEstimator):
                 accept_large_sparse=False,
                 dtype=float,
                 allow_nd=True,
+                ensure_2d=True,
             )
             y = self._validate_data(y, dtype=None, ensure_2d=False)
 
             check_consistent_length(X, y)
+
+            if y.ndim != 1:
+                warnings.warn(
+                    (
+                        "A column-vector y was passed when a "
+                        "1d array was expected. Please change "
+                        "the shape of y to (n_samples,), for "
+                        "example using ravel()."
+                    ),
+                    DataConversionWarning,
+                    stacklevel=2,
+                )
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -1007,7 +1021,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 ),
                 "check_classifiers_regression_target": ("the data cannot look continuous."),
                 "check_estimators_partial_fit_n_features": ("number of features cannot change."),
-                "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "poor_score": True,
         }
@@ -1209,7 +1222,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
-                "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "poor_score": True,
         }

@@ -72,16 +72,8 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         )
         if init:
             self.input_dim_ = X.ndim
-            if self.input_dim_ > 2:
-                raise ValueError("Data can be at most two dimensional, not %d" % self.input_dim_)
-        else:
-            if X.ndim != self.input_dim_:
-                raise ValueError("Dimension of data is inconsistent with previous call")
         if X.ndim == 1:
             X = X.reshape(-1, 1)
-        if X.ndim != 2:
-            raise SystemError("Data must be two dimensional at this point.")
-
         return X
 
     def fit(self, X, y=None):
