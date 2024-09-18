@@ -101,7 +101,7 @@ def test_model_early_stop(torch):
         callbacks=lambda callback_obj, step: step > 5,
     )
     mitigator.fit(X, Y, sensitive_features=Z)
-    assert mitigator.step_ == 6
+    assert mitigator.n_iter_ == 6
 
 
 def test_model_equalized_odds_model_setup():

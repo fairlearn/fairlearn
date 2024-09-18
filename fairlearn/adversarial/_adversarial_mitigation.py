@@ -460,7 +460,7 @@ class _AdversarialFairness(BaseEstimator):
         predictor_losses = [None]
         adversary_losses = []
 
-        self.step_ = 0
+        self.n_iter_ = 0
         for epoch in range(epochs):
             if self.shuffle:
                 X, y, A = self.backendEngine_.shuffle(X, y, A)
@@ -506,16 +506,16 @@ class _AdversarialFairness(BaseEstimator):
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
 
-                self.step_ += 1
+                self.n_iter_ += 1
 
                 # Purposefully first stop and then handle callbacks
-                if self.max_iter != -1 and self.step_ >= self.max_iter:
+                if self.max_iter != -1 and self.n_iter_ >= self.max_iter:
                     return self
 
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
-                        result = cb(self, self.step_)
+                        result = cb(self, self.n_iter_)
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
                         stop = stop or result
@@ -1036,11 +1036,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
     def _more_tags(self):
         return {
-            "_xfail_checks": {
-                "check_non_transformer_estimators_n_iter": (
-                    "estimator is missing the _n_iter attribute."
-                ),
-            },
             "poor_score": True,
         }
 
@@ -1238,9 +1233,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
                 "check_estimators_overwrite_params": "pickling is not possible.",
-                "check_non_transformer_estimators_n_iter": (
-                    "estimator is missing the _n_iter attribute."
-                ),
             },
             "poor_score": True,
         }
