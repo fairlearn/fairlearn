@@ -12,6 +12,7 @@ from sklearn.base import (
     ClassifierMixin,
     RegressorMixin,
     TransformerMixin,
+    is_classifier,
 )
 from sklearn.exceptions import DataConversionWarning, NotFittedError
 from sklearn.utils import check_scalar
@@ -647,6 +648,11 @@ class _AdversarialFairness(BaseEstimator):
 
             check_consistent_length(X, y)
 
+            if is_classifier(self) and type_of_target(y) == "continuous":
+                raise ValueError(
+                    "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
+                )
+
             if y.ndim != 1:
                 warnings.warn(
                     (
@@ -1019,7 +1025,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
-                "check_classifiers_regression_target": ("the data cannot look continuous."),
                 "check_estimators_partial_fit_n_features": ("number of features cannot change."),
             },
             "poor_score": True,
