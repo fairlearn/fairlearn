@@ -414,12 +414,9 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        if not hasattr(self, "classes"):
-            reinitialize = True
-        else:
-            reinitialize = False
+        first_call = not hasattr(self, "classes")
 
-        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize)
+        X, y, A = self._validate_input(X, y, sensitive_features, first_call)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -1036,6 +1033,10 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
 
     def _more_tags(self):
         return {
+            "_xfail_checks": {
+                "check_estimators_pickle": "pickling is not possible.",
+                "check_estimators_overwrite_params": "pickling is not possible.",
+            },
             "poor_score": True,
         }
 
