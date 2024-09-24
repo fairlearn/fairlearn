@@ -9,7 +9,7 @@ from fairlearn.adversarial._constants import _IMPORT_ERROR_MESSAGE
 
 @pytest.mark.parametrize("library", ["auto", "torch", "tensorflow"])
 def test_no_library(library):
-    expected_library = "torch or tensorflow" if library is None else library
+    expected_library = "torch or tensorflow" if library is None or "auto" else library
     X = [[0]]
     Y = [0]
     with pytest.raises(RuntimeError) as exc:
