@@ -261,14 +261,16 @@ class _AdversarialFairness(BaseEstimator):
 
     def __setup(self, X, y, A):
         """
-        Initialize the entire model from the parameters and the given data.
+        Initialize model from parameters and data.
 
-        Following sklearn API, we do not do intialization in `__init__`, but
-        instead in `fit`. Firstly, we validate the backend. Then, we validate
-        some key-word arguments. Then, we initialize the BackendEngine, which
-        handles the initialization of the losses and optimizers. Among these
-        steps, if a loss or function is not explicitely defined, we try to
-        infer something appropriate from data (see interpret_keyword).
+        Validates backend and arguments, then initializes BackendEngine.
+        Infers appropriate losses and functions if not explicitly defined.
+        Called from `fit` method, not `__init__`, following sklearn API.
+
+        Parameters:
+        X : array-like, input features
+        y : array-like, target values
+        A : array-like, sensitive features
         """
         self._validate_backend()
 
@@ -411,7 +413,6 @@ class _AdversarialFairness(BaseEstimator):
             training data.
         """
         X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
-        self.classes_ = unique(y)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -589,11 +590,32 @@ class _AdversarialFairness(BaseEstimator):
 
     def _validate_input(self, X, y, A, reinitialize=False):
         """
-        Validate the input data and possibly setup this estimator.
+        Validate input data and optionally set up the estimator.
 
-        Important note is that we follow call `__setup` from here, because the
-        setup procedure requires the validated data. If `reintialize` is True,
-        then always call `__setup`.
+        Parameters
+        ----------
+        X : array-like
+            The input features.
+        y : array-like
+            The target values.
+        A : array-like
+            The sensitive features.
+        reinitialize : bool, default=False
+            If True, force reinitialization of the estimator.
+
+        Returns
+        -------
+        X : array-like
+            Validated input features.
+        y : array-like
+            Validated target values.
+        A : array-like
+            Validated sensitive features.
+
+        Notes
+        -----
+        This method calls `__setup` if the estimator is not fitted or if
+        `reinitialize` is True. The setup procedure requires validated data.
         """
         if not self.skip_validation:
             X = self._validate_data(
@@ -603,10 +625,9 @@ class _AdversarialFairness(BaseEstimator):
                 dtype=float,
                 allow_nd=True,
             )
-            y = self._validate_data(y, ensure_2d=False)
+            y = self._validate_data(y, dtype=None, ensure_2d=False)
 
             check_consistent_length(X, y)
-            check_consistent_length(X, A)
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -619,12 +640,15 @@ class _AdversarialFairness(BaseEstimator):
             logger.warning("Setting sensitive_features to zeros")
             A = zeros(len(y))
 
+        if not self.skip_validation:
+            check_consistent_length(X, A)
+
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        if not self.skip_validation:
-            y = self._y_transform.transform(y)
-            A = self._sf_transform.transform(A)
+        self.classes_ = unique(y)
+        y = self._y_transform.transform(y)
+        A = self._sf_transform.transform(A)
 
         if not self.skip_validation:
             # Some backendEngine may want to do some additional preprocessing,
@@ -717,6 +741,9 @@ class _AdversarialFairness(BaseEstimator):
             )
         )
 
+    def _binary_predictor_function(self, pred):
+        return (pred >= self.threshold_value).astype(float)
+
     def _set_predictor_function(self):
         """
         Infer prediction function.
@@ -735,9 +762,7 @@ class _AdversarialFairness(BaseEstimator):
         elif isinstance(self.predictor_function_, str):
             kw = self.predictor_function_
             if kw == "binary":
-                self.predictor_function_ = lambda pred: (pred >= self.threshold_value).astype(
-                    float
-                )
+                self.predictor_function_ = self._binary_predictor_function
             elif kw in ["multiclass", "multilabel-indicator"]:
 
                 def loss(pred):
@@ -759,13 +784,6 @@ class _AdversarialFairness(BaseEstimator):
     def __sklearn_is_fitted__(self):
         """Speed up check_is_fitted."""
         return hasattr(self, "_is_setup")
-
-    def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-            }
-        }
 
 
 class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
@@ -975,9 +993,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
                 ),
                 "check_classifiers_regression_target": ("the data cannot look continuous."),
                 "check_estimators_partial_fit_n_features": ("number of features cannot change."),
-                "check_classifiers_classes": (
-                    "decision function output must match classifier output."
-                ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
             },
             "poor_score": True,
@@ -1176,12 +1191,12 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         return {
             "_xfail_checks": {
                 "check_estimators_pickle": "pickling is not possible.",
+                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_methods_sample_order_invariance": ("fails for the predict() method."),
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
                 "check_supervised_y_2d": "DataConversionWarning not caught.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_estimators_partial_fit_n_features": (
                     "number of features cannot change between calls of partial_fit"
                 ),
