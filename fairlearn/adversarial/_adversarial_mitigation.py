@@ -746,8 +746,6 @@ class _AdversarialFairness(BaseEstimator):
             except ImportError:
                 if self.backend == "torch":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
-                if self.backend == "auto":
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
             if select:
                 self.backend_ = PytorchEngine
                 return
@@ -771,8 +769,6 @@ class _AdversarialFairness(BaseEstimator):
             except ImportError:
                 if self.backend == "tensorflow":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
-                if self.backend == "auto":
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
             if select:
                 self.backend_ = TensorflowEngine
                 return
