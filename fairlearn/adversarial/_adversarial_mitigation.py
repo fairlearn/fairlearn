@@ -986,6 +986,8 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
+                "check_estimators_pickle": "pickling is not possible.",
+                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
                 ),
@@ -1188,6 +1190,8 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
+                "check_estimators_pickle": "pickling is not possible.",
+                "check_estimators_overwrite_params": "pickling is not possible.",
                 "check_methods_sample_order_invariance": ("fails for the predict() method."),
                 "check_non_transformer_estimators_n_iter": (
                     "estimator is missing the _n_iter attribute."
