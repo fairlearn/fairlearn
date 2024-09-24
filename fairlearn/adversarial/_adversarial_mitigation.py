@@ -811,7 +811,7 @@ class _AdversarialFairness(BaseEstimator):
             kw = self.predictor_function_
             if kw == "binary":
                 self.predictor_function_ = self._binary_predictor_function
-            elif kw in ["multiclass", "multilabel-indicator"]:
+            elif kw == "multiclass":
 
                 def loss(pred):
                     shape = pred.shape
@@ -822,7 +822,7 @@ class _AdversarialFairness(BaseEstimator):
                     return b
 
                 self.predictor_function_ = loss
-            elif kw in ["continuous", "continuous-multioutput"]:
+            elif kw == "continuous":
                 self.predictor_function_ = lambda pred: pred
             else:
                 raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
