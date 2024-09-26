@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import logging
-
 from typing import Dict, List, Optional, Union
 
 import numpy as np
@@ -14,8 +13,7 @@ from ._disaggregated_result import DisaggregatedResult
 logger = logging.getLogger(__name__)
 
 BOOTSTRAP_QUANTILE_ERROR = (
-    "Error calling numpy.quantiles. Most likely due to a metric returning a non-scalar"
-    " result"
+    "Error calling numpy.quantiles. Most likely due to a metric returning a non-scalar result"
 )
 
 
@@ -86,15 +84,11 @@ def generate_bootstrap_samples(
     return result
 
 
-def _calc_series_quantiles(
-    *, quantiles: List[float], samples: List[pd.Series]
-) -> List[pd.Series]:
+def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]) -> List[pd.Series]:
     for s in samples:
         assert isinstance(s, pd.Series)
         assert s.name == samples[0].name
-        assert all(
-            s.index == samples[0].index
-        ), "Sanity check shape of bootstrap sample"
+        assert all(s.index == samples[0].index), "Sanity check shape of bootstrap sample"
 
     try:
         result_np = np.quantile(samples, q=quantiles, axis=0)
@@ -103,9 +97,7 @@ def _calc_series_quantiles(
     result = []
     assert result_np.shape[0] == len(quantiles)
     for i in range(result_np.shape[0]):
-        nxt = pd.Series(
-            name=samples[0].name, index=samples[0].index, data=result_np[i, :]
-        )
+        nxt = pd.Series(name=samples[0].name, index=samples[0].index, data=result_np[i, :])
         result.append(nxt)
     return result
 
@@ -116,9 +108,7 @@ def _calc_dataframe_quantiles(
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)
-        assert all(
-            s.index == samples[0].index
-        ), "Sanity check shape of bootstrap sample"
+        assert all(s.index == samples[0].index), "Sanity check shape of bootstrap sample"
 
     try:
         result_np = np.quantile(samples, q=quantiles, axis=0)
@@ -143,9 +133,7 @@ def calculate_pandas_quantiles(
     if isinstance(bootstrap_samples[0], pd.Series):
         result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)
     elif isinstance(bootstrap_samples[0], pd.DataFrame):
-        result = _calc_dataframe_quantiles(
-            quantiles=quantiles, samples=bootstrap_samples
-        )
+        result = _calc_dataframe_quantiles(quantiles=quantiles, samples=bootstrap_samples)
     else:
         assert False, "Should not be possible to get here"
     return result

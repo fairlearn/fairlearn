@@ -24,7 +24,9 @@ from _utils import _LogWrapper
 _logger = logging.getLogger(__name__)
 
 _BASE_URI_FORMAT = "https://github.com/fairlearn/fairlearn/tree/v{0}"
-_CURRENT_RELEASE_PATTERN = r"\[fairlearn v(\S+)\]\(https://github.com/fairlearn/fairlearn/tree/v\1\)"  # noqa: E501
+_CURRENT_RELEASE_PATTERN = (
+    r"\[fairlearn v(\S+)\]\(https://github.com/fairlearn/fairlearn/tree/v\1\)"  # noqa: E501
+)
 _OTHER_MD_REF_PATTERN = r"\]\(\./(\w+\.md)"
 _SAME_MD_REF_PATTERN = r"\]\((#.+)\)"
 

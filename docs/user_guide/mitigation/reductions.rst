@@ -148,9 +148,9 @@ Demographic Parity
 A binary classifier :math:`h(X)` satisfies *demographic parity* if
 
 .. math::
-    
+
     \P[h(X) = 1 \given A = a] = \P[h(X) = 1] \quad \forall a
- 
+
 In other words, the selection rate or percentage of samples with label 1
 should be equal across all groups. Implicitly this means the percentage
 with label 0 is equal as well. In this case, the utility function
@@ -193,7 +193,7 @@ the predicted labels.
     ...                                      y_true=y_true,
     ...                                      y_pred=y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
-    >>> selection_rate_summary.overall
+    >>> selection_rate_summary.overall.item()
         0.4
     >>> selection_rate_summary.by_group
     SF 0
@@ -208,7 +208,7 @@ the predicted labels.
     -     all    a          -0.2
                  b           0.2
     dtype: float64
- 
+
 The ratio constraints for the demographic parity with :code:`ratio_bound`
 :math:`r` (and :code:`ratio_bound_slack=0`) take form
 
@@ -281,7 +281,7 @@ In practice this can be used in a difference-based relaxation as follows:
     ...                           y_true=y_true,
     ...                           y_pred=y_pred,
     ...                           sensitive_features=sensitive_features)
-    >>> tpr_summary.overall
+    >>> tpr_summary.overall.item()
     0.5714285714285714
     >>> tpr_summary.by_group
     sensitive_feature_0
@@ -320,7 +320,7 @@ Alternatively, a ratio-based relaxation is also available:
     dtype: float64
 
 .. _equalized_odds:
-    
+
 Equalized Odds
 ~~~~~~~~~~~~~~
 
@@ -379,7 +379,7 @@ the overall error rate by more than the value of :code:`difference_bound`.
     ...                                y_true=y_true,
     ...                                y_pred=y_pred,
     ...                                sensitive_features=sensitive_features)
-    >>> accuracy_summary.overall
+    >>> accuracy_summary.overall.item()
     0.6
     >>> accuracy_summary.by_group
     sensitive_feature_0
@@ -535,7 +535,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     ...                         y_true=y_true,
     ...                         y_pred=y_pred,
     ...                         sensitive_features=pd.Series(sensitive_features, name="SF 0"))
-    >>> mae_frame.overall
+    >>> mae_frame.overall.item()
     0.275
     >>> mae_frame.by_group
     SF 0

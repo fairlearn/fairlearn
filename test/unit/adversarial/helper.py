@@ -11,18 +11,18 @@ here. Additionally, we generate data here.
 """
 
 import sys
+
 import numpy as np
+from sklearn.datasets import make_classification
 
 from fairlearn.adversarial._adversarial_mitigation import (
     _AdversarialFairness,  # We just test the base class because this covers all
 )
+from fairlearn.adversarial._backend_engine import BackendEngine
 from fairlearn.adversarial._pytorch_engine import PytorchEngine
 from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
-from fairlearn.adversarial._backend_engine import BackendEngine
-
 
 model_class = type("Model", (object,), {})
-
 
 Keyword_BINARY = "binary"
 Keyword_CATEGORY = "category"
@@ -197,6 +197,10 @@ Cat = np.zeros((rows, cols), dtype=float)
 Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.0
 Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(rows, 1)
+MultiClass2d, _ = make_classification(
+    random_state=42, n_classes=3, n_clusters_per_class=1, n_samples=rows, n_features=cols
+)
+MultiClass1d = np.random.choice([0.0, 1.0, 0.2], size=(rows, 1))
 
 
 def generate_data_combinations(n=10):
@@ -249,7 +253,7 @@ class RemoveAll(BackendEngine):
         rows = len(X)
         y = []
         for row in range(rows):
-            rng = np.random.default_rng(int(np.round(np.mean(X[row]) * (2**32))))
+            rng = np.random.default_rng(int(np.round(np.mean(abs(X[row])) * (2**32))))
             y.append(rng.random(cols))
         return np.stack(y)
 

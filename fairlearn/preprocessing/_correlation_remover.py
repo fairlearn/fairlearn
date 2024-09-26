@@ -61,7 +61,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, *, sensitive_feature_ids, alpha=1):
+    def __init__(self, *, sensitive_feature_ids=None, alpha=1):
         self.sensitive_feature_ids = sensitive_feature_ids
         self.alpha = alpha
 
@@ -116,13 +116,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     def _more_tags(self):
         return {
             "_xfail_checks": {
-                "check_parameters_default_constructible": (
-                    "sensitive_feature_ids has to be explicitly set to "
-                    "instantiate this estimator"
-                ),
                 "check_transformer_data_not_an_array": (
-                    "this estimator only accepts pandas dataframes or numpy "
-                    "ndarray as input."
+                    "this estimator only accepts pandas dataframes or numpy ndarray as input."
                 ),
             }
         }

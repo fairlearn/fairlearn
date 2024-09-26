@@ -6,28 +6,21 @@
 # Since that file does its own testing setup
 
 # Required for environment
-flake8
-autopep8
-flake8-blind-except
-flake8-builtins
-flake8-copyright
-flake8-docstrings
-flake8-logging-format
-flake8-rst-docstrings
+ruff==0.4.5
 requirements-parser
 # Need to keep black version consistent in
 # requirements-dev.txt
 # linting.yml
 # .pre-commit-config.yaml
-black==23.9.1
+black==24.4.2
 
 # Required for test
-pytest==7.4.2
+pytest
 pytest-cov
 pytest-mock
 pytest-mpl
 wheel
-lightgbm<4.0.0  # 4.0.0 is incompatible with latest numpy https://github.com/microsoft/LightGBM/issues/5990  Needs to sync with .github/workflows/release-wheel.yml
+lightgbm
 xlrd
 
 # Required for documentation
@@ -39,5 +32,7 @@ numpydoc
 pydata-sphinx-theme==0.14.1
 sphinx-autodoc-typehints
 sphinxcontrib-bibtex
+sphinx-prompt
+sphinx-copybutton
 packaging
 seaborn

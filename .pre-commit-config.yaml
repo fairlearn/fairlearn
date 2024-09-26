@@ -13,15 +13,15 @@ repos:
 # requirements-dev.txt
 # linting.yml
 # .pre-commit-config.yaml
-    rev: 23.9.1
+    rev: 24.4.2
     hooks:
     -   id: black
--   repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-    -   id: flake8
-        types: [file, python]
 -   repo: https://github.com/PyCQA/isort
     rev: 5.12.0
     hooks:
     -   id: isort
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.5
+    hooks:
+    -   id: ruff
+        args: [ --fix ]

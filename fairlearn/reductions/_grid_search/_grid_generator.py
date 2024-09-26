@@ -70,20 +70,14 @@ class _GridGenerator:
             true_dim = self.dim
 
         if true_dim > GRID_DIMENSION_WARN_THRESHOLD:
-            logger.warning(
-                GRID_DIMENSION_WARN_TEMPLATE, true_dim, GRID_DIMENSION_WARN_THRESHOLD
-            )
+            logger.warning(GRID_DIMENSION_WARN_TEMPLATE, true_dim, GRID_DIMENSION_WARN_THRESHOLD)
 
         recommended_min_grid_size = 2**true_dim
         if grid_size < recommended_min_grid_size:
-            logger.warning(
-                GRID_SIZE_WARN_TEMPLATE, grid_size, recommended_min_grid_size
-            )
+            logger.warning(GRID_SIZE_WARN_TEMPLATE, grid_size, recommended_min_grid_size)
 
         # a conservative lower bound on the scaling parameter of the grid
-        n_units = (float(grid_size) / (2.0 ** neg_allowed.sum())) ** (
-            1.0 / true_dim
-        ) - 1
+        n_units = (float(grid_size) / (2.0 ** neg_allowed.sum())) ** (1.0 / true_dim) - 1
         n_units = int(np.floor(n_units))
         if n_units < 0:
             n_units = 0
@@ -129,6 +123,4 @@ class _GridGenerator:
 
             for current_value in values:
                 self.entry[index] = current_value
-                self.accumulate_integer_grid(
-                    index + 1, max_val - abs(current_value)
-                )  # noqa: E501
+                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))  # noqa: E501

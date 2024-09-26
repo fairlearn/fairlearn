@@ -65,28 +65,28 @@ def _plot_curve(ax, sensitive_feature, x_col, y_col, points):
 def _raise_if_not_threshold_optimizer(obj):
     if not isinstance(obj, ThresholdOptimizer):
         raise ValueError(
-            "Argument {} needs to be of type {}.".format(
-                obj.__name__, ThresholdOptimizer.__name__
-            )
+            "Argument {} needs to be of type {}.".format(obj.__name__, ThresholdOptimizer.__name__)
         )
 
 
 def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
-    """Plot the chosen solution of the threshold optimizer.
+    r"""Plot the chosen solution of the threshold optimizer.
 
-    For `fairlearn.postprocessing.ThresholdOptimizer` objects that have their
-    constraint set to `'demographic_parity'` this will result in a
-    selection/error curve plot. For `fairlearn.postprocessing.ThresholdOptimizer`
-    objects that have their constraint set to `'equalized_odds'` this will
+    For :class:`.ThresholdOptimizer` objects that have their
+    constraint set to :code:`demographic_parity` this will result in a
+    selection/error curve plot. For :class:`.ThresholdOptimizer`
+    objects that have their constraint set to :code:`equalized_odds` this will
     result in a ROC curve plot.
 
-    :param threshold_optimizer: the `ThresholdOptimizer` instance for which the
-        results should be illustrated.
-    :type threshold_optimizer: fairlearn.postprocessing.ThresholdOptimizer
-    :param ax: a custom `matplotlib.axes.Axes` object to use for the plots, default None
-    :type ax: `matplotlib.axes.Axes`
-    :param show_plot: whether or not the generated plot should be shown, default True
-    :type show_plot: bool
+    Parameters
+    ----------
+    threshold_optimizer : :class:`.ThresholdOptimizer`
+        The `ThresholdOptimizer` instance for which the results should be
+        illustrated.
+    ax : :class:`matplotlib.axes.Axes`, default = None
+        A custom `matplotlib.axes.Axes` object to use for the plots.
+    show_plot : bool, default = True
+        Whether or not the generated plot should be shown, default True
     """
     try:
         import matplotlib.pyplot as plt

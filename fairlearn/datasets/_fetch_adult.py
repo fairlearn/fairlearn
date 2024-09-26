@@ -84,7 +84,7 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References

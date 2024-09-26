@@ -27,15 +27,11 @@ _SF_DICT_CONVERSION_FAILURE = (
     "The __cause__ field of this exception may contain further information."
 )
 _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
-_FEATURE_DF_COLUMN_BAD_NAME = (
-    "DataFrame column names must be strings. Name '{0}' is of type {1}"
-)
+_FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
 _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
-_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = (
-    "Keys in 'sample_params' do not match those in 'metric'"
-)
+_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = "Keys in 'sample_params' do not match those in 'metric'"
 
 _COMPARE_METHODS = ["between_groups", "to_overall"]
 _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
@@ -228,9 +224,7 @@ class MetricFrame:
         y_pred,
         sensitive_features,
         control_features=None,
-        sample_params: Optional[
-            Union[Dict[str, Any], Dict[str, Dict[str, Any]]]
-        ] = None,
+        sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
         n_boot: Optional[int] = None,
         ci_quantiles: Optional[List[float]] = None,
         random_state: Optional[Union[int, np.random.RandomState]] = None,
@@ -306,9 +300,7 @@ class MetricFrame:
             )
 
             self._populate_results_ci(_bootstrap_samples, ci_quantiles)
-        elif (n_boot is not None) ^ (
-            (ci_quantiles is not None) and (len(ci_quantiles)) > 0
-        ):
+        elif (n_boot is not None) ^ ((ci_quantiles is not None) and (len(ci_quantiles)) > 0):
             raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
 
     def _extract_result(self, underlying_result, no_control_levels: bool):
@@ -337,9 +329,7 @@ class MetricFrame:
         if isinstance(target, pd.Series):
             result = target.map(lambda x: x if x is not None else np.nan)
         else:
-            result = target.apply(
-                lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
-            )
+            result = target.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
         return result
 
     def _populate_results(self, raw_result: DisaggregatedResult):
@@ -371,9 +361,7 @@ class MetricFrame:
             self._result_cache[k] = dict()
             for err_string in _VALID_ERROR_STRING:
                 try:
-                    self._result_cache[k][err_string] = self._group(
-                        raw_result, v, err_string
-                    )
+                    self._result_cache[k][err_string] = self._group(raw_result, v, err_string)
                 except Exception as e:  # noqa: B902
                     # Store any exception for later
                     self._result_cache[k][err_string] = e
@@ -461,16 +449,18 @@ class MetricFrame:
                     quantiles=ci_quantiles, bootstrap_samples=samples
                 )
 
-                result = [
-                    self._extract_result(x, no_control_levels=False) for x in raw_result
-                ]
+                result = [self._extract_result(x, no_control_levels=False) for x in raw_result]
 
                 self._result_cache[c_t][c_m] = result
 
     @property
     def overall(
         self,
-    ) -> Union[Any, pd.Series, pd.DataFrame,]:
+    ) -> Union[
+        Any,
+        pd.Series,
+        pd.DataFrame,
+    ]:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Read more in the :ref:`User Guide <assessment_quantify_harms>`.
@@ -507,7 +497,13 @@ class MetricFrame:
     @property
     def overall_ci(
         self,
-    ) -> List[Union[Any, pd.Series, pd.DataFrame,]]:
+    ) -> List[
+        Union[
+            Any,
+            pd.Series,
+            pd.DataFrame,
+        ]
+    ]:
         """Return the underlying bootstrapped metrics evaluated on the whole dataset.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -644,9 +640,7 @@ class MetricFrame:
             for r in bootstrap_samples
         ]
 
-        raw_result = calculate_pandas_quantiles(
-            quantiles=ci_quantiles, bootstrap_samples=samples
-        )
+        raw_result = calculate_pandas_quantiles(quantiles=ci_quantiles, bootstrap_samples=samples)
 
         result = [self._extract_result(x, no_control_levels=False) for x in raw_result]
         return result
@@ -966,9 +960,7 @@ class MetricFrame:
 
         return amf
 
-    def _process_features(
-        self, base_name, features, sample_array
-    ) -> List[GroupFeature]:
+    def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
         result = []
 

@@ -3,24 +3,19 @@
 
 """All example code from "docs/user_guide/adversarial.rst"."""
 
-from sklearn.compose import make_column_transformer, make_column_selector
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
 import torch
 from numpy import mean, number
+from sklearn.compose import make_column_selector, make_column_transformer
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import fairlearn.utils._compatibility as compat
-from fairlearn.datasets import fetch_adult
-from fairlearn.metrics import (
-    MetricFrame,
-    selection_rate,
-    demographic_parity_difference,
-)
-from sklearn.metrics import accuracy_score
-
-from sklearn.model_selection import train_test_split
 from fairlearn.adversarial import AdversarialFairnessClassifier
+from fairlearn.datasets import fetch_adult
+from fairlearn.metrics import MetricFrame, demographic_parity_difference, selection_rate
 
 # Global variables of test_examples()
 schedulers = []
@@ -110,16 +105,14 @@ def test_examples():
             predictions == pos_label,
             sensitive_features=Z_test,
         )
-        accuracy = mean(predictions.values == Y_test.values)
+        accuracy = mean(predictions == Y_test.values)
         selection_rate = mean(predictions == pos_label)
         return dp_diff, accuracy, selection_rate
 
     def optimizer_constructor(model):
         global schedulers
         optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-        schedulers.append(
-            torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.995)
-        )
+        schedulers.append(torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.995))
         return optimizer
 
     from math import sqrt
