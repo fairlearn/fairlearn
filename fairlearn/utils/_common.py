@@ -88,6 +88,9 @@ def _get_soft_predictions_batch(estimator, X, predict_method, batch_size, device
 
     batch_size : int
         The number of samples in each batch
+    
+    device : str
+        The device on which to run the computation
 
     Returns
     -------
