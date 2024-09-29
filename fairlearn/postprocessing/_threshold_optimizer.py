@@ -375,7 +375,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         )
         return preds
 
-    def _pmf_predict(self, X, *, sensitive_features):
+    def _pmf_predict(self, X, *, sensitive_features, batch_size=None, device='cpu'):
         """Probabilistic mass function.
 
         Parameters
@@ -394,7 +394,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
         return self.interpolated_thresholder_._pmf_predict(
-            X, sensitive_features=sensitive_features
+            X, sensitive_features=sensitive_features, batch_size=batch_size, device=device
         )
 
     def _threshold_optimization_for_simple_constraints(

@@ -118,11 +118,11 @@ def _get_soft_predictions_batch(estimator, X, predict_method, batch_size, device
 
     # move data to device
     x_prev_device = X.device.type
-    if X.device != device:
+    if x_prev_device != device:
         X = X.to(device)
-    
-    estimator_prev_device = next(estimator.model.parameters()).device.type
-    if estimator.device != device:
+
+    estimator_prev_device = estimator.device.type
+    if estimator_prev_device != device:
         estimator = estimator.to(device)
 
     for start_idx in tqdm(range(0, n_samples, batch_size), desc="Processing Batches"):
