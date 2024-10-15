@@ -104,9 +104,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         """Transform X using the fitted encoder or passthrough."""
         if isinstance(self.transformer, str) or self.transformer is None:
             if not type_of_target(X) == self.inferred_type_:
-                raise ValueError(
-                    "Inferred distribution type of X does not match " + self.inferred_type_
-                )
+                raise ValueError("Unknown label type")
             return (
                 self.transform_.transform(self._check(X)).astype(float)
                 if self.inferred_type_ in ["binary", "multiclass"]
