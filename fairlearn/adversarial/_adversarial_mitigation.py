@@ -414,7 +414,7 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        first_call = not hasattr(self, "classes")
+        first_call = not hasattr(self, "classes_")
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
 
