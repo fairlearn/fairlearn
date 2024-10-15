@@ -192,15 +192,18 @@ class fake_tensorflow:
 rows = 60
 cols = 5
 Bin2d = np.random.choice([0.0, 1.0], size=(rows, cols))
-Bin1d = np.random.choice([0.0, 1.0], size=(rows, 1))
+Bin1d = np.random.choice([0.0, 1.0], size=(rows,))
 Cat = np.zeros((rows, cols), dtype=float)
 Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.0
+Cat1d = Cat[:, 0]
 Cont2d = np.random.rand(rows, cols)
-Cont1d = np.random.rand(rows, 1)
+Cont1d = np.random.rand(
+    rows,
+)
 MultiClass2d, _ = make_classification(
     random_state=42, n_classes=3, n_clusters_per_class=1, n_samples=rows, n_features=cols
 )
-MultiClass1d = np.random.choice([0.0, 1.0, 0.2], size=(rows, 1))
+MultiClass1d = np.random.choice([0.0, 1.0, 0.2], size=(rows,))
 
 
 def generate_data_combinations(n=10):
@@ -213,14 +216,14 @@ def generate_data_combinations(n=10):
         (X, Y, Z) is data, and (X_type, Y_type, Z_type) are their respective
         distribution types.
     """
-    datas = [Bin1d, Cat, Cont2d, Cont1d]
+    dataX = [Bin2d, Cat, Cont2d]
+    dataY = [Bin1d, Cat1d, Cont1d]
     dist_type = [
         Keyword_BINARY,
-        Keyword_CATEGORY,
-        Keyword_CONTINUOUS,
+        Keyword_BINARY,
         Keyword_CONTINUOUS,
     ]
-    K = len(datas)
+    K = len(dataX)
     total_combinations = K**3
     combinations = np.random.choice(total_combinations, size=n).tolist()
     for c in combinations:
@@ -232,11 +235,11 @@ def generate_data_combinations(n=10):
         Z = c % K
         assert X + Y * K + Z * K * K == c_orig
         X_type = dist_type[X]
-        X = datas[X]
+        X = dataX[X]
         Y_type = dist_type[Y]
-        Y = datas[Y]
+        Y = dataY[Y]
         Z_type = dist_type[Z]
-        Z = datas[Z]
+        Z = dataY[Z]
         yield (X, Y, Z), (X_type, Y_type, Z_type)
 
 
