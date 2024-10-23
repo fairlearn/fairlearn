@@ -6,6 +6,7 @@ dependencies:
 - pip>=19.1.1
 - pytest
 - pytest-cov
+- pytorch
 - pytorch-cpu
 - pip:
    - skorch>=0.12.1
