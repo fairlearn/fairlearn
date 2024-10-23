@@ -9,5 +9,6 @@ dependencies:
 - pytest
 - pytest-cov
 - tensorflow
+- keras
 - pip:
    - scikeras[tensorflow-cpu]
