@@ -130,7 +130,7 @@ def validate(pipeline, X, y, z, pos_label):
         predictions == pos_label,
         sensitive_features=z,
     )
-    accuracy = mean(predictions.values == y.values)
+    accuracy = mean(predictions == y.values)
     selection_rate = mean(predictions == pos_label)
     print(
         "DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
@@ -233,3 +233,5 @@ print(mf.by_group)
 # difference than in Exercise 1! This may come at the cost of some accuracy,
 # but such a tradeoff is to be expected as we are purposely mitigating
 # the unfairness that was present in the data.
+
+sklearn.set_config(enable_metadata_routing=False)
