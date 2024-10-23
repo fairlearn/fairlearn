@@ -1,6 +1,5 @@
 name: fairlearn-tensorflow
 channels:
-- defaults
 - conda-forge
 dependencies:
 - python>=3.10
@@ -11,4 +10,4 @@ dependencies:
 - tensorflow
 - keras
 - pip:
-   - scikeras[tensorflow-cpu]
+   - scikeras

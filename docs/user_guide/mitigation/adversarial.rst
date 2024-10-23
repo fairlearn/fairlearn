@@ -60,7 +60,7 @@ Models
 ------
 
 One can implement the predictor and adversarial neural networks as
-a `torch.nn.Module` (using PyTorch) or as a `tensorflow.keras.Model` (using TensorFlow).
+a `torch.nn.Module` (using PyTorch) or as a `keras.Model` (using TensorFlow).
 This implementation has a soft dependency on either PyTorch or TensorFlow, and the user
 needs to have installed either one of the two soft dependencies. It is not possible to
 mix these dependencies, so a PyTorch predictor with a TensorFlow loss function is not

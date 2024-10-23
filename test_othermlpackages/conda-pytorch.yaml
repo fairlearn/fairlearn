@@ -1,15 +1,12 @@
 name: fairlearn-pytorch
 channels:
-- defaults
 - conda-forge
-- pytorch
 dependencies:
-- python==3.11
+- python>=3.10
 - pip>=19.1.1
 - pytest
 - pytest-cov
-- pytorch
-- cpuonly
+- pytorch-cpu
 - pip:
    - skorch>=0.12.1
 
