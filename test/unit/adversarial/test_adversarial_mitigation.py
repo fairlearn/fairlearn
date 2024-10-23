@@ -13,24 +13,15 @@ from fairlearn.adversarial import (
     AdversarialFairnessRegressor,
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
-from fairlearn.adversarial._constants import _TYPE_COMPLIANCE_ERROR
 from fairlearn.adversarial._preprocessor import FloatTransformer
 
 from .helper import (
-    BCE,
-    CCE,
-    MSE,
     Bin1d,
     Bin2d,
     Cat,
-    Cont1d,
     Cont2d,
-    Keyword_AUTO,
-    Keyword_BINARY,
-    Keyword_CATEGORY,
-    Keyword_CLASSIFICATION,
-    Keyword_CONTINUOUS,
     KeywordToClass,
+    MultiClass2d,
     cols,
     generate_data_combinations,
     get_instance,
@@ -110,7 +101,7 @@ def test_model_early_stop(torch):
         callbacks=lambda callback_obj, step, *args, **kwargs: step > 5,
     )
     mitigator.fit(X, Y, sensitive_features=Z)
-    assert mitigator.step_ == 6
+    assert mitigator.n_iter_ == 6
 
 
 def test_model_equalized_odds_model_setup():
@@ -264,6 +255,34 @@ def test_model_kw_error_torch():
             tensorflow=False,
             fake_mixin=True,
         ),
+        get_instance(
+            AdversarialFairnessClassifier,
+            fake_training=True,
+            torch=False,
+            tensorflow=True,
+            fake_mixin=True,
+        ),
+        get_instance(
+            AdversarialFairnessClassifier,
+            fake_training=True,
+            torch=True,
+            tensorflow=False,
+            fake_mixin=True,
+        ),
+        get_instance(
+            AdversarialFairnessRegressor,
+            fake_training=True,
+            torch=False,
+            tensorflow=True,
+            fake_mixin=True,
+        ),
+        get_instance(
+            AdversarialFairnessRegressor,
+            fake_training=True,
+            torch=True,
+            tensorflow=False,
+            fake_mixin=True,
+        ),
     ]
 )
 def test_estimators(estimator, check):
@@ -271,44 +290,11 @@ def test_estimators(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize("torch1", [True, False])
-def test_classifier(torch1):
-    """Test classifier subclass."""
-    mitigator = get_instance(
-        AdversarialFairnessClassifier,
-        fake_training=True,
-        torch=torch1,
-        tensorflow=not torch1,
-    )
-    assert isinstance(mitigator, _AdversarialFairness)
-
-    mitigator.fit(Cont2d, Bin1d, sensitive_features=Cat)
-    assert isinstance(mitigator.backendEngine_.predictor_loss, BCE)
-    assert isinstance(mitigator.backendEngine_.adversary_loss, CCE)
-
-
-@pytest.mark.parametrize("torch2", [True, False])
-def test_regressor(torch2):
-    """Test regressor subclass."""
-    mitigator = get_instance(
-        AdversarialFairnessRegressor,
-        fake_training=True,
-        torch=torch2,
-        tensorflow=not torch2,
-    )
-    assert isinstance(mitigator, _AdversarialFairness)
-
-    mitigator.fit(Cont2d, Cont2d, sensitive_features=Cat)
-    assert isinstance(mitigator.backendEngine_.predictor_loss, MSE)
-    assert isinstance(mitigator.backendEngine_.adversary_loss, CCE)
-
-
 @pytest.mark.parametrize("torch3", [True, False])
 def test_fake_models(torch3):
     """Test various data types and see if it is interpreted correctly."""
     for (X, Y, Z), (X_type, Y_type, Z_type) in generate_data_combinations():
         mitigator = get_instance(fake_training=True, torch=torch3, tensorflow=not torch3)
-
         mitigator.fit(X, Y, sensitive_features=Z)
         assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
         assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
@@ -325,125 +311,24 @@ def test_fake_models_df_inputs():
     """Test model with data frames as input."""
     for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
-        mitigator.fit(pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z))
+        mitigator.fit(pd.DataFrame(X), pd.Series(Y), sensitive_features=pd.DataFrame(Z))
 
 
-def check_type_helper(data, actual_type, valid_choices, invalid_choices):
-    """Help to check if distribution types are interpreted correctly."""
-    for valid_choice in valid_choices:
-        prep = FloatTransformer(transformer=valid_choice)
-        prep.fit(data)
-        assert prep.dist_type_ == actual_type
-        assert prep.n_features_in_ == data.shape[0]
-        assert prep.n_features_out_ == data.shape[1]
-
-    for invalid_choice in invalid_choices:
-        with pytest.raises(ValueError) as exc:
-            prep = FloatTransformer(transformer=invalid_choice)
-            prep.fit(data)
-            assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(
-                invalid_choice, prep.inferred_type_
-            )
-
-
-def test_check_type_correct_data():
-    """Test distribution types on some correct/incorrectly distributed data."""
-    check_type_helper(
-        Bin1d,
-        Keyword_BINARY,
-        [Keyword_AUTO, Keyword_BINARY, Keyword_CLASSIFICATION],
-        [Keyword_CATEGORY, None, "bogus"],
-    )
-    check_type_helper(
-        Cat,
-        Keyword_CATEGORY,
-        [Keyword_AUTO, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-        [Keyword_BINARY, None, "bogus"],
-    )
-    check_type_helper(
-        Cont1d,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS, None],
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            "bogus",
-        ],
-    )
-    check_type_helper(
-        Cont2d,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS, None],
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            "bogus",
-        ],
-    )
-    # Bin2d is not interpretable as binary 2d, nor continuous, because it is so ambiguous.
-    check_type_helper(
-        Bin2d,
-        None,
-        [],
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            Keyword_CONTINUOUS,
-            None,
-            "bogus",
-        ],
-    )
-
-    with pytest.raises(ValueError) as exc:
-        prep = FloatTransformer(transformer=Keyword_AUTO)
-        prep.fit(Bin2d)
-        assert str(exc.value) == _TYPE_COMPLIANCE_ERROR.format(Keyword_AUTO, prep.inferred_type_)
-
-
-def test_check_type_faulty_data():
-    """Check distribution types on slightly faulty datasets."""
-    notBin1d = Bin1d.copy()
-    notBin1d[0] = 0.1
-    check_type_helper(
-        notBin1d,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],
-        [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-    )
-    notCat = Cat.copy()
-    notCat[0, 0:2] = 1
-    # Special case where values are still {0,1}, but sums arent 1. Then we also
-    # reject continuous
-    check_type_helper(
-        notCat,
-        None,
-        [],  # Auto doesnt work on ambiguous
-        [
-            Keyword_BINARY,
-            Keyword_CATEGORY,
-            Keyword_CLASSIFICATION,
-            Keyword_CONTINUOUS,
-            Keyword_AUTO,
-        ],
-    )
-    notCat[0, 0] = 0.5
-    check_type_helper(
-        notCat,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],  # Auto does work here
-        [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-    )
-    notCat[0, 1] = 0.5
-    notCat[0, 2:] = 0.0  # Special case because now first row sums to one but is not one-hot
-    check_type_helper(
-        notCat,
-        Keyword_CONTINUOUS,
-        [Keyword_AUTO, Keyword_CONTINUOUS],  # Auto does work here
-        [Keyword_BINARY, Keyword_CATEGORY, Keyword_CLASSIFICATION],
-    )
+@pytest.mark.parametrize(
+    "data, valid_choice",
+    [
+        (Bin2d, "binary"),
+        (Cat, "binary"),
+        (Cont2d, "continuous"),
+        (MultiClass2d, "multiclass"),
+    ],
+)
+def test_valid_input_data_types(data, valid_choice):
+    """Test if the model processes the right data types"""
+    prep = FloatTransformer(transformer=valid_choice)
+    prep.fit(data)
+    assert prep.n_features_in_ == data.shape[0]
+    assert prep.n_features_out_ == data.shape[1]
 
 
 def check_2dnp(X):
@@ -476,7 +361,7 @@ def test_validate_data_df_inputs():
     """Test if validate_data properly preprocesses dataframes to ndarray."""
     for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
-        X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.DataFrame(Y), pd.DataFrame(Z))
+        X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.Series(Y), pd.DataFrame(Z))
         for x in (X, Y, Z):
             check_2dnp(x)
 

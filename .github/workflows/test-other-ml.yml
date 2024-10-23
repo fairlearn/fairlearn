@@ -12,10 +12,10 @@ on:
       mlpackage:
         required: true
         type: string
-      
+
 
 jobs:
-  other-ml:      
+  other-ml:
     runs-on: ${{ inputs.os }}
     env:
       baseDir: test_othermlpackages
@@ -32,11 +32,21 @@ jobs:
           conda env create --name $condaEnv --file=$baseDir/conda-${{inputs.mlpackage}}.yaml
         name: Create conda environment
       - run: |
+          if [[ ${{ inputs.mlpackage }} == "tensorflow" ]]; then
+            export NUMPY_DEP="numpy<2"
+          else
+            export NUMPY_DEP="numpy"
+          fi
+          if [[ ${{ inputs.mlpackage }} == "lightgbm" ]]; then
+            export NUMPY_DEP="numpy<2"
+          else
+            export NUMPY_DEP="numpy"
+          fi
           # For some reason, 'conda init bash' doesn't stick so
           # We have to keep doing the following
           source /usr/share/miniconda/etc/profile.d/conda.sh
           conda activate $condaEnv
-          pip install .
+          pip install . $NUMPY_DEP
         name: Install Fairlearn
       - run: |
           source /usr/share/miniconda/etc/profile.d/conda.sh
@@ -45,10 +55,11 @@ jobs:
           conda list
           echo
           # Override the filterwarnings set in the TOML file
-          python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py 
+          python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
         name: Run ${{matrix.mlpackage}} tests
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Upload coverage reports to Codecov with GitHub Action
+        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
+        uses: codecov/codecov-action@v4.2.0
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true

@@ -3,6 +3,6 @@
 """
 Enables experimental functionality that may be migrated to other modules at a later point.
 
-Warning:
+.. warning::
     Anything can break from version to version without further warning.
 """

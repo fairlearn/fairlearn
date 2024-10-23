@@ -190,8 +190,6 @@ class UtilityParity(ClassificationMoment):
         # constraints, which is achieved by removing some redundant constraints.
         # Considering fewer constraints is not required for correctness, but it can dramatically
         # speed up GridSearch.
-        self.pos_basis = pd.DataFrame()
-        self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series(dtype="float64")
         # zero_vec = pd.Series(0.0, self.index)
         col_count = len(event_vals) * (len(group_vals) - 1)

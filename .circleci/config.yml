@@ -16,6 +16,14 @@ jobs:
       # check out PR branch
       - checkout
 
+      - restore_cache:
+          key: v1-build-doc-datasets-{{ .Branch }}
+
+      - restore_cache:
+          keys:
+            - build-doc-ccache-{{ .Branch }}
+            - build-doc-ccache
+
       - run:
           name: Show Python version
           command: python --version
@@ -51,15 +59,26 @@ jobs:
           name: "Copy static pages"
           command: cp -r docs/static_landing_page/ docs/_build/
 
-      - persist_to_workspace:
-          root: docs/_build
-          paths: 
-            - html
-            - static_landing_page
+      - save_cache:
+          key: build-doc-ccache-{{ .Branch }}-{{ .BuildNum }}
+          paths:
+            - ~/.ccache
+            - ~/.cache/pip
+
+      - save_cache:
+          key: v1-build-doc-datasets-{{ .Branch }}
+          paths:
+            - ~/scikit_learn_data
 
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
           path: docs/_build/html
+
+      - persist_to_workspace:
+          root: docs/_build
+          paths:
+            - html
+            - static_landing_page
 
   build-doctest:
     docker:
@@ -69,6 +88,14 @@ jobs:
     steps:
       # check out PR branch
       - checkout
+
+      - restore_cache:
+          key: v1-build-doctest-datasets-{{ .Branch }}
+
+      - restore_cache:
+          keys:
+            - build-doctest-ccache-{{ .Branch }}
+            - build-doctest-ccache
 
       - run:
           name: Show Python version
@@ -100,6 +127,17 @@ jobs:
           name: 'Build doctest'
           command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
+
+      - save_cache:
+          key: build-doctest-ccache-{{ .Branch }}-{{ .BuildNum }}
+          paths:
+            - ~/.ccache
+            - ~/.cache/pip
+
+      - save_cache:
+          key: v1-build-doctest-datasets-{{ .Branch }}
+          paths:
+            - ~/scikit_learn_data
 
   deploy-doc:
     docker:
