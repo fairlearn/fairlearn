@@ -321,6 +321,7 @@ def get_instance(
         sys.modules["torch"] = None
     if tensorflow:
         sys.modules["tensorflow"] = fake_tensorflow
+        sys.modules["keras"] = fake_tensorflow.keras
     else:
         sys.modules["tensorflow"] = None
 
