@@ -141,45 +141,46 @@ class fake_torch:
         pass
 
 
-class fake_tensorflow:
-    """Mock of the TensorFlow module."""
+class fake_keras:
+    """Mock of tf.keras."""
 
-    class keras:
-        """Mock of tf.keras."""
+    class activations:  # noqa: D106
+        def deserialize(item):
+            return type(item, (), {"__call__": lambda x: x})
 
-        class activations:  # noqa: D106
-            def deserialize(item):
-                return type(item, (), {"__call__": lambda x: x})
+    class layers:  # noqa: D106
+        class Dense:  # noqa: D106
+            def __init__(self, units, kernel_initializer, bias_initializer):
+                self.b = units
 
-        class layers:  # noqa: D106
-            class Dense:  # noqa: D106
-                def __init__(self, units, kernel_initializer, bias_initializer):
-                    self.b = units
+    class initializers:  # noqa: D106
+        class GlorotNormal:  # noqa: D106
+            pass
 
-        class initializers:  # noqa: D106
-            class GlorotNormal:  # noqa: D106
+    Model = type("Model", (model_class,), {})
+
+    class losses:
+        """Mock of tf.keras.losses."""
+
+        BinaryCrossentropy = type("BinaryCrossentropy", (BCE,), {})
+        CategoricalCrossentropy = type("CategoricalCrossentropy", (CCE,), {})
+        MeanSquaredError = type("MeanSquaredError", (MSE,), {})
+
+    class optimizers:
+        """Mock of tf.keras.optimizers."""
+
+        class Optimizer:
+            """Mock of base optimizer."""
+
+            def __init__(self, **kwargs):  # noqa: D107
                 pass
 
-        Model = type("Model", (model_class,), {})
+        class Adam(Optimizer):
+            """Mock of pytorch Adam optimizer."""
 
-        class losses:
-            """Mock of tf.keras.losses."""
 
-            BinaryCrossentropy = type("BinaryCrossentropy", (BCE,), {})
-            CategoricalCrossentropy = type("CategoricalCrossentropy", (CCE,), {})
-            MeanSquaredError = type("MeanSquaredError", (MSE,), {})
-
-        class optimizers:
-            """Mock of tf.keras.optimizers."""
-
-            class Optimizer:
-                """Mock of base optimizer."""
-
-                def __init__(self, **kwargs):  # noqa: D107
-                    pass
-
-            class Adam(Optimizer):
-                """Mock of pytorch Adam optimizer."""
+class fake_tensorflow:
+    """Mock of the TensorFlow module."""
 
     class random:
         """mock of tf.random."""
@@ -321,8 +322,10 @@ def get_instance(
         sys.modules["torch"] = None
     if tensorflow:
         sys.modules["tensorflow"] = fake_tensorflow
+        sys.modules["keras"] = fake_keras
     else:
         sys.modules["tensorflow"] = None
+        sys.modules["keras"] = None
 
     default_kwargs = dict()
 
@@ -330,8 +333,8 @@ def get_instance(
         default_kwargs["predictor_model"] = fake_torch.nn.Module()
         default_kwargs["adversary_model"] = fake_torch.nn.Module()
     elif tensorflow:
-        default_kwargs["predictor_model"] = fake_tensorflow.keras.Model()
-        default_kwargs["adversary_model"] = fake_tensorflow.keras.Model()
+        default_kwargs["predictor_model"] = fake_keras.Model()
+        default_kwargs["adversary_model"] = fake_keras.Model()
 
     default_kwargs.update(kwargs)
     mitigator = cls(**default_kwargs)
@@ -349,3 +352,4 @@ def get_instance(
 
 sys.modules["torch"] = None
 sys.modules["tensorflow"] = None
+sys.modules["keras"] = None

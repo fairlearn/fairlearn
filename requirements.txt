@@ -1,8 +1,4 @@
 numpy>=1.24.4
 pandas>=2.0.3
-# pyarrow is going to be a mandatory dependency to pandas
-# this explicit dependency is only for the sake removing the DeprecationWarning
-# from pandas in this regard while that happens.
-pyarrow>=15
 scikit-learn>=1.2.1
 scipy>=1.9.3

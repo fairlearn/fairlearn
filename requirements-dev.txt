@@ -36,3 +36,4 @@ sphinx-prompt
 sphinx-copybutton
 packaging
 seaborn
+torch

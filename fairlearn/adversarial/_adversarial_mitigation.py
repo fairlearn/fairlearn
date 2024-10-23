@@ -92,7 +92,7 @@ class _AdversarialFairness(BaseEstimator):
         the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
-    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+    predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
         Instead of a neural network model, it is possible to pass a list
         :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
@@ -108,22 +108,22 @@ class _AdversarialFairness(BaseEstimator):
         If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
-    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+    adversary_model : list, torch.nn.Module, keras.Model
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
-        or tensorflow.keras.optimizers.Optimizer is passed, this
+        or keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
         callable and pass our model, and set the result of this call
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    adversary_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Defined similarly as
         :code:`predictor_optimizer`.
 
@@ -512,7 +512,9 @@ class _AdversarialFairness(BaseEstimator):
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
-                        result = cb(self, self.n_iter_)
+                        result = cb(
+                            self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=1
+                        )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
                         stop = stop or result
@@ -752,7 +754,7 @@ class _AdversarialFairness(BaseEstimator):
         if self.backend == "tensorflow" or self.backend == "auto":
             select = False
             try:
-                from tensorflow.keras import Model as model
+                from keras import Model as model
 
                 tensorflow_installed = True
                 if isinstance(self.predictor_model, (list, model)) and isinstance(
@@ -763,7 +765,7 @@ class _AdversarialFairness(BaseEstimator):
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
                             "predictor_model and adversary_model",
-                            "a list or tensorflow.keras.Model",
+                            "a list or keras.Model",
                         )
                     )
             except ImportError:
@@ -784,7 +786,7 @@ class _AdversarialFairness(BaseEstimator):
         raise ValueError(
             _KWARG_ERROR_MESSAGE.format(
                 "predictor_model and adversary_model",
-                "a list, torch.nn.Module, or tensorflow.keras.Model. Also, "
+                "a list, torch.nn.Module, or keras.Model. Also, "
                 + "make sure to have installed the corresponding backend",
             )
         )
@@ -885,7 +887,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
-    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+    predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
         Instead of a neural network model, it is possible to pass a list
         :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
@@ -901,22 +903,22 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
-    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+    adversary_model : list, torch.nn.Module, keras.Model
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
-        or tensorflow.keras.optimizers.Optimizer is passed, this
+        or keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
         callable and pass our model, and set the result of this call
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    adversary_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Defined similarly as
         :code:`predictor_optimizer`.
 
@@ -957,10 +959,16 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     callbacks : callable
         Callback function, called after every batch. For instance useable when
         wanting to validate. A list of callback functions can also be provided.
-        Each callback function is passed two arguments :code:`self` (the
-        estimator instance) and :code:`step` (the completed iteration), and
-        may return a Boolean value. If the returned value is `True`, the
-        optimization algorithm terminates. This can be used to implement
+        Each callback function is called as::
+
+            callback(
+                self, step=self.step_, X=X, y=y, z=sensitive_features, pos_label=1
+            )
+
+        which is passed the ``self`` object, the step number, the inputs ``X``,
+        the targets ``y``, the sensitive features ``z``, and the positive label.
+        The callback may return a Boolean value. If the returned value is `True`,
+        the optimization algorithm terminates. This can be used to implement
         *early stopping*.
 
     cuda : str, default = None
@@ -1083,7 +1091,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
-    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+    predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
         Instead of a neural network model, it is possible to pass a list
         :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
@@ -1099,22 +1107,22 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
-    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+    adversary_model : list, torch.nn.Module, keras.Model
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
-        or tensorflow.keras.optimizers.Optimizer is passed, this
+        or keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
         callable and pass our model, and set the result of this call
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    adversary_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Defined similarly as
         :code:`predictor_optimizer`.
 

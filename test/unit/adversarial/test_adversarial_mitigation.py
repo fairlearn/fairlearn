@@ -74,7 +74,7 @@ def test_model_params(torch):
         max_iter=10,
         random_state=1,
         progress_updates=0.0000001,
-        callbacks=[lambda *args: False, lambda *args: False],
+        callbacks=[lambda *args, **kwargs: False, lambda *args, **kwargs: False],
     )
     mitigator.fit(X, Y, sensitive_features=Z)
 
@@ -98,7 +98,7 @@ def test_model_early_stop(torch):
         max_iter=10,
         random_state=1,
         progress_updates=0.0000001,
-        callbacks=lambda callback_obj, step: step > 5,
+        callbacks=lambda callback_obj, step, *args, **kwargs: step > 5,
     )
     mitigator.fit(X, Y, sensitive_features=Z)
     assert mitigator.n_iter_ == 6
