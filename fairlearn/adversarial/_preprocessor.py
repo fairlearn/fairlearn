@@ -72,16 +72,8 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         )
         if init:
             self.input_dim_ = X.ndim
-            if self.input_dim_ > 2:
-                raise ValueError("Data can be at most two dimensional, not %d" % self.input_dim_)
-        else:
-            if X.ndim != self.input_dim_:
-                raise ValueError("Dimension of data is inconsistent with previous call")
         if X.ndim == 1:
             X = X.reshape(-1, 1)
-        if X.ndim != 2:
-            raise SystemError("Data must be two dimensional at this point.")
-
         return X
 
     def fit(self, X, y=None):
@@ -112,9 +104,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
         """Transform X using the fitted encoder or passthrough."""
         if isinstance(self.transformer, str) or self.transformer is None:
             if not type_of_target(X) == self.inferred_type_:
-                raise ValueError(
-                    "Inferred distribution type of X does not match " + self.inferred_type_
-                )
+                raise ValueError("Unknown label type")
             return (
                 self.transform_.transform(self._check(X)).astype(float)
                 if self.inferred_type_ in ["binary", "multiclass"]
@@ -125,13 +115,10 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
-        if (
-            self.transformer is None
-            or isinstance(self.transformer, str)
-            and self.inferred_type_ == "continuous"
-        ):
-            inverse = y
-        else:
-            inverse = self.transform_.inverse_transform(y)
+        if self.transformer is None or isinstance(self.transformer, str):
+            if self.inferred_type_ == "continuous":
+                inverse = y
+            else:
+                inverse = self.transform_.inverse_transform(y)
 
         return inverse.reshape(-1) if self.input_dim_ == 1 else inverse
