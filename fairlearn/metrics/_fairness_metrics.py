@@ -100,8 +100,13 @@ def demographic_parity_ratio(
 
 
 def equalized_odds_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups",
-    sample_weight=None, agg="worst_case"
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method="between_groups",
+    sample_weight=None,
+    agg="worst_case",
 ) -> float:
     """Calculate the equalized odds difference.
 
@@ -156,8 +161,13 @@ def equalized_odds_difference(
 
 
 def equalized_odds_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups",
-    sample_weight=None, agg="worst_case"
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method="between_groups",
+    sample_weight=None,
+    agg="worst_case",
 ) -> float:
     """Calculate the equalized odds ratio.
 
