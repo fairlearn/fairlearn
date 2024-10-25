@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from itertools import product
 import pytest
 
 from fairlearn.metrics import (
@@ -19,6 +20,9 @@ from fairlearn.metrics import (
 from .data_for_test import g_1, s_w, y_p, y_t
 
 _aggregate_methods = ["between_groups", "to_overall"]
+_agg_options = ["worst_case", "mean"]
+# cartesian product of the two lists
+_agg_combinations = list(product(_aggregate_methods, _agg_options))
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
@@ -73,21 +77,26 @@ def test_demographic_parity_ratio_weighted(agg_method):
     assert actual == gm.ratio(method=agg_method)
 
 
-@pytest.mark.parametrize("agg_method", _aggregate_methods)
-def test_equalized_odds_difference(agg_method):
-    actual = equalized_odds_difference(y_t, y_p, sensitive_features=g_1, method=agg_method)
-
-    metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
-    gm = MetricFrame(metrics=metrics, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
-
-    diffs = gm.difference(method=agg_method)
-    assert actual == diffs.max()
-
-
-@pytest.mark.parametrize("agg_method", _aggregate_methods)
-def test_equalized_odds_difference_weighted(agg_method):
+@pytest.mark.parametrize("agg_method, agg", _agg_combinations)
+def test_equalized_odds_difference(agg_method, agg):
     actual = equalized_odds_difference(
-        y_t, y_p, sensitive_features=g_1, method=agg_method, sample_weight=s_w
+        y_t, y_p, sensitive_features=g_1, method=agg_method, agg=agg
+    )
+
+    metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
+    gm = MetricFrame(metrics=metrics, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
+
+    diffs = gm.difference(method=agg_method)
+    if agg == "worst_case":
+        assert actual == diffs.max()
+    else:
+        assert actual == diffs.mean()
+
+
+@pytest.mark.parametrize("agg_method, agg", _agg_combinations)
+def test_equalized_odds_difference_weighted(agg_method, agg):
+    actual = equalized_odds_difference(
+        y_t, y_p, sensitive_features=g_1, method=agg_method, sample_weight=s_w, agg=agg
     )
 
     metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
@@ -102,24 +111,30 @@ def test_equalized_odds_difference_weighted(agg_method):
     )
 
     diffs = gm.difference(method=agg_method)
-    assert actual == diffs.max()
+    if agg == "worst_case":
+        assert actual == diffs.max()
+    else:
+        assert actual == diffs.mean()
 
 
-@pytest.mark.parametrize("agg_method", _aggregate_methods)
-def test_equalized_odds_ratio(agg_method):
-    actual = equalized_odds_ratio(y_t, y_p, method=agg_method, sensitive_features=g_1)
+@pytest.mark.parametrize("agg_method, agg", _agg_combinations)
+def test_equalized_odds_ratio(agg_method, agg):
+    actual = equalized_odds_ratio(y_t, y_p, method=agg_method, sensitive_features=g_1, agg=agg)
 
     metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
     gm = MetricFrame(metrics=metrics, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
 
     ratios = gm.ratio(method=agg_method)
-    assert actual == ratios.min()
+    if agg == "worst_case":
+        assert actual == ratios.min()
+    else:
+        assert actual == ratios.mean()
 
 
-@pytest.mark.parametrize("agg_method", _aggregate_methods)
-def test_equalized_odds_ratio_weighted(agg_method):
+@pytest.mark.parametrize("agg_method, agg", _agg_combinations)
+def test_equalized_odds_ratio_weighted(agg_method, agg):
     actual = equalized_odds_ratio(
-        y_t, y_p, method=agg_method, sensitive_features=g_1, sample_weight=s_w
+        y_t, y_p, method=agg_method, sensitive_features=g_1, sample_weight=s_w, agg=agg
     )
 
     metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
@@ -134,7 +149,10 @@ def test_equalized_odds_ratio_weighted(agg_method):
     )
 
     ratios = gm.ratio(method=agg_method)
-    assert actual == ratios.min()
+    if agg == "worst_case":
+        assert actual == ratios.min()
+    else:
+        assert actual == ratios.mean()
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
