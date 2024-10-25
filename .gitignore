@@ -66,6 +66,8 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/auto_examples/
+docs/sg_execution_times.rst
+docs/modules/
 
 # PyBuilder
 target/
@@ -121,3 +123,6 @@ docbuild/
 
 # Generated API stub files
 docs/api_reference/generated/
+
+# Doc build generated files
+*.pkl

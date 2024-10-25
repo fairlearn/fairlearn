@@ -24,9 +24,7 @@ def test_list():
 
 def test_named_list():
     expected_name = "My Named List"
-    target = metrics._group_feature.GroupFeature(
-        "Ignored", raw_feature, 2, expected_name
-    )
+    target = metrics._group_feature.GroupFeature("Ignored", raw_feature, 2, expected_name)
 
     assert target.name_ == expected_name
     common_validations(target)

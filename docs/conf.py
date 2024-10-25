@@ -52,7 +52,6 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "bokeh.sphinxext.bokeh_plot",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.doctest",
@@ -60,10 +59,12 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.linkcode",
     "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
     "sphinx_gallery.gen_gallery",
-    "sphinx_autodoc_typehints",  # needs to be AFTER napoleon
+    "sphinx_autodoc_typehints",
     "numpydoc",
+    "matplotlib.sphinxext.plot_directive",
+    "sphinx_prompt",
+    "sphinx_copybutton",
 ]
 
 source_suffix = [".rst"]
@@ -90,6 +91,8 @@ templates_path = ["templates"]
 
 # generate autosummary even if no references
 autosummary_generate = True
+class_members_toctree = False
+numpydoc_show_class_members = False
 
 
 # List of patterns, relative to source directory, that match files and
@@ -98,10 +101,6 @@ autosummary_generate = True
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "README.rst"]
 
 master_doc = "index"
-
-if fairlearn.__version__ == "0.4.6":
-    print("Current version is v0.4.6, will apply overrides")
-    master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -182,6 +181,8 @@ sphinx_gallery_conf = {
     "gallery_dirs": "auto_examples",
     # pypandoc enables rst to md conversion in downloadable notebooks
     "pypandoc": True,
+    "backreferences_dir": os.path.join("modules", "generated"),
+    "doc_module": ("fairlearn",),
 }
 
 html_sidebars = {
@@ -192,13 +193,20 @@ html_sidebars = {
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_default_options = {
-    "member-order": "groupwise"
-}
+autodoc_default_options = {"member-order": "groupwise"}
+
+# Options for the `::plot` directive
+# ----------------------------------
+# https://matplotlib.org/stable/api/sphinxext_plot_directive_api.html
+plot_formats = ["png"]
+plot_include_source = True
+plot_html_show_formats = False
+plot_html_show_source_link = False
 
 
 # Linking Code
 # ------------
+
 
 # The following is used by sphinx.ext.linkcode to provide links to github
 # based on pandas doc/source/conf.py
@@ -238,9 +246,7 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
-    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(
-        os.sep, "/"
-    )
+    fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, "/")
     if tag_or_branch == "main":
         return (
             "http://github.com/fairlearn/fairlearn/blob"

@@ -22,15 +22,12 @@ METRIC_DICT = {
     "true_negative_rate": lambda x: x.true_negatives / x.negatives,
     "accuracy_score": lambda x: (x.true_positives + x.true_negatives) / x.n,
     "balanced_accuracy_score": (
-        lambda x: 0.5 * x.true_positives / x.positives
-        + 0.5 * x.true_negatives / x.negatives
+        lambda x: 0.5 * x.true_positives / x.positives + 0.5 * x.true_negatives / x.negatives
     ),
 }
 
 
-def _extend_confusion_matrix(
-    *, true_positives, false_positives, true_negatives, false_negatives
-):
+def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives, false_negatives):
     """Extend the provided confusion matrix counts with additional implied fields.
 
     Parameters
@@ -151,18 +148,23 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
              (2) min and max in x_grid are below/above min and max in data[x_col]
              (3) data is indexed 0,...,len(data)
 
-    :param data: the convex hull data points
-    :type data: pandas.DataFrame
-    :param x_col: name of the x-column in `data`
-    :type x_col: str
-    :param y_col: name of the y-column in `data`
-    :type y_col: str
-    :param content_col: name of the column in `data` with a description of the data point
-    :type content_col: str
-    :param x_grid: the grid of x-values for which the y-values need to be calculated
-    :type x_grid: numpy.ndarray
-    :return: DataFrame with the points of the interpolated curve
-    :type: pandas.DataFrame
+    Parameters
+    ----------
+    data : :class:`pandas:pandas.DataFrame`
+        The convex hull data points.
+    x_col : str
+        Name of the x-column in `data`.
+    y_col : str
+        Name of the y-column in `data`.
+    content_col : str
+        Name of the column in `data` with a description of the data point.
+    x_grid: :class:`numpy.ndarray`
+        The grid of x-values for which the y-values need to be calculated.
+
+    Returns
+    -------
+    result : :class:`pandas:pandas.DataFrame`
+        DataFrame with the points of the interpolated curve.
     """
     data_transpose = data.transpose()
 
@@ -183,9 +185,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
 
         # Calculate the y value at x based on the slope between data points i and i + 1
         x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
-        x_distance_between_data_points = (
-            data_transpose[i + 1][x_col] - data_transpose[i][x_col]
-        )
+        x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
         p0 = x_distance_from_next_data_point / x_distance_between_data_points
         p1 = 1 - p0
         y = p0 * data_transpose[i][y_col] + p1 * data_transpose[i + 1][y_col]
@@ -200,9 +200,7 @@ def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
             }
         )
 
-    return pd.DataFrame(dict_list)[
-        [x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]
-    ]
+    return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
 
 
 def _calculate_tradeoff_points(
@@ -217,22 +215,25 @@ def _calculate_tradeoff_points(
     This is done by iterating through all possible
     thresholds that could be set based on the available scores.
 
-    :param data: the DataFrame containing scores and labels
-    :type data: pandas.DataFrame
-    :param sensitive_feature_value: the sensitive feature value of the samples provided in `data`
-    :type sensitive_feature_value: str or int
-    :param flip: if True flip points below the ROC diagonal into points above by applying negative
-        weights; if False does not allow flipping; default True
-    :type flip: bool
-    :return: the ROC curve points with their corresponding threshold operations
-    :rtype: pandas.DataFrame
+    Parameters
+    ----------
+    data : :class:`pandas:pandas.DataFrame`
+        The DataFrame containing scores and labels.
+    sensitive_feature_value : str, int
+        The sensitive feature value of the samples provided in `data`.
+    flip : bool, default = True
+        If True `flip` points below the ROC diagonal into points above by
+        applying negative weights; if False does not allow flipping.
+
+    Returns
+    -------
+    result : :class:`pandas:pandas.DataFrame`
+        The ROC curve points with their corresponding threshold operations.
     """
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
 
     if n_positive == 0 or n_negative == 0:
-        raise ValueError(
-            DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value)
-        )
+        raise ValueError(DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value))
 
     scores.append(-np.inf)
     labels.append(np.nan)
@@ -298,11 +299,16 @@ def _get_scores_labels_and_counts(data):
 
     The samples are sorted into descending order.
 
-    :param data: the DataFrame containing scores and labels
-    :type data: pandas.DataFrame
-    :return: a tuple containing the sorted scores, labels, the number of samples, the number
-        of positive samples, and the number of negative samples
-    :rtype: tuple of list, list, int, int, int
+    Parameters
+    ----------
+    data : :class:`pandas:pandas.DataFrame`
+        The DataFrame containing scores and labels.
+
+    Returns
+    -------
+    result : tuple[list, list, int, int, int]
+        A tuple containing the sorted scores, labels, the number of samples, \
+        the number of positive samples, and the number of negative samples.
     """
     data_sorted = data.sort_values(by=SCORE_KEY, ascending=False)
 
@@ -317,10 +323,16 @@ def _get_scores_labels_and_counts(data):
 def _get_counts(labels):
     """Return the overall, positive, and negative counts of the labels.
 
-    :param labels: the labels of the samples
-    :type labels: list
-    :return: a tuple containing the overall, positive, and negative counts of the labels
-    :rtype: tuple of int, int, int
+    Parameters
+    ----------
+    labels : list
+        The labels of the samples.
+
+    Returns
+    -------
+    result : tuple[int, int, int]
+        A tuple containing the overall, positive, and negative counts of \
+        the labels.
     """
     n = len(labels)
     n_positive = sum(labels)

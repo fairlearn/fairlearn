@@ -45,12 +45,8 @@ def general_wilson(p, n, digits=digits_of_precision, z=z_score):
     denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
     adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
-    lower_bound = (
-        centre_adjusted_probability - z * adjusted_standard_deviation
-    ) / denominator
-    upper_bound = (
-        centre_adjusted_probability + z * adjusted_standard_deviation
-    ) / denominator
+    lower_bound = (centre_adjusted_probability - z * adjusted_standard_deviation) / denominator
+    upper_bound = (centre_adjusted_probability + z * adjusted_standard_deviation) / denominator
     return np.array([round(lower_bound, digits), round(upper_bound, digits)])
 
 
@@ -118,9 +114,7 @@ metrics_dict = {
 
 @pytest.fixture()
 def sample_metric_frame():
-    return MetricFrame(
-        metrics=metrics_dict, y_true=y_t, y_pred=y_p, sensitive_features=g_1
-    )
+    return MetricFrame(metrics=metrics_dict, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
 
 
 def test_plotting_output(sample_metric_frame):

@@ -32,7 +32,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     The exponentiated gradient algorithm is described in detail by
     :footcite:t:`agarwal2018reductions`.
 
-    Read more in the :ref:`User Guide <exponentiated_gradient>`.
+    Read more in :ref:`sphx_glr_auto_examples_plot_mitigation_pipeline.py`.
 
     .. versionchanged:: 0.3.0
         Was a function before, not a class
@@ -155,7 +155,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         Qs = []
 
         last_regret_checked = _REGRET_CHECK_START_T
-        last_gap = np.PINF
+        last_gap = np.inf
         for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
@@ -193,13 +193,11 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             gaps_EG.append(gap_EG)
 
             if t == 0 or not self.run_linprog_step:
-                gap_LP = np.PINF
+                gap_LP = np.inf
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(
-                    self.nu
-                )
+                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(self.nu)
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -317,9 +315,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             pred = self._pmf_predict(X)
             randomized_pred = np.zeros(pred.shape[0])
             for i in range(pred.shape[0]):
-                randomized_pred[i] = random_state.choice(
-                    pred.iloc[i, :], p=self.weights_
-                )
+                randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
             return randomized_pred
 
     def _pmf_predict(self, X):

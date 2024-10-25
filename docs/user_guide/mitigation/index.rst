@@ -8,7 +8,7 @@ in Fairlearn.
 One thing which should always be remembered: all the algorithms herein
 will provide mathematical guarantees as to how close they can drive some
 unfairness metric to zero.
-**However** this does not mean that the results are *fair*.
+**However**, this does not mean that the results are *fair*.
 
 Fairlearn contains the following algorithms for mitigating unfairness:
 
@@ -97,5 +97,6 @@ fairness definitions, please open a
    :maxdepth: 2
 
    preprocessing
+   postprocessing
    reductions
    adversarial

@@ -14,13 +14,11 @@ logger = logging.getLogger(__name__)
 _VALID_ERROR_STRING = ["raise", "coerce"]
 _VALID_GROUPING_FUNCTION = ["min", "max"]
 
-_INVALID_ERRORS_VALUE_ERROR_MESSAGE = (
-    "Invalid error value specified. Valid values are {0}".format(_VALID_ERROR_STRING)
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. Valid values are {0}".format(
+    _VALID_ERROR_STRING
 )
 _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = (
-    "Invalid grouping function specified. Valid values are {0}".format(
-        _VALID_GROUPING_FUNCTION
-    )
+    "Invalid grouping function specified. Valid values are {0}".format(_VALID_GROUPING_FUNCTION)
 )
 _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
     "Metric frame contains non-scalar cells. Please remove non-scalar columns from your"
@@ -28,9 +26,7 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
 )
 
 
-def extract_unique_classes(
-    data: pd.DataFrame, feature_list: List[str]
-) -> Dict[str, np.ndarray]:
+def extract_unique_classes(data: pd.DataFrame, feature_list: List[str]) -> Dict[str, np.ndarray]:
     """Compute unique values in a given set of columns."""
     result = dict()
     for feature in feature_list:
@@ -39,13 +35,22 @@ def extract_unique_classes(
 
 
 def apply_to_dataframe(
-    data: pd.DataFrame, metric_functions: Dict[str, AnnotatedMetricFunction]
+    data: pd.DataFrame,
+    metric_functions: Dict[str, AnnotatedMetricFunction],
+    include_groups: bool = False,
 ) -> pd.Series:
     """Apply metric functions to a DataFrame.
 
     The incoming DataFrame may have been sliced via `groupby()`.
     This function applies each annotated function in turn to the
     supplied DataFrame.
+
+    The include_groups argument is weird. It appears that pandas
+    introduced it as an argument in v2.2, and immediately deprecated
+    it (dependent on when this is being read, may need to adjust):
+    https://pandas.pydata.org/docs/reference/api/pandas.core.groupby.DataFrameGroupBy.apply.html
+    We don't use this argument, and only include it so that we can be
+    compatible with pandas<2.2
     """
     values = dict()
     for function_name, metric_function in metric_functions.items():
@@ -135,9 +140,7 @@ class DisaggregatedResult:
                     else:
                         vals = [mf[m].max() for m in mf.columns]
 
-                    result = pd.Series(
-                        vals, index=self.by_group.columns, dtype="object"
-                    )
+                    result = pd.Series(vals, index=self.by_group.columns, dtype="object")
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
@@ -160,21 +163,15 @@ class DisaggregatedResult:
             if errors == "raise":
                 try:
                     if grouping_function == "min":
-                        result = self.by_group.groupby(
-                            level=control_feature_names
-                        ).min()
+                        result = self.by_group.groupby(level=control_feature_names).min()
                     else:
-                        result = self.by_group.groupby(
-                            level=control_feature_names
-                        ).max()
+                        result = self.by_group.groupby(level=control_feature_names).max()
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
                 mf = self.by_group.copy()
-                mf = mf.apply(
-                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
-                )
+                mf = mf.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
                 if grouping_function == "min":
                     result = mf.groupby(level=control_feature_names).min()
                 else:
@@ -221,15 +218,11 @@ class DisaggregatedResult:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
         if method == "between_groups":
-            subtrahend = self.apply_grouping(
-                "min", control_feature_names, errors=errors
-            )
+            subtrahend = self.apply_grouping("min", control_feature_names, errors=errors)
         elif method == "to_overall":
             subtrahend = self.overall
         else:
-            raise ValueError(
-                "Unrecognised method '{0}' in difference() call".format(method)
-            )
+            raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
         mf = self.by_group.copy()
         # Can assume errors='coerce', else error would already have been raised in .group_min
@@ -300,9 +293,9 @@ class DisaggregatedResult:
 
             if control_feature_names is not None:
                 # It's easiest to give in to the DataFrame columns preference
-                ratios = self.by_group.unstack(
+                ratios = self.by_group.unstack(level=control_feature_names) / self.overall.unstack(
                     level=control_feature_names
-                ) / self.overall.unstack(level=control_feature_names)
+                )
             else:
                 ratios = self.by_group / self.overall
 
@@ -363,7 +356,10 @@ class DisaggregatedResult:
             overall = apply_to_dataframe(data, metric_functions=annotated_functions)
         else:
             temp = data.groupby(by=control_feature_names).apply(
-                apply_to_dataframe, metric_functions=annotated_functions
+                apply_to_dataframe,
+                metric_functions=annotated_functions,
+                # See note in apply_to_dataframe about include_groups
+                include_groups=False,
             )
             # If there are multiple control features, might have missing combinations
             if len(control_feature_names) > 1:
@@ -383,7 +379,10 @@ class DisaggregatedResult:
             all_grouping_names = control_feature_names + all_grouping_names
 
         temp = data.groupby(all_grouping_names).apply(
-            apply_to_dataframe, metric_functions=annotated_functions
+            apply_to_dataframe,
+            metric_functions=annotated_functions,
+            # See note in apply_to_dataframe about include_groups
+            include_groups=False,
         )
         if len(all_grouping_names) > 1:
             # We might have missing combinations in the input, so expand to fill

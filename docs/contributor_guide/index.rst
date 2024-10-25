@@ -7,7 +7,7 @@ This project welcomes contributions and suggestions. Check the sections below
 to find out how to connect to our community of users and developers.
 Also make sure to read and respect our community's :ref:`code_of_conduct`.
 The contribution guide explains how to structure your contributions. Please
-:ref:`reach out <communication>` if you encouter any issues.
+:ref:`reach out <communication>` if you encounter any issues.
 
 .. toctree::
    :maxdepth: 1
@@ -39,7 +39,8 @@ To report bugs, request features, or ask usage questions please use the
 Community calls
 ---------------
 
-We have a weekly community call every Thursday at 11am US Eastern time (ET).
+We have a community call every other Wednesday starting on the 11th of September 2024.
+These are held at noon US Eastern time (ET).
 Check what this means in your time zone with
 `Time.is <https://time.is/New_York>`_.
 All are welcome! Please reach out via

@@ -20,25 +20,27 @@ def simple_binary_threshold_data(
     of the resultant X array; the sensitive feature is included in
     this array under the label 'example_sensitive_feature'
 
-    :param number_a0: Number of samples to generate with the label a0
-    :type number_a0: int
+    Parameters
+    ----------
+    number_a0 : int
+        Number of samples to generate with the label a0.
 
-    :param number_a1: Number of samples to generate with the label a1
-    :type number_a1: int
+    number_a1 : int
+        Number of samples to generate with the label a1.
 
-    :param a0_threshold: Threshold value for samples with label a0 to
-        get a result of '1' in the Y array
-    :type a0_threshold: float
+    a0_threshold: float
+        Threshold value for samples with label a0 to \
+        get a result of '1' in the Y array.
 
-    :param a1_threshold: Threshold value for samples with label a1 to
-        get a result of '1' in the Y array
-    :type a1_threshold: float
+    a1_threshold: float
+        Threshold value for samples with label a1 to \
+        get a result of '1' in the Y array.
 
-    :param a0_label: The label value for the a0 class
-    :type a0_label: int, string
+    a0_label: int, string
+        The label value for the a0 class.
 
-    :param a1_label: The label value for the a1 class
-    :type a1_label: int, string
+    a1_label: int, string
+        The label value for the a1 class.
 
     Returns X, Y, A:
         X is the feature array (containing the uniformly distributed feature

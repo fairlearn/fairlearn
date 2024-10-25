@@ -89,14 +89,10 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     if opt_lambda:
         projected_lambda = constraints.project_lambda(lambda_vec)
         L_expected = (
-            best_h_error
-            + np.sum(projected_lambda * best_h_gamma)
-            - eps * np.sum(projected_lambda)
+            best_h_error + np.sum(projected_lambda * best_h_gamma) - eps * np.sum(projected_lambda)
         )
     else:
-        L_expected = (
-            best_h_error + np.sum(lambda_vec * best_h_gamma) - eps * np.sum(lambda_vec)
-        )
+        L_expected = best_h_error + np.sum(lambda_vec * best_h_gamma) - eps * np.sum(lambda_vec)
 
     L_high_expected = best_h_error + B * (best_h_gamma.max() - eps)
 
@@ -107,9 +103,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
     # call _eval to get the desired results L, L_high, gamma, error;
     # _eval is compatible with a callable h or a vector Q
     Q_vec = pd.Series([1.0])
-    L, L_high, gamma, error = lagrangian._eval(
-        h if use_Q_callable else Q_vec, lambda_vec
-    )
+    L, L_high, gamma, error = lagrangian._eval(h if use_Q_callable else Q_vec, lambda_vec)
 
     # in this particular example the estimator is always the same
     expected_estimator_weights = {
@@ -154,9 +148,7 @@ def test_call_oracle(Constraints, eps, estimator, mocker):
 
     # Set up initial lambda vector based on a 0-initialized theta and use separate constraints
     # object for it to avoid the dependence on the lagrangian object.
-    lambda_vec, new_weights, new_labels = get_lambda_new_weights_and_labels(
-        constraints, X, y, A
-    )
+    lambda_vec, new_weights, new_labels = get_lambda_new_weights_and_labels(constraints, X, y, A)
 
     _ = lagrangian._call_oracle(lambda_vec)
 
@@ -250,9 +242,7 @@ def test_objective_constraints_compatibility(Constraints, Objective):
                 sensitive_features=A,
             )
         assert (
-            _MESSAGE_BAD_OBJECTIVE.format(
-                objective._moment_type(), constraints._moment_type()
-            )
+            _MESSAGE_BAD_OBJECTIVE.format(objective._moment_type(), constraints._moment_type())
             in execInfo.value.args[0]
         )
     else:

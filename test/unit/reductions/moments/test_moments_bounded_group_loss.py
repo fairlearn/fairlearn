@@ -20,9 +20,7 @@ class TestBoundedGroupLoss:
         def predictor(x):
             return self.estimator.predict(x)
 
-        self.disparity_criterion = BoundedGroupLoss(
-            SquareLoss(-np.inf, np.inf), upper_bound=eps
-        )
+        self.disparity_criterion = BoundedGroupLoss(SquareLoss(-np.inf, np.inf), upper_bound=eps)
         self.disparity_criterion.load_data(X, Y, sensitive_features=A)
         bnd = self.disparity_criterion.bound()
         loss_eps = self.disparity_criterion.gamma(predictor) - bnd
@@ -165,9 +163,7 @@ class TestBoundedGroupLoss:
         X["gender"] = A
         Y = data.gpa
         y = data.gpa
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         A_train = X_train.gender
         A_test = X_test.gender
         del X_train["gender"]
@@ -187,9 +183,7 @@ class TestBoundedGroupLoss:
 
         eps = 0.05
 
-        disparity_criterion = BoundedGroupLoss(
-            SquareLoss(-np.inf, np.inf), upper_bound=eps
-        )
+        disparity_criterion = BoundedGroupLoss(SquareLoss(-np.inf, np.inf), upper_bound=eps)
         disparity_criterion.load_data(X, Y, sensitive_features=A)
         bnd = disparity_criterion.bound()
         loss_eps = disparity_criterion.gamma(predictor)

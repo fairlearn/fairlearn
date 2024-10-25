@@ -61,16 +61,14 @@ class ConditionalLossMoment(LossMoment):
         for attr in attr_vals:
             self.pos_basis[i] = 0 + zero_vec
             self.neg_basis[i] = 0 + zero_vec
-            self.pos_basis[i][attr] = 1
+            self.pos_basis.loc[attr, i] = 1
             self.neg_basis_present.at[i] = False
             i += 1
 
     def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the predictor."""
         self.tags[_PREDICTION] = predictor(self.X)
-        self.tags[_LOSS] = self.reduction_loss.eval(
-            self.tags[_LABEL], self.tags[_PREDICTION]
-        )
+        self.tags[_LOSS] = self.reduction_loss.eval(self.tags[_LABEL], self.tags[_PREDICTION])
         expect_attr = self.tags.groupby(_GROUP_ID).mean()
         self._gamma_descr = str(expect_attr[[_LOSS]])
         return expect_attr[_LOSS]

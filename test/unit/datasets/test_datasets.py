@@ -1,11 +1,12 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
 
 from fairlearn.datasets import (
+    fetch_acs_income,
     fetch_adult,
     fetch_bank_marketing,
     fetch_boston,
@@ -21,6 +22,7 @@ class TestFairlearnDataset:
     @pytest.mark.parametrize(
         "fetch_function",
         [
+            fetch_acs_income,
             fetch_adult,
             fetch_bank_marketing,
             fetch_boston,
@@ -47,6 +49,7 @@ class TestFairlearnDataset:
     @pytest.mark.parametrize(
         "fetch_function",
         [
+            fetch_acs_income,
             fetch_adult,
             fetch_bank_marketing,
             fetch_boston,
@@ -71,3 +74,24 @@ class TestFairlearnDataset:
         # been fixed.
         with pytest.raises(ValueError):
             fetch_diabetes_hospital(as_frame=False)
+
+    def test_fetch_acs_income_dataframe(self):
+        dataset = fetch_acs_income()
+        expected_columns = [
+            "AGEP",
+            "COW",
+            "SCHL",
+            "MAR",
+            "OCCP",
+            "POBP",
+            "RELP",
+            "WKHP",
+            "SEX",
+            "RAC1P",
+        ]
+        assert dataset["data"].columns.to_list() == expected_columns
+        assert dataset["data"].shape == (1664500, 10)
+
+    def test_fetch_acs_income_value_error(self):
+        with pytest.raises(ValueError):
+            fetch_acs_income(states=["XY"])

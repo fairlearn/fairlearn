@@ -1,7 +1,7 @@
 v0.10.0
 =======
 
-.. note::
-
-   v0.10.0 is not yet released. This page reflects changes on the current
-   :code:`main` branch that will eventually be a part of v0.10.0.
+* Added bootstrapping to :class:`.MetricFrame`, along with a new section
+  in the user guide
+* Added intersectionality in mental health care example notebook.
+* Added user guide for :class:`fairlearn.postprocessing.ThresholdOptimizer`

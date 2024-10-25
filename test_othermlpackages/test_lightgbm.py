@@ -15,6 +15,7 @@ def test_expgrad_classification():
         "learning_rate": 0.03,
         "num_leaves": 10,
         "max_depth": 3,
+        "verbose": -1,
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
     disparity_moment = DemographicParity()
@@ -29,6 +30,7 @@ def test_gridsearch_classification():
         "learning_rate": 0.03,
         "num_leaves": 10,
         "max_depth": 3,
+        "verbose": -1,
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
     disparity_moment = DemographicParity()
@@ -43,6 +45,7 @@ def test_thresholdoptimizer_classification():
         "learning_rate": 0.03,
         "num_leaves": 10,
         "max_depth": 3,
+        "verbose": -1,
     }
     estimator = lgb.LGBMClassifier(**lgb_params)
 

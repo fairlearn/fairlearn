@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 
+from fairlearn.metrics import plot_model_comparison
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 from fairlearn.postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
-from fairlearn.metrics import plot_model_comparison
 from fairlearn.postprocessing._threshold_optimizer import SIMPLE_CONSTRAINTS
 
 
@@ -34,14 +34,12 @@ def test_no_matplotlib(constraints):
     threshold_optimizer.fit(
         X=np.random.random((n_samples, n_features)),
         y=np.random.randint(n_classes, size=n_samples),
-        sensitive_features=np.random.randint(
-            n_sensitive_feature_values, size=n_samples
-        ),
+        sensitive_features=np.random.randint(n_sensitive_feature_values, size=n_samples),
     )
 
     with pytest.raises(RuntimeError) as exc:
         plot_threshold_optimizer(threshold_optimizer)
-        assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+    assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 
 
 def test_no_matplotlib_plot_model_comparison():
@@ -53,4 +51,4 @@ def test_no_matplotlib_plot_model_comparison():
             y_preds={},
             sensitive_features=[],
         )
-        assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+    assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE

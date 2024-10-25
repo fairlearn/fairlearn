@@ -4,19 +4,19 @@ Contributing code
 General advice
 --------------
 
-The field of ML fairness is nascent and developing, and while there are many 
-emerging methods in the fairness literature, the Fairlearn team is discerning 
-when it comes to adding new methods to the library. We often get requests to 
-add emerging methods as features, but if you want to suggest including 
-new features in the future, please keep in mind the guidance in this section. 
-For algorithms, we require all methods to be described in a peer-reviewed 
-paper; the Fairlean team specifies this requirement as a quality check, so 
-we do not need to complete the peer reviewing ourselves. We have a preference 
-for algorithms that are intuitive, easy to understand, and make explicit 
-the underlying empirical and normative assumptions (for example, algorithms 
-that are designed to address a specific type of measurement bias). 
-For metrics, Fairlearn currently only supports disaggregated methods, so 
-any proposed metrics that do not fall into the group fairness metric 
+The field of ML fairness is nascent and developing, and while there are many
+emerging methods in the fairness literature, the Fairlearn team is discerning
+when it comes to adding new methods to the library. We often get requests to
+add emerging methods as features, but if you want to suggest including
+new features in the future, please keep in mind the guidance in this section.
+For algorithms, we require all methods to be described in a peer-reviewed
+paper; the Fairlean team specifies this requirement as a quality check, so
+we do not need to complete the peer reviewing ourselves. We have a preference
+for algorithms that are intuitive, easy to understand, and make explicit
+the underlying empirical and normative assumptions (for example, algorithms
+that are designed to address a specific type of measurement bias).
+For metrics, Fairlearn currently only supports disaggregated methods, so
+any proposed metrics that do not fall into the group fairness metric
 paradigm would first require thorough discussion with maintainers.
 
 
@@ -92,7 +92,7 @@ optional if the sensitive features are already provided through :code:`X`.
 Code Style
 ----------
 
-We use ``flake8`` to check for PEP8 compatibility issues. You can either follow
+We use ``ruff`` to check for PEP8 compatibility issues. You can either follow
 the guidelines, or you could run ``black`` on your code. The generated
 formatting by ``black`` is compatible with the requirements we have. You can
 configure your IDE to use ``black`` to format your code. Please refer to your

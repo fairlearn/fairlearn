@@ -199,9 +199,7 @@ def test_1m_2cf():
 
     assert isinstance(target.overall, pd.Series)
     assert len(target.overall) == 4
-    assert np.array_equal(
-        target.overall.index.names, ["control_feature_0", "control_feature_1"]
-    )
+    assert np.array_equal(target.overall.index.names, ["control_feature_0", "control_feature_1"])
     mask_a_f = np.logical_and((g_1 == "aa"), (g_2 == "f"))
     mask_a_g = np.logical_and((g_1 == "aa"), (g_2 == "g"))
     mask_b_f = np.logical_and((g_1 == "ba"), (g_2 == "f"))
@@ -230,9 +228,7 @@ def test_1m_2cf_metric_dict():
 
     assert isinstance(target.overall, pd.DataFrame)
     assert target.overall.shape == (4, 1)
-    assert np.array_equal(
-        target.overall.index.names, ["control_feature_0", "control_feature_1"]
-    )
+    assert np.array_equal(target.overall.index.names, ["control_feature_0", "control_feature_1"])
     mask_a_f = np.logical_and((g_1 == "aa"), (g_2 == "f"))
     mask_a_g = np.logical_and((g_1 == "aa"), (g_2 == "g"))
     mask_b_f = np.logical_and((g_1 == "ba"), (g_2 == "f"))

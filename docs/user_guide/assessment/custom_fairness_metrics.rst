@@ -34,12 +34,12 @@ the requested aggregation. For example:
     >>> recall_difference = make_derived_metric(metric=recall_score,
     ...                                        transform='difference')
     >>> recall_difference(y_true, y_pred,
-    ...                   sensitive_features=sf_data)
+    ...                   sensitive_features=sf_data).item()
     0.19999...
     >>> MetricFrame(metrics=recall_score,
     ...             y_true=y_true,
     ...             y_pred=y_pred,
-    ...             sensitive_features=sf_data).difference()
+    ...             sensitive_features=sf_data).difference().item()
     0.19999...
 
 We use :func:`fairlearn.metrics.make_derived_metric` to manufacture a number

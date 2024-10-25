@@ -8,6 +8,8 @@ from fairlearn.metrics import (
     MetricFrame,
     demographic_parity_difference,
     demographic_parity_ratio,
+    equal_opportunity_difference,
+    equal_opportunity_ratio,
     equalized_odds_difference,
     equalized_odds_ratio,
     false_positive_rate,
@@ -25,13 +27,9 @@ _agg_combinations = list(product(_aggregate_methods, _agg_options))
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
 def test_demographic_parity_difference(agg_method):
-    actual = demographic_parity_difference(
-        y_t, y_p, sensitive_features=g_1, method=agg_method
-    )
+    actual = demographic_parity_difference(y_t, y_p, sensitive_features=g_1, method=agg_method)
 
-    gm = MetricFrame(
-        metrics=selection_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1
-    )
+    gm = MetricFrame(metrics=selection_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
 
     assert actual == gm.difference(method=agg_method)
 
@@ -55,13 +53,9 @@ def test_demographic_parity_difference_weighted(agg_method):
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)
 def test_demographic_parity_ratio(agg_method):
-    actual = demographic_parity_ratio(
-        y_t, y_p, sensitive_features=g_1, method=agg_method
-    )
+    actual = demographic_parity_ratio(y_t, y_p, sensitive_features=g_1, method=agg_method)
 
-    gm = MetricFrame(
-        metrics=selection_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1
-    )
+    gm = MetricFrame(metrics=selection_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
 
     assert actual == gm.ratio(method=agg_method)
 
@@ -159,3 +153,55 @@ def test_equalized_odds_ratio_weighted(agg_method, agg):
         assert actual == ratios.min()
     else:
         assert actual == ratios.mean()
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_difference(agg_method):
+    actual = equal_opportunity_difference(y_t, y_p, sensitive_features=g_1, method=agg_method)
+
+    gm = MetricFrame(metrics=true_positive_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
+
+    assert actual == gm.difference(method=agg_method)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_difference_weighted(agg_method):
+    actual = equal_opportunity_difference(
+        y_t, y_p, sensitive_features=g_1, sample_weight=s_w, method=agg_method
+    )
+
+    gm = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        sample_params={"sample_weight": s_w},
+    )
+
+    assert actual == gm.difference(method=agg_method)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_ratio(agg_method):
+    actual = equal_opportunity_ratio(y_t, y_p, sensitive_features=g_1, method=agg_method)
+
+    gm = MetricFrame(metrics=true_positive_rate, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
+
+    assert actual == gm.ratio(method=agg_method)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_ratio_weighted(agg_method):
+    actual = equal_opportunity_ratio(
+        y_t, y_p, sensitive_features=g_1, sample_weight=s_w, method=agg_method
+    )
+
+    gm = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        sample_params={"sample_weight": s_w},
+    )
+
+    assert actual == gm.ratio(method=agg_method)

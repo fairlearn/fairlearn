@@ -1,12 +1,13 @@
 name: fairlearn-tensorflow
 channels:
-- defaults
 - conda-forge
 dependencies:
 - python>=3.10
 - pip>=19.1.1
+- numpy>=1.24.4, <2
 - pytest
 - pytest-cov
 - tensorflow
+- keras
 - pip:
-   - scikeras[tensorflow-cpu]
+   - scikeras

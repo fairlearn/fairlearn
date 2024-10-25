@@ -22,7 +22,10 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     Classes                             2
     ==============   ====================
 
-    Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
+    Source:
+
+    - UCI Repository :footcite:`kohavi1996adult`
+    - Paper: Kohavi and Becker :footcite:`kohavi1996scaling`
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
@@ -81,19 +84,12 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
-    .. [1] R. Kohavi and B. Becker, UCI Machine Learning Repository:
-       Adult Data Set, 01-May-1996. [Online]. Available:
-       https://archive.ics.uci.edu/ml/datasets/adult.
-
-    .. [2] R. Kohavi, "Scaling Up the Accuracy of Naive-Bayes Classifiers:
-       a Decision-Tree Hybrid," in *Second International Conference on knowledge
-       discovery and data mining: proceedings: August 2-4, 1996, Portland,
-       Oregon*, 1996, pp. 202–207.
+    .. footbibliography::
 
     """
     if not data_home:

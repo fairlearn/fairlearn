@@ -79,7 +79,7 @@ phenomena itself is unjust (e.g., consider the case of predictive policing,
 where a system created to predict crime rates may correctly predict higher crime 
 rates for certain areas, but simultaneously fail to consider that those higher 
 rates may be caused by disproportionate policing and overcriminimalization of those areas). 
-In reality, these assumptions may not be the true. The
+In reality, these assumptions may not be true. The
 dataset might be an accurate representation of the phenomena itself, 
 or the phenomena being modeled may not be unjust. 
 If either assumption is not true, then demographic parity may not provide 
@@ -95,7 +95,7 @@ by :footcite:cts:`barocas2019fairness`:
 
     "However, decisions based on a classifier that satisfies independence can 
     have undesirable properties (and similar arguments apply to other 
-    statistical critiera). Here is one way in which this can happen, 
+    statistical criteria). Here is one way in which this can happen,
     which is easiest to illustrate if we imagine a callous or ill-intentioned 
     decision maker. Imagine a company that in *group A* hires diligently 
     selected applicants at some rate p>0. In *group B*, the company 
@@ -123,7 +123,7 @@ but that trend may disappear or reverse when groups are combined. Known as
 `Simpson's Paradox <https://en.wikipedia.org/wiki/Simpson%27s_paradox>`_, this 
 outcome may appear when observing disparate outcomes across groups. A 
 famous example of Simpson's Paradox is a study of 1973 graduate school 
-admissions to the University of California, Berkley :footcite:ps:`bickel1975biasinadmissions`. 
+admissions to the University of California, Berkeley :footcite:ps:`bickel1975biasinadmissions`.
 The study showed that when observing admissions by gender, men applying were 
 more likely than women to be accepted. However, drilling down into admissions 
 by department revealed that women tended to apply to departments with more 
@@ -205,7 +205,7 @@ The goal of the equalized odds fairness metric is to ensure a machine
 learning model performs equally well for different groups. It is stricter 
 than demographic parity because it requires that the machine learning 
 model's predictions are not only independent of sensitive group membership, 
-but that groups have the same false positive rates and and true positive 
+but that groups have the same false positive rates and true positive
 rates. This distinction is important because a model could achieve 
 demographic parity (i.e., its predictions could be independent of 
 sensitive group membership), but still generate more false positive 
@@ -225,8 +225,8 @@ conditionally independent of the sensitive feature :math:`A` given the label
 :footcite:cts:`agarwal2018reductions` show that this is equivalent to
 :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
 Equalized odds requires that the true 
-positive rate, :math:`\P(h(X)=1 | Y=1`, and the false positive rate, 
-:math:`\P(h(X)=1 | Y=0`, be equal across groups. 
+positive rate, :math:`\P(h(X)=1 | Y=1)`, and the false positive rate, 
+:math:`\P(h(X)=1 | Y=0)`, be equal across groups. 
 
 The inclusion of false positive rates acknowledges that different groups 
 experience different costs from misclassification. For example, in the case of 
@@ -265,7 +265,7 @@ However, since equalized odds is based on both the true positive and
 false positive rates, there is an extra step in order to return
 a single scalar result.
 For :func:`equalized_odds_difference`, we first calculate the
-true positive rate difference and the true negative rate difference
+true positive rate difference and the false positive rate difference
 separately.
 We then return the larger of these two differences.
 *Mutatis mutandis*, :func:`equalized_odds_ratio` works similarly.
