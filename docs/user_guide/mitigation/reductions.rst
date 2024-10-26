@@ -551,7 +551,7 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
 
 .. note::
 
-    In the example above the :code::class:BoundedGroupLoss` object does not use the
+    In the example above the :code:`BoundedGroupLoss` object does not use the
     :code:`upper_bound` argument. It is only used by reductions techniques
     during the unfairness mitigation. As a result the constraint violation
     detected by :code:`gamma` is identical to the mean absolute error.
