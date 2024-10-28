@@ -4,15 +4,12 @@
 """Threshold Optimization Post Processing algorithm.
 
 This is based on M. Hardt, E. Price, N. Srebro's paper
-"`Equality of Opportunity in Supervised Learning
-<https://arxiv.org/pdf/1610.02413.pdf>`_" for binary
-classification with one categorical sensitive feature [1]_.
+"Equality of Opportunity in Supervised Learning" :footcite:`hardt2016equality`
+for binary classification with one categorical sensitive feature.
 
 References
 ----------
-.. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-   Supervised Learning," arXiv.org, 07-Oct-2016. [Online]. Available:
-   https://arxiv.org/abs/1610.02413.
+.. footbibliography::
 
 """
 
@@ -53,13 +50,9 @@ MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = (
 )
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = (
     "A sensitive feature named {} or {} "
-    "was detected. Please rename your column and try again.".format(
-        SCORE_KEY, LABEL_KEY
-    )
+    "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 )
-SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = (
-    "The provided scores data contains multiple columns."
-)
+SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
 logger = logging.getLogger(__name__)
@@ -128,7 +121,8 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
     Parameters
     ----------
     estimator : object
-        A `scikit-learn compatible estimator <https://scikit-learn.org/stable/developers/develop.html#estimators>`_  # noqa
+        A `scikit-learn compatible estimator
+        <https://scikit-learn.org/stable/developers/develop.html#estimators>`_
         whose output is postprocessed.
 
     constraints : str, default='demographic_parity'
@@ -178,22 +172,22 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         values.
 
             'auto'
-                use one of :code:`predict_proba`, :code:`decision_function`, or 
+                use one of :code:`predict_proba`, :code:`decision_function`, or
                 :code:`predict`, in that order.
-            
+
             'predict_proba'
-                use the second column from the output of :code:`predict_proba`. 
-                It is assumed that the second column represents the positive 
+                use the second column from the output of :code:`predict_proba`.
+                It is assumed that the second column represents the positive
                 outcome.
-            
+
             'decision_function'
                 use the raw values given by the :code:`decision_function`.
-            
+
             'predict'
-                use the hard values reported by the :code:`predict` method if 
-                estimator is a classifier, and the regression values if 
-                estimator is a regressor. This is equivalent to what 
-                is done in [1]_.
+                use the hard values reported by the :code:`predict` method if
+                estimator is a classifier, and the regression values if
+                estimator is a regressor. This is equivalent to what
+                is done in :footcite:`hardt2016equality`.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
@@ -201,18 +195,16 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         .. versionchanged:: 0.7
             From version 0.7, 'predict' is deprecated as the default value and
-            the default will change to 'auto' from v0.10.
+            the default changes to 'auto' from v0.10.
 
     Notes
     -----
     The procedure is based on the algorithm of
-    `Hardt et al. (2016) <https://arxiv.org/abs/1610.02413>`_ [1]_.
+    Hardt et al. :footcite:`hardt2016equality`.
 
     References
     ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-       Supervised Learning," arXiv.org, 07-Oct-2016.
-       [Online]. Available: https://arxiv.org/abs/1610.02413.
+    .. footbibliography::
 
     Examples
     --------
@@ -244,7 +236,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         grid_size=1000,
         flip=False,
         prefit=False,
-        predict_method="deprecated",
+        predict_method="auto",
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -282,25 +274,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 )
         elif self.constraints == "equalized_odds":
             if self.objective not in OBJECTIVES_FOR_EQUALIZED_ODDS:
-                raise ValueError(
-                    NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE
-                )
+                raise ValueError(NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE)
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
 
-        if self.predict_method == "deprecated":
-            warn(
-                (
-                    "'predict_method' default value is changed from 'predict' to "
-                    "'auto'. Explicitly pass `predict_method='predict' to "
-                    "replicate the old behavior, or pass `predict_method='auto' "
-                    "or other valid values to silence this warning."
-                ),
-                FutureWarning,
-            )
-            self._predict_method = "predict"
-        else:
-            self._predict_method = self.predict_method
+        self._predict_method = self.predict_method
 
         if kwargs.get(_KW_CONTROL_FEATURES) is not None:
             raise ValueError(NO_CONTROL_FEATURES)
@@ -335,15 +313,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         if self.constraints == "equalized_odds":
             self.x_metric_ = "false_positive_rate"
             self.y_metric_ = "true_positive_rate"
-            threshold_optimization_method = (
-                self._threshold_optimization_for_equalized_odds
-            )
+            threshold_optimization_method = self._threshold_optimization_for_equalized_odds
         else:
             self.x_metric_ = SIMPLE_CONSTRAINTS[self.constraints]
             self.y_metric_ = self.objective
-            threshold_optimization_method = (
-                self._threshold_optimization_for_simple_constraints
-            )
+            threshold_optimization_method = self._threshold_optimization_for_simple_constraints
 
         self.interpolated_thresholder_ = threshold_optimization_method(
             sensitive_feature_vector, y, scores
@@ -398,9 +372,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             X, sensitive_features=sensitive_features
         )
 
-    def _threshold_optimization_for_simple_constraints(
-        self, sensitive_features, labels, scores
-    ):
+    def _threshold_optimization_for_simple_constraints(self, sensitive_features, labels, scores):
         """Calculate the objective value across all values of constraints.
 
         These calculations are made at different thresholds over the scores. Subsequently weighs
@@ -458,8 +430,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             # Add up objective for the current group multiplied by the probability of the current
             # group. This will help us in identifying the maximum overall objective.
             overall_tradeoff_curve += (
-                p_sensitive_feature_value
-                * self._tradeoff_curve[sensitive_feature_value]["y"]
+                p_sensitive_feature_value * self._tradeoff_curve[sensitive_feature_value]["y"]
             )
 
             logger.debug(OUTPUT_SEPARATOR)
@@ -479,9 +450,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         # interpolation per sensitive feature value.
         interpolation_dict = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
-            best_interpolation = self._tradeoff_curve[
-                sensitive_feature_value
-            ].transpose()[i_best]
+            best_interpolation = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best]
             interpolation_dict[sensitive_feature_value] = Bunch(
                 p0=best_interpolation.p0,
                 operation0=best_interpolation.operation0,
@@ -507,9 +476,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             predict_method=self._predict_method,
         ).fit(None, None)
 
-    def _threshold_optimization_for_equalized_odds(
-        self, sensitive_features, labels, scores
-    ):
+    def _threshold_optimization_for_equalized_odds(self, sensitive_features, labels, scores):
         """Calculate the ROC curve of every sensitive feature value at different thresholds.
 
         Subsequently takes the overlapping region of the ROC curves, and finds the best
@@ -538,7 +505,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
 
         n = len(labels)
 
-        if type(labels) == pd.DataFrame:
+        if isinstance(labels, pd.DataFrame):
             n_positive = labels.sum().loc[0]
         else:
             n_positive = sum(labels)
@@ -551,15 +518,11 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             sensitive_feature_value,
             group,
         ) in data_grouped_by_sensitive_feature:
-            roc_convex_hull = _tradeoff_curve(
-                group, sensitive_feature_value, flip=self.flip
-            )
+            roc_convex_hull = _tradeoff_curve(group, sensitive_feature_value, flip=self.flip)
             self._tradeoff_curve[sensitive_feature_value] = _interpolate_curve(
                 roc_convex_hull, "x", "y", "operation", self._x_grid
             )
-            y_values[sensitive_feature_value] = self._tradeoff_curve[
-                sensitive_feature_value
-            ]["y"]
+            y_values[sensitive_feature_value] = self._tradeoff_curve[sensitive_feature_value]["y"]
 
             logger.debug(OUTPUT_SEPARATOR)
             logger.debug("Processing %s", str(sensitive_feature_value))
@@ -598,9 +561,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         # interpolation per sensitive feature
         interpolation_dict = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
-            roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[
-                i_best_EO
-            ]
+            roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best_EO]
             # p_ignore * x_best represent the diagonal of the ROC plot.
             if roc_result.y == roc_result.x:
                 # result is on the diagonal of the ROC plot, i.e. p_ignore is not required
@@ -608,9 +569,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             else:
                 # Calculate p_ignore to change prediction P to y_best
                 # p_ignore * x_best + (1 - p_ignore) * P
-                difference_from_best_predictor_for_sensitive_feature = (
-                    roc_result.y - self._y_best
-                )
+                difference_from_best_predictor_for_sensitive_feature = roc_result.y - self._y_best
                 vertical_distance_from_diagonal = roc_result.y - roc_result.x
                 p_ignore = (
                     difference_from_best_predictor_for_sensitive_feature
@@ -645,9 +604,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         ).fit(None, None)
 
 
-def _reformat_and_group_data(
-    sensitive_features, labels, scores, sensitive_feature_names=None
-):
+def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_feature_names=None):
     """Reformats the data into a new pandas.DataFrame and group by sensitive feature values.
 
     The data are provided as three arguments (`sensitive_features`, `labels`, `scores`) and
@@ -712,33 +669,27 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
     dict
         The updated `data_dict` with reformatted data at the `key` slot
     """
-    if type(additional_data) == np.ndarray:
+    if isinstance(additional_data, np.ndarray):
         if len(additional_data.shape) > 2 or (
             len(additional_data.shape) == 2 and additional_data.shape[1] > 1
         ):
             # TODO: extend to multiple columns for additional_group data
-            raise ValueError(
-                MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features")
-            )
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
         else:
             data_dict[key] = additional_data.squeeze()
-    elif type(additional_data) == pd.DataFrame:
+    elif isinstance(additional_data, pd.DataFrame):
         # TODO: extend to multiple columns for additional_data by using column names
         for attribute_column in additional_data.columns:
             data_dict[key] = additional_data[attribute_column].values
-    elif type(additional_data) == pd.Series:
+    elif isinstance(additional_data, pd.Series):
         data_dict[key] = additional_data.values
-    elif type(additional_data) == list:
-        if type(additional_data[0]) == list:
+    elif isinstance(additional_data, list):
+        if isinstance(additional_data[0], list):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(
-                    MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features")
-                )
+                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data
     else:
-        raise TypeError(
-            UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data))
-        )
+        raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))

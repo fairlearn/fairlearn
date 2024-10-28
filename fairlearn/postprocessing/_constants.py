@@ -10,8 +10,7 @@ P1_KEY = "p1"
 OUTPUT_SEPARATOR = "-" * 65
 
 _MATPLOTLIB_IMPORT_ERROR_MESSAGE = (
-    "Please make sure to install fairlearn[customplots] to use "
-    "the postprocessing plots."
+    "Please make sure to install fairlearn[customplots] to use the postprocessing plots."
 )
 BASE_ESTIMATOR_NONE_ERROR_MESSAGE = "The base estimator cannot be `None`."
 BASE_ESTIMATOR_NOT_FITTED_WARNING = (

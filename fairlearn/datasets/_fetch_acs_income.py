@@ -3,11 +3,7 @@
 
 import pathlib
 
-import numpy as np
-import pandas as pd
 from sklearn.datasets import fetch_openml
-
-import fairlearn.utils._compatibility as compat
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
@@ -31,8 +27,10 @@ def fetch_acs_income(
     Target                        numeric
     ==============   ====================
 
-    Source: Paper: Ding et al. (2021) [1]_
-            and corresponding repository https://github.com/zykls/folktables/
+    Source:
+
+    - Paper: Ding et al. (2021) :footcite:`ding2021retiring`
+    - Repository: https://github.com/zykls/folktables/
 
     Read more in the :ref:`User Guide <acsincome_data>`.
 
@@ -68,7 +66,7 @@ def fetch_acs_income(
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
         The state abbreviations and codes can be found on page 1 of the data
-        dictionary at ACS PUMS [2]_.
+        dictionary at ACS PUMS :footcite:`census2019pums`.
 
     Returns
     -------
@@ -96,16 +94,12 @@ def fetch_acs_income(
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
-    .. [1] Ding, F., Hardt, M., Miller, J., & Schmidt, L. (2021).
-       "Retiring Adult: New Datasets for Fair Machine Learning."
-       Advances in Neural Information Processing Systems, 34.
-
-    .. [2] "2018 ACS PUMS Data Dictionary". United States Census Bureau.
+    .. footbibliography::
 
     """
     # State Code based on 2010 Census definitions
@@ -168,16 +162,14 @@ def fetch_acs_income(
     # check that user-provided state abbreviations are valid
     if states is not None:
         states = [state.upper() for state in states]
-        for state in states:
-            try:
-                _STATE_CODES[state]
-            except KeyError:
-                raise KeyError(
-                    f"Error with state code: {state}\n"
-                    "State code must be a two letter abbreviation"
-                    f"from the list {list(_STATE_CODES.keys())}\n"
-                    "Note that PR is the abbreviation for Puerto Rico."
-                )
+        not_valid_states = [state for state in states if state not in _STATE_CODES.keys()]
+        if len(not_valid_states) > 0:
+            raise ValueError(
+                f"Error with states: {not_valid_states}\n"
+                "State code must be a two letter abbreviation"
+                f"from the list {list(_STATE_CODES.keys())}\n"
+                "Note that PR is the abbreviation for Puerto Rico."
+            )
     else:
         states = _STATE_CODES.keys()
 
@@ -185,25 +177,24 @@ def fetch_acs_income(
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
     # fetch data for all 50 US states and Puerto Rico
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     data_dict = fetch_openml(
         data_id=43141,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=True,
         return_X_y=False,
-        **compat._PARSER_KWARG,
+        parser="auto",
     )
 
     # filter by state
     df_all = data_dict["data"].copy(deep=True)
     df_all["PINCP"] = data_dict["target"]
-    cols = df_all.columns
-    df = pd.DataFrame(np.zeros((0, len(cols))), columns=cols)
-    for state in states:
-        dfs = [df, df_all.query(f"ST == {int(_STATE_CODES[state])}")]
-        df = pd.concat(dfs)
+    state_codes_list = [int(_STATE_CODES[state]) for state in states]
+
     # drop the state column since it is not a feature in the published ACSIncome dataset
-    df.drop("ST", axis=1, inplace=True)
+    df = df_all[df_all["ST"].isin(state_codes_list)].drop("ST", axis=1)
 
     if as_frame:
         data_dict["data"] = df.iloc[:, :_NUM_FEATS]

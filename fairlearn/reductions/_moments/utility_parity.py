@@ -10,14 +10,7 @@ from fairlearn.utils._input_validation import (
 )
 
 from .error_rate import ErrorRate
-from .moment import (
-    _ALL,
-    _EVENT,
-    _GROUP_ID,
-    _LABEL,
-    _SIGN,
-    ClassificationMoment,
-)
+from .moment import _ALL, _EVENT, _GROUP_ID, _LABEL, _SIGN, ClassificationMoment
 
 _UPPER_BOUND_DIFF = "upper_bound_diff"
 _LOWER_BOUND_DIFF = "lower_bound_diff"
@@ -95,9 +88,7 @@ class UtilityParity(ClassificationMoment):
         Default 0.0
     """
 
-    def __init__(
-        self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0
-    ):
+    def __init__(self, *, difference_bound=None, ratio_bound=None, ratio_bound_slack=0.0):
         """Initialize with the ratio value."""
         super(UtilityParity, self).__init__()
         if (difference_bound is None) and (ratio_bound is None):
@@ -154,9 +145,7 @@ class UtilityParity(ClassificationMoment):
         self.utilities = utilities
         self.utility_diff = self.utilities[:, 1] - self.utilities[:, 0]
         self.prob_event = self.tags.groupby(_EVENT).size() / self.total_samples
-        self.prob_group_event = (
-            self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
-        )
+        self.prob_group_event = self.tags.groupby([_EVENT, _GROUP_ID]).size() / self.total_samples
         signed = pd.concat(
             [self.prob_group_event, self.prob_group_event],
             keys=["+", "-"],
@@ -201,18 +190,22 @@ class UtilityParity(ClassificationMoment):
         # constraints, which is achieved by removing some redundant constraints.
         # Considering fewer constraints is not required for correctness, but it can dramatically
         # speed up GridSearch.
-        self.pos_basis = pd.DataFrame()
-        self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series(dtype="float64")
-        zero_vec = pd.Series(0.0, self.index)
+        # zero_vec = pd.Series(0.0, self.index)
+        col_count = len(event_vals) * (len(group_vals) - 1)
+        self.pos_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
+        self.neg_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
+
         i = 0
+
         for e in event_vals:
-            # Constraints on the final group are redundant, so they are not included in the basis.
+            # Constraints on the final group are redundant, so they are not
+            # included in the basis.
             for g in group_vals[:-1]:
-                self.pos_basis[i] = 0 + zero_vec
-                self.neg_basis[i] = 0 + zero_vec
-                self.pos_basis[i]["+", e, g] = 1
-                self.neg_basis[i]["-", e, g] = 1
+                if ("+", e, g) in self.index:
+                    self.pos_basis.loc[("+", e, g), i] = 1
+                if ("-", e, g) in self.index:
+                    self.neg_basis.loc[("-", e, g), i] = 1
                 self.neg_basis_present.at[i] = True
                 i += 1
 

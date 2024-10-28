@@ -59,15 +59,11 @@ def test_interpolate_curve():
     [
         (pd.DataFrame({"x": [0, 1], "y": [0, 1], "operation": ["i", "r"]}), [0, 1]),
         (
-            pd.DataFrame(
-                {"x": [0, 0.5, 1], "y": [0, 0.5, 1], "operation": ["i", "r", "e"]}
-            ),
+            pd.DataFrame({"x": [0, 0.5, 1], "y": [0, 0.5, 1], "operation": ["i", "r", "e"]}),
             [0, 2],
         ),
         (
-            pd.DataFrame(
-                {"x": [0, 0.5, 1], "y": [0, 0.51, 1], "operation": ["i", "r", "e"]}
-            ),
+            pd.DataFrame({"x": [0, 0.5, 1], "y": [0, 0.51, 1], "operation": ["i", "r", "e"]}),
             [0, 1, 2],
         ),
         (
@@ -104,12 +100,8 @@ def test_interpolate_curve():
 )
 def test_convex_hull(base_points, expected_remaining_indices):
     convex_hull = _filter_points_to_get_convex_hull(base_points)
-    assert (
-        base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]
-    ).all()
-    assert (
-        base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]
-    ).all()
+    assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
+    assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
     assert (
         base_points.operation[expected_remaining_indices]
         == [point.operation for point in convex_hull]
@@ -256,9 +248,7 @@ def _assert_equal_points(expected_points, actual_points):
     for i in range(len(expected_points)):
         assert np.isclose(actual_points.x[i], expected_points.x[i])
         assert np.isclose(actual_points.y[i], expected_points.y[i])
-        assert (
-            actual_points.operation[i].operator == expected_points.operation[i].operator
-        )
+        assert actual_points.operation[i].operator == expected_points.operation[i].operator
         assert np.isclose(
             actual_points.operation[i].threshold, expected_points.operation[i].threshold
         )

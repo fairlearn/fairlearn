@@ -3,7 +3,7 @@ v0.8.0
 
 * Relaxed checks made on :code:`X` in :code:`_validate_and_reformat_input()`
   since that is the concern of the underlying estimator and not Fairlearn.
-* Add support for Python 3.9 and 3.10, remove support for Python 3.6
+* Added support for Python 3.9 and 3.10, remove support for Python 3.6
 * Added error handling in :code:`MetricFrame`. Methods :code:`group_max`, :code:`group_min`,
   :code:`difference` and :code:`ratio` now accept :code:`errors` as a parameter,
   which could either be :code:`raise` or :code:`coerce`.
@@ -13,7 +13,7 @@ v0.8.0
 * :class:`~fairlearn.preprocessing.CorrelationRemover` now exposes
   :code:`n_features_in_` and :code:`feature_names_in_`.
 * Added the ACSIncome dataset and corresponding documentation.
-* Add `sphinxcontrib-bibtex` extension to manage citations in documentation using bibtex.
+* Added `sphinxcontrib-bibtex` extension to manage citations in documentation using bibtex.
 * Added support for explicitly specifying optimization objective in
   :class:`~fairlearn.reductions.ExponentiatedGradient`.
   Added support for cost sensitive classification in

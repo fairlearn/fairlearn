@@ -11,10 +11,12 @@ class ThresholdOperation:
 
     Read more in the :ref:`User Guide <postprocessing>`.
 
-    :param operator: the threshold operator, can be either '>' or '<'
-    :type operator: str
-    :param threshold: the threshold, can be numpy.inf or -numpy.inf
-    :type threshold: float
+    Parameters
+    ----------
+    operator : str
+        The threshold operator, can be either '>' or '<'.
+    threshold : float
+        The threshold, can be numpy.inf or -numpy.inf.
     """
 
     def __init__(self, operator, threshold):
@@ -36,10 +38,15 @@ class ThresholdOperation:
     def __call__(self, y_hat):
         """Evaluate the threshold rule `y_hat > t` or `y_hat < t`.
 
-        :param y_hat: the input array
-        :type y_hat: array
-        :return: the result of elementwise application of the threshold rule
-        :rtype: array
+        Parameters
+        ----------
+        y_hat : array
+            The input array.
+
+        Returns
+        -------
+        y_hat : array
+            The result of elementwise application of the threshold rule.
         """
         if self._operator == ">":
             return y_hat > self._threshold

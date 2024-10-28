@@ -5,14 +5,10 @@ import pathlib
 
 from sklearn.datasets import fetch_openml
 
-import fairlearn.utils._compatibility as compat
-
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_diabetes_hospital(
-    *, as_frame=True, cache=True, data_home=None, return_X_y=False
-):
+def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return_X_y=False):
     """Load the preprocessed Diabetes 130-Hospitals dataset (binary classification).
 
     Download it if necessary.
@@ -95,7 +91,7 @@ def fetch_diabetes_hospital(
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
@@ -106,11 +102,13 @@ def fetch_diabetes_hospital(
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=43874,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        **compat._PARSER_KWARG,
+        parser="auto",
     )

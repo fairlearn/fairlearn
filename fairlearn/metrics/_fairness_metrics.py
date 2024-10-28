@@ -27,7 +27,7 @@ def demographic_parity_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -73,7 +73,7 @@ def demographic_parity_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
+    sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
     method : str
@@ -100,7 +100,13 @@ def demographic_parity_ratio(
 
 
 def equalized_odds_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method="between_groups",
+    sample_weight=None,
+    agg="worst_case",
 ) -> float:
     """Calculate the equalized odds difference.
 
@@ -122,28 +128,46 @@ def equalized_odds_difference(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+    sensitive_features : array-like
+        The sensitive features over which equalized odds should be assessed
 
     method : str
-        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
-        for details.
+        How to compute the differences.
+        See :func:`fairlearn.metrics.MetricFrame.difference` for details.
 
     sample_weight : array-like
         The sample weights
+
+    agg : str
+        The aggregation method. One of `"worst_case"` or `"mean"`.
+        If `"worst_case"`, the greater one of the false positive rate
+        difference and true positive rate difference is returned.
+        If `"mean"`, the mean of the differences is returned.
 
     Returns
     -------
     float
         The equalized odds difference
     """
+    if agg not in ["worst_case", "mean"]:
+        return ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return max(eo.difference(method=method))
+    if agg == "worst_case":
+        return max(eo.difference(method=method))
+    else:
+        return eo.difference(method=method).mean()
 
 
 def equalized_odds_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method="between_groups",
+    sample_weight=None,
+    agg="worst_case",
 ) -> float:
     """Calculate the equalized odds ratio.
 
@@ -165,8 +189,8 @@ def equalized_odds_ratio(
     y_pred : array-like
         Predicted labels :math:`h(X)` returned by the classifier.
 
-    sensitive_features :
-        The sensitive features over which demographic parity should be assessed
+    sensitive_features : array-like
+        The sensitive features over which equalized odds should be assessed
 
     method : str
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
@@ -175,14 +199,26 @@ def equalized_odds_ratio(
     sample_weight : array-like
         The sample weights
 
+    agg : str
+        The aggregation method. One of `"worst_case"` or `"mean"`.
+        If `"worst_case"`, the smaller one of the false positive rate ratio
+        and true positive rate ratio is returned.
+        If `"mean"`, the mean of the ratios is returned.
+
     Returns
     -------
     float
         The equalized odds ratio
     """
+    if agg not in ["worst_case", "mean"]:
+        return ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return min(eo.ratio(method=method))
+    if agg == "worst_case":
+        return min(eo.ratio(method=method))
+    else:
+        return eo.ratio(method=method).mean()
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
@@ -197,3 +233,95 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
         sample_params=sp,
     )
     return eo
+
+
+def equal_opportunity_difference(
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
+    """Calculate the equal opportunity difference.
+
+    The equal opportunity difference is defined as the difference
+    between the largest and the smallest group-level true positive rates,
+    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
+    The equal opportunity difference of 0 means that all groups have the same true positive rate.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    Parameters
+    ----------
+    y_true : array-like
+        Ground truth (correct) labels.
+
+    y_pred : array-like
+        Predicted labels :math:`h(X)` returned by the classifier.
+
+    sensitive_features : array-like
+        The sensitive features over which equal opportunity should be assessed
+
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
+
+    sample_weight : array-like
+        The sample weights
+
+    Returns
+    -------
+    float
+        The equal opportunity difference
+    """
+    tpr = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": sample_weight},
+    )
+    result = tpr.difference(method=method)
+    return result
+
+
+def equal_opportunity_ratio(
+    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+) -> float:
+    """Calculate the equal opportunity ratio.
+
+    The equal opportunity ratio is defined as the ratio
+    between the smallest and the largest group-level true positive rate,
+    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
+    The equal opportunity ratio of 1 means that all groups have the same true positive rate.
+
+    Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    Parameters
+    ----------
+    y_true : array-like
+        Ground truth (correct) labels.
+
+    y_pred : array-like
+        Predicted labels :math:`h(X)` returned by the classifier.
+
+    sensitive_features : array-like
+        The sensitive features over which equal opportunity should be assessed
+
+    method : str
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
+        for details.
+
+    sample_weight : array-like
+        The sample weights
+
+    Returns
+    -------
+    float
+        The equal opportunity ratio
+    """
+    tpr = MetricFrame(
+        metrics=true_positive_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": sample_weight},
+    )
+    result = tpr.ratio(method=method)
+    return result

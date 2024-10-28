@@ -1,11 +1,13 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._backend_engine import BackendEngine
 from numpy import finfo, float32
+
+from ._backend_engine import BackendEngine
 
 # dynamic imports.
 tensorflow = None
+keras = None
 
 
 class TensorflowEngine(BackendEngine):
@@ -21,10 +23,13 @@ class TensorflowEngine(BackendEngine):
         global tensorflow
         import tensorflow
 
+        global keras
+        import keras
+
         tensorflow.random.set_seed(base.random_state_.random())
 
-        self.model_class = tensorflow.keras.Model
-        self.optim_class = tensorflow.keras.optimizers.Optimizer
+        self.model_class = keras.Model
+        self.optim_class = keras.optimizers.Optimizer
         super(TensorflowEngine, self).__init__(base, X, Y, A)
 
     def evaluate(self, X):
@@ -90,9 +95,9 @@ class TensorflowEngine(BackendEngine):
         optim = None
         if isinstance(optim_param, str):
             if optim_param.lower() == "adam":
-                optim = tensorflow.keras.optimizers.Adam
+                optim = keras.optimizers.Adam
             elif optim_param.lower() == "sgd":
-                optim = tensorflow.keras.optimizers.SGD
+                optim = keras.optimizers.SGD
         if optim is not None:
             return optim(learning_rate=self.base.learning_rate)
 
@@ -100,12 +105,12 @@ class TensorflowEngine(BackendEngine):
         """Get loss function corresponding to the keyword."""
         if dist_type == "binary":
             # Use sigmoid as final layer
-            return tensorflow.keras.losses.BinaryCrossentropy(from_logits=False)
-        elif dist_type == "category":
+            return keras.losses.BinaryCrossentropy(from_logits=False)
+        elif dist_type in ["multiclass", "multilabel-indicator"]:
             # User softmax as final layer
-            return tensorflow.keras.losses.CategoricalCrossentropy(from_logits=False)
-        elif dist_type == "continuous":
-            return tensorflow.keras.losses.MeanSquaredError()
+            return keras.losses.CategoricalCrossentropy(from_logits=False)
+        elif dist_type in ["continuous", "continuous-multioutput"]:
+            return keras.losses.MeanSquaredError()
         super(TensorflowEngine, self).get_loss(dist_type)
 
     def get_model(self, list_nodes):
@@ -124,16 +129,16 @@ class TensorflowEngine(BackendEngine):
             a number of nodes.
             Callable keywords are added to the model as a layer directly,
             which is useful for activation functions. String keywords are
-            interpreted using :code:`tensorflow.keras.activations.deserialize`.
+            interpreted using :code:`keras.activations.deserialize`.
 
         Returns
         -------
-        model : tensorflow.keras.Model
+        model : keras.Model
             initialized model with layers as specified.
         """
-        initializer_w = tensorflow.keras.initializers.GlorotNormal()
+        initializer_w = keras.initializers.GlorotNormal()
 
-        class FullyConnected(tensorflow.keras.Model):
+        class FullyConnected(keras.Model):
             """Neural network class."""
 
             def __init__(self):
@@ -145,7 +150,7 @@ class TensorflowEngine(BackendEngine):
                         continue  # What if the first item is not an int?
                     if isinstance(item, int):
                         layers.append(
-                            tensorflow.keras.layers.Dense(
+                            keras.layers.Dense(
                                 units=item,
                                 kernel_initializer=initializer_w,
                                 bias_initializer="zeros",
@@ -154,7 +159,7 @@ class TensorflowEngine(BackendEngine):
                     elif callable(item):
                         layers.append(item)
                     elif isinstance(item, str):
-                        layers.append(tensorflow.keras.activations.deserialize(item))
+                        layers.append(keras.activations.deserialize(item))
                 self.layers_ = layers
 
             def call(self, x):

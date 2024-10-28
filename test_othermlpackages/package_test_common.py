@@ -4,21 +4,19 @@
 """Common testing methods for use with other ML packages."""
 
 import copy
+import logging
 
 import pandas as pd
-from numpy import mean, random, number
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
+from numpy import mean, number, random
 from sklearn.compose import make_column_selector, make_column_transformer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 
-import fairlearn.utils._compatibility as compat
 import fairlearn.datasets as fld
+import fairlearn.utils._compatibility as compat
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +70,7 @@ def run_expgrad_classification(estimator, moment):
     gamma_mitigated = verification_moment.gamma(lambda x: expgrad.predict(x))
 
     for idx in gamma_mitigated.index:
-        assert abs(gamma_mitigated[idx]) <= abs(
-            gamma_unmitigated[idx]
-        ), "Checking {0}".format(idx)
+        assert abs(gamma_mitigated[idx]) <= abs(gamma_unmitigated[idx]), "Checking {0}".format(idx)
 
 
 def run_gridsearch_classification(estimator, moment):
@@ -96,9 +92,7 @@ def run_gridsearch_classification(estimator, moment):
     gamma_mitigated = verification_moment.gamma(lambda x: gs.predict(x))
 
     for idx in gamma_mitigated.index:
-        assert abs(gamma_mitigated[idx]) <= abs(
-            gamma_unmitigated[idx]
-        ), "Checking {0}".format(idx)
+        assert abs(gamma_mitigated[idx]) <= abs(gamma_unmitigated[idx]), "Checking {0}".format(idx)
 
 
 def run_thresholdoptimizer_classification(estimator):
@@ -167,9 +161,7 @@ def run_AdversarialFairness_classification(estimator):
 
     predictions = estimator.predict(X_test)
 
-    dp_diff = demographic_parity_difference(
-        Y_test, predictions, sensitive_features=A_test
-    )
+    dp_diff = demographic_parity_difference(Y_test, predictions, sensitive_features=A_test)
 
     accuracy = mean(predictions == Y_test)
 

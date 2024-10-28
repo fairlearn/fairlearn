@@ -861,7 +861,7 @@ class TestExponentiatedGradientSmoke:
         disparity_moment.load_data(X, y, sensitive_features=A)
         objective_moment.load_data(X, y, sensitive_features=A)
         disparity = disparity_moment.gamma(Q).max()
-        error = objective_moment.gamma(Q)[0]
+        error = objective_moment.gamma(Q).iloc[0]
         assert disparity == pytest.approx(data["disp"], abs=_PRECISION)
         assert error == pytest.approx(data["error"], abs=_PRECISION)
 
@@ -907,12 +907,10 @@ class TestExponentiatedGradientSmoke:
             default_objective = MeanLoss(data["loss"])
             default_objective.load_data(X, y, sensitive_features=A)
             disparity = disparity_moment.gamma(Q).max()
-            error = default_objective.gamma(Q)[0]
+            error = default_objective.gamma(Q).iloc[0]
             assert disparity == pytest.approx(data["disp"][i], abs=_PRECISION)
             assert error == pytest.approx(data["error"][i], abs=_PRECISION)
-            assert expgrad.weights_[i] == pytest.approx(
-                data["weights"][i], abs=_PRECISION
-            )
+            assert expgrad.weights_[i] == pytest.approx(data["weights"][i], abs=_PRECISION)
 
         assert sum(expgrad.weights_) == pytest.approx(1, abs=_PRECISION)
 
@@ -957,9 +955,7 @@ class TestExponentiatedGradientSmoke:
         y = [1, 1, 1]
         A = ["a", "b", "b"]
 
-        estimator = LogisticRegression(
-            solver="liblinear", fit_intercept=True, random_state=97
-        )
+        estimator = LogisticRegression(solver="liblinear", fit_intercept=True, random_state=97)
         expgrad = ExponentiatedGradient(estimator, DemographicParity())
 
         # Following line should not throw an exception
@@ -982,10 +978,7 @@ class TestExponentiatedGradientSmoke:
         assert expgrad.best_iter_ == data["best_iter"]
         assert expgrad.last_iter_ >= _MIN_ITER
         assert expgrad.n_oracle_calls_ == data["n_oracle_calls"]
-        assert (
-            expgrad.n_oracle_calls_dummy_returned_
-            == data["n_oracle_calls_dummy_returned"]
-        )
+        assert expgrad.n_oracle_calls_dummy_returned_ == data["n_oracle_calls_dummy_returned"]
         assert n_predictors == data["n_predictors"]
         assert len(expgrad.oracle_execution_times_) == expgrad.n_oracle_calls_
 
@@ -1032,9 +1025,9 @@ class TestExponentiatedGradientSmoke:
 
             objective_eval = deepcopy(objective_moment)
             objective_eval.load_data(X, y, sensitive_features=A)
-            total_error = objective_eval.gamma(Q)[0] * len(y)
+            total_error = objective_eval.gamma(Q).iloc[0] * len(y)
             results[method] = {
-                "error": objective_eval.gamma(Q)[0],
+                "error": objective_eval.gamma(Q).iloc[0],
                 "total_error": total_error,
                 "disp": disparity,
                 "n_predictors": len(expgrad.predictors_),
@@ -1048,16 +1041,11 @@ class TestExponentiatedGradientSmoke:
         self._assert_expgrad_two_states(results["costs"], results["sampling"])
 
     def _assert_expgrad_two_states(self, state1, state2):
-        assert state1["total_error"] == pytest.approx(
-            state2["total_error"], abs=_PRECISION
-        )
+        assert state1["total_error"] == pytest.approx(state2["total_error"], abs=_PRECISION)
         assert state1["disp"] == pytest.approx(state2["disp"], abs=_PRECISION)
         assert state1["n_predictors"] == state2["n_predictors"]
         assert state1["best_gap"] == pytest.approx(state2["best_gap"], abs=_PRECISION)
         assert state1["last_iter"] == state2["last_iter"]
         assert state1["best_iter"] == state2["best_iter"]
         assert state1["n_oracle_calls"] == state2["n_oracle_calls"]
-        assert (
-            state1["n_oracle_calls_dummy_returned"]
-            == state2["n_oracle_calls_dummy_returned"]
-        )
+        assert state1["n_oracle_calls_dummy_returned"] == state2["n_oracle_calls_dummy_returned"]

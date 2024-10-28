@@ -121,9 +121,7 @@ class Test1m1sf0cf:
         # Need to use approx, due to internal method of calculating
         # the correct ratio. Internally, MetricFrame computes a ratio
         # and takes the reciprocal if it's greater than 1
-        assert target_ratio_overall == pytest.approx(
-            expected_ratio_overall, rel=1e-10, abs=1e-16
-        )
+        assert target_ratio_overall == pytest.approx(expected_ratio_overall, rel=1e-10, abs=1e-16)
 
     def test_ratio_zero_divide(self):
         # Simple test to check on zero division
@@ -336,9 +334,7 @@ class Test2m1sf0cf:
         assert target_ratio["recall"] == min(self.recall_p, self.recall_q) / max(
             self.recall_p, self.recall_q
         )
-        assert target_ratio["prec"] == min(
-            self.prec_p / self.prec_q, self.prec_q / self.prec_p
-        )
+        assert target_ratio["prec"] == min(self.prec_p / self.prec_q, self.prec_q / self.prec_p)
 
     def test_ratio_to_overall(self):
         self._prepare()
@@ -549,12 +545,8 @@ class Test1m1cf1sfFnDict:
         target_diff = self.target.difference(method="between_groups")
         assert isinstance(target_diff, pd.DataFrame)
         assert target_diff.shape == (2, 1)
-        assert target_diff[self.mfn]["kk"] == max(self.metric_k_arr) - min(
-            self.metric_k_arr
-        )
-        assert target_diff[self.mfn]["m"] == max(self.metric_m_arr) - min(
-            self.metric_m_arr
-        )
+        assert target_diff[self.mfn]["kk"] == max(self.metric_k_arr) - min(self.metric_k_arr)
+        assert target_diff[self.mfn]["m"] == max(self.metric_m_arr) - min(self.metric_m_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_difference_to_overall(self, metric_fn):
@@ -581,12 +573,8 @@ class Test1m1cf1sfFnDict:
         target_ratio = self.target.ratio(method="between_groups")
         assert isinstance(target_ratio, pd.DataFrame)
         assert target_ratio.shape == (2, 1)
-        assert target_ratio[self.mfn]["kk"] == min(self.metric_k_arr) / max(
-            self.metric_k_arr
-        )
-        assert target_ratio[self.mfn]["m"] == min(self.metric_m_arr) / max(
-            self.metric_m_arr
-        )
+        assert target_ratio[self.mfn]["kk"] == min(self.metric_k_arr) / max(self.metric_k_arr)
+        assert target_ratio[self.mfn]["m"] == min(self.metric_m_arr) / max(self.metric_m_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_ratio_to_overall(self, metric_fn):
@@ -702,12 +690,8 @@ class Test1m1sf2cf:
         diffs = self.target.difference(method="between_groups")
         assert isinstance(diffs, pd.Series)
         assert len(diffs) == 4
-        assert diffs[("kk", "aa")] == max(self.metric_k_a_arr) - min(
-            self.metric_k_a_arr
-        )
-        assert diffs[("kk", "ba")] == max(self.metric_k_b_arr) - min(
-            self.metric_k_b_arr
-        )
+        assert diffs[("kk", "aa")] == max(self.metric_k_a_arr) - min(self.metric_k_a_arr)
+        assert diffs[("kk", "ba")] == max(self.metric_k_b_arr) - min(self.metric_k_b_arr)
         assert diffs[("m", "aa")] == max(self.metric_m_a_arr) - min(self.metric_m_a_arr)
         assert diffs[("m", "ba")] == max(self.metric_m_b_arr) - min(self.metric_m_b_arr)
 
@@ -735,18 +719,10 @@ class Test1m1sf2cf:
         ratios = self.target.ratio(method="between_groups")
         assert isinstance(ratios, pd.Series)
         assert len(ratios) == 4
-        assert ratios[("kk", "aa")] == min(self.metric_k_a_arr) / max(
-            self.metric_k_a_arr
-        )
-        assert ratios[("kk", "ba")] == min(self.metric_k_b_arr) / max(
-            self.metric_k_b_arr
-        )
-        assert ratios[("m", "aa")] == min(self.metric_m_a_arr) / max(
-            self.metric_m_a_arr
-        )
-        assert ratios[("m", "ba")] == min(self.metric_m_b_arr) / max(
-            self.metric_m_b_arr
-        )
+        assert ratios[("kk", "aa")] == min(self.metric_k_a_arr) / max(self.metric_k_a_arr)
+        assert ratios[("kk", "ba")] == min(self.metric_k_b_arr) / max(self.metric_k_b_arr)
+        assert ratios[("m", "aa")] == min(self.metric_m_a_arr) / max(self.metric_m_a_arr)
+        assert ratios[("m", "ba")] == min(self.metric_m_b_arr) / max(self.metric_m_b_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_ratio_to_overall(self, metric_fn):
@@ -865,18 +841,10 @@ class Test1m1sf2cfFnDict:
         diffs = self.target.difference(method="between_groups")
         assert isinstance(diffs, pd.DataFrame)
         assert diffs.shape == (4, 1)
-        assert diffs[self.mfn][("kk", "aa")] == max(self.metric_k_a_arr) - min(
-            self.metric_k_a_arr
-        )
-        assert diffs[self.mfn][("kk", "ba")] == max(self.metric_k_b_arr) - min(
-            self.metric_k_b_arr
-        )
-        assert diffs[self.mfn][("m", "aa")] == max(self.metric_m_a_arr) - min(
-            self.metric_m_a_arr
-        )
-        assert diffs[self.mfn][("m", "ba")] == max(self.metric_m_b_arr) - min(
-            self.metric_m_b_arr
-        )
+        assert diffs[self.mfn][("kk", "aa")] == max(self.metric_k_a_arr) - min(self.metric_k_a_arr)
+        assert diffs[self.mfn][("kk", "ba")] == max(self.metric_k_b_arr) - min(self.metric_k_b_arr)
+        assert diffs[self.mfn][("m", "aa")] == max(self.metric_m_a_arr) - min(self.metric_m_a_arr)
+        assert diffs[self.mfn][("m", "ba")] == max(self.metric_m_b_arr) - min(self.metric_m_b_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_difference_to_overall(self, metric_fn):
@@ -908,12 +876,8 @@ class Test1m1sf2cfFnDict:
         assert ratios[self.mfn][("kk", "ba")] == min(self.metric_k_b_arr) / max(
             self.metric_k_b_arr
         )
-        assert ratios[self.mfn][("m", "aa")] == min(self.metric_m_a_arr) / max(
-            self.metric_m_a_arr
-        )
-        assert ratios[self.mfn][("m", "ba")] == min(self.metric_m_b_arr) / max(
-            self.metric_m_b_arr
-        )
+        assert ratios[self.mfn][("m", "aa")] == min(self.metric_m_a_arr) / max(self.metric_m_a_arr)
+        assert ratios[self.mfn][("m", "ba")] == min(self.metric_m_b_arr) / max(self.metric_m_b_arr)
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_ratio_to_overall(self, metric_fn):
@@ -1018,12 +982,8 @@ class Test2m1sf1cf:
         assert diffs.shape == (2, 2)
         assert diffs["recall"]["kk"] == max(self.recall_k_arr) - min(self.recall_k_arr)
         assert diffs["recall"]["m"] == max(self.recall_m_arr) - min(self.recall_m_arr)
-        assert diffs["prec"]["kk"] == max(self.precision_k_arr) - min(
-            self.precision_k_arr
-        )
-        assert diffs["prec"]["m"] == max(self.precision_m_arr) - min(
-            self.precision_m_arr
-        )
+        assert diffs["prec"]["kk"] == max(self.precision_k_arr) - min(self.precision_k_arr)
+        assert diffs["prec"]["m"] == max(self.precision_m_arr) - min(self.precision_m_arr)
 
     def test_difference_to_overall(self):
         self._prepare()
@@ -1033,12 +993,8 @@ class Test2m1sf1cf:
         assert diffs_overall.shape == (2, 2)
         recall_k_overall = max([abs(x - self.recall_k) for x in self.recall_k_arr])
         recall_m_overall = max([abs(x - self.recall_m) for x in self.recall_m_arr])
-        precision_k_overall = max(
-            [abs(x - self.precision_k) for x in self.precision_k_arr]
-        )
-        precision_m_overall = max(
-            [abs(x - self.precision_m) for x in self.precision_m_arr]
-        )
+        precision_k_overall = max([abs(x - self.precision_k) for x in self.precision_k_arr])
+        precision_m_overall = max([abs(x - self.precision_m) for x in self.precision_m_arr])
         assert diffs_overall["recall"]["kk"] == recall_k_overall
         assert diffs_overall["recall"]["m"] == recall_m_overall
         assert diffs_overall["prec"]["kk"] == precision_k_overall
@@ -1052,12 +1008,8 @@ class Test2m1sf1cf:
         assert ratios.shape == (2, 2)
         assert ratios["recall"]["kk"] == min(self.recall_k_arr) / max(self.recall_k_arr)
         assert ratios["recall"]["m"] == min(self.recall_m_arr) / max(self.recall_m_arr)
-        assert ratios["prec"]["kk"] == min(self.precision_k_arr) / max(
-            self.precision_k_arr
-        )
-        assert ratios["prec"]["m"] == min(self.precision_m_arr) / max(
-            self.precision_m_arr
-        )
+        assert ratios["prec"]["kk"] == min(self.precision_k_arr) / max(self.precision_k_arr)
+        assert ratios["prec"]["m"] == min(self.precision_m_arr) / max(self.precision_m_arr)
 
     def test_ratio_to_overall(self):
         self._prepare()
@@ -1697,9 +1649,7 @@ class Test2m1sf0cfErrorHandlingCM2:
     def _prepare(self):
         fns = {
             "confusion_matrix1": skm.confusion_matrix,
-            "confusion_matrix2": functools.partial(
-                skm.confusion_matrix, normalize="all"
-            ),
+            "confusion_matrix2": functools.partial(skm.confusion_matrix, normalize="all"),
         }
         self.target = metrics.MetricFrame(
             metrics=fns, y_true=y_t, y_pred=y_p, sensitive_features=g_2

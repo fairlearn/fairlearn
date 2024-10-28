@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 
-concurrency: 
+concurrency:
   # this ensures after each commit the old jobs are cancelled and the new ones
   # run instead.
   group: ${{ github.head_ref || github.run_id }}
@@ -21,32 +21,35 @@ jobs:
   all-deps:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.8", "3.9", "3.10"]
+        os: [ubuntu-latest, windows-latest, macos-12]
+        python: ["3.8", "3.9", "3.10", "3.11"]
         requirementsPinned: ["false"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
       requirementsPinned: ${{ matrix.requirementsPinned }}
-  
+      codeCovPython: "3.11"
+
   minimal-deps:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python: ["3.8", "3.9", "3.10"]
+        os: [ubuntu-latest, windows-latest, macos-12]
+        python: ["3.8", "3.9", "3.10", "3.11"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
+      codeCovPython: "3.11"
 
-  
+
   other-ml:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.8"]
+        python: ["3.11"]
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
+      fail-fast: false
     uses: ./.github/workflows/test-other-ml.yml
     with:
       os: ${{ matrix.os }}
@@ -58,7 +61,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.9"]
+        python: ["3.11"]
     uses: ./.github/workflows/linting.yml
     with:
       os: ${{ matrix.os }}

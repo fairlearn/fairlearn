@@ -25,6 +25,8 @@ sf_binary = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 derived_metric_results = {
     "true_positive_rate_difference": {"method": "to_overall", "expected": 0.25},
     "true_positive_rate_ratio": {"method": "to_overall", "expected": 0.75},
+    "equal_opportunity_difference": {"method": "to_overall", "expected": 0.25},
+    "equal_opportunity_ratio": {"method": "to_overall", "expected": 0.75},
     "true_negative_rate_difference": {
         "method": "between_groups",
         "expected": 0.083333333,

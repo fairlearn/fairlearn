@@ -51,9 +51,7 @@ def test_3m_2sf_2cf():
     assert len(np.unique(sf_2_arr)) == len(sf_2_groups)
 
     # Make some inputs
-    sf_frame = pd.DataFrame(
-        np.stack([sf_1_arr, sf_2_arr], axis=1), columns=["SF0", "SF1"]
-    )
+    sf_frame = pd.DataFrame(np.stack([sf_1_arr, sf_2_arr], axis=1), columns=["SF0", "SF1"])
     cf_array = np.stack([cf_1_arr, cf_2_arr], axis=1)
 
     # Create the target object
@@ -114,20 +112,15 @@ def test_3m_2sf_2cf():
                     == max_val - min_val
                 )
                 assert (
-                    target.ratio(method="between_groups")[name][(cf_1, cf_2)]
-                    == min_val / max_val
+                    target.ratio(method="between_groups")[name][(cf_1, cf_2)] == min_val / max_val
                 )
 
                 diffs = [abs(x - overall) for x in metric_vals]
-                assert target.difference(method="to_overall")[name][
-                    (cf_1, cf_2)
-                ] == max(diffs)
+                assert target.difference(method="to_overall")[name][(cf_1, cf_2)] == max(diffs)
 
                 # Ratio to overall needs a pytest.approx since we make sure
                 # the ratio is less than 1 in a slightly different way
-                ratios = [x / overall for x in metric_vals] + [
-                    overall / x for x in metric_vals
-                ]
+                ratios = [x / overall for x in metric_vals] + [overall / x for x in metric_vals]
                 actual = target.ratio(method="to_overall")[name][(cf_1, cf_2)]
                 assert actual == pytest.approx(min(ratios), rel=1e-10, abs=1e-16)
 

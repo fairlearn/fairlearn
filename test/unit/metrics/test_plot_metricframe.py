@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
@@ -44,12 +45,8 @@ def general_wilson(p, n, digits=digits_of_precision, z=z_score):
     denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
     adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
-    lower_bound = (
-        centre_adjusted_probability - z * adjusted_standard_deviation
-    ) / denominator
-    upper_bound = (
-        centre_adjusted_probability + z * adjusted_standard_deviation
-    ) / denominator
+    lower_bound = (centre_adjusted_probability - z * adjusted_standard_deviation) / denominator
+    upper_bound = (centre_adjusted_probability + z * adjusted_standard_deviation) / denominator
     return np.array([round(lower_bound, digits), round(upper_bound, digits)])
 
 
@@ -117,9 +114,7 @@ metrics_dict = {
 
 @pytest.fixture()
 def sample_metric_frame():
-    return MetricFrame(
-        metrics=metrics_dict, y_true=y_t, y_pred=y_p, sensitive_features=g_1
-    )
+    return MetricFrame(metrics=metrics_dict, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
 
 
 def test_plotting_output(sample_metric_frame):
@@ -167,7 +162,7 @@ def test_single_bound(sample_metric_frame):
 
 def test_single_ax_input(sample_metric_frame):
     """Tests plotting function works with single axis input."""
-    ax = matplotlib.pyplot.subplot()
+    ax = plt.subplot()
     ax = plot_metric_frame(
         sample_metric_frame,
         metrics=["Recall"],
@@ -180,7 +175,7 @@ def test_single_ax_input(sample_metric_frame):
 
 def test_multi_ax_input(sample_metric_frame):
     """Tests plotting function works with multiple axis input."""
-    fig, ax = matplotlib.pyplot.subplots(nrows=1, ncols=2)
+    fig, ax = plt.subplots(nrows=1, ncols=2)
     ax[0].set_title("Recall Plot")
     ax[0].set_ylabel("Recall")
     ax[0].set_xlabel("Race")

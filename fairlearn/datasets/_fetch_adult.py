@@ -5,8 +5,6 @@ import pathlib
 
 from sklearn.datasets import fetch_openml
 
-import fairlearn.utils._compatibility as compat
-
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
@@ -24,7 +22,10 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     Classes                             2
     ==============   ====================
 
-    Source: UCI Repository [1]_ , Paper: R. Kohavi (1996) [2]_
+    Source:
+
+    - UCI Repository :footcite:`kohavi1996adult`
+    - Paper: Kohavi and Becker :footcite:`kohavi1996scaling`
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
@@ -83,29 +84,24 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
-    .. [1] R. Kohavi and B. Becker, UCI Machine Learning Repository:
-       Adult Data Set, 01-May-1996. [Online]. Available:
-       https://archive.ics.uci.edu/ml/datasets/adult.
-
-    .. [2] R. Kohavi, "Scaling Up the Accuracy of Naive-Bayes Classifiers:
-       a Decision-Tree Hybrid," in *Second International Conference on knowledge
-       discovery and data mining: proceedings: August 2-4, 1996, Portland,
-       Oregon*, 1996, pp. 202–207.
+    .. footbibliography::
 
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=1590,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        **compat._PARSER_KWARG,
+        parser="auto",
     )

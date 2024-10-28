@@ -138,7 +138,7 @@ def bounding_box_iou(box_A_input, box_B_input):
     if box_B[3] < 0:
         raise ValueError("Bad delta y for box_B")
 
-    # Convert deltas to co-ordinates
+    # Convert deltas to coordinates
     box_A[2:4] = box_A[0:2] + box_A[2:4]
     box_B[2:4] = box_B[0:2] + box_B[2:4]
 
@@ -179,8 +179,7 @@ def mean_iou(true_boxes, predicted_boxes):
         raise ValueError("Array size mismatch")
 
     all_iou = [
-        bounding_box_iou(y_true, y_pred)
-        for y_true, y_pred in zip(true_boxes, predicted_boxes)
+        bounding_box_iou(y_true, y_pred) for y_true, y_pred in zip(true_boxes, predicted_boxes)
     ]
 
     return np.mean(all_iou)

@@ -70,7 +70,7 @@ from fairlearn.metrics import MetricFrame, count, selection_rate
 # Next, we import the data:
 
 data = fetch_adult()
-X_raw = data.data
+X_raw = data.data.copy()
 y = (data.target == ">50K") * 1
 
 # %%
@@ -109,7 +109,9 @@ def marriage_transform(m_s_string):
 def occupation_transform(occ_string):
     """Perform some simple manipulations."""
     result = "Small"
-    if occ_string.startswith("Machine"):
+    # The isinstance check is to guard against 'missing'
+    # data marked with NaN
+    if not isinstance(occ_string, float) and occ_string.startswith("Machine"):
         result = "Large"
     return result
 
@@ -119,10 +121,10 @@ col_credit.name = "Credit Score"
 col_loan_size = X_raw["occupation"].map(occupation_transform).fillna("Small")
 col_loan_size.name = "Loan Size"
 
-A = X_raw[["race", "sex"]]
+A = X_raw[["race", "sex"]].copy()
 A["Credit Score"] = col_credit
 A["Loan Size"] = col_loan_size
-A
+
 
 # %%
 # Now that we have imported our dataset and manufactured a few features, we
@@ -158,9 +160,7 @@ A_test = A_test.reset_index(drop=True)
 # missing data could also cause trouble, if particular subgroups
 # have poorer data quality.
 
-numeric_transformer = Pipeline(
-    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())]
-)
+numeric_transformer = Pipeline(steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())])
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),

@@ -65,7 +65,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         - 'predict': use the hard values reported by the `predict` method if
           estimator is a classifier, and the regression values if estimator is
           a regressor.
-          This is equivalent to what is done in [1]_.
+          This is equivalent to what is done in :footcite:`hardt2016equality`.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
@@ -73,18 +73,15 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
         .. versionchanged:: 0.7
             From version 0.7, 'predict' is deprecated as the default value and
-            the default will change to 'auto' from v0.10.
+            the default changes to 'auto' from v0.10.
 
     References
     ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-       Supervised Learning," arXiv.org, 07-Oct-2016.
-       [Online]. Available: https://arxiv.org/abs/1610.02413.
+    .. footbibliography::
+
     """
 
-    def __init__(
-        self, estimator, interpolation_dict, prefit=False, predict_method="deprecated"
-    ):
+    def __init__(self, estimator, interpolation_dict, prefit=False, predict_method="auto"):
         self.estimator = estimator
         self.interpolation_dict = interpolation_dict
         self.prefit = prefit
@@ -99,19 +96,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
 
-        if self.predict_method == "deprecated":
-            warn(
-                (
-                    "'predict_method' default value is changed from 'predict' to "
-                    "'auto'. Explicitly pass `predict_method='predict' to "
-                    "replicate the old behavior, or pass `predict_method='auto' "
-                    "or other valid values to silence this warning."
-                ),
-                FutureWarning,
-            )
-            self._predict_method = "predict"
-        else:
-            self._predict_method = self.predict_method
+        self._predict_method = self.predict_method
 
         if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
@@ -195,7 +180,5 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
         random_state = check_random_state(random_state)
-        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features)[
-            :, 1
-        ]
+        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features)[:, 1]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1

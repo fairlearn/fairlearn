@@ -24,13 +24,15 @@ def test_grid_generator_demographic_parity(grid_size, grid_limit):
         [["+", "-"], events, [0, 1]], names=[_SIGN, _EVENT, _GROUP_ID]
     )
     assert (expected_index == grid.index).all()
-    expected_grid = pd.DataFrame()
     grid_size_or_next_smaller_even_number = int(grid_size / 2) * 2
     step_size = 2 * grid_limit / grid_size_or_next_smaller_even_number
+    columns = []
     for i in range(grid_size):
-        expected_grid[i] = pd.Series(0.0, index=expected_index)
-        expected_grid[i]["-", _ALL, 1] = max(grid_limit - step_size * i, 0)
-        expected_grid[i]["+", _ALL, 1] = max(-grid_limit + step_size * i, 0)
+        column = pd.Series(0.0, index=expected_index)
+        column["-", _ALL, 1] = max(grid_limit - step_size * i, 0)
+        column["+", _ALL, 1] = max(-grid_limit + step_size * i, 0)
+        columns.append(column)
+    expected_grid = pd.concat(columns, axis=1)
     assert np.isclose(expected_grid.values, grid.values).all()
 
 
@@ -39,9 +41,7 @@ def test_grid_generator_demographic_parity(grid_size, grid_limit):
 @pytest.mark.parametrize(
     "grid_offset", [[0, 0.2, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0], [0, 0, 0, 0.2]]
 )
-def test_grid_generator_demographic_parity_with_center(
-    grid_size, grid_limit, grid_offset
-):
+def test_grid_generator_demographic_parity_with_center(grid_size, grid_limit, grid_offset):
     disparity_moment = DemographicParity()
     events = [_ALL]
 
@@ -60,10 +60,10 @@ def test_grid_generator_demographic_parity_with_center(
     step_size = 2 * grid_limit / grid_size_or_next_smaller_even_number
     for i in range(grid_size):
         expected_grid[i] = pd.Series(0.0, index=expected_index)
-        expected_grid[i]["-", _ALL, 1] = (
+        expected_grid.loc[("-", _ALL, 1), i] = (
             max(grid_limit - step_size * i, 0) + grid_offset["-", _ALL, 1]
         )
-        expected_grid[i]["+", _ALL, 1] = (
+        expected_grid.loc[("+", _ALL, 1), i] = (
             max(-grid_limit + step_size * i, 0) + grid_offset["+", _ALL, 1]
         )
     assert np.isclose(expected_grid.values, grid.values).all()
@@ -90,10 +90,10 @@ def test_grid_generator_equalized_odds_basic(grid_limit):
     for i in range(grid_size):
         expected_grid[i] = pd.Series(0.0, index=expected_index)
 
-    expected_grid[0]["-", label0, 1] = grid_limit
-    expected_grid[1]["-", label1, 1] = grid_limit
-    expected_grid[3]["+", label1, 1] = grid_limit
-    expected_grid[4]["+", label0, 1] = grid_limit
+    expected_grid.loc[("-", label0, 1), 0] = grid_limit
+    expected_grid.loc[("-", label1, 1), 1] = grid_limit
+    expected_grid.loc[("+", label1, 1), 3] = grid_limit
+    expected_grid.loc[("+", label0, 1), 4] = grid_limit
 
     assert np.isclose(expected_grid.values, grid.values).all()
 

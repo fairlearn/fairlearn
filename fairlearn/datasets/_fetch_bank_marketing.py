@@ -5,14 +5,10 @@ import pathlib
 
 from sklearn.datasets import fetch_openml
 
-import fairlearn.utils._compatibility as compat
-
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_bank_marketing(
-    *, cache=True, data_home=None, as_frame=True, return_X_y=False
-):
+def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     """Load the UCI bank marketing dataset (binary classification).
 
     Download it if necessary.
@@ -24,7 +20,10 @@ def fetch_bank_marketing(
     Classes                             2
     ==============   ====================
 
-    Source: UCI Repository [3]_ Paper: Moro et al., 2014 [4]_
+    Source:
+
+    - UCI Repository :footcite:`moro2012bank`
+    - Paper: Moro et al. :footcite:`moro2014data`
 
     The data is related with direct marketing campaigns of a Portuguese
     banking institution. The marketing campaigns were based on phone calls.
@@ -87,28 +86,24 @@ def fetch_bank_marketing(
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
-    .. [3] S. Moro, P. Cortez, and P. Rita, UCI Machine Learning Repository:
-       Bank Marketing Data Set, 14-Feb-2014. [Online]. Available:
-       https://archive.ics.uci.edu/ml/datasets/Bank+Marketing.
-
-    .. [4] S. Moro, P. Cortez and P. Rita. A Data-Driven Approach to Predict
-       the Success of Bank Telemarketing. Decision Support Systems,
-       Elsevier, 62:22-31, June 2014
+    .. footbibliography::
 
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # For data_home see
+    # https://github.com/scikit-learn/scikit-learn/issues/27447
     return fetch_openml(
         data_id=1461,
-        data_home=data_home,
+        data_home=str(data_home),
         cache=cache,
         as_frame=as_frame,
         return_X_y=return_X_y,
-        **compat._PARSER_KWARG,
+        parser="auto",
     )

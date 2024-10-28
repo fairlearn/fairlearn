@@ -3,15 +3,15 @@
 
 import pytest
 
-from fairlearn.reductions import DemographicParity
 from fairlearn.adversarial import AdversarialFairnessClassifier
+from fairlearn.reductions import DemographicParity
 
 from . import package_test_common as ptc
 
 tf = pytest.importorskip("tensorflow")
+from keras.layers import Dense  # noqa
+from keras.models import Sequential  # noqa
 from scikeras.wrappers import KerasClassifier  # noqa
-from tensorflow.keras.layers import Dense  # noqa
-from tensorflow.keras.models import Sequential  # noqa
 
 
 def create_model():
