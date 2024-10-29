@@ -5,6 +5,14 @@
 Basics & Model Specification of `AdversarialFairnessClassifier`
 ===============================================================
 
+.. note::
+
+    View this example on
+    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_adversarial_basics.py>`_,
+    or open an `issue
+    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Adversarial%20Basics&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_adversarial_basics.py>`_
+    related to it.
+
 This example shows how to use
 :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` on the UCI Adult
 dataset.

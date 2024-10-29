@@ -5,6 +5,14 @@
 ==============================
 Metrics with Multiple Features
 ==============================
+
+.. note::
+
+    View this example on
+    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_new_metrics.py>`_,
+    or open an `issue
+    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20New%20Metrics&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_new_metrics.py>`_
+    related to it.
 """
 # %%
 # This notebook demonstrates the new API for metrics, which supports

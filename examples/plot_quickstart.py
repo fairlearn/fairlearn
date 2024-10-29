@@ -5,6 +5,14 @@
 ==========================
 MetricFrame visualizations
 ==========================
+
+.. note::
+
+    View this example on
+    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_quickstart.py>`_,
+    or open an `issue
+    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Quickstart&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_quickstart.py>`_
+    related to it.
 """
 
 from functools import partial

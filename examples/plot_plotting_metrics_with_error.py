@@ -5,6 +5,14 @@
 ============================
 Plotting Metrics with Errors
 ============================
+
+.. note::
+
+    View this example on
+    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_plotting_metrics_with_error.py>`_,
+    or open an `issue
+    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Plotting%20Metrics%20With%20Error&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_plotting_metrics_with_error.py>`_
+    related to it.
 """
 import numpy as np
 from sklearn.compose import ColumnTransformer
