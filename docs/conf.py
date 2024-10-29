@@ -65,6 +65,7 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "sphinx_prompt",
     "sphinx_copybutton",
+    "jupyterlite_sphinx",
 ]
 
 source_suffix = [".rst"]
