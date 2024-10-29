@@ -20,6 +20,7 @@ import sys
 from datetime import datetime
 
 from packaging.version import parse
+from sphinx_gallery.notebook import add_code_cell
 
 rootdir = os.path.join(os.getcwd(), "..")
 sys.path.insert(0, rootdir)
@@ -173,19 +174,6 @@ html_show_sourcelink = False
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
-# Use filename_pattern so that plot_adult_dataset is not
-# included in the gallery, but its plot is available for
-# the quickstart
-sphinx_gallery_conf = {
-    "reference_url": {"fairlearn": None},
-    "examples_dirs": "../examples",
-    "gallery_dirs": "auto_examples",
-    # pypandoc enables rst to md conversion in downloadable notebooks
-    "pypandoc": True,
-    "backreferences_dir": os.path.join("modules", "generated"),
-    "doc_module": ("fairlearn",),
-}
-
 html_sidebars = {
     "**": ["search-field", "sidebar-nav-bs.html"],
 }
@@ -284,6 +272,51 @@ def check_if_v07():
 
     return result
 
+
+def notebook_modification_function(notebook_content, notebook_filename):
+    notebook_content_str = str(notebook_content)
+
+    dummy_notebook_content = {"cells": []}
+    code_lines = []
+
+    code_lines.append("%pip install fairlearn")
+    if "seaborn" in notebook_content_str:
+        code_lines.append("%pip install seaborn")
+    if "fetch_" in notebook_content_str:
+        code_lines.extend(
+            [
+                "%pip install pyodide-http",
+                "import pyodide_http",
+                "pyodide_http.patch_all()",
+            ]
+        )
+    # always import matplotlib and pandas to avoid Pyodide limitation with
+    # imports inside functions
+    code_lines.extend(["import matplotlib", "import pandas"])
+
+    if code_lines:
+        code_lines = ["# JupyterLite-specific code"] + code_lines
+        code = "\n".join(code_lines)
+        add_code_cell(dummy_notebook_content, code)
+
+    notebook_content["cells"] = dummy_notebook_content["cells"] + notebook_content["cells"]
+
+
+# Use filename_pattern so that plot_adult_dataset is not
+# included in the gallery, but its plot is available for
+# the quickstart
+sphinx_gallery_conf = {
+    "reference_url": {"fairlearn": None},
+    "examples_dirs": "../examples",
+    "gallery_dirs": "auto_examples",
+    # pypandoc enables rst to md conversion in downloadable notebooks
+    "pypandoc": True,
+    "backreferences_dir": os.path.join("modules", "generated"),
+    "doc_module": ("fairlearn",),
+    "jupyterlite": {
+        "notebook_modification_function": notebook_modification_function,
+    },
+}
 
 # Setup for sphinx-bibtex
 
