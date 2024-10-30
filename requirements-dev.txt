@@ -34,6 +34,8 @@ sphinx-autodoc-typehints
 sphinxcontrib-bibtex
 sphinx-prompt
 sphinx-copybutton
+jupyterlite_sphinx
+jupyterlite-pyodide-kernel
 packaging
 seaborn
 torch
