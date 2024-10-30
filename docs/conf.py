@@ -20,7 +20,7 @@ import sys
 from datetime import datetime
 
 from packaging.version import parse
-from sphinx_gallery.notebook import add_code_cell
+from sphinx_gallery.notebook import add_code_cell, add_markdown_cell
 
 rootdir = os.path.join(os.getcwd(), "..")
 sys.path.insert(0, rootdir)
@@ -276,7 +276,29 @@ def check_if_v07():
 def notebook_modification_function(notebook_content, notebook_filename):
     notebook_content_str = str(notebook_content)
 
+    warning_template = "\n".join(
+        [
+            "<div class='alert alert-{message_class}'>",
+            "",
+            "# This notebook is just for preview",
+            "",
+            "{message}",
+            "</div>",
+        ]
+    )
+
+    message_class = "warning"
+    message = (
+        "It isn't possible to install pytorch and run the full example. You can use"
+        " this notebook to preview the content."
+    )
+
+    markdown = warning_template.format(message_class=message_class, message=message)
     dummy_notebook_content = {"cells": []}
+
+    if "torch" in notebook_content_str:
+        add_markdown_cell(dummy_notebook_content, markdown)
+
     code_lines = []
 
     code_lines.append("%pip install fairlearn")
