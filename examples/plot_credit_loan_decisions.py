@@ -6,14 +6,6 @@
 =====================
 Credit Loan Decisions
 =====================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_credit_loan_decisions.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Credit%20Loan%20Decisions&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_credit_loan_decisions.py>`_
-    related to it.
 """
 
 # %%

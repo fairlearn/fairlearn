@@ -6,14 +6,6 @@
 ===========================
 GridSearch with Census Data
 ===========================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_grid_search_census.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Grid%20Search%20Census&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_grid_search_census.py>`_
-    related to it.
 """
 # %% This notebook shows how to use Fairlearn to generate predictors for the
 # Census dataset. This dataset is a classification problem - given a range of

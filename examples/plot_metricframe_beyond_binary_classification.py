@@ -5,14 +5,6 @@
 =========================================
 MetricFrame: Beyond Binary Classification
 =========================================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_metricframe_beyond_binary_classification.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20MetricFrame%20Beyond%20Binary%20Classification&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_metricframe_beyond_binary_classification.py>`_
-    related to it.
 """
 
 # %%

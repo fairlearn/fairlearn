@@ -5,14 +5,6 @@
 ==========================================
 Passing pipelines to mitigation techniques
 ==========================================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_mitigation_pipeline.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Mitigation%20Pipeline&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_mitigation_pipeline.py>`_
-    related to it.
 """
 # %%
 # This notebook shows how to pass :class:`sklearn.pipeline.Pipeline` to

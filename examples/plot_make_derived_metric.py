@@ -5,14 +5,6 @@
 ======================
 Making Derived Metrics
 ======================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_make_derived_metric.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Make%20Derived%20Metric&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_make_derived_metric.py>`_
-    related to it.
 """
 # %%
 # This notebook demonstrates the use of the :func:`fairlearn.metrics.make_derived_metric`

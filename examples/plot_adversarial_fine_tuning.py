@@ -5,14 +5,6 @@
 Fine Tuning ad ``AdversarialFairnessClassifier``
 ================================================
 
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_adversarial_fine_tuning.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Adversarial%20Fine%20Tuning&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_adversarial_fine_tuning.py>`_
-    related to it.
-
 Adversarial learning is inherently difficult because of various issues,
 such as mode collapse, divergence, and diminishing gradients.
 In particular, mode collapse seems a real problem on this dataset: the

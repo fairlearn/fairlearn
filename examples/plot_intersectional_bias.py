@@ -6,14 +6,6 @@
 =======================================
 Intersectionality in Mental Health Care
 =======================================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_intersectional_bias.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Intersectional%20Bias&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_intersectional_bias.py>`_
-    related to it.
 """
 
 # %%

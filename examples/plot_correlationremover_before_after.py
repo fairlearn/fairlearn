@@ -5,14 +5,6 @@
 ================================
 CorrelationRemover visualization
 ================================
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_correlationremover_before_after.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20CorrelationRemover%20Visualization&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_correlationremover_before_after.py>`_
-    related to it.
 """
 # %%
 # This notebook demonstrates the use of the :func:`fairlearn.preprocessing.CorrelationRemover`

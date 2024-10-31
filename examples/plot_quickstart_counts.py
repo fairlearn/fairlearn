@@ -5,14 +5,6 @@
 =============
 Value counts
 =============
-
-.. note::
-
-    View this example on
-    `GitHub <https://github.com/fairlearn/fairlearn/blob/main/examples/plot_quickstart_counts.py>`_,
-    or open an `issue
-    <https://github.com/fairlearn/fairlearn/issues/new?title=DOC%20Issue:%20Quickstart%20Counts&body=https://github.com/fairlearn/fairlearn/blob/main/examples/plot_quickstart_counts.py>`_
-    related to it.
 """
 import matplotlib.pyplot as plt
 
