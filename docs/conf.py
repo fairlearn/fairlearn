@@ -148,6 +148,7 @@ html_theme_options = {
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_persistent": [],
     "header_links_before_dropdown": 7,
+    "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],
 }
 
 # The name of an image file (relative to this directory) to place at the top
