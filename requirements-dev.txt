@@ -29,7 +29,7 @@ sphinx==7.1.2; python_version=="3.8"
 sphinx==7.2.6; python_version>"3.8"
 sphinx-gallery>=0.18.0
 numpydoc
-pydata-sphinx-theme==0.14.1
+pydata-sphinx-theme==0.16.0
 sphinx-autodoc-typehints
 sphinxcontrib-bibtex
 sphinx-prompt
