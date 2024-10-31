@@ -27,7 +27,7 @@ xlrd
 pypandoc
 sphinx==7.1.2; python_version=="3.8"
 sphinx==7.2.6; python_version>"3.8"
-sphinx-gallery
+sphinx-gallery>=0.18.0
 numpydoc
 pydata-sphinx-theme==0.14.1
 sphinx-autodoc-typehints
