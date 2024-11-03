@@ -140,6 +140,7 @@ html_theme_options = {
             "icon": "fa-brands fa-discord",
         },
     ],
+    "use_edit_page_button": True,
     "show_prev_next": False,
     "switcher": {
         "json_url": "https://fairlearn.org/main/_static/versions.json",
@@ -147,8 +148,19 @@ html_theme_options = {
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_persistent": [],
-    "header_links_before_dropdown": 7,
-    "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],
+    "secondary_sidebar_items": [
+        "page-toc",
+        "edit-this-page",
+        "sg_download_links",
+        "sg_launcher_links",
+    ],
+}
+
+html_context = {
+    "github_user": "fairlearn",
+    "github_repo": "fairlearn",
+    "github_version": tag_or_branch,
+    "doc_path": "docs",
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -196,6 +208,10 @@ plot_html_show_source_link = False
 
 # Linking Code
 # ------------
+
+
+def setup(app):
+    app.add_css_file("css/hide_links.css")
 
 
 # The following is used by sphinx.ext.linkcode to provide links to github
@@ -324,6 +340,9 @@ def notebook_modification_function(notebook_content, notebook_filename):
 
     notebook_content["cells"] = dummy_notebook_content["cells"] + notebook_content["cells"]
 
+
+# Sphinx Gallery
+# ------------
 
 # Use filename_pattern so that plot_adult_dataset is not
 # included in the gallery, but its plot is available for
