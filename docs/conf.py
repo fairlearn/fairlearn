@@ -150,17 +150,10 @@ html_theme_options = {
     "navbar_persistent": [],
     "secondary_sidebar_items": [
         "page-toc",
-        "edit-this-page",
+        "edit-example-link",
         "sg_download_links",
         "sg_launcher_links",
     ],
-}
-
-html_context = {
-    "github_user": "fairlearn",
-    "github_repo": "fairlearn",
-    "github_version": tag_or_branch,
-    "doc_path": "docs",
 }
 
 # The name of an image file (relative to this directory) to place at the top

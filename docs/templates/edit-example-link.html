@@ -1,0 +1,10 @@
+<div class="edit-example-link">
+    {% if pagename.split('/')[-1].startswith('plot_') %}
+        <a href="https://github.com/fairlearn/fairlearn/edit/main/examples/{{ pagename.split('/')[1]}}.py">
+            Edit this example on GitHub
+        </a>
+        <a href="https://github.com/fairlearn/fairlearn/issues/new?assignees=&labels=Documentation&template=doc_improvement.md&title=DOC%20Issue%20in%20{{ pagename.split('/')[1] }}&body=https://github.com/fairlearn/fairlearn/edit/main/examples/{{ pagename.split('/')[1] }}.py">
+            Report an issue on GitHub
+        </a>
+    {% endif %}
+</div>
