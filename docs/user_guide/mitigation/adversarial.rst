@@ -208,7 +208,7 @@ Some pieces of advice regarding training with adversarial fairness:
 
 Refer to the following examples for more details:
 
-- :ref:`sphx_glr_auto_examples_plot_adversarial_basis.py`
+- :ref:`sphx_glr_auto_examples_plot_adversarial_basics.py`
 - :ref:`sphx_glr_auto_examples_plot_adversarial_fine_tuning.py`
 
 References

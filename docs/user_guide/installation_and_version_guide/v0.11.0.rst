@@ -6,7 +6,7 @@ This release greately improves upon the :code:`scikit-learn` compatibility of th
 estimators. It also includes a number of other improvements.
 
 :code:`scikit-learn` compatibility
---------------------------------
+----------------------------------
 
 * The estimators :code:`AdversarialFairnessClassifier` and :code:`AdversarialFairnessRegressor`
   now pass all but one :code:`scikit-learn` estimator checks. Changes in
