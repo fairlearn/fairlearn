@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import logging
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -601,7 +601,7 @@ class MetricFrame:
         self,
         disagg_result: DisaggregatedResult,
         grouping_function: str,
-        errors: str = "raise",
+        errors: Literal["raise", "coerce"] = "raise",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
@@ -645,7 +645,9 @@ class MetricFrame:
         result = [self._extract_result(x, no_control_levels=False) for x in raw_result]
         return result
 
-    def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_max(
+        self, errors: Literal["raise", "coerce"] = "raise"
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -694,7 +696,9 @@ class MetricFrame:
         value = self._result_cache["group_max_ci"]
         return value
 
-    def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_min(
+        self, errors: Literal["raise", "coerce"] = "raise"
+    ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
@@ -744,7 +748,9 @@ class MetricFrame:
         return value
 
     def difference(
-        self, method: str = "between_groups", errors: str = "coerce"
+        self,
+        method: Literal["between_groups", "to_overall"] = "between_groups",
+        errors: Literal["raise", "coerce"] = "coerce",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the maximum absolute difference between groups for each metric.
 
@@ -793,7 +799,7 @@ class MetricFrame:
             return value
 
     def difference_ci(
-        self, method: str = "between_groups"
+        self, method: Literal["between_groups", "to_overall"] = "between_groups"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         """Return the bootstrapped confidence intervals for :meth:`MetricFrame.difference`.
 
@@ -814,7 +820,9 @@ class MetricFrame:
         return value
 
     def ratio(
-        self, method: str = "between_groups", errors: str = "coerce"
+        self,
+        method: Literal["between_groups", "to_overall"] = "between_groups",
+        errors: Literal["raise", "coerce"] = "coerce",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum ratio between groups for each metric.
 
@@ -865,7 +873,7 @@ class MetricFrame:
             return value
 
     def ratio_ci(
-        self, method: str = "between_groups"
+        self, method: Literal["between_groups", "to_overall"] = "between_groups"
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         """Return the bootstrapped confidence intervals for :meth:`MetricFrame.ratio`.
 
