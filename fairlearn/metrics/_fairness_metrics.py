@@ -3,12 +3,19 @@
 
 """Metrics for measuring fairness."""
 
+from typing import Literal
+
 from ._base_metrics import false_positive_rate, selection_rate, true_positive_rate
 from ._metric_frame import MetricFrame
 
 
 def demographic_parity_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the demographic parity difference.
 
@@ -54,7 +61,12 @@ def demographic_parity_difference(
 
 
 def demographic_parity_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the demographic parity ratio.
 
@@ -104,9 +116,9 @@ def equalized_odds_difference(
     y_pred,
     *,
     sensitive_features,
-    method="between_groups",
+    method: Literal["between_groups", "to_overall"] = "between_groups",
     sample_weight=None,
-    agg="worst_case",
+    agg: Literal["worst_case", "mean"] = "worst_case",
 ) -> float:
     """Calculate the equalized odds difference.
 
@@ -165,9 +177,9 @@ def equalized_odds_ratio(
     y_pred,
     *,
     sensitive_features,
-    method="between_groups",
+    method: Literal["between_groups", "to_overall"] = "between_groups",
     sample_weight=None,
-    agg="worst_case",
+    agg: Literal["worst_case", "mean"] = "worst_case",
 ) -> float:
     """Calculate the equalized odds ratio.
 
@@ -236,7 +248,12 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
 
 
 def equal_opportunity_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the equal opportunity difference.
 
@@ -282,7 +299,12 @@ def equal_opportunity_difference(
 
 
 def equal_opportunity_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the equal opportunity ratio.
 
