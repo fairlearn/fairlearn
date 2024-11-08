@@ -1,7 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
 from itertools import product
+
 import pytest
 
 from fairlearn.metrics import (
@@ -153,6 +156,44 @@ def test_equalized_odds_ratio_weighted(agg_method, agg):
         assert actual == ratios.min()
     else:
         assert actual == ratios.mean()
+
+
+@pytest.mark.parametrize(
+    ["agg", "expectation"],
+    [
+        (
+            "wrong-arg",
+            pytest.raises(
+                ValueError, match="agg must be one of 'worst_case' or 'mean', got wrong-arg"
+            ),
+        ),
+        ("mean", does_not_raise()),
+        ("worst_case", does_not_raise()),
+    ],
+)
+def test_equalized_odds_difference_raises_on_invalid_agg(
+    agg: str, expectation: AbstractContextManager
+):
+    with expectation:
+        equalized_odds_difference(y_t, y_p, sensitive_features=g_1, agg=agg)
+
+
+@pytest.mark.parametrize(
+    ["agg", "expectation"],
+    [
+        (
+            "wrong-arg",
+            pytest.raises(
+                ValueError, match="agg must be one of 'worst_case' or 'mean', got wrong-arg"
+            ),
+        ),
+        ("mean", does_not_raise()),
+        ("worst_case", does_not_raise()),
+    ],
+)
+def test_equalized_odds_ratio_raises_on_invalid_agg(agg: str, expectation: AbstractContextManager):
+    with expectation:
+        equalized_odds_ratio(y_t, y_p, sensitive_features=g_1, agg=agg)
 
 
 @pytest.mark.parametrize("agg_method", _aggregate_methods)

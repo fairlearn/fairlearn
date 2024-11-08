@@ -150,7 +150,7 @@ def equalized_odds_difference(
         The equalized odds difference
     """
     if agg not in ["worst_case", "mean"]:
-        return ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+        raise ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
 
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
@@ -211,7 +211,7 @@ def equalized_odds_ratio(
         The equalized odds ratio
     """
     if agg not in ["worst_case", "mean"]:
-        return ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+        raise ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
 
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
