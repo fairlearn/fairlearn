@@ -4,11 +4,14 @@
 import functools
 
 import numpy as np
+import pandas as pd
+import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
 
 from .data_for_test import g_1, g_2, y_p, y_t
+from .utils import _get_raw_MetricFrame
 
 
 def test_1m_1sf_0cf():
@@ -97,3 +100,42 @@ def test_multid_input_output():
         expected = skm.r2_score(y_t_2[mask], y_p_2[mask], multioutput="raw_values")
         actual = target.by_group[g]
         assert np.allclose(actual, expected, rtol=1e-12, atol=1e-10)
+
+
+@pytest.mark.parametrize(
+    ["target", "expected_result"],
+    [
+        (pd.Series(), pd.Series()),
+        (pd.Series([None, "a", "b"]), pd.Series([np.nan, "a", "b"])),
+        (pd.Series([1, np.nan, np.nan]), pd.Series([1, np.nan, np.nan])),
+        (pd.Series([False, np.nan, None]), pd.Series([False, np.nan, np.nan])),
+    ],
+)
+def test_none_to_nan_on_series(target: pd.Series, expected_result: pd.Series) -> None:
+    metric_frame = _get_raw_MetricFrame()
+
+    result = metric_frame._none_to_nan(target=target)
+
+    pd.testing.assert_series_equal(expected_result, result)
+
+
+@pytest.mark.parametrize(
+    ["target", "expected_result"],
+    [
+        (pd.DataFrame(), pd.DataFrame()),
+        (
+            pd.DataFrame(
+                {"col1": [None, "a", "b"], "col2": [1, 2, None], "col3": [False, None, True]}
+            ),
+            pd.DataFrame(
+                {"col1": [np.nan, "a", "b"], "col2": [1, 2, np.nan], "col3": [False, np.nan, True]}
+            ),
+        ),
+    ],
+)
+def test_none_to_nan_on_dataframe(target: pd.DataFrame, expected_result: pd.DataFrame) -> None:
+    metric_frame = _get_raw_MetricFrame()
+
+    result = metric_frame._none_to_nan(target=target)
+
+    pd.testing.assert_frame_equal(expected_result, result)

@@ -323,14 +323,7 @@ class MetricFrame:
         self, target: Union[pd.Series, pd.DataFrame]
     ) -> Union[pd.Series, pd.DataFrame]:
         """Convert Nones to NaNs."""
-        # Ideally, we wouldn't care about Series vs DataFrame
-        # However, DataFrame.map() didn't appear until Pandas 2.1
-        # Before, it was DataFrame.applymap() which then got deprecated
-        if isinstance(target, pd.Series):
-            result = target.map(lambda x: x if x is not None else np.nan)
-        else:
-            result = target.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
-        return result
+        return target.where(target.notna(), np.nan)
 
     def _populate_results(self, raw_result: DisaggregatedResult):
         """
