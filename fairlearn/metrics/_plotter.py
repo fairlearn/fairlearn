@@ -3,7 +3,7 @@
 
 """Utility class for plotting metrics with and without confidence interval ranges."""
 
-from typing import List, Union
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -118,8 +118,8 @@ def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
     kind: str = "point",
-    metrics: Union[List[str], str] = None,
-    conf_intervals: Union[List[str], str] = None,
+    metrics: Optional[Union[List[str], str]] = None,
+    conf_intervals: Optional[Union[List[str], str]] = None,
     subplots: bool = True,
     plot_ci_labels: bool = False,
     ci_labels_precision: int = 4,

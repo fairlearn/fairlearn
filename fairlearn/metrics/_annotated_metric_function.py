@@ -48,8 +48,8 @@ class AnnotatedMetricFunction:
         *,
         func: Callable,
         name: Optional[str],
-        positional_argument_names: List[str] = None,
-        kw_argument_mapping: Dict[str, str] = None,
+        positional_argument_names: Optional[List[str]] = None,
+        kw_argument_mapping: Optional[Dict[str, str]] = None,
     ):
         if func is None:
             raise ValueError(_METRIC_FUNCTION_NONE)

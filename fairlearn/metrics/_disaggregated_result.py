@@ -182,7 +182,7 @@ class DisaggregatedResult:
 
     def difference(
         self,
-        control_feature_names: List[str],
+        control_feature_names: Optional[List[str]],
         method: Literal["between_groups", "to_overall"] = "between_groups",
         errors: Literal["raise", "coerce"] = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
@@ -239,7 +239,7 @@ class DisaggregatedResult:
 
     def ratio(
         self,
-        control_feature_names: List[str],
+        control_feature_names: Optional[List[str]],
         method: Literal["between_groups", "to_overall"] = "between_groups",
         errors: Literal["raise", "coerce"] = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
