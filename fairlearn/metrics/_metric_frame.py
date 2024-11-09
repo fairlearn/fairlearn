@@ -206,11 +206,11 @@ class MetricFrame:
     ...               'ratio': mf2.ratio(),
     ...               'group_min': mf2.group_min(),
     ...               'group_max': mf2.group_max()}).T
-               accuracy selection_rate
-    difference      0.2            0.4
-    ratio          0.75            0.5
-    group_min       0.6            0.4
-    group_max       0.8            0.8
+                accuracy  selection_rate
+    difference      0.20             0.4
+    ratio           0.75             0.5
+    group_min       0.60             0.4
+    group_max       0.80             0.8
 
     More information about plotting metrics can be found in the
     :ref:`plotting section <plot_metricframe>` of the User Guide.

@@ -247,13 +247,13 @@ methods show the smallest and largest values for each metric:
     fpr      0.0
     sel      0.5
     count    4.0
-    dtype: object
+    dtype: float64
     >>> mf.group_max()
-    tpr       0.6
-    fpr       1.0
-    sel      0.75
-    count     8.0
-    dtype: object
+    tpr       0.60
+    fpr       1.00
+    sel       0.75
+    count     8.00
+    dtype: float64
 
 We can also compute differences and ratios between groups for all of the
 metrics.

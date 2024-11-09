@@ -140,7 +140,7 @@ class DisaggregatedResult:
                     else:
                         vals = [mf[m].max() for m in mf.columns]
 
-                    result = pd.Series(vals, index=self.by_group.columns, dtype="object")
+                    result = pd.Series(vals, index=self.by_group.columns)
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
@@ -158,7 +158,7 @@ class DisaggregatedResult:
                             for m in mf.columns
                         ]
 
-                    result = pd.Series(vals, index=mf.columns, dtype="object")
+                    result = pd.Series(vals, index=mf.columns)
         else:
             if errors == "raise":
                 try:
