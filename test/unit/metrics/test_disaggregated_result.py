@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import Optional
 
 import pandas as pd
 import pytest
@@ -100,9 +99,7 @@ class TestErrorMessages:
         (None, pd.Series({"selection_rate": 0.5})),
     ],
 )
-def test_apply_functions_with_no_grouping(
-    grouping_names: Optional[list[str]], expected: pd.Series
-) -> None:
+def test_apply_functions_with_no_grouping(grouping_names, expected):
     data = pd.DataFrame(
         {
             "y_pred": [1, 0, 1, 0, 0, 1],
@@ -150,9 +147,7 @@ def test_apply_functions_with_no_grouping(
         ),
     ],
 )
-def test_apply_functions_with_grouping(
-    grouping_names: Optional[list[str]], expected: pd.Series
-) -> None:
+def test_apply_functions_with_grouping(grouping_names, expected):
     data = pd.DataFrame(
         {
             "y_pred": [1, 0, 1, 0, 0, 1],
