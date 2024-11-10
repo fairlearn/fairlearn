@@ -182,7 +182,7 @@ class DisaggregatedResult:
 
     def difference(
         self,
-        control_feature_names: Optional[List[str]],
+        control_feature_names: Optional[List[str]] = None,
         method: Literal["between_groups", "to_overall"] = "between_groups",
         errors: Literal["raise", "coerce"] = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
@@ -203,6 +203,9 @@ class DisaggregatedResult:
 
         Parameters
         ----------
+        control_feature_names: Optional[List[str]]
+            Names of the control features. Must appear in the index of the `overall`
+            and `by_group` properties
         method : {'between_groups', 'overall'}, default :code:`between_groups`
             How to compute the aggregate.
         errors: {'raise', 'coerce'}, default :code:`coerce`
@@ -239,7 +242,7 @@ class DisaggregatedResult:
 
     def ratio(
         self,
-        control_feature_names: Optional[List[str]],
+        control_feature_names: Optional[List[str]] = None,
         method: Literal["between_groups", "to_overall"] = "between_groups",
         errors: Literal["raise", "coerce"] = "coerce",
     ) -> Union[pd.Series, pd.DataFrame]:
@@ -262,6 +265,9 @@ class DisaggregatedResult:
 
         Parameters
         ----------
+        control_feature_names: Optional[List[str]]
+            Names of the control features. Must appear in the index of the `overall`
+            and `by_group` properties
         method : {'between_groups', 'overall'}, default :code:`between_groups`
             How to compute the aggregate.
         errors: {'raise', 'coerce'}, default :code:`coerce`
@@ -316,7 +322,7 @@ class DisaggregatedResult:
         data: pd.DataFrame,
         annotated_functions: Dict[str, AnnotatedMetricFunction],
         sensitive_feature_names: List[str],
-        control_feature_names: Optional[List[str]],
+        control_feature_names: Optional[List[str]] = None,
     ) -> "DisaggregatedResult":
         """Manufacture a DisaggregatedResult.
 
