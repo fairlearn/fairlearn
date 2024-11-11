@@ -407,7 +407,7 @@ class MetricFrame:
 
         group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = self._result_cache[k] = self._group_ci(
+            self._result_cache[k] = self._group_ci(
                 bootstrap_samples=bootstrap_samples,
                 ci_quantiles=ci_quantiles,
                 grouping_function=v,
