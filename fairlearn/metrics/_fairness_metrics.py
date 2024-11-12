@@ -37,7 +37,7 @@ def demographic_parity_difference(
     sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
 
@@ -88,7 +88,7 @@ def demographic_parity_ratio(
     sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
@@ -143,14 +143,14 @@ def equalized_odds_difference(
     sensitive_features : array-like
         The sensitive features over which equalized odds should be assessed
 
-    method : str
-        How to compute the differences.
-        See :func:`fairlearn.metrics.MetricFrame.difference` for details.
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+        How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
+        for details.
 
     sample_weight : array-like
         The sample weights
 
-    agg : str
+    agg : string {'worst_case', 'mean'}, default :code:`worst_case`
         The aggregation method. One of `"worst_case"` or `"mean"`.
         If `"worst_case"`, the greater one of the false positive rate
         difference and true positive rate difference is returned.
@@ -204,14 +204,14 @@ def equalized_odds_ratio(
     sensitive_features : array-like
         The sensitive features over which equalized odds should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
     sample_weight : array-like
         The sample weights
 
-    agg : str
+    agg : string {'worst_case', 'mean'}, default :code:`worst_case`
         The aggregation method. One of `"worst_case"` or `"mean"`.
         If `"worst_case"`, the smaller one of the false positive rate ratio
         and true positive rate ratio is returned.
@@ -275,7 +275,7 @@ def equal_opportunity_difference(
     sensitive_features : array-like
         The sensitive features over which equal opportunity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
 
@@ -326,7 +326,7 @@ def equal_opportunity_ratio(
     sensitive_features : array-like
         The sensitive features over which equal opportunity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
