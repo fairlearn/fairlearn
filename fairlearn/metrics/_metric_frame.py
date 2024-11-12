@@ -206,11 +206,11 @@ class MetricFrame:
     ...               'ratio': mf2.ratio(),
     ...               'group_min': mf2.group_min(),
     ...               'group_max': mf2.group_max()}).T
-               accuracy selection_rate
-    difference      0.2            0.4
-    ratio          0.75            0.5
-    group_min       0.6            0.4
-    group_max       0.8            0.8
+                accuracy  selection_rate
+    difference      0.20             0.4
+    ratio           0.75             0.5
+    group_min       0.60             0.4
+    group_max       0.80             0.8
 
     More information about plotting metrics can be found in the
     :ref:`plotting section <plot_metricframe>` of the User Guide.
@@ -323,14 +323,7 @@ class MetricFrame:
         self, target: Union[pd.Series, pd.DataFrame]
     ) -> Union[pd.Series, pd.DataFrame]:
         """Convert Nones to NaNs."""
-        # Ideally, we wouldn't care about Series vs DataFrame
-        # However, DataFrame.map() didn't appear until Pandas 2.1
-        # Before, it was DataFrame.applymap() which then got deprecated
-        if isinstance(target, pd.Series):
-            result = target.map(lambda x: x if x is not None else np.nan)
-        else:
-            result = target.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
-        return result
+        return target.where(target.notna(), np.nan)
 
     def _populate_results(self, raw_result: DisaggregatedResult):
         """
