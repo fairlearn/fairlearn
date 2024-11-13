@@ -593,7 +593,7 @@ class MetricFrame:
     def _group(
         self,
         disagg_result: DisaggregatedResult,
-        grouping_function: str,
+        grouping_function: Literal["min", "max"],
         errors: Literal["raise", "coerce"] = "raise",
     ) -> Union[Any, pd.Series, pd.DataFrame]:
         """Return the minimum/maximum value of the metric over the sensitive features.
@@ -603,10 +603,10 @@ class MetricFrame:
         Parameters
         ----------
         disagg_result: The DisaggregatedResult containing all the metrics
-        grouping_function: {'min', 'max'}
-        errors: {'raise', 'coerce'}, default 'raise'
-        if 'raise', then invalid parsing will raise an exception
-        if 'coerce', then invalid parsing will be set as NaN
+        grouping_function: string {'min', 'max'}
+        errors: {'raise', 'coerce'}, default :code:`raise`
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
@@ -624,7 +624,7 @@ class MetricFrame:
         self,
         bootstrap_samples: List[DisaggregatedResult],
         ci_quantiles: List[float],
-        grouping_function: str,
+        grouping_function: Literal["min", "max"],
     ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
         # There is no 'errors' argument because everything must have been a scalar for
         # np.quantiles
@@ -654,7 +654,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default 'raise'
+        errors: {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -705,7 +705,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default 'raise'
+        errors: {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -768,9 +768,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        method : str
-            How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'raise', 'coerce'}, default 'coerce'
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
+        errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -805,6 +805,11 @@ class MetricFrame:
 
         Unlike :meth:`MetricFrame.difference` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+
+        Parameters
+        ----------
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
         """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
@@ -842,9 +847,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        method : str
-            How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'raise', 'coerce'}, default 'coerce'
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
+        errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -879,6 +884,11 @@ class MetricFrame:
 
         Unlike :meth:`MetricFrame.ratio` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+
+        Parameters
+        ----------
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
         """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))

@@ -103,7 +103,7 @@ class DisaggregatedResult:
 
     def apply_grouping(
         self,
-        grouping_function: str,
+        grouping_function: Literal["min", "max"],
         control_feature_names: Optional[List[str]] = None,
         errors: Literal["raise", "coerce"] = "raise",
     ) -> Union[pd.Series, pd.DataFrame]:
@@ -111,12 +111,11 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        grouping_function: string
-            Must be 'min' or 'max'
+        grouping_function: string {'min', 'max'}
         control_feature_names: Optional[List[str]]
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        errors: string {'raise', 'coerce'}, default 'raise'
+        errors: string {'raise', 'coerce'}, default :code:`raise`
             How to deal with any errors. Either coerce to `np.nan` or wrap the
             exception and reraise
 
@@ -204,9 +203,9 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        method : str
-            How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'raise', 'coerce'}, default 'coerce'
+        method : {'between_groups', 'overall'}, default :code:`between_groups`
+            How to compute the aggregate.
+        errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -263,9 +262,9 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        method : str
-            How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'raise', 'coerce'}, default 'coerce'
+        method : {'between_groups', 'overall'}, default :code:`between_groups`
+            How to compute the aggregate.
+        errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
