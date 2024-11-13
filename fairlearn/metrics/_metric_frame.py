@@ -506,6 +506,9 @@ class MetricFrame:
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
         """
+        if self._ci_quantiles is None:
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
+
         return self._result_cache["overall_ci"]
 
     @property
@@ -550,6 +553,9 @@ class MetricFrame:
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
         """
+        if self._ci_quantiles is None:
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
+
         return self._result_cache["by_group_ci"]
 
     @property
@@ -686,6 +692,9 @@ class MetricFrame:
         Unlike :meth:`MetricFrame.group_max` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
         """
+        if self._ci_quantiles is None:
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
+
         value = self._result_cache["group_max_ci"]
         return value
 
@@ -737,6 +746,9 @@ class MetricFrame:
         Unlike :meth:`MetricFrame.group_min` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
         """
+        if self._ci_quantiles is None:
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
+
         value = self._result_cache["group_min_ci"]
         return value
 
@@ -813,6 +825,9 @@ class MetricFrame:
         """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        if self._ci_quantiles is None:
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
 
         value = self._result_cache["difference_ci"][method]
         return value
@@ -892,6 +907,9 @@ class MetricFrame:
         """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
+
+        if self._ci_quantiles is None:
+            raise ValueError(_BOOTSTRAP_NEED_N_AND_CI)
 
         value = self._result_cache["ratio_ci"][method]
         return value
