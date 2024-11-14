@@ -26,14 +26,15 @@ non-sensitive attributes :math:`Z`. The removal of correlation is then
 described as:
 
 .. math::
-        \min _{\mathbf{z}_{1}, \ldots, \mathbf{z}_{n}} \sum_{i=1}^{n}\left\|\mathbf{z}_{i}
-        -\mathbf{x}_{i}\right\|^{2} \\
-        \text{subject to} \\
-        \frac{1}{n} \sum_{i=1}^{n} \mathbf{z}_{i}\left(\mathbf{s}_{i}-\overline{\mathbf{s}}
-        \right)^{T}=\mathbf{0}
+
+    \min _{W} \| Z - (S - \bar{S}) W \|_2^2
+
+.. math::
+
+    \text{Let } Z^* = Z - (S - \bar{S}) W^*
 
 The solution to this problem is found by centering sensitive features, fitting a
-linear regression model to the non-sensitive features and reporting the residual.
+linear regression model to the non-sensitive features and reporting the residual :math:`Z^*`.
 The columns in :math:`S` will be dropped from the dataset :math:`X`.
 The amount of correlation that is removed can be controlled using the
 :code:`alpha` parameter. This is described as follows:
