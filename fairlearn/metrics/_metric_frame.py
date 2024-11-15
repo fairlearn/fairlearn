@@ -41,7 +41,8 @@ _BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
 _BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
 _BOOTSTRAP_NOT_INIITIALIZED = (
     "Could not compute confidence intervals:"
-    " Bootstrapping parameters n_boot and ci_quantiles were not specified in the MetricFrame constructor."
+    " Bootstrapping parameters n_boot and ci_quantiles were not specified"
+    " in the MetricFrame constructor."
 )
 
 
