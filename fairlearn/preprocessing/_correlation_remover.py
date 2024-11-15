@@ -32,22 +32,43 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     This method will change the original dataset by removing all correlation with sensitive
     values. To describe that mathematically, let's assume in the original dataset :math:`X`
     we've got a set of sensitive attributes :math:`S` and a set of non-sensitive attributes
-    :math:`Z`. Mathematically this method will be solving the following problem.
+    :math:`Z`.
+
+    In mathematical terms, assume we have the original dataset :math:`X`, which
+    contains a set of **sensitive attributes** denoted by :math:`S` and a set of
+    **non-sensitive attributes** denoted by :math:`Z`. The goal is to remove
+    correlations between the sensitive attributes and the non-sensitive attributes.
+
+    Let :math:`m_s` and :math:`m_{ns}` denote the number of sensitive and non-sensitive
+    features, respectively.
+    Let :math:`\bar{S}` represent the mean of the sensitive attributes, *i.e.*,
+    :math:`\bar{S} = (\bar{s}_1, \dots, \bar{s}_{m_s})`, where
+    :math:`\bar{s}_j` is the mean of the :math:`j\text{-th}` sensitive feature.
+
+    For each non-sensitive feature :math:`z_j` in :math:`Z`,
+    we compute an optimal weight vector :math:`w_j^* \in \mathbb{R}^{m_s}` that minimizes the
+    following least squares objective:
 
     .. math::
 
-        \min _{W} \| Z - (S - \bar{S}) W \|_2^2
+        \min _{w} \| z_j - (S - \bar{S}) w \|_2^2
+
+    In other words, :math:`w_j^*` is the solution to a linear regression problem where we project
+    :math:`z_j` onto the centered sensitive attributes. The weight matrix
+    :math:`W^* = (w_1^*, \dots, w_{m_{ns}}^*)` is thus obtained by solving this regression
+    for each non-sensitive feature.
+
+    Once we have the optimal weight matrix :math:`W^*`, we compute the **residual
+    non-sensitive attributes** :math:`Z^*` as follows:
 
     .. math::
 
-        \text{Let } Z^* = Z - (S - \bar{S}) W^*
+        Z^* = Z - (S - \bar{S}) W^*
 
 
-    The solution to this problem is found by centering sensitive features, fitting a
-    linear regression model to the non-sensitive features and reporting the residual :math:`Z^*`.
-
-    The columns in :math:`S` will be dropped but the hyper parameter :math:`\alpha`
-    does allow you to tweak the amount of filtering that gets applied.
+    The columns in :math:`S` will be dropped from the dataset :math:`X`, and :math:`Z^*` will replace
+    the original non-sensitive features :math:`Z`, but the hyper parameter :math:`\alpha`
+    does allow you to tweak the amount of filtering that gets applied:
 
     .. math::
 
