@@ -95,9 +95,7 @@ class TestErrorMessages:
 
 @pytest.mark.parametrize(
     ["grouping_names", "expected"],
-    [
-        (None, pd.Series({"selection_rate": 0.5})),
-    ],
+    [(None, pd.Series({"selection_rate": 0.5})), ([], pd.Series({"selection_rate": 0.5}))],
 )
 def test_apply_functions_with_no_grouping(grouping_names, expected):
     data = pd.DataFrame(

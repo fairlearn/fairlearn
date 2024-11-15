@@ -371,10 +371,9 @@ class DisaggregatedResult:
             A Series or DataFrame with the results of the metric functions applied. If grouping_names is provided,
             the results are grouped accordingly.
         """
-        if grouping_names is None:
+        if grouping_names is None or len(grouping_names) == 0:
             return apply_to_dataframe(data, metric_functions=annotated_functions)
 
-        assert len(grouping_names) > 0
         temp = data.groupby(grouping_names).apply(
             apply_to_dataframe,
             metric_functions=annotated_functions,
