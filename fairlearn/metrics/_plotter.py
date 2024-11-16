@@ -3,7 +3,7 @@
 
 """Utility class for plotting metrics with and without confidence interval ranges."""
 
-from typing import List, Optional, Union
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -118,8 +118,8 @@ def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
     kind: str = "point",
-    metrics: Optional[Union[List[str], str]] = None,
-    conf_intervals: Optional[Union[List[str], str]] = None,
+    metrics: list[str] | str | None = None,
+    conf_intervals: list[str] | str | None = None,
     subplots: bool = True,
     plot_ci_labels: bool = False,
     ci_labels_precision: int = 4,
@@ -149,11 +149,11 @@ def plot_metric_frame(
         The type of plot to display, e.g., "point", "bar", "line", etc.
         The supported values are "point" and those listed in :meth:`pandas.DataFrame.plot`
 
-    metrics : str or list of str
+    metrics : list[str] | str | None
         The name of the metrics to plot.
         Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 
-    conf_intervals : str or list of str
+    conf_intervals : list[str] | str | None
         The name of the confidence intervals to plot.
         Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 

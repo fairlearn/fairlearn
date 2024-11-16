@@ -1,9 +1,10 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
 import warnings
-from typing import Callable, Dict, List, Optional
+from typing import Callable
 
 import numpy as np
 import pandas as pd
@@ -30,12 +31,12 @@ class AnnotatedMetricFunction:
     ----------
     func : callable
         The metric function we wish to invoke
-    name: str
+    name: str | None
         An optional string defining the name of the function
-    positional_argument_names: List[str]
+    positional_argument_names: list[str] | None
         The column names to be extracted and passed as positional arguments
         when invoking the function
-    kw_argument_mapping: Dict[str, str]
+    kw_argument_mapping: dict[str, str] | None
         The column names which are to be passed as keyword arguments
         when invoking the function. Since the DataFrame column names may
         not match the function's argument names, this is a dictionary
@@ -47,9 +48,9 @@ class AnnotatedMetricFunction:
         self,
         *,
         func: Callable,
-        name: Optional[str],
-        positional_argument_names: Optional[List[str]] = None,
-        kw_argument_mapping: Optional[Dict[str, str]] = None,
+        name: str | None = None,
+        positional_argument_names: list[str] | None = None,
+        kw_argument_mapping: dict[str, str] | None = None,
     ):
         if func is None:
             raise ValueError(_METRIC_FUNCTION_NONE)
