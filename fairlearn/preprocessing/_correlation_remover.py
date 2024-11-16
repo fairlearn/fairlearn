@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from collections.abc import Iterable
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -22,7 +24,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     ----------
         sensitive_feature_ids : list
             list of columns to filter out this can be a sequence of
-            either int ,in the case of numpy, or string, in the case of pandas.
+            either int, in the case of numpy, or string, in the case of pandas.
         alpha : float
             parameter to control how much to filter, for alpha=1.0 we filter out
             all information while for alpha=0.0 we don't apply any.
@@ -61,7 +63,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, *, sensitive_feature_ids=None, alpha=1):
+    def __init__(self, *, sensitive_feature_ids: Iterable = (), alpha: float = 1):
         self.sensitive_feature_ids = sensitive_feature_ids
         self.alpha = alpha
 
