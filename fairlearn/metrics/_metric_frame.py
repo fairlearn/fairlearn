@@ -39,6 +39,11 @@ _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 _BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
 _BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
 _BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
+_BOOTSTRAP_NOT_INIITIALIZED = (
+    "Could not compute confidence intervals:"
+    " Bootstrapping parameters n_boot and ci_quantiles were not specified"
+    " in the MetricFrame constructor."
+)
 
 
 class MetricFrame:
@@ -281,14 +286,15 @@ class MetricFrame:
         self._populate_results(result)
 
         # Handle bootstrapping
-        self._ci_quantiles = None
+        self._ci_quantiles = ci_quantiles
+        self._n_boot = n_boot
+
         if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
             if not isinstance(n_boot, int) or n_boot < 1:
                 raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
             for _ci in ci_quantiles:
                 if not isinstance(_ci, float) or _ci <= 0 or _ci >= 1:
                     raise ValueError(_BOOTSTRAP_CI_INVALID)
-            self._ci_quantiles = ci_quantiles
 
             _bootstrap_samples = generate_bootstrap_samples(
                 n_samples=n_boot,
@@ -407,7 +413,7 @@ class MetricFrame:
 
         group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = self._result_cache[k] = self._group_ci(
+            self._result_cache[k] = self._group_ci(
                 bootstrap_samples=bootstrap_samples,
                 ci_quantiles=ci_quantiles,
                 grouping_function=v,
@@ -506,6 +512,7 @@ class MetricFrame:
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
         """
+        self._check_bootstrap_initialized()
         return self._result_cache["overall_ci"]
 
     @property
@@ -550,6 +557,7 @@ class MetricFrame:
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
         """
+        self._check_bootstrap_initialized()
         return self._result_cache["by_group_ci"]
 
     @property
@@ -589,6 +597,11 @@ class MetricFrame:
     def ci_quantiles(self) -> Optional[List[float]]:
         """Return the quantiles specified for bootstrapping."""
         return self._ci_quantiles
+
+    @property
+    def n_boot(self) -> Optional[int]:
+        """Return the number of bootstrap samples specified."""
+        return self._n_boot
 
     def _group(
         self,
@@ -686,8 +699,8 @@ class MetricFrame:
         Unlike :meth:`MetricFrame.group_max` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
         """
-        value = self._result_cache["group_max_ci"]
-        return value
+        self._check_bootstrap_initialized()
+        return self._result_cache["group_max_ci"]
 
     def group_min(
         self, errors: Literal["raise", "coerce"] = "raise"
@@ -737,8 +750,8 @@ class MetricFrame:
         Unlike :meth:`MetricFrame.group_min` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
         """
-        value = self._result_cache["group_min_ci"]
-        return value
+        self._check_bootstrap_initialized()
+        return self._result_cache["group_min_ci"]
 
     def difference(
         self,
@@ -814,8 +827,9 @@ class MetricFrame:
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache["difference_ci"][method]
-        return value
+        self._check_bootstrap_initialized()
+
+        return self._result_cache["difference_ci"][method]
 
     def ratio(
         self,
@@ -893,8 +907,9 @@ class MetricFrame:
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache["ratio_ci"][method]
-        return value
+        self._check_bootstrap_initialized()
+
+        return self._result_cache["ratio_ci"][method]
 
     def _process_functions(
         self,
@@ -1024,3 +1039,8 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    def _check_bootstrap_initialized(self):
+        """Check that the bootstrap parameters n_boot and ci_quantiles were correctly initialized."""
+        if self._ci_quantiles is None or len(self._ci_quantiles) == 0 or self._n_boot is None:
+            raise ValueError(_BOOTSTRAP_NOT_INIITIALIZED)
