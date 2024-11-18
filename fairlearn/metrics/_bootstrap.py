@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Union
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -19,11 +20,11 @@ BOOTSTRAP_QUANTILE_ERROR = (
 
 def generate_single_bootstrap_sample(
     *,
-    random_state: Union[int, np.random.RandomState],
+    random_state: int | np.random.RandomState,
     data: pd.DataFrame,
-    annotated_functions: Dict[str, AnnotatedMetricFunction],
-    sensitive_feature_names: List[str],
-    control_feature_names: Optional[List[str]],
+    annotated_functions: dict[str, AnnotatedMetricFunction],
+    sensitive_feature_names: list[str],
+    control_feature_names: list[str] | None = None,
 ) -> DisaggregatedResult:
     """Create a single bootstrapped DisaggregatedResult."""
     assert random_state is not None, "Must specify random_state"
@@ -44,11 +45,11 @@ def generate_single_bootstrap_sample(
 def generate_bootstrap_samples(
     *,
     n_samples: int,
-    random_state: Optional[Union[int, np.random.RandomState]],
+    random_state: int | np.random.RandomState | None,
     data: pd.DataFrame,
-    annotated_functions: Dict[str, AnnotatedMetricFunction],
-    sensitive_feature_names: List[str],
-    control_feature_names: Optional[List[str]],
+    annotated_functions: dict[str, AnnotatedMetricFunction],
+    sensitive_feature_names: list[str],
+    control_feature_names: list[str] | None = None,
 ) -> List[DisaggregatedResult]:
     """Create a list of bootstrapped DisaggregatedResults.
 
@@ -84,7 +85,7 @@ def generate_bootstrap_samples(
     return result
 
 
-def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]) -> List[pd.Series]:
+def _calc_series_quantiles(*, quantiles: list[float], samples: list[pd.Series]) -> list[pd.Series]:
     for s in samples:
         assert isinstance(s, pd.Series)
         assert s.name == samples[0].name
@@ -103,8 +104,8 @@ def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]) 
 
 
 def _calc_dataframe_quantiles(
-    *, quantiles: List[float], samples: List[pd.DataFrame]
-) -> List[pd.DataFrame]:
+    *, quantiles: list[float], samples: list[pd.DataFrame]
+) -> list[pd.DataFrame]:
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)
@@ -127,8 +128,8 @@ def _calc_dataframe_quantiles(
 
 
 def calculate_pandas_quantiles(
-    quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
-) -> Union[List[pd.Series], List[pd.DataFrame]]:
+    quantiles: list[float], bootstrap_samples: list[pd.Series | pd.DataFrame]
+) -> list[pd.Series] | list[pd.DataFrame]:
     """Calculate quantiles for a list of pandas objects."""
     if isinstance(bootstrap_samples[0], pd.Series):
         result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)

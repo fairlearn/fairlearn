@@ -1,8 +1,9 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
-from typing import Callable, Union
+from typing import Callable
 
 from numpy import array, zeros
 from sklearn.utils.validation import check_array
@@ -23,8 +24,8 @@ def plot_model_comparison(
     y_preds,
     y_true=None,
     sensitive_features=None,
-    x_axis_metric: Callable[..., Union[float, int]] = None,
-    y_axis_metric: Callable[..., Union[float, int]] = None,
+    x_axis_metric: Callable[..., float | int] | None = None,
+    y_axis_metric: Callable[..., float | int] | None = None,
     ax=None,
     axis_labels=True,
     point_labels=False,
@@ -46,19 +47,19 @@ def plot_model_comparison(
         An array-like containing predictions per model. Hence, predictions of
         model :code:`i` should be in :code:`y_preds[i]`.
 
-    y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+    y_true : list, pandas.Series, numpy.ndarray, pandas.DataFrame
         The ground-truth labels (for classification) or target values (for regression).
 
-    sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, optional
+    sensitive_features : list, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame, None
         Sensitive features for the fairness metrics (if a fairness metric is
         specified for the x-axis or the y-axis).
 
-    x_axis_metric : Callable
+    x_axis_metric : Callable | None
         The metric function for the x-axis.
         The metric function must take `y_true`, `y_pred`, and optionally `sensitive_features`
         as arguments, and return a scalar value.
 
-    y_axis_metric : Callable
+    y_axis_metric : Callable | None
         The metric function for the y-axis, similar to x_axis_metric.
         The metric function must take `y_true`, `y_pred`, and optionally `sensitive_features`
         as arguments, and return a scalar value.
