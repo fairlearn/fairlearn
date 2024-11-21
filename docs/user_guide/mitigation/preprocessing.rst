@@ -22,44 +22,45 @@ while details from the original data are retained as much as possible (as measur
 by the least-squares error). The user can control the level of projection via the
 :code:`alpha` parameter.
 
-In mathematical terms, assume we have the original dataset :math:`X`, which
-contains a set of **sensitive attributes** denoted by :math:`S` and a set of
-**non-sensitive attributes** denoted by :math:`Z`. The goal is to remove
-correlations between the sensitive attributes and the non-sensitive attributes.
+In mathematical terms, assume we have the original dataset :math:`\mathbf{X}`, which
+contains a set of **sensitive features** denoted by :math:`\mathbf{S}` and a set of
+**non-sensitive features** denoted by :math:`\mathbf{Z}`. The goal is to remove
+correlations between the sensitive features and the non-sensitive features.
 
 Let :math:`m_s` and :math:`m_{ns}` denote the number of sensitive and non-sensitive
 features, respectively.
-Let :math:`\bar{S}` represent the mean of the sensitive attributes, *i.e.*,
-:math:`\bar{S} = (\bar{s}_1, \dots, \bar{s}_{m_s})`, where
+Let :math:`\bar{\mathbf{s}}` represent the mean of the sensitive features, *i.e.*,
+:math:`\bar{\mathbf{s}} = [\bar{s}_1, \dots, \bar{s}_{m_s}]^\top`, where
 :math:`\bar{s}_j` is the mean of the :math:`j\text{-th}` sensitive feature.
 
-For each non-sensitive feature :math:`z_j` in :math:`Z`,
-we compute an optimal weight vector :math:`w_j^* \in \mathbb{R}^{m_s}` that minimizes the
+For each non-sensitive feature :math:`\mathbf{z}_j\in\mathbb{R}^n`, where :math:`j=1,\dotsc,m_{ns}`,
+we compute an optimal weight vector :math:`\mathbf{w}_j^* \in \mathbb{R}^{m_s}` that minimizes the
 following least squares objective:
 
 .. math::
 
-    \min _{w} \| z_j - (S - \bar{S}) w \|_2^2
+    \min _{\mathbf{w}} \| \mathbf{z}_j - (\mathbf{S} - \bar{\mathbf{s}}) \mathbf{w} \|_2^2
 
-In other words, :math:`w_j^*` is the solution to a linear regression problem where we project
-:math:`z_j` onto the centered sensitive attributes. The weight matrix
-:math:`W^* = (w_1^*, \dots, w_{m_{ns}}^*)` is thus obtained by solving this regression
+In other words, :math:`\mathbf{w}_j^*` is the solution to a linear regression problem where we project
+:math:`\mathbf{z}_j` onto the centered sensitive features. The weight matrix
+:math:`\mathbf{W}^* = (\mathbf{w}_1^*, \dots, \mathbf{w}_{m_{ns}}^*)` is thus obtained by solving this regression
 for each non-sensitive feature.
 
-Once we have the optimal weight matrix :math:`W^*`, we compute the **residual
-non-sensitive attributes** :math:`Z^*` as follows:
+Once we have the optimal weight matrix :math:`\mathbf{W}^*`, we compute the **residual
+non-sensitive features** :math:`\mathbf{Z}^*` as follows:
 
 .. math::
 
-    Z^* = Z - (S - \bar{S}) W^*
+    \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
 
+where :math:`\mathbf{1}_n` is a the all-one vector in :math:`\mathbb{R}^n`.
 
-The columns in :math:`S` will be dropped from the dataset :math:`X`, and :math:`Z^*` will replace
-the original non-sensitive features :math:`Z`, but the hyper parameter :math:`\alpha`
+The columns in :math:`\mathbf{S}` will be dropped from the dataset :math:`\mathbf{X}`, and :math:`\mathbf{Z}^*` will replace
+the original non-sensitive features :math:`\mathbf{Z}`, but the hyper parameter :math:`\alpha`
 does allow you to tweak the amount of filtering that gets applied:
 
 .. math::
-        X_{\text{tfm}} = \alpha X_{\text{filtered}} + (1-\alpha) X_{\text{orig}}
+        \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
 
 Note that the lack of correlation does not imply anything about statistical dependence.
 In particular, since correlation measures linear relationships, it might still be
@@ -95,12 +96,12 @@ The :code:`CorrelationRemover` will drop the sensitive features from the dataset
 
 In the visualization below, we see the correlation values in the
 original dataset. We are particularly interested in the correlations
-between the 'race_AfricanAmerican' column and the three non-sensitive attributes
+between the 'race_AfricanAmerican' column and the three non-sensitive features
 'time_in_hospital', 'had_inpatient_days' and 'medicare_True'. The target
 variable is also included in these visualization for completeness, and it is
 defined as a binary feature which indicated whether the readmission of a patient
 occurred within 30 days of the release. We see that 'race_AfricanAmerican' is
-not highly correlated with the three mentioned attributes, but we want to remove
+not highly correlated with the three mentioned features, but we want to remove
 these correlations nonetheless. The code for generating the correlation matrix
 can be found in
 `this example notebook
