@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
+from __future__ import annotations
+
 import logging
 from typing import Literal
 
@@ -25,14 +27,6 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
     "Metric frame contains non-scalar cells. Please remove non-scalar columns from your"
     " metric frame or use parameter errors='coerce'."
 )
-
-
-def extract_unique_classes(data: pd.DataFrame, feature_list: list[str]) -> dict[str, np.ndarray]:
-    """Compute unique values in a given set of columns."""
-    result = dict()
-    for feature in feature_list:
-        result[feature] = np.unique(data[feature])
-    return result
 
 
 def apply_to_dataframe(
@@ -134,48 +128,31 @@ class DisaggregatedResult:
         if not control_feature_names:
             if errors == "raise":
                 try:
-                    mf = self.by_group
-                    if grouping_function == "min":
-                        vals = [mf[m].min() for m in mf.columns]
-                    else:
-                        vals = [mf[m].max() for m in mf.columns]
-
-                    result = pd.Series(vals, index=self.by_group.columns)
+                    result = self.by_group.agg(grouping_function, axis=0)
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
-            elif errors == "coerce":
-                if not control_feature_names:
-                    mf = self.by_group
-                    # Fill in the possible min/max values, else np.nan
-                    if grouping_function == "min":
-                        vals = [
-                            mf[m].min() if np.isscalar(mf[m].values[0]) else np.nan
-                            for m in mf.columns
-                        ]
-                    else:
-                        vals = [
-                            mf[m].max() if np.isscalar(mf[m].values[0]) else np.nan
-                            for m in mf.columns
-                        ]
 
-                    result = pd.Series(vals, index=mf.columns)
+            elif errors == "coerce":
+                # Fill in the possible min/max values, else np.nan
+                mf = self.by_group.apply(
+                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
+                )
+                result = mf.agg(grouping_function, axis=0)
         else:
             if errors == "raise":
                 try:
-                    if grouping_function == "min":
-                        result = self.by_group.groupby(level=control_feature_names).min()
-                    else:
-                        result = self.by_group.groupby(level=control_feature_names).max()
+                    result = self.by_group.groupby(level=control_feature_names).agg(
+                        grouping_function
+                    )
+
                 except ValueError as ve:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self.by_group.copy()
-                mf = mf.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
-                if grouping_function == "min":
-                    result = mf.groupby(level=control_feature_names).min()
-                else:
-                    result = mf.groupby(level=control_feature_names).max()
+                mf = self.by_group.apply(
+                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
+                )
+                result = mf.groupby(level=control_feature_names).agg(grouping_function)
 
         assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
 
@@ -227,10 +204,9 @@ class DisaggregatedResult:
         else:
             raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
 
-        mf = self.by_group.copy()
         # Can assume errors='coerce', else error would already have been raised in .group_min
         # Fill all non-scalar values with NaN
-        mf = mf.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
+        mf = self.by_group.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
 
         if control_feature_names is None:
             result = (mf - subtrahend).abs().max()
@@ -289,7 +265,6 @@ class DisaggregatedResult:
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
 
-        result = None
         if method == "between_groups":
             result = self.apply_grouping(
                 "min", control_feature_names, errors=errors
@@ -357,49 +332,61 @@ class DisaggregatedResult:
         DisaggregatedResult
             Freshly constructed instance of this class
         """
-        # Calculate the 'overall' values
-        if control_feature_names is None:
-            overall = apply_to_dataframe(data, metric_functions=annotated_functions)
-        else:
-            temp = data.groupby(by=control_feature_names).apply(
-                apply_to_dataframe,
-                metric_functions=annotated_functions,
-                # See note in apply_to_dataframe about include_groups
-                include_groups=False,
-            )
-            # If there are multiple control features, might have missing combinations
-            if len(control_feature_names) > 1:
-                cf_classes = extract_unique_classes(data, control_feature_names)
-                all_indices = pd.MultiIndex.from_product(
-                    cf_classes.values(), names=cf_classes.keys()
-                )
-
-                overall = temp.reindex(index=all_indices)
-            else:
-                overall = temp
-
-        # Calculate the 'by_group' values
-        all_grouping_names = [x for x in sensitive_feature_names]
-        if control_feature_names is not None:
-            # Note that we prepend the control feature names
-            all_grouping_names = control_feature_names + all_grouping_names
-
-        temp = data.groupby(all_grouping_names).apply(
-            apply_to_dataframe,
-            metric_functions=annotated_functions,
-            # See note in apply_to_dataframe about include_groups
-            include_groups=False,
+        overall = DisaggregatedResult._apply_functions(
+            data=data,
+            annotated_functions=annotated_functions,
+            grouping_names=control_feature_names,
         )
-        if len(all_grouping_names) > 1:
-            # We might have missing combinations in the input, so expand to fill
-            all_classes = extract_unique_classes(data, all_grouping_names)
-            all_indices = pd.MultiIndex.from_product(
-                all_classes.values(),
-                names=all_classes.keys(),
-            )
 
-            by_group = temp.reindex(index=all_indices)
-        else:
-            by_group = temp
+        by_group = DisaggregatedResult._apply_functions(
+            data=data,
+            annotated_functions=annotated_functions,
+            grouping_names=(control_feature_names or []) + sensitive_feature_names,
+        )
 
         return DisaggregatedResult(overall, by_group)
+
+    @staticmethod
+    def _apply_functions(
+        *,
+        data: pd.DataFrame,
+        annotated_functions: dict[str, AnnotatedMetricFunction],
+        grouping_names: list[str] | None,
+    ) -> pd.Series | pd.DataFrame:
+        """
+        Apply annotated metric functions to a DataFrame, optionally grouping by specified columns.
+
+        Parameters
+        ----------
+        data : pd.DataFrame
+            The input data on which the metric functions will be applied.
+        annotated_functions : dict[str, AnnotatedMetricFunction]
+            A dictionary where keys are metric names and values are the corresponding annotated metric
+            functions.
+        grouping_names : list[str] | None
+            A list of column names to group by before applying the metric functions. If None, the
+            functions are applied to the entire DataFrame.
+
+        Returns
+        -------
+        Series or DataFrame
+            A Series or DataFrame with the results of the metric functions applied. If grouping_names is provided,
+            the results are grouped accordingly.
+        """
+        if grouping_names is None or len(grouping_names) == 0:
+            return apply_to_dataframe(data, metric_functions=annotated_functions)
+
+        temp = data.groupby(grouping_names).apply(
+            apply_to_dataframe,
+            metric_functions=annotated_functions,
+            include_groups=False,
+        )
+
+        if len(grouping_names) > 1:
+            all_indices = pd.MultiIndex.from_product(
+                [np.unique(data[col]) for col in grouping_names], names=grouping_names
+            )
+
+            return temp.reindex(index=all_indices)
+
+        return temp
