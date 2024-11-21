@@ -54,7 +54,9 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     .. math::
 
-        \min _{\mathbf{w}} \| \mathbf{z}_j - (\mathbf{S} - \bar{\mathbf{s}}) \mathbf{w} \|_2^2
+        \min _{\mathbf{w}} \| \mathbf{z}_j - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{w} \|_2^2
+
+    where :math:`\mathbf{1}_n` is the all-one vector in :math:`\mathbb{R}^n`.
 
     In other words, :math:`\mathbf{w}_j^*` is the solution to a linear regression problem where
     we project :math:`\mathbf{z}_j` onto the centered sensitive features. The weight matrix
@@ -67,8 +69,6 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     .. math::
 
     \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
-
-    where :math:`\mathbf{1}_n` is the all-one vector in :math:`\mathbb{R}^n`.
 
     The columns in :math:`\mathbf{S}` will be dropped from the dataset :math:`\mathbf{X}`, and
     :math:`\mathbf{Z}^*` will replace the original non-sensitive features :math:`\mathbf{Z}`, but
