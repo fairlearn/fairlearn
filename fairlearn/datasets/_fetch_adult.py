@@ -4,11 +4,12 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+from sklearn.utils import Bunch
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
+def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False) -> Bunch:
     """Load the UCI Adult dataset (binary classification).
 
     Read more in the :ref:`User Guide <boston_housing_data>`.
