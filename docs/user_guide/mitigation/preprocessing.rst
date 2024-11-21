@@ -41,10 +41,10 @@ following least squares objective:
 
     \min _{\mathbf{w}} \| \mathbf{z}_j - (\mathbf{S} - \bar{\mathbf{s}}) \mathbf{w} \|_2^2
 
-In other words, :math:`\mathbf{w}_j^*` is the solution to a linear regression problem where we project
-:math:`\mathbf{z}_j` onto the centered sensitive features. The weight matrix
-:math:`\mathbf{W}^* = (\mathbf{w}_1^*, \dots, \mathbf{w}_{m_{ns}}^*)` is thus obtained by solving this regression
-for each non-sensitive feature.
+In other words, :math:`\mathbf{w}_j^*` is the solution to a linear regression problem where we
+project :math:`\mathbf{z}_j` onto the centered sensitive features. The weight matrix
+:math:`\mathbf{W}^* = (\mathbf{w}_1^*, \dots, \mathbf{w}_{m_{ns}}^*)` is thus obtained by solving
+this regression for each non-sensitive feature.
 
 Once we have the optimal weight matrix :math:`\mathbf{W}^*`, we compute the **residual
 non-sensitive features** :math:`\mathbf{Z}^*` as follows:
@@ -53,14 +53,14 @@ non-sensitive features** :math:`\mathbf{Z}^*` as follows:
 
     \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
 
-where :math:`\mathbf{1}_n` is a the all-one vector in :math:`\mathbb{R}^n`.
+where :math:`\mathbf{1}_n` is the all-one vector in :math:`\mathbb{R}^n`.
 
-The columns in :math:`\mathbf{S}` will be dropped from the dataset :math:`\mathbf{X}`, and :math:`\mathbf{Z}^*` will replace
-the original non-sensitive features :math:`\mathbf{Z}`, but the hyper parameter :math:`\alpha`
-does allow you to tweak the amount of filtering that gets applied:
+The columns in :math:`\mathbf{S}` will be dropped from the dataset :math:`\mathbf{X}`, and
+:math:`\mathbf{Z}^*` will replace the original non-sensitive features :math:`\mathbf{Z}`, but the
+hyper parameter :math:`\alpha` does allow you to tweak the amount of filtering that gets applied:
 
 .. math::
-        \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
+    \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
 
 Note that the lack of correlation does not imply anything about statistical dependence.
 In particular, since correlation measures linear relationships, it might still be
