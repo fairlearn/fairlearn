@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import functools
 import inspect
-from typing import Callable, List, Union
+from typing import Callable, Union
 
 from ._metric_frame import MetricFrame
 
@@ -28,9 +29,9 @@ class _DerivedMetric:
     def __init__(
         self,
         *,
-        metric: Callable[..., Union[float, int]],
+        metric: Callable[..., float | int],
         transform: str,
-        sample_param_names: List[str],
+        sample_param_names: list[str],
     ):
         if not callable(metric):
             raise ValueError(_METRIC_CALLABLE_ERROR)
@@ -93,10 +94,10 @@ class _DerivedMetric:
 
 def make_derived_metric(
     *,
-    metric: Callable[..., Union[float, int]],
+    metric: Callable[..., float | int],
     transform: str,
-    sample_param_names: List[str] = ["sample_weight"],
-) -> Callable[..., Union[float, int]]:
+    sample_param_names: list[str] = ["sample_weight"],
+) -> Callable[..., float | int]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
     Many higher order machine learning operations (such as hyperparameter tuning)
@@ -134,7 +135,7 @@ def make_derived_metric(
         The list of possible options is:
         ['difference', 'group_min', 'group_max', 'ratio'].
 
-    sample_param_names : List[str]
+    sample_param_names : list[str]
         A list of parameters names of the underlying :code:`metric` which should
         be treated as sample parameters (i.e. the same leading dimension as the
         :code:`y_true` and :code:`y_pred` parameters). This defaults to a list with

@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
-from typing import Dict, List, Literal, Optional, Union
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -26,7 +27,7 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
 )
 
 
-def extract_unique_classes(data: pd.DataFrame, feature_list: List[str]) -> Dict[str, np.ndarray]:
+def extract_unique_classes(data: pd.DataFrame, feature_list: list[str]) -> dict[str, np.ndarray]:
     """Compute unique values in a given set of columns."""
     result = dict()
     for feature in feature_list:
@@ -36,7 +37,7 @@ def extract_unique_classes(data: pd.DataFrame, feature_list: List[str]) -> Dict[
 
 def apply_to_dataframe(
     data: pd.DataFrame,
-    metric_functions: Dict[str, AnnotatedMetricFunction],
+    metric_functions: dict[str, AnnotatedMetricFunction],
     include_groups: bool = False,
 ) -> pd.Series:
     """Apply metric functions to a DataFrame.
@@ -85,14 +86,14 @@ class DisaggregatedResult:
         the sensitive and control features
     """
 
-    def __init__(self, overall: Union[pd.Series, pd.DataFrame], by_group: pd.DataFrame):
+    def __init__(self, overall: pd.Series | pd.DataFrame, by_group: pd.DataFrame):
         """Construct an object."""
         self._overall = overall
         assert isinstance(by_group, pd.DataFrame)
         self._by_group = by_group
 
     @property
-    def overall(self) -> Union[pd.Series, pd.DataFrame]:
+    def overall(self) -> pd.Series | pd.DataFrame:
         """Return overall metrics."""
         return self._overall
 
@@ -104,15 +105,15 @@ class DisaggregatedResult:
     def apply_grouping(
         self,
         grouping_function: Literal["min", "max"],
-        control_feature_names: Optional[List[str]] = None,
+        control_feature_names: list[str] | None = None,
         errors: Literal["raise", "coerce"] = "raise",
-    ) -> Union[pd.Series, pd.DataFrame]:
+    ) -> pd.Series | pd.DataFrame:
         """Compute mins or maxes.
 
         Parameters
         ----------
         grouping_function: string {'min', 'max'}
-        control_feature_names: Optional[List[str]]
+        control_feature_names: list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
         errors: string {'raise', 'coerce'}, default :code:`raise`
@@ -182,10 +183,10 @@ class DisaggregatedResult:
 
     def difference(
         self,
-        control_feature_names: List[str],
+        control_feature_names: list[str] | None = None,
         method: Literal["between_groups", "to_overall"] = "between_groups",
         errors: Literal["raise", "coerce"] = "coerce",
-    ) -> Union[pd.Series, pd.DataFrame]:
+    ) -> pd.Series | pd.DataFrame:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -203,6 +204,9 @@ class DisaggregatedResult:
 
         Parameters
         ----------
+        control_feature_names: list[str] | None
+            Names of the control features. Must appear in the index of the `overall`
+            and `by_group` properties
         method : {'between_groups', 'overall'}, default :code:`between_groups`
             How to compute the aggregate.
         errors: {'raise', 'coerce'}, default :code:`coerce`
@@ -239,10 +243,10 @@ class DisaggregatedResult:
 
     def ratio(
         self,
-        control_feature_names: List[str],
+        control_feature_names: list[str] | None = None,
         method: Literal["between_groups", "to_overall"] = "between_groups",
         errors: Literal["raise", "coerce"] = "coerce",
-    ) -> Union[pd.Series, pd.DataFrame]:
+    ) -> pd.Series | pd.DataFrame:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -262,6 +266,9 @@ class DisaggregatedResult:
 
         Parameters
         ----------
+        control_feature_names: list[str] | None
+            Names of the control features. Must appear in the index of the `overall`
+            and `by_group` properties
         method : {'between_groups', 'overall'}, default :code:`between_groups`
             How to compute the aggregate.
         errors: {'raise', 'coerce'}, default :code:`coerce`
@@ -314,9 +321,9 @@ class DisaggregatedResult:
     def create(
         *,
         data: pd.DataFrame,
-        annotated_functions: Dict[str, AnnotatedMetricFunction],
-        sensitive_feature_names: List[str],
-        control_feature_names: Optional[List[str]],
+        annotated_functions: dict[str, AnnotatedMetricFunction],
+        sensitive_feature_names: list[str],
+        control_feature_names: list[str] | None = None,
     ) -> "DisaggregatedResult":
         """Manufacture a DisaggregatedResult.
 
@@ -336,12 +343,12 @@ class DisaggregatedResult:
         ----------
         data : DataFrame
             A DataFrame containing all of the columns required to compute the metrics
-        annotated_functions: Dict[str, AnnotatedMetricFunction]
+        annotated_functions: dict[str, AnnotatedMetricFunction]
             A dictionary of metric functions, each of which is annotated with the
             mapping of columns in `data` to argument names in the function
-        sensitive_feature_names: List[str]
+        sensitive_feature_names: list[str]
             The list of columns in `data` which correspond to the sensitive feature(s)
-        control_feature_names: Optional[List[str]]
+        control_feature_names: list[str] | None
             Optional list of columns in `data` which correspond to the control features,
             if any
 

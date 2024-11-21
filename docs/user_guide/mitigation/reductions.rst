@@ -557,6 +557,84 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     detected by :code:`gamma` is identical to the mean absolute error.
 
 
+Exponentiated Gradient
+----------------------
+
+The :class:`ExponentiatedGradient` algorithm in Fairlearn is used to produce models that
+satisfy fairness constraints without needing access to sensitive features at deployment time.
+This algorithm creates a sequence of re-weighted datasets and retrains the
+wrapped classifier on each of these datasets.
+To instantiate an :class:`ExponentiatedGradient` model, we need to pass in a base estimator
+and fairness constraints. The fairness constraints are typically specified by providing
+an upper bound on the difference (or the ratio) between the largest and the smallest
+value of some statistic (like a false positive rate) across all groups. This bound is
+often referred to as epsilon.
+
+Here is an example of how to instantiate an :class:`ExponentiatedGradient` model:
+
+.. doctest:: mitigation_reductions
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.datasets import fetch_adult
+    >>> from fairlearn.metrics import plot_model_comparison, equal_opportunity_difference
+    >>> from fairlearn.reductions import ExponentiatedGradient, EqualizedOdds
+    >>> from sklearn.ensemble import  RandomForestClassifier
+    >>> from sklearn.metrics import accuracy_score
+    >>> from sklearn.model_selection import train_test_split
+    >>> from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+    >>> from sklearn.compose import ColumnTransformer
+    >>> from sklearn.pipeline import Pipeline
+    >>> # Fetch and preprocess the data
+    >>> X, y = fetch_adult(return_X_y=True, as_frame=True)
+    >>> A = X["sex"]
+    >>> # Identify features
+    >>> categorical_features = X.select_dtypes(include='category').columns.tolist()
+    >>> numeric_features = X.select_dtypes(include='number').columns.tolist()
+    >>> # Create preprocessor for X
+    >>> preprocessor = ColumnTransformer(
+    ...     transformers=[
+    ...         ('num', 'passthrough', numeric_features),
+    ...         ('cat', OneHotEncoder(drop='first'), categorical_features)])
+    >>> # Transform y to numerical values
+    >>> le = LabelEncoder()
+    >>> y = le.fit_transform(y)
+    >>> # Create a pipeline with the preprocessor and estimator
+    >>> estimator = Pipeline([
+    ...     ('preprocessor', preprocessor),
+    ...     ('classifier', RandomForestClassifier(n_estimators=10, random_state=42))])
+    >>> # Split the data
+    >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X, y, A, test_size=0.2, random_state=42)
+    >>> # Train and evaluate the base model
+    >>> _ = estimator.fit(X_train, y_train) #variable assignment only there to prevent large output
+    >>> y_pred_base = estimator.predict(X_test)
+    >>> # Create a list of ExponentiatedGradient models with different epsilons
+    >>> epsilons = [0.001, 0.01, 0.05, 0.1, 0.2]
+    >>> exp_grad_models = {}
+    >>> for eps in epsilons:
+    ...     exp_grad_est = ExponentiatedGradient(
+    ...         estimator=estimator,
+    ...         constraints=EqualizedOdds(difference_bound=eps),
+    ...         sample_weight_name="classifier__sample_weight")
+    ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train) #variable assignment only there to prevent large output
+    ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(X_test)
+    >>> # Add the base model predictions
+    >>> exp_grad_models["Base Model"] = y_pred_base
+    >>> # Plot the comparison
+    >>> plot_model_comparison(
+    ...     x_axis_metric=accuracy_score,
+    ...     y_axis_metric=equal_opportunity_difference,
+    ...     y_true=y_test,
+    ...     y_preds=exp_grad_models,
+    ...     sensitive_features=A_test,
+    ...     show_plot=True,
+    ...     point_labels =True)
+    <Axes: xlabel='accuracy score', ylabel='equal opportunity difference'>
+
+The performance-fairness trade-off learned by the ExponentiatedGradient model is
+sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparameter
+and iterated over a range of potential values.
+
+
 References
 ----------
 

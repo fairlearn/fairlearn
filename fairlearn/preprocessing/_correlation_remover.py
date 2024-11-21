@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from collections.abc import Iterable
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -22,7 +24,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     ----------
         sensitive_feature_ids : list
             list of columns to filter out this can be a sequence of
-            either int ,in the case of numpy, or string, in the case of pandas.
+            either int, in the case of numpy, or string, in the case of pandas.
         alpha : float
             parameter to control how much to filter, for alpha=1.0 we filter out
             all information while for alpha=0.0 we don't apply any.
@@ -82,7 +84,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, *, sensitive_feature_ids=None, alpha=1):
+    def __init__(self, *, sensitive_feature_ids: Iterable = (), alpha: float = 1):
         self.sensitive_feature_ids = sensitive_feature_ids
         self.alpha = alpha
 
@@ -105,6 +107,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
+        self._check_sensitive_features_in_X(X)
         self._create_lookup(X)
         X = self._validate_data(X)
         X_use, X_sensitive = self._split_X(X)
@@ -134,11 +137,26 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
         X_filtered = np.atleast_2d(X_filtered)
         return self.alpha * X_filtered + (1 - self.alpha) * X_use
 
+    def _check_sensitive_features_in_X(self, X) -> None:
+        """Check if the sensitive features are in X."""
+        if isinstance(X, pd.DataFrame):
+            missing_columns = [c for c in self.sensitive_feature_ids if c not in X.columns]
+        else:
+            if X.ndim == 1:
+                return
+            missing_columns = [i for i in self.sensitive_feature_ids if i not in range(X.shape[1])]
+
+        if len(missing_columns) > 0:
+            raise ValueError(f"Columns {missing_columns} not found in the input data.")
+
     def _more_tags(self):
         return {
             "_xfail_checks": {
                 "check_transformer_data_not_an_array": (
                     "this estimator only accepts pandas dataframes or numpy ndarray as input."
+                ),
+                "check_estimators_empty_data_messages": (
+                    "this estimator raises on missing sensitive features in data."
                 ),
             }
         }
