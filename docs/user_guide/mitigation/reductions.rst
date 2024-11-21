@@ -565,8 +565,10 @@ satisfy fairness constraints without needing access to sensitive features at dep
 This algorithm creates a sequence of re-weighted datasets and retrains the
 wrapped classifier on each of these datasets.
 To instantiate an :class:`ExponentiatedGradient` model, we need to pass in a base estimator
-and fairness constraints. The fairness constraints can be specified using an epsilon value,
-which represents the maximum allowed difference or ratio between the largest and smallest value.
+and fairness constraints. The fairness constraints are typically specified by providing
+an upper bound on the difference (or the ratio) between the largest and the smallest
+value of some statistic (like a false positive rate) across all groups. This bound is
+often referred to as epsilon.
 
 Here is an example of how to instantiate an :class:`ExponentiatedGradient` model:
 
