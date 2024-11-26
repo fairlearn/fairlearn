@@ -75,47 +75,50 @@ def _get_adult_fairness_comparison_data() -> FairnessComparisonData:
     )
 
 
-ADULT_FAIRNESS_COMPARISON_DATA = _get_adult_fairness_comparison_data()
-
-
 @pytest.mark.parametrize(
-    "fairness_metric",
-    [
-        demographic_parity_difference,
-        equal_opportunity_difference,
-        equalized_odds_difference,
-    ],
+    "fairness_metrics",
+    [[demographic_parity_difference, equal_opportunity_difference, equalized_odds_difference]],
 )
-@pytest.mark.parametrize("data", (ADULT_FAIRNESS_COMPARISON_DATA,))
+@pytest.mark.parametrize("fairness_comparison_data_loader", [_get_adult_fairness_comparison_data])
 def test_correlation_remover_mitigates_bias(
-    data: FairnessComparisonData, fairness_metric: Callable
+    fairness_comparison_data_loader: Callable[[], FairnessComparisonData],
+    fairness_metrics: list[Callable],
 ) -> None:
+    data = fairness_comparison_data_loader()
+
     bootstrap_iterations = 30
-    fairness_metric_values_with_mitigation = []
-    fairness_metric_values_without_mitigation = []
+
+    fairness_metrics_values_with_mitigation = np.zeros(
+        (len(fairness_metrics), bootstrap_iterations)
+    )
+    fairness_metrics_values_without_mitigation = np.zeros(
+        (len(fairness_metrics), bootstrap_iterations)
+    )
 
     for iteration in range(bootstrap_iterations):
         sampled_data = data.bootstrap(seed=iteration)
 
-        metric_with_mitigation = fairness_metric(
-            sampled_data.y_true,
-            sampled_data.y_pred_with_mitigation,
-            sensitive_features=sampled_data.sensitive_feature,
+        for i, metric in enumerate(fairness_metrics):
+            metric_with_mitigation = metric(
+                sampled_data.y_true,
+                sampled_data.y_pred_with_mitigation,
+                sensitive_features=sampled_data.sensitive_feature,
+            )
+
+            metric_without_mitigation = metric(
+                sampled_data.y_true,
+                sampled_data.y_pred_without_mitigation,
+                sensitive_features=sampled_data.sensitive_feature,
+            )
+
+            fairness_metrics_values_with_mitigation[i, iteration] = metric_with_mitigation
+            fairness_metrics_values_without_mitigation[i, iteration] = metric_without_mitigation
+
+    for metric in range(len(fairness_metrics)):
+        _, p_value = wilcoxon(
+            fairness_metrics_values_without_mitigation[metric],
+            fairness_metrics_values_with_mitigation[metric],
+            alternative="greater",
         )
 
-        metric_without_mitigation = fairness_metric(
-            sampled_data.y_true,
-            sampled_data.y_pred_without_mitigation,
-            sensitive_features=sampled_data.sensitive_feature,
-        )
-
-        fairness_metric_values_with_mitigation.append(metric_with_mitigation)
-        fairness_metric_values_without_mitigation.append(metric_without_mitigation)
-
-    _, p_value = wilcoxon(
-        fairness_metric_values_without_mitigation,
-        fairness_metric_values_with_mitigation,
-        alternative="greater",
-    )
-
-    assert p_value < 0.05
+        assert p_value < 0.05
