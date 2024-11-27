@@ -441,6 +441,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Tradeoff curve")
             logger.debug(roc_convex_hull)
 
+        self._overall_tradeoff_curve = pd.DataFrame(
+            {"x": self._x_grid, "y": overall_tradeoff_curve}
+        )
+
         # Find maximum objective point given that at each point the constraint value for each
         # sensitive feature value is identical by design.
         i_best = overall_tradeoff_curve.idxmax()

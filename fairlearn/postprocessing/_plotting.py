@@ -3,6 +3,7 @@
 
 """Utilities for plotting curves."""
 
+import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
 from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
@@ -42,6 +43,18 @@ def _plot_solution(ax, x_best, y_best, solution_label, xlabel, ylabel):
     ax.set_ylabel(ylabel)
 
 
+def _plot_overall_tradeoff_curve(ax, overall_tradeoff_curve: pd.DataFrame) -> None:
+    """Plot the overall tradeoff curve."""
+    ax.plot(
+        overall_tradeoff_curve["x"],
+        overall_tradeoff_curve["y"],
+        c="b",
+        ls="--",
+        lw=2.0,
+        label="overall tradeoff curve",
+    )
+
+
 def _plot_overlap(ax, x_grid, y_min):
     """Plot the overlap region."""
     highlight_color = [0.95, 0.90, 0.40]
@@ -69,7 +82,7 @@ def _raise_if_not_threshold_optimizer(obj):
         )
 
 
-def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
+def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, show_plot=True):
     r"""Plot the chosen solution of the threshold optimizer.
 
     For :class:`.ThresholdOptimizer` objects that have their
@@ -119,6 +132,7 @@ def plot_threshold_optimizer(threshold_optimizer, ax=None, show_plot=True):
             "$P[\\hat{Y}=1|Y=1]$",
         )
     else:
+        _plot_overall_tradeoff_curve(ax, threshold_optimizer._overall_tradeoff_curve)
         _plot_solution(
             ax,
             threshold_optimizer._x_best,
