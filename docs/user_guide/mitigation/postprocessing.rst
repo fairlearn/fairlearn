@@ -93,7 +93,6 @@ true positive rate parity as the fairness constraint.
     ... )
     >>> categorical_transformer = Pipeline(
     ...     [
-    ...         # ("impute", SimpleImputer(strategy="most_frequent")),
     ...         ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ...     ]
     ... )
@@ -157,7 +156,6 @@ true positive rate parity as the fairness constraint.
     >>> plot_threshold_optimizer(threshold_optimizer)
 
 When calling :code:`predict`, :class:`ThresholdOptimizer` uses one of the
-
 thresholds at random based on the probabilities :math:`p_0` and :math:`p_1`.
 The results can be interpreted as follows based on the following formula for
 the probability to predict label 1:
@@ -167,7 +165,7 @@ the probability to predict label 1:
     p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})
 
 
-- "Female: :math:`0.628 \cdot \mathbb{I}(\text{score}>0.110) + 0.371 \cdot \mathbb{I}(\text{score}>0.096)`
+- "Female": :math:`0.628 \cdot \mathbb{I}(\text{score}>0.110) + 0.371 \cdot \mathbb{I}(\text{score}>0.096)`
 
   - if the score is above :math:`0.110` predict 1
   - if the score is between :math:`0.110` and :math:`0.096` predict 1 with
