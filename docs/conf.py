@@ -185,6 +185,8 @@ html_sidebars = {
     "**": ["search-field", "sidebar-nav-bs.html"],
 }
 
+html_favicon = "_static/images/fairlearn-favicon.ico"
+
 # Auto-Doc Options
 # ----------------
 
