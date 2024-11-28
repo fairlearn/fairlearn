@@ -32,11 +32,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     Notes
     -----
     This method will change the original dataset by removing all correlation with sensitive
-    values. To describe that mathematically, let's assume in the original dataset
-    :math:`\mathbf{X}` we've got a set of sensitive attributes :math:`\mathbf{S}` and a set of
-    non-sensitive attributes :math:`\mathbf{Z}`.
-
-    In mathematical terms, assume we have the original dataset :math:`\mathbf{X}`, which
+    values. In mathematical terms, assume we have the original dataset :math:`\mathbf{X}`, which
     contains a set of **sensitive features** denoted by :math:`\mathbf{S}` and a set of
     **non-sensitive features** denoted by :math:`\mathbf{Z}`. The goal is to remove
     correlations between the sensitive features and the non-sensitive features.
