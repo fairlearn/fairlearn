@@ -6,11 +6,7 @@ LABEL_KEY = "label"
 SENSITIVE_FEATURE_KEY = "sensitive_feature"
 P0_KEY = "p0"
 P1_KEY = "p1"
-OPERATION_KEY = "operation"
-OPERATION0_KEY = "operation0"
-OPERATION1_KEY = "operation1"
-X_KEY = "x"
-Y_KEY = "y"
+
 
 OUTPUT_SEPARATOR = "-" * 65
 

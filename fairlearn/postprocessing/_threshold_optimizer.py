@@ -30,16 +30,11 @@ from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING,
     LABEL_KEY,
-    OPERATION0_KEY,
-    OPERATION1_KEY,
-    OPERATION_KEY,
     OUTPUT_SEPARATOR,
     P0_KEY,
     P1_KEY,
     SCORE_KEY,
     SENSITIVE_FEATURE_KEY,
-    X_KEY,
-    Y_KEY,
 )
 from ._interpolated_thresholder import InterpolatedThresholder
 from ._tradeoff_curve_utilities import (
@@ -433,7 +428,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             )
 
             self._tradeoff_curve[sensitive_feature_value] = _interpolate_curve(
-                metrics_curve_convex_hull, X_KEY, Y_KEY, OPERATION_KEY, self._x_grid
+                metrics_curve_convex_hull, "x", "y", "operation", self._x_grid
             )
 
             # Add up objective for the current group multiplied by the probability of the current
@@ -451,7 +446,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             logger.debug(metrics_curve_convex_hull)
 
         self._overall_tradeoff_curve = pd.DataFrame(
-            {X_KEY: self._x_grid, Y_KEY: overall_tradeoff_curve}
+            {"x": self._x_grid, "y": overall_tradeoff_curve}
         )
 
         # Find maximum objective point given that at each point the constraint value for each
@@ -466,9 +461,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             best_interpolation = self._tradeoff_curve[sensitive_feature_value].iloc[i_best]
             interpolation_dict[sensitive_feature_value] = Bunch(
                 p0=best_interpolation[P0_KEY],
-                operation0=best_interpolation[OPERATION0_KEY],
+                operation0=best_interpolation["operation0"],
                 p1=best_interpolation[P1_KEY],
-                operation1=best_interpolation[OPERATION1_KEY],
+                operation1=best_interpolation["operation1"],
             )
 
         logger.debug(OUTPUT_SEPARATOR)
@@ -533,7 +528,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         ) in data_grouped_by_sensitive_feature:
             roc_convex_hull = _tradeoff_curve(group, sensitive_feature_value, flip=self.flip)
             self._tradeoff_curve[sensitive_feature_value] = _interpolate_curve(
-                roc_convex_hull, X_KEY, Y_KEY, OPERATION_KEY, self._x_grid
+                roc_convex_hull, "x", "y", "operation", self._x_grid
             )
             y_values[sensitive_feature_value] = self._tradeoff_curve[sensitive_feature_value]["y"]
 

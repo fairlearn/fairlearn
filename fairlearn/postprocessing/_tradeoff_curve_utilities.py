@@ -6,15 +6,7 @@ import pandas as pd
 from numpy.typing import NDArray
 from sklearn.utils import Bunch
 
-from ._constants import (
-    LABEL_KEY,
-    OPERATION_KEY,
-    P0_KEY,
-    P1_KEY,
-    SCORE_KEY,
-    X_KEY,
-    Y_KEY,
-)
+from ._constants import LABEL_KEY, P0_KEY, P1_KEY, SCORE_KEY
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
@@ -146,7 +138,7 @@ def _filter_points_to_get_convex_hull(points_sorted: pd.DataFrame) -> pd.DataFra
             else:
                 break
         selected.append(r2)
-    return pd.DataFrame(selected)[[X_KEY, Y_KEY, OPERATION_KEY]]
+    return pd.DataFrame(selected)[["x", "y", "operation"]]
 
 
 def _interpolate_curve(
@@ -324,8 +316,8 @@ def _calculate_tradeoff_points(
             operation_list.append(operation)
 
     return (
-        pd.DataFrame({X_KEY: x_list, Y_KEY: y_list, OPERATION_KEY: operation_list})
-        .sort_values(by=[X_KEY, Y_KEY])
+        pd.DataFrame({"x": x_list, "y": y_list, "operation": operation_list})
+        .sort_values(by=["x", "y"])
         .reset_index(drop=True)
     )
 

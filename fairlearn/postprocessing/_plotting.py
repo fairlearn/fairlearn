@@ -6,7 +6,7 @@
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
-from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE, X_KEY, Y_KEY
+from ._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ._threshold_optimizer import ThresholdOptimizer
 
 _debug_colors = None
@@ -46,8 +46,8 @@ def _plot_solution(ax, x_best, y_best, solution_label, xlabel, ylabel):
 def _plot_overall_tradeoff_curve(ax, overall_tradeoff_curve: pd.DataFrame) -> None:
     """Plot the overall tradeoff curve."""
     ax.plot(
-        overall_tradeoff_curve[X_KEY],
-        overall_tradeoff_curve[Y_KEY],
+        overall_tradeoff_curve["x"],
+        overall_tradeoff_curve["y"],
         c="b",
         ls="--",
         lw=2.0,
@@ -116,8 +116,8 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
         _plot_curve(
             ax,
             sensitive_feature_value,
-            X_KEY,
-            Y_KEY,
+            "x",
+            "y",
             threshold_optimizer._tradeoff_curve[sensitive_feature_value],
         )
 
