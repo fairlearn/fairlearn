@@ -182,17 +182,15 @@ def _interpolate_curve(
     content_col_0 = content_col + "0"
     content_col_1 = content_col + "1"
 
-    indices = np.searchsorted(x_values, x_grid, side="right") - 1
-    indices = np.clip(indices, 0, len(x_values) - 2)
-    indices[1:-1] = np.where(
-        x_grid[1:-1] == x_values[indices[1:-1]], indices[1:-1] - 1, indices[1:-1]
-    )
+    interpolation_indices = _get_interpolation_indices(x_grid, x_values)
 
-    x_distance_from_next_data_point = x_values[indices + 1] - x_grid
-    x_distance_between_data_points = x_values[indices + 1] - x_values[indices]
+    x_distance_from_next_data_point = x_values[interpolation_indices + 1] - x_grid
+    x_distance_between_data_points = (
+        x_values[interpolation_indices + 1] - x_values[interpolation_indices]
+    )
     p0 = x_distance_from_next_data_point / x_distance_between_data_points
     p1 = 1 - p0
-    y = p0 * y_values[indices] + p1 * y_values[indices + 1]
+    y = p0 * y_values[interpolation_indices] + p1 * y_values[interpolation_indices + 1]
 
     dict_list = [
         {
@@ -203,10 +201,43 @@ def _interpolate_curve(
             P1_KEY: p1_val,
             content_col_1: content_values[idx + 1],
         }
-        for x, y_val, p0_val, p1_val, idx in zip(x_grid, y, p0, p1, indices)
+        for x, y_val, p0_val, p1_val, idx in zip(x_grid, y, p0, p1, interpolation_indices)
     ]
 
     return pd.DataFrame(dict_list)
+
+
+def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
+    """
+    This function finds the indices of `x_values` that are just to the left of each value in `x_grid`.
+    The returned indices are such that:
+    `x_values[indices[i]] < x_grid[i] <= x_values[indices[i] + 1]`.
+    Parameters
+    ----------
+    x_grid : array-like
+        The grid of x values where interpolation is desired.
+    x_values : array-like
+        The sorted array of x values from which to interpolate.
+    Returns
+    -------
+    indices : ndarray
+        The array of indices in `x_values` that are just to the left of each value in `x_grid`.
+    """
+    # Use 'right' to get the index of the first element in x_values greater than x_grid
+    # Subtract 1 to get the index to the left
+    # This yields indices that verify x_values[indices[i]] <= x_grid[i] < x_values[indices[i] + 1]
+    # The edge case for the last element is handled by the second line.
+    indices = np.searchsorted(x_values, x_grid, side="right") - 1
+
+    # The convention is that in case a point in x_grid is equal to a point in x_values,
+    # the index is the one to the left of the point in x_values.
+    # i.e., x_values[indices[i]] < x_grid[i] <= x_values[indices[i] + 1]
+    # This is achieved by decrementing the index if the point in x_values is equal to the point in x_grid.
+    # This also keeps the last index in bounds.
+    # The first element is left unchanged to keep the indices in bounds.
+    indices[1:] = np.where(x_grid[1:] == x_values[indices[1:]], indices[1:] - 1, indices[1:])
+
+    return indices
 
 
 def _calculate_tradeoff_points(
