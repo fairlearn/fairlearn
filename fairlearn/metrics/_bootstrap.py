@@ -63,12 +63,14 @@ def generate_bootstrap_samples(
     assert n_samples >= 1
     if random_state is None:
         generator = np.random.default_rng()
-        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype="int64")
     elif isinstance(random_state, np.random.RandomState):
-        rs = random_state.randint(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        rs = random_state.randint(
+            low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype="int64"
+        )
     elif isinstance(random_state, int):
         generator = np.random.default_rng(seed=random_state)
-        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype="int64")
     else:
         raise ValueError(f"Unsupported random_state: {random_state}")
 
