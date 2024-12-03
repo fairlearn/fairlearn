@@ -7,9 +7,30 @@ from contextlib import nullcontext as does_not_raise
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.utils.estimator_checks import parametrize_with_checks
+from sklearn.utils.estimator_checks import check_estimator, parametrize_with_checks
 
 from fairlearn.preprocessing import CorrelationRemover
+
+EXPECTED_FAILED_CHECKS = {
+    "CorrelationRemover": {
+        "check_transformer_data_not_an_array": (
+            "this estimator only accepts pandas dataframes or numpy ndarray as input."
+        ),
+        "check_estimators_empty_data_messages": (
+            "this estimator raises on missing sensitive features in data.",
+        ),
+    },
+}
+
+
+def check_extended(estimator, check, expected_failed_checks=None):
+    try:
+        check_estimator(
+            estimator, expected_failed_checks=EXPECTED_FAILED_CHECKS[estimator.__class__.__name__]
+        )
+    except TypeError:
+        # sklearn version < 1.6
+        check(estimator)
 
 
 @parametrize_with_checks(
@@ -19,7 +40,7 @@ from fairlearn.preprocessing import CorrelationRemover
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
-    check(estimator)
+    check_extended(estimator, check)
 
 
 @pytest.mark.parametrize(
