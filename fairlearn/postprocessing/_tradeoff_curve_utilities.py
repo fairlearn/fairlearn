@@ -184,19 +184,16 @@ def _interpolate_curve(
     p1 = 1 - p0
     y = p0 * y_values[interpolation_indices] + p1 * y_values[interpolation_indices + 1]
 
-    dict_list = [
+    return pd.DataFrame(
         {
-            x_col: x,
-            y_col: y_val,
-            P0_KEY: p0_val,
-            content_col_0: content_values[idx],
-            P1_KEY: p1_val,
-            content_col_1: content_values[idx + 1],
+            x_col: x_grid,
+            y_col: y,
+            P0_KEY: p0,
+            content_col_0: content_values[interpolation_indices],
+            P1_KEY: p1,
+            content_col_1: content_values[interpolation_indices + 1],
         }
-        for x, y_val, p0_val, p1_val, idx in zip(x_grid, y, p0, p1, interpolation_indices)
-    ]
-
-    return pd.DataFrame(dict_list)
+    )
 
 
 def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
