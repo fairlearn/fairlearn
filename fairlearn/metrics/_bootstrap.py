@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from functools import reduce
 from typing import List
 
 import numpy as np
@@ -106,13 +107,15 @@ def _calc_series_quantiles(*, quantiles: list[float], samples: list[pd.Series]) 
 def _calc_dataframe_quantiles(
     *, quantiles: list[float], samples: list[pd.DataFrame]
 ) -> list[pd.DataFrame]:
+    samples = _align_sample_indices(samples)
+
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)
         assert all(s.index == samples[0].index), "Sanity check shape of bootstrap sample"
 
     try:
-        result_np = np.quantile(samples, q=quantiles, axis=0)
+        result_np = np.nanquantile(samples, q=quantiles, axis=0)
     except ValueError as ve:
         raise ValueError(BOOTSTRAP_QUANTILE_ERROR) from ve
 
@@ -127,8 +130,34 @@ def _calc_dataframe_quantiles(
     return result
 
 
+def _align_sample_indices(samples: list[pd.DataFrame]) -> list[pd.DataFrame]:
+    """
+    Align the indices of the bootstrapped DataFrames, so that all the combinations of sensitive
+    and control feature values are present in all the samples.
+
+    This is achieved by reindexing them to a common outer union of all indices, filling the missing
+    combinations with NaNs.
+
+    If a combination is missing from all the samples, it won't appear in the common index.
+
+    Parameters
+    ----------
+    samples : list[pd.DataFrame]
+        A list of pandas DataFrames to be aligned.
+
+    Returns
+    -------
+    list[pd.DataFrame]
+        A list of pandas DataFrames with aligned indices.
+    """
+    all_indices = [sample.index for sample in samples]
+    outer_common_index = reduce(lambda x, y: x.union(y), all_indices)
+    samples = [sample.reindex(outer_common_index) for sample in samples]
+    return samples
+
+
 def calculate_pandas_quantiles(
-    quantiles: list[float], bootstrap_samples: list[pd.Series | pd.DataFrame]
+    quantiles: list[float], bootstrap_samples: list[pd.Series] | list[pd.DataFrame]
 ) -> list[pd.Series] | list[pd.DataFrame]:
     """Calculate quantiles for a list of pandas objects."""
     if isinstance(bootstrap_samples[0], pd.Series):
