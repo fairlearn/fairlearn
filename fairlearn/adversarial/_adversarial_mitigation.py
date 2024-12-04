@@ -4,7 +4,6 @@
 import logging
 import warnings
 from math import ceil
-from test.unit.fixes import validate_data
 from time import time
 
 from numpy import arange, argmax, unique, zeros
@@ -23,6 +22,8 @@ from sklearn.utils.validation import (
     check_is_fitted,
     check_random_state,
 )
+
+from fairlearn.utils._fixes import validate_data
 
 from ._backend_engine import BackendEngine
 from ._constants import (
