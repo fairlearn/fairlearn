@@ -82,6 +82,7 @@ def _validate_and_reformat_input(
         elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
             y = y.to_numpy().reshape(-1)
 
+        # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
         X = _check_array(X, dtype=None, ensure_all_finite=False)
         y = _check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
         if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
