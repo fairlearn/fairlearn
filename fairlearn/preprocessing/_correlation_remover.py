@@ -100,6 +100,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
             self.lookup_ = {c: i for i, c in enumerate(X.columns)}
             return X.values
         # correctly handle a 1d input
+        X = validate_data(self, X, ensure_2d=False, ensure_min_samples=0)
         if len(X.shape) == 1:
             return {0: 0}
         self.lookup_ = {i: i for i in range(X.shape[1])}
@@ -155,6 +156,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         if isinstance(X, pd.DataFrame):
             missing_columns = [c for c in self.sensitive_feature_ids if c not in X.columns]
         else:
+            X = validate_data(self, X, ensure_2d=False, ensure_min_samples=0)
             if X.ndim == 1:
                 return
             missing_columns = [i for i in self.sensitive_feature_ids if i not in range(X.shape[1])]
