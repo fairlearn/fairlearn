@@ -164,16 +164,3 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
                 "Columns %s not found in the input data."
                 % (len(missing_columns), len(missing_columns), missing_columns)
             )
-
-    def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_transformer_data_not_an_array": (
-                    "this estimator only accepts pandas dataframes or numpy ndarray as input."
-                ),
-            }
-        }
-
-    def __sklearn_tags__(self):
-        tags = super().__sklearn_tags__()
-        return tags

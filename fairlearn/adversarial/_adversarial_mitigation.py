@@ -1044,13 +1044,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
         )
 
     def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
-            },
-            "poor_score": True,
-        }
+        return {"poor_score": True}
 
     def __sklearn_tags__(self):
         tags = super().__sklearn_tags__()
@@ -1248,13 +1242,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
         )
 
     def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
-            },
-            "poor_score": True,
-        }
+        return {"poor_score": True}
 
     def __sklearn_tags__(self):
         tags = super().__sklearn_tags__()
