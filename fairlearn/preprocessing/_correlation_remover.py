@@ -65,7 +65,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
     .. math::
 
-    \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
+        \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
 
     The columns in :math:`\mathbf{S}` will be dropped from the dataset :math:`\mathbf{X}`, and
     :math:`\mathbf{Z}^*` will replace the original non-sensitive features :math:`\mathbf{Z}`, but
@@ -73,7 +73,8 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
     applied:
 
     .. math::
-    \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
+
+        \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
 
     Note that the lack of correlation does not imply anything about statistical dependence.
     Therefore, we expect this to be most appropriate as a preprocessing step for
