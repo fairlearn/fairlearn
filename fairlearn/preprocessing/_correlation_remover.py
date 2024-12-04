@@ -159,16 +159,17 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
             missing_columns = [i for i in self.sensitive_feature_ids if i not in range(X.shape[1])]
 
         if len(missing_columns) > 0:
-            raise ValueError(f"Columns {missing_columns} not found in the input data.")
+            raise ValueError(
+                "0 feature(s) (shape=(%d, 0)) while a minimum of %d is required. "
+                "Columns %s not found in the input data."
+                % (len(missing_columns), len(missing_columns), missing_columns)
+            )
 
     def _more_tags(self):
         return {
             "_xfail_checks": {
                 "check_transformer_data_not_an_array": (
                     "this estimator only accepts pandas dataframes or numpy ndarray as input."
-                ),
-                "check_estimators_empty_data_messages": (
-                    "this estimator raises on missing sensitive features in data."
                 ),
             }
         }

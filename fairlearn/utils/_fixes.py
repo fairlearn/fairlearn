@@ -1,3 +1,4 @@
+from sklearn import __version__ as sklearn_version
 from sklearn.utils.validation import check_array as _check_array
 
 
@@ -62,3 +63,76 @@ def check_array(X, **kwargs):
         # sklearn version < 1.6
         kwargs.pop("ensure_all_finite", False)
         return _check_array(X, **kwargs, force_all_finite=False)
+
+
+# the two functions below were copied from sklearn-compat PR #15
+# both functions are use to accommodate the usage of sklearn 1.6 and the versions below with one API
+def patched_more_tags(estimator, expected_failed_checks):
+    """
+    Patch an estimator's _more_tags method to include expected failed checks.
+    This is used for compatibility with sklearn's estimator checks framework.
+
+    Parameters
+    ----------
+    estimator : object
+        The sklearn estimator instance to patch
+    expected_failed_checks : list or callable
+        List of check names that are expected to fail, or a callable that returns
+        such a list when given an estimator instance
+
+    Returns
+    -------
+    object
+        The patched estimator with modified _more_tags method
+    """
+    import copy
+
+    from sklearn.utils._tags import _safe_tags
+
+    original_tags = copy.deepcopy(_safe_tags(estimator))
+
+    def patched_more_tags(self):
+        original_tags.update({"_xfail_checks": expected_failed_checks})
+        return original_tags
+
+    estimator.__class__._more_tags = patched_more_tags
+    return estimator
+
+
+def parametrize_with_checks(
+    estimators,
+    *,
+    legacy=True,
+    expected_failed_checks=None,
+):
+    """
+    Parametrize a test with a list of estimators and their expected failed checks.
+
+    This function is a wrapper around sklearn's parametrize_with_checks, allowing
+    for additional handling of expected failed checks for each estimator.
+
+    Parameters
+    ----------
+    estimators : list
+        A list of sklearn estimator instances to be tested.
+    legacy : bool, optional
+        This parameter is not supported and is ignored.
+    expected_failed_checks : callable, optional
+        A callable that returns a list of check names expected to fail for a given
+        estimator instance.
+
+    Returns
+    -------
+    function
+        A pytest parameterized test function with the given estimators.
+    """
+    from sklearn.utils.estimator_checks import parametrize_with_checks
+
+    if sklearn_version < "1.6":
+        estimators = [
+            patched_more_tags(estimator, expected_failed_checks(estimator))
+            for estimator in estimators
+        ]
+        return parametrize_with_checks(estimators)
+    else:
+        return parametrize_with_checks(estimators, expected_failed_checks=expected_failed_checks)
