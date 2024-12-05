@@ -6,11 +6,12 @@ from collections.abc import Iterable
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
+from fairlearn.utils._fixes import validate_data
 
-class CorrelationRemover(BaseEstimator, TransformerMixin):
+
+class CorrelationRemover(TransformerMixin, BaseEstimator):
     r"""
     A component that filters out sensitive correlations in a dataset.
 
@@ -64,7 +65,7 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     .. math::
 
-    \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
+        \mathbf{Z}^* = \mathbf{Z} - (\mathbf{S}-\mathbf{1}_n\times\bar{\mathbf{s}}^\top) \mathbf{W}^*
 
     The columns in :math:`\mathbf{S}` will be dropped from the dataset :math:`\mathbf{X}`, and
     :math:`\mathbf{Z}^*` will replace the original non-sensitive features :math:`\mathbf{Z}`, but
@@ -72,7 +73,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
     applied:
 
     .. math::
-    \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
+
+        \mathbf{X}_{\text{tfm}} = \alpha \mathbf{X}_{\text{filtered}} + (1-\alpha) \mathbf{X}_{\text{orig}}
 
     Note that the lack of correlation does not imply anything about statistical dependence.
     Therefore, we expect this to be most appropriate as a preprocessing step for
@@ -105,29 +107,42 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
+
+        first_call = not hasattr(self, "_n_features_in_")
+
         self._check_sensitive_features_in_X(X)
         self._create_lookup(X)
-        X = self._validate_data(X)
+        X = validate_data(self, X)
+
+        if not first_call:
+            if self._n_features_in_ != X.shape[1]:
+                raise ValueError(
+                    "X has %d features, but %s is expecting %d features as input"
+                    % (X.shape[1], self.__class__.__name__, self._n_features_in_)
+                )
+
         X_use, X_sensitive = self._split_X(X)
+
         # correctly handle zero provided sensitive features
-        if X_sensitive.shape[1] == 0:
-            self.sensitive_mean_ = np.array([])
-        else:
-            self.sensitive_mean_ = X_sensitive.mean()
+        self.sensitive_mean_ = np.array([]) if X_sensitive.shape[1] == 0 else X_sensitive.mean()
+
         X_s_center = X_sensitive - self.sensitive_mean_
         self.beta_, _, _, _ = np.linalg.lstsq(X_s_center, X_use, rcond=None)
-        self.X_shape_ = X.shape
+
+        self._n_features_in_ = X.shape[1]
         return self
 
     def transform(self, X):
         """Transform X by applying the correlation remover."""
-        X = check_array(X, estimator=self)
-        check_is_fitted(self, ["beta_", "X_shape_", "lookup_", "sensitive_mean_"])
-        if self.X_shape_[1] != X.shape[1]:
+        check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_", "sensitive_mean_"])
+
+        X = validate_data(self, X)
+        if self._n_features_in_ != X.shape[1]:
             raise ValueError(
-                f"The trained data has {self.X_shape_[1]} features while this dataset"
-                f" has {X.shape[1]}."
+                "X has %d features, but %s is expecting %d features as input"
+                % (X.shape[1], self.__class__.__name__, self._n_features_in_)
             )
+
         X_use, X_sensitive = self._split_X(X)
         X_s_center = X_sensitive - self.sensitive_mean_
         X_filtered = X_use - X_s_center.dot(self.beta_)
@@ -145,16 +160,8 @@ class CorrelationRemover(BaseEstimator, TransformerMixin):
             missing_columns = [i for i in self.sensitive_feature_ids if i not in range(X.shape[1])]
 
         if len(missing_columns) > 0:
-            raise ValueError(f"Columns {missing_columns} not found in the input data.")
-
-    def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_transformer_data_not_an_array": (
-                    "this estimator only accepts pandas dataframes or numpy ndarray as input."
-                ),
-                "check_estimators_empty_data_messages": (
-                    "this estimator raises on missing sensitive features in data."
-                ),
-            }
-        }
+            raise ValueError(
+                "0 feature(s) (shape=(%d, 0)) while a minimum of %d is required. "
+                "Columns %s not found in the input data."
+                % (len(missing_columns), len(missing_columns), missing_columns)
+            )
