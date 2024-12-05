@@ -23,6 +23,8 @@ from sklearn.utils.validation import (
     check_random_state,
 )
 
+from fairlearn.utils._fixes import validate_data
+
 from ._backend_engine import BackendEngine
 from ._constants import (
     _CALLBACK_RETURNS_ERROR,
@@ -560,8 +562,8 @@ class _AdversarialFairness(BaseEstimator):
         if not first_call:
             if self.n_features_in_ != X.shape[1]:
                 raise ValueError(
-                    "Number of features %d does not match previous "
-                    "data %d." % (X.shape[1], self.n_features_in_)
+                    "X has %d features, but %s is expecting %d features as input"
+                    % (X.shape[1], self.__class__.__name__, self.n_features_in_)
                 )
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
@@ -584,7 +586,8 @@ class _AdversarialFairness(BaseEstimator):
             Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
-        X = self._validate_data(
+        X = validate_data(
+            self,
             X,
             accept_sparse=False,
             accept_large_sparse=False,
@@ -648,7 +651,8 @@ class _AdversarialFairness(BaseEstimator):
         `reinitialize` is True. The setup procedure requires validated data.
         """
         if not self.skip_validation:
-            X = self._validate_data(
+            X = validate_data(
+                self,
                 X,
                 accept_sparse=False,
                 accept_large_sparse=False,
@@ -656,25 +660,25 @@ class _AdversarialFairness(BaseEstimator):
                 allow_nd=True,
                 ensure_2d=True,
             )
-            y = self._validate_data(y, dtype=None, ensure_2d=False)
+            if y is not None:
+                y = validate_data(self, y, dtype=None, ensure_2d=False)
+                if y.ndim != 1:
+                    warnings.warn(
+                        (
+                            "A column-vector y was passed when a "
+                            "1d array was expected. Please change "
+                            "the shape of y to (n_samples,), for "
+                            "example using ravel()."
+                        ),
+                        DataConversionWarning,
+                        stacklevel=2,
+                    )
 
             check_consistent_length(X, y)
 
             if is_classifier(self) and type_of_target(y) == "continuous":
                 raise ValueError(
                     "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
-                )
-
-            if y.ndim != 1:
-                warnings.warn(
-                    (
-                        "A column-vector y was passed when a "
-                        "1d array was expected. Please change "
-                        "the shape of y to (n_samples,), for "
-                        "example using ravel()."
-                    ),
-                    DataConversionWarning,
-                    stacklevel=2,
                 )
 
         try:  # TODO check this
@@ -686,7 +690,7 @@ class _AdversarialFairness(BaseEstimator):
         if A is None:
             logger.warning("No sensitive_features provided")
             logger.warning("Setting sensitive_features to zeros")
-            A = zeros(len(y))
+            A = zeros(len(X))
 
         if not self.skip_validation:
             check_consistent_length(X, A)
@@ -836,7 +840,7 @@ class _AdversarialFairness(BaseEstimator):
         return hasattr(self, "_is_setup")
 
 
-class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
+class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     r"""Train PyTorch or TensorFlow classifiers while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
@@ -1040,16 +1044,16 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         )
 
     def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
-            },
-            "poor_score": True,
-        }
+        return {"poor_score": True}
+
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        if tags.classifier_tags:
+            tags.classifier_tags.poor_score = True
+        return tags
 
 
-class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
+class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     r"""Train PyTorch or TensorFlow regressors while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
@@ -1238,10 +1242,10 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         )
 
     def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
-            },
-            "poor_score": True,
-        }
+        return {"poor_score": True}
+
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        if tags.regressor_tags:
+            tags.regressor_tags.poor_score = True
+        return tags

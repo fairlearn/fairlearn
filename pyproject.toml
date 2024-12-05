@@ -26,6 +26,9 @@ filterwarnings = [
 
     # Warnings in other-ml (tensorflow)
     "default:The initializer GlorotNormal is unseeded:UserWarning",
+
+    # Warnings in test_othermlpackages
+    "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
 ]
 
 [tool.ruff]

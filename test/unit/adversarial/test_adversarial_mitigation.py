@@ -6,7 +6,6 @@ import sys
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fairlearn.adversarial import (
     AdversarialFairnessClassifier,
@@ -14,6 +13,7 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._preprocessor import FloatTransformer
+from fairlearn.utils._fixes import parametrize_with_checks
 
 from .helper import (
     Bin1d,
@@ -247,6 +247,18 @@ def test_model_kw_error_torch():
         mitigator.fit(X, Y, sensitive_features=Z)
 
 
+EXPECTED_FAILED_CHECKS = {
+    "AdversarialFairnessClassifier": {
+        "check_estimators_pickle": "pickling is not possible.",
+        "check_estimators_overwrite_params": "pickling is not possible.",
+    },
+    "AdversarialFairnessRegressor": {
+        "check_estimators_pickle": "pickling is not possible.",
+        "check_estimators_overwrite_params": "pickling is not possible.",
+    },
+}
+
+
 @parametrize_with_checks(
     [
         get_instance(
@@ -283,7 +295,8 @@ def test_model_kw_error_torch():
             tensorflow=False,
             fake_mixin=True,
         ),
-    ]
+    ],
+    expected_failed_checks=lambda x: EXPECTED_FAILED_CHECKS.get(x.__class__.__name__, {}),
 )
 def test_estimators(estimator, check):
     """Check the compatibility with scikit-learn API."""
