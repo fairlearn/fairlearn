@@ -31,7 +31,7 @@ Current release
 
 -  Our current version may differ substantially from earlier versions.
    Users of earlier versions should visit our
-   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`_
+   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`__
    to navigate significant changes and find information on how to migrate.
 
 What we mean by *fairness*
@@ -85,8 +85,7 @@ The Fairlearn Python package has two components:
 Fairlearn metrics
 ~~~~~~~~~~~~~~~~~
 
-Check out our in-depth `guide on the Fairlearn
-metrics <https://fairlearn.org/main/user_guide/assessment>`__.
+Check out our in-depth `guide on the Fairlearn metrics <https://fairlearn.org/main/user_guide/assessment>`__.
 
 Fairlearn algorithms
 ~~~~~~~~~~~~~~~~~~~~
@@ -97,8 +96,7 @@ For an overview of our algorithms please refer to our
 Install Fairlearn
 -----------------
 
-For instructions on how to install Fairlearn check out our `Quickstart
-guide <https://fairlearn.org/main/quickstart.html>`__.
+For instructions on how to install Fairlearn check out our `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__.
 
 Usage
 -----
@@ -114,8 +112,7 @@ locate the appropriate version of the notebook.
 Contributing
 ------------
 
-To contribute please check our `contributor
-guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
+To contribute please check our `contributor guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
 
 Maintainers
 -----------

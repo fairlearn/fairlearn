@@ -25,8 +25,8 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False) 
 
     Source:
 
-    - UCI Repository :footcite:`kohavi1996adult`
-    - Paper: Kohavi and Becker :footcite:`kohavi1996scaling`
+    - UCI Repository [1]_
+    - Paper: Kohavi and Becker [2]_
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
@@ -90,7 +90,10 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False) 
 
     References
     ----------
-    .. footbibliography::
+    .. [1] Kohavi, R. (1996). UCI Adult dataset.
+       https://archive.ics.uci.edu/ml/datasets/adult
+    .. [2] Kohavi, R., & Becker, B. (1996). Scaling Up the Accuracy of
+       Naive-Bayes Classifiers: a Decision-Tree Hybrid. KDD.
 
     """
     if not data_home:

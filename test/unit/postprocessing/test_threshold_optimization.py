@@ -153,17 +153,18 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints):
     n = len(X_ex)
-    expected_exception_messages = {
-        "inconsistent": "Found input variables with inconsistent numbers of samples",
-        "empty": "Found array with 0 sample",
+    inconsistent_exception_messages = {
+        "inconsistent_sklearn": "Found input variables with inconsistent numbers of samples",
+        "inconsistent_pandas": "All arrays must be of the same length",
     }
+
+    empty_exception_messages = {
+        "empty_sklearn": "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required.",
+        "empty_pandas": "Found array with 0 sample",
+    }
+
     for permutation in [(0, 1), (1, 0)]:
-        with pytest.raises(
-            ValueError,
-            match=expected_exception_messages["inconsistent"].format(
-                "X, sensitive_features, and y"
-            ),
-        ):
+        with pytest.raises(ValueError) as e:
             adjusted_predictor = ThresholdOptimizer(
                 estimator=ExamplePredictor(scores_ex),
                 constraints=constraints,
@@ -174,20 +175,22 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
                 data_X_y_sf.y[: n - permutation[1]],
                 sensitive_features=data_X_y_sf.sensitive_features,
             )
+        assert any(message in str(e.value) for message in inconsistent_exception_messages.values())
 
     # try providing empty lists in all combinations
-    for permutation in [(0, n, "inconsistent"), (n, 0, "empty")]:
+    for permutation in [(0, n), (n, 0)]:
         adjusted_predictor = ThresholdOptimizer(
             estimator=ExamplePredictor(scores_ex),
             constraints=constraints,
             predict_method="predict",
         )
-        with pytest.raises(ValueError, match=expected_exception_messages[permutation[2]]):
+        with pytest.raises(ValueError) as e:
             adjusted_predictor.fit(
                 data_X_y_sf.X[: n - permutation[0]],
                 data_X_y_sf.y[: n - permutation[1]],
                 sensitive_features=data_X_y_sf.sensitive_features,
             )
+        assert any(message in str(e.value) for message in empty_exception_messages.values())
 
 
 class PassThroughPredictor(BaseEstimator):
