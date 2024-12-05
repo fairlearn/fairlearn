@@ -31,8 +31,6 @@ from ._constants import (
     BASE_ESTIMATOR_NOT_FITTED_WARNING,
     LABEL_KEY,
     OUTPUT_SEPARATOR,
-    P0_KEY,
-    P1_KEY,
     SCORE_KEY,
     SENSITIVE_FEATURE_KEY,
 )
@@ -460,10 +458,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         for sensitive_feature_value in self._tradeoff_curve.keys():
             best_interpolation = self._tradeoff_curve[sensitive_feature_value].iloc[i_best]
             interpolation_dict[sensitive_feature_value] = Bunch(
-                p0=best_interpolation[P0_KEY],
-                operation0=best_interpolation["operation0"],
-                p1=best_interpolation[P1_KEY],
-                operation1=best_interpolation["operation1"],
+                p0=best_interpolation.p0,
+                operation0=best_interpolation.operation0,
+                p1=best_interpolation.p1,
+                operation1=best_interpolation.operation1,
             )
 
         logger.debug(OUTPUT_SEPARATOR)

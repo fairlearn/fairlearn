@@ -6,7 +6,7 @@ import pandas as pd
 from numpy.typing import NDArray
 from sklearn.utils import Bunch
 
-from ._constants import LABEL_KEY, P0_KEY, P1_KEY, SCORE_KEY
+from ._constants import LABEL_KEY, SCORE_KEY
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
@@ -188,9 +188,9 @@ def _interpolate_curve(
         {
             x_col: x_grid,
             y_col: y,
-            P0_KEY: p0,
+            "p0": p0,
             content_col_0: content_values[interpolation_indices],
-            P1_KEY: p1,
+            "p1": p1,
             content_col_1: content_values[interpolation_indices + 1],
         }
     )
