@@ -579,9 +579,9 @@ def test_ci_properties_raise_on_uninitialized_bootstrap_params(
 
 
 def test_bootstrapping_can_handle_missing_sensitive_feature_values_in_samples() -> None:
-    y_true = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0]
-    y_pred = [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0]
-    sensitive_features = ["a", "b", "c", "a", "b", "c", "a", "b", "c", "a", "b"]
+    sensitive_features = ["a"] * 99 + ["b"]
+    y_true = np.ones(100)
+    y_pred = np.ones(100)
 
     # using this random state yields a sample with a missing value, "b", for the sensitive feature
     random_state = np.random.RandomState(1234)
