@@ -13,6 +13,8 @@ References
 
 """
 
+from __future__ import annotations
+
 import logging
 from warnings import warn
 
