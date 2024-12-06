@@ -52,6 +52,14 @@ from .conftest import ExamplePredictor
             [1, 2, 2],
             0.55,
         ),
+        (
+            np.linspace(0, 1, 6),
+            [np.array([1, 0, 0, 0, 1, 0]), np.array([1, 0, 0, 0, 0, 1])],
+            [0.5, 0.5],
+            0.2,
+            [0, 0],
+            1.0,
+        ),
     ],
 )
 def test_maximize_objective_with_tolerance_returns_correct_values(

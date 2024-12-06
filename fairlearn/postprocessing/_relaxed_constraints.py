@@ -43,6 +43,7 @@ def maximize_objective_with_tolerance(
     # Variables to track the best solution
     best_indices = []
     max_sum = float("-inf")
+    min_range = float("inf")
 
     # Sliding window start pointer
     start = 0
@@ -63,11 +64,18 @@ def maximize_objective_with_tolerance(
             start += 1
 
         # Calculate the sum of the maximum weighted `y` values in the current window
-        current_sum = sum(y_columns[k][deques[k][0]] for k in range(m))
+        current_indices = [deques[k][0] for k in range(m)]
+        current_sum = sum(y_columns[k][current_indices[k]] for k in range(m))
+        # Calculate the range of x values in the selected indices
+        current_range = max(x_values[idx] for idx in current_indices) - min(
+            x_values[idx] for idx in current_indices
+        )
 
-        # Update the best solution if the current sum is larger
-        if current_sum >= max_sum:
+        # Update the best solution if the current sum is larger, or if the current sum is equal
+        # and the current range is smaller
+        if current_sum > max_sum or (current_sum == max_sum and current_range <= min_range):
             max_sum = current_sum
-            best_indices = [deques[k][0] for k in range(m)]
+            best_indices = current_indices
+            min_range = current_range
 
     return best_indices, max_sum
