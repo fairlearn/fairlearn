@@ -95,6 +95,10 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         .. versionadded:: 0.5.0
 
+    References
+    ----------
+    .. footbibliography::
+        
     """
 
     def __init__(
