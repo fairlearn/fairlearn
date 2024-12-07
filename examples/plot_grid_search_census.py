@@ -245,8 +245,8 @@ plt.ylabel("selection rate difference")
 #
 # In a real example, we would pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
-#
-# %% [markdown]
+
+# %%
 # Comparing models easily
 # -----------------------
 # Fairlearn also provides functionality to compare models much more easily.
