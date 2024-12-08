@@ -10,7 +10,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-from ..utils._common import _get_soft_predictions
+from ..utils._common import _get_soft_predictions, _get_soft_predictions_batch
 from ..utils._input_validation import _validate_and_reformat_input
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
@@ -73,7 +73,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
         .. versionchanged:: 0.7
             From version 0.7, 'predict' is deprecated as the default value and
-            the default changes to 'auto' from v0.10.
+            the default will change to 'auto' from v0.10.
 
     References
     ----------
@@ -81,7 +81,9 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
 
     """
 
-    def __init__(self, estimator, interpolation_dict, prefit=False, predict_method="auto"):
+    def __init__(
+        self, estimator, interpolation_dict, prefit=False, predict_method="deprecated"
+    ):
         self.estimator = estimator
         self.interpolation_dict = interpolation_dict
         self.prefit = prefit
@@ -96,7 +98,17 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
 
-        self._predict_method = self.predict_method
+        if self.predict_method == "deprecated":
+            warn(
+                "'predict_method' default value is changed from 'predict' to "
+                "'auto'. Explicitly pass `predict_method='predict' to "
+                "replicate the old behavior, or pass `predict_method='auto' "
+                "or other valid values to silence this warning.",
+                FutureWarning,
+            )
+            self._predict_method = "predict"
+        else:
+            self._predict_method = self.predict_method
 
         if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
@@ -108,7 +120,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             self.estimator_ = self.estimator
         return self
 
-    def _pmf_predict(self, X, *, sensitive_features):
+    def _pmf_predict(self, X, *, sensitive_features, batch_size=None, device='cpu'):
         """Probabilistic mass function.
 
         Parameters
@@ -125,9 +137,16 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             The sum of the two numbers in each tuple needs to add up to 1.
         """
         check_is_fitted(self)
-        base_predictions = np.array(
-            _get_soft_predictions(self.estimator_, X, self._predict_method)
-        )
+        if batch_size is None:
+            base_predictions = np.array(
+                _get_soft_predictions(self.estimator_, X, self._predict_method)
+            )
+        else:
+            base_predictions = np.array(
+                _get_soft_predictions_batch(
+                    self.estimator_, X, self._predict_method, batch_size=batch_size, device=device
+                )
+            )
         (
             _,
             base_predictions_vector,
@@ -156,7 +175,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
             ]
         return np.array([1.0 - positive_probs, positive_probs]).transpose()
 
-    def predict(self, X, *, sensitive_features, random_state=None):
+    def predict(self, X, *, sensitive_features, random_state=None, batch_size=None, device='cpu'):
         """Provide a prediction for the given input data.
 
         Note that this is non-deterministic, due to the nature of the
@@ -180,5 +199,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
         random_state = check_random_state(random_state)
-        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features)[:, 1]
+        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features, batch_size=batch_size, device=device)[
+            :, 1
+        ]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1
