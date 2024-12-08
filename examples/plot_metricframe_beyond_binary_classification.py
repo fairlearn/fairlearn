@@ -179,8 +179,7 @@ def mean_iou(true_boxes, predicted_boxes):
         raise ValueError("Array size mismatch")
 
     all_iou = [
-        bounding_box_iou(y_true, y_pred)
-        for y_true, y_pred in zip(true_boxes, predicted_boxes)
+        bounding_box_iou(y_true, y_pred) for y_true, y_pred in zip(true_boxes, predicted_boxes)
     ]
 
     return np.mean(all_iou)

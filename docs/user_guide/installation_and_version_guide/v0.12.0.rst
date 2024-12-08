@@ -1,0 +1,16 @@
+v0.12.0
+=======
+
+.. note::
+
+   v0.12.0 is not yet released. This page reflects changes on the current
+   :code:`main` branch that will eventually be a part of v0.11.0.
+
+:code:`scikit-learn` compatibility
+----------------------------------
+
+* Fairlearn is now compatible with :code:`scikit-learn` 1.6: `#1451 <https://github.com/fairlearn/fairlearn/pull/1451>`_
+
+
+Other improvements
+------------------

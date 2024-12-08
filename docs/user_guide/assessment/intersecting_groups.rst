@@ -48,7 +48,7 @@ of these groups:
     ...                          y_true=y_true,
     ...                          y_pred=y_pred,
     ...                          sensitive_features=s_f_frame)
-    >>> metric_2sf.overall  # Same as before
+    >>> metric_2sf.overall.item()  # Same as before
     0.5
     >>> metric_2sf.by_group
     SF 0  SF 1

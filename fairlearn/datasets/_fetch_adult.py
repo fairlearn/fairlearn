@@ -4,11 +4,12 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+from sklearn.utils import Bunch
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
 
-def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
+def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False) -> Bunch:
     """Load the UCI Adult dataset (binary classification).
 
     Read more in the :ref:`User Guide <boston_housing_data>`.
@@ -24,8 +25,8 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
 
     Source:
 
-    - UCI Repository :footcite:`kohavi1996adult`
-    - Paper: Kohavi and Becker :footcite:`kohavi1996scaling`
+    - UCI Repository [1]_
+    - Paper: Kohavi and Becker [2]_
 
     Prediction task is to determine whether a person makes over $50,000 a
     year.
@@ -84,12 +85,15 @@ def fetch_adult(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     (data, target) : tuple if ``return_X_y`` is True
 
     Notes
-    ----------
+    -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
 
     References
     ----------
-    .. footbibliography::
+    .. [1] Kohavi, R. (1996). UCI Adult dataset.
+       https://archive.ics.uci.edu/ml/datasets/adult
+    .. [2] Kohavi, R., & Becker, B. (1996). Scaling Up the Accuracy of
+       Naive-Bayes Classifiers: a Decision-Tree Hybrid. KDD.
 
     """
     if not data_home:

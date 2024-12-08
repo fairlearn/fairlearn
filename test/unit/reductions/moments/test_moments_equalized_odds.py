@@ -106,22 +106,16 @@ def test_project_lambda_smoke_negatives():
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
     labels = ["a", "b"]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
-    )
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
     # Note that the '-' labels are larger
-    df = 0 + pd.Series(
-        [1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx, dtype=np.float64
-    )
+    df = 0 + pd.Series([1, 2, 11, 19, 1001, 1110, 1230, 1350], index=midx, dtype=np.float64)
 
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series(
-        [0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx, dtype=np.float64
-    )
+    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -133,9 +127,7 @@ def test_project_lambda_smoke_positives():
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
     labels = ["a", "b"]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
-    )
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
     # Note that the '-' indices are now smaller
@@ -144,9 +136,7 @@ def test_project_lambda_smoke_positives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series(
-        [196, 295, 94, 593, 0, 0, 0, 0], index=midx, dtype=np.float64
-    )
+    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -174,13 +164,9 @@ def test_signed_weights():
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
     labels = [a0_label, a1_label]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
-    )
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
-    lambda_vec = pd.Series(
-        [2000, 1000, 4000, 5000, 500, 100, 700, 900], index=midx, name=0
-    )
+    lambda_vec = pd.Series([2000, 1000, 4000, 5000, 500, 100, 700, 900], index=midx, name=0)
 
     lambda_a0_F = 2000 - 500
     lambda_a0_T = 4000 - 700

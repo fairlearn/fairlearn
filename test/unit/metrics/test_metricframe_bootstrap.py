@@ -1,5 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
 
 import numpy as np
 import pytest
@@ -114,12 +116,8 @@ class TestOverallQuantiles:
         assert mf_1m_1cf.ci_quantiles == QUANTILES
 
         # Overall value should be close to quantile 0.5
-        assert mf_1m_1cf.overall_ci[1]["f"] == pytest.approx(
-            mf_1m_1cf.overall["f"], abs=ABS_TOL
-        )
-        assert mf_1m_1cf.overall_ci[1]["g"] == pytest.approx(
-            mf_1m_1cf.overall["g"], abs=ABS_TOL
-        )
+        assert mf_1m_1cf.overall_ci[1]["f"] == pytest.approx(mf_1m_1cf.overall["f"], abs=ABS_TOL)
+        assert mf_1m_1cf.overall_ci[1]["g"] == pytest.approx(mf_1m_1cf.overall["g"], abs=ABS_TOL)
 
     def test_2m_1cf(self, mf_2m_1cf):
         assert isinstance(mf_2m_1cf.overall_ci, list)
@@ -143,9 +141,7 @@ class TestByGroupQuantiles:
         assert mf_1m_0cf.ci_quantiles == QUANTILES
         for g in np.unique(g_1):
             # Check median close to nominal
-            assert mf_1m_0cf.by_group_ci[1][g] == pytest.approx(
-                mf_1m_0cf.by_group[g], abs=ABS_TOL
-            )
+            assert mf_1m_0cf.by_group_ci[1][g] == pytest.approx(mf_1m_0cf.by_group[g], abs=ABS_TOL)
 
     def test_1m_0cf_dict(self, mf_1mdict_0cf: MetricFrame):
         assert isinstance(mf_1mdict_0cf.by_group_ci, list)
@@ -478,3 +474,125 @@ class TestErrors:
         with pytest.raises(ValueError) as execInfo:
             _ = mf_1mdict_0cf.ratio_ci(method="Another Random String")
         assert execInfo.value.args[0] == msg
+
+
+@pytest.mark.parametrize(
+    ["n_boot", "ci_quantiles", "expectation"],
+    [
+        (100, [0.05, 0.5, 0.95], does_not_raise()),
+        (
+            None,
+            None,
+            pytest.raises(
+                ValueError,
+                match=(
+                    "Could not compute confidence intervals: "
+                    "Bootstrapping parameters n_boot and ci_quantiles were not specified "
+                    "in the MetricFrame constructor."
+                ),
+            ),
+        ),
+        (
+            None,
+            [],
+            pytest.raises(
+                ValueError,
+                match=(
+                    "Could not compute confidence intervals: "
+                    "Bootstrapping parameters n_boot and ci_quantiles were not specified "
+                    "in the MetricFrame constructor."
+                ),
+            ),
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "method",
+    ["group_min_ci", "group_max_ci", "difference_ci", "ratio_ci"],
+)
+def test_ci_methods_raise_on_uninitialized_bootstrap_params(
+    method, n_boot, ci_quantiles, expectation: AbstractContextManager
+) -> None:
+    mf = MetricFrame(
+        metrics={"mse": skm.mean_squared_error},
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=n_boot,
+        ci_quantiles=ci_quantiles,
+        random_state=13489623,
+    )
+
+    with expectation:
+        getattr(mf, method)()
+
+
+@pytest.mark.parametrize(
+    ["n_boot", "ci_quantiles", "expectation"],
+    [
+        (100, [0.05, 0.5, 0.95], does_not_raise()),
+        (
+            None,
+            None,
+            pytest.raises(
+                ValueError,
+                match=(
+                    "Could not compute confidence intervals: "
+                    "Bootstrapping parameters n_boot and ci_quantiles were not specified "
+                    "in the MetricFrame constructor."
+                ),
+            ),
+        ),
+        (
+            None,
+            [],
+            pytest.raises(
+                ValueError,
+                match=(
+                    "Could not compute confidence intervals: "
+                    "Bootstrapping parameters n_boot and ci_quantiles were not specified "
+                    "in the MetricFrame constructor."
+                ),
+            ),
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "method",
+    ["overall_ci", "by_group_ci"],
+)
+def test_ci_properties_raise_on_uninitialized_bootstrap_params(
+    method, n_boot, ci_quantiles, expectation: AbstractContextManager
+) -> None:
+    mf = MetricFrame(
+        metrics={"mse": skm.mean_squared_error},
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=n_boot,
+        ci_quantiles=ci_quantiles,
+        random_state=13489623,
+    )
+
+    with expectation:
+        getattr(mf, method)
+
+
+def test_bootstrapping_can_handle_missing_sensitive_feature_values_in_samples() -> None:
+    sensitive_features = ["a"] * 99 + ["b"]
+    y_true = np.ones(100)
+    y_pred = np.ones(100)
+
+    # using this random state yields a sample with a missing value, "b", for the sensitive feature
+    random_state = np.random.RandomState(1234)
+
+    with does_not_raise():
+        MetricFrame(
+            metrics=count,
+            y_true=y_true,
+            y_pred=y_pred,
+            sensitive_features=sensitive_features,
+            ci_quantiles=[0.1, 0.5, 0.9],
+            n_boot=3,
+            random_state=random_state,
+        )

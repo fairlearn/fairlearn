@@ -11,7 +11,7 @@ check the documentation of the version of the package that they are using.
 
 To contribute, make sure to install sphinx and its add-ons by running
 
-.. code-block::
+.. prompt:: bash
 
     python scripts/install_requirements.py --pinned False
 
@@ -21,7 +21,7 @@ You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
 Since plotting is an optional addition to Fairlearn, you may also need to
 install matplotlib
 
-.. code-block::
+.. prompt:: bash
 
     pip install matplotlib>=3.2.1
 
@@ -32,13 +32,13 @@ editing the restructured text files (`.rst`) corresponding to your updates.
 To build the webpage run the following command from the repository root
 directory:
 
-.. code-block::
+.. prompt:: bash
 
     python -m sphinx -v -b html -n -j auto docs docs/_build/html
 
 or use the shortcut
 
-.. code-block::
+.. prompt:: bash
 
         make doc
 
@@ -49,16 +49,18 @@ rebuilds the changed pages, so the build time should be a lot shorter.
 You can check that the document(s) render properly by inspecting the HTML with
 the following commands:
 
-.. code-block::
+.. prompt:: bash
 
     start docs/_build/html/index.html
     start docs/_build/html/quickstart.html
     ...
     start docs/_build/html/auto_examples/plot_*.html
 
-The above code block works for Windows users.
-For MacOS users, use :code: `open docs/_build/html/index.html`
-For Linux users, use :code: `xdg-open docs/_build/html/index.html`
+.. line-block::
+
+ The above code block works for Windows users.
+ For MacOS users, use :code:`open docs/_build/html/index.html`.
+ For Linux users, use :code:`xdg-open docs/_build/html/index.html`.
 
 .. note::
 
@@ -84,12 +86,12 @@ ensure that they all render properly.
 Citations
 ^^^^^^^^^
 
-Citations are built using the `sphinxcontrib-bibtex <https://pypi.org/project/sphinxcontrib-bibtex/>`_ 
+Citations are built using the `sphinxcontrib-bibtex <https://pypi.org/project/sphinxcontrib-bibtex/>`_
 extension. This allows us to use the `refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ BibTeX file to generate our citations.
 
 To add a citation:
 
-1. Check if your required BibTex entry already exists in the 
+1. Check if your required BibTex entry already exists in the
    `docs/refs.bib <https://github.com/fairlearn/fairlearn/blob/main/docs/refs.bib>`_ file. If not, simply paste your entry at the end.
 2. Change your bibtex id to the format ``<author-last-name><4digit-year><keyword>``.
 3. Use the :code:`:footcite:`bibtex-id`` role to create an inline citation rendered as :code:`[CitationNumber]`.

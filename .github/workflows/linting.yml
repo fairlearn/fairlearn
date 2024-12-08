@@ -11,15 +11,6 @@ on:
         type: string
 
 jobs:
-  linting-flake8:
-    runs-on: ${{ inputs.os }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: ${{ inputs.python }}
-      - run: pip install -r requirements-dev.txt
-      - run: flake8 .
   linting-black:
     # Need to keep black version consistent in
     # requirements-dev.txt
@@ -27,5 +18,10 @@ jobs:
     # .pre-commit-config.yaml
     runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@23.9.1
+      - uses: actions/checkout@v4
+      - uses: psf/black@24.4.2
+  ruff:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chartboost/ruff-action@v1

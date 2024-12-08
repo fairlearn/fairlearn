@@ -33,4 +33,8 @@
     <a href='https://github.com/alliesaizan'><img src='https://github.com/alliesaizan.png' class='avatar' /></a> <br />
     <p>Allie Saizan</p>
     </div>
+    <div>
+    <a href='https://github.com/tamaraatanasoska/'><img src='https://github.com/tamaraatanasoska.png' class='avatar' /></a> <br />
+    <p>Tamara Atanasoska</p>
+    </div>
     </div>

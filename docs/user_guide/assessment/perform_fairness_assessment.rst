@@ -5,16 +5,16 @@ Performing a Fairness Assessment
 
 .. currentmodule:: fairlearn.metrics
 
-The goal of fairness assessment is to answer the question: Which groups of 
-people may be disproportionately negatively impacted by an AI system and in 
+The goal of fairness assessment is to answer the question: Which groups of
+people may be disproportionately negatively impacted by an AI system and in
 what ways?
 
 The steps of the assessment are as follows:
 
-1. Identify types of harms 
-2. Identify the groups that might be harmed 
-3. Quantify harms 
-4. Compare quantified harms across the groups 
+1. Identify types of harms
+2. Identify the groups that might be harmed
+3. Quantify harms
+4. Compare quantified harms across the groups
 
 We next examine these four steps in more detail.
 
@@ -34,7 +34,7 @@ The Fairlearn package is particularly suitable for measuring:
   For example, facial recognition and speech-to-text systems may have
   substantially different performance for different ethnicities.
 
-Note that one system can lead to multiple harms, and different types of 
+Note that one system can lead to multiple harms, and different types of
 harms are not mutually exclusive.
 For more information, review Fairlearn's
 `2021 SciPy tutorial <https://github.com/fairlearn/talks/blob/main/2021_scipy_tutorial/overview.pdf>`_.
@@ -42,15 +42,15 @@ For more information, review Fairlearn's
 Identify the groups that might be harmed
 ----------------------------------------
 
-In most applications, we consider demographic groups including historically 
-marginalized groups (e.g., based on gender, race, ethnicity). We should also 
-consider groups that are relevant to a particular use case or deployment context. For example, for 
-speech-to-text transcription, this might include groups who speak a regional dialect or people who are a  
+In most applications, we consider demographic groups including historically
+marginalized groups (e.g., based on gender, race, ethnicity). We should also
+consider groups that are relevant to a particular use case or deployment context. For example, for
+speech-to-text transcription, this might include groups who speak a regional dialect or people who are a
 native or a non-native speaker.
 
 It is also important to consider group intersections, for example, in addition
-to considering groups according to gender and groups according to race, it is 
-also important to consider their intersections (e.g., Black women, Latinx 
+to considering groups according to gender and groups according to race, it is
+also important to consider their intersections (e.g., Black women, Latinx
 nonbinary people, etc.). :footcite:cts:`crenshaw1991intersectionality`
 offers a thorough background on the topic of intersectionality.
 See :ref:`this section <assessment_intersecting_groups>` of our user guide for
@@ -86,27 +86,27 @@ Define metrics that quantify harms or benefits:
   in the word error rate for different group, measured by the number of
   mistakes in a transcript divided by the overall number of words.
 
-Note that in some cases, the outcome we seek to measure is not 
-directly available. 
-Occasionally, another variable in our dataset provides a close 
-approximation to the phenomenon we seek to measure. 
-In these cases, we might choose to use that closely related variable, 
-often called a "proxy", to stand in for the missing variable. 
-For example, suppose that in the job screening scenario, 
-we have data on whether the candidate passes the first two stages, 
-but not if they are ultimately recommended for the job. 
+Note that in some cases, the outcome we seek to measure is not
+directly available.
+Occasionally, another variable in our dataset provides a close
+approximation to the phenomenon we seek to measure.
+In these cases, we might choose to use that closely related variable,
+often called a "proxy", to stand in for the missing variable.
+For example, suppose that in the job screening scenario,
+we have data on whether the candidate passes the first two stages,
+but not if they are ultimately recommended for the job.
 
 As an alternative to the unobserved final recommendation, we could
 therefore measure the harm using the proxy variable indicating whether
 the candidate passes the first stage of the screen.
-If you choose to use a proxy variable to 
-represent the harm, check the proxy variable regularly to ensure it 
+If you choose to use a proxy variable to
+represent the harm, check the proxy variable regularly to ensure it
 remains useful over time. Our section on
 :ref:`construct validity <construct_validity>`
-describes how to determine whether a  
-proxy variable measures the intended construct in a meaningful 
-and useful way. It is important to ensure that the proxy is suitable 
-for the social context of the problem you seek to solve. 
+describes how to determine whether a
+proxy variable measures the intended construct in a meaningful
+and useful way. It is important to ensure that the proxy is suitable
+for the social context of the problem you seek to solve.
 In particular, be careful of falling into one of the
 :ref:`abstraction traps <abstraction_traps>`.
 
@@ -116,7 +116,7 @@ In particular, be careful of falling into one of the
 Disaggregated metrics
 ---------------------
 
-The centerpiece of fairness assessment in Fairlearn are disaggregated metrics, 
+The centerpiece of fairness assessment in Fairlearn are disaggregated metrics,
 which are metrics evaluated on slices of data.
 For example, to measure gender-based harms due to errors, we would begin by
 evaluating the errors separately for males, females and nonbinary persons
@@ -124,14 +124,14 @@ in our dataset.
 If we found that males were experiencing errors at a much lower rate than
 females and nonbinary persons, we would flag this as a potential fairness harm.
 
-Note that by "errors" here, we are referring to the methods we use to 
-assess the performance of the machine learning model overall, for 
-example accuracy or precision in the classification case. 
-We distiniguish these model performance metrics from fairness metrics, 
-which operationalize different definitions of fairness 
+Note that by "errors" here, we are referring to the methods we use to
+assess the performance of the machine learning model overall, for
+example accuracy or precision in the classification case.
+We distiniguish these model performance metrics from fairness metrics,
+which operationalize different definitions of fairness
 (such as demographic parity or equal opportunity).
-We will review those metrics in a subsequent section of the User Guide. 
-For more information on fairness metrics, 
+We will review those metrics in a subsequent section of the User Guide.
+For more information on fairness metrics,
 review :ref:`common_fairness_metrics`.
 
 Fairlearn provides the :class:`fairlearn.metrics.MetricFrame` class to help
@@ -217,9 +217,9 @@ All of these values can be checked against the original arrays above.
 
 .. note::
 
-  Note that :class:`MetricFrame` is intended for analyzing the disparities 
-  between groups with regard to a base metric, and consequently cannot take 
-  predefined fairness metrics, such as :func:`demographic_parity_difference`, 
+  Note that :class:`MetricFrame` is intended for analyzing the disparities
+  between groups with regard to a base metric, and consequently cannot take
+  predefined fairness metrics, such as :func:`demographic_parity_difference`,
   as input to the `metrics` parameter.
 
 .. _assessment_compare_harms:
@@ -227,8 +227,8 @@ All of these values can be checked against the original arrays above.
 Compare quantified harms across the groups
 ------------------------------------------
 
-To summarize the disparities in errors (or other metrics), we may want to 
-report quantities such as the difference or ratio of the metric values between 
+To summarize the disparities in errors (or other metrics), we may want to
+report quantities such as the difference or ratio of the metric values between
 the best and the worst groups identified by the sensitive feature(s).
 In settings where the goal is to guarantee certain minimum quality of service
 across all groups (such as speech recognition), it is also meaningful to
@@ -247,13 +247,13 @@ methods show the smallest and largest values for each metric:
     fpr      0.0
     sel      0.5
     count    4.0
-    dtype: object
+    dtype: float64
     >>> mf.group_max()
-    tpr       0.6
-    fpr       1.0
-    sel      0.75
-    count     8.0
-    dtype: object
+    tpr       0.60
+    fpr       1.00
+    sel       0.75
+    count     8.00
+    dtype: float64
 
 We can also compute differences and ratios between groups for all of the
 metrics.
@@ -308,25 +308,25 @@ Predefined fairness metrics
 ---------------------------
 
 In addition to the disaggregated analysis of base metrics enabled by
-:class:`MetricFrame`, Fairlearn also provides a set of predefined fairness 
-metrics that output a single score. These metrics take as input 
-`sensitive_features` to compute the maximum difference or ratio between 
-subgroups of a sensitive variable. The predefined fairness metrics offered 
-by Fairlearn are :func:`demographic_parity_difference`, 
-:func:`demographic_parity_ratio`, :func:`equalized_odds_difference`, 
-and :func:`equalized_odds_ratio`. 
-The ratio and difference can be calculated `between_groups` 
-or `to_overall`, but `to_overall` results in more than 1 value being 
+:class:`MetricFrame`, Fairlearn also provides a set of predefined fairness
+metrics that output a single score. These metrics take as input
+`sensitive_features` to compute the maximum difference or ratio between
+subgroups of a sensitive variable. The predefined fairness metrics offered
+by Fairlearn are :func:`demographic_parity_difference`,
+:func:`demographic_parity_ratio`, :func:`equalized_odds_difference`,
+and :func:`equalized_odds_ratio`.
+The ratio and difference can be calculated `between_groups`
+or `to_overall`, but `to_overall` results in more than 1 value being
 returned (when the `control_features` parameter is not `None`.
-:class:`MetricFrame` can also calculate differences and ratios between 
-groups. For more information on available method of computing 
-ratios or differences, view the documentation for :meth:`MetricFrame.ratio` 
+:class:`MetricFrame` can also calculate differences and ratios between
+groups. For more information on available method of computing
+ratios or differences, view the documentation for :meth:`MetricFrame.ratio`
 and :meth:`MetricFrame.difference`, respectively.
-Note that because these metrics are calculated using 
-aggregations between groups, they are meant to be 
+Note that because these metrics are calculated using
+aggregations between groups, they are meant to be
 called directly, rather than used within the instantiation of a MetricFrame.
 
-Below, we show an example of calculating demographic parity ratio using the 
+Below, we show an example of calculating demographic parity ratio using the
 sample data defined above.
 
 .. doctest:: assessment_metrics
@@ -338,18 +338,18 @@ sample data defined above.
     ...                                sensitive_features=sf_data))
     0.66666...
 
-It is also possible to define custom fairness metrics based on any 
-standard performance metric (e.g., the false positive rate or AUC) 
-using :func:make_derived_metric. 
-Under the hood, the fairness assessment metrics 
-also use :class:`MetricFrame` to compute a particular base rate across 
-sensitive groups and subsequently perform an aggregation (the difference 
-or ratio) on the base metric values across groups. For example, 
+It is also possible to define custom fairness metrics based on any
+standard performance metric (e.g., the false positive rate or AUC)
+using :func:make_derived_metric.
+Under the hood, the fairness assessment metrics
+also use :class:`MetricFrame` to compute a particular base rate across
+sensitive groups and subsequently perform an aggregation (the difference
+or ratio) on the base metric values across groups. For example,
 :func:`equalized_odds_ratio` uses both the :func:`false_positive_rate` and
-:func:`false_negative_rate` within a :class:`MetricFrame` on the backend 
-to generate an output. As demonstrated below, 
-using :func:`equalized_odds_ratio` and :meth:`MetricFrame.ratio` method 
-produces the same outcome. 
+:func:`false_negative_rate` within a :class:`MetricFrame` on the backend
+to generate an output. As demonstrated below,
+using :func:`equalized_odds_ratio` and :meth:`MetricFrame.ratio` method
+produces the same outcome.
 
 .. doctest:: assessment_metrics
     :options:  +NORMALIZE_WHITESPACE
@@ -372,6 +372,6 @@ produces the same outcome.
     >>> min(mf.ratio(method="between_groups"))
     0.0
 
-:ref:`common_fairness_metrics` provides an overview of common metrics used 
-in fairness analyses. For a deep dive into how to extend the capabilities of 
+:ref:`common_fairness_metrics` provides an overview of common metrics used
+in fairness analyses. For a deep dive into how to extend the capabilities of
 fairness metrics provided by Fairlearn, review :ref:`custom_fairness_metrics`.

@@ -81,13 +81,9 @@ def test_derived_difference_broadcast_arg():
 
     my_fbeta = functools.partial(skm.fbeta_score, beta=my_beta)
     my_fbeta.__name__ = "my_fbeta"
-    grouped = metrics.MetricFrame(
-        metrics=my_fbeta, y_true=y_t, y_pred=y_p, sensitive_features=gid
-    )
+    grouped = metrics.MetricFrame(metrics=my_fbeta, y_true=y_t, y_pred=y_p, sensitive_features=gid)
 
-    actual = my_fn(
-        y_t, y_p, sensitive_features=gid, beta=my_beta, method="between_groups"
-    )
+    actual = my_fn(y_t, y_p, sensitive_features=gid, beta=my_beta, method="between_groups")
     assert actual == grouped.difference(method="between_groups")
 
 
@@ -105,9 +101,7 @@ def test_derived_difference_sample_arg():
         sensitive_features=gid,
         sample_params={"sample_weight": wgt},
     )
-    actual = my_fn(
-        y_t, y_p, sensitive_features=gid, sample_weight=wgt, method="between_groups"
-    )
+    actual = my_fn(y_t, y_p, sensitive_features=gid, sample_weight=wgt, method="between_groups")
     assert actual == grouped.difference(method="between_groups")
 
 
@@ -251,12 +245,8 @@ def test_function_method_arg_rejected():
 
 
 def test_bad_transform_rejected():
-    expected = (
-        "Transform must be one of ['difference', 'group_min', 'group_max', 'ratio']"
-    )
+    expected = "Transform must be one of ['difference', 'group_min', 'group_max', 'ratio']"
 
     with pytest.raises(ValueError) as context:
-        _ = metrics.make_derived_metric(
-            metric=skm.accuracy_score, transform="something rotten"
-        )
+        _ = metrics.make_derived_metric(metric=skm.accuracy_score, transform="something rotten")
     assert context.value.args[0] == expected

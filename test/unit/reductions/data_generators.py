@@ -32,8 +32,6 @@ def loan_scenario_generator(
                 PLOAN.append(flip)
                 Y.append(1 if flip < f_curr else 0)
 
-    X = pd.DataFrame(
-        data=np.transpose([IB, SF, PLOAN]), columns=["ctrl", "sens", "ploan"]
-    )
+    X = pd.DataFrame(data=np.transpose([IB, SF, PLOAN]), columns=["ctrl", "sens", "ploan"])
 
     return X, Y
