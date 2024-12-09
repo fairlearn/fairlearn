@@ -136,7 +136,7 @@ true positive rate parity as the fairness constraint.
                        objective='balanced_accuracy_score',
                        predict_method='predict_proba')
     >>> threshold_optimizer.predict(X_test, sensitive_features=A_test, random_state=12345)
-    array([0, 0, 0, ..., 0, 1, 0])
+    array([0, 0, 0, ..., 0, 1, 0], shape=(30529,))
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
     {
