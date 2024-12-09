@@ -53,6 +53,7 @@ def test_model_init(torch):
     assert layers[5].b == 1
     assert layers[6].__name__.lower() == "sigmoid"
     assert len(layers) == 7
+    assert 2 == 2
 
 
 @pytest.mark.parametrize("torch", [True, False])
