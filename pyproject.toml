@@ -122,10 +122,3 @@ docstring-code-line-length = "dynamic"
 # It's fine not to put the import at the top of the file in the examples
 # folder.
 "examples/*"=["E402"]
-
-[tool.changelog-bot]
-    [tool.changelog-bot.towncrier_changelog]
-        enabled = true
-        verify_pr_number = true
-        changelog_noop_label = "No Changelog Needed"
-        whatsnew_pattern = 'docs/user_guide/installation_and_version_guide/[^/]+/\d+\.[^.]+\.rst'
