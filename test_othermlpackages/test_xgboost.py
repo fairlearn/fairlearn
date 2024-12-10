@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 import pytest
+import sklearn
+from packaging.version import parse
 
 from fairlearn.reductions import DemographicParity
 
@@ -10,7 +12,14 @@ from . import package_test_common as ptc
 xgb = pytest.importorskip("xgboost")
 
 
-@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
+def _should_skip_test():
+    return parse(sklearn.__version__) >= parse("1.6.0")
+
+
+@pytest.mark.skipif(
+    _should_skip_test(),
+    reason="Skipped because of scikit-learn >= 1.6. Will be enabled again when the issues in the external library are fixed.",
+)
 def test_expgrad_classification():
     estimator = xgb.XGBClassifier()
     disparity_moment = DemographicParity()
@@ -18,7 +27,10 @@ def test_expgrad_classification():
     ptc.run_expgrad_classification(estimator, disparity_moment)
 
 
-@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
+@pytest.mark.skipif(
+    _should_skip_test(),
+    reason="Skipped because of scikit-learn >= 1.6. Will be enabled again when the issues in the external library are fixed.",
+)
 def test_gridsearch_classification():
     estimator = xgb.XGBClassifier()
     disparity_moment = DemographicParity()
@@ -26,7 +38,10 @@ def test_gridsearch_classification():
     ptc.run_gridsearch_classification(estimator, disparity_moment)
 
 
-@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
+@pytest.mark.skipif(
+    _should_skip_test(),
+    reason="Skipped because of scikit-learn >= 1.6. Will be enabled again when the issues in the external library are fixed.",
+)
 def test_thresholdoptimizer_classification():
     estimator = xgb.XGBClassifier()
 
