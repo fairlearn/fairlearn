@@ -14,3 +14,18 @@ v0.12.0
 
 Other improvements
 ------------------
+
+* Fixed :code:`MetricFrame` bootstrapping with missing sensitive feature values in
+  `#1450 <https://github.com/fairlearn/fairlearn/pull/1450>`_.
+
+* Added user-friendly error messages in case of inconsistent access to the :code:`MetricFrame`'s confidence
+  intervals in `#1437 <https://github.com/fairlearn/fairlearn/pull/1439>`_.
+
+* Added the weighted objective's curve to the :code:`ThresholdOptimizer`'s plot in
+  `#1445 <https://github.com/fairlearn/fairlearn/pull/1445>`_.
+
+* Corrected the :code:`CorrelationRemover`'s mathematical formulation in the documentation in
+  `#1438 <https://github.com/fairlearn/fairlearn/pull/1438>`_.
+
+* Fixed the :code:`CorrelationRemover`'s default constructor and added an input validation step in
+  `#1439 <https://github.com/fairlearn/fairlearn/pull/1439>`_.
