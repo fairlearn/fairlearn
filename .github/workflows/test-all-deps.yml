@@ -40,7 +40,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
+      - name: Upgrade pip for Python 3.8
+        if: ${{ inputs.python == '3.8' }}
+        run: pip install --upgrade pip
       - run: python scripts/install_requirements.py --pinned ${{ inputs.requirementsPinned }}
+
       - run: pip install .
       - run: pip install matplotlib
       - run: pytest --ignore=test/install --cov=fairlearn --cov-report=xml -vl test/

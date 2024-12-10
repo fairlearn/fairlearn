@@ -67,9 +67,16 @@ extensions = [
     "sphinx_prompt",
     "sphinx_copybutton",
     "jupyterlite_sphinx",
+    "sphinx_issues",
 ]
 
 source_suffix = [".rst"]
+
+# sphinx-issues config
+issues_github_path = "fairlearn/fairlearn"
+issues_user_uri = "https://github.com/{user}"
+issues_user_prefix = "@"
+
 
 intersphinx_mapping = {
     "python3": ("https://docs.python.org/3", None),
