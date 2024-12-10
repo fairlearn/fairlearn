@@ -6,6 +6,9 @@ v0.12.0
    v0.12.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.11.0.
 
+This release focuses on improving :code:`scikit-learn` compatibility and fixing several core components.
+Key highlights include support for :code:`scikit-learn` 1.6 and various improvements to metrics and documentation.
+
 :code:`scikit-learn` compatibility
 ----------------------------------
 
@@ -14,3 +17,8 @@ v0.12.0
 
 Other improvements
 ------------------
+* Fixed :code:`MetricFrame` bootstrapping with missing sensitive feature values: :pr:`1450` by :user:`Tahar Allouche <taharallouche>`.
+* Added weighted objective's curve to :code:`ThresholdOptimizer`'s plot: :pr:`1445` by :user:`Tahar Allouche <taharallouche>`.
+* Corrected :code:`CorrelationRemover`'s mathematical formulation in documentation: :pr:`1438` by :user:`Tahar Allouche <taharallouche>`.
+* Fixed :code:`CorrelationRemover`'s default constructor and added input validation: :pr:`1439` by :user:`Tahar Allouche <taharallouche>`.
+* Updating the documentation infrastructure for ease of use: :pr:`1421` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
