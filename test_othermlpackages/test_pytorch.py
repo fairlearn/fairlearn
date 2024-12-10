@@ -84,10 +84,12 @@ def create_model():
     return net
 
 
+@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
 def test_examples():
     af.test_examples()
 
 
+@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
 def test_expgrad_classification():
     estimator = create_model()
     disparity_moment = DemographicParity()
@@ -95,6 +97,7 @@ def test_expgrad_classification():
     ptc.run_expgrad_classification(estimator, disparity_moment)
 
 
+@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
 def test_gridsearch_classification():
     estimator = create_model()
     disparity_moment = DemographicParity()
@@ -102,6 +105,7 @@ def test_gridsearch_classification():
     ptc.run_gridsearch_classification(estimator, disparity_moment)
 
 
+@pytest.mark.skip(reason="external library errors because of new scikit-learn release")
 def test_thresholdoptimizer_classification():
     estimator = create_model()
 
