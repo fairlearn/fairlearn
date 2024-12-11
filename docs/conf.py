@@ -70,6 +70,9 @@ extensions = [
     "sphinx_issues",
 ]
 
+copybutton_prompt_text = r"\$\s+"
+copybutton_prompt_is_regexp = True
+
 source_suffix = [".rst"]
 
 # sphinx-issues config
