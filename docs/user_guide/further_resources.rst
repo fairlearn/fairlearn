@@ -39,5 +39,8 @@ Papers
 Online demos, talks, tutorials
 ------------------------------
 
-- `Fairness in Machine Learning (NeurIPS 2017 Tutorial) <https://fairmlbook.org/tutorial1.html>`_
-- `Gender Shades Project <http://gendershades.org/>`_
+.. bibliography::
+    :list: bullet
+
+    barocas2017tutorial
+    mit2018gendershades
