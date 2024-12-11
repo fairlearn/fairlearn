@@ -30,21 +30,6 @@
         "url": "https://fairlearn.org/v0.7.0/"
     },
     {
-        "name": "v0.6.2",
-        "version": "0.6.2",
-        "url": "https://fairlearn.org/v0.6.2/"
-    },
-    {
-        "name": "v0.5.0",
-        "version": "0.5.0",
-        "url": "https://fairlearn.org/v0.5.0/"
-    },
-    {
-        "name": "v0.4.6",
-        "version": "0.4.6",
-        "url": "https://fairlearn.org/v0.4.6/"
-    },
-    {
         "name": "v0.13.0 (dev)",
         "version": "0.13.0",
         "url": "https://fairlearn.org/main/"
