@@ -1,11 +1,6 @@
 v0.12.0
 =======
 
-.. note::
-
-   v0.12.0 is not yet released. This page reflects changes on the current
-   :code:`main` branch that will eventually be a part of v0.11.0.
-
 This release focuses on improving :code:`scikit-learn` compatibility and fixing several core components.
 Key highlights include support for :code:`scikit-learn` 1.6 and various improvements to metrics and documentation.
 
