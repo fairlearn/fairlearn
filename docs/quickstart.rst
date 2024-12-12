@@ -186,7 +186,11 @@ the model does not predict that outcome.
     Name: false_negative_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
-:class:`fairlearn.metrics.MetricFrame`
+:class:`fairlearn.metrics.MetricFrame`. 
+Note that due to the fairlearn documentation build process, we 
+have omitted the import of the libraries defined in the *metrics* 
+object from this guide and advise that you manually add the import 
+statements back if you attempt to run this tutorial in Python.
 
 .. literalinclude:: auto_examples/plot_quickstart.py
     :language: python
