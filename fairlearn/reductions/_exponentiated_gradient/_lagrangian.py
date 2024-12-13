@@ -87,8 +87,11 @@ class _Lagrangian:
         self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda
-        self.hs = pd.Series(dtype="float64")
-        self.predictors = pd.Series(dtype="float64")
+
+        # Stores the best-response estimators as _PredictorAsCallable instances
+        self.hs = pd.Series(dtype="object")
+
+        self.predictors = pd.Series(dtype="object")
         self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
