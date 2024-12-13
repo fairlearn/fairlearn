@@ -71,7 +71,10 @@ jobs:
         echo "Using pip to install test requirements subject to constraints in requirements-dev.txt"
         pip install pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
     - name: Run tests
-      run: pytest --ignore=test/install test/
+      run: |
+        pytest --mpl \
+           --mpl-baseline-path="${{ github.workspace }}/test/unit/plot_snapshots" \
+           --ignore=test/install test/
 
   release-wheel:
     needs: test-wheel
