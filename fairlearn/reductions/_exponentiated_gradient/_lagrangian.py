@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
 import logging
 from time import time
 
@@ -11,6 +13,7 @@ from sklearn import clone
 from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions._moments import ClassificationMoment
+from fairlearn.reductions._moments.moment import Moment
 
 from ._constants import _INDENTATION, _LINE, _PRECISION
 
@@ -66,11 +69,11 @@ class _Lagrangian:
         X,
         y,
         estimator,
-        constraints,
-        B,
-        objective=None,
-        opt_lambda=True,
-        sample_weight_name="sample_weight",
+        constraints: Moment,
+        B: float,
+        objective: Moment | None = None,
+        opt_lambda: bool = True,
+        sample_weight_name: str = "sample_weight",
         **kwargs,
     ):
         self.constraints = constraints
@@ -143,7 +146,7 @@ class _Lagrangian:
             L_high = error + self.B * max_constraint
         return L, L_high, gamma, error
 
-    def eval_gap(self, Q, lambda_hat, nu):
+    def eval_gap(self, Q, lambda_hat, nu) -> "_GapResult":
         r"""Return the duality gap object for the given :math:`Q` and :math:`\hat{\lambda}`."""
         L, L_high, gamma, error = self._eval(Q, lambda_hat)
         result = _GapResult(L, L, L_high, gamma, error)
@@ -157,7 +160,7 @@ class _Lagrangian:
                 break
         return result
 
-    def solve_linprog(self, nu):
+    def solve_linprog(self, nu: float) -> tuple[pd.Series, pd.Series, "_GapResult"]:
         n_hs = len(self.hs)
         n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
@@ -228,11 +231,12 @@ class _Lagrangian:
 
         return estimator
 
-    def best_h(self, lambda_vec):
+    def best_h(self, lambda_vec) -> tuple[_PredictorAsCallable, int]:
         """Solve the best-response problem.
 
         Returns the classifier that solves the best-response problem for
-        the vector of Lagrange multipliers `lambda_vec`.
+        the vector of Lagrange multipliers `lambda_vec` and its index in the series storing the
+        best-response classifiers.
         """
         classifier = self._call_oracle(lambda_vec)
 

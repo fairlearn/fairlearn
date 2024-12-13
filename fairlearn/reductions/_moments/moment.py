@@ -80,6 +80,10 @@ class Moment:
         """Return the moment type, e.g., ClassificationMoment vs LossMoment."""
         return NotImplementedError()
 
+    def default_objective(self):
+        """Return the default objective for the moment."""
+        raise NotImplementedError()
+
 
 # Ensure that Moment shows up in correct place in documentation
 # when it is used as a base class
