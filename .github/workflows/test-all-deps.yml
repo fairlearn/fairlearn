@@ -47,9 +47,9 @@ jobs:
 
       - run: pip install .
       - run: pip install matplotlib
-      - run: |
-          pytest --mpl \
-          --mpl-baseline-path="${{ github.workspace }}/test/unit/plot_snapshots" \
+      - run: >
+          pytest --mpl
+          --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install --cov=fairlearn --cov-report=xml -vl test/
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
