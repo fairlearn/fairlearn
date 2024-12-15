@@ -425,7 +425,7 @@ def test_single_element_lists():
 
 @pytest.mark.parametrize(["pos_label", "expected_overall"], [("label-1", 1.0), ("label-2", 0.5)])
 def test_MetricFrame_forwards_non_sample_kwargs_to_metrics(
-    pos_label: int, expected_overall: float
+    pos_label: str, expected_overall: float
 ) -> None:
     y_true = ["label-1", "label-1", "label-2", "label-2"]
     y_pred = ["label-1", "label-2", "label-1", "label-1"]
