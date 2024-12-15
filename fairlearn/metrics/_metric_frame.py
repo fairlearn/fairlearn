@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from functools import partial
 from typing import Any, Callable, Literal
 
 import numpy as np
@@ -243,7 +244,7 @@ class MetricFrame:
 
         all_data = pd.DataFrame.from_dict({"y_true": list(y_t), "y_pred": list(y_p)})
 
-        annotated_funcs = self._process_functions(metrics, sample_params, all_data)
+        annotated_funcs = self._get_annotated_metric_functions(metrics, sample_params, all_data)
 
         # Now, prepare the sensitive features
         sf_list = self._process_features("sensitive_feature_", sensitive_features, y_t)
@@ -894,80 +895,89 @@ class MetricFrame:
 
         return self._result_cache["ratio_ci"][method]
 
-    def _process_functions(
+    def _get_annotated_metric_functions(
         self,
         metric: Callable | dict[str, Callable],
-        sample_params,
+        sample_params: dict[str, Any] | dict[str, dict[str, Any]] | None,
         all_data: pd.DataFrame,
     ) -> dict[str, AnnotatedMetricFunction]:
         """Get the metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
+        if not isinstance(sample_params, dict | None):
+            raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
+
         self._user_supplied_callable = True
-        func_dict = dict()
+        annotated_functions = {}
+        sample_params = sample_params or {}
 
-        # The supplied 'metric' may be a dictionary of functions
-        if isinstance(metric, dict):
-            self._user_supplied_callable = False
-            s_p = dict()
-
-            if sample_params is not None:
-                # If we have sample_params, they had better be a dictionary
-                if not isinstance(sample_params, dict):
-                    raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
-
-                # The keys of the sample_params dictionary must be a
-                # subset of our supplied metric functions
-                sp_keys = set(sample_params.keys())
-                mf_keys = set(metric.keys())
-                if not sp_keys.issubset(mf_keys):
-                    raise ValueError(_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT)
-                s_p = sample_params
-
-            for name, func in metric.items():
-                curr_s_p = None
-                if name in s_p:
-                    curr_s_p = s_p[name]
-
-                amf = self._process_one_function(func, name, curr_s_p, all_data)
-                func_dict[amf.name] = amf
-        else:
+        if not isinstance(metric, dict):
             # This is the case where the user has supplied a single metric function
-            amf = self._process_one_function(metric, None, sample_params, all_data)
-            func_dict[amf.name] = amf
-        return func_dict
+            annotated_metric_function = self._construct_annotated_metric_function(
+                func=metric, name=None, sample_parameters=sample_params, all_data=all_data
+            )
+            annotated_functions[annotated_metric_function.name] = annotated_metric_function
+            return annotated_functions
 
-    def _process_one_function(
+        # The supplied 'metric' is a dictionary of functions
+        self._user_supplied_callable = False
+
+        # The keys of the sample_params dictionary must be a
+        # subset of our supplied metric functions
+        sample_params_keys = set(sample_params.keys())
+        metric_functions_keys = set(metric.keys())
+        if not sample_params_keys.issubset(metric_functions_keys):
+            raise ValueError(_SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT)
+
+        for name, metric_function in metric.items():
+            associated_sample_params = sample_params.get(name, {})
+
+            annotated_metric_function = self._construct_annotated_metric_function(
+                metric_function, name, associated_sample_params, all_data
+            )
+            annotated_functions[annotated_metric_function.name] = annotated_metric_function
+
+        return annotated_functions
+
+    def _construct_annotated_metric_function(
         self,
         func: Callable,
         name: str | None,
-        sample_parameters: dict[str, Any] | None,
+        sample_parameters: dict[str, Any],
         all_data: pd.DataFrame,
     ) -> AnnotatedMetricFunction:
-        # Deal with the sample parameters
-        _sample_param_arrays = dict()
-        if sample_parameters is not None:
-            if not isinstance(sample_parameters, dict):
-                raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
-            for k, v in sample_parameters.items():
-                if v is not None:
-                    # Coerce any sample_params to being ndarrays for easy masking
-                    _sample_param_arrays[k] = np.asarray(v)
+        if not isinstance(sample_parameters, dict):
+            raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
-        # Build the kwargs
-        kwarg_dict = dict()
-        for param_name, param_values in _sample_param_arrays.items():
+        # Stores the kwargs related to the sample data, e.g, the sample_weights
+        sample_kwargs = {}
+        # Stores other arbitrary kwargs that the metric function may require, e.g., pos_label
+        other_kwargs = {}
+
+        for param_name, param_value in sample_parameters.items():
+            if (
+                param_value is None
+                or np.isscalar(param_value)
+                or len(param_value) != len(all_data)
+            ):
+                # The parameter can not be a sample parameter
+                other_kwargs[param_name] = param_value
+                continue
+
             col_name = f"{name}_{param_name}"
-            all_data[col_name] = param_values
-            kwarg_dict[param_name] = col_name
+            all_data[col_name] = np.asarray(param_value)
+            sample_kwargs[param_name] = col_name
 
-        # Construct the return object
-        amf = AnnotatedMetricFunction(
+        if len(other_kwargs) > 0:
+            if hasattr(func, __name__):
+                name = func.__name__
+            func = partial(func, **other_kwargs)
+            func.__name__ = name
+
+        return AnnotatedMetricFunction(
             func=func,
             name=name,
             positional_argument_names=["y_true", "y_pred"],
-            kw_argument_mapping=kwarg_dict,
+            kw_argument_mapping=sample_kwargs,
         )
-
-        return amf
 
     def _process_features(self, base_name, features, sample_array) -> list[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
