@@ -902,7 +902,7 @@ class MetricFrame:
         all_data: pd.DataFrame,
     ) -> dict[str, AnnotatedMetricFunction]:
         """Get the metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
-        if not isinstance(sample_params, dict | None):
+        if sample_params is not None and not isinstance(sample_params, dict):
             raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
         self._user_supplied_callable = True
