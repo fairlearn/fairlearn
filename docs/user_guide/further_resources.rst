@@ -34,6 +34,7 @@ Papers
     madaio2020codesigning
     mehrabi2021survey
     selbst2019fairness
+    buolamwini2018gender
 
 
 Online demos, talks, tutorials
@@ -43,4 +44,3 @@ Online demos, talks, tutorials
     :list: bullet
 
     barocas2017tutorial
-    mit2018gendershades
