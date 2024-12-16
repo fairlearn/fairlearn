@@ -37,30 +37,30 @@ While working on Fairlearn itself you may want to install it in editable mode.
 This allows you to test the changed functionality. First, clone the repository
 locally via:
 
-.. prompt:: bash
+.. code-block:: bash
 
-    git clone git@github.com:fairlearn/fairlearn.git
+   $ git clone git@github.com:fairlearn/fairlearn.git
 
 To install in editable mode, from the repository root path run:
 
-.. prompt:: bash
+.. code-block:: bash
 
-    pip install -e .
+   $ pip install -e .
 
 To verify that the code works as expected run:
 
-.. prompt:: bash
+.. code-block:: bash
 
-    python ./scripts/install_requirements.py --pinned False
-    python -m pytest -s ./test/unit
+   $ python ./scripts/install_requirements.py --pinned False
+   $ python -m pytest -s ./test/unit
 
 Fairlearn currently includes plotting functionality provided by
 :code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
 
-.. prompt:: bash
+.. code-block:: bash
 
-    pip install -e .
-    pip install matplotlib
+   $ pip install -e .
+   $ pip install matplotlib
 
 The Requirements Files
 """"""""""""""""""""""
@@ -118,7 +118,7 @@ Follow the steps below to create a pull request.
 #. Clone your fork of the fairlern repo from your GitHub account to your
    local machine:
 
-   .. prompt:: bash
+   .. code-block:: bash
 
       git clone git@github.com:YourLogin/fairlearn.git  # add --depth 1 if your connection is slow
       cd fairlearn
@@ -127,9 +127,9 @@ Follow the steps below to create a pull request.
    fairlearn repository, which you can use to keep your repository
    synchronized with the latest changes:
 
-   .. prompt:: bash
+   .. code-block:: bash
 
-        git remote add upstream git@github.com:fairlearn/fairlearn.git
+      $ git remote add upstream git@github.com:fairlearn/fairlearn.git
 
 #. Check that the :code:`upstream` and :code:`origin` remote aliases are configured correctly
    by running
@@ -146,10 +146,10 @@ Follow the steps below to create a pull request.
 
 #. (Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
 
-   .. prompt:: bash
+   .. code-block:: bash
 
-    pip install pre-commit
-    pre-commit install
+   $ pip install pre-commit
+   $ pre-commit install
 
    Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
 
