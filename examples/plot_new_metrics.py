@@ -393,7 +393,7 @@ grouped_on_race.ratio(method="to_overall")
 # and we have already found some serious issues in our example data.
 # However, sometimes serious issues can be hiding in intersections of
 # features. For example, the
-# Gender Shades project :footcite:`mit2018gendershades`
+# Gender Shades project :footcite:`buolamwini2018gender`
 # found that facial recognition algorithms performed worse for blacks
 # than whites, and also worse for women than men (despite overall high
 # accuracy score). Moreover, performance on black females was *terrible*.
