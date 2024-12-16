@@ -1001,8 +1001,6 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
 
     """  # noqa : E501
 
-    _estimator_type = "classifier"
-
     def __init__(
         self,
         *,
@@ -1199,8 +1197,6 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     .. footbibliography::
 
     """  # noqa : E501
-
-    _estimator_type = "regressor"
 
     def __init__(
         self,
