@@ -203,6 +203,11 @@ class _AdversarialFairness(BaseEstimator):
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
 
+    max_iter : int, default = -1
+        Maximum number of training iterations to perform. If set to -1, the number
+        of iterations is determined by epochs parameter. Either epochs or max_iter
+        must be positive.
+
     References
     ----------
     .. footbibliography::
@@ -996,6 +1001,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
 
     """  # noqa : E501
 
+    _estimator_type = "classifier"
+
     def __init__(
         self,
         *,
@@ -1018,7 +1025,6 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        self._estimator_type = "classifier"
         super(AdversarialFairnessClassifier, self).__init__(
             backend=backend,
             predictor_model=predictor_model,
@@ -1194,6 +1200,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
 
     """  # noqa : E501
 
+    _estimator_type = "regressor"
+
     def __init__(
         self,
         *,
@@ -1216,7 +1224,6 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        self._estimator_type = "regressor"
         super(AdversarialFairnessRegressor, self).__init__(
             backend=backend,
             predictor_model=predictor_model,
