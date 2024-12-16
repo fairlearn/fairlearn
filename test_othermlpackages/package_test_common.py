@@ -145,7 +145,7 @@ def run_AdversarialFairness_classification(estimator):
         return ct.fit_transform(X)
 
     X = preprocess(X)
-    y = preprocess(y)
+    y = preprocess(y).ravel()
     sensitive_feature = preprocess(sensitive_feature)
 
     X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(
