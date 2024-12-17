@@ -186,7 +186,14 @@ the model does not predict that outcome.
     Name: false_negative_rate, dtype: float64
 
 Fairlearn also allows us to quickly plot these metrics from the
-:class:`fairlearn.metrics.MetricFrame`
+:class:`fairlearn.metrics.MetricFrame`. 
+
+.. doctest:: quickstart
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import false_positive_rate, selection_rate, count
+    >>> from functools import partial
+    >>> zero_div_precision_score = partial(precision_score, zero_division=0)
 
 .. literalinclude:: auto_examples/plot_quickstart.py
     :language: python
