@@ -63,12 +63,18 @@ jobs:
         pip install --pre --find-links . "fairlearn"
         pip uninstall fairlearn --yes
         pip install --no-index --find-links . "fairlearn"
+    - name: Upgrade pip for Python 3.8
+      if: ${{ matrix.python-version == '3.8' }}
+      run: pip install --upgrade pip
     - name: Install testing requirements
       run: |
         echo "Using pip to install test requirements subject to constraints in requirements-dev.txt"
         pip install pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
     - name: Run tests
-      run: pytest --ignore=test/install test/
+      run: >
+        pytest --mpl
+        --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
+        --ignore=test/install test/
 
   release-wheel:
     needs: test-wheel

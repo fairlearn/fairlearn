@@ -39,3 +39,4 @@ jupyterlite-pyodide-kernel
 packaging
 seaborn
 torch
+sphinx-issues

@@ -114,9 +114,11 @@ def _filter_points_to_get_convex_hull(points_sorted):
 
     Notes
     -----
-    Uses `Andrew's monotone chain convex hull algorithm
-    <https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain>`_.
+    Uses Andrew's monotone chain convex hull algorithm :footcite:`wikibooks2010monotone`
 
+    References
+    ----------
+    .. footbibliography::
     """
     selected = []
     for r2 in points_sorted.itertuples():
