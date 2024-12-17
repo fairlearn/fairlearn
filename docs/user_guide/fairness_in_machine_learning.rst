@@ -29,8 +29,7 @@ the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 Types of harms
 --------------
 
-There are many types of harms (see, e.g., the
-`keynote by K. Crawford at NeurIPS 2017 <https://www.youtube.com/watch?v=fMym_BKWQzk>`_).
+There are many types of harms :footcite:`barocas2017problem`.
 Some of these are:
 
 * *Allocation harms* can occur when AI systems extend or withhold
@@ -76,7 +75,7 @@ since these are easiest to measure.
 Concept glossary
 ----------------------------
 
-The concepts outlined in this glossary are relevant to sociotechnical contexts. 
+The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
@@ -90,12 +89,12 @@ The concepts outlined in this glossary give an introduction into the language of
 This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
 In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
-Key Terms 
+Key Terms
 ~~~~~~~~~
 
 - **Sociotechnical context** – The context surrounding a technical system, including both social aspects (e.g., people, institutions, communities) and technical aspects (e.g., algorithms, technical processes). The sociotechnical context of a system shapes who might benefit or is harmed by AI systems.
 
-- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model. 
+- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model.
 
 - **Measurement model** – The method and approach used to measure the unobservable theoretical construct.
 
@@ -110,24 +109,24 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Teacher effectiveness** is an example of an unobservable theoretical construct. Common measurement models include student performance on standardized exams and qualitative feedback for the teacher’s students.
 
-- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
+- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income.
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example.
 
 **Note:**
 We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
 Please reference :footcite:cts:`jacobs2021measurement` for more detailed examples.
- 
- 
+
+
 .. _construct_validity:
 
-What is construct validity? 
+What is construct validity?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our 
+Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our
 exploration below on construct Validity.
 We note that both play an important role in understanding fairness in sociotechnical contexts.
-With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that 
+With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that
 is helpful in thinking about fairness in sociotechnical contexts.
 We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
@@ -139,24 +138,24 @@ We capture the idea in seven key parts that when combined  can serve as a framew
    b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
    c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
 
-3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
-   measurement models for which construct validity has been established? 
- 
-4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
-   related constructs as appropriate?  
+3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from
+   measurement models for which construct validity has been established?
 
-5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
+4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with
+   related constructs as appropriate?
+
+5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements
    of any relevant observable properties or other unobservable theoretical constructs?
 
-6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
+6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements
    produced by the measurement model, and whether those are “substantively interesting”.
 
-7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
-   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
+7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the
+   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the
    measurements, and what world do we wish to live in?
 
-**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific 
-sociotechnical context. This is only intended to explain the key concepts that could be used in a 
+**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific
+sociotechnical context. This is only intended to explain the key concepts that could be used in a
 framework for analyzing a task.
 
 Fairness assessment and unfairness mitigation
