@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
-
-from typing import Optional
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -42,11 +41,11 @@ class GroupFeature:
     index : int
         Used together with `base_name` when automatically generating a name
 
-    name : str
+    name : str | None
         Optional name for the feature
     """
 
-    def __init__(self, base_name: str, feature_vector, index: int, name: Optional[str]):
+    def __init__(self, base_name: str, feature_vector, index: int, name: str | None = None):
         """Help with the metrics."""
         self.classes_ = np.unique(feature_vector)
         self.raw_feature_ = feature_vector

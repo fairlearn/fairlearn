@@ -113,7 +113,7 @@ NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
 )
 
 
-class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
+class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     """A classifier based on the threshold optimization approach.
 
     The classifier is obtained by applying group-specific thresholds to the
@@ -468,6 +468,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             logger.debug(group)
             logger.debug("Tradeoff curve")
             logger.debug(roc_convex_hull)
+
+        self._overall_tradeoff_curve = pd.DataFrame(
+            {"x": self._x_grid, "y": overall_tradeoff_curve}
+        )
 
         # Find maximum objective point given that at each point the constraint value for each
         # sensitive feature value is identical by design.

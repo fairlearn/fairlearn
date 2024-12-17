@@ -37,3 +37,4 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Beth Zeranski](https://github.com/bethz)
 - [Vlad Iliescu](https://vladiliescu.net)
 - [Hrittik RoyChoudhury](https://github.com/Hrittik20)
+- [Tamara Atanasoska](https://github.com/tamaraatanasoska)

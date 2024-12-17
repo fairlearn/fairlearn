@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 from sklearn.utils import Bunch
 
 from ._constants import LABEL_KEY, P0_KEY, P1_KEY, SCORE_KEY
@@ -113,9 +114,11 @@ def _filter_points_to_get_convex_hull(points_sorted):
 
     Notes
     -----
-    Uses `Andrew's monotone chain convex hull algorithm
-    <https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain>`_.
+    Uses Andrew's monotone chain convex hull algorithm :footcite:`wikibooks2010monotone`
 
+    References
+    ----------
+    .. footbibliography::
     """
     selected = []
     for r2 in points_sorted.itertuples():
@@ -141,7 +144,9 @@ def _filter_points_to_get_convex_hull(points_sorted):
     return selected
 
 
-def _interpolate_curve(data, x_col, y_col, content_col, x_grid):
+def _interpolate_curve(
+    data: pd.DataFrame, x_col: str, y_col: str, content_col: str, x_grid: NDArray
+):
     """Interpolates the DataFrame in `data` along the values in `x_grid`.
 
     Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]

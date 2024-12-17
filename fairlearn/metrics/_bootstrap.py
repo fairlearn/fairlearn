@@ -1,8 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Union
+from functools import reduce
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -19,11 +21,11 @@ BOOTSTRAP_QUANTILE_ERROR = (
 
 def generate_single_bootstrap_sample(
     *,
-    random_state: Union[int, np.random.RandomState],
+    random_state: int | np.random.RandomState,
     data: pd.DataFrame,
-    annotated_functions: Dict[str, AnnotatedMetricFunction],
-    sensitive_feature_names: List[str],
-    control_feature_names: Optional[List[str]],
+    annotated_functions: dict[str, AnnotatedMetricFunction],
+    sensitive_feature_names: list[str],
+    control_feature_names: list[str] | None = None,
 ) -> DisaggregatedResult:
     """Create a single bootstrapped DisaggregatedResult."""
     assert random_state is not None, "Must specify random_state"
@@ -44,11 +46,11 @@ def generate_single_bootstrap_sample(
 def generate_bootstrap_samples(
     *,
     n_samples: int,
-    random_state: Optional[Union[int, np.random.RandomState]],
+    random_state: int | np.random.RandomState | None,
     data: pd.DataFrame,
-    annotated_functions: Dict[str, AnnotatedMetricFunction],
-    sensitive_feature_names: List[str],
-    control_feature_names: Optional[List[str]],
+    annotated_functions: dict[str, AnnotatedMetricFunction],
+    sensitive_feature_names: list[str],
+    control_feature_names: list[str] | None = None,
 ) -> List[DisaggregatedResult]:
     """Create a list of bootstrapped DisaggregatedResults.
 
@@ -61,12 +63,18 @@ def generate_bootstrap_samples(
     assert n_samples >= 1
     if random_state is None:
         generator = np.random.default_rng()
-        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        rs = generator.integers(
+            low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype=np.uint32
+        )
     elif isinstance(random_state, np.random.RandomState):
-        rs = random_state.randint(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        rs = random_state.randint(
+            low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype=np.uint32
+        )
     elif isinstance(random_state, int):
         generator = np.random.default_rng(seed=random_state)
-        rs = generator.integers(low=0, high=np.iinfo(np.uint32).max, size=n_samples)
+        rs = generator.integers(
+            low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype=np.uint32
+        )
     else:
         raise ValueError(f"Unsupported random_state: {random_state}")
 
@@ -84,7 +92,7 @@ def generate_bootstrap_samples(
     return result
 
 
-def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]) -> List[pd.Series]:
+def _calc_series_quantiles(*, quantiles: list[float], samples: list[pd.Series]) -> list[pd.Series]:
     for s in samples:
         assert isinstance(s, pd.Series)
         assert s.name == samples[0].name
@@ -103,15 +111,17 @@ def _calc_series_quantiles(*, quantiles: List[float], samples: List[pd.Series]) 
 
 
 def _calc_dataframe_quantiles(
-    *, quantiles: List[float], samples: List[pd.DataFrame]
-) -> List[pd.DataFrame]:
+    *, quantiles: list[float], samples: list[pd.DataFrame]
+) -> list[pd.DataFrame]:
+    samples = _align_sample_indices(samples)
+
     for s in samples:
         assert isinstance(s, pd.DataFrame)
         assert all(s.columns == samples[0].columns)
         assert all(s.index == samples[0].index), "Sanity check shape of bootstrap sample"
 
     try:
-        result_np = np.quantile(samples, q=quantiles, axis=0)
+        result_np = np.nanquantile(samples, q=quantiles, axis=0)
     except ValueError as ve:
         raise ValueError(BOOTSTRAP_QUANTILE_ERROR) from ve
 
@@ -126,9 +136,35 @@ def _calc_dataframe_quantiles(
     return result
 
 
+def _align_sample_indices(samples: list[pd.DataFrame]) -> list[pd.DataFrame]:
+    """
+    Align the indices of the bootstrapped DataFrames, so that all the combinations of sensitive
+    and control feature values are present in all the samples.
+
+    This is achieved by reindexing them to a common outer union of all indices, filling the missing
+    combinations with NaNs.
+
+    If a combination is missing from all the samples, it won't appear in the common index.
+
+    Parameters
+    ----------
+    samples : list[pd.DataFrame]
+        A list of pandas DataFrames to be aligned.
+
+    Returns
+    -------
+    list[pd.DataFrame]
+        A list of pandas DataFrames with aligned indices.
+    """
+    all_indices = [sample.index for sample in samples]
+    outer_common_index = reduce(lambda x, y: x.union(y), all_indices)
+    samples = [sample.reindex(outer_common_index) for sample in samples]
+    return samples
+
+
 def calculate_pandas_quantiles(
-    quantiles: List[float], bootstrap_samples: List[Union[pd.Series, pd.DataFrame]]
-) -> Union[List[pd.Series], List[pd.DataFrame]]:
+    quantiles: list[float], bootstrap_samples: list[pd.Series] | list[pd.DataFrame]
+) -> list[pd.Series] | list[pd.DataFrame]:
     """Calculate quantiles for a list of pandas objects."""
     if isinstance(bootstrap_samples[0], pd.Series):
         result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)

@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Literal
 
 import numpy as np
 import pandas as pd
@@ -39,6 +40,11 @@ _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 _BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
 _BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
 _BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
+_BOOTSTRAP_NOT_INIITIALIZED = (
+    "Could not compute confidence intervals:"
+    " Bootstrapping parameters n_boot and ci_quantiles were not specified"
+    " in the MetricFrame constructor."
+)
 
 
 class MetricFrame:
@@ -92,20 +98,20 @@ class MetricFrame:
         callables. This distinction remains *even if* the dictionary only
         contains a single entry.
 
-    y_true : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+    y_true : list, pandas.Series, numpy.ndarray, pandas.DataFrame
         The ground-truth labels (for classification) or target values (for regression).
 
-    y_pred : List, pandas.Series, numpy.ndarray, pandas.DataFrame
+    y_pred : list, pandas.Series, numpy.ndarray, pandas.DataFrame
         The predictions.
 
-    sensitive_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
+    sensitive_features : list, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
         We also forbid DataFrames with column names of ``None``.
         For cases where no names are provided we generate names ``sensitive_feature_[n]``.
 
-    control_features : List, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
+    control_features : list, pandas.Series, dict of 1d arrays, numpy.ndarray, pandas.DataFrame
         Control features are similar to sensitive features, in that they
         divide the input data into subgroups.
         Unlike the sensitive features, aggregations are not performed
@@ -129,17 +135,17 @@ class MetricFrame:
         a nested dictionary, with the first set of string keys identifying the
         metric function name, with the values being the string-to-array-like dictionaries.
 
-    n_boot : Optional[int]
+    n_boot : int | None
         If set to a postive integer, generate this number of bootstrap samples of the
         supplied data, and use to estimate confidence intervals for all of the metrics.
         Must be set with `ci_quantiles`.
 
-    ci_quantiles : Optional[List[float]]
+    ci_quantiles : list[float] | None
         A list of confidence interval quantiles to extract from the bootstrap samples.
         For example, the list `[0.159, 0.5, 0.841]` would extract the median and
         standard deviations.
 
-    random_state : Optional[Union[int, np.random.RandomState]]
+    random_state : int | np.random.RandomState | None
         Used to control the generation of the bootstrap samples
 
     Examples
@@ -206,11 +212,11 @@ class MetricFrame:
     ...               'ratio': mf2.ratio(),
     ...               'group_min': mf2.group_min(),
     ...               'group_max': mf2.group_max()}).T
-               accuracy selection_rate
-    difference      0.2            0.4
-    ratio          0.75            0.5
-    group_min       0.6            0.4
-    group_max       0.8            0.8
+                accuracy  selection_rate
+    difference      0.20             0.4
+    ratio           0.75             0.5
+    group_min       0.60             0.4
+    group_max       0.80             0.8
 
     More information about plotting metrics can be found in the
     :ref:`plotting section <plot_metricframe>` of the User Guide.
@@ -219,15 +225,15 @@ class MetricFrame:
     def __init__(
         self,
         *,
-        metrics: Union[Callable, Dict[str, Callable]],
+        metrics: Callable | dict[str, Callable],
         y_true,
         y_pred,
         sensitive_features,
         control_features=None,
-        sample_params: Optional[Union[Dict[str, Any], Dict[str, Dict[str, Any]]]] = None,
-        n_boot: Optional[int] = None,
-        ci_quantiles: Optional[List[float]] = None,
-        random_state: Optional[Union[int, np.random.RandomState]] = None,
+        sample_params: dict[str, Any] | dict[str, dict[str, Any]] | None = None,
+        n_boot: int | None = None,
+        ci_quantiles: list[float] | None = None,
+        random_state: int | np.random.RandomState | None = None,
     ):
         """Read a placeholder comment."""
         check_consistent_length(y_true, y_pred)
@@ -281,14 +287,15 @@ class MetricFrame:
         self._populate_results(result)
 
         # Handle bootstrapping
-        self._ci_quantiles = None
+        self._ci_quantiles = ci_quantiles
+        self._n_boot = n_boot
+
         if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
             if not isinstance(n_boot, int) or n_boot < 1:
                 raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
             for _ci in ci_quantiles:
                 if not isinstance(_ci, float) or _ci <= 0 or _ci >= 1:
                     raise ValueError(_BOOTSTRAP_CI_INVALID)
-            self._ci_quantiles = ci_quantiles
 
             _bootstrap_samples = generate_bootstrap_samples(
                 n_samples=n_boot,
@@ -319,18 +326,9 @@ class MetricFrame:
         else:
             return underlying_result
 
-    def _none_to_nan(
-        self, target: Union[pd.Series, pd.DataFrame]
-    ) -> Union[pd.Series, pd.DataFrame]:
+    def _none_to_nan(self, target: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
         """Convert Nones to NaNs."""
-        # Ideally, we wouldn't care about Series vs DataFrame
-        # However, DataFrame.map() didn't appear until Pandas 2.1
-        # Before, it was DataFrame.applymap() which then got deprecated
-        if isinstance(target, pd.Series):
-            result = target.map(lambda x: x if x is not None else np.nan)
-        else:
-            result = target.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
-        return result
+        return target.where(target.notna(), np.nan)
 
     def _populate_results(self, raw_result: DisaggregatedResult):
         """
@@ -392,7 +390,7 @@ class MetricFrame:
                         self._result_cache[c_t][c_m][err_string] = e
 
     def _populate_results_ci(
-        self, bootstrap_samples: List[DisaggregatedResult], ci_quantiles: List[float]
+        self, bootstrap_samples: list[DisaggregatedResult], ci_quantiles: list[float]
     ):
         """Similar to _populate_results, but computes confidence intervals from bootstrap.
 
@@ -414,7 +412,7 @@ class MetricFrame:
 
         group_functions = {"group_min_ci": "min", "group_max_ci": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = self._result_cache[k] = self._group_ci(
+            self._result_cache[k] = self._group_ci(
                 bootstrap_samples=bootstrap_samples,
                 ci_quantiles=ci_quantiles,
                 grouping_function=v,
@@ -454,13 +452,7 @@ class MetricFrame:
                 self._result_cache[c_t][c_m] = result
 
     @property
-    def overall(
-        self,
-    ) -> Union[
-        Any,
-        pd.Series,
-        pd.DataFrame,
-    ]:
+    def overall(self) -> Any | pd.Series | pd.DataFrame:
         """Return the underlying metrics evaluated on the whole dataset.
 
         Read more in the :ref:`User Guide <assessment_quantify_harms>`.
@@ -479,10 +471,10 @@ class MetricFrame:
             Callable Provided          Series, indexed by the subgroups
                                        of the conditional feature(s)
             -------- ----------------  ---------------------------------
-            Dict     None              Series, indexed by the metric
+            dict     None              Series, indexed by the metric
                                        names
             -------- ----------------  ---------------------------------
-            Dict     Provided          DataFrame. Columns are
+            dict     Provided          DataFrame. Columns are
                                        metric names, rows are subgroups
                                        of conditional feature(s)
             ======== ================  =================================
@@ -495,15 +487,7 @@ class MetricFrame:
         return self._result_cache["overall"]
 
     @property
-    def overall_ci(
-        self,
-    ) -> List[
-        Union[
-            Any,
-            pd.Series,
-            pd.DataFrame,
-        ]
-    ]:
+    def overall_ci(self) -> list[Any | pd.Series | pd.DataFrame]:
         """Return the underlying bootstrapped metrics evaluated on the whole dataset.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -513,12 +497,11 @@ class MetricFrame:
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
         """
+        self._check_bootstrap_initialized()
         return self._result_cache["overall_ci"]
 
     @property
-    def by_group(
-        self,
-    ) -> Union[pd.Series, pd.DataFrame]:
+    def by_group(self) -> pd.Series | pd.DataFrame:
         """Return the collection of metrics evaluated for each subgroup.
 
         The collection is defined by the combination of classes in the
@@ -547,7 +530,7 @@ class MetricFrame:
         return self._result_cache["by_group"]
 
     @property
-    def by_group_ci(self) -> Union[List[pd.Series], List[pd.DataFrame]]:
+    def by_group_ci(self) -> list[pd.Series] | list[pd.DataFrame]:
         """Return the confidence intervals for the metrics, evaluated on each subgroup.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -557,10 +540,11 @@ class MetricFrame:
         The elements of the list are indexed by the `ci_quantiles` array supplied
         to the constructor.
         """
+        self._check_bootstrap_initialized()
         return self._result_cache["by_group_ci"]
 
     @property
-    def control_levels(self) -> Optional[List[str]]:
+    def control_levels(self) -> list[str] | None:
         """Return a list of feature names which are produced by control features.
 
         If control features are present, then the rows of the :attr:`.by_group`
@@ -576,7 +560,7 @@ class MetricFrame:
         return self._cf_names
 
     @property
-    def sensitive_levels(self) -> List[str]:
+    def sensitive_levels(self) -> list[str]:
         """Return a list of the feature names which are produced by sensitive features.
 
         In cases where the :attr:`.by_group` property has a :class:`pandas.MultiIndex`
@@ -593,16 +577,21 @@ class MetricFrame:
         return self._sf_names
 
     @property
-    def ci_quantiles(self) -> Optional[List[float]]:
+    def ci_quantiles(self) -> list[float] | None:
         """Return the quantiles specified for bootstrapping."""
         return self._ci_quantiles
+
+    @property
+    def n_boot(self) -> int | None:
+        """Return the number of bootstrap samples specified."""
+        return self._n_boot
 
     def _group(
         self,
         disagg_result: DisaggregatedResult,
-        grouping_function: str,
-        errors: str = "raise",
-    ) -> Union[Any, pd.Series, pd.DataFrame]:
+        grouping_function: Literal["min", "max"],
+        errors: Literal["raise", "coerce"] = "raise",
+    ) -> Any | pd.Series | pd.DataFrame:
         """Return the minimum/maximum value of the metric over the sensitive features.
 
         This is a private method, please use .group_min() or .group_max() instead.
@@ -610,10 +599,10 @@ class MetricFrame:
         Parameters
         ----------
         disagg_result: The DisaggregatedResult containing all the metrics
-        grouping_function: {'min', 'max'}
-        errors: {'raise', 'coerce'}, default 'raise'
-        if 'raise', then invalid parsing will raise an exception
-        if 'coerce', then invalid parsing will be set as NaN
+        grouping_function: string {'min', 'max'}
+        errors: {'raise', 'coerce'}, default :code:`raise`
+            if 'raise', then invalid parsing will raise an exception
+            if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
@@ -629,10 +618,10 @@ class MetricFrame:
 
     def _group_ci(
         self,
-        bootstrap_samples: List[DisaggregatedResult],
-        ci_quantiles: List[float],
-        grouping_function: str,
-    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        bootstrap_samples: list[DisaggregatedResult],
+        ci_quantiles: list[float],
+        grouping_function: Literal["min", "max"],
+    ) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
         # There is no 'errors' argument because everything must have been a scalar for
         # np.quantiles
         samples = [
@@ -645,7 +634,9 @@ class MetricFrame:
         result = [self._extract_result(x, no_control_levels=False) for x in raw_result]
         return result
 
-    def group_max(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_max(
+        self, errors: Literal["raise", "coerce"] = "raise"
+    ) -> Any | pd.Series | pd.DataFrame:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the maximum value over all combinations of
@@ -659,7 +650,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default 'raise'
+        errors: {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -678,7 +669,7 @@ class MetricFrame:
         else:
             return value
 
-    def group_max_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+    def group_max_ci(self) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
         """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_max`.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -691,10 +682,12 @@ class MetricFrame:
         Unlike :meth:`MetricFrame.group_max` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
         """
-        value = self._result_cache["group_max_ci"]
-        return value
+        self._check_bootstrap_initialized()
+        return self._result_cache["group_max_ci"]
 
-    def group_min(self, errors: str = "raise") -> Union[Any, pd.Series, pd.DataFrame]:
+    def group_min(
+        self, errors: Literal["raise", "coerce"] = "raise"
+    ) -> Any | pd.Series | pd.DataFrame:
         """Return the maximum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
@@ -708,7 +701,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default 'raise'
+        errors: {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -727,7 +720,7 @@ class MetricFrame:
         else:
             return value
 
-    def group_min_ci(self) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+    def group_min_ci(self) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
         """Return the bootstrapped confidence intervals for :attr:`MetricFrame.group_min`.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -740,12 +733,14 @@ class MetricFrame:
         Unlike :meth:`MetricFrame.group_min` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
         """
-        value = self._result_cache["group_min_ci"]
-        return value
+        self._check_bootstrap_initialized()
+        return self._result_cache["group_min_ci"]
 
     def difference(
-        self, method: str = "between_groups", errors: str = "coerce"
-    ) -> Union[Any, pd.Series, pd.DataFrame]:
+        self,
+        method: Literal["between_groups", "to_overall"] = "between_groups",
+        errors: Literal["raise", "coerce"] = "coerce",
+    ) -> Any | pd.Series | pd.DataFrame:
         """Return the maximum absolute difference between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -769,9 +764,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        method : str
-            How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'raise', 'coerce'}, default 'coerce'
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
+        errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -793,8 +788,8 @@ class MetricFrame:
             return value
 
     def difference_ci(
-        self, method: str = "between_groups"
-    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        self, method: Literal["between_groups", "to_overall"] = "between_groups"
+    ) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
         """Return the bootstrapped confidence intervals for :meth:`MetricFrame.difference`.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -806,16 +801,24 @@ class MetricFrame:
 
         Unlike :meth:`MetricFrame.difference` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+
+        Parameters
+        ----------
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
         """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache["difference_ci"][method]
-        return value
+        self._check_bootstrap_initialized()
+
+        return self._result_cache["difference_ci"][method]
 
     def ratio(
-        self, method: str = "between_groups", errors: str = "coerce"
-    ) -> Union[Any, pd.Series, pd.DataFrame]:
+        self,
+        method: Literal["between_groups", "to_overall"] = "between_groups",
+        errors: Literal["raise", "coerce"] = "coerce",
+    ) -> Any | pd.Series | pd.DataFrame:
         """Return the minimum ratio between groups for each metric.
 
         This method calculates a scalar value for each underlying metric by
@@ -841,9 +844,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        method : str
-            How to compute the aggregate. Default is :code:`between_groups`
-        errors: {'raise', 'coerce'}, default 'coerce'
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
+        errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -865,8 +868,8 @@ class MetricFrame:
             return value
 
     def ratio_ci(
-        self, method: str = "between_groups"
-    ) -> Union[List[Any], List[pd.Series], List[pd.DataFrame]]:
+        self, method: Literal["between_groups", "to_overall"] = "between_groups"
+    ) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
         """Return the bootstrapped confidence intervals for :meth:`MetricFrame.ratio`.
 
         When bootstrapping has been activated (by `n_boot` and `ci_quantiles` in the
@@ -878,19 +881,25 @@ class MetricFrame:
 
         Unlike :meth:`MetricFrame.ratio` there is no :code:`errors` parameter, because
         a bootstrapped :class:`MetricFrame` requires all the metrics to return scalars.
+
+        Parameters
+        ----------
+        method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
+            How to compute the aggregate.
         """
         if method not in _COMPARE_METHODS:
             raise ValueError(_INVALID_COMPARE_METHOD.format(method))
 
-        value = self._result_cache["ratio_ci"][method]
-        return value
+        self._check_bootstrap_initialized()
+
+        return self._result_cache["ratio_ci"][method]
 
     def _process_functions(
         self,
-        metric: Union[Callable, Dict[str, Callable]],
+        metric: Callable | dict[str, Callable],
         sample_params,
         all_data: pd.DataFrame,
-    ) -> Dict[str, AnnotatedMetricFunction]:
+    ) -> dict[str, AnnotatedMetricFunction]:
         """Get the metrics into :class:`fairlearn.metrics.AnnotatedMetricFunction`."""
         self._user_supplied_callable = True
         func_dict = dict()
@@ -929,8 +938,8 @@ class MetricFrame:
     def _process_one_function(
         self,
         func: Callable,
-        name: Optional[str],
-        sample_parameters: Optional[Dict[str, Any]],
+        name: str | None,
+        sample_parameters: dict[str, Any] | None,
         all_data: pd.DataFrame,
     ) -> AnnotatedMetricFunction:
         # Deal with the sample parameters
@@ -960,7 +969,7 @@ class MetricFrame:
 
         return amf
 
-    def _process_features(self, base_name, features, sample_array) -> List[GroupFeature]:
+    def _process_features(self, base_name, features, sample_array) -> list[GroupFeature]:
         """Extract the features into :class:`fairlearn.metrics.GroupFeature` objects."""
         result = []
 
@@ -1013,3 +1022,8 @@ class MetricFrame:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
         return result
+
+    def _check_bootstrap_initialized(self):
+        """Check that the bootstrap parameters n_boot and ci_quantiles were correctly initialized."""
+        if self._ci_quantiles is None or len(self._ci_quantiles) == 0 or self._n_boot is None:
+            raise ValueError(_BOOTSTRAP_NOT_INIITIALIZED)

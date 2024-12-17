@@ -5,7 +5,9 @@ import logging
 
 import numpy as np
 import pandas as pd
-from sklearn.utils.validation import check_array, check_consistent_length, check_X_y
+from sklearn.utils.validation import check_consistent_length
+
+from fairlearn.utils._fixes import check_array
 
 logger = logging.getLogger(__file__)
 
@@ -81,14 +83,15 @@ def _validate_and_reformat_input(
         elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
             y = y.to_numpy().reshape(-1)
 
-        X, y = check_X_y(X, y, dtype=None, force_all_finite=False)
-        y = check_array(y, ensure_2d=False, dtype="numeric")
+        # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
+        X = check_array(X, dtype=None, ensure_all_finite=False)
+        y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
         if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
             raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
     else:
-        X = check_array(X, dtype=None, force_all_finite=False)
+        X = check_array(X, dtype=None, ensure_all_finite=False)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:

@@ -20,6 +20,7 @@ import sys
 from datetime import datetime
 
 from packaging.version import parse
+from sphinx_gallery.notebook import add_code_cell, add_markdown_cell
 
 rootdir = os.path.join(os.getcwd(), "..")
 sys.path.insert(0, rootdir)
@@ -65,9 +66,20 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "sphinx_prompt",
     "sphinx_copybutton",
+    "jupyterlite_sphinx",
+    "sphinx_issues",
 ]
 
+copybutton_prompt_text = r"\$\s+"
+copybutton_prompt_is_regexp = True
+
 source_suffix = [".rst"]
+
+# sphinx-issues config
+issues_github_path = "fairlearn/fairlearn"
+issues_user_uri = "https://github.com/{user}"
+issues_user_prefix = "@"
+
 
 intersphinx_mapping = {
     "python3": ("https://docs.python.org/3", None),
@@ -138,6 +150,7 @@ html_theme_options = {
             "icon": "fa-brands fa-discord",
         },
     ],
+    "use_edit_page_button": True,
     "show_prev_next": False,
     "switcher": {
         "json_url": "https://fairlearn.org/main/_static/versions.json",
@@ -146,6 +159,12 @@ html_theme_options = {
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_persistent": [],
     "header_links_before_dropdown": 7,
+    "secondary_sidebar_items": [
+        "page-toc",
+        "edit-example-link",
+        "sg_download_links",
+        "sg_launcher_links",
+    ],
 }
 
 # The name of an image file (relative to this directory) to place at the top
@@ -172,22 +191,11 @@ html_show_sourcelink = False
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
-# Use filename_pattern so that plot_adult_dataset is not
-# included in the gallery, but its plot is available for
-# the quickstart
-sphinx_gallery_conf = {
-    "reference_url": {"fairlearn": None},
-    "examples_dirs": "../examples",
-    "gallery_dirs": "auto_examples",
-    # pypandoc enables rst to md conversion in downloadable notebooks
-    "pypandoc": True,
-    "backreferences_dir": os.path.join("modules", "generated"),
-    "doc_module": ("fairlearn",),
-}
-
 html_sidebars = {
     "**": ["search-field", "sidebar-nav-bs.html"],
 }
+
+html_favicon = "_static/images/fairlearn-favicon.ico"
 
 # Auto-Doc Options
 # ----------------
@@ -206,6 +214,10 @@ plot_html_show_source_link = False
 
 # Linking Code
 # ------------
+
+
+def setup(app):
+    app.add_css_file("css/hide_links.css")
 
 
 # The following is used by sphinx.ext.linkcode to provide links to github
@@ -283,6 +295,76 @@ def check_if_v07():
 
     return result
 
+
+def notebook_modification_function(notebook_content, notebook_filename):
+    notebook_content_str = str(notebook_content)
+
+    warning_template = "\n".join(
+        [
+            "<div class='alert alert-{message_class}'>",
+            "",
+            "# This notebook is just for preview",
+            "",
+            "{message}",
+            "</div>",
+        ]
+    )
+
+    message_class = "warning"
+    message = (
+        "It isn't possible to install pytorch and run the full example. You can use"
+        " this notebook to preview the content."
+    )
+
+    markdown = warning_template.format(message_class=message_class, message=message)
+    dummy_notebook_content = {"cells": []}
+
+    if "torch" in notebook_content_str:
+        add_markdown_cell(dummy_notebook_content, markdown)
+
+    code_lines = []
+
+    code_lines.append("%pip install fairlearn")
+    if "seaborn" in notebook_content_str:
+        code_lines.append("%pip install seaborn")
+    if "fetch_" in notebook_content_str:
+        code_lines.extend(
+            [
+                "%pip install pyodide-http",
+                "import pyodide_http",
+                "pyodide_http.patch_all()",
+            ]
+        )
+    # always import matplotlib and pandas to avoid Pyodide limitation with
+    # imports inside functions
+    code_lines.extend(["import matplotlib", "import pandas"])
+
+    if code_lines:
+        code_lines = ["# JupyterLite-specific code"] + code_lines
+        code = "\n".join(code_lines)
+        add_code_cell(dummy_notebook_content, code)
+
+    notebook_content["cells"] = dummy_notebook_content["cells"] + notebook_content["cells"]
+
+
+# Sphinx Gallery
+# ------------
+
+# Use filename_pattern so that plot_adult_dataset is not
+# included in the gallery, but its plot is available for
+# the quickstart
+sphinx_gallery_conf = {
+    "reference_url": {"fairlearn": None},
+    "examples_dirs": "../examples",
+    "gallery_dirs": "auto_examples",
+    # pypandoc enables rst to md conversion in downloadable notebooks
+    "pypandoc": True,
+    "backreferences_dir": os.path.join("modules", "generated"),
+    "doc_module": ("fairlearn",),
+    "jupyterlite": {
+        "notebook_modification_function": notebook_modification_function,
+    },
+}
 
 # Setup for sphinx-bibtex
 

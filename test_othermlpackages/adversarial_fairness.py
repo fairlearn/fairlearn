@@ -117,7 +117,7 @@ def test_examples():
 
     from math import sqrt
 
-    def callbacks(model, *args):
+    def callbacks(model, *args, **kwargs):
         global step
         global schedulers
         step += 1

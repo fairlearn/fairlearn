@@ -26,6 +26,10 @@ filterwarnings = [
 
     # Warnings in other-ml (tensorflow)
     "default:The initializer GlorotNormal is unseeded:UserWarning",
+    "default:Do not pass an `input_shape`/`input_dim` argument to a layer:UserWarning",
+
+    # Warnings in test_othermlpackages
+    "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
 ]
 
 [tool.ruff]
@@ -114,3 +118,8 @@ docstring-code-format = false
 # This only has an effect when the `docstring-code-format` setting is
 # enabled.
 docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.per-file-ignores]
+# It's fine not to put the import at the top of the file in the examples
+# folder.
+"examples/*"=["E402"]

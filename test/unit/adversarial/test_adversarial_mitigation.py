@@ -6,7 +6,6 @@ import sys
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fairlearn.adversarial import (
     AdversarialFairnessClassifier,
@@ -14,15 +13,14 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._preprocessor import FloatTransformer
+from fairlearn.utils._fixes import parametrize_with_checks
 
 from .helper import (
     Bin1d,
     Bin2d,
     Cat,
-    Cont1d,
     Cont2d,
     KeywordToClass,
-    MultiClass1d,
     MultiClass2d,
     cols,
     generate_data_combinations,
@@ -76,7 +74,7 @@ def test_model_params(torch):
         max_iter=10,
         random_state=1,
         progress_updates=0.0000001,
-        callbacks=[lambda *args: False, lambda *args: False],
+        callbacks=[lambda *args, **kwargs: False, lambda *args, **kwargs: False],
     )
     mitigator.fit(X, Y, sensitive_features=Z)
 
@@ -100,10 +98,10 @@ def test_model_early_stop(torch):
         max_iter=10,
         random_state=1,
         progress_updates=0.0000001,
-        callbacks=lambda callback_obj, step: step > 5,
+        callbacks=lambda callback_obj, step, *args, **kwargs: step > 5,
     )
     mitigator.fit(X, Y, sensitive_features=Z)
-    assert mitigator.step_ == 6
+    assert mitigator.n_iter_ == 6
 
 
 def test_model_equalized_odds_model_setup():
@@ -249,6 +247,18 @@ def test_model_kw_error_torch():
         mitigator.fit(X, Y, sensitive_features=Z)
 
 
+EXPECTED_FAILED_CHECKS = {
+    "AdversarialFairnessClassifier": {
+        "check_estimators_pickle": "pickling is not possible.",
+        "check_estimators_overwrite_params": "pickling is not possible.",
+    },
+    "AdversarialFairnessRegressor": {
+        "check_estimators_pickle": "pickling is not possible.",
+        "check_estimators_overwrite_params": "pickling is not possible.",
+    },
+}
+
+
 @parametrize_with_checks(
     [
         get_instance(
@@ -285,7 +295,8 @@ def test_model_kw_error_torch():
             tensorflow=False,
             fake_mixin=True,
         ),
-    ]
+    ],
+    expected_failed_checks=lambda x: EXPECTED_FAILED_CHECKS.get(x.__class__.__name__, {}),
 )
 def test_estimators(estimator, check):
     """Check the compatibility with scikit-learn API."""
@@ -297,7 +308,6 @@ def test_fake_models(torch3):
     """Test various data types and see if it is interpreted correctly."""
     for (X, Y, Z), (X_type, Y_type, Z_type) in generate_data_combinations():
         mitigator = get_instance(fake_training=True, torch=torch3, tensorflow=not torch3)
-
         mitigator.fit(X, Y, sensitive_features=Z)
         assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
         assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
@@ -314,18 +324,15 @@ def test_fake_models_df_inputs():
     """Test model with data frames as input."""
     for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
-        mitigator.fit(pd.DataFrame(X), pd.DataFrame(Y), sensitive_features=pd.DataFrame(Z))
+        mitigator.fit(pd.DataFrame(X), pd.Series(Y), sensitive_features=pd.DataFrame(Z))
 
 
 @pytest.mark.parametrize(
     "data, valid_choice",
     [
-        (Bin1d, "binary"),
         (Bin2d, "binary"),
         (Cat, "binary"),
-        (Cont1d, "continuous"),
         (Cont2d, "continuous"),
-        (MultiClass1d, "multiclass"),
         (MultiClass2d, "multiclass"),
     ],
 )
@@ -367,7 +374,7 @@ def test_validate_data_df_inputs():
     """Test if validate_data properly preprocesses dataframes to ndarray."""
     for (X, Y, Z), types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
-        X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.DataFrame(Y), pd.DataFrame(Z))
+        X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.Series(Y), pd.DataFrame(Z))
         for x in (X, Y, Z):
             check_2dnp(x)
 

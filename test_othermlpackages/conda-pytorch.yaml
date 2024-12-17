@@ -1,17 +1,15 @@
 name: fairlearn-pytorch
 channels:
-- defaults
 - conda-forge
-- pytorch
 dependencies:
-- python==3.11
+# Remove constraint when torch supports python 3.13
+- python<3.13
 - pip>=19.1.1
 - pytest
 - pytest-cov
 - pytorch
-- cpuonly
-- pip:
-   - skorch>=0.12.1
+- pytorch-cpu
+- skorch
 
 # Note pytorch will not install cuda. If you do not want that, please
 # use conda install pytorch -c pytorch

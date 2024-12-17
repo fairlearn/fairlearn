@@ -3,12 +3,19 @@
 
 """Metrics for measuring fairness."""
 
+from typing import Literal
+
 from ._base_metrics import false_positive_rate, selection_rate, true_positive_rate
 from ._metric_frame import MetricFrame
 
 
 def demographic_parity_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the demographic parity difference.
 
@@ -30,7 +37,7 @@ def demographic_parity_difference(
     sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
 
@@ -54,7 +61,12 @@ def demographic_parity_difference(
 
 
 def demographic_parity_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the demographic parity ratio.
 
@@ -76,7 +88,7 @@ def demographic_parity_ratio(
     sensitive_features : array-like
         The sensitive features over which demographic parity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
@@ -100,7 +112,13 @@ def demographic_parity_ratio(
 
 
 def equalized_odds_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
+    agg: Literal["worst_case", "mean"] = "worst_case",
 ) -> float:
     """Calculate the equalized odds difference.
 
@@ -123,27 +141,45 @@ def equalized_odds_difference(
         Predicted labels :math:`h(X)` returned by the classifier.
 
     sensitive_features : array-like
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which equalized odds should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
 
     sample_weight : array-like
         The sample weights
 
+    agg : string {'worst_case', 'mean'}, default :code:`worst_case`
+        The aggregation method. One of `"worst_case"` or `"mean"`.
+        If `"worst_case"`, the greater one of the false positive rate
+        difference and true positive rate difference is returned.
+        If `"mean"`, the mean of the differences is returned.
+
     Returns
     -------
     float
         The equalized odds difference
     """
+    if agg not in ["worst_case", "mean"]:
+        raise ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return max(eo.difference(method=method))
+    if agg == "worst_case":
+        return max(eo.difference(method=method))
+    else:
+        return eo.difference(method=method).mean()
 
 
 def equalized_odds_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
+    agg: Literal["worst_case", "mean"] = "worst_case",
 ) -> float:
     """Calculate the equalized odds ratio.
 
@@ -166,23 +202,35 @@ def equalized_odds_ratio(
         Predicted labels :math:`h(X)` returned by the classifier.
 
     sensitive_features : array-like
-        The sensitive features over which demographic parity should be assessed
+        The sensitive features over which equalized odds should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 
     sample_weight : array-like
         The sample weights
 
+    agg : string {'worst_case', 'mean'}, default :code:`worst_case`
+        The aggregation method. One of `"worst_case"` or `"mean"`.
+        If `"worst_case"`, the smaller one of the false positive rate ratio
+        and true positive rate ratio is returned.
+        If `"mean"`, the mean of the ratios is returned.
+
     Returns
     -------
     float
         The equalized odds ratio
     """
+    if agg not in ["worst_case", "mean"]:
+        raise ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
+
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
-    return min(eo.ratio(method=method))
+    if agg == "worst_case":
+        return min(eo.ratio(method=method))
+    else:
+        return eo.ratio(method=method).mean()
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
@@ -200,7 +248,12 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
 
 
 def equal_opportunity_difference(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the equal opportunity difference.
 
@@ -222,7 +275,7 @@ def equal_opportunity_difference(
     sensitive_features : array-like
         The sensitive features over which equal opportunity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.difference`
         for details.
 
@@ -246,7 +299,12 @@ def equal_opportunity_difference(
 
 
 def equal_opportunity_ratio(
-    y_true, y_pred, *, sensitive_features, method="between_groups", sample_weight=None
+    y_true,
+    y_pred,
+    *,
+    sensitive_features,
+    method: Literal["between_groups", "to_overall"] = "between_groups",
+    sample_weight=None,
 ) -> float:
     """Calculate the equal opportunity ratio.
 
@@ -268,7 +326,7 @@ def equal_opportunity_ratio(
     sensitive_features : array-like
         The sensitive features over which equal opportunity should be assessed
 
-    method : str
+    method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
         How to compute the differences. See :func:`fairlearn.metrics.MetricFrame.ratio`
         for details.
 

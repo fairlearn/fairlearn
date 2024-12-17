@@ -1,11 +1,10 @@
 name: fairlearn-lightgbm
 channels:
-- defaults
 - conda-forge
 dependencies:
-- python==3.11
+- python>=3.10
 - pip>=19.1.1
-- numpy>=1.24.4, <2
+- numpy
 - pandas
 - pytest
 - pytest-cov

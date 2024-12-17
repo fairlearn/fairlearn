@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import logging
+import warnings
 from math import ceil
 from time import time
 
@@ -11,8 +12,9 @@ from sklearn.base import (
     ClassifierMixin,
     RegressorMixin,
     TransformerMixin,
+    is_classifier,
 )
-from sklearn.exceptions import NotFittedError
+from sklearn.exceptions import DataConversionWarning, NotFittedError
 from sklearn.utils import check_scalar
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
@@ -20,6 +22,8 @@ from sklearn.utils.validation import (
     check_is_fitted,
     check_random_state,
 )
+
+from fairlearn.utils._fixes import validate_data
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -90,7 +94,7 @@ class _AdversarialFairness(BaseEstimator):
         the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
-    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+    predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
         Instead of a neural network model, it is possible to pass a list
         :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
@@ -106,22 +110,22 @@ class _AdversarialFairness(BaseEstimator):
         If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
-    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+    adversary_model : list, torch.nn.Module, keras.Model
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
-        or tensorflow.keras.optimizers.Optimizer is passed, this
+        or keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
         callable and pass our model, and set the result of this call
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    adversary_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Defined similarly as
         :code:`predictor_optimizer`.
 
@@ -198,6 +202,11 @@ class _AdversarialFairness(BaseEstimator):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
+
+    max_iter : int, default = -1
+        Maximum number of training iterations to perform. If set to -1, the number
+        of iterations is determined by epochs parameter. Either epochs or max_iter
+        must be positive.
 
     References
     ----------
@@ -412,7 +421,9 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=True)
+        first_call = not hasattr(self, "classes_")
+
+        X, y, A = self._validate_input(X, y, sensitive_features, first_call)
 
         # Not checked in __setup, because partial_fit may not require it.
         if self.epochs == -1 and self.max_iter == -1:
@@ -453,7 +464,7 @@ class _AdversarialFairness(BaseEstimator):
         predictor_losses = [None]
         adversary_losses = []
 
-        self.step_ = 0
+        self.n_iter_ = 0
         for epoch in range(epochs):
             if self.shuffle:
                 X, y, A = self.backendEngine_.shuffle(X, y, A)
@@ -499,16 +510,18 @@ class _AdversarialFairness(BaseEstimator):
                 predictor_losses.append(LP)
                 adversary_losses.append(LA)
 
-                self.step_ += 1
+                self.n_iter_ += 1
 
                 # Purposefully first stop and then handle callbacks
-                if self.max_iter != -1 and self.step_ >= self.max_iter:
+                if self.max_iter != -1 and self.n_iter_ >= self.max_iter:
                     return self
 
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
-                        result = cb(self, self.step_)
+                        result = cb(
+                            self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=1
+                        )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
                         stop = stop or result
@@ -518,23 +531,47 @@ class _AdversarialFairness(BaseEstimator):
 
         return self
 
-    def partial_fit(self, X, y, *, sensitive_features=None):
+    def partial_fit(self, X, y, *, classes=None, sensitive_features=None):
         """
-        Perform one epoch on given samples and update model.
+        Perform one training step on given samples and update model.
+
+        This method allows for incremental fitting on batches of data.
 
         Parameters
         ----------
-        X : numpy.ndarray
-            Two-dimensional numpy array containing training data
+        X : array-like of shape (n_samples, n_features)
+            The training input samples.
 
-        y : array
-            Array-like containing training targets
+        y : array-like of shape (n_samples,)
+            The target values.
 
-        sensitive_features : array
-            Array-like containing the sensitive feature of the
-            training data.
+        classes : array-like of shape (n_classes,), default=None
+            List of all the classes that can possibly appear in the y vector.
+            Must be provided at the first call to partial_fit, can be omitted
+            in subsequent calls.
+
+        sensitive_features : array-like of shape (n_samples,), default=None
+            The sensitive features for each sample. If None, a vector of zeros
+            will be used.
+
+        Returns
+        -------
+        self : object
+            Returns self.
         """
-        X, y, A = self._validate_input(X, y, sensitive_features, reinitialize=False)
+
+        first_call = not hasattr(self, "classes_")
+
+        if first_call and classes is not None:
+            self.classes_ = classes
+        if not first_call:
+            if self.n_features_in_ != X.shape[1]:
+                raise ValueError(
+                    "X has %d features, but %s is expecting %d features as input"
+                    % (X.shape[1], self.__class__.__name__, self.n_features_in_)
+                )
+
+        X, y, A = self._validate_input(X, y, sensitive_features, first_call)
         self.backendEngine_.train_step(X, y, A)
 
         return self
@@ -554,7 +591,8 @@ class _AdversarialFairness(BaseEstimator):
             Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
-        X = self._validate_data(
+        X = validate_data(
+            self,
             X,
             accept_sparse=False,
             accept_large_sparse=False,
@@ -618,16 +656,35 @@ class _AdversarialFairness(BaseEstimator):
         `reinitialize` is True. The setup procedure requires validated data.
         """
         if not self.skip_validation:
-            X = self._validate_data(
+            X = validate_data(
+                self,
                 X,
                 accept_sparse=False,
                 accept_large_sparse=False,
                 dtype=float,
                 allow_nd=True,
+                ensure_2d=True,
             )
-            y = self._validate_data(y, dtype=None, ensure_2d=False)
+            if y is not None:
+                y = validate_data(self, y, dtype=None, ensure_2d=False)
+                if y.ndim != 1:
+                    warnings.warn(
+                        (
+                            "A column-vector y was passed when a "
+                            "1d array was expected. Please change "
+                            "the shape of y to (n_samples,), for "
+                            "example using ravel()."
+                        ),
+                        DataConversionWarning,
+                        stacklevel=2,
+                    )
 
             check_consistent_length(X, y)
+
+            if is_classifier(self) and type_of_target(y) == "continuous":
+                raise ValueError(
+                    "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
+                )
 
         try:  # TODO check this
             check_is_fitted(self)
@@ -638,7 +695,7 @@ class _AdversarialFairness(BaseEstimator):
         if A is None:
             logger.warning("No sensitive_features provided")
             logger.warning("Setting sensitive_features to zeros")
-            A = zeros(len(y))
+            A = zeros(len(X))
 
         if not self.skip_validation:
             check_consistent_length(X, A)
@@ -646,7 +703,9 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        self.classes_ = unique(y)
+        if not hasattr(self, "classes_"):
+            self.classes_ = unique(y)
+
         y = self._y_transform.transform(y)
         A = self._sf_transform.transform(A)
 
@@ -704,7 +763,7 @@ class _AdversarialFairness(BaseEstimator):
         if self.backend == "tensorflow" or self.backend == "auto":
             select = False
             try:
-                from tensorflow.keras import Model as model
+                from keras import Model as model
 
                 tensorflow_installed = True
                 if isinstance(self.predictor_model, (list, model)) and isinstance(
@@ -715,7 +774,7 @@ class _AdversarialFairness(BaseEstimator):
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
                             "predictor_model and adversary_model",
-                            "a list or tensorflow.keras.Model",
+                            "a list or keras.Model",
                         )
                     )
             except ImportError:
@@ -736,7 +795,7 @@ class _AdversarialFairness(BaseEstimator):
         raise ValueError(
             _KWARG_ERROR_MESSAGE.format(
                 "predictor_model and adversary_model",
-                "a list, torch.nn.Module, or tensorflow.keras.Model. Also, "
+                "a list, torch.nn.Module, or keras.Model. Also, "
                 + "make sure to have installed the corresponding backend",
             )
         )
@@ -763,7 +822,7 @@ class _AdversarialFairness(BaseEstimator):
             kw = self.predictor_function_
             if kw == "binary":
                 self.predictor_function_ = self._binary_predictor_function
-            elif kw in ["multiclass", "multilabel-indicator"]:
+            elif kw == "multiclass":
 
                 def loss(pred):
                     shape = pred.shape
@@ -774,7 +833,7 @@ class _AdversarialFairness(BaseEstimator):
                     return b
 
                 self.predictor_function_ = loss
-            elif kw in ["continuous", "continuous-multioutput"]:
+            elif kw == "continuous":
                 self.predictor_function_ = lambda pred: pred
             else:
                 raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
@@ -786,7 +845,7 @@ class _AdversarialFairness(BaseEstimator):
         return hasattr(self, "_is_setup")
 
 
-class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
+class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     r"""Train PyTorch or TensorFlow classifiers while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
@@ -837,7 +896,7 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
-    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+    predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
         Instead of a neural network model, it is possible to pass a list
         :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
@@ -853,22 +912,22 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
-    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+    adversary_model : list, torch.nn.Module, keras.Model
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
-        or tensorflow.keras.optimizers.Optimizer is passed, this
+        or keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
         callable and pass our model, and set the result of this call
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    adversary_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Defined similarly as
         :code:`predictor_optimizer`.
 
@@ -909,10 +968,16 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
     callbacks : callable
         Callback function, called after every batch. For instance useable when
         wanting to validate. A list of callback functions can also be provided.
-        Each callback function is passed two arguments :code:`self` (the
-        estimator instance) and :code:`step` (the completed iteration), and
-        may return a Boolean value. If the returned value is `True`, the
-        optimization algorithm terminates. This can be used to implement
+        Each callback function is called as::
+
+            callback(
+                self, step=self.step_, X=X, y=y, z=sensitive_features, pos_label=1
+            )
+
+        which is passed the ``self`` object, the step number, the inputs ``X``,
+        the targets ``y``, the sensitive features ``z``, and the positive label.
+        The callback may return a Boolean value. If the returned value is `True`,
+        the optimization algorithm terminates. This can be used to implement
         *early stopping*.
 
     cuda : str, default = None
@@ -958,7 +1023,6 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        self._estimator_type = "classifier"
         super(AdversarialFairnessClassifier, self).__init__(
             backend=backend,
             predictor_model=predictor_model,
@@ -984,22 +1048,16 @@ class AdversarialFairnessClassifier(_AdversarialFairness, ClassifierMixin):
         )
 
     def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
-                "check_non_transformer_estimators_n_iter": (
-                    "estimator is missing the _n_iter attribute."
-                ),
-                "check_classifiers_regression_target": ("the data cannot look continuous."),
-                "check_estimators_partial_fit_n_features": ("number of features cannot change."),
-                "check_supervised_y_2d": "DataConversionWarning not caught.",
-            },
-            "poor_score": True,
-        }
+        return {"poor_score": True}
+
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        if tags.classifier_tags:
+            tags.classifier_tags.poor_score = True
+        return tags
 
 
-class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
+class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     r"""Train PyTorch or TensorFlow regressors while mitigating unfairness.
 
     This estimator implements the supervised learning method proposed in
@@ -1041,7 +1099,7 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         the backend from the :code:`predictor_model`.
         You can also pass in a BackendEngine class.
 
-    predictor_model : list, torch.nn.Module, tensorflow.keras.Model
+    predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
         Instead of a neural network model, it is possible to pass a list
         :math:`[k_1, k_2, \dots]`, where each :math:`k_i` either indicates
@@ -1057,22 +1115,22 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         If :code:`backend` is specified, you cannot pass a model
         that uses a different backend.
 
-    adversary_model : list, torch.nn.Module, tensorflow.keras.Model
+    adversary_model : list, torch.nn.Module, keras.Model
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
 
-    predictor_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
         either 'SGD' or 'Adam'. A corresponding SGD or Adam optimizer is
         initialized with the given predictor model and learning rate.
         If an instance of a subclass of torch.optim.Optimizer
-        or tensorflow.keras.optimizers.Optimizer is passed, this
+        or keras.optimizers.Optimizer is passed, this
         is used directly. If a callable :code:`fn` is passed, we call this
         callable and pass our model, and set the result of this call
         as the optimizer, so: :code:`predictor_optimizer=fn(predictor_model)`.
 
-    adversary_optimizer : str, torch.optim, tensorflow.keras.optimizers, callable, default = 'Adam'
+    adversary_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. Defined similarly as
         :code:`predictor_optimizer`.
 
@@ -1162,7 +1220,6 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        self._estimator_type = "regressor"
         super(AdversarialFairnessRegressor, self).__init__(
             backend=backend,
             predictor_model=predictor_model,
@@ -1188,19 +1245,10 @@ class AdversarialFairnessRegressor(_AdversarialFairness, RegressorMixin):
         )
 
     def _more_tags(self):
-        return {
-            "_xfail_checks": {
-                "check_estimators_pickle": "pickling is not possible.",
-                "check_estimators_overwrite_params": "pickling is not possible.",
-                "check_methods_sample_order_invariance": ("fails for the predict() method."),
-                "check_non_transformer_estimators_n_iter": (
-                    "estimator is missing the _n_iter attribute."
-                ),
-                "check_supervised_y_2d": "DataConversionWarning not caught.",
-                "check_estimators_partial_fit_n_features": (
-                    "number of features cannot change between calls of partial_fit"
-                ),
-                "check_fit_score_takes_y": "y_true and y_pred array lengths are not matching",
-            },
-            "poor_score": True,
-        }
+        return {"poor_score": True}
+
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        if tags.regressor_tags:
+            tags.regressor_tags.poor_score = True
+        return tags
