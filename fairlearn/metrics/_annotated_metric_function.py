@@ -67,7 +67,6 @@ class AnnotatedMetricFunction:
         else:
             self.name = name
 
-        self.func = func
         self.postional_argument_names = ["y_true", "y_pred"]
         if positional_argument_names is not None:
             self.postional_argument_names = positional_argument_names
