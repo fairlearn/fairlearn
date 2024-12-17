@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from contextlib import nullcontext as does_not_raise
 from copy import deepcopy
 from test.unit.input_convertors import _map_into_single_column
 
@@ -924,3 +925,28 @@ def test_predict_method(predict_method):
     exception = "predict_proba" if predict_method == "auto" else predict_method
     with pytest.raises(Exception, match=exception):
         clf.fit(X, y, sensitive_features=sensitive_feature)
+
+
+def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
+    class DummyEstimator(BaseEstimator, ClassifierMixin):
+        def fit(self, X, y, **kwargs):
+            self.fitted_ = True
+            return self
+
+        def predict(self, X):
+            return np.array([0, 1] * (len(X) // 2))
+
+        def predict_proba(self, X):
+            return np.array([[0.6, 0.4], [0.4, 0.6]] * (len(X) // 2))
+
+    X = np.random.rand(10, 5, 3)
+    y = np.array([0, 1] * 5)
+    sensitive_features = ["A"] * 5 + ["B"] * 5
+
+    threshold_optimizer = ThresholdOptimizer(
+        estimator=DummyEstimator(), grid_size=10, prefit=False
+    )
+
+    with does_not_raise():
+        threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
+        threshold_optimizer.predict(X, sensitive_features=sensitive_features)
