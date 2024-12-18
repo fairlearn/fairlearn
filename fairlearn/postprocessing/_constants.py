@@ -4,8 +4,6 @@
 SCORE_KEY = "score"
 LABEL_KEY = "label"
 SENSITIVE_FEATURE_KEY = "sensitive_feature"
-P0_KEY = "p0"
-P1_KEY = "p1"
 
 OUTPUT_SEPARATOR = "-" * 65
 

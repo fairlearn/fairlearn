@@ -372,7 +372,9 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             X, sensitive_features=sensitive_features
         )
 
-    def _threshold_optimization_for_simple_constraints(self, sensitive_features, labels, scores):
+    def _threshold_optimization_for_simple_constraints(
+        self, sensitive_features, labels, scores
+    ) -> InterpolatedThresholder:
         """Calculate the objective value across all values of constraints.
 
         These calculations are made at different thresholds over the scores. Subsequently weighs
@@ -415,7 +417,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             # Determine probability of current sensitive feature group based on data.
             p_sensitive_feature_value = len(group) / n
 
-            roc_convex_hull = _tradeoff_curve(
+            metrics_curve_convex_hull = _tradeoff_curve(
                 group,
                 sensitive_feature_value,
                 flip=self.flip,
@@ -424,7 +426,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             )
 
             self._tradeoff_curve[sensitive_feature_value] = _interpolate_curve(
-                roc_convex_hull, "x", "y", "operation", self._x_grid
+                metrics_curve_convex_hull, "x", "y", "operation", self._x_grid
             )
 
             # Add up objective for the current group multiplied by the probability of the current
@@ -439,7 +441,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             logger.debug("DATA")
             logger.debug(group)
             logger.debug("Tradeoff curve")
-            logger.debug(roc_convex_hull)
+            logger.debug(metrics_curve_convex_hull)
 
         self._overall_tradeoff_curve = pd.DataFrame(
             {"x": self._x_grid, "y": overall_tradeoff_curve}
@@ -454,7 +456,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         # interpolation per sensitive feature value.
         interpolation_dict = {}
         for sensitive_feature_value in self._tradeoff_curve.keys():
-            best_interpolation = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best]
+            best_interpolation = self._tradeoff_curve[sensitive_feature_value].iloc[i_best]
             interpolation_dict[sensitive_feature_value] = Bunch(
                 p0=best_interpolation.p0,
                 operation0=best_interpolation.operation0,
