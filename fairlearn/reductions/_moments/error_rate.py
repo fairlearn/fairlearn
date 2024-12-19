@@ -40,8 +40,6 @@ class ErrorRate(ClassificationMoment):
         costs of 1.0 are assumed.
     """
 
-    short_name = "Err"
-
     def __init__(self, *, costs=None):
         """Initialize the costs."""
         super(ErrorRate, self).__init__()

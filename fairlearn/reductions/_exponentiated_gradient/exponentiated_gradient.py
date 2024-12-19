@@ -138,7 +138,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         self.lambda_vecs_EG_ = pd.DataFrame()
         self.lambda_vecs_LP_ = pd.DataFrame()
-        self.lambda_vecs_ = pd.DataFrame()
 
         logger.debug("...Exponentiated Gradient STARTING")
 
@@ -155,10 +154,19 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         )
 
         theta = pd.Series(0, lagrangian.constraints.index)
+
+        # Stores the weights of the best-response estimators without LP and before averaging
         Qsum = pd.Series(dtype="float64")
-        gaps_EG = []
-        gaps = []
-        Qs = []
+
+        # Stores the duality gap of the Exponentiated Gradient (EG) at each iteration
+        gaps_EG: list[float] = []
+
+        # Stores the best gap at each iteration among the ones EG and Linear Programming (LP) yield
+        gaps: list[float] = []
+
+        # Stores the best-reponse estimators' weights at each iteration
+        # The appended weights come either from (EG) or (LP), depending on their respective gaps
+        Qs: list[pd.Series] = []
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.inf

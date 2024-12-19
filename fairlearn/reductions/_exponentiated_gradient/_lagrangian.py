@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from time import time
 
 import numpy as np
@@ -105,7 +106,9 @@ class _Lagrangian:
         self.last_linprog_result = None
         self.sample_weight_name = sample_weight_name
 
-    def _eval(self, Q, lambda_vec):
+    def _eval(
+        self, Q: pd.Series | Callable, lambda_vec: pd.Series
+    ) -> tuple[float, float, pd.Series, float]:
         """Return the value of the Lagrangian.
 
         Parameters
@@ -134,19 +137,18 @@ class _Lagrangian:
             gamma = self.gammas[Q.index].dot(Q)
 
         if self.opt_lambda:
-            lambda_projected = self.constraints.project_lambda(lambda_vec)
-            L = error + np.sum(lambda_projected * (gamma - self.constraints.bound()))
-        else:
-            L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
+            lambda_vec = self.constraints.project_lambda(lambda_vec)
+
+        L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
         max_constraint = (gamma - self.constraints.bound()).max()
-        if max_constraint <= 0:
-            L_high = error
-        else:
-            L_high = error + self.B * max_constraint
+
+        L_high = error
+        if max_constraint > 0:
+            L_high += self.B * max_constraint
         return L, L_high, gamma, error
 
-    def eval_gap(self, Q, lambda_hat, nu) -> "_GapResult":
+    def eval_gap(self, Q: pd.Series, lambda_hat: pd.Series, nu: float) -> _GapResult:
         r"""Return the duality gap object for the given :math:`Q` and :math:`\hat{\lambda}`."""
         L, L_high, gamma, error = self._eval(Q, lambda_hat)
         result = _GapResult(L, L, L_high, gamma, error)
@@ -160,7 +162,7 @@ class _Lagrangian:
                 break
         return result
 
-    def solve_linprog(self, nu: float) -> tuple[pd.Series, pd.Series, "_GapResult"]:
+    def solve_linprog(self, nu: float) -> tuple[pd.Series, pd.Series, _GapResult]:
         n_hs = len(self.hs)
         n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
@@ -200,7 +202,7 @@ class _Lagrangian:
         )
         return self.last_linprog_result
 
-    def _call_oracle(self, lambda_vec):
+    def _call_oracle(self, lambda_vec: pd.Series):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
@@ -231,7 +233,7 @@ class _Lagrangian:
 
         return estimator
 
-    def best_h(self, lambda_vec) -> tuple[_PredictorAsCallable, int]:
+    def best_h(self, lambda_vec: pd.Series) -> tuple[_PredictorAsCallable, int]:
         """Solve the best-response problem.
 
         Returns the classifier that solves the best-response problem for
@@ -270,12 +272,12 @@ class _Lagrangian:
 class _GapResult:
     """The result of a duality gap computation."""
 
-    def __init__(self, L, L_low, L_high, gamma, error):
+    def __init__(self, L: float, L_low: float, L_high: float, gamma: pd.Series, error: float):
         self.L = L
         self.L_low = L_low
         self.L_high = L_high
         self.gamma = gamma
         self.error = error
 
-    def gap(self):
+    def gap(self) -> float:
         return max(self.L - self.L_low, self.L_high - self.L)

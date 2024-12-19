@@ -27,7 +27,7 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series = None):
+    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series = None) -> None:
         """Load a set of data for use by this object.
 
         Parameters
@@ -51,20 +51,20 @@ class Moment:
         self._gamma_descr = None
 
     @property
-    def total_samples(self):
+    def total_samples(self) -> int:
         """Return the number of samples in the data."""
         return self.X.shape[0]
 
     @property
-    def _y_as_series(self):
+    def _y_as_series(self) -> pd.Series:
         """Return the y array as a :class:`~pandas.Series`."""
         return self._y
 
-    def gamma(self, predictor):  # noqa: D102
+    def gamma(self, predictor) -> pd.Series:  # noqa: D102
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
-    def bound(self):  # noqa: D102
+    def bound(self) -> pd.Series:  # noqa: D102
         """Return vector of fairness bound constraint the length of gamma."""
         raise NotImplementedError()
 
