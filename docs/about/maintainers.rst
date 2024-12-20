@@ -34,7 +34,7 @@
     <p>Allie Saizan</p>
     </div>
     <div>
-    <a href='https://github.com/tamaraatanasoska/'><img src='https://github.com/tamaraatanasoska.png' class='avatar' /></a> <br />
+    <a href='https://github.com/tamaraatanasoska'><img src='https://github.com/tamaraatanasoska.png' class='avatar' /></a> <br />
     <p>Tamara Atanasoska</p>
     </div>
     </div>

@@ -7,17 +7,9 @@ from contextlib import nullcontext as does_not_raise
 import numpy as np
 import pandas as pd
 import pytest
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fairlearn.preprocessing import CorrelationRemover
-from fairlearn.utils._fixes import parametrize_with_checks
-
-EXPECTED_FAILED_CHECKS = {
-    "CorrelationRemover": {
-        "check_transformer_data_not_an_array": (
-            "this estimator only accepts pandas dataframes or numpy ndarray as input."
-        ),
-    },
-}
 
 
 @parametrize_with_checks(
@@ -25,7 +17,6 @@ EXPECTED_FAILED_CHECKS = {
         CorrelationRemover(sensitive_feature_ids=[]),
         CorrelationRemover(sensitive_feature_ids=[0]),
     ],
-    expected_failed_checks=lambda x: EXPECTED_FAILED_CHECKS.get(x.__class__.__name__, {}),
 )
 def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)

@@ -110,7 +110,7 @@ NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
 )
 
 
-class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
+class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     """A classifier based on the threshold optimization approach.
 
     The classifier is obtained by applying group-specific thresholds to the

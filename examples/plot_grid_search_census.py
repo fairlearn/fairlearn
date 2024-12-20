@@ -138,8 +138,8 @@ metric_frame.by_group.plot.bar(
 # --------------------------
 #
 # The :class:`fairlearn.reductions.GridSearch` class implements a simplified
-# version of the exponentiated gradient reduction of `Agarwal et al. 2018
-# <https://arxiv.org/abs/1803.02453>`_. The user supplies a standard ML
+# version of the exponentiated gradient reduction of Agarwal et al.
+# :footcite:`agarwal2018reductions`. The user supplies a standard ML
 # estimator, which is treated as a blackbox. `GridSearch` works by generating a
 # sequence of relabellings and reweightings, and trains a predictor for each.
 #
@@ -245,8 +245,8 @@ plt.ylabel("selection rate difference")
 #
 # In a real example, we would pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
-#
-# %% [markdown]
+
+# %%
 # Comparing models easily
 # -----------------------
 # Fairlearn also provides functionality to compare models much more easily.
@@ -264,3 +264,9 @@ plot_model_comparison(
     show_plot=True,
 )
 # End model comparison
+
+# %%
+# ===========================
+# References
+# ===========================
+# .. footbibliography::
