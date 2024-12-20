@@ -1,12 +1,14 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from typing import Literal
+
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
 from sklearn.utils import Bunch
 
-from ._constants import LABEL_KEY, P0_KEY, P1_KEY, SCORE_KEY
+from ._constants import LABEL_KEY, SCORE_KEY
 from ._threshold_operation import ThresholdOperation
 
 DEGENERATE_LABELS_ERROR_MESSAGE = "Degenerate labels for sensitive feature value {}"
@@ -61,12 +63,24 @@ def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives,
 
 
 def _tradeoff_curve(
-    data,
+    data: pd.DataFrame,
     sensitive_feature_value,
-    flip=False,
-    x_metric="false_positive_rate",
-    y_metric="true_positive_rate",
-):
+    flip: bool = False,
+    x_metric: Literal[
+        "selection_rate",
+        "true_positive_rate",
+        "false_positive_rate",
+        "true_negative_rate",
+        "false_negative_rate",
+    ] = "false_positive_rate",
+    y_metric: Literal[
+        "accuracy_score",
+        "balanced_accuracy_score",
+        "selection_rate",
+        "true_positive_rate",
+        "true_negative_rate",
+    ] = "true_positive_rate",
+) -> pd.DataFrame:
     """Get a convex hull of achievable trade-offs between the two provided metrics.
 
     The metrics are based on considering all possible thresholds of 'score' column of `data` and
@@ -85,6 +99,16 @@ def _tradeoff_curve(
         If True, also consider the flipped thresholding (points below the threshold
         classified as positive and above the threshold as negative).
 
+    x_metric : str, default="false_positive_rate"
+        The metric to use for the x-axis. Possible values are:
+        "selection_rate", "true_positive_rate", "false_positive_rate",
+        "true_negative_rate", "false_negative_rate".
+
+    y_metric : str, default="true_positive_rate"
+        The metric to use for the y-axis. Possible values are:
+        "accuracy_score", "balanced_accuracy_score", "selection_rate",
+        "true_positive_rate", "true_negative_rate".
+
     Returns
     -------
     result : pandas.DataFrame
@@ -95,17 +119,16 @@ def _tradeoff_curve(
         data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric
     )
     points_selected = _filter_points_to_get_convex_hull(points_sorted)
-    convex_hull = pd.DataFrame(points_selected)[["x", "y", "operation"]]
-    return convex_hull
+    return points_selected
 
 
-def _filter_points_to_get_convex_hull(points_sorted):
+def _filter_points_to_get_convex_hull(points_sorted: pd.DataFrame) -> pd.DataFrame:
     """Find the upper convex hull.
 
     Parameters
     ----------
     points_sorted : pandas.DataFrame
-        Points represented as rows with 'x' and 'y' columns, sorted by 'x'.
+        Points represented as rows with 'x' and 'y' columns, sorted lexicographically by 'x' and 'y'.
 
     Returns
     -------
@@ -141,17 +164,16 @@ def _filter_points_to_get_convex_hull(points_sorted):
             else:
                 break
         selected.append(r2)
-    return selected
+    return pd.DataFrame(selected)[["x", "y", "operation"]]
 
 
 def _interpolate_curve(
     data: pd.DataFrame, x_col: str, y_col: str, content_col: str, x_grid: NDArray
-):
+) -> pd.DataFrame:
     """Interpolates the DataFrame in `data` along the values in `x_grid`.
 
-    Assumes: (1) data[y_col] is convex and non-decreasing in data[x_col]
-             (2) min and max in x_grid are below/above min and max in data[x_col]
-             (3) data is indexed 0,...,len(data)
+    Assumes: (1) data[y_col] is concave in data[x_col]
+             (2) min and max in x_grid are above and below min and max in data[x_col], respectively
 
     Parameters
     ----------
@@ -171,50 +193,87 @@ def _interpolate_curve(
     result : :class:`pandas:pandas.DataFrame`
         DataFrame with the points of the interpolated curve.
     """
-    data_transpose = data.transpose()
+    x_values = data[x_col].values
+    y_values = data[y_col].values
+    content_values = data[content_col].values
 
     content_col_0 = content_col + "0"
     content_col_1 = content_col + "1"
 
-    i = 0
-    dict_list = []
-    x0 = data_transpose[0][x_col]
-    while data_transpose[i + 1][x_col] == x0:
-        i += 1
+    interpolation_indices = _get_interpolation_indices(x_grid, x_values)
 
-    # calculate the curve points for each x tick in x_grid
-    for x in x_grid:
-        # skip over data points that we've already passed
-        while x > data_transpose[i + 1][x_col]:
-            i += 1
+    x_distance_from_next_data_point = x_values[interpolation_indices + 1] - x_grid
+    x_distance_between_data_points = (
+        x_values[interpolation_indices + 1] - x_values[interpolation_indices]
+    )
+    p0 = x_distance_from_next_data_point / x_distance_between_data_points
+    p1 = 1 - p0
+    y = p0 * y_values[interpolation_indices] + p1 * y_values[interpolation_indices + 1]
 
-        # Calculate the y value at x based on the slope between data points i and i + 1
-        x_distance_from_next_data_point = data_transpose[i + 1][x_col] - x
-        x_distance_between_data_points = data_transpose[i + 1][x_col] - data_transpose[i][x_col]
-        p0 = x_distance_from_next_data_point / x_distance_between_data_points
-        p1 = 1 - p0
-        y = p0 * data_transpose[i][y_col] + p1 * data_transpose[i + 1][y_col]
-        dict_list.append(
-            {
-                x_col: x,
-                y_col: y,
-                P0_KEY: p0,
-                content_col_0: data_transpose[i][content_col],
-                P1_KEY: p1,
-                content_col_1: data_transpose[i + 1][content_col],
-            }
-        )
+    return pd.DataFrame(
+        {
+            x_col: x_grid,
+            y_col: y,
+            "p0": p0,
+            content_col_0: content_values[interpolation_indices],
+            "p1": p1,
+            content_col_1: content_values[interpolation_indices + 1],
+        }
+    )
 
-    return pd.DataFrame(dict_list)[[x_col, y_col, P0_KEY, content_col_0, P1_KEY, content_col_1]]
+
+def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
+    """
+    This function finds the indices of `x_values` that are just to the left of each value in `x_grid`.
+    The returned indices are such that:
+    `x_values[indices[i]] < x_grid[i] <= x_values[indices[i] + 1]`.
+    Parameters
+    ----------
+    x_grid : array-like
+        The grid of x values where interpolation is desired.
+    x_values : array-like
+        The sorted array of x values from which to interpolate.
+    Returns
+    -------
+    indices : ndarray
+        The array of indices in `x_values` that are just to the left of each value in `x_grid`.
+    """
+    # Use 'right' to get the index of the first element in x_values greater than x_grid
+    # Subtract 1 to get the index to the left
+    # This yields indices that verify x_values[indices[i]] <= x_grid[i] < x_values[indices[i] + 1]
+    # The edge case for the last element is handled by the second line.
+    indices = np.searchsorted(x_values, x_grid, side="right") - 1
+
+    # The convention is that in case a point in x_grid is equal to a point in x_values,
+    # the index is the one to the left of the point in x_values.
+    # i.e., x_values[indices[i]] < x_grid[i] <= x_values[indices[i] + 1]
+    # This is achieved by decrementing the index if the point in x_values is equal to the point in x_grid.
+    # This also keeps the last index in bounds.
+    # The first element is left unchanged to keep the indices in bounds.
+    indices[1:] = np.where(x_grid[1:] == x_values[indices[1:]], indices[1:] - 1, indices[1:])
+
+    return indices
 
 
 def _calculate_tradeoff_points(
-    data,
+    data: pd.DataFrame,
     sensitive_feature_value,
-    flip=False,
-    x_metric="false_positive_rate",
-    y_metric="true_positive_rate",
-):
+    flip: bool = False,
+    x_metric: Literal[
+        "selection_rate",
+        "true_positive_rate",
+        "false_positive_rate",
+        "true_negative_rate",
+        "false_negative_rate",
+    ] = "false_positive_rate",
+    y_metric: Literal[
+        "accuracy_score",
+        "balanced_accuracy_score",
+        "selection_rate",
+        "true_positive_rate",
+        "true_negative_rate",
+    ] = "true_positive_rate",
+) -> pd.DataFrame:
     """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible
@@ -229,6 +288,14 @@ def _calculate_tradeoff_points(
     flip : bool, default = True
         If True `flip` points below the ROC diagonal into points above by
         applying negative weights; if False does not allow flipping.
+    x_metric : str, default="false_positive_rate"
+        The metric to use for the x-axis. Possible values are:
+        "selection_rate", "true_positive_rate", "false_positive_rate",
+        "true_negative_rate", "false_negative_rate".
+    y_metric : str, default="true_positive_rate"
+        The metric to use for the y-axis. Possible values are:
+        "accuracy_score", "balanced_accuracy_score", "selection_rate",
+        "true_positive_rate", "true_negative_rate".
 
     Returns
     -------
@@ -262,11 +329,6 @@ def _calculate_tradeoff_points(
                 i += 1
             threshold = (threshold + scores[i]) / 2
 
-        # For the ROC curve we calculate points (x, y), where x represents
-        # the conditional probability P[Y_hat=1 | Y=0] and y represents
-        # the conditional probability P[Y_hat=1 | Y=1]. The conditional
-        # probability is achieved by dividing by only the number of
-        # negative/positive samples.
         actual_counts = _extend_confusion_matrix(
             false_positives=count[0],
             true_positives=count[1],
@@ -299,7 +361,7 @@ def _calculate_tradeoff_points(
     )
 
 
-def _get_scores_labels_and_counts(data):
+def _get_scores_labels_and_counts(data: pd.DataFrame):
     """Order samples by scores, counting number of positive, negative, and overall samples.
 
     The samples are sorted into descending order.
