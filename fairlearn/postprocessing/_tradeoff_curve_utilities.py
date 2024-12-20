@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from typing import Literal
+
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
@@ -64,8 +66,20 @@ def _tradeoff_curve(
     data: pd.DataFrame,
     sensitive_feature_value,
     flip: bool = False,
-    x_metric: str = "false_positive_rate",
-    y_metric: str = "true_positive_rate",
+    x_metric: Literal[
+        "selection_rate",
+        "true_positive_rate",
+        "false_positive_rate",
+        "true_negative_rate",
+        "false_negative_rate",
+    ] = "false_positive_rate",
+    y_metric: Literal[
+        "accuracy_score",
+        "balanced_accuracy_score",
+        "selection_rate",
+        "true_positive_rate",
+        "true_negative_rate",
+    ] = "true_positive_rate",
 ) -> pd.DataFrame:
     """Get a convex hull of achievable trade-offs between the two provided metrics.
 
@@ -84,6 +98,16 @@ def _tradeoff_curve(
     flip : bool, default=False
         If True, also consider the flipped thresholding (points below the threshold
         classified as positive and above the threshold as negative).
+
+    x_metric : str, default="false_positive_rate"
+        The metric to use for the x-axis. Possible values are:
+        "selection_rate", "true_positive_rate", "false_positive_rate",
+        "true_negative_rate", "false_negative_rate".
+
+    y_metric : str, default="true_positive_rate"
+        The metric to use for the y-axis. Possible values are:
+        "accuracy_score", "balanced_accuracy_score", "selection_rate",
+        "true_positive_rate", "true_negative_rate".
 
     Returns
     -------
@@ -233,8 +257,20 @@ def _calculate_tradeoff_points(
     data: pd.DataFrame,
     sensitive_feature_value,
     flip: bool = False,
-    x_metric: str = "false_positive_rate",
-    y_metric: str = "true_positive_rate",
+    x_metric: Literal[
+        "selection_rate",
+        "true_positive_rate",
+        "false_positive_rate",
+        "true_negative_rate",
+        "false_negative_rate",
+    ] = "false_positive_rate",
+    y_metric: Literal[
+        "accuracy_score",
+        "balanced_accuracy_score",
+        "selection_rate",
+        "true_positive_rate",
+        "true_negative_rate",
+    ] = "true_positive_rate",
 ) -> pd.DataFrame:
     """Calculate the ROC points from the scores and labels.
 
@@ -250,10 +286,14 @@ def _calculate_tradeoff_points(
     flip : bool, default = True
         If True `flip` points below the ROC diagonal into points above by
         applying negative weights; if False does not allow flipping.
-    x_metric : str, default = "false_positive_rate"
-        The metric to use for the x-axis.
-    y_metric : str, default = "true_positive_rate"
-        The metric to use for the y-axis.
+    x_metric : str, default="false_positive_rate"
+        The metric to use for the x-axis. Possible values are:
+        "selection_rate", "true_positive_rate", "false_positive_rate",
+        "true_negative_rate", "false_negative_rate".
+    y_metric : str, default="true_positive_rate"
+        The metric to use for the y-axis. Possible values are:
+        "accuracy_score", "balanced_accuracy_score", "selection_rate",
+        "true_positive_rate", "true_negative_rate".
 
     Returns
     -------

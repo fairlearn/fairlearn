@@ -14,6 +14,7 @@ References
 """
 
 import logging
+from typing import Literal
 from warnings import warn
 
 import numpy as np
@@ -231,12 +232,26 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self,
         *,
         estimator=None,
-        constraints="demographic_parity",
-        objective="accuracy_score",
-        grid_size=1000,
-        flip=False,
-        prefit=False,
-        predict_method="auto",
+        constraints: Literal[
+            "demographic_parity",
+            "equalized_odds",
+            "false_negative_rate_parity",
+            "false_positive_rate_parity",
+            "selection_rate_parity",
+            "true_negative_rate_parity",
+            "true_positive_rate_parity",
+        ] = "demographic_parity",
+        objective: Literal[
+            "accuracy_score",
+            "balanced_accuracy_score",
+            "selection_rate",
+            "true_positive_rate",
+            "true_negative_rate",
+        ] = "accuracy_score",
+        grid_size: int = 1000,
+        flip: bool = False,
+        prefit: bool = False,
+        predict_method: Literal["auto", "predict_proba", "decision_function", "predict"] = "auto",
     ):
         self.estimator = estimator
         self.constraints = constraints
