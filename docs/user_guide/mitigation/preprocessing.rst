@@ -139,3 +139,4 @@ we would expect with :math:`\alpha=0.5`.
 .. figure:: ../../auto_examples/images/sphx_glr_plot_correlationremover_before_after_003.png
     :align: center
     :target: ../../auto_examples/plot_correlationremover_before_after.html
+
