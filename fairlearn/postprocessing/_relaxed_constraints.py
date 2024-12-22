@@ -57,9 +57,9 @@ def maximize_objective_with_tolerance(
             deques[k].append(end)
 
         # Adjust the window to ensure the range of x values is within tol
-        while x_values[end] - x_values[start] > tol:
+        if x_values[end] - x_values[start] > tol:
             for k in range(m):
-                if deques[k] and deques[k][0] <= start:
+                if deques[k] and deques[k][0] == start:
                     deques[k].popleft()
             start += 1
 
