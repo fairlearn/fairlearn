@@ -16,6 +16,7 @@ References
 from __future__ import annotations
 
 import logging
+from typing import Literal
 from warnings import warn
 
 import numpy as np
@@ -241,6 +242,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         prefit=False,
         predict_method="auto",
         tol: float | None = None,
+        tol_method: Literal["to_overall", "between_groups"] = "between_groups",
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -250,6 +252,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.prefit = prefit
         self.predict_method = predict_method
         self.tol = tol
+        self.tol_method = tol_method
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -482,6 +485,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 dataframes=[tradeoff_curve for tradeoff_curve in self._tradeoff_curve.values()],
                 weights=sensitive_feature_proportions.values(),
                 tol=self.tol,
+                method=self.tol_method,
             )
 
             self._x_best_per_group = {
