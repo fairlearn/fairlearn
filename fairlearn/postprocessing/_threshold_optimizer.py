@@ -201,6 +201,13 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             From version 0.7, 'predict' is deprecated as the default value and
             the default changes to 'auto' from v0.10.
 
+    tol : float | None, default=None
+        The tolerance for the constraint metric. If None, the constraint is not relaxed.
+
+    tol_method : {'to_overall', 'between_groups'} | None, default=None
+        Whether the tolerance is computed with respect to the overall constraint values or
+        between the groups. Must be set to None if tol is None or 0.
+
     Notes
     -----
     The procedure is based on the algorithm of
@@ -242,7 +249,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         prefit=False,
         predict_method="auto",
         tol: float | None = None,
-        tol_method: Literal["to_overall", "between_groups"] = "between_groups",
+        tol_method: Literal["to_overall", "between_groups"] | None = None,
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -288,6 +295,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 raise ValueError("Relaxed constraints are not supported for equalized odds.")
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+
+        if (self.tol is None or self.tol == 0) != (self.tol_method is None):
+            raise ValueError("Both tol and tol_method must be provided together.")
 
         self._predict_method = self.predict_method
 
@@ -466,6 +476,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             # sensitive feature value is identical by design.
             i_best = overall_tradeoff_curve.idxmax()
             self._x_best = self._x_grid[i_best]
+            self._x_best_per_group = {
+                group: self._x_best for group in sensitive_feature_proportions.keys()
+            }
             self._y_best = overall_tradeoff_curve[i_best]
             optimal_indices = [i_best] * len(sensitive_feature_proportions)
 
@@ -492,6 +505,21 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 group: self._x_grid[idx]
                 for group, idx in zip(self._tradeoff_curve.keys(), optimal_indices)
             }
+
+        max_x = max(self._x_best_per_group.values())
+        min_x = min(self._x_best_per_group.values())
+        self._between_groups = max_x - min_x
+
+        overall = np.sum(
+            [
+                group_proptortion * group_x
+                for group_proptortion, group_x in zip(
+                    sensitive_feature_proportions.values(), self._x_best_per_group.values()
+                )
+            ]
+        )
+
+        self._to_overall = max(overall - min_x, max_x - overall)
 
         # Create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature value.
