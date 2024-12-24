@@ -69,7 +69,12 @@ class ErrorRate(ClassificationMoment):
         )
         # The following uses X  so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
-        self.index = [_ALL]
+        self._index = [_ALL]
+
+    @property
+    def index(self) -> pd.Index:
+        """Return the index listing the constraints."""
+        return self._index
 
     def gamma(self, predictor) -> pd.Series:
         """Return the gamma values for the given predictor."""

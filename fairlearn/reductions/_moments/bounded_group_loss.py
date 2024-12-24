@@ -33,6 +33,11 @@ class ConditionalLossMoment(LossMoment):
         self.upper_bound = upper_bound
         self.no_groups = no_groups
 
+    @property
+    def index(self) -> pd.Index:
+        """Return the index listing the constraints."""
+        return self._index
+
     def default_objective(self):
         """Return a default objective."""
         return MeanLoss(self.reduction_loss)
@@ -48,7 +53,7 @@ class ConditionalLossMoment(LossMoment):
         # The following uses X and not X_train so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
-        self.index = self.prob_attr.index
+        self._index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr
 
         # fill in the information about the basis

@@ -60,6 +60,11 @@ class Moment:
         """Return the y array as a :class:`~pandas.Series`."""
         return self._y
 
+    @property
+    def index(self) -> pd.MultiIndex | pd.Index:
+        """Return a pandas (multi-)index listing the constraints."""
+        raise NotImplementedError()
+
     def gamma(self, predictor) -> pd.Series:  # noqa: D102
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()

@@ -106,6 +106,11 @@ class UtilityParity(ClassificationMoment):
             # both difference_bound and ratio_bound specified
             raise ValueError(_MESSAGE_INVALID_BOUNDS)
 
+    @property
+    def index(self) -> pd.MultiIndex:
+        """Return the multi-index listing the constraints."""
+        return self._index
+
     def default_objective(self):
         """Return the default objective for moments of this kind."""
         return ErrorRate()
@@ -116,7 +121,7 @@ class UtilityParity(ClassificationMoment):
         y: pd.Series,
         *,
         sensitive_features: pd.Series,
-        event: pd.Series = None,
+        event: pd.Series | None = None,
         utilities=None,
     ):
         """Load the specified data into this object.
@@ -151,7 +156,7 @@ class UtilityParity(ClassificationMoment):
             keys=["+", "-"],
             names=[_SIGN, _EVENT, _GROUP_ID],
         )
-        self.index = signed.index
+        self._index = signed.index
         self.default_objective_lambda_vec = None
 
         # Fill information about the matrix U, which is used to calculate signed weights
@@ -191,7 +196,6 @@ class UtilityParity(ClassificationMoment):
         # Considering fewer constraints is not required for correctness, but it can dramatically
         # speed up GridSearch.
         self.neg_basis_present = pd.Series(dtype="float64")
-        # zero_vec = pd.Series(0.0, self.index)
         col_count = len(event_vals) * (len(group_vals) - 1)
         self.pos_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
         self.neg_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
