@@ -1,5 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
+
+from typing import Callable, Literal
 
 import numpy as np
 import pandas as pd
@@ -40,7 +43,7 @@ class ErrorRate(ClassificationMoment):
         costs of 1.0 are assumed.
     """
 
-    def __init__(self, *, costs=None):
+    def __init__(self, *, costs: dict[Literal["fp", "fn"], float] | None = None):
         """Initialize the costs."""
         super(ErrorRate, self).__init__()
         if costs is None:
@@ -58,7 +61,7 @@ class ErrorRate(ClassificationMoment):
         else:
             raise ValueError(_MESSAGE_BAD_COSTS)
 
-    def load_data(self, X, y, *, sensitive_features, control_features=None):
+    def load_data(self, X, y, *, sensitive_features, control_features=None) -> None:
         """Load the specified data into the object."""
         _, y_train, sf_train, _ = _validate_and_reformat_input(
             X,
@@ -76,7 +79,7 @@ class ErrorRate(ClassificationMoment):
         """Return the index listing the constraints."""
         return self._index
 
-    def gamma(self, predictor) -> pd.Series:
+    def gamma(self, predictor: Callable) -> pd.Series:
         """Return the gamma values for the given predictor."""
         pred = predictor(self.X)
         if isinstance(pred, np.ndarray):
@@ -92,11 +95,11 @@ class ErrorRate(ClassificationMoment):
         self._gamma_descr = str(error)
         return error
 
-    def project_lambda(self, lambda_vec):
+    def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
         """Return the lambda values."""
         return lambda_vec
 
-    def signed_weights(self, lambda_vec=None):
+    def signed_weights(self, lambda_vec: pd.Series | None = None) -> pd.Series:
         """Return the signed weights."""
         weights = -self.fp_cost + (self.fp_cost + self.fn_cost) * self.tags[_LABEL]
         if lambda_vec is None:

@@ -1,5 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
+
+from collections.abc import Callable
 
 import pandas as pd
 
@@ -27,7 +30,7 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series = None) -> None:
+    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series | None = None) -> None:
         """Load a set of data for use by this object.
 
         Parameters
@@ -65,7 +68,7 @@ class Moment:
         """Return a pandas (multi-)index listing the constraints."""
         raise NotImplementedError()
 
-    def gamma(self, predictor) -> pd.Series:  # noqa: D102
+    def gamma(self, predictor: Callable) -> pd.Series:  # noqa: D102
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
@@ -73,19 +76,19 @@ class Moment:
         """Return vector of fairness bound constraint the length of gamma."""
         raise NotImplementedError()
 
-    def project_lambda(self, lambda_vec):  # noqa: D102
+    def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:  # noqa: D102
         """Return the projected lambda values."""
         raise NotImplementedError()
 
-    def signed_weights(self, lambda_vec):  # noqa: D102
+    def signed_weights(self, lambda_vec: pd.Series) -> pd.Series:  # noqa: D102
         """Return the signed weights."""
         raise NotImplementedError()
 
-    def _moment_type(self):
+    def _moment_type(self) -> type[Moment]:
         """Return the moment type, e.g., ClassificationMoment vs LossMoment."""
         return NotImplementedError()
 
-    def default_objective(self):
+    def default_objective(self) -> Moment:
         """Return the default objective for the moment."""
         raise NotImplementedError()
 
