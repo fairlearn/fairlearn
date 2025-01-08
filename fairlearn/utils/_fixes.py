@@ -131,6 +131,7 @@ def parametrize_with_checks(
     from sklearn.utils.estimator_checks import parametrize_with_checks
 
     if sklearn_version < "1.6":
+        expected_failed_checks = expected_failed_checks or (lambda x: {})
         estimators = [
             patched_more_tags(estimator, expected_failed_checks(estimator))
             for estimator in estimators

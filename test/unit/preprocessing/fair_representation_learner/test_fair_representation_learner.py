@@ -12,7 +12,6 @@ from fairlearn.utils._fixes import parametrize_with_checks
     [
         FairRepresentationLearner(max_iter=50),
     ],
-    expected_failed_checks=lambda x: {},
 )
 def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
