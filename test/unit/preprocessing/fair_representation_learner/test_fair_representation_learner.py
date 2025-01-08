@@ -3,9 +3,9 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fairlearn.preprocessing import FairRepresentationLearner
+from fairlearn.utils._fixes import parametrize_with_checks
 
 
 @parametrize_with_checks(
