@@ -525,7 +525,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
         X = validate_data(self, X, reset=False)
 
-        binary_predictions = self.predict_proba(X)[:, 1] > 0.5
+        binary_predictions = (self.predict_proba(X)[:, 1] > 0.5).astype(int)
 
         return self._label_encoder.inverse_transform(binary_predictions)
 
@@ -601,7 +601,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         """
         X, y = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
 
-        y_type = type_of_target(y, input_name="y", raise_unknown=True)
+        y_type = type_of_target(y, input_name="y")
         if y_type != "binary":
             raise ValueError(
                 f"Unknown label type: {y_type}. Only binary classification is supported."
@@ -616,3 +616,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         tags = super().__sklearn_tags__()
         tags.classifier_tags.multi_class = False
         return tags
+
+    def _more_tags(self):
+        return {"binary_only": True}
