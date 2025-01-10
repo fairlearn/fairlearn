@@ -30,7 +30,7 @@ def validate_data(estimator, X, **kwargs):
         from sklearn.utils.validation import validate_data
 
         return validate_data(estimator, X, **kwargs)
-    except (ImportError, TypeError):
+    except ImportError:
         # sklearn version < 1.6
         ensure_all_finite = kwargs.pop("ensure_all_finite", True)
 
@@ -131,7 +131,6 @@ def parametrize_with_checks(
     from sklearn.utils.estimator_checks import parametrize_with_checks
 
     if sklearn_version < "1.6":
-        expected_failed_checks = expected_failed_checks or (lambda x: {})
         estimators = [
             patched_more_tags(estimator, expected_failed_checks(estimator))
             for estimator in estimators

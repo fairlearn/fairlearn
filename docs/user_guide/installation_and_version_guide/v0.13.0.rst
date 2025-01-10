@@ -5,3 +5,8 @@ v0.13.0
 
    v0.13.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.13.0.
+
+Other improvements
+------------------
+* Implemented the :code:`FairRepresentationLearner` introduced in introduced in Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`:
+  :pr:`1478` by :user:`Tahar Allouche <taharallouche>`.
