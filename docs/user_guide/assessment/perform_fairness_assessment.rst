@@ -375,3 +375,7 @@ produces the same outcome.
 :ref:`common_fairness_metrics` provides an overview of common metrics used
 in fairness analyses. For a deep dive into how to extend the capabilities of
 fairness metrics provided by Fairlearn, review :ref:`custom_fairness_metrics`.
+
+References
+----------
+.. footbibliography::
