@@ -4,13 +4,26 @@
 Fairness in Machine Learning
 ============================
 
+Stakeholder Identification
+--------------------------
+Introduction
+^^^^^^^^^^^^
+
+AI systems can perform differently for different groups of people, especially disadvantaged ones, based on various demographic, sociocultural, behavioral, and morphological factors.  In order to address these disparities, practitioners often assess system performance based on the intersection of more than one factor to avoid obscuring performance for people belonging to intersectional groups :footcite:`barocas2021disagg`. For example, the Gender Shades project focused on intersectional groups based on two factors: gender (demographic) and skin tone (morphological) when evaluating three commercially available gender classifiers :footcite:`buolamwini2018gender`. If practitioners do not have a process to engage stakeholders, they may rely on their personal experiences and identities instead and overlook fairness-related harms :footcite:`madaio2022assess`.  Therefore, it is important to identify the relevant stakeholders, factors, and groups that might be at the most risk of experiencing fairness-related harms before conducting a fairness assessment.
+
+.. _defining_terms:
+Defining terms
+^^^^^^^^^^^^^^
+**Stakeholders** includes direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`reed2024stakeholder`.
+  Some have identified that usage of the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to be aware of the negative understandings, meanings, and beliefs associated with the term and opt for alternative terminology to avoid causing harm.
+**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
+
 Fairness of AI systems
 ----------------------
 
 AI systems can behave unfairly for a variety of reasons. Sometimes it is
 because of societal biases reflected in the training data and in the decisions
 made during the development and deployment of these systems. In other cases,
-AI systems behave unfairly not because of societal biases, but because of
 characteristics of the data (e.g., too few data points about some group of
 people) or characteristics of the systems themselves. It can be hard to
 distinguish between these reasons, especially since they are not mutually
@@ -22,7 +35,6 @@ terms of intent, such as prejudice.
 **Usage of the word bias.** Since we define fairness in terms of harms
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
-
 
 .. _types_of_harms:
 
