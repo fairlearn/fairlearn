@@ -15,7 +15,9 @@ AI systems can perform differently for different groups of people, especially di
 Defining terms
 ^^^^^^^^^^^^^^
 **Stakeholders** includes direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`reed2024stakeholder`.
-  Some have identified that usage of the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to be aware of the negative understandings, meanings, and beliefs associated with the term and opt for alternative terminology to avoid causing harm.
+
+Note: Some have identified that usage of the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to be aware of the negative understandings, meanings, and beliefs associated with the term and opt for alternative terminology to avoid causing harm.
+
 **Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
 Fairness of AI systems
