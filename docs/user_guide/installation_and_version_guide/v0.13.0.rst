@@ -5,3 +5,8 @@ v0.13.0
 
    v0.13.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.13.0.
+
+
+Other improvements
+------------------
+* Vectorized the curve interpolation step in :code:`ThresholdOptimizer` to improve performance and readability: :pr:`1448` by :user:`Tahar Allouche <taharallouche>`.
