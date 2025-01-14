@@ -68,7 +68,7 @@ def _validate_and_reformat_input(
 
     Returns
     -------
-    Tuple(numpy.ndarray, pandas.Series, pandas.Series, pandas.Series)
+    Tuple(numpy.ndarray | pd.DataFrame, pandas.Series, pandas.Series, pandas.Series)
         The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead
@@ -91,7 +91,9 @@ def _validate_and_reformat_input(
     elif expect_y:
         raise ValueError(_MESSAGE_Y_NONE)
 
-    X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
+    result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
+    if isinstance(X, pd.DataFrame):
+        result_X = pd.DataFrame(result_X)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
@@ -125,7 +127,7 @@ def _validate_and_reformat_input(
     else:
         result_y = pd.Series(dtype="float64")
 
-    return (X, result_y, sensitive_features, control_features)
+    return (result_X, result_y, sensitive_features, control_features)
 
 
 def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:

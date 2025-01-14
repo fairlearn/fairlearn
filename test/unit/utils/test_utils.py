@@ -21,6 +21,7 @@ class TestValidateAndReformatInput:
         assert isinstance(sf_update, pd.Series)
         assert cf_update is None
 
+        assert isinstance(X_update, pd.DataFrame)
         assert np.array_equal(X, X_update)
         assert np.array_equal(y, y_update)
         assert np.array_equal(sf, sf_update)
@@ -32,6 +33,7 @@ class TestValidateAndReformatInput:
         X_update, _, _, _ = iv._validate_and_reformat_input(
             X=X, expect_y=False, expect_sensitive_features=False
         )
+        assert isinstance(X_update, pd.DataFrame)
 
     def test_cf(self):
         # Regression test for Issue #898
@@ -46,6 +48,7 @@ class TestValidateAndReformatInput:
         assert isinstance(y_update, pd.Series)
         assert isinstance(cf_update, pd.Series)
 
+        assert isinstance(X_update, pd.DataFrame)
         assert np.array_equal(X, X_update)
         assert np.array_equal(y, y_update)
         assert np.array_equal(sf, sf_update)
