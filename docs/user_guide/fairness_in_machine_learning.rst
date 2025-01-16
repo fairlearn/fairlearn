@@ -4,22 +4,6 @@
 Fairness in Machine Learning
 ============================
 
-Stakeholder Identification
---------------------------
-Introduction
-^^^^^^^^^^^^
-
-AI systems can perform differently for different groups of people, especially disadvantaged ones, based on various demographic, sociocultural, behavioral, and morphological factors.  In order to address these disparities, practitioners often assess system performance based on the intersection of more than one factor to avoid obscuring performance for people belonging to intersectional groups :footcite:`barocas2021disagg`. For example, the Gender Shades project focused on intersectional groups based on two factors: gender (demographic) and skin tone (morphological) when evaluating three commercially available gender classifiers :footcite:`buolamwini2018gender`. If practitioners do not have a process to engage stakeholders, they may rely on their personal experiences and identities instead and overlook fairness-related harms :footcite:`madaio2022assess`.  Therefore, it is important to identify the relevant stakeholders, factors, and groups that might be at the most risk of experiencing fairness-related harms before conducting a fairness assessment.
-
-.. _defining_terms:
-Defining terms
-^^^^^^^^^^^^^^
-**Stakeholders** includes direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`reed2024stakeholder`.
-
-Note: Some have identified that usage of the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to be aware of the negative understandings, meanings, and beliefs associated with the term and opt for alternative terminology to avoid causing harm.
-
-**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
-
 Fairness of AI systems
 ----------------------
 
@@ -479,6 +463,23 @@ which judging and recommending an outcome take place. This frame might
 incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
+
+Stakeholder Identification
+--------------------------
+Introduction
+^^^^^^^^^^^^
+
+Now that we've seen how AI systems can generate harms, what else should we account for when designing an AI system?
+AI systems impact not only end users but also organizations within a business, communities, civil society, government agencies, and entire industries. If practitioners do not have a process to engage stakeholders, they may rely on their personal experiences and identities instead and overlook fairness-related harms :footcite:`madaio2022assess`.  Therefore, it is important to identify the relevant stakeholders, factors, and groups that might be at the most risk of experiencing fairness-related harms before conducting a fairness assessment.
+
+.. _defining_terms:
+Defining terms
+^^^^^^^^^^^^^^
+**Stakeholders** include direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`madaio2022assess`. For example, in the case of a fraud detection AI system, there could be three types of stakeholders identified: a) people whose transactions might be mistakenly classified as fraudulent b) companies running money-transfer platforms with the fraud detection AI system, and c) local government fraud auditors that audit the money transfer platforms' transactions.
+
+Note: Some have identified that using the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to pay attention to the context in which stakeholder identification occurs and adjust accordingly (e.g. opt for alternative terminology to avoid causing harm).
+
+**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
 References
 ----------
