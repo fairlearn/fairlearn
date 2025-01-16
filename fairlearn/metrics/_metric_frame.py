@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from functools import partial
 from typing import Any, Callable, Literal
 
 import numpy as np
@@ -947,36 +946,18 @@ class MetricFrame:
         if not isinstance(sample_parameters, dict):
             raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
-        # Stores the kwargs related to the sample data, e.g, the sample_weights
-        sample_kwargs = {}
-        # Stores other arbitrary kwargs that the metric function may require, e.g., pos_label
-        other_kwargs = {}
+        kw_argument_mapping = {}
 
         for param_name, param_value in sample_parameters.items():
-            if (
-                param_value is None
-                or np.isscalar(param_value)
-                or len(param_value) != len(all_data)
-            ):
-                # The parameter can not be a sample parameter
-                other_kwargs[param_name] = param_value
-                continue
-
             col_name = f"{name}_{param_name}"
             all_data[col_name] = np.asarray(param_value)
-            sample_kwargs[param_name] = col_name
-
-        if len(other_kwargs) > 0:
-            if hasattr(func, __name__):
-                name = func.__name__
-            func = partial(func, **other_kwargs)
-            func.__name__ = name
+            kw_argument_mapping[param_name] = col_name
 
         return AnnotatedMetricFunction(
             func=func,
             name=name,
             positional_argument_names=["y_true", "y_pred"],
-            kw_argument_mapping=sample_kwargs,
+            kw_argument_mapping=kw_argument_mapping,
         )
 
     def _process_features(self, base_name, features, sample_array) -> list[GroupFeature]:

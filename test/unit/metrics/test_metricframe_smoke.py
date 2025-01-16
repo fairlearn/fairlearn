@@ -421,23 +421,3 @@ def test_single_element_lists():
         sensitive_features=[0],
     )
     assert mf.overall == 1
-
-
-@pytest.mark.parametrize(["pos_label", "expected_overall"], [("label-1", 1.0), ("label-2", 0.5)])
-def test_MetricFrame_forwards_non_sample_kwargs_to_metrics(
-    pos_label: str, expected_overall: float
-) -> None:
-    y_true = ["label-1", "label-1", "label-2", "label-2"]
-    y_pred = ["label-1", "label-2", "label-1", "label-1"]
-    sf = ["a", "a", "b", "b"]
-    sample_weight = [0.1] * len(y_true)
-
-    mf = metrics.MetricFrame(
-        metrics=metrics.false_positive_rate,
-        y_true=y_true,
-        y_pred=y_pred,
-        sensitive_features=sf,
-        sample_params={"sample_weight": sample_weight, "pos_label": pos_label},
-    )
-
-    assert mf.overall == expected_overall
