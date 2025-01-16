@@ -38,3 +38,4 @@ All names are sorted alphabetically by last name. Contributors, please add your 
 - [Vlad Iliescu](https://vladiliescu.net)
 - [Hrittik RoyChoudhury](https://github.com/Hrittik20)
 - [Tamara Atanasoska](https://github.com/tamaraatanasoska)
+- [Tahar Allouche](https://github.com/taharallouche)
