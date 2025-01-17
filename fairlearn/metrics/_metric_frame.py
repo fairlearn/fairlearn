@@ -904,14 +904,15 @@ class MetricFrame:
         if sample_params is not None and not isinstance(sample_params, dict):
             raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
-        self._user_supplied_callable = True
         annotated_functions = {}
         sample_params = sample_params or {}
 
         if not isinstance(metric, dict):
             # This is the case where the user has supplied a single metric function
+            self._user_supplied_callable = True
+
             annotated_metric_function = self._construct_annotated_metric_function(
-                func=metric, name=None, sample_parameters=sample_params, all_data=all_data
+                func=metric, name=None, sample_params=sample_params, all_data=all_data
             )
             annotated_functions[annotated_metric_function.name] = annotated_metric_function
             return annotated_functions
@@ -919,8 +920,7 @@ class MetricFrame:
         # The supplied 'metric' is a dictionary of functions
         self._user_supplied_callable = False
 
-        # The keys of the sample_params dictionary must be a
-        # subset of our supplied metric functions
+        # The keys of sample_params must be a subset of the supplied metric dictionnary
         sample_params_keys = set(sample_params.keys())
         metric_functions_keys = set(metric.keys())
         if not sample_params_keys.issubset(metric_functions_keys):
@@ -930,7 +930,10 @@ class MetricFrame:
             associated_sample_params = sample_params.get(name, {})
 
             annotated_metric_function = self._construct_annotated_metric_function(
-                metric_function, name, associated_sample_params, all_data
+                func=metric_function,
+                name=name,
+                sample_params=associated_sample_params,
+                all_data=all_data,
             )
             annotated_functions[annotated_metric_function.name] = annotated_metric_function
 
@@ -940,15 +943,18 @@ class MetricFrame:
         self,
         func: Callable,
         name: str | None,
-        sample_parameters: dict[str, Any],
+        sample_params: dict[str, Any],
         all_data: pd.DataFrame,
     ) -> AnnotatedMetricFunction:
-        if not isinstance(sample_parameters, dict):
+        if not isinstance(sample_params, dict):
             raise ValueError(_SAMPLE_PARAMS_NOT_DICT)
 
         kw_argument_mapping = {}
 
-        for param_name, param_value in sample_parameters.items():
+        for param_name, param_value in sample_params.items():
+            if param_value is None:
+                continue
+
             col_name = f"{name}_{param_name}"
             all_data[col_name] = np.asarray(param_value)
             kw_argument_mapping[param_name] = col_name
