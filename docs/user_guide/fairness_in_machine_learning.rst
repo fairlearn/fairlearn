@@ -9,8 +9,7 @@ Fairness of AI systems
 
 AI systems can behave unfairly for a variety of reasons. Sometimes it is
 because of societal biases reflected in the training data and in the decisions
-made during the development and deployment of these systems. In other cases,
-characteristics of the data (e.g., too few data points about some group of
+made during the development and deployment of these systems. In other cases, AI systems behave unfairly due to characteristics of the data (e.g., too few data points about some group of
 people) or characteristics of the systems themselves. It can be hard to
 distinguish between these reasons, especially since they are not mutually
 exclusive and often exacerbate one another. Therefore, we define whether an AI
@@ -475,7 +474,7 @@ AI systems impact not only end users but also organizations within a business, c
 .. _defining_terms:
 Defining terms
 ^^^^^^^^^^^^^^
-**Stakeholders** include direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`madaio2022assess`. For example, in the case of a fraud detection AI system, there could be three types of stakeholders identified: a) people whose transactions might be mistakenly classified as fraudulent b) companies running money-transfer platforms with the fraud detection AI system, and c) local government fraud auditors that audit the money transfer platforms' transactions.
+**Stakeholders** include direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`madaio2022assess`. For example, in the case of a fraud detection AI system, there could be three types of stakeholders identified: a) people whose transactions might be mistakenly classified as fraudulent, b) companies running money-transfer platforms with the fraud detection AI system, and c) local government fraud auditors that audit the money transfer platforms' transactions.
 
 Note: Some have identified that using the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to pay attention to the context in which stakeholder identification occurs and adjust accordingly (e.g. opt for alternative terminology to avoid causing harm).
 
