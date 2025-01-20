@@ -33,6 +33,8 @@ changing all the docstrings in one PR.
 
 Installation instructions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You will need a GitHub account to contribute to this project. Authenticating with Github using an ssh connection is highly recommended. You can learn more about it `here <https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account>`_.
+
 First, clone the repository locally via:
 
 .. code-block:: bash
@@ -60,12 +62,6 @@ First, clone the repository locally via:
             .. code-block:: bash
 
                (venv) $ which python #confirm virtual environment is active
-               (venv) $ pip install -e . #install package dependencies
-               (venv) $ pip list #confirm packages were installed
-               accessible-pygments           0.0.5
-               alabaster                     0.7.16
-               anyio                         4.7.0
-               ...
                (venv) $ conda deactivate #use to deactivate if needed
 
 
