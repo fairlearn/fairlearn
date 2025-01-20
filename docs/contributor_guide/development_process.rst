@@ -64,10 +64,7 @@ First, clone the repository locally via:
                (venv) $ which python #confirm virtual environment is active
                (venv) $ conda deactivate #use to deactivate if needed
 
-
-(Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
-
-If you are using a virtual environment(highly recommended), make sure it is activated before you execute the next steps. 
+If you are using a virtual environment(highly recommended), make sure it is activated before you execute the next steps.
 
 To install in editable mode, from the repository root path run:
 
