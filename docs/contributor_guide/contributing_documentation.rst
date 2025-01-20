@@ -33,20 +33,11 @@ Contributing
 ^^^^^^^^^^^^
 
 The instructions below are an addition to the instructions on the
-:ref:`development_process` page. If it is your first time
-contributing, please start there.
+:ref:`development_process` page. Please follow the installation
+instructions on that page, and return to follow the further
+documentation specific guidelines.
 
-Make sure to install sphinx and its add-ons in the repository repository
-root directory by running:
-
-.. code-block:: bash
-
-    $ python scripts/install_requirements.py --pinned False
-
-You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
-
-Plotting is an optional addition to Fairlearn, so you may also also need to
-install :code:`matplotlib`.
+You may also need to `install Pandoc <https://pandoc.org/installing.html>`_. and :code:`matplotlib`.
 
 .. code-block:: bash
 
