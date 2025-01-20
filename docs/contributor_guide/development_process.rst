@@ -56,6 +56,11 @@ To verify that the code works as expected run:
    $ python ./scripts/install_requirements.py --pinned False
    $ python -m pytest -s ./test/unit
 
+.. note::
+
+   If there is a :code:`torch` related error during the installation,
+   please downgrade keep your :code:`python` version between 3.8-3.12.
+
 Fairlearn currently includes plotting functionality provided by
 :code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
 
@@ -108,6 +113,12 @@ Follow the steps below to create a pull request.
       * Identify an issue that you would like to work on.
       * Leave a comment on the issue indicating interest and outlining possible questions.
       * Once we know you are working on it, we will support you on your contribution journey!
+
+.. note::
+
+   We would like to make sure that the issues are fairly distributed, so if you have claimed an issue and
+   haven't responded in any way in a week the issue will be free to be taken by someone else. An important distinction
+   is that we are looking for signs of continuous interest, rather than a quick PR.
 
 #. The communication channels are outlined here: :ref:`communication`.
 
