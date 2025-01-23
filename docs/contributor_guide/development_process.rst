@@ -53,7 +53,7 @@ First, clone the repository locally via:
 
             .. code-block:: bash
 
-               $ conda create --name venv python=3.12  # creates virtual environment
+               $ conda create --name fairlearn python=3.12  # creates virtual environment
                $ conda activate myenv # activates virtual environment
                (venv) $ # notice the shell prompt includes name of active virtual environment
 
