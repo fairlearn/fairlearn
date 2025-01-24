@@ -9,9 +9,7 @@ Fairness of AI systems
 
 AI systems can behave unfairly for a variety of reasons. Sometimes it is
 because of societal biases reflected in the training data and in the decisions
-made during the development and deployment of these systems. In other cases,
-AI systems behave unfairly not because of societal biases, but because of
-characteristics of the data (e.g., too few data points about some group of
+made during the development and deployment of these systems. In other cases, AI systems behave unfairly due to characteristics of the data (e.g., too few data points about some group of
 people) or characteristics of the systems themselves. It can be hard to
 distinguish between these reasons, especially since they are not mutually
 exclusive and often exacerbate one another. Therefore, we define whether an AI
@@ -22,7 +20,6 @@ terms of intent, such as prejudice.
 **Usage of the word bias.** Since we define fairness in terms of harms
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
-
 
 .. _types_of_harms:
 
@@ -465,6 +462,23 @@ which judging and recommending an outcome take place. This frame might
 incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
+
+Stakeholder Identification
+--------------------------
+Introduction
+^^^^^^^^^^^^
+
+Now that we've seen how AI systems can generate harms, what else should we account for when designing an AI system?
+AI systems impact not only end users but also organizations within a business, communities, civil society, government agencies, and entire industries. If practitioners do not have a process to engage stakeholders, they may rely on their personal experiences and identities instead and overlook fairness-related harms :footcite:`madaio2022assess`.  Therefore, it is important to identify the relevant stakeholders, factors, and groups that might be at the most risk of experiencing fairness-related harms before conducting a fairness assessment.
+
+.. _defining_terms:
+Defining terms
+^^^^^^^^^^^^^^
+**Stakeholders** include direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`madaio2022assess`. For example, in the case of a fraud detection AI system, there could be three types of stakeholders identified: a) people whose transactions might be mistakenly classified as fraudulent, b) companies running money-transfer platforms with the fraud detection AI system, and c) local government fraud auditors that audit the money transfer platforms' transactions.
+
+Note: Some have identified that using the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to pay attention to the context in which stakeholder identification occurs and adjust accordingly (e.g. opt for alternative terminology to avoid causing harm).
+
+**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
 References
 ----------
