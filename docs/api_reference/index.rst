@@ -92,6 +92,7 @@ API Docs
    :template: class.rst
 
    CorrelationRemover
+   FairRepresentationLearner
 
 :py:mod:`fairlearn.reductions`
 ==============================
