@@ -576,3 +576,23 @@ def test_ci_properties_raise_on_uninitialized_bootstrap_params(
 
     with expectation:
         getattr(mf, method)
+
+
+def test_bootstrapping_can_handle_missing_sensitive_feature_values_in_samples() -> None:
+    sensitive_features = ["a"] * 99 + ["b"]
+    y_true = np.ones(100)
+    y_pred = np.ones(100)
+
+    # using this random state yields a sample with a missing value, "b", for the sensitive feature
+    random_state = np.random.RandomState(1234)
+
+    with does_not_raise():
+        MetricFrame(
+            metrics=count,
+            y_true=y_true,
+            y_pred=y_pred,
+            sensitive_features=sensitive_features,
+            ci_quantiles=[0.1, 0.5, 0.9],
+            n_boot=3,
+            random_state=random_state,
+        )

@@ -18,7 +18,7 @@ from ._constants import (
 )
 
 
-class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
+class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
     r"""Binary predictor that thresholds continuous predictions of a base estimator.
 
     At prediction time, the predictor takes as input both standard and sensitive features.

@@ -23,9 +23,11 @@ filterwarnings = [
     "default:You are about to use a dataset with known fairness issues:Warning",
     "default:Auto-removal of overlapping axes is deprecated:Warning",
     "default:DataFrame is highly fragmented:Warning",
+    "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:DeprecationWarning",
 
     # Warnings in other-ml (tensorflow)
     "default:The initializer GlorotNormal is unseeded:UserWarning",
+    "default:Do not pass an `input_shape`/`input_dim` argument to a layer:UserWarning",
 
     # Warnings in test_othermlpackages
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",

@@ -16,6 +16,7 @@ References
 from __future__ import annotations
 
 import logging
+from typing import Literal
 from warnings import warn
 
 import numpy as np
@@ -112,7 +113,7 @@ NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
 )
 
 
-class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
+class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     """A classifier based on the threshold optimization approach.
 
     The classifier is obtained by applying group-specific thresholds to the
@@ -240,12 +241,26 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self,
         *,
         estimator=None,
-        constraints="demographic_parity",
-        objective="accuracy_score",
-        grid_size=1000,
-        flip=False,
-        prefit=False,
-        predict_method="auto",
+        constraints: Literal[
+            "demographic_parity",
+            "equalized_odds",
+            "false_negative_rate_parity",
+            "false_positive_rate_parity",
+            "selection_rate_parity",
+            "true_negative_rate_parity",
+            "true_positive_rate_parity",
+        ] = "demographic_parity",
+        objective: Literal[
+            "accuracy_score",
+            "balanced_accuracy_score",
+            "selection_rate",
+            "true_positive_rate",
+            "true_negative_rate",
+        ] = "accuracy_score",
+        grid_size: int = 1000,
+        flip: bool = False,
+        prefit: bool = False,
+        predict_method: Literal["auto", "predict_proba", "decision_function", "predict"] = "auto",
         tol: float | None = None,
     ):
         self.estimator = estimator
@@ -386,7 +401,9 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             X, sensitive_features=sensitive_features
         )
 
-    def _threshold_optimization_for_simple_constraints(self, sensitive_features, labels, scores):
+    def _threshold_optimization_for_simple_constraints(
+        self, sensitive_features, labels, scores
+    ) -> InterpolatedThresholder:
         """Calculate the objective value across all values of constraints.
 
         These calculations are made at different thresholds over the scores. Subsequently weighs
@@ -432,7 +449,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             p_sensitive_feature_value = len(group) / n
             sensitive_feature_proportions[sensitive_feature_value] = p_sensitive_feature_value
 
-            roc_convex_hull = _tradeoff_curve(
+            metrics_curve_convex_hull = _tradeoff_curve(
                 group,
                 sensitive_feature_value,
                 flip=self.flip,
@@ -441,7 +458,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             )
 
             self._tradeoff_curve[sensitive_feature_value] = _interpolate_curve(
-                roc_convex_hull, "x", "y", "operation", self._x_grid
+                metrics_curve_convex_hull, "x", "y", "operation", self._x_grid
             )
 
             logger.debug(OUTPUT_SEPARATOR)
@@ -450,7 +467,7 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             logger.debug("DATA")
             logger.debug(group)
             logger.debug("Tradeoff curve")
-            logger.debug(roc_convex_hull)
+            logger.debug(metrics_curve_convex_hull)
 
         if not self.tol:
             overall_tradeoff_curve = pd.concat(

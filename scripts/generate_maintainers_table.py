@@ -19,6 +19,7 @@ MAINTAINERS = {
     "romanlutz": "Roman Lutz",
     "alliesaizan": "Allie Saizan",
     "tamaraatanasoska": "Tamara Atanasoska",
+    "taharallouche": "Tahar Allouche",
 }
 
 
@@ -40,6 +41,7 @@ def generate_table(maintainers):
         lines.append("    <p>%s</p>" % (name,))
         lines.append("    </div>")
     lines.append("    </div>")
+    lines.append("")  # add empty line for linting compliance
     return "\n".join(lines)
 
 

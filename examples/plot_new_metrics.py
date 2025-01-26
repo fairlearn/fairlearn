@@ -393,14 +393,13 @@ grouped_on_race.ratio(method="to_overall")
 # and we have already found some serious issues in our example data.
 # However, sometimes serious issues can be hiding in intersections of
 # features. For example, the
-# `Gender Shades project <https://www.media.mit.edu/projects/gender-shades/overview/>`_
+# Gender Shades project :footcite:`buolamwini2018gender`
 # found that facial recognition algorithms performed worse for blacks
 # than whites, and also worse for women than men (despite overall high
 # accuracy score). Moreover, performance on black females was *terrible*.
 # We can examine the intersections of sensitive features by passing
 # multiple columns to the :class:`fairlearn.metrics.MetricFrame`
 # constructor:
-
 grouped_on_race_and_sex = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
@@ -516,7 +515,6 @@ counts.by_group
 # %%
 # Recall that ``NaN`` indicates that there were no individuals
 # in a cell - ``member_counts()`` will not even have been called.
-
 # %%
 # Exporting from MetricFrame
 # ==========================
@@ -539,3 +537,9 @@ print(csv_output)
 #
 # The :meth:`~fairlearn.metrics.MetricFrame.overall` property can
 # be handled similarly, in the cases that it is not a scalar.
+#
+# References
+# ----------
+#
+# .. footbibliography::
+#
