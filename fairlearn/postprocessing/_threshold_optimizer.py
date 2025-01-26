@@ -16,7 +16,6 @@ References
 from __future__ import annotations
 
 import logging
-from typing import Literal
 from warnings import warn
 
 import numpy as np
@@ -202,11 +201,10 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
             the default changes to 'auto' from v0.10.
 
     tol : float | None, default=None
-        The tolerance for the constraint metric. If None, the constraint is not relaxed.
+        The tolerance for the constraint metric. The range of the constraint metric's values across
+        all the sensitive groups is at most `tol`. If `None`, the constraint is not relaxed.
+        Relaxation is not supported for `equalized_odds`.
 
-    tol_method : {'to_overall', 'between_groups'} | None, default=None
-        Whether the tolerance is computed with respect to the overall constraint values or
-        between the groups. Must be set to None if tol is None or 0.
 
     Notes
     -----
@@ -249,7 +247,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         prefit=False,
         predict_method="auto",
         tol: float | None = None,
-        tol_method: Literal["to_overall", "between_groups"] | None = None,
     ):
         self.estimator = estimator
         self.constraints = constraints
@@ -259,7 +256,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         self.prefit = prefit
         self.predict_method = predict_method
         self.tol = tol
-        self.tol_method = tol_method
 
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
@@ -295,9 +291,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 raise ValueError("Relaxed constraints are not supported for equalized odds.")
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
-
-        if (self.tol is None or self.tol == 0) != (self.tol_method is None):
-            raise ValueError("Both tol and tol_method must be provided together.")
 
         self._predict_method = self.predict_method
 
@@ -498,7 +491,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
                 dataframes=[tradeoff_curve for tradeoff_curve in self._tradeoff_curve.values()],
                 weights=sensitive_feature_proportions.values(),
                 tol=self.tol,
-                method=self.tol_method,
             )
 
             self._x_best_per_group = {
@@ -509,17 +501,6 @@ class ThresholdOptimizer(BaseEstimator, MetaEstimatorMixin):
         max_x = max(self._x_best_per_group.values())
         min_x = min(self._x_best_per_group.values())
         self._between_groups = max_x - min_x
-
-        overall = np.sum(
-            [
-                group_proptortion * group_x
-                for group_proptortion, group_x in zip(
-                    sensitive_feature_proportions.values(), self._x_best_per_group.values()
-                )
-            ]
-        )
-
-        self._to_overall = max(overall - min_x, max_x - overall)
 
         # Create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature value.

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
-from typing import Iterable, Literal
+from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -11,29 +11,41 @@ def maximize_objective_with_tolerance(
     dataframes: Iterable[pd.DataFrame],
     weights: Iterable[float],
     tol: float,
-    method: Literal["to_overall", "between_groups"] = "between_groups",
     x_col: str = "x",
     y_col: str = "y",
 ) -> tuple[list[int], float]:
     """
     Finds the indices that maximize the sum of weighted `y` values across multiple DataFrames
-    under the constraint that the `x` values satisfy the constraint up to a tolerance `tol`.
-    If method is "between_groups", the maximum allowed range of selected `x` values is `tol`.
-    If method is "to_overall", the difference between the overall weighted `x` value and the
-    smallest and largest selected `x` values must be at most `tol`.
+    under the constraint that the range of the associated `x` values is at most equal to `tol`.
 
-    Args:
-        dataframes (Iterable[pd.DataFrame]): An Iterable of DataFrames. Each DataFrame must have:
-                                         - An `x` column (sorted in ascending order).
-                                         - A `y` column.
-        weights (Iterable[float]): An Iterable of weights for each DataFrame.
-        tol (float): The maximum allowed tolerance.
-        method (Literal["to_overall", "between_groups"]): Whethert the tolerance is computed
-            with respect to the overall `x` values or between the groups.
+    Parameters
+    -----------
+    dataframes:  Iterable[pd.DataFrame]
+        An Iterable of DataFrames. The DataFrames must have:
+        - A common `x` column (sorted in ascending order).
+        - A `y` column.
+    weights: Iterable[float]:
+        An Iterable of weights for each DataFrame.
+    tol: float
+        The maximum allowed tolerance.
 
-    Returns:
-        list[int], float: - A list of selected indices (one per DataFrame).
-                          - The maximum sum of weighted `y` values under the constraint.
+    Returns
+    -------
+    tuple[list[int], float]:
+        - A list of selected indices (one per DataFrame).
+        - The maximum sum of weighted `y` values under the constraint.
+
+    Algorithm
+    ---------
+    The algorithm uses a sliding window over sorted x values to enforce the tolerance constraint.
+    For each DataFrame, a deque (double-ended queue) maintains indices in descending order of y
+    values within the window at each iteration, ensuring the front always holds the current maximum.
+    As the window advances, expired indices are removed, and new indices are added while preserving
+    the descending order. The optimal indices for the current window are selected from the deque
+    fronts, updating the solution if the weighted sum exceeds the previous maximum or, in cases of
+    equality, if the x-range of the selected indices is smaller.
+
+
     """
     # Extract `x` values (all DataFrames must share the same `x` values)
     x_values = dataframes[0][x_col].values
@@ -46,8 +58,8 @@ def maximize_objective_with_tolerance(
     # Initialize a deque for each DataFrame to store indices in descending order of y values
     deques = [deque() for _ in range(m)]
 
-    # Variables to track the best solution
-    best_indices = []
+    # Variables to track the best solution at each iteration
+    best_indices: list[int] = []
     max_objective = float("-inf")
     min_violation = float("inf")
 
@@ -58,19 +70,26 @@ def maximize_objective_with_tolerance(
     for end in range(n):
         # Add the current `end` index to the deques, maintaining descending order of y values
         for k in range(m):
-            while deques[k] and y_columns[k][deques[k][-1]] <= y_columns[k][end]:
+            while deques[k] and (y_columns[k][deques[k][-1]] <= y_columns[k][end]):
                 deques[k].pop()
             deques[k].append(end)
 
         # Adjust the window to ensure the tolerance constraint is satisfied
-        start = _adjust_window(deques, x_values, weights, start, end, tol, method)
+        while x_values[end] - x_values[start] > tol:
+            for k in range(m):
+                if deques[k] and (deques[k][0] == start):
+                    deques[k].popleft()
 
-        # Calculate the sum of the maximum weighted `y` values in the current window
+            start += 1
+
+        # Calculate the maximum weighted sum of `y` values in the current window
+        # Pick the first element from each deque since the indices are stored in descending order
+        # of y_values
         current_indices = [deques[k][0] for k in range(m)]
         current_objective = sum(y_columns[k][current_indices[k]] for k in range(m))
 
-        # Calculate the violation of the equality constraint
-        current_violation = _compute_current_violation(current_indices, x_values, weights, method)
+        # Calculate the violation of the equality constraint in the current window
+        current_violation = np.ptp(x_values[current_indices])
 
         # Update the best solution if the current objective is larger, or if the current objective
         # is equal and the current violation is smaller
@@ -82,98 +101,3 @@ def maximize_objective_with_tolerance(
             min_violation = current_violation
 
     return best_indices, max_objective
-
-
-def _adjust_window(
-    deques: list[deque[int]],
-    x_values: np.ndarray,
-    weights: Iterable[float],
-    start: int,
-    end: int,
-    tol: float,
-    method: Literal["to_overall", "between_groups"],
-) -> int:
-    """
-    Adjusts the window to ensure the tolerance constraint is satisfied.
-
-    Args:
-        deques (list[deque[int]]): A list of deques, each storing indices in descending order of y values.
-        x_values (np.ndarray): The array of `x` values.
-        weights (Iterable[float]): An Iterable of weights for each DataFrame.
-        start (int): The current start index of the window.
-        end (int): The current end index of the window.
-        tol (float): The maximum allowed range of `x` values for the selected indices.
-        method (Literal["to_overall", "between_groups"]): Whethert the tolerance is computed
-            with respect to the overall `x` values or between the groups.
-
-    Returns:
-        int: The new start index of the window.
-
-    Side effects:
-        Modifies the deques in place to remove indices that are no longer in the window.
-    """
-
-    if method == "between_groups":
-        while x_values[end] - x_values[start] > tol:
-            for k in range(len(deques)):
-                if deques[k] and deques[k][0] == start:
-                    deques[k].popleft()
-
-            start += 1
-        return start
-
-    assert method == "to_overall"
-
-    current_indices = [deques[k][0] for k in range(len(deques))]
-    current_overall = np.sum(
-        [x_values[idx] * list(weights)[k] for k, idx in enumerate(current_indices)]
-    )
-
-    while current_overall - x_values[start] > tol or x_values[end] - current_overall > tol:
-        for k in range(len(deques)):
-            if deques[k] and deques[k][0] == start:
-                deques[k].popleft()
-
-        start += 1
-
-        current_indices = [deques[k][0] for k in range(len(deques))]
-        current_overall = np.sum(
-            [x_values[idx] * list(weights)[k] for k, idx in enumerate(current_indices)]
-        )
-
-    return start
-
-
-def _compute_current_violation(
-    current_indices: list[int],
-    x_values: np.ndarray,
-    weights: Iterable[float],
-    method: Literal["to_overall", "between_groups"],
-) -> float:
-    """
-    Computes the violation of the equality constraint for the current window.
-
-    Args:
-        current_indices (list[int]): The current indices selected in the window.
-        x_values (np.ndarray): The array of `x` values.
-        weights (Iterable[float]): An Iterable of weights for each DataFrame.
-        method (Literal["to_overall", "between_groups"]): Whethert the tolerance is computed
-            with respect to the overall `x` values or between the groups.
-
-    Returns:
-        float: The violation of the tolerance constraint.
-    """
-
-    min_x = min(x_values[idx] for idx in current_indices)
-    max_x = max(x_values[idx] for idx in current_indices)
-
-    if method == "between_groups":
-        return max_x - min_x
-
-    assert method == "to_overall"
-
-    current_overall = np.sum(
-        [x_values[idx] * list(weights)[k] for k, idx in enumerate(current_indices)]
-    )
-
-    return max(current_overall - min_x, max_x - current_overall)
