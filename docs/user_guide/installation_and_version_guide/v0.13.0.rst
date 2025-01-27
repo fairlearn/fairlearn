@@ -10,3 +10,4 @@ v0.13.0
 Other improvements
 ------------------
 * Vectorized the curve interpolation step in :code:`ThresholdOptimizer` to improve performance and readability: :pr:`1448` by :user:`Tahar Allouche <taharallouche>`.
+* Allowed multi-dimensional input data :code:`X` (:code:`ndims > 2`) in :code:`ThresholdOptimizer` and :code:`ExponentiatedGradient`: :pr:`1470` by :user:`Tahar Allouche <taharallouche>`.

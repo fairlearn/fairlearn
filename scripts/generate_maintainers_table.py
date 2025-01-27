@@ -19,6 +19,7 @@ MAINTAINERS = {
     "romanlutz": "Roman Lutz",
     "alliesaizan": "Allie Saizan",
     "tamaraatanasoska": "Tamara Atanasoska",
+    "taharallouche": "Tahar Allouche",
 }
 
 
