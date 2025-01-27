@@ -7,7 +7,7 @@ Documentation is formatted in restructured text (ReST) and the website is
 built using `Sphinx <https://www.sphinx-doc.org/en/master/>`_ and some of its
 extensions.
 
-Specifically, the website is available for a part of our previous releases to
+Specifically, the website is available for most previous releases to
 allow users to check the documentation of the version of the package that they are using.
 
 Documentation structure
