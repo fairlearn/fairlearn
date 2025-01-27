@@ -100,12 +100,9 @@ def test_interpolate_curve():
 )
 def test_convex_hull(base_points, expected_remaining_indices):
     convex_hull = _filter_points_to_get_convex_hull(base_points)
-    assert (base_points.x[expected_remaining_indices] == [point.x for point in convex_hull]).all()
-    assert (base_points.y[expected_remaining_indices] == [point.y for point in convex_hull]).all()
-    assert (
-        base_points.operation[expected_remaining_indices]
-        == [point.operation for point in convex_hull]
-    ).all()
+    pd.testing.assert_frame_equal(
+        base_points.iloc[expected_remaining_indices].reset_index(drop=True), convex_hull
+    )
 
 
 def test_calculate_tradeoff_points():
