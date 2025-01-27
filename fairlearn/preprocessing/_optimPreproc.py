@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from ._optimPreproc_helper import DTools
-
 from sklearn.base import BaseEstimator, TransformerMixin
+
+from ._optimPreproc_helper import DTools
 
 
 class OptimizedPreprocessor(BaseEstimator, TransformerMixin):
@@ -70,9 +70,7 @@ class OptimizedPreprocessor(BaseEstimator, TransformerMixin):
 
         self.opt = DTools(df=df, features=features)
         self.opt.setFeatures(D=D_features, X=X_features, Y=Y_features)
-        self.opt.set_distortion(
-            self.optim_options["distortion_fun"], self.optim_options["clist"]
-        )
+        self.opt.set_distortion(self.optim_options["distortion_fun"], self.optim_options["clist"])
 
         self.opt.optimize(
             epsilon=self.optim_options["epsilon"],

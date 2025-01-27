@@ -1,8 +1,9 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.preprocessing import OptimizedPreprocessor
+
 
 def get_distortion_adult_dataframe(vold, vnew):
     """Distortion function for the adult dataset. We set the distortion
@@ -204,13 +205,11 @@ optim_options = {
     "clist": [0.99, 1.99, 2.99],
     "dlist": [0.1, 0.05, 0],
 }
-opt = OptimizedPreprocessor(['sex'], distortion_function=get_distortion_adult_dataframe)
+opt = OptimizedPreprocessor(["sex"], distortion_function=get_distortion_adult_dataframe)
 y = df[["Income Binary"]]
 X = df.drop(columns=["Income Binary"])
 opt.fit(X, y)
-df_transformed = opt.transform(
-    X, y
-)
+df_transformed = opt.transform(X, y)
 assert df_transformed.shape == df.shape
 print("Test Passed for dataframe!")
 

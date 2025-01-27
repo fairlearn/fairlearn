@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from cvxpy import Variable, Minimize, norm, multiply, Problem, sum
+from cvxpy import Minimize, Problem, Variable, multiply, norm, sum
 
 
 class DTools:
@@ -24,14 +24,10 @@ class DTools:
             self.features = features
 
         # build joint distribution
-        self.dfJoint = (
-            self.df.groupby(self.features, observed=False).size().reset_index()
-        )
+        self.dfJoint = self.df.groupby(self.features, observed=False).size().reset_index()
         self.dfJoint.rename(columns={0: "Count"}, inplace=True)
         # print 'Here'
-        self.dfJoint["Frequency"] = self.dfJoint["Count"].apply(
-            lambda x: x / float(len(self.df))
-        )
+        self.dfJoint["Frequency"] = self.dfJoint["Count"].apply(lambda x: x / float(len(self.df)))
 
         # initialize the features that will be used for optimization
         self.D_features = []  # discriminatory features
@@ -77,29 +73,19 @@ class DTools:
         self.X_features = X
 
         # Get values for Pandas multindex
-        self.D_values = [
-            self.dfJoint[feature].unique().tolist() for feature in self.D_features
-        ]
-        self.Y_values = [
-            self.dfJoint[feature].unique().tolist() for feature in self.Y_features
-        ]
-        self.X_values = [
-            self.dfJoint[feature].unique().tolist() for feature in self.X_features
-        ]
+        self.D_values = [self.dfJoint[feature].unique().tolist() for feature in self.D_features]
+        self.Y_values = [self.dfJoint[feature].unique().tolist() for feature in self.Y_features]
+        self.X_values = [self.dfJoint[feature].unique().tolist() for feature in self.X_features]
 
         # Create multindex for mapping dataframe
         self.DXY_features = self.D_features + self.X_features + self.Y_features
         self.DXY_values = self.D_values + self.X_values + self.Y_values
-        self.DXY_index = pd.MultiIndex.from_product(
-            self.DXY_values, names=self.DXY_features
-        )
+        self.DXY_index = pd.MultiIndex.from_product(self.DXY_values, names=self.DXY_features)
 
         # Create multindex for distortion dataframe
         self.XY_features = self.X_features + self.Y_features
         self.XY_values = self.X_values + self.Y_values
-        self.XY_index = pd.MultiIndex.from_product(
-            self.XY_values, names=self.XY_features
-        )
+        self.XY_index = pd.MultiIndex.from_product(self.XY_values, names=self.XY_features)
 
         # Initialize mapping dataframe
         self.dfP = pd.DataFrame(
@@ -124,9 +110,7 @@ class DTools:
         # find corresponding frequency value
         i = 0
         for comb in self.dfJoint[self.DXY_features].values.tolist():
-            idx = index_list.index(
-                comb
-            )  # get the entry corresponding to the combination
+            idx = index_list.index(comb)  # get the entry corresponding to the combination
             # add marginal to list
             self.dfPxyd.iloc[idx, 0] = self.dfJoint.loc[i, "Frequency"]
             i += 1
@@ -142,9 +126,7 @@ class DTools:
 
         # compute mask that reduces Pxyd to Pyd
         self.YD_features_index = (
-            self.dfJoint.groupby(self.Y_features + self.D_features, observed=False)[
-                "Frequency"
-            ]
+            self.dfJoint.groupby(self.Y_features + self.D_features, observed=False)["Frequency"]
             .sum()
             .index
         )
@@ -207,15 +189,13 @@ class DTools:
         # this will make it easier to compute distrotion metric
         rows_tuple = self.dfD.index.tolist()
         rows_dict = [
-            {self.XY_features[i]: t[i] for i in range(len(self.XY_features))}
-            for t in rows_tuple
+            {self.XY_features[i]: t[i] for i in range(len(self.XY_features))} for t in rows_tuple
         ]
 
         # create columns dictionay (columns represent new values)
         cols_tuple = self.dfD.columns.tolist()
         cols_dict = [
-            {self.XY_features[i]: t[i] for i in range(len(self.XY_features))}
-            for t in cols_tuple
+            {self.XY_features[i]: t[i] for i in range(len(self.XY_features))} for t in cols_tuple
         ]
 
         for i in range(self.dfD.shape[0]):
@@ -245,12 +225,8 @@ class DTools:
         self.dlist = dlist
         self.mean_distortion = mean_distortion
 
-        Pmap = Variable(
-            shape=(self.dfP.shape[0], self.dfP.shape[1])
-        )  # main conditional map
-        PXhYh = Variable(
-            self.dfMask_Pxyd_to_Pxy.shape[1]
-        )  # marginal distribution of (Xh Yh)
+        Pmap = Variable(shape=(self.dfP.shape[0], self.dfP.shape[1]))  # main conditional map
+        PXhYh = Variable(self.dfMask_Pxyd_to_Pxy.shape[1])  # marginal distribution of (Xh Yh)
         PYhgD = Variable(
             shape=(self.dfD_to_Y_address.shape[1], self.dfD_to_Y_address.shape[0])
         )  # rows represent p_(y|D)
@@ -260,12 +236,8 @@ class DTools:
         )
         """
         # marginal distribution
-        dfMarginal = self.dfJoint.groupby(self.DXY_features, observed=False)[
-            "Frequency"
-        ].sum()
-        PxydMarginal = (
-            pd.concat([self.dfP, dfMarginal], axis=1).fillna(0)["Frequency"].values
-        )
+        dfMarginal = self.dfJoint.groupby(self.DXY_features, observed=False)["Frequency"].sum()
+        PxydMarginal = pd.concat([self.dfP, dfMarginal], axis=1).fillna(0)["Frequency"].values
         self.PxydMarginal = PxydMarginal
         """
         PyMarginal = PxydMarginal.dot(self.dfMask_Pxyd_to_Py).T
@@ -305,9 +277,7 @@ class DTools:
 
         for i in range(len(self.CMlist)):
             # Cost = multiply(self.CMlist[i],Pxy_xhyh)
-            constraints.append(
-                sum(multiply(self.CMlist[i], Pxy_xhyh), axis=1) <= self.dlist[i]
-            )
+            constraints.append(sum(multiply(self.CMlist[i], Pxy_xhyh), axis=1) <= self.dlist[i])
 
         # epsilon definition for discrimination control
         # epsilon = .1
@@ -332,9 +302,7 @@ class DTools:
         self.const = []
         for i in range(len(self.CMlist)):
             # Cost = multiply(self.CMlist[i],Pxy_xhyh)
-            self.const.append(
-                sum(multiply(self.CMlist[i], Pxy_xhyh), axis=1).value.max()
-            )
+            self.const.append(sum(multiply(self.CMlist[i], Pxy_xhyh), axis=1).value.max())
 
     def computeMarginals(self):
         # mask = self.dfMask_Pxyd_to_Pxy.T.values
@@ -366,9 +334,7 @@ class DTools:
             columns=self.dfMask_Pxy_to_Py.columns,
         )
 
-        self.dfPxydMarginal = pd.DataFrame(
-            self.PxydMarginal, index=self.dfMask_Pxyd_to_Pxy.index
-        )
+        self.dfPxydMarginal = pd.DataFrame(self.PxydMarginal, index=self.dfMask_Pxyd_to_Pxy.index)
 
         self.dfPxygdPrior = (
             self.dfPxydMarginal.reset_index()
