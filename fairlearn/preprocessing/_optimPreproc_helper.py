@@ -147,6 +147,7 @@ class DTools:
             columns=self.D_features,
             index=self.Y_features,
             values=0,
+            observed=False,
         )
 
         # compute mask that reduces Pxyd to Py
@@ -251,7 +252,7 @@ class DTools:
         constraints.append(Pmap >= 0)
 
         # definition of marginal PxhYh
-        constraints.append(PXhYh == sum(np.diag(PxydMarginal) * Pmap, axis=0).T)
+        constraints.append(PXhYh == sum(np.diag(PxydMarginal) @ Pmap, axis=0).T)
 
         # Define the joint distribution P_{YH,D}
         # constraints.append(PYhD == (self.dfMask_Pxyd_to_Pd.values.T).dot(np.diag(PxydMarginal))*Pmap*self.dfMask_Pxy_to_Py.values)
@@ -263,16 +264,16 @@ class DTools:
             == np.diag(np.ravel(PdMarginal) ** (-1))
             .dot(self.dfMask_Pxyd_to_Pd.values.T)
             .dot(np.diag(PxydMarginal))
-            * Pmap
-            * self.dfMask_Pxy_to_Py.values
+            @ Pmap
+            @ self.dfMask_Pxy_to_Py.values
         )
 
         # add excess distorion
         Pxy_xhyh = (
-            np.nan_to_num(np.diag(PxyMarginal ** (-1)))
+            np.nan_to_num(np.diag((PxyMarginal + 1e-10) ** (-1)))
             .dot(self.dfMask_Pxyd_to_Pxy.values.T)
             .dot(np.diag(PxydMarginal))
-            * Pmap
+            @ Pmap
         )
 
         for i in range(len(self.CMlist)):
