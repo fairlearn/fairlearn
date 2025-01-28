@@ -12,7 +12,7 @@ on:
       codeCovPython:
         required: true
         type: string
-        default: "3.11"
+        default: "3.12"
 
 jobs:
   minimal-deps:
