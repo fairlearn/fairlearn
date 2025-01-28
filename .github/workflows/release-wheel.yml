@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -63,9 +63,6 @@ jobs:
         pip install --pre --find-links . "fairlearn"
         pip uninstall fairlearn --yes
         pip install --no-index --find-links . "fairlearn"
-    - name: Upgrade pip for Python 3.8
-      if: ${{ matrix.python-version == '3.8' }}
-      run: pip install --upgrade pip
     - name: Install testing requirements
       run: |
         echo "Using pip to install test requirements subject to constraints in requirements-dev.txt"
