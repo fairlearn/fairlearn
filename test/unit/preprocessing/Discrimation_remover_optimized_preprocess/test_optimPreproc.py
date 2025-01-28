@@ -1,8 +1,12 @@
+import warnings
+
 import numpy as np
 import pandas as pd
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.preprocessing import OptimizedPreprocessor
+
+warnings.simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
 
 def get_distortion_adult_dataframe(vold, vnew):

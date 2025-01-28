@@ -5,7 +5,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from ._optimPreproc_helper import DTools
 
 
-class OptimizedPreprocessor(BaseEstimator, TransformerMixin):
+class OptimizedPreprocessor(TransformerMixin, BaseEstimator):
     """Optimized preprocessing is a preprocessing technique that learns a
     probabilistic transformation that edits the features and labels in the data
     with group fairness, individual distortion, and data fidelity constraints
@@ -91,7 +91,7 @@ class OptimizedPreprocessor(BaseEstimator, TransformerMixin):
         df = pd.concat([df, df_y], axis=1)
 
         if transform_y:
-            dfP_withY = self.opt.dfP.applymap(lambda x: 0 if x < 1e-8 else x)
+            dfP_withY = self.opt.dfP.map(lambda x: 0 if x < 1e-8 else x)
             dfP_withY = dfP_withY.divide(dfP_withY.sum(axis=1), axis=0)
 
             df_transformed = _apply_randomized_mapping(
@@ -109,7 +109,7 @@ class OptimizedPreprocessor(BaseEstimator, TransformerMixin):
             d2 = d1.transpose().reset_index().groupby(X_features, observed=False).sum()
             dfP_noY = d2.transpose()
             dfP_noY = dfP_noY.drop(Y_features, axis=1)
-            dfP_noY = dfP_noY.applymap(lambda x: x if x > 1e-8 else 0)
+            dfP_noY = dfP_noY.map(lambda x: x if x > 1e-8 else 0)
             dfP_noY = dfP_noY / dfP_noY.sum()
 
             dfP_noY = dfP_noY.divide(dfP_noY.sum(axis=1), axis=0)
