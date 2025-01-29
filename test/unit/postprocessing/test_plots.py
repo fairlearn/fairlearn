@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 from importlib.metadata import PackageNotFoundError
 
