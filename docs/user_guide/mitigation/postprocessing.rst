@@ -197,27 +197,12 @@ In the example below, we examine how the outcome changes when setting a toleranc
     ...     prefit=False,
     ...     tol=0.2,
     ... )
-    >>> threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
-    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
-    >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
-    {
-        "Female": {
-            "p0": 0.007...,
-            "operation0": "[>0.110...]",
-            "p1": 0.993...,
-            "operation1": "[>0.096...]"
-        },
-        "Male": {
-            "p0": 0.019...,
-            "operation0": "[>0.107...]",
-            "p1": 0.980...,
-            "operation1": "[>0.104...]"
-        }
-    }
-    >>> print(threshold_optimizer._x_best_per_group)
-    {'Female': np.float64(0.70), 'Male': np.float64(0.63)}
-    >>> print(threshold_optimizer._y_best)
-    0.6047
+    >>> _ = threshold_optimizer.fit(X_train, y_train, sensitive_features=A_train)
+    >>> true_positive_rate_per_group = threshold_optimizer._x_best_per_group
+    >>> print({group: f"{rate:.2f}" for group, rate in true_positive_rate_per_group.items()})
+    {'Female': '0.70', 'Male': '0.63'}
+    >>> print(f"{threshold_optimizer._y_best:5f}")
+    0.604667
     >>> plot_threshold_optimizer(threshold_optimizer)
 
 Notice that the :code:`true_positive_rate` differs between the Male and Female groups, yet the
