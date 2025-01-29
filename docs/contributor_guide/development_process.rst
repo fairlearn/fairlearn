@@ -30,18 +30,44 @@ This is a `recent decision by the community <https://github.com/fairlearn/fairle
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
 
-Advanced installation instructions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-While working on Fairlearn itself you may want to install it in editable mode.
-This allows you to test the changed functionality. First, clone the repository
-locally via:
+Installation instructions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You will need a GitHub account to contribute to this project. Authenticating with Github using an ssh connection is highly recommended. You can learn more about it `here <https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account>`_.
+
+First, clone the repository locally via:
 
 .. code-block:: bash
 
    $ git clone git@github.com:fairlearn/fairlearn.git
 
+
+(Optional) Set up a virtual environment:
+
+   While you can use :code:`pip` to install the fairlearn package globally, we strongly recommend developing using a virtual environment. Virtual environments are a great way to isolate project dependencies, especially if you're working on multiple issues that require different versions of the package.
+
+   Create a Python virtual environment using :code:`conda`:
+
+         #. Make your virtual environment inside the fairlearn project directory. This will create a new :code:`venv` folder and seed it with a Python 3 environment. Then activate the virtual environment:
+
+
+            .. code-block:: bash
+
+               $ conda create --name fairlearn python=3.11  # creates virtual environment
+               $ conda activate myenv # activates virtual environment
+               (venv) $ # notice the shell prompt includes name of active virtual environment
+
+         #. Check if your virtual environment is indeed active. Then proceed to installing the package dependencies:
+
+            .. code-block:: bash
+
+               (venv) $ which python #confirm virtual environment is active
+               (venv) $ conda deactivate #use to deactivate if needed
+
+If you are using a virtual environment(highly recommended), make sure it is activated before you execute the next steps.
+
 To install in editable mode, from the repository root path run:
+
 
 .. code-block:: bash
 
@@ -148,8 +174,8 @@ Follow the steps below to create a pull request.
 
    .. code-block:: bash
 
-   $ pip install pre-commit
-   $ pre-commit install
+      $ pip install pre-commit
+      $ pre-commit install
 
    Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
 

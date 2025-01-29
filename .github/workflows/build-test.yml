@@ -22,32 +22,32 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.8", "3.9", "3.10", "3.11"]
+        python: ["3.9", "3.10", "3.11", "3.12"]
         requirementsPinned: ["false"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
       requirementsPinned: ${{ matrix.requirementsPinned }}
-      codeCovPython: "3.11"
+      codeCovPython: "3.12"
 
   minimal-deps:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.8", "3.9", "3.10", "3.11"]
+        python: ["3.9", "3.10", "3.11", "3.12"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      codeCovPython: "3.11"
+      codeCovPython: "3.12"
 
 
   other-ml:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.11"]
+        python: ["3.12"]
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
       fail-fast: false
     uses: ./.github/workflows/test-other-ml.yml
@@ -61,7 +61,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.11"]
+        python: ["3.12"]
     uses: ./.github/workflows/linting.yml
     with:
       os: ${{ matrix.os }}
