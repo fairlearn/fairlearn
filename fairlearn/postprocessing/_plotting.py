@@ -132,7 +132,10 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
             "$P[\\hat{Y}=1|Y=1]$",
         )
     else:
-        if hasattr(threshold_optimizer, "_overall_tradeoff_curve"):
+        if threshold_optimizer.tol:
+            _plot_solution_with_tol(threshold_optimizer, ax)
+
+        else:
             _plot_overall_tradeoff_curve(ax, threshold_optimizer._overall_tradeoff_curve)
             _plot_solution(
                 ax,
@@ -142,8 +145,6 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
                 threshold_optimizer.x_metric_,
                 threshold_optimizer.y_metric_,
             )
-        else:
-            _plot_solution_with_tol(threshold_optimizer, ax)
 
     if show_plot:
         plt.show()
