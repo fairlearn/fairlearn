@@ -1,3 +1,5 @@
+.. _development_process:
+
 Development process
 -------------------
 
@@ -53,7 +55,7 @@ First, clone the repository locally via:
 
             .. code-block:: bash
 
-               $ conda create --name fairlearn python=3.11  # creates virtual environment
+               $ conda create --name fairlearn python=3.12  # creates virtual environment
                $ conda activate myenv # activates virtual environment
                (venv) $ # notice the shell prompt includes name of active virtual environment
 
@@ -79,6 +81,11 @@ To verify that the code works as expected run:
 
    $ python ./scripts/install_requirements.py --pinned False
    $ python -m pytest -s ./test/unit
+
+.. note::
+
+   If there is a :code:`torch` related error during the installation,
+   please downgrade keep your :code:`python` version between 3.9-3.12.
 
 Fairlearn currently includes plotting functionality provided by
 :code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
@@ -132,6 +139,11 @@ Follow the steps below to create a pull request.
       * Identify an issue that you would like to work on.
       * Leave a comment on the issue indicating interest and outlining possible questions.
       * Once we know you are working on it, we will support you on your contribution journey!
+
+.. note::
+
+   If you claim an issue, please try to keep it updated each week, either by continuing a discussion in the issue itself or in a pull request.
+   Issues which are not receiving updates may be claimed by someone else.
 
 #. The communication channels are outlined here: :ref:`communication`.
 

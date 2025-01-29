@@ -6,20 +6,38 @@ Contributing documentation
 Documentation is formatted in restructured text (ReST) and the website is
 built using `Sphinx <https://www.sphinx-doc.org/en/master/>`_ and some of its
 extensions.
-Specifically, the website is available for all our releases to allow users to
-check the documentation of the version of the package that they are using.
 
-To contribute, make sure to install sphinx and its add-ons by running
+Specifically, the website is available for most previous releases to
+allow users to check the documentation of the version of the package that they are using.
 
-.. code-block:: bash
+Documentation structure
+^^^^^^^^^^^^^^^^^^^^^^^
 
-    $ python scripts/install_requirements.py --pinned False
+Most of the pages on the website are generated based on the :code:`.rst` files that can be found
+in the `docs <https://github.com/fairlearn/fairlearn/tree/main/docs>`_ folder in the
+repository. The documentation is generated following paths of that folder.
 
-in the repository root directory.
-You may also need to `install Pandoc <https://pandoc.org/installing.html>`_.
+The home page is static and can be found in a
+`subfolder <https://github.com/fairlearn/fairlearn/tree/main/docs/static_landing_page>`_.
 
-Since plotting is an optional addition to Fairlearn, you may also need to
-install matplotlib
+The `API reference <file:///Users/tamara/FOSS/fairlearn/docs/_build/html/api_reference/index.html>`_
+documentation is also generated from the page structure defined
+in the `docs folder <https://github.com/fairlearn/fairlearn/tree/main/docs/api_reference>`_.
+However, the content of the generated pages is taken from the NumPy style docstrings
+found in the files of the respective classes and methods. For example, take a look at the
+`code and docstrings <https://github.com/fairlearn/fairlearn/blob/main/fairlearn/preprocessing/_correlation_remover.py>`_
+of the :code:`CorrelationRemover` and the corresponding
+`generated page <file:///Users/tamara/FOSS/fairlearn/docs/_build/html/api_reference/generated/fairlearn.preprocessing.CorrelationRemover.html>`_.
+
+Contributing
+^^^^^^^^^^^^
+
+The instructions below are an addition to the instructions on the
+:ref:`development_process` page. Please follow the installation
+instructions on that page, and return to follow the further
+documentation specific guidelines.
+
+You may also need to `install pandoc <https://pandoc.org/installing.html>`_. and :code:`matplotlib`.
 
 .. code-block:: bash
 
@@ -36,7 +54,7 @@ directory:
 
     $ python -m sphinx -v -b html -n -j auto docs docs/_build/html
 
-or use the shortcut
+or use the shortcut:
 
 .. code-block:: bash
 
@@ -51,21 +69,14 @@ the following commands:
 
 .. code-block:: bash
 
+    $ #replace start with open for MacOS and xdg-open for Linux
     $ start docs/_build/html/index.html
     $ start docs/_build/html/quickstart.html
     ...
     $ start docs/_build/html/auto_examples/plot_*.html
 
-.. line-block::
-
- The above code block works for Windows users.
- For MacOS users, use :code:`open docs/_build/html/index.html`.
- For Linux users, use :code:`xdg-open docs/_build/html/index.html`.
-
-.. note::
-
-    The rendered HTML files can be explored in any file explorer and then opened
-    using a browser (e.g., Chrome/Firefox/Safari).
+The rendered HTML files can be explored in any file explorer and then opened
+using a browser (e.g., Chrome/Firefox/Safari).
 
 :code:`plot_*` can be replaced with any of the notebooks in the
 :code:`auto_examples` folder. To view your changes, simply navigate to the
@@ -82,6 +93,7 @@ ensure that they all render properly.
     If you encounter problems with the documentation build (locally or in your
     pull request) and need help, simply @mention
     :code:`@fairlearn/fairlearn-maintainers` to get help.
+
 
 Citations
 ^^^^^^^^^
