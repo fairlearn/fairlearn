@@ -33,94 +33,129 @@ class OptimizedPreprocessor(TransformerMixin, BaseEstimator):
         super().__init__()
 
         self.seed = seed
-        self.optim_options = {
-            "distortion_fun": distortion_function,
-            "epsilon": epsilon,
-            "clist": clist,
-            "dlist": dlist,
-        }
         self.verbose = verbose
         self.sensitive_feature_ids = sensitive_feature_ids
+        self.distortion_function = distortion_function
+        self.epsilon = epsilon
+        self.clist = clist
+        self.dlist = dlist
 
     def createDataframe(self, X, y, prefix="column"):
+        """Convert input data into pandas DataFrames with appropriate column names.
+
+        Args:
+            X: Input features as numpy array or pandas DataFrame
+            y: Target values
+            prefix: Prefix for auto-generated column names when X is a numpy array
+
+        Returns:
+            tuple: (features_df, target_df, sensitive_df) containing:
+                - features_df: DataFrame of non-sensitive features
+                - target_df: DataFrame of target values
+                - sensitive_df: DataFrame of sensitive features
+        """
         n_cols = X.shape[1]
         if isinstance(X, pd.DataFrame):
-            df_sensitive = X[self.sensitive_feature_ids]
-            df_x = X.drop(columns=self.sensitive_feature_ids)
-            return df_x, y, df_sensitive
+            sensitive_df = X[self.sensitive_feature_ids]
+            X_df = X.drop(columns=self.sensitive_feature_ids)
+            return X_df, y, sensitive_df
         elif isinstance(X, np.ndarray):
             column_names = [f"{prefix}_{i}" for i in range(1, n_cols + 1)]
             sensitive_columns = []
             for ids in self.sensitive_feature_ids:
                 sensitive_columns.append(column_names[ids])
-            df_x = pd.DataFrame(X, columns=column_names)
-            df_sensitive = df_x[sensitive_columns]
-            df_x = df_x.drop(columns=sensitive_columns)
-            df_y = pd.DataFrame(y, columns=[f"{prefix}_{n_cols+1}"])
-            return df_x, df_y, df_sensitive
+            X_df = pd.DataFrame(X, columns=column_names)
+            sensitive_df = X_df[sensitive_columns]
+            X_df = X_df.drop(columns=sensitive_columns)
+            y_df = pd.DataFrame(y, columns=[f"{prefix}_{n_cols+1}"])
+            return X_df, y_df, sensitive_df
 
     def fit(self, X, y):
-        df_x, df_y, df_sensitive = self.createDataframe(X, y)
-        X_features = df_x.columns.to_list()
-        Y_features = df_y.columns.to_list()
-        D_features = df_sensitive.columns.to_list()
-        features = X_features + D_features + Y_features
-        df = pd.concat([df_x, df_sensitive], axis=1)
-        df = pd.concat([df, df_y], axis=1)
+        """Fit the preprocessor to the input data.
 
-        self.opt = DTools(df=df, features=features)
-        self.opt.setFeatures(D=D_features, X=X_features, Y=Y_features)
-        self.opt.set_distortion(self.optim_options["distortion_fun"], self.optim_options["clist"])
+        Args:
+            X: Input features
+            y: Target values
 
-        self.opt.optimize(
-            epsilon=self.optim_options["epsilon"],
-            dlist=self.optim_options["dlist"],
+        Returns:
+            self: The fitted preprocessor
+        """
+        X_df, y_df, sensitive_df = self.createDataframe(X, y)
+        X_features = X_df.columns.to_list()
+        y_features = y_df.columns.to_list()
+        sensitive_names = sensitive_df.columns.to_list()
+        all_features = X_features + sensitive_names + y_features
+
+        combined_df = pd.concat([X_df, sensitive_df], axis=1)
+        combined_df = pd.concat([combined_df, y_df], axis=1)
+
+        self.optimizer = DTools(df=combined_df, features=all_features)
+        self.optimizer.setFeatures(D=sensitive_names, X=X_features, Y=y_features)
+        self.optimizer.set_distortion(self.distortion_function, self.clist)
+
+        self.optimizer.optimize(
+            epsilon=self.epsilon,
+            dlist=self.dlist,
             verbose=self.verbose,
         )
 
-        self.opt.computeMarginals()
+        self.optimizer.computeMarginals()
 
         return self
 
     def transform(self, X, y, transform_y=False):
-        df_x, df_y, df_sensitive = self.createDataframe(X, y)
-        X_features = df_x.columns.to_list()
-        Y_features = df_y.columns.to_list()
-        D_features = df_sensitive.columns.to_list()
-        df = pd.concat([df_x, df_sensitive], axis=1)
-        df = pd.concat([df, df_y], axis=1)
+        """Transform the input data using the fitted preprocessor.
+
+        Args:
+            X: Input features
+            y: Target values
+            transform_y: Whether to transform the target values as well
+
+        Returns:
+            DataFrame: Transformed dataset
+        """
+        X_df, y_df, sensitive_df = self.createDataframe(X, y)
+        X_features = X_df.columns.to_list()
+        y_features = y_df.columns.to_list()
+        sensitive_names = sensitive_df.columns.to_list()
+
+        combined_df = pd.concat([X_df, sensitive_df], axis=1)
+        combined_df = pd.concat([combined_df, y_df], axis=1)
 
         if transform_y:
-            dfP_withY = self.opt.dfP.map(lambda x: 0 if x < 1e-8 else x)
-            dfP_withY = dfP_withY.divide(dfP_withY.sum(axis=1), axis=0)
+            prob_matrix = self.optimizer.dfP.map(lambda x: 0 if x < 1e-8 else x)
+            prob_matrix = prob_matrix.divide(prob_matrix.sum(axis=1), axis=0)
 
-            df_transformed = _apply_randomized_mapping(
-                df,
-                dfP_withY,
-                features=D_features + X_features + Y_features,
+            transformed_df = _apply_randomized_mapping(
+                combined_df,
+                prob_matrix,
+                features=sensitive_names + X_features + y_features,
                 random_seed=self.seed,
             )
         else:
-            d1 = (
-                self.opt.dfFull.reset_index()
-                .groupby(D_features + X_features, observed=False)
+            # Calculate marginal probabilities excluding target variable
+            grouped_probs = (
+                self.optimizer.dfFull.reset_index()
+                .groupby(sensitive_names + X_features, observed=False)
                 .sum()
             )
-            d2 = d1.transpose().reset_index().groupby(X_features, observed=False).sum()
-            dfP_noY = d2.transpose()
-            dfP_noY = dfP_noY.drop(Y_features, axis=1)
-            dfP_noY = dfP_noY.map(lambda x: x if x > 1e-8 else 0)
-            dfP_noY = dfP_noY / dfP_noY.sum()
+            marginal_probs = (
+                grouped_probs.transpose().reset_index().groupby(X_features, observed=False).sum()
+            )
+            prob_matrix = marginal_probs.transpose()
+            prob_matrix = prob_matrix.drop(y_features, axis=1)
+            prob_matrix = prob_matrix.map(lambda x: x if x > 1e-8 else 0)
+            prob_matrix = prob_matrix / prob_matrix.sum()
 
-            dfP_noY = dfP_noY.divide(dfP_noY.sum(axis=1), axis=0)
+            prob_matrix = prob_matrix.divide(prob_matrix.sum(axis=1), axis=0)
 
-            df_transformed = _apply_randomized_mapping(
-                df,
-                dfP_noY,
-                features=D_features + X_features,
+            transformed_df = _apply_randomized_mapping(
+                combined_df,
+                prob_matrix,
+                features=sensitive_names + X_features,
                 random_seed=self.seed,
             )
-        return df_transformed
+        return transformed_df
 
     def fit_transform(self, X, y, transform_y=False):
         return self.fit(X, y).transform(X, y, transform_y)

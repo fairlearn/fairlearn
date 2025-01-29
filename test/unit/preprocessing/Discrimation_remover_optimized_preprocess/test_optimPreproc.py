@@ -5,8 +5,7 @@ import pandas as pd
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.preprocessing import OptimizedPreprocessor
-
-warnings.simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+from fairlearn.utils._fixes import parametrize_with_checks
 
 
 def get_distortion_adult_dataframe(vold, vnew):
@@ -199,35 +198,61 @@ def preprocessed_adult_data():
     return df
 
 
-df = preprocessed_adult_data()
-D_features = ["sex"]
-Y_features = ["Income Binary"]
-X_features = ["Age (decade)", "Education Years"]
-optim_options = {
-    "distortion_fun": get_distortion_adult_dataframe,
-    "epsilon": 0.05,
-    "clist": [0.99, 1.99, 2.99],
-    "dlist": [0.1, 0.05, 0],
+def test_optimized_preprocessor_with_dataframe():
+    """Test OptimizedPreprocessor with pandas DataFrame input."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", pd.errors.PerformanceWarning)
+        warnings.filterwarnings("ignore", message=".*dropping on a non-lexsorted multi-index.*")
+
+        df = preprocessed_adult_data()
+        sensitive_features = ["sex"]
+
+        preprocessor = OptimizedPreprocessor(
+            sensitive_features,
+            distortion_function=get_distortion_adult_dataframe,
+        )
+
+        X = df[sensitive_features + ["Age (decade)", "Education Years"]]
+        y = df[["Income Binary"]]
+
+        preprocessor.fit(X, y)
+        df_trans = preprocessor.transform(X, y)
+
+        assert df_trans.shape == df.shape
+
+
+def test_optimized_preprocessor_with_numpy():
+    """Test OptimizedPreprocessor with NumPy array input."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", pd.errors.PerformanceWarning)
+        warnings.filterwarnings("ignore", message=".*dropping on a non-lexsorted multi-index.*")
+
+        df = preprocessed_adult_data()
+        sensitive_features = ["sex"]
+
+        preprocessor = OptimizedPreprocessor(
+            [df.columns.get_loc(sensitive_features[0])],
+            distortion_function=get_distortion_adult_numpy,
+        )
+
+        X = df[["Age (decade)", "Education Years"] + sensitive_features].to_numpy()
+        y = df[["Income Binary"]].to_numpy()
+
+        preprocessor.fit(X, y)
+        X_trans = preprocessor.transform(X, y)
+
+        assert X_trans.shape == df.shape
+
+
+EXPECTED_FAILED_CHECKS = {
+    "OptimizedPreprocessor": {},
 }
-opt = OptimizedPreprocessor(["sex"], distortion_function=get_distortion_adult_dataframe)
-y = df[["Income Binary"]]
-X = df.drop(columns=["Income Binary"])
-opt.fit(X, y)
-df_transformed = opt.transform(X, y)
-assert df_transformed.shape == df.shape
-print("Test Passed for dataframe!")
 
-op = OptimizedPreprocessor([2], get_distortion_adult_numpy)
 
-df_1 = preprocessed_adult_data()
-y = df_1["Income Binary"]
-df1 = df_1.drop(columns=["Income Binary"])
-
-X = df1.to_numpy()
-y = y.to_numpy()
-
-op.fit(X, y)
-dfx = op.transform(X, y)
-
-assert dfx.shape == df_1.shape
-print("Test Passed for Numpy")
+@parametrize_with_checks(
+    [OptimizedPreprocessor([2], distortion_function=get_distortion_adult_numpy)],
+    expected_failed_checks=lambda x: EXPECTED_FAILED_CHECKS.get(x.__class__.__name__, {}),
+)
+def test_estimators(estimator, check):
+    """Check the compatibility with scikit-learn API."""
+    check(estimator)
