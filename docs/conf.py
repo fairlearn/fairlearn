@@ -70,8 +70,9 @@ extensions = [
     "sphinx_issues",
 ]
 
-copybutton_prompt_text = r"\$\s+"
+copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True
+copybutton_exclude = "style"
 
 source_suffix = [".rst"]
 
