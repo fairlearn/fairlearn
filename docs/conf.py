@@ -135,9 +135,9 @@ html_theme_options = {
             "icon": "fa-brands fa-github",
         },
         {
-            "name": "Twitter",
-            "url": "https://twitter.com/fairlearn",
-            "icon": "fa-brands fa-twitter",
+            "name": "LinkedIn",
+            "url": "https://www.linkedin.com/company/fairlearn/",
+            "icon": "fa-brands fa-linkedin",
         },
         {
             "name": "StackOverflow",
