@@ -10,9 +10,9 @@ The following steps assume git remote's :code:`origin` points to
 #. Ensure the maintainers listed in :code:`scripts/generate_maintainers_table.py`
    are up to date. Run the command below from the repository root directory:
 
-   .. code-block:: bash
+   .. prompt:: bash
 
-        $ python scripts/generate_maintainers_table.py
+        python scripts/generate_maintainers_table.py
 
    If the generated file :code:`docs/about/maintainers.rst` does not change
    you can proceed with the next step. Otherwise, create a PR to update
@@ -28,15 +28,15 @@ The following steps assume git remote's :code:`origin` points to
 
     #. Create a new branch:
 
-        .. code-block:: bash
+        .. prompt:: bash
 
-            $ git checkout -b release/v<x.y>.X
+            git checkout -b release/v<x.y>.X
 
     #. Push the branch to GitHub:
 
-        .. code-block:: bash
+        .. prompt:: bash
 
-            $ git push -u origin release/v<x.y>.X
+            git push -u origin release/v<x.y>.X
 
        You may need to temporarily add an exception to the
        `branch protection rules <https://github.com/fairlearn/fairlearn/settings/branches>`_
@@ -54,15 +54,15 @@ The following steps assume git remote's :code:`origin` points to
 
 #. On the release branch, place an annotated tag:
 
-        .. code-block:: bash
+        .. prompt:: bash
 
-            $ git tag -a v<x.y.z> -m "v<x.y.z> release"
+            git tag -a v<x.y.z> -m "v<x.y.z> release"
 
 #. Push the tag to GitHub:
 
-        .. code-block:: bash
+        .. prompt:: bash
 
-            $ git push origin v<x.y.z>
+            git push origin v<x.y.z>
 
 #. On `GitHub's release page <https://github.com/fairlearn/fairlearn/releases>`_,
    draft a new release. Choose the new tag, title the release `v<x.y.z>`,
