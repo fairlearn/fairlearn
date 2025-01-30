@@ -39,9 +39,9 @@ documentation specific guidelines.
 
 You may also need to `install pandoc <https://pandoc.org/installing.html>`_. and :code:`matplotlib`.
 
-.. code-block:: bash
+.. prompt:: bash
 
-    $ pip install matplotlib>=3.2.1
+    pip install matplotlib>=3.2.1
 
 You can contribute updates to existing documentation by navigating to the
 relevant part of the repository (typically in the `docs` directory), and
@@ -50,15 +50,15 @@ editing the restructured text files (`.rst`) corresponding to your updates.
 To build the webpage run the following command from the repository root
 directory:
 
-.. code-block:: bash
+.. prompt:: bash
 
-    $ python -m sphinx -v -b html -n -j auto docs docs/_build/html
+    python -m sphinx -v -b html -n -j auto docs docs/_build/html
 
 or use the shortcut:
 
-.. code-block:: bash
+.. prompt:: bash
 
-        $ make doc
+    make doc
 
 This will generate the website in the directory mentioned at the end of the
 command. Rerunning this after making changes to individual files only
@@ -67,13 +67,13 @@ rebuilds the changed pages, so the build time should be a lot shorter.
 You can check that the document(s) render properly by inspecting the HTML with
 the following commands:
 
-.. code-block:: bash
+.. prompt:: bash
 
-    $ #replace start with open for MacOS and xdg-open for Linux
-    $ start docs/_build/html/index.html
-    $ start docs/_build/html/quickstart.html
+    #replace start with open for MacOS and xdg-open for Linux
+    start docs/_build/html/index.html
+    start docs/_build/html/quickstart.html
     ...
-    $ start docs/_build/html/auto_examples/plot_*.html
+    start docs/_build/html/auto_examples/plot_*.html
 
 The rendered HTML files can be explored in any file explorer and then opened
 using a browser (e.g., Chrome/Firefox/Safari).
