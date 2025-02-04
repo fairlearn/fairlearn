@@ -189,13 +189,6 @@ Fairlearn also allows us to quickly plot these metrics from the
 :class:`fairlearn.metrics.MetricFrame`. For example, this is from our
 example :ref:`plt_quick_start`:
 
-.. doctest:: quickstart
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from fairlearn.metrics import false_positive_rate, selection_rate, count
-    >>> from functools import partial
-    >>> zero_div_precision_score = partial(precision_score, zero_division=0)
-
 .. literalinclude:: auto_examples/plot_quickstart.py
     :language: python
     :start-after: # Analyze metrics using MetricFrame
