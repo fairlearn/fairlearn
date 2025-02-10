@@ -57,10 +57,10 @@ First, clone the repository locally via:
    inside the fairlearn project directory. This will create a new :code:`fairlearn` folder
    and seed it with a :code:`python=3.12` environment. Then activate the virtual environment:
 
-   .. code-block:: bash
+   .. prompt:: bash
 
-      $ conda create --name fairlearn python=3.12  # creates virtual env
-      $ conda activate fairlearn # activates virtual env
+      conda create --name fairlearn python=3.12  # creates virtual env
+      conda activate fairlearn # activates virtual env
       (fairlearn) $ # notice the shell prompt includes name of active virtual env
 
    If you see the name of the environment in the shell prompt,
