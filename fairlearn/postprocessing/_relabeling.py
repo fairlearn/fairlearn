@@ -164,13 +164,15 @@ class Leaf:
 
         :return: Return the string representation of the object.
         """
-        return f"Path: format -> (node id, feature, way)\n{self.path} " \
-               f"\nnode_id: {self.node_id} " \
-               f"\nThe effect of relabeling the leaf on accuracy: {self.acc}" \
-               f"\nThe effect of relabeling the leaf on discrimination: {self.disc} " \
-               f"\nratio: {self.ratio} " \
-               f"\ncontingency table: \n{[self.u, self.v]}\n{[self.w, self.x]}" \
-               f"\ntransactions: {self.transactions}"
+        return (
+            f"Path: format -> (node id, feature, way)\n{self.path} "
+            f"\nnode_id: {self.node_id} "
+            f"\nThe effect of relabeling the leaf on accuracy: {self.acc}"
+            f"\nThe effect of relabeling the leaf on discrimination: {self.disc} "
+            f"\nratio: {self.ratio} "
+            f"\ncontingency table: \n{[self.u, self.v]}\n{[self.w, self.x]}"
+            f"\ntransactions: {self.transactions}"
+        )
 
     def __repr__(self):
         """Return the object representation in string format.
@@ -197,9 +199,9 @@ def get_transactions_by_leaf(clf, path, x):
     for tupl in path:
         node_id = tupl[0]
         feature = tupl[1]
-        if tupl[2] == 'left':
+        if tupl[2] == "left":
             filtered = filtered.loc[filtered[feature] <= clf.tree_.threshold[node_id]]
-        elif tupl[2] == 'right':
+        elif tupl[2] == "right":
             filtered = filtered.loc[filtered[feature] > clf.tree_.threshold[node_id]]
         else:
             raise Exception("Should not reach here")
@@ -222,15 +224,17 @@ def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, 
     """
     feature = clf.tree_.feature[node_id]
     if feature >= 0:
-        tmp_path = path + ((node_id, feature, 'left'),)
-        get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves,
-                              clf.tree_.children_left[node_id], tmp_path)
-        tmp_path = path + ((node_id, feature, 'right'),)
-        get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves,
-                              clf.tree_.children_right[node_id], tmp_path)
+        tmp_path = path + ((node_id, feature, "left"),)
+        get_leaves_candidates(
+            clf, x, y, sensitive, cnt, length, leaves, clf.tree_.children_left[node_id], tmp_path
+        )
+        tmp_path = path + ((node_id, feature, "right"),)
+        get_leaves_candidates(
+            clf, x, y, sensitive, cnt, length, leaves, clf.tree_.children_right[node_id], tmp_path
+        )
     else:
         transactions = get_transactions_by_leaf(clf, path, x)
-        tmp_path = path + ((node_id, feature, 'leaf'),)
+        tmp_path = path + ((node_id, feature, "leaf"),)
 
         u, v, w, x = 0, 0, 0, 0
         for transaction in transactions:
@@ -244,8 +248,9 @@ def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, 
                     w += 1
                 elif y[transaction] == 1:
                     x += 1
-        leaf = Leaf(tmp_path, node_id, u / length, v / length,
-                    w / length, x / length, transactions)
+        leaf = Leaf(
+            tmp_path, node_id, u / length, v / length, w / length, x / length, transactions
+        )
         # leaf.value = copy.deepcopy(clf.tree_.value[node_id])
         leaf.compute_gain(v + x, u + w, cnt[0] / length, cnt[1] / length)
         if leaf.disc < 0:
@@ -313,8 +318,10 @@ def browse_and_relab(clf, node_id):
     if clf.tree_.value[node_id][0][0] == clf.tree_.value[node_id][0][1]:
         clf.tree_.value[node_id][0][1] += 1
     else:
-        clf.tree_.value[node_id][0][0], clf.tree_.value[node_id][0][1] = \
-            clf.tree_.value[node_id][0][1], clf.tree_.value[node_id][0][0]
+        clf.tree_.value[node_id][0][0], clf.tree_.value[node_id][0][1] = (
+            clf.tree_.value[node_id][0][1],
+            clf.tree_.value[node_id][0][0],
+        )
 
 
 def relabeling(clf, x, y, y_pred, sensitive, threshold):
@@ -340,5 +347,7 @@ def relabeling(clf, x, y, y_pred, sensitive, threshold):
         if clf.tree_.value[leaf.node_id][0][0] == clf.tree_.value[leaf.node_id][0][1]:
             clf.tree_.value[leaf.node_id][0][1] += 1
         else:
-            clf.tree_.value[leaf.node_id][0][0], clf.tree_.value[leaf.node_id][0][1] = \
-                clf.tree_.value[leaf.node_id][0][1], clf.tree_.value[leaf.node_id][0][0]
+            clf.tree_.value[leaf.node_id][0][0], clf.tree_.value[leaf.node_id][0][1] = (
+                clf.tree_.value[leaf.node_id][0][1],
+                clf.tree_.value[leaf.node_id][0][0],
+            )
