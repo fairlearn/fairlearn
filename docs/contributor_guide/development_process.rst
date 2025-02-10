@@ -95,7 +95,7 @@ Fairlearn currently includes plotting functionality provided by
 The Requirements Files
 """"""""""""""""""""""
 
-The prerequisites for Fairlearn are split between three separate files:
+The prerequisites for Fairlearn are split between two separate files:
 
 * `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
   contains the prerequisites for the core Fairlearn package
