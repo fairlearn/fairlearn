@@ -253,9 +253,7 @@ print("From function:", beta_from_func)
 
 from_myacc = my_acc(y_test, y_pred, sensitive_features=A_test["race"])
 
-from_pregen = accuracy_score_group_min(
-    y_test, y_pred, sensitive_features=A_test["race"]
-)
+from_pregen = accuracy_score_group_min(y_test, y_pred, sensitive_features=A_test["race"])
 
 print("From my function :", from_myacc)
 print("From pregenerated:", from_pregen)

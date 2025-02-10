@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from contextlib import nullcontext as does_not_raise
 from copy import deepcopy
 from test.unit.input_convertors import _map_into_single_column
 
@@ -57,9 +58,7 @@ def test_predict_before_fit_error(
     )
 
     with pytest.raises(ValueError, match="instance is not fitted yet"):
-        getattr(adjusted_predictor, predict_method_name)(
-            X, sensitive_features=sensitive_features
-        )
+        getattr(adjusted_predictor, predict_method_name)(X, sensitive_features=sensitive_features)
 
 
 @pytest.mark.parametrize("constraints", ["demographic_parity", "equalized_odds"])
@@ -147,29 +146,26 @@ def test_threshold_optimization_degenerate_labels(data_X_sf, y_transform, constr
     )
 
     feature_name = _degenerate_labels_feature_name[data_X_sf.example_name]
-    with pytest.raises(
-        ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)
-    ):
-        adjusted_predictor.fit(
-            data_X_sf.X, y, sensitive_features=data_X_sf.sensitive_features
-        )
+    with pytest.raises(ValueError, match=DEGENERATE_LABELS_ERROR_MESSAGE.format(feature_name)):
+        adjusted_predictor.fit(data_X_sf.X, y, sensitive_features=data_X_sf.sensitive_features)
 
 
 @pytest.mark.parametrize("constraints", ["demographic_parity", "equalized_odds"])
 @pytest.mark.uncollect_if(func=is_invalid_transformation)
 def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints):
     n = len(X_ex)
-    expected_exception_messages = {
-        "inconsistent": "Found input variables with inconsistent numbers of samples",
-        "empty": "Found array with 0 sample",
+    inconsistent_exception_messages = {
+        "inconsistent_sklearn": "Found input variables with inconsistent numbers of samples",
+        "inconsistent_pandas": "All arrays must be of the same length",
     }
+
+    empty_exception_messages = {
+        "empty_sklearn": "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required.",
+        "empty_pandas": "Found array with 0 sample",
+    }
+
     for permutation in [(0, 1), (1, 0)]:
-        with pytest.raises(
-            ValueError,
-            match=expected_exception_messages["inconsistent"].format(
-                "X, sensitive_features, and y"
-            ),
-        ):
+        with pytest.raises(ValueError) as e:
             adjusted_predictor = ThresholdOptimizer(
                 estimator=ExamplePredictor(scores_ex),
                 constraints=constraints,
@@ -180,22 +176,22 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
                 data_X_y_sf.y[: n - permutation[1]],
                 sensitive_features=data_X_y_sf.sensitive_features,
             )
+        assert any(message in str(e.value) for message in inconsistent_exception_messages.values())
 
     # try providing empty lists in all combinations
-    for permutation in [(0, n, "inconsistent"), (n, 0, "empty")]:
+    for permutation in [(0, n), (n, 0)]:
         adjusted_predictor = ThresholdOptimizer(
             estimator=ExamplePredictor(scores_ex),
             constraints=constraints,
             predict_method="predict",
         )
-        with pytest.raises(
-            ValueError, match=expected_exception_messages[permutation[2]]
-        ):
+        with pytest.raises(ValueError) as e:
             adjusted_predictor.fit(
                 data_X_y_sf.X[: n - permutation[0]],
                 data_X_y_sf.y[: n - permutation[1]],
                 sensitive_features=data_X_y_sf.sensitive_features,
             )
+        assert any(message in str(e.value) for message in empty_exception_messages.values())
 
 
 class PassThroughPredictor(BaseEstimator):
@@ -232,17 +228,15 @@ def test_threshold_optimization_demographic_parity(
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
-        return estimator._pmf_predict(
-            pd.DataFrame(scores), sensitive_features=sensitive_features
-        )[0, 1]
+        return estimator._pmf_predict(pd.DataFrame(scores), sensitive_features=sensitive_features)[
+            0, 1
+        ]
 
     # For Demographic Parity we can ignore p_ignore since it's always 0.
 
     # sensitive feature value A
     value_for_less_than_2_5 = 0.8008
-    assert np.isclose(
-        value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [0])
-    )
+    assert np.isclose(value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [0]))
     assert np.isclose(
         value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [2.499])
     )
@@ -251,12 +245,8 @@ def test_threshold_optimization_demographic_parity(
 
     # sensitive feature value B
     value_for_less_than_0_5 = 0.00133333333333
-    assert np.isclose(
-        value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0])
-    )
-    assert np.isclose(
-        value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0.5])
-    )
+    assert np.isclose(value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0]))
+    assert np.isclose(value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0.5]))
     assert 1 == prob_pred([sensitive_feature_names_ex1[1]], [0.51])
     assert 1 == prob_pred([sensitive_feature_names_ex1[1]], [1])
     assert 1 == prob_pred([sensitive_feature_names_ex1[1]], [100])
@@ -268,9 +258,7 @@ def test_threshold_optimization_demographic_parity(
     assert np.isclose(
         value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [0.51])
     )
-    assert np.isclose(
-        value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1])
-    )
+    assert np.isclose(value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1]))
     assert np.isclose(
         value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1.5])
     )
@@ -290,9 +278,7 @@ def test_threshold_optimization_demographic_parity(
     average_probabilities_by_sensitive_feature = []
     for sensitive_feature_value in sorted(predictions_by_sensitive_feature):
         average_probabilities_by_sensitive_feature.append(
-            _average_prediction(
-                sensitive_feature_value, predictions_by_sensitive_feature
-            )
+            _average_prediction(sensitive_feature_value, predictions_by_sensitive_feature)
         )
     assert np.isclose(average_probabilities_by_sensitive_feature, [0.572] * 3).all()
 
@@ -316,9 +302,9 @@ def test_threshold_optimization_equalized_odds(
     estimator.fit(pd.DataFrame(scores_ex), y, sensitive_features=sensitive_features)
 
     def prob_pred(sensitive_features, scores):
-        return estimator._pmf_predict(
-            pd.DataFrame(scores), sensitive_features=sensitive_features
-        )[0, 1]
+        return estimator._pmf_predict(pd.DataFrame(scores), sensitive_features=sensitive_features)[
+            0, 1
+        ]
 
     # For Equalized Odds we need to factor in that the output is calculated by
     # p_ignore * prediction_constant + (1 - p_ignore) * (p0 * pred0(x) + p1 * pred1(x))
@@ -331,9 +317,7 @@ def test_threshold_optimization_equalized_odds(
     base_value = prediction_constant * p_ignore
     value_for_less_than_2_5 = base_value + (1 - p_ignore) * 0.668
 
-    assert np.isclose(
-        value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [0])
-    )
+    assert np.isclose(value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [0]))
     assert np.isclose(
         value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [2.499])
     )
@@ -345,19 +329,11 @@ def test_threshold_optimization_equalized_odds(
     p_ignore = 0.1991991991991991
     base_value = prediction_constant * p_ignore
     value_for_less_than_0_5 = base_value + (1 - p_ignore) * 0.001
-    assert np.isclose(
-        value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0])
-    )
-    assert np.isclose(
-        value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0.5])
-    )
-    assert base_value + 1 - p_ignore == prob_pred(
-        [sensitive_feature_names_ex1[1]], [0.51]
-    )
+    assert np.isclose(value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0]))
+    assert np.isclose(value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0.5]))
+    assert base_value + 1 - p_ignore == prob_pred([sensitive_feature_names_ex1[1]], [0.51])
     assert base_value + 1 - p_ignore == prob_pred([sensitive_feature_names_ex1[1]], [1])
-    assert base_value + 1 - p_ignore == prob_pred(
-        [sensitive_feature_names_ex1[1]], [100]
-    )
+    assert base_value + 1 - p_ignore == prob_pred([sensitive_feature_names_ex1[1]], [100])
 
     # sensitive feature value C
     # p_ignore is 0 which means there's no adjustment
@@ -369,18 +345,12 @@ def test_threshold_optimization_equalized_odds(
     assert np.isclose(
         value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [0.51])
     )
-    assert np.isclose(
-        value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1])
-    )
+    assert np.isclose(value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1]))
     assert np.isclose(
         value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1.5])
     )
-    assert base_value + 1 - p_ignore == prob_pred(
-        [sensitive_feature_names_ex1[2]], [1.51]
-    )
-    assert base_value + 1 - p_ignore == prob_pred(
-        [sensitive_feature_names_ex1[2]], [100]
-    )
+    assert base_value + 1 - p_ignore == prob_pred([sensitive_feature_names_ex1[2]], [1.51])
+    assert base_value + 1 - p_ignore == prob_pred([sensitive_feature_names_ex1[2]], [100])
 
     # Assert Equalized Odds actually holds
     predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(
@@ -391,13 +361,9 @@ def test_threshold_optimization_equalized_odds(
         label, sensitive_feature_value, predictions_by_sensitive_feature
     ):
         relevant_predictions = predictions_by_sensitive_feature[sensitive_feature_value]
-        predictions_for_label = [
-            lp.prediction for lp in relevant_predictions if lp.label == label
-        ]
+        predictions_for_label = [lp.prediction for lp in relevant_predictions if lp.label == label]
         sum_of_predictions_for_label = np.sum(predictions_for_label)
-        n_predictions_for_label = len(
-            [lp for lp in relevant_predictions if lp.label == label]
-        )
+        n_predictions_for_label = len([lp for lp in relevant_predictions if lp.label == label])
         return sum_of_predictions_for_label / n_predictions_for_label
 
     predictions_based_on_label = {0: [], 1: []}
@@ -445,8 +411,7 @@ def test_threshold_optimization_demographic_parity_e2e(data_X_y_sf):
     for sensitive_feature_name in data_X_y_sf.feature_names:
         average_probs = np.average(
             predictions[
-                _map_into_single_column(data_X_y_sf.sensitive_features)
-                == sensitive_feature_name
+                _map_into_single_column(data_X_y_sf.sensitive_features) == sensitive_feature_name
             ],
             axis=0,
         )
@@ -883,24 +848,18 @@ results = {
     "equalized_odds, bad_objective": (
         "For equalized_odds only the following objectives are supported"
     ),
-    "bad_constraints, accuracy_score": (
-        "Currently only the following constraints are supported"
-    ),
+    "bad_constraints, accuracy_score": "Currently only the following constraints are supported",
     "bad_constraints, balanced_accuracy_score": (
         "Currently only the following constraints are supported"
     ),
-    "bad_constraints, selection_rate": (
-        "Currently only the following constraints are supported"
-    ),
+    "bad_constraints, selection_rate": "Currently only the following constraints are supported",
     "bad_constraints, true_positive_rate": (
         "Currently only the following constraints are supported"
     ),
     "bad_constraints, true_negative_rate": (
         "Currently only the following constraints are supported"
     ),
-    "bad_constraints, bad_objective": (
-        "Currently only the following constraints are supported"
-    ),
+    "bad_constraints, bad_objective": "Currently only the following constraints are supported",
 }
 
 PREC = 1e-6
@@ -920,7 +879,7 @@ def test_constraints_objective_pairs(constraints, objective):
         predict_method="predict",
     )
     expected = results[constraints + ", " + objective]
-    if type(expected) is str:
+    if isinstance(expected, str):
         with pytest.raises(ValueError) as error_info:
             thr_optimizer.fit(X, y, sensitive_features=sf)
         assert str(error_info.value).startswith(expected)
@@ -930,18 +889,12 @@ def test_constraints_objective_pairs(constraints, objective):
         for key in [0, 1]:
             assert res[key]["p0"] == pytest.approx(expected[key]["p0"], PREC)
             assert res[key]["operation0"]._operator == expected[key]["op0"]
-            assert res[key]["operation0"]._threshold == pytest.approx(
-                expected[key]["thr0"], PREC
-            )
+            assert res[key]["operation0"]._threshold == pytest.approx(expected[key]["thr0"], PREC)
             assert res[key]["p1"] == pytest.approx(expected[key]["p1"], PREC)
             assert res[key]["operation1"]._operator == expected[key]["op1"]
-            assert res[key]["operation1"]._threshold == pytest.approx(
-                expected[key]["thr1"], PREC
-            )
+            assert res[key]["operation1"]._threshold == pytest.approx(expected[key]["thr1"], PREC)
             if "p_ignore" in expected[key]:
-                assert res[key]["p_ignore"] == pytest.approx(
-                    expected[key]["p_ignore"], PREC
-                )
+                assert res[key]["p_ignore"] == pytest.approx(expected[key]["p_ignore"], PREC)
                 assert res[key]["prediction_constant"] == pytest.approx(
                     expected[key]["prediction_constant"], PREC
                 )
@@ -972,3 +925,28 @@ def test_predict_method(predict_method):
     exception = "predict_proba" if predict_method == "auto" else predict_method
     with pytest.raises(Exception, match=exception):
         clf.fit(X, y, sensitive_features=sensitive_feature)
+
+
+def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
+    class DummyEstimator(BaseEstimator, ClassifierMixin):
+        def fit(self, X, y, **kwargs):
+            self.fitted_ = True
+            return self
+
+        def predict(self, X):
+            return np.array([0, 1] * (len(X) // 2))
+
+        def predict_proba(self, X):
+            return np.array([[0.6, 0.4], [0.4, 0.6]] * (len(X) // 2))
+
+    X = np.random.rand(10, 5, 3)
+    y = np.array([0, 1] * 5)
+    sensitive_features = ["A"] * 5 + ["B"] * 5
+
+    threshold_optimizer = ThresholdOptimizer(
+        estimator=DummyEstimator(), grid_size=10, prefit=False
+    )
+
+    with does_not_raise():
+        threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
+        threshold_optimizer.predict(X, sensitive_features=sensitive_features)

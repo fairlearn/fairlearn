@@ -9,7 +9,6 @@ Plotting Metrics with Errors
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
-from fairlearn.datasets import fetch_adult
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score, confusion_matrix, recall_score
 from sklearn.model_selection import train_test_split
@@ -17,6 +16,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils import check_consistent_length
+
+from fairlearn.datasets import fetch_adult
 
 # %%
 # Load and preprocess the data set
@@ -26,7 +27,7 @@ from fairlearn.experimental.enable_metric_frame_plotting import plot_metric_fram
 from fairlearn.metrics import MetricFrame
 
 # %%
-# We download the data set using the function :func:`fetch_adult` in :mod:`fairlearn.datasets`.
+# We download the data set using the function :func:`.fetch_adult` in :mod:`fairlearn.datasets`.
 # The original Adult data set can be found at https://archive.ics.uci.edu/ml/datasets/Adult
 # There are some caveats to using this dataset, but we will use it solely as an example
 # to demonstrate the functionality of plotting metrics with error bars.
@@ -110,12 +111,8 @@ def general_wilson(p, n, digits=4, z=1.959964):
     denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
     adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
-    lower_bound = (
-        centre_adjusted_probability - z * adjusted_standard_deviation
-    ) / denominator
-    upper_bound = (
-        centre_adjusted_probability + z * adjusted_standard_deviation
-    ) / denominator
+    lower_bound = (centre_adjusted_probability - z * adjusted_standard_deviation) / denominator
+    upper_bound = (centre_adjusted_probability + z * adjusted_standard_deviation) / denominator
     return np.array([round(lower_bound, digits), round(upper_bound, digits)])
 
 
@@ -227,7 +224,7 @@ plot_metric_frame(metric_frame, kind="bar", colormap="rainbow", layout=[1, 2])
 # %%
 # Customizing plots
 # -----------------
-# :func:`plot_metric_frame` returns an :class:`Axes` object that we can customize further.
+# :func:`.plot_metric_frame` returns an :class:`matplotlib.axes.Axes` object that we can customize further.
 
 axs = plot_metric_frame(
     metric_frame,

@@ -3,56 +3,52 @@
 API Docs
 ========
 
-fairlearn.datasets
-==================
+:py:mod:`fairlearn.datasets`
+============================
 
 .. automodule:: fairlearn.datasets
     :no-members:
     :no-inherited-members:
 
-.. currentmodule:: fairlearn
-
 .. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: function.rst
 
-   datasets.fetch_acs_income
-   datasets.fetch_adult
-   datasets.fetch_bank_marketing
-   datasets.fetch_boston
-   datasets.fetch_credit_card
-   datasets.fetch_diabetes_hospital
+   fetch_acs_income
+   fetch_adult
+   fetch_bank_marketing
+   fetch_boston
+   fetch_credit_card
+   fetch_diabetes_hospital
 
-fairlearn.metrics
-=================
+:py:mod:`fairlearn.metrics`
+===========================
 
 .. automodule:: fairlearn.metrics
     :no-members:
     :no-inherited-members:
 
-.. currentmodule:: fairlearn
-
-.. autosummary:: 
+.. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: function.rst
 
-    metrics.count
-    metrics.demographic_parity_difference
-    metrics.demographic_parity_ratio
-    metrics.equalized_odds_difference
-    metrics.equalized_odds_ratio
-    metrics.equal_opportunity_difference
-    metrics.equal_opportunity_ratio
-    metrics.false_negative_rate
-    metrics.false_positive_rate
-    metrics.make_derived_metric
-    metrics.mean_prediction
-    metrics.plot_model_comparison
-    metrics.selection_rate
-    metrics.true_negative_rate
-    metrics.true_positive_rate
+    count
+    demographic_parity_difference
+    demographic_parity_ratio
+    equalized_odds_difference
+    equalized_odds_ratio
+    equal_opportunity_difference
+    equal_opportunity_ratio
+    false_negative_rate
+    false_positive_rate
+    make_derived_metric
+    mean_prediction
+    plot_model_comparison
+    selection_rate
+    true_negative_rate
+    true_positive_rate
 
 
 .. autosummary::
@@ -60,98 +56,90 @@ fairlearn.metrics
    :toctree: generated/
    :template: class.rst
 
-   metrics.MetricFrame
+    MetricFrame
 
-fairlearn.postprocessing
-========================
+:py:mod:`fairlearn.postprocessing`
+==================================
 
 .. automodule:: fairlearn.postprocessing
     :no-members:
     :no-inherited-members:
 
-.. currentmodule:: fairlearn
-
 .. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: class.rst
 
-   postprocessing.ThresholdOptimizer
+   ThresholdOptimizer
 
 .. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: function.rst
 
-   postprocessing.plot_threshold_optimizer
+   plot_threshold_optimizer
 
-fairlearn.preprocessing
-=======================
+:py:mod:`fairlearn.preprocessing`
+=================================
 
 .. automodule:: fairlearn.preprocessing
     :no-members:
     :no-inherited-members:
 
-.. currentmodule:: fairlearn
-
 .. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: class.rst
 
-   preprocessing.CorrelationRemover
+   CorrelationRemover
 
-fairlearn.reductions
-====================
+:py:mod:`fairlearn.reductions`
+==============================
 
 .. automodule:: fairlearn.reductions
     :no-members:
     :no-inherited-members:
 
-.. currentmodule:: fairlearn
-
 .. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: class.rst
 
-   reductions.AbsoluteLoss
-   reductions.BoundedGroupLoss
-   reductions.ClassificationMoment
-   reductions.DemographicParity
-   reductions.EqualizedOdds
-   reductions.ErrorRate
-   reductions.ErrorRateParity
-   reductions.ExponentiatedGradient
-   reductions.TruePositiveRateParity
-   reductions.FalsePositiveRateParity
-   reductions.UtilityParity
-   reductions.GridSearch
-   reductions.LossMoment
-   reductions.Moment
-   reductions.BoundedGroupLoss
-   reductions.SquareLoss
-   reductions.ZeroOneLoss
+   AbsoluteLoss
+   BoundedGroupLoss
+   ClassificationMoment
+   DemographicParity
+   EqualizedOdds
+   ErrorRate
+   ErrorRateParity
+   ExponentiatedGradient
+   TruePositiveRateParity
+   FalsePositiveRateParity
+   UtilityParity
+   GridSearch
+   LossMoment
+   Moment
+   BoundedGroupLoss
+   SquareLoss
+   ZeroOneLoss
 
-fairlearn.adversarial
-=====================
+:py:mod:`fairlearn.adversarial`
+===============================
 
 .. automodule:: fairlearn.adversarial
     :no-members:
     :no-inherited-members:
 
-.. currentmodule:: fairlearn
-
 .. autosummary::
    :nosignatures:
    :toctree: generated/
    :template: class.rst
-   
-   adversarial.AdversarialFairnessClassifier
-   adversarial.AdversarialFairnessRegressor
 
-fairlearn.experimental
-======================
+   AdversarialFairnessClassifier
+   AdversarialFairnessRegressor
+
+:py:mod:`fairlearn.experimental`
+================================
 
 .. automodule:: fairlearn.experimental
     :no-members:
@@ -163,5 +151,5 @@ fairlearn.experimental
    :nosignatures:
    :toctree: generated/
    :template: function.rst
-   
+
    metrics._plotter.plot_metric_frame

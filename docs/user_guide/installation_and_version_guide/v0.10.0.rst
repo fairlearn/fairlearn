@@ -1,7 +1,7 @@
 v0.10.0
 =======
 
-* Added bootstrapping to :class:`MetricFrame`, along with a new section
+* Added bootstrapping to :class:`.MetricFrame`, along with a new section
   in the user guide
 * Added intersectionality in mental health care example notebook.
 * Added user guide for :class:`fairlearn.postprocessing.ThresholdOptimizer`

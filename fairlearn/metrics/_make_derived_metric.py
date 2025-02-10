@@ -1,9 +1,10 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import functools
 import inspect
-from typing import Callable, List, Union
+from typing import Callable, Union
 
 from ._metric_frame import MetricFrame
 
@@ -28,9 +29,9 @@ class _DerivedMetric:
     def __init__(
         self,
         *,
-        metric: Callable[..., Union[float, int]],
+        metric: Callable[..., float | int],
         transform: str,
-        sample_param_names: List[str],
+        sample_param_names: list[str],
     ):
         if not callable(metric):
             raise ValueError(_METRIC_CALLABLE_ERROR)
@@ -49,9 +50,7 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(
-        self, y_true, y_pred, *, sensitive_features, **other_params
-    ) -> Union[float, int]:
+    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params) -> Union[float, int]:
         sample_params = dict()
         params = dict()
         transform_parameters = dict()
@@ -95,10 +94,10 @@ class _DerivedMetric:
 
 def make_derived_metric(
     *,
-    metric: Callable[..., Union[float, int]],
+    metric: Callable[..., float | int],
     transform: str,
-    sample_param_names: List[str] = ["sample_weight"],
-) -> Callable[..., Union[float, int]]:
+    sample_param_names: list[str] = ["sample_weight"],
+) -> Callable[..., float | int]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
     Many higher order machine learning operations (such as hyperparameter tuning)
@@ -136,7 +135,7 @@ def make_derived_metric(
         The list of possible options is:
         ['difference', 'group_min', 'group_max', 'ratio'].
 
-    sample_param_names : List[str]
+    sample_param_names : list[str]
         A list of parameters names of the underlying :code:`metric` which should
         be treated as sample parameters (i.e. the same leading dimension as the
         :code:`y_true` and :code:`y_pred` parameters). This defaults to a list with
@@ -151,7 +150,5 @@ def make_derived_metric(
         :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
-    dm = _DerivedMetric(
-        metric=metric, transform=transform, sample_param_names=sample_param_names
-    )
+    dm = _DerivedMetric(metric=metric, transform=transform, sample_param_names=sample_param_names)
     return dm

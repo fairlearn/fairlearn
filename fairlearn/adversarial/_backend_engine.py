@@ -1,15 +1,16 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from ._constants import (
-    _KWARG_ERROR_MESSAGE,
-    _NOT_IMPLEMENTED,
-    _DIST_TYPE_NOT_IMPLEMENTED,
-    _NO_LOSS,
-    _LIST_MODEL_UNSUPPORTED,
-)
-from sklearn.utils import shuffle
 from numpy import ndarray
+from sklearn.utils import shuffle
+
+from ._constants import (
+    _DIST_TYPE_NOT_IMPLEMENTED,
+    _KWARG_ERROR_MESSAGE,
+    _LIST_MODEL_UNSUPPORTED,
+    _NO_LOSS,
+    _NOT_IMPLEMENTED,
+)
 
 
 class BackendEngine:
@@ -105,9 +106,7 @@ class BackendEngine:
             return model_param
         else:
             raise ValueError(
-                _KWARG_ERROR_MESSAGE.format(
-                    f"{name}_model", f"a list or a '{name}_model'"
-                )
+                _KWARG_ERROR_MESSAGE.format(f"{name}_model", f"a list or a '{name}_model'")
             )
 
     def __init_loss__(self, loss_param, name):
@@ -224,9 +223,7 @@ class BackendEngine:
         This is the base function which can be used as fall-back for subclass
         methods.
         """
-        raise ValueError(
-            _DIST_TYPE_NOT_IMPLEMENTED.format(self.__class__.__name__, dist_type)
-        )
+        raise ValueError(_DIST_TYPE_NOT_IMPLEMENTED.format(self.__class__.__name__, dist_type))
 
     def get_model(self, list_nodes):
         """

@@ -68,9 +68,7 @@ class TestSingleFeature:
         raw_feature = pd.DataFrame(data=r_f)
 
         target = _get_raw_MetricFrame()
-        msg = (
-            "DataFrame column names must be strings. Name '0' is of type <class 'int'>"
-        )
+        msg = "DataFrame column names must be strings. Name '0' is of type <class 'int'>"
         with pytest.raises(ValueError) as execInfo:
             _ = target._process_features("Unused", raw_feature, y_true)
         assert execInfo.value.args[0] == msg
@@ -88,10 +86,7 @@ class TestSingleFeature:
         raw_feature = pd.DataFrame(data=r_f, columns=[0])
 
         target = _get_raw_MetricFrame()
-        msg = (
-            "DataFrame column names must be strings. Name '0' is of type <class"
-            " 'numpy.int64'>"
-        )
+        msg = "DataFrame column names must be strings. Name '0' is of type <class 'numpy.int64'>"
         with pytest.raises(ValueError) as execInfo:
             _ = target._process_features("Unused", raw_feature, y_true)
         assert execInfo.value.args[0] == msg
@@ -159,9 +154,7 @@ class TestTwoFeatures:
         rf = pd.DataFrame(data=zip(a, b))
 
         target = _get_raw_MetricFrame()
-        msg = (
-            "DataFrame column names must be strings. Name '0' is of type <class 'int'>"
-        )
+        msg = "DataFrame column names must be strings. Name '0' is of type <class 'int'>"
         with pytest.raises(ValueError) as execInfo:
             _ = target._process_features("Unused", rf, y_true)
         assert execInfo.value.args[0] == msg

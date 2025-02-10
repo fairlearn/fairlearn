@@ -9,9 +9,7 @@ Fairness of AI systems
 
 AI systems can behave unfairly for a variety of reasons. Sometimes it is
 because of societal biases reflected in the training data and in the decisions
-made during the development and deployment of these systems. In other cases,
-AI systems behave unfairly not because of societal biases, but because of
-characteristics of the data (e.g., too few data points about some group of
+made during the development and deployment of these systems. In other cases, AI systems behave unfairly due to characteristics of the data (e.g., too few data points about some group of
 people) or characteristics of the systems themselves. It can be hard to
 distinguish between these reasons, especially since they are not mutually
 exclusive and often exacerbate one another. Therefore, we define whether an AI
@@ -23,14 +21,12 @@ terms of intent, such as prejudice.
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 
-
 .. _types_of_harms:
 
 Types of harms
 --------------
 
-There are many types of harms (see, e.g., the
-`keynote by K. Crawford at NeurIPS 2017 <https://www.youtube.com/watch?v=fMym_BKWQzk>`_).
+There are many types of harms :footcite:`barocas2017problem`.
 Some of these are:
 
 * *Allocation harms* can occur when AI systems extend or withhold
@@ -76,7 +72,7 @@ since these are easiest to measure.
 Concept glossary
 ----------------------------
 
-The concepts outlined in this glossary are relevant to sociotechnical contexts. 
+The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
@@ -90,12 +86,12 @@ The concepts outlined in this glossary give an introduction into the language of
 This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
 In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
-Key Terms 
+Key Terms
 ~~~~~~~~~
 
 - **Sociotechnical context** – The context surrounding a technical system, including both social aspects (e.g., people, institutions, communities) and technical aspects (e.g., algorithms, technical processes). The sociotechnical context of a system shapes who might benefit or is harmed by AI systems.
 
-- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model. 
+- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model.
 
 - **Measurement model** – The method and approach used to measure the unobservable theoretical construct.
 
@@ -110,24 +106,24 @@ Key Term Examples  - Unobservable theoretical constructs and Measurement models
 
 - **Teacher effectiveness** is an example of an unobservable theoretical construct. Common measurement models include student performance on standardized exams and qualitative feedback for the teacher’s students.
 
-- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
+- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income.
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example.
 
 **Note:**
 We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
 Please reference :footcite:cts:`jacobs2021measurement` for more detailed examples.
- 
- 
+
+
 .. _construct_validity:
 
-What is construct validity? 
+What is construct validity?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our 
+Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our
 exploration below on construct Validity.
 We note that both play an important role in understanding fairness in sociotechnical contexts.
-With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that 
+With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that
 is helpful in thinking about fairness in sociotechnical contexts.
 We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
@@ -139,24 +135,24 @@ We capture the idea in seven key parts that when combined  can serve as a framew
    b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
    c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
 
-3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
-   measurement models for which construct validity has been established? 
- 
-4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
-   related constructs as appropriate?  
+3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from
+   measurement models for which construct validity has been established?
 
-5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
+4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with
+   related constructs as appropriate?
+
+5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements
    of any relevant observable properties or other unobservable theoretical constructs?
 
-6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
+6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements
    produced by the measurement model, and whether those are “substantively interesting”.
 
-7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
-   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
+7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the
+   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the
    measurements, and what world do we wish to live in?
 
-**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific 
-sociotechnical context. This is only intended to explain the key concepts that could be used in a 
+**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific
+sociotechnical context. This is only intended to explain the key concepts that could be used in a
 framework for analyzing a task.
 
 Fairness assessment and unfairness mitigation
@@ -466,6 +462,24 @@ which judging and recommending an outcome take place. This frame might
 incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
+
+Stakeholder Identification
+--------------------------
+Introduction
+^^^^^^^^^^^^
+
+Now that we've seen how AI systems can generate harms, what else should we account for when designing an AI system?
+AI systems impact not only end users but also organizations within a business, communities, civil society, government agencies, and entire industries. If practitioners do not have a process to engage stakeholders, they may rely on their personal experiences and identities instead and overlook fairness-related harms :footcite:`madaio2022assess`.  Therefore, it is important to identify the relevant stakeholders, factors, and groups that might be at the most risk of experiencing fairness-related harms before conducting a fairness assessment.
+
+.. _defining_terms:
+
+Defining terms
+^^^^^^^^^^^^^^
+**Stakeholders** include direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`madaio2022assess`. For example, in the case of a fraud detection AI system, there could be three types of stakeholders identified: a) people whose transactions might be mistakenly classified as fraudulent, b) companies running money-transfer platforms with the fraud detection AI system, and c) local government fraud auditors that audit the money transfer platforms' transactions.
+
+Note: Some have identified that using the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to pay attention to the context in which stakeholder identification occurs and adjust accordingly (e.g. opt for alternative terminology to avoid causing harm).
+
+**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
 References
 ----------

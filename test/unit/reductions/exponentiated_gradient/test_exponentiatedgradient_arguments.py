@@ -39,9 +39,7 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_argument_types_difference_bound(
-        self, transformX, transformY, transformA, A_two_dim
-    ):
+    def test_argument_types_difference_bound(self, transformX, transformY, transformA, A_two_dim):
         # This is an expanded-out version of one of the smoke tests
         X, y, A = _get_data(A_two_dim)
         merged_A = _map_into_single_column(A)
@@ -86,9 +84,7 @@ class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
     @pytest.mark.parametrize("A_two_dim", [False, True])
     @pytest.mark.uncollect_if(func=is_invalid_transformation)
-    def test_argument_types_ratio_bound(
-        self, transformX, transformY, transformA, A_two_dim
-    ):
+    def test_argument_types_ratio_bound(self, transformX, transformY, transformA, A_two_dim):
         # This is an expanded-out version of one of the smoke tests
         X, y, A = _get_data(A_two_dim)
         merged_A = _map_into_single_column(A)
@@ -148,9 +144,7 @@ class TestExponentiatedGradientArguments:
         estimator.predict = mocker.Mock(return_value=y)
         estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(
-            estimator, constraints=DemographicParity(), max_iter=1
-        )
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
         mocker.patch("copy.deepcopy", return_value=estimator)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
@@ -185,16 +179,11 @@ class TestExponentiatedGradientArguments:
 
         X, y, A = _get_data()
 
-        expgrad = ExponentiatedGradient(
-            estimator, constraints=DemographicParity(), max_iter=1
-        )
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
 
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
-        assert (
-            "Pipeline.fit does not accept the sample_weight parameter"
-            in execInfo.value.args[0]
-        )
+        assert "Pipeline.fit does not accept the sample_weight parameter" in execInfo.value.args[0]
 
         expgrad = ExponentiatedGradient(
             estimator,

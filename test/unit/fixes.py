@@ -9,5 +9,5 @@ def get_sklearn_expected_1d_message():
     if sklearn.__version__ < "0.23.0":
         expected_message = "bad input shape"
     else:
-        expected_message = "y should be a 1d array"
+        expected_message = "Data must be 1-dimensional"
     return expected_message

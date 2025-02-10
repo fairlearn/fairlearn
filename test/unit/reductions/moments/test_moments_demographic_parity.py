@@ -89,9 +89,7 @@ def test_project_lambda_smoke_negatives():
     events = ["all"]
     signs = ["+", "-"]
     labels = ["a", "b"]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
-    )
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
     # Note that the '-' indices (11 and 19) are larger
@@ -113,9 +111,7 @@ def test_project_lambda_smoke_positives():
     events = ["all"]
     signs = ["+", "-"]
     labels = ["a", "b"]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
-    )
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
     # Note that the '-' indices are smaller than
@@ -153,9 +149,7 @@ def test_signed_weights():
     events = ["all"]
     signs = ["+", "-"]
     labels = [a0_label, a1_label]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
-    )
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     lambda_vec = pd.Series([2000, 1000, 500, 100], index=midx, name=0)
     lambda_a0 = 2000 - 500

@@ -67,8 +67,8 @@ true positive rate parity as the fairness constraint.
     >>> # Drop 3 rows of Unknown gender since it's not representative of that group.
     >>> # In a real application, this would be a red flag to investigate data collection.
     >>> keep_idx = (data.data['gender'] == "Male") | (data.data['gender'] == "Female")
-    >>> X_raw = data.data[keep_idx]
-    >>> y = data.target[keep_idx]
+    >>> X_raw = data.data[keep_idx].copy()
+    >>> y = data.target[keep_idx].copy()
     >>> categorical_columns = [
     ...     'race', 'gender', 'age', 'discharge_disposition_id', 'admission_source_id',
     ...     'medical_specialty', 'primary_diagnosis', 'readmitted', 'max_glu_serum',
@@ -93,7 +93,6 @@ true positive rate parity as the fairness constraint.
     ... )
     >>> categorical_transformer = Pipeline(
     ...     [
-    ...         # ("impute", SimpleImputer(strategy="most_frequent")),
     ...         ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ...     ]
     ... )
@@ -137,7 +136,7 @@ true positive rate parity as the fairness constraint.
                        objective='balanced_accuracy_score',
                        predict_method='predict_proba')
     >>> threshold_optimizer.predict(X_test, sensitive_features=A_test, random_state=12345)
-    array([0, 0, 0, ..., 0, 1, 0])
+    array([0, 0, 0, ..., 0, 1, 0], shape=(30529,))
     >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
     >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
     {
@@ -157,7 +156,6 @@ true positive rate parity as the fairness constraint.
     >>> plot_threshold_optimizer(threshold_optimizer)
 
 When calling :code:`predict`, :class:`ThresholdOptimizer` uses one of the
-
 thresholds at random based on the probabilities :math:`p_0` and :math:`p_1`.
 The results can be interpreted as follows based on the following formula for
 the probability to predict label 1:
@@ -167,7 +165,7 @@ the probability to predict label 1:
     p_0 \cdot \text{operation}_0(\text{score}) + p_1 \cdot \text{operation}_1(\text{score})
 
 
-- "Female: :math:`0.628 \cdot \mathbb{I}(\text{score}>0.110) + 0.371 \cdot \mathbb{I}(\text{score}>0.096)`
+- "Female": :math:`0.628 \cdot \mathbb{I}(\text{score}>0.110) + 0.371 \cdot \mathbb{I}(\text{score}>0.096)`
 
   - if the score is above :math:`0.110` predict 1
   - if the score is between :math:`0.110` and :math:`0.096` predict 1 with

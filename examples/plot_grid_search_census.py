@@ -32,6 +32,7 @@ GridSearch with Census Data
 # to use:
 #
 
+import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn import metrics as skm
 from sklearn.linear_model import LogisticRegression
@@ -39,14 +40,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from fairlearn.datasets import fetch_adult
-from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 from fairlearn.metrics import (
     MetricFrame,
-    selection_rate,
     count,
     plot_model_comparison,
+    selection_rate,
     selection_rate_difference,
 )
+from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
@@ -137,8 +138,8 @@ metric_frame.by_group.plot.bar(
 # --------------------------
 #
 # The :class:`fairlearn.reductions.GridSearch` class implements a simplified
-# version of the exponentiated gradient reduction of `Agarwal et al. 2018
-# <https://arxiv.org/abs/1803.02453>`_. The user supplies a standard ML
+# version of the exponentiated gradient reduction of Agarwal et al.
+# :footcite:`agarwal2018reductions`. The user supplies a standard ML
 # estimator, which is treated as a blackbox. `GridSearch` works by generating a
 # sequence of relabellings and reweightings, and trains a predictor for each.
 #
@@ -192,9 +193,7 @@ for m in predictors:
     errors.append(error.gamma(classifier).iloc[0])
     disparities.append(disparity.gamma(classifier).max())
 
-all_results = pd.DataFrame(
-    {"predictor": predictors, "error": errors, "disparity": disparities}
-)
+all_results = pd.DataFrame({"predictor": predictors, "error": errors, "disparity": disparities})
 
 non_dominated = []
 for row in all_results.itertuples():
@@ -224,13 +223,9 @@ for i in range(len(non_dominated)):
         y_pred=predictions[key],
     )
 
-import matplotlib.pyplot as plt
 
 x = [metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()]
-y = [
-    metric_frame.difference()["selection_rate"]
-    for metric_frame in metric_frames.values()
-]
+y = [metric_frame.difference()["selection_rate"] for metric_frame in metric_frames.values()]
 keys = list(metric_frames.keys())
 plt.scatter(x, y)
 for i in range(len(x)):
@@ -250,8 +245,8 @@ plt.ylabel("selection rate difference")
 #
 # In a real example, we would pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
-#
-# %% [markdown]
+
+# %%
 # Comparing models easily
 # -----------------------
 # Fairlearn also provides functionality to compare models much more easily.
@@ -269,3 +264,9 @@ plot_model_comparison(
     show_plot=True,
 )
 # End model comparison
+
+# %%
+# ===========================
+# References
+# ===========================
+# .. footbibliography::

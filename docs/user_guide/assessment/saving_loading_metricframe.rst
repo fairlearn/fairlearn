@@ -21,7 +21,7 @@ format and how to load it from a stored pickle file.
     ...                            y_true=y_true,
     ...                            y_pred=y_pred,
     ...                            sensitive_features=sf_data)
-    >>> metric_frame.overall
+    >>> metric_frame.overall.item()
     0.444...
     >>> metric_frame.by_group
     sensitive_feature_0
@@ -32,7 +32,7 @@ format and how to load it from a stored pickle file.
     >>> file_name = 'metric_frame_save_load_example.pkl'
     >>> pickle.dump(metric_frame, open(file_name, 'wb'))
 	>>> loaded_metric_frame = pickle.load(open(file_name, 'rb'))
-    >>> loaded_metric_frame.overall
+    >>> loaded_metric_frame.overall.item()
     0.444...
     >>> loaded_metric_frame.by_group
     sensitive_feature_0
@@ -40,5 +40,3 @@ format and how to load it from a stored pickle file.
     b    0.666667
     c    0.375000
     Name: accuracy_score, dtype: float64
-
-

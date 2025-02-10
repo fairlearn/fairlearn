@@ -1,91 +1,84 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from contextlib import AbstractContextManager
+from contextlib import nullcontext as does_not_raise
+
 import numpy as np
 import pytest
+from numpy.typing import NDArray
+from sklearn.base import BaseEstimator, ClassifierMixin
 
-import fairlearn.utils._input_manipulations as fmim
-
-
-class TestConvertToNDArrayAndSqueeze:
-    def test_simple_list(self):
-        X = [0, 1, 2]
-
-        result = fmim._convert_to_ndarray_and_squeeze(X)
-
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (3,)
-        assert result[0] == 0
-        assert result[1] == 1
-        assert result[2] == 2
-
-    def test_multi_rows(self):
-        X = [[0], [1]]
-
-        result = fmim._convert_to_ndarray_and_squeeze(X)
-
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (2,)
-        assert result[0] == 0
-        assert result[1] == 1
-
-    def test_multi_columns(self):
-        X = [[0, 1]]
-
-        result = fmim._convert_to_ndarray_and_squeeze(X)
-
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (2,)
-        assert result[0] == 0
-        assert result[1] == 1
-
-    def test_single_element(self):
-        X = [[[1]]]
-
-        result = fmim._convert_to_ndarray_and_squeeze(X)
-
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (1,)
-        assert result[0] == 1
+from fairlearn.reductions import DemographicParity, ExponentiatedGradient
+from fairlearn.utils._input_manipulations import (
+    _convert_to_ndarray_1d,
+    _convert_to_ndarray_and_squeeze,
+)
 
 
-class TestConvertToNDArray1D:
-    def test_simple_list(self):
-        X = [0, 1, 2]
+@pytest.mark.parametrize(
+    "X, expected",
+    [
+        ([0, 1, 2], np.array([0, 1, 2])),
+        ([[0], [1]], np.array([0, 1])),
+        ([[0, 1]], np.array([0, 1])),
+        ([[[1]]], np.array([1])),
+    ],
+)
+def test_convert_to_ndarray_and_squeeze(X, expected: NDArray):
+    result = _convert_to_ndarray_and_squeeze(X)
+    np.testing.assert_array_equal(result, expected)
 
-        result = fmim._convert_to_ndarray_1d(X)
 
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (3,)
-        assert result[0] == 0
-        assert result[1] == 1
-        assert result[2] == 2
+@pytest.mark.parametrize(
+    "X, expected",
+    [
+        ([0, 1, 2], np.array([0, 1, 2])),
+        ([[4, 5]], np.array([4, 5])),
+        ([[5], [7]], np.array([5, 7])),
+    ],
+)
+def test_convert_to_ndarray_1d(X, expected: NDArray):
+    result = _convert_to_ndarray_1d(X)
+    np.testing.assert_array_equal(result, expected)
 
-    def test_simple_nested_list(self):
-        X = [[4, 5]]
 
-        result = fmim._convert_to_ndarray_1d(X)
+@pytest.mark.parametrize(
+    "X, expectation",
+    [
+        (
+            [[1, 2], [3, 4]],
+            pytest.raises(
+                ValueError, match="Supplied input array has more than one non-trivial dimension"
+            ),
+        )
+    ],
+)
+def test_convert_to_ndarray_1d_raises_exception(X, expectation: AbstractContextManager):
+    with expectation:
+        _convert_to_ndarray_1d(X)
 
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (2,)
-        assert result[0] == 4
-        assert result[1] == 5
 
-    def test_simple_transposed_list(self):
-        X = [[5], [7]]
+def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
+    class DummyEstimator(BaseEstimator, ClassifierMixin):
+        def fit(self, X, y, **kwargs):
+            self.fitted_ = True
+            return self
 
-        result = fmim._convert_to_ndarray_1d(X)
+        def predict(self, X):
+            return np.array([0, 1] * (len(X) // 2))
 
-        assert isinstance(result, np.ndarray)
-        assert result.shape == (2,)
-        assert result[0] == 5
-        assert result[1] == 7
+        def predict_proba(self, X):
+            return np.array([[0.6, 0.4], [0.4, 0.6]] * (len(X) // 2))
 
-    def test_2d_raises_exception(self):
-        X = [[1, 2], [3, 4]]
+    X = np.random.rand(10, 5, 3)
+    y = np.array([0, 1] * 5)
+    sensitive_features = ["A"] * 5 + ["B"] * 5
 
-        with pytest.raises(ValueError) as exception_context:
-            _ = fmim._convert_to_ndarray_1d(X)
+    exponentiated_gradient = ExponentiatedGradient(
+        estimator=DummyEstimator(), constraints=DemographicParity(), max_iter=10
+    )
 
-        expected = "Supplied input array has more than one non-trivial dimension"
-        assert exception_context.value.args[0] == expected
+    with does_not_raise():
+        exponentiated_gradient.fit(X, y, sensitive_features=sensitive_features)
+        exponentiated_gradient.predict(X)

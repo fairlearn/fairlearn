@@ -70,7 +70,7 @@ from fairlearn.metrics import MetricFrame, count, selection_rate
 # Next, we import the data:
 
 data = fetch_adult()
-X_raw = data.data
+X_raw = data.data.copy()
 y = (data.target == ">50K") * 1
 
 # %%
@@ -121,10 +121,10 @@ col_credit.name = "Credit Score"
 col_loan_size = X_raw["occupation"].map(occupation_transform).fillna("Small")
 col_loan_size.name = "Loan Size"
 
-A = X_raw[["race", "sex"]]
+A = X_raw[["race", "sex"]].copy()
 A["Credit Score"] = col_credit
 A["Loan Size"] = col_loan_size
-A
+
 
 # %%
 # Now that we have imported our dataset and manufactured a few features, we
@@ -160,9 +160,7 @@ A_test = A_test.reset_index(drop=True)
 # missing data could also cause trouble, if particular subgroups
 # have poorer data quality.
 
-numeric_transformer = Pipeline(
-    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())]
-)
+numeric_transformer = Pipeline(steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())])
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
@@ -395,14 +393,13 @@ grouped_on_race.ratio(method="to_overall")
 # and we have already found some serious issues in our example data.
 # However, sometimes serious issues can be hiding in intersections of
 # features. For example, the
-# `Gender Shades project <https://www.media.mit.edu/projects/gender-shades/overview/>`_
+# Gender Shades project :footcite:`buolamwini2018gender`
 # found that facial recognition algorithms performed worse for blacks
 # than whites, and also worse for women than men (despite overall high
 # accuracy score). Moreover, performance on black females was *terrible*.
 # We can examine the intersections of sensitive features by passing
 # multiple columns to the :class:`fairlearn.metrics.MetricFrame`
 # constructor:
-
 grouped_on_race_and_sex = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
@@ -518,7 +515,6 @@ counts.by_group
 # %%
 # Recall that ``NaN`` indicates that there were no individuals
 # in a cell - ``member_counts()`` will not even have been called.
-
 # %%
 # Exporting from MetricFrame
 # ==========================
@@ -541,3 +537,9 @@ print(csv_output)
 #
 # The :meth:`~fairlearn.metrics.MetricFrame.overall` property can
 # be handled similarly, in the cases that it is not a scalar.
+#
+# References
+# ----------
+#
+# .. footbibliography::
+#

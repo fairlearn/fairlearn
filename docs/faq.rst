@@ -25,7 +25,7 @@ Why not just ignore the sensitive features?
     Worse, without having the race available in the dataset, it is hard to
     assess the  model's impact across different groups defined by race or by
     race intersected with other demographic features.
-    
+
 The model is unfair because the data are biased. Isn't it better to get better data?
     The answer to this question depends on what is meant by 'unfair',
     'biased data', and 'better data' in any particular context.
@@ -91,17 +91,17 @@ I've got improved data, trained and mitigated new models, checked all the metric
     On a technical level, this means checking for data drift within the
     vulnerable subgroups identified during the fairness analysis.
     However the societal aspects need to be considered as well, for example:
-    
+
     - Are the actual harms as expected, both in the nature of the harms and
       their distribution?
     - Have the users of the model (who may not be the subjects of the model)
       adjusted their usage patterns? This is sometimes called 'strategic
       behavior.'
-    
+
 What sort of fairness-related harms can the Fairlearn library address?
     We currently focus on two kinds of harms:
 
-    - *Allocation harms.* 
+    - *Allocation harms.*
       These harms can occur when AI systems extend or withhold opportunities,
       resources, or information. Some of the key applications are in hiring,
       school admissions, and lending.
@@ -145,7 +145,7 @@ Does Fairlearn support multiclass classification?
     `ongoing discussions within the community <https://github.com/fairlearn/fairlearn/issues/752>`_
     to add more extensive support to Fairlearn's assessment capabilities.
     If you have thoughts feel free to add them to the discussion.
-    
+
     On the mitigation side, our algorithms
     :class:`reductions.ExponentiatedGradient` and
     :class:`reductions.GridSearch`
@@ -192,4 +192,4 @@ What happened to the :code:`FairlearnDashboard`?
     :code:`FairnessDashboard`. For more information on how to use it refer to
     `https://github.com/microsoft/responsible-ai-toolbox <https://github.com/microsoft/responsible-ai-toolbox>`_.
     Fairlearn provides some of the existing functionality through
-    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot` section.
+    :code:`matplotlib`-based visualizations. Refer to the :ref:`plot_metricframe` section.

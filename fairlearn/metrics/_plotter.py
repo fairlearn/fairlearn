@@ -3,7 +3,7 @@
 
 """Utility class for plotting metrics with and without confidence interval ranges."""
 
-from typing import List, Union
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -90,10 +90,7 @@ def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kw
     """
     if df_all_errors is not None:
         yerr = np.array(
-            [
-                np.array([[*row] for row in df_all_errors[metric]]).T
-                for metric in metrics
-            ]
+            [np.array([[*row] for row in df_all_errors[metric]]).T for metric in metrics]
         )
         if kind == "point":
             axs = df[metrics].plot(
@@ -110,9 +107,7 @@ def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kw
 
     else:
         if kind == "point":
-            axs = df[metrics].plot(
-                linestyle="", marker="o", subplots=subplots, **kwargs
-            )
+            axs = df[metrics].plot(linestyle="", marker="o", subplots=subplots, **kwargs)
         else:
             axs = df[metrics].plot(kind=kind, subplots=subplots, **kwargs)
 
@@ -123,8 +118,8 @@ def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
     kind: str = "point",
-    metrics: Union[List[str], str] = None,
-    conf_intervals: Union[List[str], str] = None,
+    metrics: list[str] | str | None = None,
+    conf_intervals: list[str] | str | None = None,
     subplots: bool = True,
     plot_ci_labels: bool = False,
     ci_labels_precision: int = 4,
@@ -154,11 +149,11 @@ def plot_metric_frame(
         The type of plot to display, e.g., "point", "bar", "line", etc.
         The supported values are "point" and those listed in :meth:`pandas.DataFrame.plot`
 
-    metrics : str or list of str
+    metrics : list[str] | str | None
         The name of the metrics to plot.
         Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 
-    conf_intervals : str or list of str
+    conf_intervals : list[str] | str | None
         The name of the confidence intervals to plot.
         Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
 
@@ -202,9 +197,7 @@ def plot_metric_frame(
         raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
 
     metrics = [metrics] if isinstance(metrics, str) else metrics
-    conf_intervals = (
-        [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
-    )
+    conf_intervals = [conf_intervals] if isinstance(conf_intervals, str) else conf_intervals
 
     df = metric_frame.by_group
 
@@ -238,20 +231,14 @@ def plot_metric_frame(
     # plotting with confidence intervals:
     for metric, conf_interval in zip(metrics, conf_intervals):
         df_temp = pd.DataFrame([])
-        df_temp[["lower", "upper"]] = pd.DataFrame(
-            df[conf_interval].tolist(), index=df.index
-        )
-        df_temp["error"] = list(
-            zip(df[metric] - df_temp["lower"], df_temp["upper"] - df[metric])
-        )
+        df_temp[["lower", "upper"]] = pd.DataFrame(df[conf_interval].tolist(), index=df.index)
+        df_temp["error"] = list(zip(df[metric] - df_temp["lower"], df_temp["upper"] - df[metric]))
         df_all_errors[metric] = df_temp["error"]
 
         if plot_ci_labels:
             df_all_bounds[metric] = df[conf_interval]
 
-    axs = _plot_df(
-        df, metrics, kind, subplots, ci_labels_legend, df_all_errors, **kwargs
-    )
+    axs = _plot_df(df, metrics, kind, subplots, ci_labels_legend, df_all_errors, **kwargs)
 
     # Confidence interval labels don't get plotted when subplots=False
     if plot_ci_labels and kind == "bar" and subplots:

@@ -66,9 +66,7 @@ class TestGetLabelsForConfusionMatrix:
         assert str(e1.value) == expected_msg
 
     def test_need_pos_label(self):
-        expected_msg = (
-            "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
-        )
+        expected_msg = "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
         with pytest.raises(ValueError) as e0:
             _get_labels_for_confusion_matrix([0, 2], None)
         assert str(e0.value) == expected_msg
@@ -137,9 +135,7 @@ class TestTPR:
         result_skm = skm.recall_score(y_true, y_pred, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
-        result = metrics.true_positive_rate(
-            y_true, y_pred, pos_label=0, sample_weight=weight
-        )
+        result = metrics.true_positive_rate(y_true, y_pred, pos_label=0, sample_weight=weight)
         result_skm = skm.recall_score(y_true, y_pred, pos_label=0, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
@@ -380,13 +376,9 @@ class TestTNR:
         ]
 
         actual = metrics.true_negative_rate(y_true, y_pred, sample_weight=weights)
-        tn, fp, fn, tp = skm.confusion_matrix(
-            y_true, y_pred, sample_weight=weights
-        ).ravel()
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weights).ravel()
         assert (tn / (tn + fp)) == actual
-        actual = metrics.true_negative_rate(
-            y_true, y_pred, pos_label=0, sample_weight=weights
-        )
+        actual = metrics.true_negative_rate(y_true, y_pred, pos_label=0, sample_weight=weights)
         tn, fp, fn, tp = skm.confusion_matrix(
             y_true, y_pred, labels=[1, 0], sample_weight=weights
         ).ravel()
@@ -456,12 +448,8 @@ class TestFNR:
         result_skm = 1 - skm.recall_score(y_true, y_pred, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
-        result = metrics.false_negative_rate(
-            y_true, y_pred, pos_label=0, sample_weight=weight
-        )
-        result_skm = 1 - skm.recall_score(
-            y_true, y_pred, pos_label=0, sample_weight=weight
-        )
+        result = metrics.false_negative_rate(y_true, y_pred, pos_label=0, sample_weight=weight)
+        result_skm = 1 - skm.recall_score(y_true, y_pred, pos_label=0, sample_weight=weight)
         assert result == pytest.approx(result_skm)
 
 
@@ -643,13 +631,9 @@ class TestFPR:
         ]
 
         actual = metrics.false_positive_rate(y_true, y_pred, sample_weight=weight)
-        tn, fp, fn, tp = skm.confusion_matrix(
-            y_true, y_pred, sample_weight=weight
-        ).ravel()
+        tn, fp, fn, tp = skm.confusion_matrix(y_true, y_pred, sample_weight=weight).ravel()
         assert (fp / (fp + tn)) == actual
-        actual = metrics.false_positive_rate(
-            y_true, y_pred, pos_label=0, sample_weight=weight
-        )
+        actual = metrics.false_positive_rate(y_true, y_pred, pos_label=0, sample_weight=weight)
         tn, fp, fn, tp = skm.confusion_matrix(
             y_true, y_pred, labels=[1, 0], sample_weight=weight
         ).ravel()
@@ -791,9 +775,7 @@ class TestCount:
     def test_unequal_y_sizes(self):
         y_true = [0, 1, 0, 1, 0, 1, 1]
         y_pred = [0, 0, 1, 1]
-        expected_msg = (
-            "Found input variables with inconsistent numbers of samples: [7, 4]"
-        )
+        expected_msg = "Found input variables with inconsistent numbers of samples: [7, 4]"
 
         with pytest.raises(ValueError) as error:
             metrics.count(y_true, y_pred)
