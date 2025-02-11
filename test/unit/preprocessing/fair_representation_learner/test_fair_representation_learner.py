@@ -20,7 +20,7 @@ def test_sklearn_compatible_estimator(estimator, check):
 def test_reconstruction():
     X = np.array([[10, 10], [20, 20]])
     y = np.array([0, 1])
-    frl = FairRepresentationLearner(n_prototypes=2, Az=0.0, Ay=0.0, random_state=42)
+    frl = FairRepresentationLearner(n_prototypes=2, lambda_z=0.0, lambda_y=0.0, random_state=42)
     frl.fit(X, y, sensitive_features=np.array([0, 1]))
     X_transformed = frl.transform(X)
     np.testing.assert_allclose(X_transformed, X, atol=1e-4)
@@ -31,7 +31,7 @@ def test_statistical_parity():
     X = np.array([[10, 10], [20, 20], [30, 30], [40, 40]])
     y = np.array([0, 1, 0, 1])
     sensitive_features = np.array([0, 0, 1, 1])
-    frl = FairRepresentationLearner(n_prototypes=4, Ax=0.0, Ay=0.0, random_state=42)
+    frl = FairRepresentationLearner(n_prototypes=4, lambda_x=0.0, lambda_y=0.0, random_state=42)
     frl.fit(X, y, sensitive_features=sensitive_features)
 
     M = frl._get_latent_mapping(X, frl.prototypes_, frl.alpha_)
@@ -48,7 +48,7 @@ def test_classification():
     X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
     y = np.array([0, 1, 0, 1])
     sensitive_features = np.array([0, 1, 0, 1])
-    frl = FairRepresentationLearner(n_prototypes=4, Ax=0.0, Az=0.0, random_state=42)
+    frl = FairRepresentationLearner(n_prototypes=4, lambda_x=0.0, lambda_z=0.0, random_state=42)
     frl.fit(X, y, sensitive_features=sensitive_features)
 
     classification_error = frl.score(X, y)
