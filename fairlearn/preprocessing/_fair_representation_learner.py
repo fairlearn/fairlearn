@@ -103,36 +103,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     classes_ : np.ndarray
         Unique classes in the target variable.
 
-    _label_encoder : LabelEncoder
-        Encoder for transforming labels to numeric values.
-
-    _groups : pd.Series
-        Unique sensitive feature groups.
-
-    _prototypes_ : np.ndarray or None
-        Learned prototypes, if sensitive features were provided.
-
-    _alpha : np.ndarray or None
-        Learned dimension weights, if sensitive features were provided.
-
-    _prototype_dim : int or None
-        Dimension of each prototype vector.
-
-    _latent_mapping_size : int or None
-        Size of the latent representation mapping.
-
-    _prototype_predictions_size : int or None
-        Size of the prototype predictions vector.
-
-    _prototype_vectors_size : int or None
-        Total size of the prototype vectors.
-
-    _optimizer_size : int or None
-        Total size of the optimizer variables.
-
-    _fall_back_classifier : LogisticRegression or None
-        Fallback classifier used when no sensitive features are provided.
-
     Notes
     -----
     The FairRepresentationLearner implements the algorithms intoduced in Zemel et al.
