@@ -313,6 +313,28 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         return self
 
     def _objective(self, x: np.ndarray, X, y, sensitive_features) -> float:
+        """
+        Compute the objective function for the optimization problem at the given point :code:`x`.
+
+        This method extracts the current prototype vectors, the prototype predictions, and the
+        dimension weights, and calculates the current loss, which is the weighted sum of the
+        reconstruction error, classification error, and fairness error.
+        Parameters
+        ----------
+        x : np.ndarray
+            The optimization variable containing prototype vectors, weights, and dimension weights.
+        X : array-like of shape (n_samples, n_features)
+            The input samples.
+        y : array-like of shape (n_samples,)
+            The target values.
+        sensitive_features : pd.Series
+            The sensitive features for each sample.
+        Returns
+        -------
+        float
+            The computed objective value.
+        """
+
         assert x.shape == (self._optimizer_size,)
         # Compute the reconstruction error
         V = x[: self._prototype_vectors_size].reshape((self.n_prototypes, self._prototype_dim))
