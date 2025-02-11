@@ -1,3 +1,5 @@
+.. _development_process:
+
 Development process
 -------------------
 
@@ -30,37 +32,68 @@ This is a `recent decision by the community <https://github.com/fairlearn/fairle
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
 
-Advanced installation instructions
+
+Installation instructions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You will need a GitHub account to contribute to this project. Authenticating with Github using an ssh connection is highly recommended. You can learn more about it `here <https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account>`_.
 
-While working on Fairlearn itself you may want to install it in editable mode.
-This allows you to test the changed functionality. First, clone the repository
-locally via:
+First, clone the repository locally via:
 
-.. code-block:: bash
+.. prompt:: bash
 
-   $ git clone git@github.com:fairlearn/fairlearn.git
+   git clone git@github.com:fairlearn/fairlearn.git
+
+
+(Optional) Set up a virtual environment:
+
+   While you can use :code:`pip` to install the fairlearn package globally, we strongly recommend developing using a virtual environment. Virtual environments are a great way to isolate project dependencies, especially if you're working on multiple issues that require different versions of the package.
+
+   Create a Python virtual environment using :code:`conda`:
+
+         #. Make your virtual environment inside the fairlearn project directory. This will create a new :code:`venv` folder and seed it with a Python 3 environment. Then activate the virtual environment:
+
+
+            .. code-block:: bash
+
+               $ conda create --name fairlearn python=3.12  # creates virtual environment
+               $ conda activate myenv # activates virtual environment
+               (venv) $ # notice the shell prompt includes name of active virtual environment
+
+         #. Check if your virtual environment is indeed active. Then proceed to installing the package dependencies:
+
+            .. code-block:: bash
+
+               (venv) $ which python #confirm virtual environment is active
+               (venv) $ conda deactivate #use to deactivate if needed
+
+If you are using a virtual environment(highly recommended), make sure it is activated before you execute the next steps.
 
 To install in editable mode, from the repository root path run:
 
-.. code-block:: bash
 
-   $ pip install -e .
+.. prompt:: bash
+
+   pip install -e .
 
 To verify that the code works as expected run:
 
-.. code-block:: bash
+.. prompt:: bash
 
-   $ python ./scripts/install_requirements.py --pinned False
-   $ python -m pytest -s ./test/unit
+   python ./scripts/install_requirements.py --pinned False
+   python -m pytest -s ./test/unit
+
+.. note::
+
+   If there is a :code:`torch` related error during the installation,
+   please downgrade keep your :code:`python` version between 3.9-3.12.
 
 Fairlearn currently includes plotting functionality provided by
 :code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
 
-.. code-block:: bash
+.. prompt:: bash
 
-   $ pip install -e .
-   $ pip install matplotlib
+   pip install -e .
+   pip install matplotlib
 
 The Requirements Files
 """"""""""""""""""""""
@@ -107,6 +140,11 @@ Follow the steps below to create a pull request.
       * Leave a comment on the issue indicating interest and outlining possible questions.
       * Once we know you are working on it, we will support you on your contribution journey!
 
+.. note::
+
+   If you claim an issue, please try to keep it updated each week, either by continuing a discussion in the issue itself or in a pull request.
+   Issues which are not receiving updates may be claimed by someone else.
+
 #. The communication channels are outlined here: :ref:`communication`.
 
 #. Fork the `project repository
@@ -118,7 +156,7 @@ Follow the steps below to create a pull request.
 #. Clone your fork of the fairlern repo from your GitHub account to your
    local machine:
 
-   .. code-block:: bash
+   .. prompt:: bash
 
       git clone git@github.com:YourLogin/fairlearn.git  # add --depth 1 if your connection is slow
       cd fairlearn
@@ -127,7 +165,7 @@ Follow the steps below to create a pull request.
    fairlearn repository, which you can use to keep your repository
    synchronized with the latest changes:
 
-   .. code-block:: bash
+   .. prompt:: bash
 
       $ git remote add upstream git@github.com:fairlearn/fairlearn.git
 
@@ -146,10 +184,10 @@ Follow the steps below to create a pull request.
 
 #. (Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
 
-   .. code-block:: bash
+   .. prompt:: bash
 
-   $ pip install pre-commit
-   $ pre-commit install
+      pip install pre-commit
+      pre-commit install
 
    Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
 

@@ -9,14 +9,14 @@ Installation
 Fairlearn can be installed with :code:`pip` from
 `PyPI <https://pypi.org/project/fairlearn>`_ as follows:
 
-.. code-block:: bash
+.. prompt:: bash
 
    pip install fairlearn
 
 Fairlearn is also available on
 `conda-forge <https://anaconda.org/conda-forge/fairlearn>`_:
 
-.. code-block:: bash
+.. prompt:: bash
 
     conda install -c conda-forge fairlearn
 
@@ -71,7 +71,7 @@ Prerequisites
 In order to run the code samples in the Quickstart tutorial, you need to
 install the following dependencies:
 
-.. code-block:: bash
+.. prompt:: bash
 
     pip install fairlearn matplotlib
 
