@@ -33,7 +33,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     performance.
 
     The model minimizes a loss function that consists of three terms: the reconstruction error,
-    the classification error, and the statistical-parity error.
+    the classification error, and an approximation of the demographic parity difference.
 
     Read more in the :ref:`User Guide <preprocessing>`.
 
@@ -42,14 +42,14 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     n_prototypes : int, default=2
         Number of prototypes to use in the latent representation.
 
-    Ax : float, default=1.0
-        Weight for the reconstruction error term in the objective function.
+    lambda_x : float, default=1.0
+        Weight of the reconstruction error term in the objective function.
 
-    Ay : float, default=1.0
-        Weight for the classification error term in the objective function.
+    lambda_y : float, default=1.0
+        Weight of the classification error term in the objective function.
 
-    Az : float, default=1.0
-        Weight for the fairness error term in the objective function.
+    lambda_z : float, default=1.0
+        Weight of the fairness error term in the objective function.
 
     random_state : int, np.random.RandomState, or None, default=None
         Seed or random number generator for reproducibility.
@@ -69,14 +69,14 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     n_prototypes : int
         Number of prototypes to use in the latent representation.
 
-    Ax : float
-        Weight for the reconstruction error term in the objective function.
+    lambda_x : float
+        Weight of the reconstruction error term in the objective function.
 
-    Ay : float
-        Weight for the classification error term in the objective function.
+    lambda_y : float
+        Weight of the classification error term in the objective function.
 
-    Az : float
-        Weight for the fairness error term in the objective function.
+    lambda_z : float
+        Weight of the fairness error term in the objective function.
 
     random_state : int, np.random.RandomState, or None
         Seed or random number generator for reproducibility.
@@ -133,45 +133,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     _fall_back_classifier : LogisticRegression or None
         Fallback classifier used when no sensitive features are provided.
 
-    Methods
-    -------
-    __init__(self, n_prototypes=2, Ax=1.0, Ay=1.0, Az=1.0, random_state=None, optimizer="L-BFGS-B",
-             tol=1e-6, max_iter=1000)
-        Initializes the FairRepresentationLearner with the given parameters.
-
-    fit(self, X, y, *, sensitive_features=None)
-        Fits the model to the input data X and target variable y. Optionally uses sensitive features.
-
-    _optimize_with_sensitive_features(self, X, y, sensitive_features, random_state)
-        Optimizes the model with sensitive features.
-
-    _optimize_without_sensitive_features(self, X, y, random_state)
-        Optimizes the model without sensitive features using a fallback classifier.
-
-    transform(self, X) -> np.ndarray
-        Transforms the input data X to the learned latent representation.
-
-    predict_proba(self, X) -> np.ndarray
-        Predicts class probabilities for the input data X.
-
-    predict(self, X) -> np.ndarray
-        Predicts class labels for the input data X.
-
-    prototypes_(self) -> np.ndarray
-        Returns the learned prototypes.
-
-    alpha_(self) -> np.ndarray
-        Returns the learned dimension weights.
-
-    _get_latent_mapping(X, prototypes, dimension_weights) -> np.ndarray
-        Computes the latent representation mapping for the input data X.
-
-    _validate_X_y(self, X, y) -> tuple[np.ndarray, np.ndarray]
-        Validates the input data X and target variable y.
-
-    __sklearn_tags__(self)
-        Returns the scikit-learn tags for the estimator.
-
     Notes
     -----
     The FairRepresentationLearner implements the algorithms intoduced in Zemel et al.
@@ -198,9 +159,9 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     """
 
     n_prototypes: int
-    Ax: float
-    Ay: float
-    Az: float
+    lambda_x: float
+    lambda_y: float
+    lambda_z: float
     random_state: int | np.random.RandomState | None
     optimizer: Literal[
         "L-BFGS-B", "Nelder-Mead", "Powell", "SLSQP", "TNC", "trust-constr", "COBYLA", "COBYQA"
@@ -227,9 +188,9 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     def __init__(
         self,
         n_prototypes: int = 2,
-        Ax: float = 1.0,
-        Ay: float = 1.0,
-        Az: float = 1.0,
+        lambda_x: float = 1.0,
+        lambda_y: float = 1.0,
+        lambda_z: float = 1.0,
         random_state: int | np.random.RandomState | None = None,
         optimizer: Literal[
             "L-BFGS-B", "Nelder-Mead", "Powell", "SLSQP", "TNC", "trust-constr", "COBYLA", "COBYQA"
@@ -238,9 +199,9 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         max_iter: int = 1000,
     ) -> None:
         self.n_prototypes = n_prototypes
-        self.Az = Az
-        self.Ax = Ax
-        self.Ay = Ay
+        self.lambda_z = lambda_z
+        self.lambda_x = lambda_x
+        self.lambda_y = lambda_y
         self.random_state = random_state
         self.optimizer = optimizer
         self.tol = tol
@@ -259,7 +220,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
             The target values.
 
         sensitive_features : array-like or None, default=None
-            Sensitive features to be considered whose groups will be used to enforce statistical
+            Sensitive features to be considered whose groups will be used to promote demographic
             parity. If None, the model will fall back to a Logistic Regression classifier.
 
         Returns
@@ -359,9 +320,9 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
             classification_error = log_loss(y, y_hat)
 
             return (
-                self.Ax * reconstruction_error
-                + self.Ay * classification_error
-                + self.Az * fairness_error
+                self.lambda_x * reconstruction_error
+                + self.lambda_y * classification_error
+                + self.lambda_z * fairness_error
             )
 
         # Initialize the prototype vectors v_k

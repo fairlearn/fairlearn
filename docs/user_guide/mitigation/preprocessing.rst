@@ -168,7 +168,7 @@ function is thus defined as a weighted sum of three terms:
 
 .. math::
 
-    A_x \times L_x + A_y \times L_y + A_z \times L_z
+    \lambda_x \times L_x + \lambda_y \times L_y + \lambda_z \times L_z
 
 where:
 
@@ -184,7 +184,7 @@ where:
 
     L_y = -\frac{1}{N} \sum_{n=1}^{N} y_n \log(\hat{y}_n) + (1-y_n) \log(1-\hat{y}_n)
 
-:math:`L_z` is the statistical-parity fairness term that is defined as:
+:math:`L_z` is the demographic parity difference's approximation term that is defined as:
 
 .. math::
 
