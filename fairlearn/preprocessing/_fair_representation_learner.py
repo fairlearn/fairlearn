@@ -225,6 +225,13 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         """
         Minimize the loss given the sensitive features.
 
+        This method sets up and executes the optimization algorithm by:
+        - Initializing the optimization variables: the prototype vectors and their predictions are
+          randomly drawn, and the dimension weights are initialized to one.
+        - Defining the constraints: prototype predictions are constrained to [0,1], and
+          dimension weights must be non-negative.
+        - Executing the optimizer, extracting and reshaping the resulting optimal values.
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
@@ -287,7 +294,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
                 x0=x0,
                 bounds=bounds,
                 args=(X, y, sensitive_features),
-                method="L-BFGS-B",
+                method=self.optimizer,
                 tol=self.tol,
                 options={"maxiter": self.max_iter},
             )
