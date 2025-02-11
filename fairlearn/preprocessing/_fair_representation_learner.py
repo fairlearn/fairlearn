@@ -238,7 +238,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
             expect_sensitive_features=False,
             enforce_binary_labels=True,
         )
-        assert sensitive_features is None or isinstance(sensitive_features, pd.Series)
 
         self.n_features_in_ = X.shape[1]
         random_state = check_random_state(self.random_state)
@@ -294,37 +293,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
             + self._prototype_dim  # alpha: the weight of each dimension in the distance computation
         )
 
-        def objective(x: np.ndarray, X, y) -> float:
-            assert x.shape == (self._optimizer_size,)
-            # Compute the reconstruction error
-            V = x[: self._prototype_vectors_size].reshape((self.n_prototypes, self._prototype_dim))
-            alpha = x[-self._prototype_dim :]
-            M = self._get_latent_mapping(X, V, dimension_weights=alpha)
-            X_hat = M @ V
-            reconstruction_error = np.mean(np.sum((X - X_hat) ** 2, axis=1))
-
-            # Compute the fairness error
-            # Compute the mean prototype probabilities for each group
-            M_gk = np.array(
-                [np.mean(M[sensitive_features == group], axis=0) for group in self._groups]
-            )
-            # Compute the mean difference between mean prototype probabilities for each group
-            group_combinations = np.triu_indices(n=len(self._groups), k=1)
-            fairness_error = np.mean(
-                np.abs(M_gk[group_combinations[0], None] - M_gk[group_combinations[1], None])
-            )
-
-            # Compute the classification error
-            w = x[self._prototype_vectors_size : -self._prototype_dim]
-            y_hat = M @ w
-            classification_error = log_loss(y, y_hat)
-
-            return (
-                self.lambda_x * reconstruction_error
-                + self.lambda_y * classification_error
-                + self.lambda_z * fairness_error
-            )
-
         # Initialize the prototype vectors v_k
         V0 = random_state.rand(self.n_prototypes, self._prototype_dim)
 
@@ -345,10 +313,10 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
         try:
             result: OptimizeResult = minimize(
-                objective,
+                self._objective,
                 x0=x0,
                 bounds=bounds,
-                args=(X, y),
+                args=(X, y, sensitive_features),
                 method="L-BFGS-B",
                 tol=self.tol,
                 options={"maxiter": self.max_iter},
@@ -366,6 +334,37 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         self._fall_back_classifier = None
 
         return self
+
+    def _objective(self, x: np.ndarray, X, y, sensitive_features) -> float:
+        assert x.shape == (self._optimizer_size,)
+        # Compute the reconstruction error
+        V = x[: self._prototype_vectors_size].reshape((self.n_prototypes, self._prototype_dim))
+        alpha = x[-self._prototype_dim :]
+        M = self._get_latent_mapping(X, V, dimension_weights=alpha)
+        X_hat = M @ V
+        reconstruction_error = np.mean(np.sum((X - X_hat) ** 2, axis=1))
+
+        # Compute the fairness error
+        # Compute the mean prototype probabilities for each group
+        M_gk = np.array(
+            [np.mean(M[sensitive_features == group], axis=0) for group in self._groups]
+        )
+        # Compute the mean difference between mean prototype probabilities for each group
+        group_combinations = np.triu_indices(n=len(self._groups), k=1)
+        fairness_error = np.mean(
+            np.abs(M_gk[group_combinations[0], None] - M_gk[group_combinations[1], None])
+        )
+
+        # Compute the classification error
+        w = x[self._prototype_vectors_size : -self._prototype_dim]
+        y_hat = M @ w
+        classification_error = log_loss(y, y_hat)
+
+        return (
+            self.lambda_x * reconstruction_error
+            + self.lambda_y * classification_error
+            + self.lambda_z * fairness_error
+        )
 
     def _optimize_without_sensitive_features(self, X, y, random_state: np.random.RandomState):
         """
