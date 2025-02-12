@@ -64,7 +64,7 @@ class ErrorRate(ClassificationMoment):
 
     def load_data(self, X, y, *, sensitive_features):
         """Load the specified data into the object.
-        
+
         Parameters
         ----------
         X : array of shape (n,p)
