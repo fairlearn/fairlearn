@@ -84,7 +84,7 @@ class ErrorRate(ClassificationMoment):
         super().load_data(X, y_train, sensitive_features=sf_train)
         self.index = [_ALL]
 
-    def gamma(self, predictor) -> pd.Series:
+    def gamma(self, predictor):
         """Calculate the degree to which constraints are currently violated by the
         predictor. The gamma value is normalised by the number of samples.
 
@@ -95,7 +95,7 @@ class ErrorRate(ClassificationMoment):
 
         Returns
         -------
-        error : str
+        error : :class:`pandas.Series`
             gamma value for the predictor
         """
         y_pred = predictor(self.X)
