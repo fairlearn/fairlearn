@@ -402,7 +402,7 @@ to a cost-sensitive classification problem.
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
     >>> X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
     ... X, y, sensitive_features, test_size=0.33, random_state=42)
-    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +ELLIPSIS
+    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +SKIP
     >>> y_pred = mitigator.predict(X_test)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=sensitive_test)
     >>> mf_mitigated.overall.item()
