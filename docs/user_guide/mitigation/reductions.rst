@@ -357,11 +357,11 @@ and false positive rate.
 Error Rate
 ~~~~~~~~~~
 
-We can use the ErrorRate either to measure performance of a trained model that does or
+We can use the :class:`ErrorRate` either to measure performance of a trained model that does or
 does not take sensitive features into account, or as an addition to the
 objective function during the training of a fairness aware model.
 
-To measure the ErrorRate in respect to a trained estimator we use its gamma method:
+To measure the ErrorRate in respect to a trained estimator we use its :code:`gamma` method:
 
 .. doctest:: mitigation_reductions
 
@@ -383,7 +383,7 @@ To measure the ErrorRate in respect to a trained estimator we use its gamma meth
     dtype: float64
 
 
-Using ErrorRate as part of a reductions approach for fairness mitigation is equivalent
+Using :class:`ErrorRate` as part of a reductions approach for fairness mitigation is equivalent
 to a cost-sensitive classification problem.
 
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
