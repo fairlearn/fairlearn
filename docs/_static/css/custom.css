@@ -2,13 +2,13 @@ i.fa-github:hover {
    color: black;
 }
 
-i.fa-twitter:hover {
-   color: #1da1f2;
+i.fa-linkedin:hover {
+   color: #0077b5;
 }
 
 i.fa-stack-overflow:hover {
    color: #f48024;
-} 
+}
 
 i.fa-discord:hover {
    color: #5765f2;
@@ -28,11 +28,11 @@ div.sponsor-div {
    -webkit-align-items: center;
    align-items: center;
 }
- 
+
 div.sponsor-div-box {
    width: 100%;
 }
- 
+
 @media screen and (min-width: 500px) {
    div.sponsor-div-box {
       width: 50%;
@@ -45,7 +45,7 @@ div.sponsor-div-box {
    flex-wrap: wrap;
    justify-content: center;
  }
- 
+
  .maintainers-container > div {
    width: 100px;
    margin: 5px;
