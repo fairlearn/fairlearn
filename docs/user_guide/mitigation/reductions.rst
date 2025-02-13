@@ -386,6 +386,8 @@ To measure the ErrorRate in respect to a trained estimator we use its :code:`gam
 Using :class:`ErrorRate` as part of a reductions approach for fairness mitigation is equivalent
 to a cost-sensitive classification problem.
 
+.. doctest:: mitigation_reductions
+    
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score

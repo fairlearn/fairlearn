@@ -86,7 +86,6 @@ class _Lagrangian:
             )
         filtered_kwargs = _filter_kwargs(func=self.obj.load_data, kwargs=kwargs)
         self.obj.load_data(X, y, **filtered_kwargs)
-        #self.obj.load_data(X, y, **kwargs)
         self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda
