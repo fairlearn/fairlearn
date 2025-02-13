@@ -387,7 +387,7 @@ Using :class:`ErrorRate` as part of a reductions approach for fairness mitigatio
 to a cost-sensitive classification problem.
 
 .. doctest:: mitigation_reductions
-    
+
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
@@ -402,7 +402,7 @@ to a cost-sensitive classification problem.
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
     >>> X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
     ... X, y, sensitive_features, test_size=0.33, random_state=42)
-    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train)
+    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +ELLIPSIS
     >>> y_pred = mitigator.predict(X_test)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=sensitive_test)
     >>> mf_mitigated.overall.item()
@@ -438,6 +438,10 @@ the overall error rate by more than the value of :code:`difference_bound`.
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> from sklearn.metrics import accuracy_score
+    >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
+    >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
+    >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
+    >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
     >>> accuracy_summary = MetricFrame(metrics=accuracy_score,
     ...                                y_true=y_true,
     ...                                y_pred=y_pred,
