@@ -67,11 +67,11 @@ class ErrorRate(ClassificationMoment):
 
         Parameters
         ----------
-        X : array of shape (n,p)
+        X : array of shape (n_samples, n_features)
             The feature array
-        y : :class:`pandas.Series`
+        y : array-like of shape (n_samples,)
             The label vector
-        sensitive_features : :class:`pandas.Series`
+        sensitive_features : array-like of shape (n_samples, n_sensitive_features)
             The sensitive feature vector
         """
         _, y_train, sf_train, _ = _validate_and_reformat_input(
