@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -54,10 +53,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     random_state : int, np.random.RandomState, or None, default=None
         Seed or random number generator for reproducibility.
 
-    optimizer : Literal["L-BFGS-B", "Nelder-Mead", "Powell", "SLSQP", "TNC", "trust-constr",
-                        "COBYLA", "COBYQA"], default="L-BFGS-B"
-        Optimization algorithm to use for minimizing the objective function.
-
     tol : float, default=1e-6
         Convergence tolerance for the optimization algorithm.
 
@@ -80,10 +75,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
     random_state : int, np.random.RandomState, or None
         Seed or random number generator for reproducibility.
-
-    optimizer : Literal["L-BFGS-B", "Nelder-Mead", "Powell", "SLSQP", "TNC", "trust-constr",
-                        "COBYLA", "COBYQA"]
-        Optimization algorithm to use for minimizing the objective function.
 
     tol : float
         Tolerance for the optimization algorithm.
@@ -133,9 +124,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     lambda_y: float
     lambda_z: float
     random_state: int | np.random.RandomState | None
-    optimizer: Literal[
-        "L-BFGS-B", "Nelder-Mead", "Powell", "SLSQP", "TNC", "trust-constr", "COBYLA", "COBYQA"
-    ]
     tol: float
     max_iter: int
     coef_: np.ndarray
@@ -162,9 +150,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         lambda_y: float = 1.0,
         lambda_z: float = 1.0,
         random_state: int | np.random.RandomState | None = None,
-        optimizer: Literal[
-            "L-BFGS-B", "Nelder-Mead", "Powell", "SLSQP", "TNC", "trust-constr", "COBYLA", "COBYQA"
-        ] = "L-BFGS-B",
         tol: float = 1e-6,
         max_iter: int = 1000,
     ) -> None:
@@ -173,7 +158,6 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         self.lambda_x = lambda_x
         self.lambda_y = lambda_y
         self.random_state = random_state
-        self.optimizer = optimizer
         self.tol = tol
         self.max_iter = max_iter
 
@@ -230,7 +214,8 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
           randomly drawn, and the dimension weights are initialized to one.
         - Defining the constraints: prototype predictions are constrained to [0,1], and
           dimension weights must be non-negative.
-        - Executing the optimizer, extracting and reshaping the resulting optimal values.
+        - Executing the "L-BFGS-B" optimizer, extracting and reshaping the resulting optimal
+          values.
 
         Parameters
         ----------
@@ -294,7 +279,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
                 x0=x0,
                 bounds=bounds,
                 args=(X, y, sensitive_features),
-                method=self.optimizer,
+                method="L-BFGS-B",
                 tol=self.tol,
                 options={"maxiter": self.max_iter},
             )
