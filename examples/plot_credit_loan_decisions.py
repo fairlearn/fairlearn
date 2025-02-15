@@ -54,7 +54,7 @@ np.random.seed(rand_seed)
 #
 # From a regulatory perspective, financial institutions that operate within
 # the United States are subject to *legal regulations* prohibiting
-# discrimination on the `basis of race, gender, or other protected classes
+# discrimination on the `basis of race, gender, or other protected classes`
 # :footcite:`uscode2011title15chapter41subchapteriv`.
 # With the increasing prevalence of automated decision-systems in the financial
 # lending space, experts have raised concerns about whether these systems could
