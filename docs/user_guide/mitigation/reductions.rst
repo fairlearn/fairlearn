@@ -194,7 +194,7 @@ the predicted labels.
     ...                                      y_pred=y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall.item()
-        0.4
+    0.4
     >>> selection_rate_summary.by_group
     SF 0
     a    0.6
@@ -402,7 +402,8 @@ to a cost-sensitive classification problem.
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
     >>> X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
     ... X, y, sensitive_features, test_size=0.33, random_state=42)
-    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +SKIP
+    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +ELLIPSIS
+    ExponentiatedGradient(...)
     >>> y_pred = mitigator.predict(X_test)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=sensitive_test)
     >>> mf_mitigated.overall.item()

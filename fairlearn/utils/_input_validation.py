@@ -173,6 +173,7 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
         .values
     )
 
+
 def _filter_kwargs(func, kwargs):
     """Helper function to filter out kwargs that are not accepted by `func`."""
     sig = inspect.signature(func)
