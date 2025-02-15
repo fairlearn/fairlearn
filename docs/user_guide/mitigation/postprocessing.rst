@@ -453,7 +453,9 @@ during :code:`fit()`, so this is unfortunately an imperfect check.
 Relabeling 
 ^^^^^^^^^^
 
-The goal of this approach is to find the subset of leaves that can be rlabeled in order to reduce the discrimination of the classifier while minimizing the loss of accuracy.
+The goal of this approach is to find the subset of leaves that can be relabeled
+in order to reduce the discrimination of the classifier while minimizing the loss
+of accuracy.
 
 We could represent a dataset and a leaf by a contingency table like these:
 
@@ -516,9 +518,11 @@ the discrimination. It's computed in the :code:`get_leaves_candidates` function.
 
 Then, from this set, we will
 select an optimal subset of leaves that will reduce the discrimination below the
-desired threshold by minimizing the loss of accuracy. This step is done in the :code:`leaves_to_relabel` function.
+desired threshold by minimizing the loss of accuracy. This step is done in
+the :code:`leaves_to_relabel` function.
 
-After, we have to relabel all leaves. To relabel one leave we can call the :code:`browse_and_relab` function.
+After, we have to relabel all leaves. To relabel one leave we can call
+the :code:`browse_and_relab` function.
 
 But more simply to relabel a tree you just have to call the :code:`relabeling` function.
 

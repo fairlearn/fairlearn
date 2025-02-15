@@ -54,9 +54,11 @@ def test_relabeling():
     clf.fit(X, list(y))
     y_pred = clf.predict(X)
     accuracy = round(accuracy_score(y, y_pred), round_value)
-    discrimination = round(_relabeling.discrimination_dataset(y_pred, sensitive), round_value)
+    discrimination = round(_relabeling.discrimination_dataset(y_pred, sensitive),
+                           round_value)
 
-    leaves_relabel = _relabeling.leaves_to_relabel(clf, X, y, y_pred, sensitive, threshold)
+    leaves_relabel = _relabeling.leaves_to_relabel(clf, X, y, y_pred, sensitive,
+                                                   threshold)
 
     sum_acc = 0
     sum_disc = 0

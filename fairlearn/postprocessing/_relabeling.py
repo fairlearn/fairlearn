@@ -124,27 +124,31 @@ class Leaf:
 
         :param cnt_p: The number of positive class in the leaf.
         :param cnt_n: The number of negative class in the leaf.
-        :param portion_zero: Number of elements in the leaf that have the sensible feature
-            divided by the number of elements that have the sensible feature in the data set.
-        :param portion_one: Number of elements in the leaf that have not the sensible feature
-            divided by the number of elements that have not the sensible feature in the data set.
+        :param portion_zero: Number of elements in the leaf that have the sensible
+            feature divided by the number of elements that have the sensible feature
+            in the data set.
+        :param portion_one: Number of elements in the leaf that have not the sensible
+            feature divided by the number of elements that have not the sensible feature
+            in the data set.
         """
         n = self.u + self.w
         p = self.v + self.x
         """"
         WARNING ! Don't use '(self.u + self.w) > (self.v + self.x)' or 'p>n'
-        self.u, self.w,... are fractions, so in some cases this is not precise and causes a bug.
-        (can be caused by python rounding during a division)
+        self.u, self.w,... are fractions, so in some cases this is not precise 
+        and causes a bug. (can be caused by python rounding during a division)
         cnt_p and cnt_n are the number of positive and negative class,
         thus integers, there will be no error when using them.
         """
         if cnt_p > cnt_n:
             self.acc = n - p
-            self.disc = (self.u + self.v) / portion_one - (self.w + self.x) / portion_zero
+            self.disc = (self.u + self.v) / portion_one - (
+                        self.w + self.x) / portion_zero
 
         else:
             self.acc = p - n
-            self.disc = -(self.u + self.v) / portion_one + (self.w + self.x) / portion_zero
+            self.disc = -(self.u + self.v) / portion_one + (
+                        self.w + self.x) / portion_zero
 
         if self.acc == 0:
             """
@@ -152,8 +156,8 @@ class Leaf:
             after relabeling (self.disc) is < 0, this leaf must be one of
             the best to relabeling because we will have a loss in discrimination
             but no loss in accuracy.
-            This is why a positive value very close to 0 is used to avoid a division by 0
-            and to maintain a high ratio.
+            This is why a positive value very close to 0 is used to avoid a division
+            by 0 and to maintain a high ratio.
             """
             self.ratio = self.disc / -0.00000000000000000000000000000000000001
         else:
@@ -191,7 +195,8 @@ def get_transactions_by_leaf(clf, path, x):
             The tuple is in the format (node id, feature, way).
             "Node id" is id of the node in sklearn.
             "Feature" is the feature of a leaf.
-            "Way" allows to know if we have to go left or right when we navigate in the tree.
+            "Way" allows to know if we have to go left or right when we navigate
+            in the tree.
     :param x: The training input samples.
     :return: A list of sample indexes used by the leaf.
     """
@@ -208,7 +213,8 @@ def get_transactions_by_leaf(clf, path, x):
     return list(filtered.index)
 
 
-def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, path=tuple()):
+def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0,
+                          path=tuple()):
     """Recovers leaves that could be used for relabeling.
 
     :param clf: The decision tree classifier.
@@ -226,11 +232,13 @@ def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, 
     if feature >= 0:
         tmp_path = path + ((node_id, feature, "left"),)
         get_leaves_candidates(
-            clf, x, y, sensitive, cnt, length, leaves, clf.tree_.children_left[node_id], tmp_path
+            clf, x, y, sensitive, cnt, length, leaves, clf.tree_.children_left[node_id],
+            tmp_path
         )
         tmp_path = path + ((node_id, feature, "right"),)
         get_leaves_candidates(
-            clf, x, y, sensitive, cnt, length, leaves, clf.tree_.children_right[node_id], tmp_path
+            clf, x, y, sensitive, cnt, length, leaves,
+            clf.tree_.children_right[node_id], tmp_path
         )
     else:
         transactions = get_transactions_by_leaf(clf, path, x)
@@ -249,7 +257,8 @@ def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, 
                 elif y[transaction] == 1:
                     x += 1
         leaf = Leaf(
-            tmp_path, node_id, u / length, v / length, w / length, x / length, transactions
+            tmp_path, node_id, u / length, v / length, w / length, x / length,
+            transactions
         )
         # leaf.value = copy.deepcopy(clf.tree_.value[node_id])
         leaf.compute_gain(v + x, u + w, cnt[0] / length, cnt[1] / length)
@@ -259,7 +268,8 @@ def get_leaves_candidates(clf, x, y, sensitive, cnt, length, leaves, node_id=0, 
 
 # rem disc(𝐿) := disc 𝑇 + ∑ Δdisc 𝑙 ≤ 𝜖
 def rem_disc(disc_tree, leaves, threshold):
-    """Calculate the new discrimination of the tree if we relabel the leaves contained in "leaves".
+    """Calculate the new discrimination of the tree if we relabel the leaves contained
+    in "leaves".
 
     :param disc_tree: The discrimination of the tree.
     :param leaves: The leaves that we will keep to relabel them.
@@ -339,7 +349,8 @@ def relabeling(clf, x, y, y_pred, sensitive, threshold):
         print(discrimination_dataset(y, sensitive))
         raise Exception("The discrimination of the dataset can't be negative.")
     if len(np.unique(sensitive)) != 2:
-        raise Exception("Only two different labels are expected for the sensitive sample.")
+        raise Exception(
+            "Only two different labels are expected for the sensitive sample.")
     if len(np.unique(y)) != 2:
         raise Exception("Only two different labels are expected for the class sample.")
 
