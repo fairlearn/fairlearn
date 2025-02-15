@@ -5,12 +5,12 @@ import pandas as pd
 import pytest
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from fairlearn.preprocessing import FairRepresentationLearner
+from fairlearn.preprocessing import PrototypedRepresenter
 
 
 @parametrize_with_checks(
     [
-        FairRepresentationLearner(max_iter=50),
+        PrototypedRepresenter(max_iter=50),
     ],
 )
 def test_sklearn_compatible_estimator(estimator, check):
@@ -20,7 +20,7 @@ def test_sklearn_compatible_estimator(estimator, check):
 def test_reconstruction():
     X = np.array([[10, 10], [20, 20]])
     y = np.array([0, 1])
-    frl = FairRepresentationLearner(n_prototypes=2, lambda_z=0.0, lambda_y=0.0, random_state=42)
+    frl = PrototypedRepresenter(n_prototypes=2, lambda_z=0.0, lambda_y=0.0, random_state=42)
     frl.fit(X, y, sensitive_features=np.array([0, 1]))
     X_transformed = frl.transform(X)
     np.testing.assert_allclose(X_transformed, X, atol=1e-4)
@@ -31,7 +31,7 @@ def test_statistical_parity():
     X = np.array([[10, 10], [20, 20], [30, 30], [40, 40]])
     y = np.array([0, 1, 0, 1])
     sensitive_features = np.array([0, 0, 1, 1])
-    frl = FairRepresentationLearner(n_prototypes=4, lambda_x=0.0, lambda_y=0.0, random_state=42)
+    frl = PrototypedRepresenter(n_prototypes=4, lambda_x=0.0, lambda_y=0.0, random_state=42)
     frl.fit(X, y, sensitive_features=sensitive_features)
 
     M = frl._get_latent_mapping(X, frl.prototypes_, frl.alpha_)
@@ -48,7 +48,7 @@ def test_classification():
     X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
     y = np.array([0, 1, 0, 1])
     sensitive_features = np.array([0, 1, 0, 1])
-    frl = FairRepresentationLearner(n_prototypes=4, lambda_x=0.0, lambda_z=0.0, random_state=42)
+    frl = PrototypedRepresenter(n_prototypes=4, lambda_x=0.0, lambda_z=0.0, random_state=42)
     frl.fit(X, y, sensitive_features=sensitive_features)
 
     classification_error = frl.score(X, y)
@@ -99,7 +99,7 @@ def test_classification():
 def test__get_latent_mapping(
     X: np.ndarray, prototypes: np.ndarray, alpha: np.ndarray, expected_M: np.ndarray
 ):
-    M = FairRepresentationLearner._get_latent_mapping(X, prototypes, alpha)
+    M = PrototypedRepresenter._get_latent_mapping(X, prototypes, alpha)
     np.testing.assert_allclose(M, expected_M, atol=1e-4)
 
 
@@ -113,7 +113,7 @@ def test__get_latent_mapping(
 )
 def test__validate_X_y_maps_target_to_binary(y, expected_y_transformed: np.ndarray):
     X = np.eye(len(y))
-    frl = FairRepresentationLearner()
+    frl = PrototypedRepresenter()
     _, y_transformed = frl._validate_X_y(X, y)
     np.testing.assert_array_equal(y_transformed, expected_y_transformed)
     np.testing.assert_array_equal(

@@ -4,6 +4,6 @@
 """Preprocessing tools to help deal with sensitive attributes."""
 
 from ._correlation_remover import CorrelationRemover
-from ._fair_representation_learner import FairRepresentationLearner
+from ._prototyped_representer import PrototypedRepresenter
 
-__all__ = ["CorrelationRemover", "FairRepresentationLearner"]
+__all__ = ["CorrelationRemover", "PrototypedRepresenter"]

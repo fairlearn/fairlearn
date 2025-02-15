@@ -25,7 +25,7 @@ from fairlearn.utils._input_validation import _validate_and_reformat_input
 LOGGER = logging.getLogger(__name__)
 
 
-class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator):
+class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     r"""
     A transformer and classifier that learns a latent representation of the input data to
     obfuscate the sensitive features while preserving the classification and reconstruction
@@ -96,7 +96,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
     Notes
     -----
-    The FairRepresentationLearner implements the algorithms intoduced in Zemel et al.
+    The PrototypedRepresenter implements the algorithms intoduced in Zemel et al.
     :footcite:`pmlr-v28-zemel13`.
 
     If no sensitive features are provided during fitting, the model falls back to a Logistic
@@ -109,11 +109,11 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
     Examples
     --------
     >>> import numpy as np
-    >>> from fairlearn.preprocessing import FairRepresentationLearner
+    >>> from fairlearn.preprocessing import PrototypedRepresenter
     >>> X = np.array([[0, 1], [1, 0], [0, 0], [1, 1]])
     >>> y = np.array([0, 1, 0, 1])
     >>> sensitive_features = np.array([0, 0, 1, 1])
-    >>> frl = FairRepresentationLearner(n_prototypes=2, random_state=42)
+    >>> frl = PrototypedRepresenter(n_prototypes=2, random_state=42)
     >>> frl.fit(X, y, sensitive_features=sensitive_features)
     >>> X_transformed = frl.transform(X)
     >>> y_pred = frl.predict(X)
@@ -163,7 +163,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
     def fit(self, X, y, *, sensitive_features=None):
         """
-        Fit the fair representation learner to the provided data.
+        Fit the prototyped representer to the provided data.
 
         Parameters
         ----------
@@ -179,7 +179,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
         Returns
         -------
-        self : FairRepresentationLearner
+        self : PrototypedRepresenter
             Returns the fitted instance.
         """
         X, y = self._validate_X_y(X, y)
@@ -230,7 +230,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
         Returns
         -------
-        self : FairRepresentationLearner
+        self : PrototypedRepresenter
             Returns self.
 
         Raises
@@ -370,7 +370,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
         Returns
         -------
-        self : FairRepresentationLearner
+        self : PrototypedRepresenter
             Returns the instance itself.
         """
         self._groups = pd.Series()
@@ -390,7 +390,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
 
     def transform(self, X) -> np.ndarray:
         """
-        Transform the input data X using the learned fair representation.
+        Transform the input data X using the learned prototyped representation.
 
         Parameters
         ----------
@@ -405,7 +405,7 @@ class FairRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator
         Notes
         -----
         This method checks if the model is fitted, validates the input data,
-        and then applies the learned fair representation transformation.
+        and then applies the learned prototyped representation.
         If a fallback classifier is set, it returns the input data as is.
         Otherwise, it computes the latent mapping and returns the transformed data.
         """
