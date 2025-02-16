@@ -2,7 +2,7 @@ from sklearn import __version__ as sklearn_version
 from sklearn.utils.validation import check_array as _check_array
 
 
-def validate_data(estimator, X, **kwargs):
+def validate_data(estimator, X, **kwargs):  # pragma: no cover
     """
     Validate data for sklearn estimators. This function provides compatibility across
     different sklearn versions by handling the validation method changes between versions.
@@ -35,7 +35,7 @@ def validate_data(estimator, X, **kwargs):
         return estimator._validate_data(X, **kwargs)
 
 
-def check_array(X, **kwargs):
+def check_array(X, **kwargs):  # pragma: no cover
     """
     Wrapper for sklearn's check_array function that handles version compatibility.
     Using this private function is only necessary if the call contains
@@ -67,7 +67,7 @@ def check_array(X, **kwargs):
 
 # the two functions below were copied from sklearn-compat PR #15
 # both functions are use to accommodate the usage of sklearn 1.6 and the versions below with one API
-def patched_more_tags(estimator, expected_failed_checks):
+def patched_more_tags(estimator, expected_failed_checks):  # pragma: no cover
     """
     Patch an estimator's _more_tags method to include expected failed checks.
     This is used for compatibility with sklearn's estimator checks framework.
@@ -99,7 +99,7 @@ def patched_more_tags(estimator, expected_failed_checks):
     return estimator
 
 
-def parametrize_with_checks(
+def parametrize_with_checks(  # pragma: no cover
     estimators,
     *,
     legacy=True,

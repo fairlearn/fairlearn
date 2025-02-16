@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.8", "3.9", "3.10", "3.11"]
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         requirementsPinned: ["true", "false"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
@@ -29,12 +29,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.8", "3.9", "3.10", "3.11"]
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      codeCovPython: "3.11"
+      codeCovPython: "3.12"
 
   other-ml:
     strategy:
@@ -46,7 +46,7 @@ jobs:
     uses: ./.github/workflows/test-other-ml.yml
     with:
       os: ubuntu-latest
-      python: "3.11"
+      python: "3.12"
       mlpackage: ${{ matrix.mlpackage }}
 
 
@@ -54,7 +54,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.11"]
+        python: ["3.12"]
     uses: ./.github/workflows/linting.yml
     with:
       os: ${{ matrix.os }}

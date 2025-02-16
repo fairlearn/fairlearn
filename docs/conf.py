@@ -70,8 +70,9 @@ extensions = [
     "sphinx_issues",
 ]
 
-copybutton_prompt_text = r"\$\s+"
+copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True
+copybutton_exclude = "style"
 
 source_suffix = [".rst"]
 
@@ -135,9 +136,9 @@ html_theme_options = {
             "icon": "fa-brands fa-github",
         },
         {
-            "name": "Twitter",
-            "url": "https://twitter.com/fairlearn",
-            "icon": "fa-brands fa-twitter",
+            "name": "LinkedIn",
+            "url": "https://www.linkedin.com/company/fairlearn/",
+            "icon": "fa-brands fa-linkedin",
         },
         {
             "name": "StackOverflow",
