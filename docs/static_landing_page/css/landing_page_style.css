@@ -32,6 +32,14 @@ body {
     color: #e0e0e0;
 }
 
+.nav-logo {
+    filter: none;
+}
+
+.dark-theme .nav-logo {
+    filter: brightness(1.6);
+}
+
 .dark-theme h1, 
 .dark-theme h2, 
 .dark-theme h3, 
