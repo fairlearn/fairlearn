@@ -49,9 +49,13 @@ body {
     color: #ffffff;
 }
 
-.dark-theme p, 
+.dark-theme p,
 .dark-theme li {
     color: #b0b0b0;
+}
+
+.dark-theme div.pt-4.pb-2.text-dark.text-left{
+	color: #b0b0b0 !important
 }
 
 .dark-theme .navbar, 
@@ -96,15 +100,18 @@ body {
     background-color: #4c8bf5;
 }
 
-.section-5 {
-    background: #F2F2F2;
-    padding: 60px 0;
-    text-align: center;
-}
-
 .dark-theme .section-5 {
     background: #1e1e1e67;
 }
+
+.dark-theme .section-5 .benefit-card .icon-blue {
+    display: none;
+}
+
+.dark-theme .section-5 .benefit-card .icon-white {
+    display: block;
+}
+
 /* end of lightmode section */
 
 .masthead h1 {
@@ -161,6 +168,9 @@ footer {
 p {
 	font-size: 20px;
 	line-height: 26px;
+}
+p1 {
+	font-size: 18px;
 }
 li {
 	font-family: 'Code Pro Regular', Arial, sans-serif;
