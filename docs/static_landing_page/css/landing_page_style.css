@@ -26,6 +26,94 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
+/* lightmode section */
+.dark-theme {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.nav-logo {
+    filter: none;
+}
+
+.dark-theme .nav-logo {
+    filter: brightness(1.6);
+}
+
+.dark-theme h1, 
+.dark-theme h2, 
+.dark-theme h3, 
+.dark-theme h4, 
+.dark-theme h5, 
+.dark-theme h6 {
+    color: #ffffff;
+}
+
+.dark-theme p,
+.dark-theme li {
+    color: #b0b0b0;
+}
+
+.dark-theme div.pt-4.pb-2.text-dark.text-left{
+	color: #b0b0b0 !important
+}
+
+.dark-theme .navbar, 
+.dark-theme .masthead, 
+.dark-theme .card {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+.dark-theme .inner-box {
+    background-color: #242424;
+    box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .navbar li a {
+    color: #ffffff;
+}
+
+.dark-theme .navbar .nav-link:hover {
+    text-decoration: underline;
+    color: #4c8bf5;
+}
+
+.dark-theme .gradient {
+    background: linear-gradient(75deg, #0f4c75 10.56%, #3282b8 92.14%);
+}
+
+.dark-theme .quickstart-btn {
+    background-color: #4c8bf5;
+}
+
+.dark-theme footer {
+    background-color: #121212;
+    color: #b0b0b0;
+}
+
+.dark-theme .footer-small {
+    color: #ffffff;
+}
+
+.dark-theme .line {
+    background-color: #4c8bf5;
+}
+
+.dark-theme .section-5 {
+    background: #1e1e1e67;
+}
+
+.dark-theme .section-5 .benefit-card .icon-blue {
+    display: none;
+}
+
+.dark-theme .section-5 .benefit-card .icon-white {
+    display: block;
+}
+
+/* end of lightmode section */
+
 .masthead h1 {
 	font-family: 'Code Pro Medium', Arial, sans-serif;
 	font-weight: 500;
@@ -81,6 +169,7 @@ p {
 	font-size: 20px;
 	line-height: 26px;
 }
+
 li {
 	font-family: 'Code Pro Regular', Arial, sans-serif;
 	font-style: normal;
