@@ -206,7 +206,7 @@ Follow the steps below to create a pull request.
       * Opening a pull request comes with filling up an already provided description template.
         Please fill it up! If you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
 
-#. Celebration time! We would like to encourage you to become a part of our Fairlearn community. To do so, join our communication channels: :ref:`communication`.
+#. Celebration time! We would like to encourage you to become a part of our Fairlearn community. To do so, join our communication channels: :ref:`communication`. Please respect our `Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`_.
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
