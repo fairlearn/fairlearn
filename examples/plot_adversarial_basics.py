@@ -138,6 +138,7 @@ mf = MetricFrame(
 
 print(mf.by_group)
 
+# %%
 # The above statistics tell us that the accuracy of our model is quite good,
 # 90% for females and 72% for males. However, the selection rates differ, so there
 # is a large demographic disparity here. When using adversarial fairness
