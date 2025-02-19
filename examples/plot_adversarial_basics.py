@@ -150,3 +150,5 @@ print(mf.by_group)
 # :ref:`adversarial_Example_2` will demonstrate some problem-specific
 # techniques we can use such as using dynamic hyperparameters,
 # validation, and early stopping to improve adversarial training.
+
+sklearn.set_config(enable_metadata_routing=False)
