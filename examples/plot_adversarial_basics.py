@@ -138,6 +138,7 @@ mf = MetricFrame(
 
 print(mf.by_group)
 
+# %%
 # The above statistics tell us that the accuracy of our model is quite good,
 # 90% for females and 72% for males. However, the selection rates differ, so there
 # is a large demographic disparity here. When using adversarial fairness
@@ -149,3 +150,5 @@ print(mf.by_group)
 # :ref:`adversarial_Example_2` will demonstrate some problem-specific
 # techniques we can use such as using dynamic hyperparameters,
 # validation, and early stopping to improve adversarial training.
+
+sklearn.set_config(enable_metadata_routing=False)
