@@ -128,6 +128,8 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
         "link": "https://fairlearn.org",
+        "image_light": "_static/images/fairlearn_full_color_lightmode.svg", 
+        "image_dark": "_static/images/fairlearn_full_color_darkmode.svg",
     },
     "icon_links": [
         {
@@ -170,7 +172,7 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "_static/images/fairlearn_full_color.svg"
+html_logo = None
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
