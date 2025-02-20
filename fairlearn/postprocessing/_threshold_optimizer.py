@@ -273,7 +273,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         X : numpy.ndarray or pandas.DataFrame
             The feature matrix
         y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
-            The label vector
+            The label vector. This must only contain binary labels (0 and 1).
         sensitive_features : numpy.ndarray, list, pandas.DataFrame, or pandas.Series
             sensitive features to identify groups by
         """
