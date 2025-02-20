@@ -635,7 +635,6 @@ sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparam
 and iterated over a range of potential values.
 
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::

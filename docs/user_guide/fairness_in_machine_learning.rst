@@ -481,7 +481,6 @@ Note: Some have identified that using the term *stakeholder* may perpetuate colo
 
 **Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::
