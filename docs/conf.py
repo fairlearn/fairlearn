@@ -170,10 +170,6 @@ html_theme_options = {
     ],
 }
 
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-html_logo = None
-
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {}
