@@ -21,6 +21,7 @@ Website: https://fairlearn.org/
 -  `Usage <#usage>`__
 -  `Contributing <#contributing>`__
 -  `Maintainers <#maintainers>`__
+-  `Code of conduct <#code-of-conduct>`__
 -  `Issues <#issues>`__
 
 Current release
@@ -119,6 +120,10 @@ Maintainers
 
 A list of current maintainers is
 `on our website <https://fairlearn.org/main/about/index.html>`__.
+
+Code of conduct
+---------------
+Fairlearn follows the `Fairlearn Organization’s Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`__.
 
 Issues
 ------
