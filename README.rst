@@ -98,11 +98,13 @@ For an overview of our algorithms please refer to our
 Getting Started with Fairlearn
 -----------------------------
 
-For New Users
-~~~~~~~~~~~~~
+First steps
+~~~~~~~~~~~
 - **Quick Installation**: Install via pip:
   ``pip install fairlearn``
-- **First Steps**: Visit our `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__ for installation options and basic examples
+
+- **First Steps**: Visit the `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__ for installation options and basic examples
+
 - **Learning Resources**:
   - Look through the `example notebooks <https://fairlearn.org/main/auto_examples/index.html>`__
   - Read the comprehensive `user guide <https://fairlearn.org/main/user_guide/index.html>`__
@@ -111,8 +113,10 @@ For Users & Practitioners
 ~~~~~~~~~~~~~~~~~~~~~~~~
 - **Examples & Notebooks**: Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__
   - When using example notebooks, be aware that notebooks from `main` may not be compatible with pip-installed versions
-  - For version-compatible examples, use the same version tag as your installed package
+  - For version-compatible examples, use the same version tag in the website menu as your installed package
+
 - **API Documentation**: Check the `API reference <https://fairlearn.org/main/api_reference/index.html>`__
+
 - **Get Help**:
   - Ask questions on `Stack Overflow <https://stackoverflow.com/questions/tagged/fairlearn>`__ with tag ``fairlearn``
   - Join the `Discord community <https://discord.gg/R22yCfgsRn>`__ for discussions
