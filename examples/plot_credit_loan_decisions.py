@@ -159,7 +159,7 @@ dataset.shape
 dataset.head()
 
 # %%
-# From the `dataset description :footcite:`yeh2009comparisons`,
+# From the dataset description :footcite:`yeh2009comparisons`,
 # we see there are three categorical features:
 #
 # - :code:`SEX`: Sex of the applicant (as a binary feature)
