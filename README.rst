@@ -94,26 +94,37 @@ Fairlearn algorithms
 For an overview of our algorithms please refer to our
 `website <https://fairlearn.org/main/user_guide/mitigation/index.html>`__.
 
-Install Fairlearn
------------------
 
-For instructions on how to install Fairlearn check out our `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__.
+Getting Started with Fairlearn
+-----------------------------
 
-Usage
------
+For New Users
+~~~~~~~~~~~~~
+- **Quick Installation**: Install via pip:
+  ``pip install fairlearn``
+- **First Steps**: Visit our `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__ for installation options and basic examples
+- **Learning Resources**:
+  - Look through the `example notebooks <https://fairlearn.org/main/auto_examples/index.html>`__
+  - Read the comprehensive `user guide <https://fairlearn.org/main/user_guide/index.html>`__
 
-For common usage refer to the `Jupyter notebooks <https://fairlearn.org/main/auto_examples/index.html>`__ and
-our `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
-Please note that our APIs are subject to change, so notebooks downloaded
-from ``main`` may not be compatible with Fairlearn installed with
-``pip``. In this case, please navigate the tags in the repository (e.g.
-`v0.7.0 <https://github.com/fairlearn/fairlearn/tree/v0.7.0>`__) to
-locate the appropriate version of the notebook.
+For Users & Practitioners
+~~~~~~~~~~~~~~~~~~~~~~~~
+- **Examples & Notebooks**: Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__
+  - When using example notebooks, be aware that notebooks from `main` may not be compatible with pip-installed versions
+  - For version-compatible examples, use the same version tag as your installed package
+- **API Documentation**: Check the `API reference <https://fairlearn.org/main/api_reference/index.html>`__
+- **Get Help**:
+  - Ask questions on `Stack Overflow <https://stackoverflow.com/questions/tagged/fairlearn>`__ with tag ``fairlearn``
+  - Join the `Discord community <https://discord.gg/R22yCfgsRn>`__ for discussions
 
-Contributing
-------------
+For Contributors
+~~~~~~~~~~~~~~~
+- **New Contributors**:
+  - Read the `contributor guide <https://fairlearn.org/main/contributor_guide/index.html>`__
+  - Check out the `good first issues <https://github.com/fairlearn/fairlearn/labels/good%20first%20issue>`__
+  - Follow the `development process <https://fairlearn.org/main/contributor_guide/development_process.html>`__
+  - Join the `Discord <https://discord.gg/R22yCfgsRn>`__ for contributor discussions
 
-To contribute please check our `contributor guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
 
 Maintainers
 -----------
@@ -123,18 +134,10 @@ A list of current maintainers is
 
 Code of conduct
 ---------------
-Fairlearn follows the `Fairlearn Organization’s Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`__.
+Fairlearn follows the `Fairlearn Organization's Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`__.
 
 Issues
 ------
-
-Usage Questions
-~~~~~~~~~~~~~~~
-
-Pose questions and help answer them on `Stack
-Overflow <https://stackoverflow.com/questions/tagged/fairlearn>`__ with
-the tag ``fairlearn`` or on
-`Discord <https://discord.gg/R22yCfgsRn>`__.
 
 Regular (non-security) issues
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
