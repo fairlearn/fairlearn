@@ -12,24 +12,12 @@ usage.
 
 Website: https://fairlearn.org/
 
--  `Current release <#current-release>`__
 -  `What we mean by *fairness* <#what-we-mean-by-fairness>`__
 -  `Overview of Fairlearn <#overview-of-fairlearn>`__
 -  `Getting started with fairlearn <#getting-started-with-fairlearn>`__
 -  `Maintainers <#maintainers>`__
 -  `Code of conduct <#code-of-conduct>`__
 -  `Issues <#issues>`__
-
-Current release
----------------
-
--  The current stable release is available on
-   `PyPI <https://pypi.org/project/fairlearn/>`__.
-
--  Our current version may differ substantially from earlier versions.
-   Users of earlier versions should visit our
-   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`__
-   to navigate significant changes and find information on how to migrate.
 
 What we mean by *fairness*
 --------------------------
