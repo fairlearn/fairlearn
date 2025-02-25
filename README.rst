@@ -113,7 +113,7 @@ First steps
 For Users & Practitioners
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__. Notebooks downloaded from `main` may not be compatible with pip-installed versions.
+- Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__. Please note that notebooks downloaded from `main` may not be compatible with pip-installed versions.
 
 - Check the `API reference <https://fairlearn.org/main/api_reference/index.html>`__.
 
@@ -132,7 +132,7 @@ For Contributors
 
 - Follow the `development process <https://fairlearn.org/main/contributor_guide/development_process.html>`__.
 
-- Join the `Discord <https://discord.gg/R22yCfgsRn>`__ for contributor discussions. Please use the `#development` channel.
+- Join the `Discord <https://discord.gg/R22yCfgsRn>`__ for contributor discussions. Please use the ``#development`` channel.
 
 
 Maintainers
