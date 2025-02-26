@@ -578,7 +578,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     >>> from fairlearn.datasets import fetch_adult
     >>> from fairlearn.metrics import plot_model_comparison, equal_opportunity_difference
     >>> from fairlearn.reductions import ExponentiatedGradient, EqualizedOdds
-    >>> from sklearn.ensemble import  RandomForestClassifier
+    >>> from sklearn.ensemble import HistGradientBoostingClassifier
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.preprocessing import OneHotEncoder, LabelEncoder
@@ -594,18 +594,18 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     >>> preprocessor = ColumnTransformer(
     ...     transformers=[
     ...         ('num', 'passthrough', numeric_features),
-    ...         ('cat', OneHotEncoder(drop='first'), categorical_features)])
+    ...         ('cat', OneHotEncoder(drop='first', sparse_output=False), categorical_features)])
     >>> # Transform y to numerical values
     >>> le = LabelEncoder()
     >>> y = le.fit_transform(y)
     >>> # Create a pipeline with the preprocessor and estimator
     >>> estimator = Pipeline([
     ...     ('preprocessor', preprocessor),
-    ...     ('classifier', RandomForestClassifier(n_estimators=10, random_state=42))])
+    ...     ('classifier', HistGradientBoostingClassifier(random_state=42))])
     >>> # Split the data
     >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X, y, A, test_size=0.2, random_state=42)
     >>> # Train and evaluate the base model
-    >>> _ = estimator.fit(X_train, y_train) #variable assignment only there to prevent large output
+    >>> _ = estimator.fit(X_train, y_train)
     >>> y_pred_base = estimator.predict(X_test)
     >>> # Create a list of ExponentiatedGradient models with different epsilons
     >>> epsilons = [0.001, 0.01, 0.05, 0.1, 0.2]
@@ -615,7 +615,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     ...         estimator=estimator,
     ...         constraints=EqualizedOdds(difference_bound=eps),
     ...         sample_weight_name="classifier__sample_weight")
-    ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train) #variable assignment only there to prevent large output
+    ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train)
     ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(X_test)
     >>> # Add the base model predictions
     >>> exp_grad_models["Base Model"] = y_pred_base
