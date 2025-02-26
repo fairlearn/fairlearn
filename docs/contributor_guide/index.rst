@@ -48,4 +48,4 @@ All are welcome! Please reach out via
 invitation to you.
 We keep notes from each meeting in our
 `HackMD <https://hackmd.io/@Pu3O7yQTSFivjWn2cXCgFg/BkxG0KgrJl>`_.
-`Old HackMD <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>
+The 2020-2021 notes can be found `here <https://hackmd.io/QcJ8WBAbQTq6iOgoi0JT4g>`_.
