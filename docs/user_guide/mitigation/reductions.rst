@@ -601,7 +601,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     >>> # Create a pipeline with the preprocessor and estimator
     >>> estimator = Pipeline([
     ...     ('preprocessor', preprocessor),
-    ...     ('classifier', HistGradientBoostingClassifier(n_estimators=10, random_state=42))])
+    ...     ('classifier', HistGradientBoostingClassifier(random_state=42))])
     >>> # Split the data
     >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X, y, A, test_size=0.2, random_state=42)
     >>> # Train and evaluate the base model
