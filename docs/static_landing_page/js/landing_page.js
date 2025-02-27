@@ -142,6 +142,33 @@ $(document).ready(function () {
       $(".navbar-toggler").click();
     }
   });
+  
+  
+  $(document).ready(function () {
+    // Check if the user has changed the theme before
+    const savedTheme = localStorage.getItem('theme');
+  
+    // If no saved preference, check system preference
+    if (savedTheme) {
+      $("body").addClass(savedTheme);
+    } else {
+      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDarkMode) {
+        $("body").addClass("dark-theme");
+      }
+    }
+  
+    $("#lightmode").click(function () {
+      $("body").toggleClass("dark-theme");
+  
+      // Save the current theme
+      if ($("body").hasClass("dark-theme")) {
+        localStorage.setItem('theme', 'dark-theme');
+      } else {
+        localStorage.setItem('theme', '');
+      }
+    });
+  });
 
 
 });
