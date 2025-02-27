@@ -15,7 +15,6 @@ from sklearn.base import (
 )
 from sklearn.calibration import LabelEncoder
 from sklearn.dummy import check_random_state
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import log_loss
 from sklearn.utils.multiclass import type_of_target
 
@@ -99,8 +98,8 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     The PrototypedRepresenter implements the algorithms intoduced in Zemel et al.
     :footcite:`pmlr-v28-zemel13`.
 
-    If no sensitive features are provided during fitting, the model falls back to a Logistic
-    Regression classifier.
+    If no sensitive features are provided during fitting, the loss function will not include the
+    fairness error term.
 
     References
     ----------
@@ -126,22 +125,19 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     random_state: int | np.random.RandomState | None
     tol: float
     max_iter: int
+    # The following attributes are set during fitting
     coef_: np.ndarray
     n_iter_: int
     n_features_in_: int
     classes_: np.ndarray
     _label_encoder: LabelEncoder
     _groups: pd.Series
-    # The following attributes are set during fitting and can be None depending on whether
-    # sensitive features were provided
-    _prototypes_: np.ndarray | None
-    _alpha: np.ndarray | None
-    _prototype_dim: int | None
-    _latent_mapping_size: int | None
-    _prototype_predictions_size: int | None
-    _prototype_vectors_size: int | None
-    _optimizer_size: int | None
-    _fall_back_classifier: LogisticRegression | None
+    _prototypes_: np.ndarray
+    _alpha_: np.ndarray
+    _prototype_dim: int
+    _prototype_predictions_size: int
+    _prototype_vectors_size: int
+    _optimizer_size: int
 
     def __init__(
         self,
@@ -161,8 +157,8 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         self.tol = tol
         self.max_iter = max_iter
 
-    def fit(self, X, y, *, sensitive_features=None):
-        """
+    def fit(self, X, y, *, sensitive_features=None) -> PrototypedRepresenter:
+        r"""
         Fit the prototyped representer to the provided data.
 
         Parameters
@@ -175,7 +171,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
 
         sensitive_features : array-like or None, default=None
             Sensitive features to be considered whose groups will be used to promote demographic
-            parity. If None, the model will fall back to a Logistic Regression classifier.
+            parity. If None, the fairness error term will not be included in the loss function.
 
         Returns
         -------
@@ -190,24 +186,19 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
             sensitive_features=sensitive_features,
             expect_y=True,
             expect_sensitive_features=False,
-            enforce_binary_labels=True,
+            enforce_binary_labels=False,
         )
 
         self.n_features_in_ = X.shape[1]
         random_state = check_random_state(self.random_state)
 
-        if sensitive_features is None:
-            LOGGER.warning("No sensitive features provided. Fitting a Logistic Regression.")
+        return self._optimize(X, y, sensitive_features, random_state)
 
-            return self._optimize_without_sensitive_features(X, y, random_state)
-
-        return self._optimize_with_sensitive_features(X, y, sensitive_features, random_state)
-
-    def _optimize_with_sensitive_features(
-        self, X, y, sensitive_features: pd.Series, random_state: np.random.RandomState
-    ):
-        """
-        Minimize the loss given the sensitive features.
+    def _optimize(
+        self, X, y, sensitive_features: pd.Series | None, random_state: np.random.RandomState
+    ) -> PrototypedRepresenter:
+        r"""
+        Minimize the loss given the data, labels and sensitive features.
 
         This method sets up and executes the optimization algorithm by:
         - Initializing the optimization variables: the prototype vectors and their predictions are
@@ -223,7 +214,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
             The input samples.
         y : array-like of shape (n_samples,)
             The target values.
-        sensitive_features : pd.Series
+        sensitive_features : pd.Series or None
             The sensitive features for each sample.
         random_state : np.random.RandomState
             The random state for reproducibility. Used for initializing the optimization.
@@ -238,12 +229,10 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         RuntimeError
             If the loss minimization fails.
         """
-        self._groups = sensitive_features.unique()
+        self._groups = sensitive_features.unique() if sensitive_features is not None else None
 
         # Dimension of each v_k prototype vector
         self._prototype_dim = X.shape[1]
-        # Dimension of M, the latent representation stochastic mapping from X to Z
-        self._latent_mapping_size = len(self._groups) * self.n_prototypes
         # Dimension of the prototype predictions vector w
         self._prototype_predictions_size = self.n_prototypes
         # Total size of the prototype vectors
@@ -293,17 +282,17 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         self._alpha_ = result.x[-self._prototype_dim :]
         self.n_iter_ = result.nit
 
-        self._fall_back_classifier = None
-
         return self
 
-    def _objective(self, x: np.ndarray, X, y, sensitive_features) -> float:
-        """
+    def _objective(self, x: np.ndarray, X, y, sensitive_features: pd.Series | None) -> float:
+        r"""
         Compute the objective function for the optimization problem at the given point :code:`x`.
 
         This method extracts the current prototype vectors, the prototype predictions, and the
         dimension weights, and calculates the current loss, which is the weighted sum of the
-        reconstruction error, classification error, and fairness error.
+        reconstruction error, classification error, and fairness error. The latter is only included
+        if sensitive features are provided.
+
         Parameters
         ----------
         x : np.ndarray
@@ -312,7 +301,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
             The input samples.
         y : array-like of shape (n_samples,)
             The target values.
-        sensitive_features : pd.Series
+        sensitive_features : pd.Series or None
             The sensitive features for each sample.
         Returns
         -------
@@ -328,21 +317,23 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         X_hat = M @ V
         reconstruction_error = np.mean(np.sum((X - X_hat) ** 2, axis=1))
 
-        # Compute the fairness error
-        # Compute the mean prototype probabilities for each group
-        M_gk = np.array(
-            [np.mean(M[sensitive_features == group], axis=0) for group in self._groups]
-        )
-        # Compute the mean difference between mean prototype probabilities for each group
-        group_combinations = np.triu_indices(n=len(self._groups), k=1)
-        fairness_error = np.mean(
-            np.abs(M_gk[group_combinations[0], None] - M_gk[group_combinations[1], None])
-        )
-
         # Compute the classification error
         w = x[self._prototype_vectors_size : -self._prototype_dim]
         y_hat = M @ w
         classification_error = log_loss(y, y_hat)
+
+        fairness_error = 0.0
+        if sensitive_features is not None:
+            # Compute the fairness error
+            # Compute the mean prototype probabilities for each group
+            M_gk = np.array(
+                [np.mean(M[sensitive_features == group], axis=0) for group in self._groups]
+            )
+            # Compute the mean difference between mean prototype probabilities for each group
+            group_combinations = np.triu_indices(n=len(self._groups), k=1)
+            fairness_error = np.mean(
+                np.abs(M_gk[group_combinations[0], None] - M_gk[group_combinations[1], None])
+            )
 
         return (
             self.lambda_x * reconstruction_error
@@ -350,47 +341,11 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
             + self.lambda_z * fairness_error
         )
 
-    def _optimize_without_sensitive_features(self, X, y, random_state: np.random.RandomState):
-        """
-        Optimize the model without considering sensitive features.
-
-        This method trains a logistic regression model on the provided features and labels,
-        and stores the resulting coefficients and other relevant attributes.
-
-        Parameters
-        ----------
-        X : array-like or sparse matrix of shape (n_samples, n_features)
-            The input samples.
-
-        y : array-like of shape (n_samples,)
-            The target values.
-
-        random_state : np.random.RandomState
-            The random state to use for reproducibility.
-
-        Returns
-        -------
-        self : PrototypedRepresenter
-            Returns the instance itself.
-        """
-        self._groups = pd.Series()
-
-        fallback_classifier = LogisticRegression(
-            tol=self.tol, max_iter=self.max_iter, random_state=random_state
-        )
-
-        self._fall_back_classifier = fallback_classifier.fit(X, y)
-
-        self.coef_ = self._fall_back_classifier.coef_
-        self._prototypes_ = None
-        self._alpha_ = None
-        self.n_iter_ = self._fall_back_classifier.n_iter_
-
-        return self
-
     def transform(self, X) -> np.ndarray:
-        """
-        Transform the input data X using the learned prototyped representation.
+        r"""
+        Transform the input data X using the learned prototyped representation. Each sample is
+        transformed to its associated learned latent mapping, i.e. the softmax of its negative
+        distance to the prototypes.
 
         Parameters
         ----------
@@ -406,21 +361,16 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         -----
         This method checks if the model is fitted, validates the input data,
         and then applies the learned prototyped representation.
-        If a fallback classifier is set, it returns the input data as is.
-        Otherwise, it computes the latent mapping and returns the transformed data.
         """
         check_is_fitted(self)
 
         X = validate_data(self, X, reset=False)
 
-        if self._fall_back_classifier is not None:
-            return X
-
         M = self._get_latent_mapping(X, self._prototypes_, dimension_weights=self._alpha_)
-        return M @ self._prototypes_
+        return M
 
     def predict_proba(self, X) -> np.ndarray:
-        """
+        r"""
         Predict class probabilities for the input samples X.
 
         Parameters
@@ -444,15 +394,12 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
 
         X = validate_data(self, X, reset=False)
 
-        if self._fall_back_classifier is not None:
-            return self._fall_back_classifier.predict_proba(X)
-
         M = self._get_latent_mapping(X, self._prototypes_, dimension_weights=self.alpha_)
         positive_proba = M @ self.coef_
         return np.c_[1 - positive_proba, positive_proba]
 
     def predict(self, X) -> np.ndarray:
-        """
+        r"""
         Predict the labels for the given input data.
 
         Parameters
@@ -477,21 +424,11 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     def prototypes_(self) -> np.ndarray:
         check_is_fitted(self)
 
-        if self._prototypes_ is None:
-            raise AttributeError(
-                "No sensitive features provided when fitting. No prototypes were learned."
-            )
-
         return self._prototypes_
 
     @property
     def alpha_(self) -> np.ndarray:
         check_is_fitted(self)
-
-        if self._alpha_ is None:
-            raise AttributeError(
-                "No sensitive features provided when fitting. No distance was learned."
-            )
 
         return self._alpha_
 
@@ -499,7 +436,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     def _get_latent_mapping(
         X, prototypes: np.ndarray, dimension_weights: np.ndarray
     ) -> np.ndarray:
-        """
+        r"""
         Compute the latent mapping of the input data X to the given prototypes.
 
         Parameters
@@ -523,7 +460,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         return M
 
     def _validate_X_y(self, X, y) -> tuple[np.ndarray, np.ndarray]:
-        """
+        r"""
         Validate and preprocess the input features and target labels.
 
         Parameters
@@ -551,6 +488,8 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
                 f"Unknown label type: {y_type}. Only binary classification is supported."
             )
         self.classes_ = np.unique(y)
+        if len(self.classes_) == 1:
+            raise ValueError("Classifier can't train when only one class is present.")
         self._label_encoder = LabelEncoder().fit(y)
         y = self._label_encoder.transform(y)
 

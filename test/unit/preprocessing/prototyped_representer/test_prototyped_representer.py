@@ -17,13 +17,18 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-def test_reconstruction():
+@pytest.mark.parametrize(["sensitive_features"], [(np.array([0, 1]),), (None,)])
+def test_reconstruction(sensitive_features: np.array | None):
     X = np.array([[10, 10], [20, 20]])
     y = np.array([0, 1])
+    sensitive_features = np.array([0, 1])
+    expected_transformed_X = np.array([[1.0, 0.0], [0.0, 1.0]])
     frl = PrototypedRepresenter(n_prototypes=2, lambda_z=0.0, lambda_y=0.0, random_state=42)
-    frl.fit(X, y, sensitive_features=np.array([0, 1]))
+    frl.fit(X, y, sensitive_features=sensitive_features)
+
     X_transformed = frl.transform(X)
-    np.testing.assert_allclose(X_transformed, X, atol=1e-4)
+
+    np.testing.assert_allclose(X_transformed, expected_transformed_X, atol=1e-4)
     np.testing.assert_allclose(frl.prototypes_, X, atol=1e-4)
 
 
@@ -41,10 +46,15 @@ def test_statistical_parity():
     fairness_error = np.mean(
         np.abs(M_gk[group_combinations[0], None] - M_gk[group_combinations[1], None])
     )
+
     np.testing.assert_allclose(fairness_error, 0.0, atol=1e-4)
 
 
-def test_classification():
+@pytest.mark.parametrize(["sensitive_features"], [(np.array([0, 1, 0, 1]),), (None,)])
+@pytest.mark.parametrize(
+    ["y"], [(np.array([0, 1, 0, 1]),), (pd.Series(["no", "yes", "no", "yes"]),)]
+)
+def test_classification(y: np.array, sensitive_features: np.array | None):
     X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
     y = np.array([0, 1, 0, 1])
     sensitive_features = np.array([0, 1, 0, 1])
@@ -52,6 +62,7 @@ def test_classification():
     frl.fit(X, y, sensitive_features=sensitive_features)
 
     classification_error = frl.score(X, y)
+
     np.testing.assert_allclose(classification_error, 1.0, atol=1e-4)
 
 
@@ -108,7 +119,7 @@ def test__get_latent_mapping(
     [
         (np.array([0, 1]), np.array([0, 1])),
         (np.array(["b", "a", "b"]), np.array([1, 0, 1])),
-        (pd.Series(["yes", "yes"]), np.array([0, 0])),
+        (pd.Series(["yes", "yes", "no"]), np.array([1, 1, 0])),
     ],
 )
 def test__validate_X_y_maps_target_to_binary(y, expected_y_transformed: np.ndarray):
