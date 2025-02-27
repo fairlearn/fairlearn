@@ -92,7 +92,7 @@ API Docs
    :template: class.rst
 
    CorrelationRemover
-   PrototypedRepresenter
+   PrototypeRepresentationLearner
 
 :py:mod:`fairlearn.reductions`
 ==============================

@@ -24,7 +24,7 @@ from fairlearn.utils._input_validation import _validate_and_reformat_input
 LOGGER = logging.getLogger(__name__)
 
 
-class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
+class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator):
     r"""
     A transformer and classifier that learns a latent representation of the input data to
     obfuscate the sensitive features while preserving the classification and reconstruction
@@ -95,7 +95,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
 
     Notes
     -----
-    The PrototypedRepresenter implements the algorithms intoduced in Zemel et al.
+    The :class:`PrototypeRepresentationLearner` implements the algorithms intoduced in Zemel et al.
     :footcite:`pmlr-v28-zemel13`.
 
     If no sensitive features are provided during fitting, the loss function will not include the
@@ -108,14 +108,14 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     Examples
     --------
     >>> import numpy as np
-    >>> from fairlearn.preprocessing import PrototypedRepresenter
+    >>> from fairlearn.preprocessing import PrototypeRepresentationLearner
     >>> X = np.array([[0, 1], [1, 0], [0, 0], [1, 1]])
     >>> y = np.array([0, 1, 0, 1])
     >>> sensitive_features = np.array([0, 0, 1, 1])
-    >>> frl = PrototypedRepresenter(n_prototypes=2, random_state=42)
-    >>> frl.fit(X, y, sensitive_features=sensitive_features)
-    >>> X_transformed = frl.transform(X)
-    >>> y_pred = frl.predict(X)
+    >>> prl = PrototypeRepresentationLearner(n_prototypes=2, random_state=42)
+    >>> prl.fit(X, y, sensitive_features=sensitive_features)
+    >>> X_transformed = prl.transform(X)
+    >>> y_pred = prl.predict(X)
     """
 
     n_prototypes: int
@@ -131,7 +131,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
     n_features_in_: int
     classes_: np.ndarray
     _label_encoder: LabelEncoder
-    _groups: pd.Series
+    _groups: pd.Series | None
     _prototypes_: np.ndarray
     _alpha_: np.ndarray
     _prototype_dim: int
@@ -157,9 +157,9 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
         self.tol = tol
         self.max_iter = max_iter
 
-    def fit(self, X, y, *, sensitive_features=None) -> PrototypedRepresenter:
+    def fit(self, X, y, *, sensitive_features=None) -> PrototypeRepresentationLearner:
         r"""
-        Fit the prototyped representer to the provided data.
+        Fit the Prototyped Representation Learner to the provided data.
 
         Parameters
         ----------
@@ -175,7 +175,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
 
         Returns
         -------
-        self : PrototypedRepresenter
+        self : PrototypeRepresentationLearner
             Returns the fitted instance.
         """
         X, y = self._validate_X_y(X, y)
@@ -196,7 +196,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
 
     def _optimize(
         self, X, y, sensitive_features: pd.Series | None, random_state: np.random.RandomState
-    ) -> PrototypedRepresenter:
+    ) -> PrototypeRepresentationLearner:
         r"""
         Minimize the loss given the data, labels and sensitive features.
 
@@ -221,7 +221,7 @@ class PrototypedRepresenter(ClassifierMixin, TransformerMixin, BaseEstimator):
 
         Returns
         -------
-        self : PrototypedRepresenter
+        self : PrototypeRepresentationLearner
             Returns self.
 
         Raises

@@ -141,12 +141,12 @@ we would expect with :math:`\alpha=0.5`.
     :target: ../../auto_examples/plot_correlationremover_before_after.html
 
 
-.. _prototyped_representer:
+.. _prototyped_representation_learner:
 
-Prototyped Representer
+Prototyped Representation Learner
 ---------------------------
 
-:class:`~fairlearn.preprocessing.PrototypedRepresenter` is a preprocessing algorithm and
+:class:`~fairlearn.preprocessing.PrototypeRepresentationLearner` is a preprocessing algorithm and
 a classifier that aims to learn a latent representation of the data that minimizes reconstruction
 error, while simultaneously obfuscating information about sensitive features. It was introduced in
 Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`.
@@ -198,14 +198,14 @@ for group :math:`g` and prototype :math:`k`.
 
 
 In the example below, we use the `Adult Income <https://archive.ics.uci.edu/ml/datasets/adult>`_
-dataset to demonstrate the :code:`PrototypedRepresenter`. This dataset contains sensitive
+dataset to demonstrate the :code:`PrototypeRepresentationLearner`. This dataset contains sensitive
 features such as race and sex. The goal is to transform the dataset so that the sensitive
 features have less influence on the predictions of a downstream model.
 
 .. doctest:: mitigation_preprocessing
     :options:  +NORMALIZE_WHITESPACE
 
-    >>> from fairlearn.preprocessing import PrototypedRepresenter
+    >>> from fairlearn.preprocessing import PrototypeRepresentationLearner
     >>> from fairlearn.datasets import fetch_adult
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.preprocessing import StandardScaler
@@ -225,12 +225,12 @@ features have less influence on the predictions of a downstream model.
     >>> scaler = StandardScaler()
     >>> X_train = scaler.fit_transform(X_train)
     >>> X_test = scaler.transform(X_test)
-    >>> frl = PrototypedRepresenter(n_prototypes=4, max_iter=10)
-    >>> frl.fit(X_train, y_train, sensitive_features=sf_train)
-    PrototypedRepresenter(max_iter=10, n_prototypes=4)
-    >>> X_train_transformed = frl.transform(X_train)
-    >>> X_test_transformed = frl.transform(X_test)
-    >>> y_hat = frl.predict(X_test)
+    >>> prl = PrototypeRepresentationLearner(n_prototypes=4, max_iter=10)
+    >>> prl.fit(X_train, y_train, sensitive_features=sf_train)
+    PrototypeRepresentationLearner(max_iter=10, n_prototypes=4)
+    >>> X_train_transformed = prl.transform(X_train)
+    >>> X_test_transformed = prl.transform(X_test)
+    >>> y_hat = prl.predict(X_test)
 
 References
 ----------
