@@ -61,8 +61,8 @@ threshold = 0.1
 print(f"Let's find the leaves to relabel to have a discrimination lower than:" f" {threshold}")
 
 clf_relabeled = Relabeling(DecisionTreeClassifier(max_depth=3, random_state=0), threshold)
-clf_relabeled.relabeling(clf, X, y, y_pred, sensitive, threshold)
-y_pred_relabel = clf.predict(X)
+clf_relabeled.fit(X, y, sensitive)
+y_pred_relabel = clf_relabeled.predict(X)
 accuracy_relabel = round(accuracy_score(y, y_pred_relabel), round_value)
 print("\nAccuracy of the prediction after relabeling: ", accuracy_relabel)
 discrimination_relabel = round(
@@ -103,8 +103,9 @@ sum_acc = round(sum_acc, round_value)  # The effect of relabeling the leaves on 
 sum_disc = round(sum_disc, round_value)  # The effect of relabeling the leaves on discrimination
 
 # The values are accurate to a certain decimal.
-clf_relabeled.relabeling(clf, X, y, y_pred, sensitive, threshold)
-y_pred_relabel = clf.predict(X)
+clf_relabeled = Relabeling(DecisionTreeClassifier(max_depth=4, random_state=0), threshold)
+clf_relabeled.fit(X, list(y), sensitive)
+y_pred_relabel = clf_relabeled.predict(X)
 accuracy_relabel = round(accuracy_score(y, y_pred_relabel), round_value)
 discrimination_relabel = round(
     _relabeling.discrimination_dataset(y_pred_relabel, sensitive), round_value
