@@ -14,7 +14,10 @@ class Relabeling(DecisionTreeClassifier):
         self.threshold = threshold
         self.leaves_relabeled = list()
 
-    def fit(self, X, y, sensitive, sample_weight=None, check_input=True):
+    def fit(self, X, y, sensitive=None, sample_weight=None, check_input=True):
+        if sensitive is None:
+            raise Exception("Sensitive can not be None")
+
         self.clf.fit(X, y, sample_weight, check_input)
         y_pred = self.clf.predict(X)
         self.relabeling(self.clf, X, y, y_pred, sensitive, self.threshold)
