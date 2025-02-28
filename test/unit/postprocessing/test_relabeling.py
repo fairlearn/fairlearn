@@ -8,6 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.postprocessing import _relabeling
+from fairlearn.postprocessing._relabeling import Relabeling
 
 round_value = 10
 
@@ -54,11 +55,10 @@ def test_relabeling():
     clf.fit(X, list(y))
     y_pred = clf.predict(X)
     accuracy = round(accuracy_score(y, y_pred), round_value)
-    discrimination = round(_relabeling.discrimination_dataset(y_pred, sensitive),
-                           round_value)
+    discrimination = round(_relabeling.discrimination_dataset(y_pred, sensitive), round_value)
 
-    leaves_relabel = _relabeling.leaves_to_relabel(clf, X, y, y_pred, sensitive,
-                                                   threshold)
+    clf_relabeled = Relabeling(clf, threshold)
+    leaves_relabel = clf_relabeled.leaves_to_relabel(clf, X, y, y_pred, sensitive, threshold)
 
     sum_acc = 0
     sum_disc = 0
@@ -68,7 +68,7 @@ def test_relabeling():
     sum_acc = round(sum_acc, round_value)
     sum_disc = round(sum_disc, round_value)
 
-    _relabeling.relabeling(clf, X, y, y_pred, sensitive, threshold)
+    clf_relabeled.fit(X, y, sensitive)
 
     y_pred_relabel = clf.predict(X)
     accuracy_relabel = round(accuracy_score(y, y_pred_relabel), round_value)
