@@ -3,11 +3,10 @@
 
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator
 from sklearn.tree import DecisionTreeClassifier
 
 
-class Relabeling(DecisionTreeClassifier, BaseEstimator):
+class Relabeling(DecisionTreeClassifier):
 
     def __init__(self, clf, threshold):
         super().__init__()
