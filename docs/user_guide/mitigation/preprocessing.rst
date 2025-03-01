@@ -154,7 +154,7 @@ Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`.
 The latent representation consists of :math:`K` prototype vectors
 :math:`\mathbf{v}_1, \dots, \mathbf{v}_K \in \mathbb{R}^d`, where :math:`d` is the dimension
 of the input data, and a stochastic transformation matrix :math:`\mathbf{M} \in \mathbb{R}^{n \times k}`
-that maps the input data :math:`\mathbf{X} \in \mathbb{R}^{n \times d}` to the latent representation.
+that maps the input data :math:`\mathbf{X} \in \mathbb{R}^{n \times d}` to the prototypes.
 Each entry :math:`M_{nk}` is the softmax of the distances of the sample :math:`n` to the prototype
 vectors:
 
@@ -231,6 +231,23 @@ features have less influence on the predictions of a downstream model.
     >>> X_train_transformed = prl.transform(X_train)
     >>> X_test_transformed = prl.transform(X_test)
     >>> y_hat = prl.predict(X_test)
+
+Note that when used solely as a transformer, the :code:`PrototypeRepresentationLearner` does not
+require the target labels to be passed to the :code:`fit` method; they are only
+required when the :code:`PrototypeRepresentationLearner` is used as a classifier. In case they are
+not provided, the classification error term will not be included in the loss function, and the
+:code:`predict` method will raise an exception when called.
+
+
+.. doctest:: mitigation_preprocessing
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> prl = PrototypeRepresentationLearner(n_prototypes=4, max_iter=10)
+    >>> prl.fit(X_train, sensitive_features=sf_train)
+    PrototypeRepresentationLearner(max_iter=10, n_prototypes=4)
+    >>> X_train_transformed = prl.transform(X_train)
+    >>> X_test_transformed = prl.transform(X_test)
+
 
 References
 ----------

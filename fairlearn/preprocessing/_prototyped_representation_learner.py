@@ -118,6 +118,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     >>> sensitive_features = np.array([0, 0, 1, 1])
     >>> prl = PrototypeRepresentationLearner(n_prototypes=2, random_state=42)
     >>> prl.fit(X, y, sensitive_features=sensitive_features)
+    PrototypeRepresentationLearner(random_state=42)
     >>> X_transformed = prl.transform(X)
     >>> y_pred = prl.predict(X)
     """
