@@ -72,6 +72,36 @@ def test_classification(y: np.array, sensitive_features: np.array | None):
     np.testing.assert_allclose(classification_error, 1.0, atol=1e-4)
 
 
+def test_transform_without_target():
+    X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
+    y = None
+    sensitive_features = np.array([0, 1, 0, 1])
+    expected_X_transformed = np.array(
+        [[0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+    )
+    prl = PrototypeRepresentationLearner(n_prototypes=4, random_state=42)
+    prl.fit(X, y, sensitive_features=sensitive_features)
+
+    X_transformed = prl.transform(X)
+
+    np.testing.assert_allclose(expected_X_transformed, X_transformed, atol=1e-4)
+
+
+def test_predict_without_target_raises():
+    X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
+    y = None
+    sensitive_features = np.array([0, 1, 0, 1])
+    expected_message = "No labels were provided during fitting. Cannot predict probabilities."
+    prl = PrototypeRepresentationLearner(n_prototypes=4, random_state=42)
+    prl.fit(X, y, sensitive_features=sensitive_features)
+
+    with pytest.raises(ValueError, match=expected_message):
+        prl.predict(X)
+
+    with pytest.raises(ValueError, match=expected_message):
+        prl.predict_proba(X)
+
+
 @pytest.mark.parametrize(
     ["X", "prototypes", "alpha", "expected_M"],
     [

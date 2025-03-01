@@ -90,8 +90,9 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     n_features_in_ : int
         Number of features in the input data.
 
-    classes_ : np.ndarray
-        Unique classes in the target variable.
+    classes_ : np.ndarray or None
+        Unique classes in the target variable. Only set if target labels are provided during
+        fitting, otherwise None.
 
     Notes
     -----
@@ -100,6 +101,9 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
     If no sensitive features are provided during fitting, the loss function will not include the
     fairness error term.
+
+    If no target labels are provided during fitting, the loss function will not include the
+    classification error term and the model will not be able to predict probabilities or labels.
 
     References
     ----------
@@ -129,8 +133,9 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     coef_: np.ndarray
     n_iter_: int
     n_features_in_: int
-    classes_: np.ndarray
-    _label_encoder: LabelEncoder
+    classes_: np.ndarray | None
+    _has_target: bool
+    _label_encoder: LabelEncoder | None
     _groups: pd.Series | None
     _prototypes_: np.ndarray
     _alpha_: np.ndarray
@@ -157,7 +162,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         self.tol = tol
         self.max_iter = max_iter
 
-    def fit(self, X, y, *, sensitive_features=None) -> PrototypeRepresentationLearner:
+    def fit(self, X, y=None, *, sensitive_features=None) -> PrototypeRepresentationLearner:
         r"""
         Fit the Prototyped Representation Learner to the provided data.
 
@@ -166,7 +171,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         X : array-like of shape (n_samples, n_features)
             The input samples.
 
-        y : array-like of shape (n_samples,)
+        y : array-like of shape (n_samples,) or None, default=None
             The target values.
 
         sensitive_features : array-like or None, default=None
@@ -184,7 +189,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             X,
             y,
             sensitive_features=sensitive_features,
-            expect_y=True,
+            expect_y=False,
             expect_sensitive_features=False,
             enforce_binary_labels=False,
         )
@@ -212,7 +217,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         ----------
         X : array-like of shape (n_samples, n_features)
             The input samples.
-        y : array-like of shape (n_samples,)
+        y : array-like of shape (n_samples,) or None
             The target values.
         sensitive_features : pd.Series or None
             The sensitive features for each sample.
@@ -299,7 +304,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             The optimization variable containing prototype vectors, weights, and dimension weights.
         X : array-like of shape (n_samples, n_features)
             The input samples.
-        y : array-like of shape (n_samples,)
+        y : array-like of shape (n_samples,) or None
             The target values.
         sensitive_features : pd.Series or None
             The sensitive features for each sample.
@@ -318,9 +323,11 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         reconstruction_error = np.mean(np.sum((X - X_hat) ** 2, axis=1))
 
         # Compute the classification error
-        w = x[self._prototype_vectors_size : -self._prototype_dim]
-        y_hat = M @ w
-        classification_error = log_loss(y, y_hat)
+        classification_error = 0.0
+        if self._has_target:
+            w = x[self._prototype_vectors_size : -self._prototype_dim]
+            y_hat = M @ w
+            classification_error = log_loss(y, y_hat)
 
         fairness_error = 0.0
         if sensitive_features is not None:
@@ -389,10 +396,18 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         ------
         NotFittedError
             If the estimator is not fitted yet.
+
+        ValueError
+            If no labels were provided during fitting.
         """
         check_is_fitted(self)
 
         X = validate_data(self, X, reset=False)
+
+        if not self._has_target:
+            raise ValueError(
+                "No labels were provided during fitting. Cannot predict probabilities."
+            )
 
         M = self._get_latent_mapping(X, self._prototypes_, dimension_weights=self.alpha_)
         positive_proba = M @ self.coef_
@@ -411,6 +426,14 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         -------
         np.ndarray
             The predicted labels for the input data.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator is not fitted yet.
+
+        ValueError
+            If no labels were provided during fitting.
         """
         check_is_fitted(self)
 
@@ -480,8 +503,17 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         ValueError
             If the target labels are not binary.
         """
-        X, y = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
 
+        if y is None:
+            X = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
+            self._has_target = False
+            self._label_encoder = None
+            self.classes_ = None
+
+            return X, y
+
+        X, y = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
+        self._has_target = True
         y_type = type_of_target(y, input_name="y")
         if y_type != "binary":
             raise ValueError(
@@ -498,7 +530,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     def __sklearn_tags__(self):
         tags = super().__sklearn_tags__()
         tags.classifier_tags.multi_class = False
+        tags.target_tags.required = False
         return tags
 
     def _more_tags(self):
-        return {"binary_only": True}
+        return {"binary_only": True, "requires_y": False}
