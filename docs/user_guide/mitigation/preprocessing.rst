@@ -168,7 +168,7 @@ function is thus defined as a weighted sum of three terms:
 
 .. math::
 
-    \lambda_x \times L_x + \lambda_y \times L_y + \lambda_z \times L_z
+    \text{reconstruct_weight} \times L_x + \text{target_weight} \times L_y + \text{fairness_weight} \times L_z
 
 where:
 

@@ -40,13 +40,13 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     n_prototypes : int, default=2
         Number of prototypes to use in the latent representation.
 
-    lambda_x : float, default=1.0
+    reconstruct_weight : float, default=1.0
         Weight of the reconstruction error term in the objective function.
 
-    lambda_y : float, default=1.0
+    target_weight : float, default=1.0
         Weight of the classification error term in the objective function.
 
-    lambda_z : float, default=1.0
+    fairness_weight : float, default=1.0
         Weight of the fairness error term in the objective function.
 
     random_state : int, np.random.RandomState, or None, default=None
@@ -63,13 +63,13 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     n_prototypes : int
         Number of prototypes to use in the latent representation.
 
-    lambda_x : float
+    reconstruct_weight : float
         Weight of the reconstruction error term in the objective function.
 
-    lambda_y : float
+    target_weight : float
         Weight of the classification error term in the objective function.
 
-    lambda_z : float
+    fairness_weight : float
         Weight of the fairness error term in the objective function.
 
     random_state : int, np.random.RandomState, or None
@@ -119,9 +119,9 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     """
 
     n_prototypes: int
-    lambda_x: float
-    lambda_y: float
-    lambda_z: float
+    reconstruct_weight: float
+    target_weight: float
+    fairness_weight: float
     random_state: int | np.random.RandomState | None
     tol: float
     max_iter: int
@@ -142,17 +142,17 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     def __init__(
         self,
         n_prototypes: int = 2,
-        lambda_x: float = 1.0,
-        lambda_y: float = 1.0,
-        lambda_z: float = 1.0,
+        reconstruct_weight: float = 1.0,
+        target_weight: float = 1.0,
+        fairness_weight: float = 1.0,
         random_state: int | np.random.RandomState | None = None,
         tol: float = 1e-6,
         max_iter: int = 1000,
     ) -> None:
         self.n_prototypes = n_prototypes
-        self.lambda_z = lambda_z
-        self.lambda_x = lambda_x
-        self.lambda_y = lambda_y
+        self.fairness_weight = fairness_weight
+        self.reconstruct_weight = reconstruct_weight
+        self.target_weight = target_weight
         self.random_state = random_state
         self.tol = tol
         self.max_iter = max_iter
@@ -336,9 +336,9 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             )
 
         return (
-            self.lambda_x * reconstruction_error
-            + self.lambda_y * classification_error
-            + self.lambda_z * fairness_error
+            self.reconstruct_weight * reconstruction_error
+            + self.target_weight * classification_error
+            + self.fairness_weight * fairness_error
         )
 
     def transform(self, X) -> np.ndarray:
