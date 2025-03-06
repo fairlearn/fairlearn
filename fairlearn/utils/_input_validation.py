@@ -3,6 +3,7 @@
 
 import logging
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 from sklearn.utils.validation import check_consistent_length
@@ -53,9 +54,9 @@ def _validate_and_reformat_input(
 
     Parameters
     ----------
-    X : numpy.ndarray, pandas.DataFrame
+    X : numpy.ndarray, DataFrame object supported by narwhals
         The feature matrix
-    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+    y : numpy.ndarray, DataFrame or Series object supported by narwhals, or list
         The label vector
     expect_y : bool
         If True y needs to be provided, otherwise ignores the argument; default True
@@ -68,7 +69,9 @@ def _validate_and_reformat_input(
 
     Returns
     -------
-    Tuple(numpy.ndarray | pd.DataFrame, pandas.Series, pandas.Series, pandas.Series)
+    # TODO: define common way to document supported types; do we want to numerate all types individually 
+    # or to find some wording for "narwhals supported Series or DataFrame types"?
+    Tuple(numpy.ndarray | DataFrame, Series, Series, Series)
         The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead
@@ -81,7 +84,7 @@ def _validate_and_reformat_input(
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
             y = y.reshape(-1)
-        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
+        elif isinstance(y, nw.DataFrame) and y.shape[1] == 1:
             y = y.to_numpy().reshape(-1)
 
         # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
@@ -92,8 +95,8 @@ def _validate_and_reformat_input(
         raise ValueError(_MESSAGE_Y_NONE)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
-    if isinstance(X, pd.DataFrame):
-        result_X = pd.DataFrame(result_X)
+    if isinstance(X, nw.DataFrame):
+        result_X = nw.from_native(result_X, pass_through=True, eager_only=True)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
@@ -104,7 +107,7 @@ def _validate_and_reformat_input(
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
             sensitive_features = _merge_columns(sensitive_features)
 
-        sensitive_features = pd.Series(sensitive_features.squeeze())
+        sensitive_features = nw.from_native(sensitive_features.squeeze(), pass_through=True, series_only=True)
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 

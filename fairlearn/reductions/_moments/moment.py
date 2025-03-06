@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import pandas as pd
+import narwhals as nw
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -30,26 +31,29 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series | None = None) -> None:
+    def load_data(self, X, y: nw.typing.IntoSeries, *, sensitive_features: nw.typing.IntoSeries | None = None) -> None:
         """Load a set of data for use by this object.
 
         Parameters
         ----------
         X : array
             The feature array
-        y : :class:`pandas.Series`
+        # TODO: check if np.arrays are also supported for y and sensitive_features; some subclasses do allow these types
+        y : :class:`pandas.Series` or :class:`polars.Series`
             The label vector
-        sensitive_features : :class:`pandas.Series`
+        sensitive_features : :class:`pandas.Series` or :class:`polars.Series`
             The sensitive feature vector (default None)
         """
         assert self.data_loaded is False, "data can be loaded only once"
-        if sensitive_features is not None:
-            assert isinstance(sensitive_features, pd.Series)
+        X = nw.from_native(X, pass_through=True, eager_only=True)
+        # TODO: check if y can be a DataFrame too; it is not documented here, but don't some subclasses support multioutput?
+        y = nw.from_native(y,  pass_through=True, series_only=True)
+        sensitive_features = nw.from_native(sensitive_features, pass_through=True, series_only=True)
         self.X = X
         self._y = y
-        self.tags = pd.DataFrame({_LABEL: y})
+        self.tags = nw.from_dict({_LABEL: y}) # TODO: I don't need to specify a backend here? It picks whatever is passed?
         if sensitive_features is not None:
-            self.tags[_GROUP_ID] = sensitive_features
+            self.tags.with_columns(**{"_GROUP_ID": sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 

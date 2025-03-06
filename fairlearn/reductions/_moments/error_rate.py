@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Callable, Literal
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
 
@@ -45,7 +46,7 @@ class ErrorRate(ClassificationMoment):
 
     def __init__(self, *, costs: dict[Literal["fp", "fn"], float] | None = None):
         """Initialize the costs."""
-        super(ErrorRate, self).__init__()
+        super().__init__()
         if costs is None:
             self.fp_cost = 1.0
             self.fn_cost = 1.0
@@ -63,6 +64,11 @@ class ErrorRate(ClassificationMoment):
 
     def load_data(self, X, y, *, sensitive_features, control_features=None) -> None:
         """Load the specified data into the object."""
+        X = nw.from_native(X, pass_through=True, eager_only=True)
+        y = nw.from_native(y, pass_through=True, eager_only=True)
+        sensitive_features = nw.from_native(sensitive_features, pass_through=True, eager_only=True)
+        if control_features:
+            control_features = nw.from_native(control_features, pass_through=True, eager_only=True)
         _, y_train, sf_train, _ = _validate_and_reformat_input(
             X,
             y,
