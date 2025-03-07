@@ -15,6 +15,7 @@ requirements-parser
 black==24.4.2
 
 # Required for test
+polars
 pytest
 pytest-cov
 pytest-mock
