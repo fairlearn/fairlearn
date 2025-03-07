@@ -22,6 +22,7 @@ from fairlearn.postprocessing._tradeoff_curve_utilities import (
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
     _MESSAGE_SENSITIVE_FEATURES_NONE,
+    _MESSAGE_X_NONE,
     _MESSAGE_Y_NONE,
 )
 
@@ -89,14 +90,14 @@ def test_none_input_data(X, y, sensitive_features, constraints):
         predict_method="predict",
     )
 
-    if y is None:
+    if X is None:
+        with pytest.raises(ValueError) as exception:
+            adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
+        assert str(exception.value) == _MESSAGE_X_NONE
+    elif y is None:
         with pytest.raises(ValueError) as exception:
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
         assert str(exception.value) == _MESSAGE_Y_NONE
-    elif X is None:
-        with pytest.raises(ValueError) as exception:
-            adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-        assert "Expected 2D array, got scalar array instead" in str(exception.value)
     elif sensitive_features is None:
         with pytest.raises(ValueError) as exception:
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)

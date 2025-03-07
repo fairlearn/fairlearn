@@ -1,13 +1,18 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
+from typing import Sequence
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
+from narwhals.typing import IntoFrameT, IntoSeriesT
 from sklearn.utils.validation import check_consistent_length
 
 from fairlearn.utils._fixes import check_array
+from fairlearn.utils._narwhals_compat import get_common_backend
 
 logger = logging.getLogger(__file__)
 
@@ -39,13 +44,13 @@ _MERGE_COLUMN_SEPARATOR = ","
 
 
 def _validate_and_reformat_input(
-    X,
-    y=None,
-    expect_y=True,
-    expect_sensitive_features=True,
-    enforce_binary_labels=False,
+    X: np.ndarray | IntoFrameT,
+    y: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
+    expect_y: bool = True,
+    expect_sensitive_features: bool = True,
+    enforce_binary_labels: bool = False,
     **kwargs,
-):
+) -> tuple[np.ndarray | IntoFrameT, IntoSeriesT, IntoSeriesT | None, IntoSeriesT | None]:
     """Validate input data and return the data in an appropriate format.
 
     The :code:`**kwargs` can contain :code:`sensitive_features=` and :code:`control_features=`
@@ -53,9 +58,9 @@ def _validate_and_reformat_input(
 
     Parameters
     ----------
-    X : numpy.ndarray, pandas.DataFrame
+    X : numpy.ndarray, IntoFrameT
         The feature matrix
-    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
+    y : numpy.ndarray, IntoFrameT, IntoSeriesT, or list
         The label vector
     expect_y : bool
         If True y needs to be provided, otherwise ignores the argument; default True
@@ -68,20 +73,25 @@ def _validate_and_reformat_input(
 
     Returns
     -------
-    Tuple(numpy.ndarray | pd.DataFrame, pandas.Series, pandas.Series, pandas.Series)
+    Tuple(numpy.ndarray | IntoFrameT, IntoSeriesT, IntoSeriesT, IntoSeriesT)
         The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead
         of the returned X for training estimators and leave potential reformatting of X to the
         estimator.
-
     """
+    if X is None:
+        raise ValueError(_MESSAGE_X_NONE)
 
+    X = nw.from_native(X, pass_through=True, eager_only=True)
+    # get the native namespace for the X data or use the default
+    plx = get_common_backend(X, y).to_native_namespace()
     if y is not None:
+        y = nw.from_native(y, pass_through=True, eager_only=True, allow_series=True)
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
         if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
             y = y.reshape(-1)
-        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
+        elif isinstance(y, nw.DataFrame) and y.shape[1] == 1:
             y = y.to_numpy().reshape(-1)
 
         # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
@@ -92,8 +102,8 @@ def _validate_and_reformat_input(
         raise ValueError(_MESSAGE_Y_NONE)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
-    if isinstance(X, pd.DataFrame):
-        result_X = pd.DataFrame(result_X)
+    if isinstance(X, nw.DataFrame):
+        result_X = plx.DataFrame(result_X)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
@@ -104,7 +114,7 @@ def _validate_and_reformat_input(
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
             sensitive_features = _merge_columns(sensitive_features)
 
-        sensitive_features = pd.Series(sensitive_features.squeeze())
+        sensitive_features = plx.Series(sensitive_features.squeeze())
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
@@ -118,15 +128,18 @@ def _validate_and_reformat_input(
         if len(control_features.shape) > 1 and control_features.shape[1] > 1:
             control_features = _merge_columns(control_features)
 
-        control_features = pd.Series(control_features.squeeze())
+        control_features = plx.Series(control_features.squeeze())
 
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas
     if y is not None:
-        result_y = pd.Series(y)
+        result_y: IntoSeriesT = plx.Series(y)
     else:
-        result_y = pd.Series(dtype="float64")
-
+        result_y: IntoSeriesT = nw.to_native(
+            nw.from_native(plx.Series(), series_only=True).cast(nw.Float64)
+        )
+    # TODO: this are currently native objects,
+    # they can be narwhals objects once the rest of the library supports it
     return (result_X, result_y, sensitive_features, control_features)
 
 
@@ -148,26 +161,22 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
     -------
     numpy.ndarray
         One-dimensional array of merged columns
-
     """
     if not isinstance(feature_columns, np.ndarray):
         raise ValueError(
-            "Received argument of type {} instead of expected numpy.ndarray".format(
-                type(feature_columns).__name__
-            )
+            f"Received argument of type {type(feature_columns).__name__} instead of expected numpy.ndarray"
         )
-    return (
-        pd.DataFrame(feature_columns)
-        .apply(
-            lambda row: _MERGE_COLUMN_SEPARATOR.join(
-                [
-                    str(row[i])
-                    .replace("\\", "\\\\")  # escape backslash and separator
-                    .replace(_MERGE_COLUMN_SEPARATOR, "\\" + _MERGE_COLUMN_SEPARATOR)
-                    for i in range(len(row))
-                ]
-            ),
-            axis=1,
+
+    def _join_names(names: Sequence[str]) -> str:
+        return _MERGE_COLUMN_SEPARATOR.join(
+            [
+                name
+                # escape backslash and separator
+                .replace("\\", "\\\\").replace(
+                    _MERGE_COLUMN_SEPARATOR, f"\\{_MERGE_COLUMN_SEPARATOR}"
+                )
+                for name in names
+            ]
         )
-        .values
-    )
+
+    return np.array([_join_names(row) for row in feature_columns.astype(str)])
