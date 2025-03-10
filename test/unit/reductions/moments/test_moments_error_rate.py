@@ -71,8 +71,4 @@ def test_error_rate_narwhals_compatible():
     error_pl = errorrate_pl.gamma(classifier.predict)
     assert isinstance(error_pl, pl.Series)
 
-    # TODO: check if there is something like pd.testing.assert_frame_equal() for narwhals
-    error_np = error_np.to_numpy() if isinstance(error_np, nw.DataFrame) else error_np
-    error_pd = error_pd.to_numpy() if isinstance(error_pd, nw.DataFrame) else error_pd
-    error_pl = error_pl.to_numpy() if isinstance(error_pl, nw.DataFrame) else error_pl
-    assert np.array_equal(error_np, error_pd, error_pl)
+    assert np.array_equal(error_np.to_numpy(), error_pd.to_numpy(), error_pl.to_numpy())

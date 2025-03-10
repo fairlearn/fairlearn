@@ -97,12 +97,16 @@ class ErrorRate(ClassificationMoment):
         # of X; but what should happen if the user pass inputs from several
         # dataframe libraries?
         if isinstance(self.X, np.ndarray):
-            # TODO (when dependency from pandas is removed): always return the type that
-            # the user has passed; for now: if user has passed np.array for X, still
-            # return a pd.Series as before
+            # TODO (when dependency from pandas is removed): remove this check to always 
+            # return the type that the user has passed; for now: if user has passed 
+            # np.array for X, still return a pd.Series as before
             error = nw.new_series(name="error", values=error_value, native_namespace=pd)
         else:
-            error = nw.new_series(name="error", values=[error_value], native_namespace=nw.get_native_namespace(self.X))
+            error = nw.new_series(
+                name="error", 
+                values=[error_value], 
+                native_namespace=nw.get_native_namespace(self.X)
+            )
         self._gamma_descr = str(error)
         return error.to_native()
 
