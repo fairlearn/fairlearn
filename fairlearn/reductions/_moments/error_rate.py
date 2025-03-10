@@ -102,7 +102,7 @@ class ErrorRate(ClassificationMoment):
             # return a pd.Series as before
             error = nw.new_series(name="error", values=error_value, native_namespace=pd)
         else:
-            error = nw.new_series(name="error", values=error_value, native_namespace=nw.get_native_namespace(self.X))
+            error = nw.new_series(name="error", values=[error_value], native_namespace=nw.get_native_namespace(self.X))
         self._gamma_descr = str(error)
         return error.to_native()
 

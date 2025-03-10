@@ -69,9 +69,7 @@ def _validate_and_reformat_input(
 
     Returns
     -------
-    # TODO: define common way to document supported types; do we want to numerate all types individually 
-    # or to find some wording for "narwhals supported Series or DataFrame types"?
-    Tuple(numpy.ndarray | DataFrame, Series, Series, Series)
+    Tuple(numpy.ndarray | DataFrame, Series, Series, Series objects supported by narwhals)
         The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead

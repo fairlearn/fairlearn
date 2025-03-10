@@ -67,9 +67,8 @@ def test_error_rate_narwhals_compatible():
     error_pd = errorrate_pd.gamma(classifier.predict)
     assert isinstance(error_pd, pd.Series)
 
-    # TODO: do we need with sklearn.config_context(transform_output='polars') here?
     classifier = LogisticRegression().fit(X_pl, y_pl)
-    error_pl = errorrate_pl.gamma(classifier.predict) # TODO: need some feature_name handling in the polars case
+    error_pl = errorrate_pl.gamma(classifier.predict)
     assert isinstance(error_pl, pl.Series)
 
     # TODO: check if there is something like pd.testing.assert_frame_equal() for narwhals

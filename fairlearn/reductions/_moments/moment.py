@@ -36,12 +36,12 @@ class Moment:
 
         Parameters
         ----------
-        X : array
+        X : numpy.ndarray, DataFrame object supported by narwhals
             The feature array
-        # TODO: check if np.arrays are also supported for y and sensitive_features; some subclasses do allow these types
-        y : :class:`pandas.Series` or :class:`polars.Series`
+        # TODO: check if np.arrays or lists are also supported for y and sensitive_features; some subclasses do allow these types
+        y : numpy.ndarray, or Series object supported by narwhals, list
             The label vector
-        sensitive_features : :class:`pandas.Series` or :class:`polars.Series`
+        sensitive_features : Series object supported by narwhals
             The sensitive feature vector (default None)
         """
         assert self.data_loaded is False, "data can be loaded only once"
