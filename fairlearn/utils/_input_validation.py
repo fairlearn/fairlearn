@@ -79,6 +79,8 @@ def _validate_and_reformat_input(
         estimator.
 
     """
+    X = nw.from_native(X, pass_through=True, eager_only=True)
+    y = nw.from_native(y, pass_through=True, eager_only=True)
 
     if y is not None:
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
@@ -113,6 +115,7 @@ def _validate_and_reformat_input(
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
+    control_features = nw.from_native(control_features, pass_through=True, eager_only=True)
     if control_features is not None:
         check_consistent_length(X, control_features)
         control_features = check_array(control_features, ensure_2d=False, dtype=None)
@@ -121,7 +124,7 @@ def _validate_and_reformat_input(
         if len(control_features.shape) > 1 and control_features.shape[1] > 1:
             control_features = _merge_columns(control_features)
 
-        control_features = pd.Series(control_features.squeeze())
+        control_features = nw.from_native(control_features.squeeze(), pass_through=True, series_only=True)
 
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas

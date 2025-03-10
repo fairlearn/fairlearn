@@ -33,7 +33,6 @@ def test_bad_costs(bad_costs):
 
 # TODO: at the moment only tests compatibility between pandas and polars; should also 
 # test pyarrow
-# TODO: add control_features to tests
 # TODO: parametrize test
 def test_error_rate_narwhals_compatible():
     """Test that ErrorRate is compatible with any types passed via narwhals, that 
@@ -54,13 +53,13 @@ def test_error_rate_narwhals_compatible():
     errorrate_pd = ErrorRate(costs=costs)
     errorrate_pl = ErrorRate(costs=costs)
 
-    # check `ErrorRate.load_data()` works in all input types
+    # check `ErrorRate.load_data()` works with all input types
     errorrate_np.load_data(X, y, sensitive_features=sensitive_features)
     errorrate_pd.load_data(X_pd, y_pd, sensitive_features=sensitive_features_pd)
     errorrate_pl.load_data(X_pl, y_pl, sensitive_features=sensitive_features_pl)
 
     # check `ErrorRate.gamma()` returns similar returns for all input types
-    classifier = LogisticRegression().fit(X, y) # TODO: check if fairlearn has a dummy classifier for testing purpose
+    classifier = LogisticRegression().fit(X, y)
     error_np = errorrate_np.gamma(classifier.predict)
     assert isinstance(error_np, pd.Series)
 
