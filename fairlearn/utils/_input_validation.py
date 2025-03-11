@@ -76,8 +76,8 @@ def _validate_and_reformat_input(
         estimator.
 
     """
-    y = np.asarray(y).reshape(-1,1)
-    if y.size == 0 or y[0, 0] == None:
+    y = np.asarray(y).reshape(-1)
+    if expect_y and (y.size == 0 or y[0] == None):
         raise ValueError(_MESSAGE_Y_NONE)
     y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
 
