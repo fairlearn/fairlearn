@@ -76,20 +76,13 @@ def _validate_and_reformat_input(
         estimator.
 
     """
-
-    if y:
-        y = np.asarray(y)
-
-        # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
-        if len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.reshape(-1)
-
-        # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
-        y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
-        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
-            raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
-    elif expect_y:
+    y = np.asarray(y).reshape(-1,1)
+    if y.size == 0 or y[0, 0] == None:
         raise ValueError(_MESSAGE_Y_NONE)
+    y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
+
+    if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
+        raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
     if isinstance(X, pd.DataFrame):
