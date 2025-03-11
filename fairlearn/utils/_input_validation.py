@@ -77,7 +77,7 @@ def _validate_and_reformat_input(
 
     """
 
-    if y is not None:
+    if y:
         y = np.asarray(y)
 
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
