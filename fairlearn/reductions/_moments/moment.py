@@ -51,13 +51,13 @@ class Moment:
         self._y = y
         X = nw.from_native(X, pass_through=True, eager_only=True)
         # TODO: check if y can be a DataFrame too; it is not documented here, but don't some subclasses support multioutput?
-        y = nw.from_native(y,  pass_through=True, series_only=True)
+        y = nw.from_native(y, pass_through=True, series_only=True)
         sensitive_features = nw.from_native(sensitive_features, pass_through=True, series_only=True)
-        # TODO (when dependency from pandas is removed): Dynamically change backend to whatever backend the 
-        # user uses:
+        # TODO (when dependency from pandas is removed): Dynamically change backend to 
+        # the backend that the user uses:
         self.tags = nw.from_dict({_LABEL: y}, backend="pandas")
         if sensitive_features is not None:
-            self.tags.with_columns(**{"_GROUP_ID": sensitive_features})
+            self.tags = self.tags.with_columns(**{"_GROUP_ID": sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 

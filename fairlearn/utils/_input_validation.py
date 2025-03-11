@@ -54,7 +54,7 @@ def _validate_and_reformat_input(
 
     Parameters
     ----------
-    X : numpy.ndarray, DataFrame object supported by narwhals
+    X : numpy.ndarray, or DataFrame object supported by narwhals
         The feature matrix
     y : numpy.ndarray, DataFrame or Series object supported by narwhals, or list
         The label vector
@@ -77,27 +77,18 @@ def _validate_and_reformat_input(
         estimator.
 
     """
-    X = nw.from_native(X, pass_through=True, eager_only=True)
-    y = nw.from_native(y, pass_through=True, eager_only=True)
-
-    if y is not None:
-        # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
-        if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.reshape(-1)
-        elif isinstance(y, nw.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().reshape(-1)
-
-        # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
-        y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
-        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
-            raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
-    elif expect_y:
+    y = np.asarray(y).reshape(-1)
+    if expect_y and (y.size == 0 or y[0] == None):
         raise ValueError(_MESSAGE_Y_NONE)
+    y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
+
+    if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
+        raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
-    if isinstance(X, nw.DataFrame):
-        result_X = nw.from_native(result_X, pass_through=True, eager_only=True)
-
+    if isinstance(X, pd.DataFrame):
+        result_X = pd.DataFrame(result_X)
+        
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
         check_consistent_length(X, sensitive_features)

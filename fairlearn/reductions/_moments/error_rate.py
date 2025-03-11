@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from typing import Callable, Literal
+from typing import Callable, Literal, List
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -71,12 +71,12 @@ class ErrorRate(ClassificationMoment):
             sensitive_features=sensitive_features,
             control_features=control_features,
         )
-        # The following uses X  so that the estimators get X untouched
+        # The following uses X so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
         self._index = [_ALL]
 
     @property
-    def index(self) -> pd.Index:
+    def index(self) -> List[str]:
         """Return the index listing the constraints."""
         return self._index
 
@@ -110,11 +110,11 @@ class ErrorRate(ClassificationMoment):
         self._gamma_descr = str(error)
         return error.to_native()
 
-    def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
+    def project_lambda(self, lambda_vec: nw.typing.IntoSeries) -> nw.typing.IntoSeries:
         """Return the lambda values."""
         return lambda_vec
 
-    def signed_weights(self, lambda_vec: pd.Series | None = None) -> pd.Series:
+    def signed_weights(self, lambda_vec: nw.typing.IntoSeries | None = None) -> nw.typing.IntoSeries:
         """Return the signed weights."""
         weights = -self.fp_cost + (self.fp_cost + self.fn_cost) * self.tags[_LABEL]
         if lambda_vec is None:
