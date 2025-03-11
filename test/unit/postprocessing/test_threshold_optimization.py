@@ -162,6 +162,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     empty_exception_messages = {
         "empty_sklearn": "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required.",
         "empty_pandas": "Found array with 0 sample",
+        "empty_fairlearn": "Must supply y",
     }
 
     for permutation in [(0, 1), (1, 0)]:
