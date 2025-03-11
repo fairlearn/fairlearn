@@ -78,11 +78,11 @@ def _validate_and_reformat_input(
     """
 
     if y is not None:
+        y = np.asarray(y)
+
         # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
-        if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
+        if len(y.shape) == 2 and y.shape[1] == 1:
             y = y.reshape(-1)
-        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().reshape(-1)
 
         # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
         y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
