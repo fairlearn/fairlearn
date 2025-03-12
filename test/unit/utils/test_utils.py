@@ -65,7 +65,7 @@ def test_validate_and_reformat_input_allow_ndims_greater_than_2() -> None:
 
 
 @pytest.mark.parametrize(
-    "y", [np.asarray([]), [], pd.DataFrame(), pd.Series(dtype="float64"), None]
+    "y", [[], np.asarray([]), pd.Series(dtype="float64"), pd.DataFrame(), None]
 )
 def test_validate_and_reformat_input_empty_y(y):
     """Test that _validate_and_reformat_input raises as expected when y is expected, but
