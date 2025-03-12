@@ -38,9 +38,10 @@ class Moment:
         ----------
         X : numpy.ndarray, DataFrame object supported by narwhals
             The feature array
-        # TODO: check if np.arrays or lists are also supported for y and sensitive_features; some subclasses do allow these types
+        # TODO: check if np.arrays or lists are also supported for y; or also a DataFrame; some subclasses do allow this I think
         y : numpy.ndarray, or Series object supported by narwhals, list
             The label vector
+        # TODO: check if np.arrays or lists are also supported for sensitive_features; some subclasses do allow this I think
         sensitive_features : Series object supported by narwhals
             The sensitive feature vector (default None)
         """
@@ -49,15 +50,17 @@ class Moment:
             raise ValueError("The 'sensitive_features' parameter must be provided.")
         self.X = X
         self._y = y
-        X = nw.from_native(X, pass_through=True, eager_only=True)
-        # TODO: check if y can be a DataFrame too; it is not documented here, but don't some subclasses support multioutput?
-        y = nw.from_native(y, pass_through=True, series_only=True)
-        sensitive_features = nw.from_native(sensitive_features, pass_through=True, series_only=True)
-        # TODO (when dependency from pandas is removed): Dynamically change backend to 
-        # the backend that the user uses:
-        self.tags = nw.from_dict({_LABEL: y}, backend="pandas")
+        # TODO (when dependency from pandas is removed): Dynamically change backends for 
+        # X, y, sensitive_features and self.tags to the backend that the user uses:
+        try:
+            X = nw.from_native(X, eager_only=True)
+        except TypeError:
+            X = nw.from_numpy(X, native_namespace=pd)
+        y = nw.new_series(name="y", values=y, native_namespace=pd)
+        sensitive_features = nw.new_series(name="sensitive_features", values=sensitive_features, native_namespace=pd)
+        self.tags = nw.from_dict({_LABEL: y}, backend=pd)
         if sensitive_features is not None:
-            self.tags = self.tags.with_columns(**{"_GROUP_ID": sensitive_features})
+            self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 
