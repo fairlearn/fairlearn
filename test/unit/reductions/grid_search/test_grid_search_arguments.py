@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import logging
-from test.unit.fixes import get_sklearn_expected_1d_message
 from test.unit.input_convertors import (
     conversions_for_1d,
     ensure_dataframe,
@@ -319,9 +318,8 @@ class ArgumentTests:
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(ValueError, match="Found input variables with inconsistent"):
             gs.fit(transformX(X), Y_two_col_df, sensitive_features=transformA(A))
-        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -336,9 +334,8 @@ class ArgumentTests:
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(ValueError, match="Found input variables with inconsistent"):
             gs.fit(transformX(X), Y_two_col_ndarray, sensitive_features=transformA(A))
-        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     # ----------------------------
 

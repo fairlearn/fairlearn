@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import fairlearn.utils._input_validation as iv
 
@@ -61,3 +62,17 @@ def test_validate_and_reformat_input_allow_ndims_greater_than_2() -> None:
     X_update, _, _, _ = iv._validate_and_reformat_input(X=X, sensitive_features=sf, expect_y=False)
 
     np.testing.assert_array_equal(X, X_update)
+
+
+@pytest.mark.parametrize(
+    "y", [[], np.asarray([]), pd.Series(dtype="float64"), pd.DataFrame(), None]
+)
+def test_validate_and_reformat_input_empty_y(y):
+    """Test that _validate_and_reformat_input raises as expected when y is expected, but
+    passed as an empty list, nd.array, series or dataframe or None."""
+    X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
+
+    with pytest.raises(ValueError, match="Must supply y"):
+        X, y, _, _ = iv._validate_and_reformat_input(
+            X=X, y=y, expect_y=True, expect_sensitive_features=False
+        )
