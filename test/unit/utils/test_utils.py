@@ -64,9 +64,11 @@ def test_validate_and_reformat_input_allow_ndims_greater_than_2() -> None:
     np.testing.assert_array_equal(X, X_update)
 
 
-@pytest.mark.parametrize("y", [np.asarray([]), [], pd.DataFrame(), pd.Series(dtype="float64"), None])
+@pytest.mark.parametrize(
+    "y", [np.asarray([]), [], pd.DataFrame(), pd.Series(dtype="float64"), None]
+)
 def test_validate_and_reformat_input_empty_y(y):
-    """Test that _validate_and_reformat_input raises as expected when y is expected, but 
+    """Test that _validate_and_reformat_input raises as expected when y is expected, but
     passed as an empty list, nd.array, series or dataframe or None."""
     X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
 
