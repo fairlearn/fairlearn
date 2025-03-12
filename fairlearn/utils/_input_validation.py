@@ -98,9 +98,7 @@ def _validate_and_reformat_input(
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
             sensitive_features = _merge_columns(sensitive_features)
 
-        # TODO (when dependency from pandas is removed): Dynamically change backend to 
-        # the backend that the user uses:
-        sensitive_features = nw.new_series(name="sensitive_features", values=sensitive_features.squeeze(), native_namespace=pd)
+        sensitive_features = pd.Series(sensitive_features.squeeze())
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 

@@ -71,6 +71,8 @@ class ErrorRate(ClassificationMoment):
             sensitive_features=sensitive_features,
             control_features=control_features,
         )
+        # TODO: next line not necessary once _validate_and_reformat_input is narwhalified:
+        sf_train = nw.from_native(sf_train, pass_through=True, eager_only=True)
         # The following uses X so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
         self._index = [_ALL]
@@ -118,6 +120,6 @@ class ErrorRate(ClassificationMoment):
         """Return the signed weights."""
         weights = -self.fp_cost + (self.fp_cost + self.fn_cost) * self.tags[_LABEL]
         if lambda_vec is None:
-            return weights
+            return weights.to_native()
         else:
-            return lambda_vec[_ALL] * weights
+            return lambda_vec[_ALL] * weights.to_native()

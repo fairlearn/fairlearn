@@ -51,11 +51,11 @@ class Moment:
         self.X = X
         self._y = y
         # TODO (when dependency from pandas is removed): Dynamically change backends for 
-        # X, y, sensitive_features and self.tags to the backend that the user uses:
-        try:
+        # y, sensitive_features and self.tags to the backend that the user uses:
+        """try: ############# that's not necessary here ############### remove!
             X = nw.from_native(X, eager_only=True)
         except TypeError:
-            X = nw.from_numpy(X, native_namespace=pd)
+            X = nw.from_numpy(X, native_namespace=pd)"""
         y = nw.new_series(name="y", values=y, native_namespace=pd)
         sensitive_features = nw.new_series(name="sensitive_features", values=sensitive_features, native_namespace=pd)
         self.tags = nw.from_dict({_LABEL: y}, backend=pd)
