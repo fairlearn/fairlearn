@@ -16,7 +16,7 @@ black==24.4.2
 
 # Required for test
 polars
-pyarrow
+# pyarrow
 pytest
 pytest-cov
 pytest-mock

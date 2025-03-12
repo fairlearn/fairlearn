@@ -16,12 +16,11 @@ from fairlearn.utils._narwhals_compat import get_common_backend
 
 logger = logging.getLogger(__file__)
 
-_KW_SENSITIVE_FEATURES = "sensitive_features"
 _KW_CONTROL_FEATURES = "control_features"
 
 _MESSAGE_X_NONE = "Must supply X"
 _MESSAGE_Y_NONE = "Must supply y"
-_MESSAGE_SENSITIVE_FEATURES_NONE = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
+_MESSAGE_SENSITIVE_FEATURES_NONE = "Must specify `sensitive_features` (for now)"
 _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
 _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
 _MESSAGE_RATIO_NOT_IN_RANGE = "ratio must lie between (0,1]"
@@ -49,12 +48,10 @@ def _validate_and_reformat_input(
     expect_y: bool = True,
     expect_sensitive_features: bool = True,
     enforce_binary_labels: bool = False,
-    **kwargs,
-) -> tuple[np.ndarray | IntoFrameT, IntoSeriesT, IntoSeriesT | None, IntoSeriesT | None]:
+    sensitive_features: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
+    control_features: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
+) -> tuple[np.ndarray | nw.DataFrame, nw.Series, nw.Series | None, nw.Series | None]:
     """Validate input data and return the data in an appropriate format.
-
-    The :code:`**kwargs` can contain :code:`sensitive_features=` and :code:`control_features=`
-    parameters.
 
     Parameters
     ----------
@@ -70,6 +67,10 @@ def _validate_and_reformat_input(
     enforce_binary_labels : bool
         If True raise exception if there are more than two distinct
         values in the `y` data; default False
+    sensitive_features : numpy.ndarray, IntoFrameT, IntoSeriesT, or list
+        The sensitive feature matrix
+    control_features : numpy.ndarray, IntoFrameT, IntoSeriesT, or list
+        The control feature matrix
 
     Returns
     -------
@@ -102,25 +103,27 @@ def _validate_and_reformat_input(
         raise ValueError(_MESSAGE_Y_NONE)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
-    if isinstance(X, nw.DataFrame):
-        result_X = plx.DataFrame(result_X)
 
-    sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
+        sensitive_features = nw.from_native(
+            sensitive_features, pass_through=True, eager_only=True, allow_series=True
+        )
         check_consistent_length(X, sensitive_features)
         sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
 
         # compress multiple sensitive features into a single column
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-            sensitive_features = _merge_columns(sensitive_features)
+            sensitive_features = _merge_columns(sensitive_features.to_numpy())
 
         sensitive_features = plx.Series(sensitive_features.squeeze())
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
     # Handle the control features
-    control_features = kwargs.get(_KW_CONTROL_FEATURES)
     if control_features is not None:
+        sensitive_features = nw.from_native(
+            sensitive_features, pass_through=True, eager_only=True, allow_series=True
+        )
         check_consistent_length(X, control_features)
         control_features = check_array(control_features, ensure_2d=False, dtype=None)
 
@@ -133,7 +136,7 @@ def _validate_and_reformat_input(
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas
     if y is not None:
-        result_y: IntoSeriesT = plx.Series(y)
+        result_y: IntoSeriesT = y.to_native() if isinstance(y, nw.Series) else plx.Series(y)
     else:
         result_y: IntoSeriesT = nw.to_native(
             nw.from_native(plx.Series(), series_only=True).cast(nw.Float64)
@@ -180,3 +183,14 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
         )
 
     return np.array([_join_names(row) for row in feature_columns.astype(str)])
+
+
+def _all_to_native(*arrays):
+    """Convert all arrays to native format.
+
+    Temporary function to allow introducing narwhals to the codebase.
+    """
+    for array in arrays:
+        if isinstance(array, (nw.Series, nw.DataFrame)):
+            yield array.to_native()
+        yield array
