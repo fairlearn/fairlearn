@@ -78,7 +78,7 @@ def _validate_and_reformat_input(
 
     """
     y = np.asarray(y).reshape(-1)
-    if expect_y and (y.size == 0 or y[0] == None):
+    if expect_y and (y.size == 0 or y[0] is None):
         raise ValueError(_MESSAGE_Y_NONE)
     y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
 
@@ -98,13 +98,14 @@ def _validate_and_reformat_input(
         if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
             sensitive_features = _merge_columns(sensitive_features)
 
-        sensitive_features = nw.from_native(sensitive_features.squeeze(), pass_through=True, series_only=True)
+        # TODO (when dependency from pandas is removed): Dynamically change backend to 
+        # the backend that the user uses:
+        sensitive_features = nw.new_series(name="sensitive_features", values=sensitive_features.squeeze(), native_namespace=pd)
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
     # Handle the control features
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
-    control_features = nw.from_native(control_features, pass_through=True, eager_only=True)
     if control_features is not None:
         check_consistent_length(X, control_features)
         control_features = check_array(control_features, ensure_2d=False, dtype=None)
@@ -113,7 +114,7 @@ def _validate_and_reformat_input(
         if len(control_features.shape) > 1 and control_features.shape[1] > 1:
             control_features = _merge_columns(control_features)
 
-        control_features = nw.from_native(control_features.squeeze(), pass_through=True, series_only=True)
+        control_features = pd.Series(control_features.squeeze())
 
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas
