@@ -71,7 +71,9 @@ class ErrorRate(ClassificationMoment):
             sensitive_features=sensitive_features,
             control_features=control_features,
         )
-        # TODO: next line not necessary once _validate_and_reformat_input is narwhalified:
+        # TODO: remove following line when _validate_and_reformat_input is narwhalified
+        # (because then sf_train comes as a narwhals series, while now it comes as a
+        # pandas series):
         sf_train = nw.from_native(sf_train, pass_through=True, eager_only=True)
         # The following uses X so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
@@ -99,15 +101,15 @@ class ErrorRate(ClassificationMoment):
         # of X; but what should happen if the user pass inputs from several
         # dataframe libraries?
         if isinstance(self.X, np.ndarray):
-            # TODO (when dependency from pandas is removed): remove this check to always 
-            # return the type that the user has passed; for now: if user has passed 
+            # TODO (when dependency from pandas is removed): remove this check to always
+            # return the type that the user has passed; for now: if user has passed
             # np.array for X, still return a pd.Series as before
             error = nw.new_series(name="error", values=error_value, native_namespace=pd)
         else:
             error = nw.new_series(
-                name="error", 
-                values=[error_value], 
-                native_namespace=nw.get_native_namespace(self.X)
+                name="error",
+                values=[error_value],
+                native_namespace=nw.get_native_namespace(self.X),
             )
         self._gamma_descr = str(error)
         return error.to_native()
@@ -116,7 +118,9 @@ class ErrorRate(ClassificationMoment):
         """Return the lambda values."""
         return lambda_vec
 
-    def signed_weights(self, lambda_vec: nw.typing.IntoSeries | None = None) -> nw.typing.IntoSeries:
+    def signed_weights(
+        self, lambda_vec: nw.typing.IntoSeries | None = None
+    ) -> nw.typing.IntoSeries:
         """Return the signed weights."""
         weights = -self.fp_cost + (self.fp_cost + self.fn_cost) * self.tags[_LABEL]
         if lambda_vec is None:

@@ -31,7 +31,13 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X: nw.typing.IntoDataFrame, y: nw.typing.IntoSeries, *, sensitive_features: nw.typing.IntoSeries | None = None) -> None:
+    def load_data(
+        self,
+        X: nw.typing.IntoDataFrame,
+        y: nw.typing.IntoSeries,
+        *,
+        sensitive_features: nw.typing.IntoSeries | None = None,
+    ) -> None:
         """Load a set of data for use by this object.
 
         Parameters
@@ -50,14 +56,12 @@ class Moment:
             raise ValueError("The 'sensitive_features' parameter must be provided.")
         self.X = X
         self._y = y
-        # TODO (when dependency from pandas is removed): Dynamically change backends for 
-        # y, sensitive_features and self.tags to the backend that the user uses:
-        """try: ############# that's not necessary here ############### remove!
-            X = nw.from_native(X, eager_only=True)
-        except TypeError:
-            X = nw.from_numpy(X, native_namespace=pd)"""
+        # TODO (when dependency from pandas is being removed): Dynamically change
+        # backends for y, sensitive_features and self.tags to the user's backend:
         y = nw.new_series(name="y", values=y, native_namespace=pd)
-        sensitive_features = nw.new_series(name="sensitive_features", values=sensitive_features, native_namespace=pd)
+        sensitive_features = nw.new_series(
+            name="sensitive_features", values=sensitive_features, native_namespace=pd
+        )
         self.tags = nw.from_dict({_LABEL: y}, backend=pd)
         if sensitive_features is not None:
             self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
