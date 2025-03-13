@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from narwhals.dependencies import (
     get_pandas,
@@ -14,13 +14,13 @@ from narwhals.stable.v1 import Implementation, nw
 
 if TYPE_CHECKING:
     import numpy as np
-    from narwhals.typing import IntoFrameT, IntoSeriesT
+    from narwhals.typing import IntoFrame, IntoSeries
 
 
 def get_default_dataframe_backend() -> Implementation:
     """Get the default dataframe backend.
 
-    The backend priority is polars > pandas > pyarrow.
+    The backend priority is polars > pandas.
     """
     if get_polars():
         return Implementation.POLARS
@@ -31,22 +31,10 @@ def get_default_dataframe_backend() -> Implementation:
     )
 
 
-def get_common_backend(
-    X: np.ndarray | IntoFrameT, y: np.ndarray | IntoSeriesT | IntoFrameT | list | None
-) -> Implementation:
-    """Get the common backend for the input data.
-
-    Use the backend of the first non-None input data or the default backend if all inputs are None.
-    """
-    implementation_X = (
-        Implementation.from_backend(nw.get_native_namespace(X)) if is_into_dataframe(X) else None
-    )
-    implementation_y = (
-        Implementation.from_backend(nw.get_native_namespace(y))
-        if is_into_series(y) or is_into_dataframe(y)
-        else None
-    )
-    reference_impl = implementation_X or implementation_y
-    if reference_impl is None:
-        return get_default_dataframe_backend()
-    return reference_impl
+def get_native_namespace_or_default(
+    X: np.ndarray | IntoFrame, y: np.ndarray | IntoSeries | IntoFrame | list | None
+) -> Any:
+    narwhals_objects = tuple(o for o in (X, y) if is_into_dataframe(o) or is_into_series(o))
+    if narwhals_objects:
+        return nw.get_native_namespace(*narwhals_objects)
+    return get_default_dataframe_backend().to_native_namespace()
