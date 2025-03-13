@@ -126,11 +126,8 @@ class ArgumentTests:
         X, _, A = _quick_data()
         Y = np.random.randint(2, size=len(A) + 1)
 
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(ValueError, match="X and y must have same number of rows"):
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
-
-        expected_exception_message = "Found input variables with inconsistent numbers of samples"
-        assert expected_exception_message in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
