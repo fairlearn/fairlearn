@@ -183,14 +183,3 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
         )
 
     return np.array([_join_names(row) for row in feature_columns.astype(str)])
-
-
-def _all_to_native(*arrays):
-    """Convert all arrays to native format.
-
-    Temporary function to allow introducing narwhals to the codebase.
-    """
-    for array in arrays:
-        if isinstance(array, (nw.Series, nw.DataFrame)):
-            yield array.to_native()
-        yield array
