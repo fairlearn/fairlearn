@@ -16,6 +16,7 @@ from test.unit.reductions.grid_search.utilities import (
 import numpy as np
 import pandas as pd
 import pytest
+import re
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -315,7 +316,10 @@ class ArgumentTests:
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
-        with pytest.raises(ValueError, match="Found input variables with inconsistent"):
+        with pytest.raises(
+            ValueError,
+            match=re.escape("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape})."),
+        ):
             gs.fit(transformX(X), Y_two_col_df, sensitive_features=transformA(A))
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -331,7 +335,10 @@ class ArgumentTests:
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
-        with pytest.raises(ValueError, match="Found input variables with inconsistent"):
+        with pytest.raises(
+            ValueError,
+            match=re.escape("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape})."),
+        ):
             gs.fit(transformX(X), Y_two_col_ndarray, sensitive_features=transformA(A))
 
     # ----------------------------
