@@ -79,7 +79,7 @@ def _validate_and_reformat_input(
     """
     y = np.asarray(y).reshape(-1)
     if expect_y and (y.size == 0 or y[0] is None):
-        raise ValueError(_MESSAGE_Y_NONE)
+        raise ValueError(_MESSAGE_Y_NONE + f", got y={y}.")
     y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
 
     if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):

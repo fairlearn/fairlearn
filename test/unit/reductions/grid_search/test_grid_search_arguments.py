@@ -36,7 +36,6 @@ from fairlearn.reductions._grid_search._grid_generator import (
 )
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
-    _MESSAGE_Y_NONE,
 )
 
 # ==============================================================
@@ -107,10 +106,8 @@ class ArgumentTests:
         )
         X, _, A = _quick_data()
 
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(ValueError, match="Must supply y"):
             gs.fit(transformX(X), None, sensitive_features=transformA(A))
-
-        assert _MESSAGE_Y_NONE == execInfo.value.args[0]
 
     # ----------------------------
 
