@@ -93,6 +93,9 @@ def _validate_and_reformat_input(
     if isinstance(X, pd.DataFrame):
         result_X = pd.DataFrame(result_X)
 
+    if (y is not None) and y.shape[0] != result_X.shape[0]:
+        raise ValueError(_MESSAGE_X_Y_ROWS)
+
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
         check_consistent_length(X, sensitive_features)

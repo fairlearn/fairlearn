@@ -154,6 +154,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     inconsistent_exception_messages = {
         "inconsistent_sklearn": "Found input variables with inconsistent numbers of samples",
         "inconsistent_pandas": "All arrays must be of the same length",
+        "inconsistent_fairlearn": "X and y must have same number of rows",
     }
 
     empty_exception_messages = {
@@ -501,15 +502,14 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
     )
 
     with pytest.raises(
-        ValueError, match="Found input variables with inconsistent numbers of samples"
+        ValueError,
+        match=re.escape("Found input variables with inconsistent numbers of samples: [20, 19]"),
     ):
         adjusted_predictor.predict(
             data_X_y_sf.X, sensitive_features=data_X_y_sf.sensitive_features[:-1]
         )
 
-    with pytest.raises(
-        ValueError, match="Found input variables with inconsistent numbers of samples"
-    ):
+    with pytest.raises(ValueError, match="X and y must have same number of rows"):
         adjusted_predictor.predict(
             data_X_y_sf.X[:-1], sensitive_features=data_X_y_sf.sensitive_features
         )
