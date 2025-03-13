@@ -8,6 +8,7 @@ from test.unit.input_convertors import _map_into_single_column
 import numpy as np
 import pandas as pd
 import pytest
+import re
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.datasets import make_classification
 
@@ -22,7 +23,6 @@ from fairlearn.postprocessing._tradeoff_curve_utilities import (
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
     _MESSAGE_SENSITIVE_FEATURES_NONE,
-    _MESSAGE_Y_NONE,
 )
 
 from .conftest import (
@@ -90,17 +90,14 @@ def test_none_input_data(X, y, sensitive_features, constraints):
     )
 
     if y is None:
-        with pytest.raises(ValueError) as exception:
+        with pytest.raises(ValueError, match=re.escape("Must supply y, got y=None.")):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-        assert str(exception.value) == _MESSAGE_Y_NONE
     elif X is None:
-        with pytest.raises(ValueError) as exception:
+        with pytest.raises(ValueError, match="Expected 2D array, got scalar array instead"):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-        assert "Expected 2D array, got scalar array instead" in str(exception.value)
     elif sensitive_features is None:
-        with pytest.raises(ValueError) as exception:
+        with pytest.raises(ValueError, match=re.escape(_MESSAGE_SENSITIVE_FEATURES_NONE)):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-        assert str(exception.value) == _MESSAGE_SENSITIVE_FEATURES_NONE
     else:
         # skip since no arguments are None
         pass
@@ -157,11 +154,13 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     inconsistent_exception_messages = {
         "inconsistent_sklearn": "Found input variables with inconsistent numbers of samples",
         "inconsistent_pandas": "All arrays must be of the same length",
+        "inconsistent_fairlearn": "X and y must have same number of rows",
     }
 
     empty_exception_messages = {
         "empty_sklearn": "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required.",
         "empty_pandas": "Found array with 0 sample",
+        "empty_fairlearn": "Must supply y",
     }
 
     for permutation in [(0, 1), (1, 0)]:
@@ -503,15 +502,14 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
     )
 
     with pytest.raises(
-        ValueError, match="Found input variables with inconsistent numbers of samples"
+        ValueError,
+        match=re.escape("Found input variables with inconsistent numbers of samples: [20, 19]"),
     ):
         adjusted_predictor.predict(
             data_X_y_sf.X, sensitive_features=data_X_y_sf.sensitive_features[:-1]
         )
 
-    with pytest.raises(
-        ValueError, match="Found input variables with inconsistent numbers of samples"
-    ):
+    with pytest.raises(ValueError, match="X and y must have same number of rows"):
         adjusted_predictor.predict(
             data_X_y_sf.X[:-1], sensitive_features=data_X_y_sf.sensitive_features
         )
