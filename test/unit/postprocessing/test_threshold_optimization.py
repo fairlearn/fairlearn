@@ -90,7 +90,7 @@ def test_none_input_data(X, y, sensitive_features, constraints):
     )
 
     if y is None:
-        with pytest.raises(ValueError, match=re.escape("Must supply y, got y=[None].")):
+        with pytest.raises(ValueError, match=re.escape("Must supply y, got y=None.")):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
     elif X is None:
         with pytest.raises(ValueError, match="Expected 2D array, got scalar array instead"):
