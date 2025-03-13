@@ -56,7 +56,7 @@ def _validate_and_reformat_input(
     ----------
     X : numpy.ndarray, pandas.DataFrame
         The feature matrix
-    y : numpy.ndarray of shape pandas.DataFrame, pandas.Series, or list
+    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         The label vector. Must be of shape (n,) or (n,1).
     expect_y : bool
         If True y needs to be provided, otherwise ignores the argument; default True
@@ -85,10 +85,9 @@ def _validate_and_reformat_input(
             raise ValueError(_MESSAGE_Y_NONE + f", got y={y}.")
         if y.ndim > 2 or (y.ndim == 2 and y.shape[1] != 1):
             raise ValueError("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape}).")
+        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
+            raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
         y = check_array(y.reshape(-1), ensure_2d=False, dtype="numeric", ensure_all_finite=False)
-
-    if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
-        raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
     if isinstance(X, pd.DataFrame):
