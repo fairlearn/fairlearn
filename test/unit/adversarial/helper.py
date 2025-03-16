@@ -198,14 +198,8 @@ Cat = np.zeros((rows, cols), dtype=float)
 Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.0
 Cat1d = Cat[:, 0]
 Cont2d = np.random.rand(rows, cols)
-Cont1d = np.random.rand(
-    rows,
-)
-MultiClass2d, _ = make_classification(
-    random_state=42, n_classes=3, n_clusters_per_class=1, n_samples=rows, n_features=cols
-)
-MultiClass1d = np.random.choice([0.0, 1.0, 0.2], size=(rows,))
-
+Cont1d = np.random.rand(rows,)
+MultiClass2d = np.random.choice([0.0, 1.0, 2.0], size=(rows,cols))
 
 def generate_data_combinations(n=10):
     """
