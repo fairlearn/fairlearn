@@ -3,6 +3,7 @@
 
 import inspect
 import logging
+from typing import Sequence
 
 import numpy as np
 import pandas as pd
@@ -64,8 +65,8 @@ def _validate_and_reformat_input(
         If true, sensitive_features must be provided to the call to this function.
         This is the default setting.
     enforce_binary_labels : bool
-        If True raise exception if there are more than two distinct
-        values in the `y` data; default False
+        If True, raise an exception if `y` contains values other than 0 and 1.
+        Default is False.
 
     Returns
     -------
@@ -149,29 +150,24 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
     -------
     numpy.ndarray
         One-dimensional array of merged columns
-
     """
     if not isinstance(feature_columns, np.ndarray):
         raise ValueError(
-            "Received argument of type {} instead of expected numpy.ndarray".format(
-                type(feature_columns).__name__
-            )
+            f"Received argument of type {type(feature_columns).__name__} instead of expected numpy.ndarray"
         )
-    return (
-        pd.DataFrame(feature_columns)
-        .apply(
-            lambda row: _MERGE_COLUMN_SEPARATOR.join(
-                [
-                    str(row[i])
-                    .replace("\\", "\\\\")  # escape backslash and separator
-                    .replace(_MERGE_COLUMN_SEPARATOR, "\\" + _MERGE_COLUMN_SEPARATOR)
-                    for i in range(len(row))
-                ]
-            ),
-            axis=1,
+
+    def _join_names(names: Sequence[str]) -> str:
+        return _MERGE_COLUMN_SEPARATOR.join(
+            [
+                name
+                # escape backslash and separator
+                .replace("\\", "\\\\").replace(
+                    _MERGE_COLUMN_SEPARATOR, f"\\{_MERGE_COLUMN_SEPARATOR}"
+                )
+                for name in names
+            ]
         )
-        .values
-    )
+    return np.array([_join_names(row) for row in feature_columns.astype(str)])
 
 
 def _filter_kwargs(func, kwargs):
