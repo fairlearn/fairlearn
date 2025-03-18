@@ -15,7 +15,6 @@ from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions._moments import ClassificationMoment
 from fairlearn.reductions._moments.moment import Moment
-from fairlearn.utils._input_validation import _filter_kwargs
 
 from ._constants import _INDENTATION, _LINE, _PRECISION
 
@@ -88,8 +87,7 @@ class _Lagrangian:
             raise ValueError(
                 _MESSAGE_BAD_OBJECTIVE.format(objective._moment_type(), constraints._moment_type())
             )
-        filtered_kwargs = _filter_kwargs(func=self.obj.load_data, kwargs=kwargs)
-        self.obj.load_data(X, y, **filtered_kwargs)
+        self.obj.load_data(X, y, **kwargs)
         self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda

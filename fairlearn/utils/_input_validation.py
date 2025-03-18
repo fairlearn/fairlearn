@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import inspect
 import logging
 from typing import Sequence
 
@@ -169,10 +168,3 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
         )
 
     return np.array([_join_names(row) for row in feature_columns.astype(str)])
-
-
-def _filter_kwargs(func, kwargs):
-    """Helper function to filter out kwargs that are not accepted by `func`."""
-    sig = inspect.signature(func)
-    valid_params = set(sig.parameters.keys())
-    return {k: v for k, v in kwargs.items() if k in valid_params}
