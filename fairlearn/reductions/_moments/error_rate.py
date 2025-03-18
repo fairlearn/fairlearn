@@ -91,8 +91,11 @@ class ErrorRate(ClassificationMoment):
         return self._index
 
     def gamma(self, predictor: Callable) -> pd.Series:
-        """Calculate the degree to which constraints are currently violated by the
-        predictor. The gamma value is normalised by the number of samples.
+        """Calculate a vector of moments.
+
+        When the Moment object is used as a constraint, then `gamma[j]≤0 for all j` is
+        used as the set of constraints. When the Moment object is used as an objective,
+        then `gamma[0]` is used as the objective.
 
         Parameters
         ----------
