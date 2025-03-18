@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import re
 from contextlib import nullcontext as does_not_raise
 from copy import deepcopy
 from test.unit.input_convertors import _map_into_single_column
@@ -8,7 +9,6 @@ from test.unit.input_convertors import _map_into_single_column
 import numpy as np
 import pandas as pd
 import pytest
-import re
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.datasets import make_classification
 
@@ -23,6 +23,8 @@ from fairlearn.postprocessing._tradeoff_curve_utilities import (
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
     _MESSAGE_SENSITIVE_FEATURES_NONE,
+    _MESSAGE_X_Y_ROWS,
+    _MESSAGE_Y_NONE,
 )
 
 from .conftest import (
@@ -90,7 +92,7 @@ def test_none_input_data(X, y, sensitive_features, constraints):
     )
 
     if y is None:
-        with pytest.raises(ValueError, match=re.escape("Must supply y, got y=None.")):
+        with pytest.raises(ValueError, match=re.escape(_MESSAGE_Y_NONE)):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
     elif X is None:
         with pytest.raises(ValueError, match="Expected 2D array, got scalar array instead"):
@@ -160,7 +162,7 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     empty_exception_messages = {
         "empty_sklearn": "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required.",
         "empty_pandas": "Found array with 0 sample",
-        "empty_fairlearn": "Must supply y",
+        "empty_fairlearn": _MESSAGE_Y_NONE,
     }
 
     for permutation in [(0, 1), (1, 0)]:
@@ -509,7 +511,7 @@ def test_predict_different_argument_lengths(data_X_y_sf, constraints):
             data_X_y_sf.X, sensitive_features=data_X_y_sf.sensitive_features[:-1]
         )
 
-    with pytest.raises(ValueError, match="X and y must have same number of rows"):
+    with pytest.raises(ValueError, match=_MESSAGE_X_Y_ROWS):
         adjusted_predictor.predict(
             data_X_y_sf.X[:-1], sensitive_features=data_X_y_sf.sensitive_features
         )
