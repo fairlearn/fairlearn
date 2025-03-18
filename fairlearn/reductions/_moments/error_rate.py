@@ -93,9 +93,9 @@ class ErrorRate(ClassificationMoment):
     def gamma(self, predictor: Callable) -> pd.Series:
         """Calculate a vector of moments.
 
-        When the Moment object is used as a constraint, then `gamma[j]≤0 for all j` is
-        used as the set of constraints. When the Moment object is used as an objective,
-        then `gamma[0]` is used as the objective.
+        When ErrorRate() is used as a constraint, then `gamma[j]≤0 for all j` is used as
+        the set of constraints. When ErrorRate() is used as an objective, then
+        `gamma[0]` is used as the objective.
 
         Parameters
         ----------
