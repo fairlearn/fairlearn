@@ -167,6 +167,7 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
                 for name in names
             ]
         )
+
     return np.array([_join_names(row) for row in feature_columns.astype(str)])
 
 

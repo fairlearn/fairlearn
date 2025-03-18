@@ -63,7 +63,7 @@ class ErrorRate(ClassificationMoment):
         else:
             raise ValueError(_MESSAGE_BAD_COSTS)
 
-    def load_data(self, X, y, *, sensitive_features): -> None:
+    def load_data(self, X, y, *, sensitive_features) -> None:
         """Load the specified data into the object.
 
         Parameters
