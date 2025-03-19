@@ -317,7 +317,9 @@ class ArgumentTests:
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
         with pytest.raises(
             ValueError,
-            match=re.escape("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape})."),
+            match=re.escape(
+                f"`y` must be of shape (n,) or (n,1), got y of shape=({Y_two_col_df.shape})."
+            ),
         ):
             gs.fit(transformX(X), Y_two_col_df, sensitive_features=transformA(A))
 
@@ -336,7 +338,9 @@ class ArgumentTests:
         Y_two_col_ndarray = np.stack((Y, Y), -1)
         with pytest.raises(
             ValueError,
-            match=re.escape("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape})."),
+            match=re.escape(
+                f"`y` must be of shape (n,) or (n,1), got y of shape=({Y_two_col_ndarray.shape})."
+            ),
         ):
             gs.fit(transformX(X), Y_two_col_ndarray, sensitive_features=transformA(A))
 
