@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 import logging
+import re
+
 from test.unit.input_convertors import (
     conversions_for_1d,
     ensure_dataframe,
@@ -37,6 +39,8 @@ from fairlearn.reductions._grid_search._grid_generator import (
 )
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
+    _MESSAGE_X_Y_ROWS,
+    _MESSAGE_Y_NONE,
 )
 
 # ==============================================================
@@ -107,7 +111,7 @@ class ArgumentTests:
         )
         X, _, A = _quick_data()
 
-        with pytest.raises(ValueError, match="Must supply y"):
+        with pytest.raises(ValueError, match=_MESSAGE_Y_NONE):
             gs.fit(transformX(X), None, sensitive_features=transformA(A))
 
     # ----------------------------
@@ -126,7 +130,7 @@ class ArgumentTests:
         X, _, A = _quick_data()
         Y = np.random.randint(2, size=len(A) + 1)
 
-        with pytest.raises(ValueError, match="X and y must have same number of rows"):
+        with pytest.raises(ValueError, match=_MESSAGE_X_Y_ROWS):
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
@@ -315,7 +319,9 @@ class ArgumentTests:
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
         with pytest.raises(
             ValueError,
-            match=re.escape("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape})."),
+            match=re.escape(
+                f"`y` must be of shape (n,) or (n,1), got y of shape=({Y_two_col_df.shape})."
+            ),
         ):
             gs.fit(transformX(X), Y_two_col_df, sensitive_features=transformA(A))
 
@@ -334,7 +340,9 @@ class ArgumentTests:
         Y_two_col_ndarray = np.stack((Y, Y), -1)
         with pytest.raises(
             ValueError,
-            match=re.escape("`y` must be of shape (n,) or (n,1), got y of shape=({y.shape})."),
+            match=re.escape(
+                f"`y` must be of shape (n,) or (n,1), got y of shape=({Y_two_col_ndarray.shape})."
+            ),
         ):
             gs.fit(transformX(X), Y_two_col_ndarray, sensitive_features=transformA(A))
 

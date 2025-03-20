@@ -106,7 +106,7 @@ def test_validate_and_reformat_input_empty_y(y):
     passed as an empty list, nd.array, series or dataframe or None."""
     X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
 
-    with pytest.raises(ValueError, match="Must supply y"):
+    with pytest.raises(ValueError, match=iv._MESSAGE_Y_NONE):
         X, y, _, _ = iv._validate_and_reformat_input(
             X=X, y=y, expect_y=True, expect_sensitive_features=False
         )
