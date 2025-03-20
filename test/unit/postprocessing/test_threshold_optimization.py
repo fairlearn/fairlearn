@@ -9,6 +9,7 @@ from test.unit.input_convertors import _map_into_single_column
 import numpy as np
 import pandas as pd
 import pytest
+import re
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.datasets import make_classification
 

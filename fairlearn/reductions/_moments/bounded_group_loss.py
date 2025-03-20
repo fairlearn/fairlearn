@@ -55,6 +55,8 @@ class ConditionalLossMoment(LossMoment):
 
         # The following uses X and not X_train so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
+        # TODO: remove following line when ConditionalLossMoment is being narwhalified:
+        self.tags = self.tags.to_native()
         self.prob_attr = self.tags.groupby(_GROUP_ID).size() / self.total_samples
         self._index = self.prob_attr.index
         self.default_objective_lambda_vec = self.prob_attr

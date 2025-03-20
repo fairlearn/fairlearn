@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import pandas as pd
+import narwhals.stable.v1 as nw
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -30,26 +31,40 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series | None = None) -> None:
+    def load_data(
+        self,
+        X: nw.typing.IntoDataFrame,
+        y: nw.typing.IntoSeries,
+        *,
+        sensitive_features: nw.typing.IntoSeries | None = None,
+    ) -> None:
         """Load a set of data for use by this object.
 
         Parameters
         ----------
-        X : array
+        X : numpy.ndarray, DataFrame object supported by narwhals
             The feature array
-        y : :class:`pandas.Series`
+        # TODO: check if np.arrays or lists are also supported for y; or also a DataFrame; some subclasses do allow this I think
+        y : numpy.ndarray, or Series object supported by narwhals, list
             The label vector
-        sensitive_features : :class:`pandas.Series`
+        # TODO: check if np.arrays or lists are also supported for sensitive_features; some subclasses do allow this I think
+        sensitive_features : Series object supported by narwhals
             The sensitive feature vector (default None)
         """
         assert self.data_loaded is False, "data can be loaded only once"
-        if sensitive_features is not None:
-            assert isinstance(sensitive_features, pd.Series)
+        if sensitive_features is None:
+            raise ValueError("The 'sensitive_features' parameter must be provided.")
         self.X = X
         self._y = y
-        self.tags = pd.DataFrame({_LABEL: y})
+        # TODO (when dependency from pandas is being removed): Dynamically change
+        # backends for y, sensitive_features and self.tags to the user's backend:
+        y = nw.new_series(name="y", values=y, native_namespace=pd)
+        sensitive_features = nw.new_series(
+            name="sensitive_features", values=sensitive_features, native_namespace=pd
+        )
+        self.tags = nw.from_dict({_LABEL: y}, backend=pd)
         if sensitive_features is not None:
-            self.tags[_GROUP_ID] = sensitive_features
+            self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 
