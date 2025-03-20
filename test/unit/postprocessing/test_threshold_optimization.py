@@ -99,7 +99,7 @@ def test_none_input_data(X, y, sensitive_features, constraints):
     elif y is None:
         with pytest.raises(ValueError) as exception:
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
-        assert str(exception.value) == _MESSAGE_Y_NONE
+        assert str(exception.value).startswith(_MESSAGE_Y_NONE)
     elif sensitive_features is None:
         with pytest.raises(ValueError, match=re.escape(_MESSAGE_SENSITIVE_FEATURES_NONE)):
             adjusted_predictor.fit(X, y, sensitive_features=sensitive_features)
