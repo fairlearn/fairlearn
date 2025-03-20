@@ -13,7 +13,6 @@ here. Additionally, we generate data here.
 import sys
 
 import numpy as np
-from sklearn.datasets import make_classification
 
 from fairlearn.adversarial._adversarial_mitigation import (
     _AdversarialFairness,  # We just test the base class because this covers all
@@ -201,10 +200,7 @@ Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(
     rows,
 )
-MultiClass2d, _ = make_classification(
-    random_state=42, n_classes=3, n_clusters_per_class=1, n_samples=rows, n_features=cols
-)
-MultiClass1d = np.random.choice([0.0, 1.0, 0.2], size=(rows,))
+MultiClass2d = np.random.choice([0.0, 1.0, 2.0], size=(rows, cols))
 
 
 def generate_data_combinations(n=10):
