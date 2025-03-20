@@ -40,6 +40,20 @@ _ALLOWED_INPUT_TYPES_Y = [np.ndarray, pd.DataFrame, pd.Series, list]
 _MERGE_COLUMN_SEPARATOR = ","
 
 
+def _standardize_features(
+    X: np.ndarray | IntoFrameT,
+    features: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
+) -> pd.Series | None:
+    check_consistent_length(X, features)
+    features = check_array(features, ensure_2d=False, dtype=None)
+
+    # compress multiple features into a single column
+    if len(features.shape) > 1 and features.shape[1] > 1:
+        features = _merge_columns(features)
+
+    return pd.Series(features.squeeze())
+
+
 def _validate_and_reformat_input(
     X: np.ndarray | IntoFrameT,
     y: np.ndarray | IntoSeriesT | list | None = None,
@@ -85,10 +99,10 @@ def _validate_and_reformat_input(
 
     if expect_y:
         if y is None:
-            raise ValueError(_MESSAGE_Y_NONE + f", got y={y}.")
+            raise ValueError(f"{_MESSAGE_Y_NONE}, got {y=}.")
         y = np.asarray(y)
         if y.size == 0:
-            raise ValueError(_MESSAGE_Y_NONE + f", got y={y}.")
+            raise ValueError(f"{_MESSAGE_Y_NONE}, got {y=}.")
         if not (y.ndim == 1 or (y.ndim == 2 and y.shape[1] == 1)):
             raise ValueError(f"`y` must be of shape (n,) or (n,1), got y of shape=({y.shape}).")
         if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
@@ -103,27 +117,13 @@ def _validate_and_reformat_input(
         raise ValueError(_MESSAGE_X_Y_ROWS)
 
     if sensitive_features is not None:
-        check_consistent_length(X, sensitive_features)
-        sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
-
-        # compress multiple sensitive features into a single column
-        if len(sensitive_features.shape) > 1 and sensitive_features.shape[1] > 1:
-            sensitive_features = _merge_columns(sensitive_features)
-
-        sensitive_features = pd.Series(sensitive_features.squeeze())
+        sensitive_features = _standardize_features(X, sensitive_features)
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
     # Handle the control features
     if control_features is not None:
-        check_consistent_length(X, control_features)
-        control_features = check_array(control_features, ensure_2d=False, dtype=None)
-
-        # compress multiple control features into a single column
-        if len(control_features.shape) > 1 and control_features.shape[1] > 1:
-            control_features = _merge_columns(control_features)
-
-        control_features = pd.Series(control_features.squeeze())
+        control_features = _standardize_features(X, control_features)
 
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas
