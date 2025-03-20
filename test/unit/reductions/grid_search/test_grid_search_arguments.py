@@ -3,7 +3,6 @@
 
 import logging
 import re
-
 from test.unit.input_convertors import (
     conversions_for_1d,
     ensure_dataframe,
@@ -18,7 +17,6 @@ from test.unit.reductions.grid_search.utilities import (
 import numpy as np
 import pandas as pd
 import pytest
-import re
 from sklearn.exceptions import NotFittedError
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.pipeline import Pipeline

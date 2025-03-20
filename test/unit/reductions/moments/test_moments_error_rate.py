@@ -1,14 +1,12 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import narwhals as nw
 import numpy as np
-import sklearn
-from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
 import pandas as pd
 import polars as pl
 import pytest
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
 
 from fairlearn.reductions import ErrorRate
 from fairlearn.reductions._moments.error_rate import _MESSAGE_BAD_COSTS
@@ -31,11 +29,11 @@ def test_bad_costs(bad_costs):
         assert _MESSAGE_BAD_COSTS in execInfo.value.args[0]
 
 
-# TODO: at the moment only tests compatibility between pandas and polars; should also 
+# TODO: at the moment only tests compatibility between pandas and polars; should also
 # test pyarrow
 # TODO: parametrize test
 def test_error_rate_narwhals_compatible():
-    """Test that ErrorRate is compatible with any types passed via narwhals, that 
+    """Test that ErrorRate is compatible with any types passed via narwhals, that
     returns are the same for all the methods and that the input types are returned."""
 
     # make up data for testing
@@ -43,9 +41,17 @@ def test_error_rate_narwhals_compatible():
     X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     X[:, -1] = rng.integers(0, 2, size=(X.shape[0],))
     sensitive_features = X[:, -1]
-    X_pd, y_pd, sensitive_features_pd = pd.DataFrame(X), pd.Series(y), pd.Series(sensitive_features)
-    X_pl, y_pl, sensitive_features_pl = pl.DataFrame(X), pl.Series(y), pl.Series(sensitive_features)
-    costs = {"fp":0.1, "fn":0.9}
+    X_pd, y_pd, sensitive_features_pd = (
+        pd.DataFrame(X),
+        pd.Series(y),
+        pd.Series(sensitive_features),
+    )
+    X_pl, y_pl, sensitive_features_pl = (
+        pl.DataFrame(X),
+        pl.Series(y),
+        pl.Series(sensitive_features),
+    )
+    costs = {"fp": 0.1, "fn": 0.9}
 
     # we cannot check the method on the same instance, because data cannot be loaded
     # twice to the same instance)
