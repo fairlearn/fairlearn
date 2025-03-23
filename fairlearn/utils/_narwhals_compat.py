@@ -38,3 +38,13 @@ def get_native_namespace_or_default(
     if narwhals_objects:
         return nw.get_native_namespace(*narwhals_objects)
     return get_default_dataframe_backend().to_native_namespace()
+
+
+def all_to_native(*args) -> tuple:
+    """Convert all inputs to native objects if they are narwhals objects.
+
+    Temporary function to use while narwhals is not fully integrated.
+    """
+    return tuple(
+        nw.to_native(arg) if is_into_dataframe(arg) or is_into_series(arg) else arg for arg in args
+    )

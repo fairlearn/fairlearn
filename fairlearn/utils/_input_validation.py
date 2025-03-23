@@ -3,14 +3,20 @@
 from __future__ import annotations
 
 import logging
-from typing import Sequence
+from typing import Any, Sequence
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
+from narwhals.dependencies import is_into_dataframe
 from narwhals.typing import IntoFrameT, IntoSeriesT
 from sklearn.utils.validation import check_consistent_length
 
 from fairlearn.utils._fixes import check_array
+from fairlearn.utils._narwhals_compat import (
+    all_to_native,
+    get_native_namespace_or_default,
+)
 
 logger = logging.getLogger(__file__)
 
@@ -42,8 +48,10 @@ _MERGE_COLUMN_SEPARATOR = ","
 
 def _standardize_features(
     X: np.ndarray | IntoFrameT,
-    features: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
-) -> pd.Series | None:
+    features: np.ndarray | IntoSeriesT | IntoFrameT | list | None,
+    *,
+    native_namespace: Any,
+) -> nw.Series[Any]:
     check_consistent_length(X, features)
     features = check_array(features, ensure_2d=False, dtype=None)
 
@@ -51,7 +59,7 @@ def _standardize_features(
     if len(features.shape) > 1 and features.shape[1] > 1:
         features = _merge_columns(features)
 
-    return pd.Series(features.squeeze())
+    return nw.new_series(name="", values=features.squeeze(), native_namespace=native_namespace)
 
 
 def _validate_and_reformat_input(
@@ -97,6 +105,8 @@ def _validate_and_reformat_input(
     if X is None:
         raise ValueError(_MESSAGE_X_NONE)
 
+    plx = get_native_namespace_or_default(X, y)
+
     if expect_y:
         if y is None:
             raise ValueError(f"{_MESSAGE_Y_NONE}, got {y=}.")
@@ -110,29 +120,29 @@ def _validate_and_reformat_input(
         y = check_array(y.reshape(-1), ensure_2d=False, dtype="numeric", ensure_all_finite=False)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
-    if isinstance(X, pd.DataFrame):
-        result_X = pd.DataFrame(result_X)
+    if is_into_dataframe(X):
+        result_X = nw.from_numpy(result_X, native_namespace=plx)
 
     if (y is not None) and y.shape[0] != result_X.shape[0]:
         raise ValueError(_MESSAGE_X_Y_ROWS)
 
     if sensitive_features is not None:
-        sensitive_features = _standardize_features(X, sensitive_features)
+        sensitive_features = _standardize_features(X, sensitive_features, native_namespace=plx)
     elif expect_sensitive_features:
         raise ValueError(_MESSAGE_SENSITIVE_FEATURES_NONE)
 
     # Handle the control features
     if control_features is not None:
-        control_features = _standardize_features(X, control_features)
+        control_features = _standardize_features(X, control_features, native_namespace=plx)
 
     # If we don't have a y, then need to fiddle with return type to
     # avoid a warning from pandas
     if y is not None:
-        result_y = pd.Series(y)
+        result_y = nw.new_series(name="", values=y, native_namespace=plx)
     else:
-        result_y = pd.Series(dtype="float64")
+        result_y = nw.new_series(name="", values=[], dtype=nw.Float64, native_namespace=plx)
 
-    return (result_X, result_y, sensitive_features, control_features)
+    return all_to_native(result_X, result_y, sensitive_features, control_features)
 
 
 def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
