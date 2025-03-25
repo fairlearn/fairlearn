@@ -42,14 +42,12 @@ class Moment:
 
         Parameters
         ----------
-        X : numpy.ndarray, DataFrame object supported by narwhals
-            The feature array
-        # TODO: check if np.arrays or lists are also supported for y; or also a DataFrame; some subclasses do allow this I think
-        y : numpy.ndarray, or Series object supported by narwhals, list
-            The label vector
-        # TODO: check if np.arrays or lists are also supported for sensitive_features; some subclasses do allow this I think
-        sensitive_features : Series object supported by narwhals
-            The sensitive feature vector (default None)
+        X : numpy.ndarray, DataFrame object supported by narwhals, or list of lists
+            The feature array.
+        y : numpy.ndarray, Series object supported by narwhals or list
+            The label vector.
+        sensitive_features : numpy.ndarray, Series object supported by narwhals, or list, default=None
+            The sensitive feature vector.
         """
         assert self.data_loaded is False, "data can be loaded only once"
         self.X = X

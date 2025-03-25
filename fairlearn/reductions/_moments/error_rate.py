@@ -63,7 +63,17 @@ class ErrorRate(ClassificationMoment):
             raise ValueError(_MESSAGE_BAD_COSTS)
 
     def load_data(self, X, y, *, sensitive_features, control_features=None) -> None:
-        """Load the specified data into the object."""
+        """Load the specified data into the object.
+
+        Parameters
+        ----------
+        X : numpy.ndarray, DataFrame object supported by narwhals, or list of lists
+            The feature array.
+        y : numpy.ndarray, Series object supported by narwhals or list
+            The label vector.
+        sensitive_features : numpy.ndarray, Series object supported by narwhals, or list, default=None
+            The sensitive feature vector.
+        """
         _, y_train, sf_train, _ = _validate_and_reformat_input(
             X,
             y,
