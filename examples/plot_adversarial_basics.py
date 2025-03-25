@@ -1,9 +1,9 @@
 """
 .. _adversarial_Example_1:
 
-===============================================================
-Basics & Model Specification of `AdversarialFairnessClassifier`
-===============================================================
+=====================================================
+Basics & Model Specification of `AdversarialFairness`
+=====================================================
 
 This example shows how to use
 :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` on the UCI Adult
