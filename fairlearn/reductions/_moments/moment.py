@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+import narwhals.stable.v1 as nw
 import pandas as pd
 
 _GROUP_ID = "group_id"
@@ -30,26 +31,35 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series | None = None) -> None:
+    def load_data(
+        self,
+        X: nw.typing.IntoDataFrame,
+        y: nw.typing.IntoSeries,
+        *,
+        sensitive_features: nw.typing.IntoSeries | None = None,
+    ) -> None:
         """Load a set of data for use by this object.
 
         Parameters
         ----------
-        X : array
-            The feature array
-        y : :class:`pandas.Series`
-            The label vector
-        sensitive_features : :class:`pandas.Series`
-            The sensitive feature vector (default None)
+        X : numpy.ndarray, DataFrame object supported by narwhals, or list of lists
+            The feature array.
+        y : numpy.ndarray, Series object supported by narwhals or list
+            The label vector.
+        sensitive_features : numpy.ndarray, Series object supported by narwhals, or list, default=None
+            The sensitive feature vector.
         """
         assert self.data_loaded is False, "data can be loaded only once"
-        if sensitive_features is not None:
-            assert isinstance(sensitive_features, pd.Series)
         self.X = X
         self._y = y
-        self.tags = pd.DataFrame({_LABEL: y})
-        if sensitive_features is not None:
-            self.tags[_GROUP_ID] = sensitive_features
+        # TODO (when dependency from pandas is being removed): Dynamically change
+        # backends for y, sensitive_features and self.tags to user's backend:
+        y = nw.new_series(name="y", values=y, native_namespace=pd)
+        sensitive_features = nw.new_series(
+            name="sensitive_features", values=sensitive_features, native_namespace=pd
+        )
+        self.tags = nw.from_dict({_LABEL: y}, backend=pd)
+        self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 

@@ -61,9 +61,8 @@ def _validate_and_reformat_input(
     expect_y : bool, default=True
         If True, y needs to be provided and non-empty (np.asarray(y).size > 0),
         otherwise ignores the argument
-    expect_sensitive_features : bool
-        If true, sensitive_features must be provided to the call to this function.
-        This is the default setting.
+    expect_sensitive_features : bool, default=True
+        If True, sensitive_features must be provided to the call to this function.
     enforce_binary_labels : bool
         If True, raise an exception if `y` contains values other than 0 and 1.
         Default is False.
