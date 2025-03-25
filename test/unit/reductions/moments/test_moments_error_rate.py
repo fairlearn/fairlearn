@@ -30,10 +30,10 @@ def test_bad_costs(bad_costs):
         assert _MESSAGE_BAD_COSTS in execInfo.value.args[0]
 
 
-# TODO: parametrize test
 def test_error_rate_narwhals_compatible():
-    """Test that ErrorRate is compatible with any types passed via narwhals, that
-    returns are the same for all the methods and that the input types are returned."""
+    """Test that `ErrorRate` is compatible with several dataframe backends via narwhals,
+    that return values are the same across different backends and that they come in
+    types from the dataframe backend used."""
 
     # make up data for testing
     rng = np.random.default_rng(42)
@@ -57,14 +57,13 @@ def test_error_rate_narwhals_compatible():
     )
     costs = {"fp": 0.1, "fn": 0.9}
 
-    # we cannot check the method on the same instance, because data cannot be loaded
-    # twice to the same instance)
+    # create an instance per backend, since data can only be loaded once
     errorrate_np = ErrorRate(costs=costs)
     errorrate_pd = ErrorRate(costs=costs)
     errorrate_pl = ErrorRate(costs=costs)
     errorrate_pa = ErrorRate(costs=costs)
 
-    # check `ErrorRate.load_data()` works with all input types
+    # check `ErrorRate.load_data()` works with all the backends
     errorrate_np.load_data(X, y, sensitive_features=sensitive_features)
     errorrate_pd.load_data(X_pd, y_pd, sensitive_features=sensitive_features_pd)
     errorrate_pl.load_data(X_pl, y_pl, sensitive_features=sensitive_features_pl)
