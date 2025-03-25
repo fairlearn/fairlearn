@@ -4,9 +4,10 @@
 import numpy as np
 import pandas as pd
 import polars as pl
+import pyarrow as pa
 import pytest
 from sklearn.datasets import make_classification
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import HistGradientBoostingClassifier
 
 from fairlearn.reductions import ErrorRate
 from fairlearn.reductions._moments.error_rate import _MESSAGE_BAD_COSTS
@@ -29,8 +30,6 @@ def test_bad_costs(bad_costs):
         assert _MESSAGE_BAD_COSTS in execInfo.value.args[0]
 
 
-# TODO: at the moment only tests compatibility between pandas and polars; should also
-# test pyarrow
 # TODO: parametrize test
 def test_error_rate_narwhals_compatible():
     """Test that ErrorRate is compatible with any types passed via narwhals, that
@@ -51,6 +50,11 @@ def test_error_rate_narwhals_compatible():
         pl.Series(y),
         pl.Series(sensitive_features),
     )
+    X_pa, y_pa, sensitive_features_pa = (
+        pa.Table.from_pandas(X_pd),
+        pa.Array.from_pandas(y_pd),
+        pa.Array.from_pandas(sensitive_features_pd),
+    )
     costs = {"fp": 0.1, "fn": 0.9}
 
     # we cannot check the method on the same instance, because data cannot be loaded
@@ -58,23 +62,31 @@ def test_error_rate_narwhals_compatible():
     errorrate_np = ErrorRate(costs=costs)
     errorrate_pd = ErrorRate(costs=costs)
     errorrate_pl = ErrorRate(costs=costs)
+    errorrate_pa = ErrorRate(costs=costs)
 
     # check `ErrorRate.load_data()` works with all input types
     errorrate_np.load_data(X, y, sensitive_features=sensitive_features)
     errorrate_pd.load_data(X_pd, y_pd, sensitive_features=sensitive_features_pd)
     errorrate_pl.load_data(X_pl, y_pl, sensitive_features=sensitive_features_pl)
+    errorrate_pa.load_data(X_pa, y_pa, sensitive_features=sensitive_features_pa)
 
     # check `ErrorRate.gamma()` returns similar returns for all input types
-    classifier = LogisticRegression().fit(X, y)
+    classifier = HistGradientBoostingClassifier().fit(X, y)
     error_np = errorrate_np.gamma(classifier.predict)
     assert isinstance(error_np, pd.Series)
 
-    classifier = LogisticRegression().fit(X_pd, y_pd)
+    classifier = HistGradientBoostingClassifier().fit(X_pd, y_pd)
     error_pd = errorrate_pd.gamma(classifier.predict)
     assert isinstance(error_pd, pd.Series)
 
-    classifier = LogisticRegression().fit(X_pl, y_pl)
+    classifier = HistGradientBoostingClassifier().fit(X_pl, y_pl)
     error_pl = errorrate_pl.gamma(classifier.predict)
     assert isinstance(error_pl, pl.Series)
 
-    assert np.array_equal(error_np.to_numpy(), error_pd.to_numpy(), error_pl.to_numpy())
+    classifier = HistGradientBoostingClassifier().fit(X_pa, y_pa)
+    error_pa = errorrate_pa.gamma(classifier.predict)
+    assert isinstance(error_pa, (pa.Array, pa.ChunkedArray))
+
+    assert np.array_equal(error_np.to_numpy(), error_pd.to_numpy())
+    assert np.array_equal(error_np.to_numpy(), error_pl.to_numpy())
+    assert np.array_equal(error_np.to_numpy(), error_pa.to_numpy())

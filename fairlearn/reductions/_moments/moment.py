@@ -54,8 +54,7 @@ class Moment:
         self._y = y
         # TODO (when dependency from pandas is being removed): Dynamically change
         # backends for y, sensitive_features and self.tags to user's backend:
-        # y = nw.new_series(name="y", values=y, native_namespace=pd)
-        y = nw.from_native(y, pass_through=False, series_only=True, eager_only=True)
+        y = nw.new_series(name="y", values=y, native_namespace=pd)
         sensitive_features = nw.new_series(
             name="sensitive_features", values=sensitive_features, native_namespace=pd
         )
