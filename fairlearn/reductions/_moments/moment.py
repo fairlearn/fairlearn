@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-import pandas as pd
 import narwhals.stable.v1 as nw
+import pandas as pd
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -52,8 +52,6 @@ class Moment:
             The sensitive feature vector (default None)
         """
         assert self.data_loaded is False, "data can be loaded only once"
-        if sensitive_features is None:
-            raise ValueError("The 'sensitive_features' parameter must be provided.")
         self.X = X
         self._y = y
         # TODO (when dependency from pandas is being removed): Dynamically change
@@ -63,8 +61,7 @@ class Moment:
             name="sensitive_features", values=sensitive_features, native_namespace=pd
         )
         self.tags = nw.from_dict({_LABEL: y}, backend=pd)
-        if sensitive_features is not None:
-            self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
+        self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 

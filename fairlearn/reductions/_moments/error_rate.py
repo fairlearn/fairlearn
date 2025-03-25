@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from typing import Callable, Literal, List
+from typing import Callable, List, Literal
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -72,8 +72,8 @@ class ErrorRate(ClassificationMoment):
             control_features=control_features,
         )
         # TODO: remove following line when _validate_and_reformat_input is narwhalified
-        # (because then sf_train comes as a narwhals series, while now it comes as a
-        # pandas series):
+        # (because then sf_train likely comes as a narwhals series, while now it comes
+        # as a pandas series):
         sf_train = nw.from_native(sf_train, pass_through=True, eager_only=True)
         # The following uses X so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)
