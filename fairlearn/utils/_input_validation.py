@@ -54,7 +54,7 @@ def _validate_and_reformat_input(
 
     Parameters
     ----------
-    X : numpy.ndarray, or DataFrame object supported by narwhals
+    X : numpy.ndarray, pandas.DataFrame
         The feature matrix
     y : numpy.ndarray, pandas.DataFrame, pandas.Series, list, or None
         The label vector. Must be of shape (n,) or (n,1).
@@ -69,7 +69,7 @@ def _validate_and_reformat_input(
 
     Returns
     -------
-    Tuple(numpy.ndarray | DataFrame, Series, Series, Series objects supported by narwhals)
+    Tuple(numpy.ndarray | pd.DataFrame, pandas.Series, pandas.Series, pandas.Series)
         The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead
