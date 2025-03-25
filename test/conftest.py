@@ -46,10 +46,10 @@ if find_spec("polars"):
     constructors.append(polars_eager_constructor)
     backends.append("polars")
 
-# TODO: sklearn.utils.validation.check_array does not support it
-# if find_spec("pyarrow"):
-#     constructors.append(pyarrow_table_constructor)
-#     backends.append("pyarrow")
+
+if find_spec("pyarrow"):
+    constructors.append(pyarrow_table_constructor)
+    backends.append("pyarrow")
 
 
 @pytest.fixture(params=constructors)
