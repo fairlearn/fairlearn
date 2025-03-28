@@ -358,7 +358,7 @@ Error Rate
 ~~~~~~~~~~
 
 We can use the :class:`ErrorRate` either to measure performance of a trained model that does or
-does not take sensitive features into account, or as an addition to the
+does not take sensitive features into account, or as an
 objective function during the training of a fairness aware model.
 
 To measure the ErrorRate in respect to a trained estimator we use its :code:`gamma` method:
