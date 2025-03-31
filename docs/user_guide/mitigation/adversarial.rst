@@ -211,7 +211,6 @@ Refer to the following examples for more details:
 - :ref:`sphx_glr_auto_examples_plot_adversarial_basics.py`
 - :ref:`sphx_glr_auto_examples_plot_adversarial_fine_tuning.py`
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::

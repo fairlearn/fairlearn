@@ -1133,7 +1133,7 @@ intersectionalf(testy, predictions)
 # they still rated the black men as having increased psychotic symptoms.
 #
 # **So what is going on here?**
-
+#
 # It’s likely that race is **associated with other factors that are relevant to misdiagnosis**. The
 # diagnostic bias (or a tendency to overemphasize symptoms of schizophrenia and under-emphasize
 # depressive symptoms) may be related to socio-environmental factors, for example, Black men with
@@ -1145,7 +1145,7 @@ intersectionalf(testy, predictions)
 # if being assessed by a white clinician). The diagnostic instruments we have are also likely
 # culturally biased, having been developed on mostly white populations, making it difficult to pick
 # up on symptoms of depression in Black patients or men, in particular. (This article
-# :footcite:ct:`herbst2022schizophrenia`presents a nice overview of these various concerns)
+# :footcite:ct:`herbst2022schizophrenia` presents a nice overview of these various concerns)
 #
 # Unfortunately then, it’s not as simple as removing race from the equation, because of these
 # **persisting systemic biases which are related to misdiagnosis.** And these biases are reflected
