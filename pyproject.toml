@@ -26,8 +26,8 @@ filterwarnings = [
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:DeprecationWarning",
 
     # Warnings in other-ml (tensorflow)
-    "default:The initializer GlorotNormal is unseeded:UserWarning",
-    "default:Do not pass an `input_shape`/`input_dim` argument to a layer:UserWarning",
+    "default:Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new:DeprecationWarning",
+    "default:Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new:DeprecationWarning",
 
     # Warnings in test_othermlpackages
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
