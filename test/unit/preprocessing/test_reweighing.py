@@ -1,13 +1,14 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
-from fairlearn.metrics import MetricFrame
-from fairlearn.preprocessing import Reweighing
-from fairlearn.preprocessing._reweighing import calculate_weights
+import numpy as np
+import pandas as pd
 from sklearn.datasets import fetch_openml
 from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import BernoulliNB, CategoricalNB
-import numpy as np
-import pandas as pd
+
+from fairlearn.metrics import MetricFrame
+from fairlearn.preprocessing import Reweighing
+from fairlearn.preprocessing._reweighing import calculate_weights
 
 
 def main_test(est, X, Y, A, pass_sf=False, assert_improvement=False):
@@ -49,9 +50,7 @@ def test_multiple_sensitive_features():
     data = fetch_openml(data_id=1590, as_frame=True)
     X = pd.get_dummies(data.data)
     Y = (data.target == ">50K") * 1
-    A = np.array(
-        [(data.data["sex"] == "Male") * 1, (data.data["race"] == "Black") * 1]
-    ).T
+    A = np.array([(data.data["sex"] == "Male") * 1, (data.data["race"] == "Black") * 1]).T
     est = BernoulliNB()
     main_test(est, X, Y, A, assert_improvement=True)
 
