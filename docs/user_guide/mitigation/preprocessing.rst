@@ -185,7 +185,8 @@ disparity between the sexes.
     >>> Y = (data.target == ">50K") * 1
     >>> A = (data.data["sex"] == "Male") * 1
     >>> est = BernoulliNB()
-    >>> est.fit(X, Y);
+    >>> est.fit(X, Y)
+    BernoulliNB()
     >>> pred_original = est.predict(X)
 
     >>> diff_original = MetricFrame(
@@ -216,7 +217,8 @@ decreases.
     >>> A = (data.data["sex"] == "Male") * 1
     >>> est = BernoulliNB()
     >>> metaest = Reweighing(est, passthrough_sensitive_features=False)
-    >>> metaest.fit(X, Y, sensitive_features=A);
+    >>> metaest.fit(X, Y, sensitive_features=A)
+    BernoulliNB()
     >>> pred_mitigated = est.predict(X)
 
     >>> diff_mitigated = MetricFrame(
