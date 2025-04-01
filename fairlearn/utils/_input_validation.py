@@ -155,29 +155,7 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
         raise ValueError(
             f"Received argument of type {type(feature_columns).__name__} instead of expected numpy.ndarray"
         )
-        
-    if feature_columns.ndim > 2:
-        raise ValueError(
-            "Received %d-dimensional numpy.ndarray." % feature_columns.ndim
-        )
-    # avoid merging columns if it's only 1 column
-    if (feature_columns.ndim == 2 and feature_columns.shape[1] == 1) or (
-        feature_columns.ndim == 1 and feature_columns.shape[0] == 1
-    ):
-        return feature_columns
-    return (
-        pd.DataFrame(feature_columns)
-        .apply(
-            lambda row: _MERGE_COLUMN_SEPARATOR.join(
-                [
-                    str(row[i])
-                    .replace("\\", "\\\\")  # escape backslash and separator
-                    .replace(_MERGE_COLUMN_SEPARATOR, "\\" + _MERGE_COLUMN_SEPARATOR)
-                    for i in range(len(row))
-                ]
-            ),
-            axis=1,
-          
+
     def _join_names(names: Sequence[str]) -> str:
         return _MERGE_COLUMN_SEPARATOR.join(
             [
