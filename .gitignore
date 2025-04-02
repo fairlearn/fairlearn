@@ -128,3 +128,4 @@ docs/api_reference/generated/
 
 # Doc build generated files
 *.pkl
+Miniconda3-latest-MacOSX-arm64.sh
