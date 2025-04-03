@@ -96,11 +96,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         (defaults to `sample_weight`)
 
         .. versionadded:: 0.5.0
-
-    References
-    ----------
-    .. footbibliography::
-
     """
 
     def __init__(

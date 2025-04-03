@@ -128,8 +128,8 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
         "link": "https://fairlearn.org",
-        "image_light": "_static/images/fairlearn_full_color_lightmode.svg", 
-        "image_dark": "_static/images/fairlearn_full_color_darkmode.svg",
+        "image_light": "fairlearn_full_color_lightmode.svg",
+        "image_dark": "fairlearn_full_color_darkmode.svg",
     },
     "icon_links": [
         {
