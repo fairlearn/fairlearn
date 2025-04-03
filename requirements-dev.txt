@@ -22,6 +22,8 @@ pytest-mpl
 wheel
 lightgbm
 xlrd
+polars
+pyarrow
 
 # Required for documentation
 pypandoc
