@@ -125,7 +125,7 @@ def equalized_odds_difference(
     Depending on the `agg` parameter, this function computes either:
 
     - The greater of two metrics: `true_positive_rate_difference` and
-    `false_positive_rate_difference`. if `agg='worst_case'`. The former is the
+    `false_positive_rate_difference`, if `agg='worst_case'`. The former is the
     difference between the largest and smallest of
     :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a` of the sensitive
     feature(s). The latter is defined similarly, but for
