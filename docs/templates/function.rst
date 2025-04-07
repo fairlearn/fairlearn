@@ -6,6 +6,8 @@
 
 .. _sphx_glr_backreferences_{{ module }}.{{ objname }}:
 
+.. footbibliography::
+
 .. minigallery:: {{ module }}.{{ objname }}
    :add-heading: Gallery examples
    :heading-level: -
