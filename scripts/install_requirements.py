@@ -20,7 +20,7 @@ _INSERTION_FIXED = "-fixed"
 _REQUIREMENTS_EXTENSION = "txt"
 
 # Configuration for the --pinned argument including explicit package versions
-# that are minimal for the latest Python versions.
+# that are minimally required for the latest Python versions.
 _PINNED_REQUIREMENTS = {
     "3.12": "numpy==1.26.0",
     "3.13": "numpy==2.1.0",
