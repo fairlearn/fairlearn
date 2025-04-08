@@ -4,7 +4,12 @@
 """Holds the various Moments."""
 
 from .bounded_group_loss import BoundedGroupLoss  # noqa: F401
-from .bounded_group_loss import AbsoluteLoss, SquareLoss, ZeroOneLoss  # noqa: F401
+from .bounded_group_loss import (  # noqa: F401
+    AbsoluteLoss,
+    MeanLoss,
+    SquareLoss,
+    ZeroOneLoss,
+)
 from .error_rate import ErrorRate  # noqa: F401
 from .moment import Moment  # noqa: F401
 from .moment import ClassificationMoment, LossMoment  # noq: F401
@@ -32,4 +37,5 @@ __all__ = [
     "LossMoment",
     "SquareLoss",
     "ZeroOneLoss",
+    "MeanLoss",
 ]

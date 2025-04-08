@@ -207,11 +207,6 @@ class _AdversarialFairness(BaseEstimator):
         Maximum number of training iterations to perform. If set to -1, the number
         of iterations is determined by epochs parameter. Either epochs or max_iter
         must be positive.
-
-    References
-    ----------
-    .. footbibliography::
-
     """  # noqa : E501
 
     def __init__(
@@ -994,11 +989,6 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-
-    References
-    ----------
-    .. footbibliography::
-
     """  # noqa : E501
 
     def __init__(
@@ -1191,11 +1181,6 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-
-    References
-    ----------
-    .. footbibliography::
-
     """  # noqa : E501
 
     def __init__(
