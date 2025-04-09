@@ -514,8 +514,14 @@ class _AdversarialFairness(BaseEstimator):
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
+                        y_true = self._y_transform.inverse_transform(y)
                         result = cb(
-                            self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=1
+                            self,
+                            step=self.n_iter_,
+                            X=X,
+                            y=y_true,
+                            z=sensitive_features,
+                            pos_label=self.classes_[1],
                         )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
