@@ -11,12 +11,20 @@ import sys
 
 from _utils import _LogWrapper
 
+python_version = sys.version.split(" ")[0][:4]
+
 _REQUIREMENTS_STEMS = ["requirements", "requirements-dev"]
 
 _INSERTION_FIXED = "-fixed"
 
 _REQUIREMENTS_EXTENSION = "txt"
 
+# Configuration for the --pinned argument including explicit package versions
+# that are minimally required for the latest Python versions.
+_PINNED_REQUIREMENTS = {
+    "3.12": "numpy==1.26.0",
+    "3.13": "numpy==2.1.0",
+}
 
 _logger = logging.getLogger(__file__)
 logging.basicConfig(level=logging.INFO)
@@ -42,7 +50,10 @@ def _build_argument_parser():
 
 
 def _process_line(src_line):
-    return src_line.replace(">=", "==")
+    if python_version in _PINNED_REQUIREMENTS and src_line.startswith("numpy"):
+        return _PINNED_REQUIREMENTS[python_version]
+    else:
+        return src_line.replace(">=", "==")
 
 
 def _pin_requirements(src_file, dst_file):
