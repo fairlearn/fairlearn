@@ -37,6 +37,7 @@ from fairlearn.reductions._grid_search._grid_generator import (
 )
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
+    _MESSAGE_X_NONE,
     _MESSAGE_X_Y_ROWS,
     _MESSAGE_Y_NONE,
 )
@@ -95,7 +96,7 @@ class ArgumentTests:
         with pytest.raises(ValueError) as execInfo:
             gs.fit(None, transformY(Y), sensitive_features=transformA(A))
 
-        assert "Expected 2D array, got scalar array instead" in execInfo.value.args[0]
+        assert str(execInfo.value) == _MESSAGE_X_NONE
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
