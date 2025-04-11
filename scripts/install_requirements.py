@@ -22,8 +22,8 @@ _REQUIREMENTS_EXTENSION = "txt"
 # Configuration for the --pinned argument including explicit package versions
 # that are minimally required for the latest Python versions.
 _PINNED_REQUIREMENTS = {
-    "3.12": "numpy==1.26.0\n",
-    "3.13": "numpy==2.1.0\n",
+    "3.12": ["numpy==1.26.0\n", "scikit-learn==1.3.0\n", "scipy==1.11.2\n"],
+    "3.13": ["pandas==2.2.3\n", "numpy==2.1.0\n", "scikit-learn==1.6.0\n", "scipy==1.14.1\n"],
 }
 
 _logger = logging.getLogger(__file__)
@@ -50,10 +50,11 @@ def _build_argument_parser():
 
 
 def _process_line(src_line):
-    if python_version in _PINNED_REQUIREMENTS and src_line.startswith("numpy"):
-        return _PINNED_REQUIREMENTS[python_version]
-    else:
-        return src_line.replace(">=", "==")
+    if python_version in _PINNED_REQUIREMENTS:
+        for item in _PINNED_REQUIREMENTS[python_version]:
+            if src_line.startswith(item.split("==")[0]):
+                return item
+    return src_line.replace(">=", "==")
 
 
 def _pin_requirements(src_file, dst_file):
