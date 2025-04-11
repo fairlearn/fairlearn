@@ -22,8 +22,8 @@ _REQUIREMENTS_EXTENSION = "txt"
 # Configuration for the --pinned argument including explicit package versions
 # that are minimally required for the latest Python versions.
 _PINNED_REQUIREMENTS = {
-    "3.12": "numpy==1.26.0",
-    "3.13": "numpy==2.1.0",
+    "3.12": "numpy==1.26.0\n",
+    "3.13": "numpy==2.1.0\n",
 }
 
 _logger = logging.getLogger(__file__)
