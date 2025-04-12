@@ -6,15 +6,15 @@ from narwhals.typing import IntoDataFrame
 from narwhals.utils import parse_version
 
 
-def pandas_constructor(obj) -> IntoDataFrame:
+def pandas_constructor(obj) -> pd.DataFrame:
     return pd.DataFrame(obj)  # type: ignore[no-any-return]
 
 
-def pandas_nullable_constructor(obj) -> IntoDataFrame:
+def pandas_nullable_constructor(obj) -> pd.DataFrame:
     return pd.DataFrame(obj).convert_dtypes(dtype_backend="numpy_nullable")  # type: ignore[no-any-return]
 
 
-def pandas_pyarrow_constructor(obj) -> IntoDataFrame:
+def pandas_pyarrow_constructor(obj) -> pd.DataFrame:
     return pd.DataFrame(obj).convert_dtypes(dtype_backend="pyarrow")  # type: ignore[no-any-return]
 
 
