@@ -74,7 +74,7 @@ To verify that the code works as expected run:
 
 .. prompt:: bash
 
-   python ./scripts/install_requirements.py --pinned False
+   python ./scripts/install_requirements.py
    python -m pytest -s ./test/unit
 
 .. note::
