@@ -121,6 +121,11 @@ class MeanLoss(ConditionalLossMoment):
         super().__init__(loss, upper_bound=None, no_groups=True)
 
 
+# Ensure that MeanLoss shows up in correct place in documentation
+# when it is used as a base class
+MeanLoss.__module__ = "fairlearn.reductions"
+
+
 class BoundedGroupLoss(ConditionalLossMoment):
     """Moment for constraining the worst-case loss by a group.
 

@@ -2,7 +2,7 @@
 .. _adversarial_Example_2:
 
 ================================================
-Fine Tuning ad ``AdversarialFairnessClassifier``
+`AdversarialFairness` Fine Tuning
 ================================================
 
 Adversarial learning is inherently difficult because of various issues,

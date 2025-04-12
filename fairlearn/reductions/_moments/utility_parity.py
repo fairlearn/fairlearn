@@ -136,7 +136,7 @@ class UtilityParity(ClassificationMoment):
         This adds a column `event` to the `tags` field.
 
         The `utilities` is a 2-d array which corresponds to g(X,A,Y,h(X))
-        from :footcite:t:`agarwal2018reductions`.
+        from Agarwal et al. (2018).
         The `utilities` defaults to h(X), i.e. [0, 1] for each X_i.
         The first column is G^0 and the second is G^1.
         Assumes binary classification with labels 0/1.
@@ -266,7 +266,7 @@ class UtilityParity(ClassificationMoment):
         """Compute the signed weights.
 
         Uses the equations for :math:`C_i^0` and :math:`C_i^1` as defined
-        in Section 3.2 of :footcite:t:`agarwal2018reductions`
+        in Section 3.2 of Agarwal et al. (2018).
         in the 'best response of the Q-player' subsection to compute the
         signed weights to be applied to the data by the next call to the underlying
         estimator.
