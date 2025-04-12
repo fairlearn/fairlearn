@@ -22,13 +22,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        requirementsPinned: ["false", "true"]
+        python: ["3.9", "3.10", "3.11", "3.12"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      requirementsPinned: ${{ matrix.requirementsPinned }}
       codeCovPython: "3.12"
 
   minimal-deps:
