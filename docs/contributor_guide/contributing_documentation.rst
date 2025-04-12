@@ -94,6 +94,10 @@ ensure that they all render properly.
     pull request) and need help, simply @mention
     :code:`@fairlearn/fairlearn-maintainers` to get help.
 
+Code Style
+^^^^^^^^^^
+View the :ref:`code_style` section for an overview of the style we expect for contributed
+documentation files.
 
 Citations
 ^^^^^^^^^

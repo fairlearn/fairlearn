@@ -1,0 +1,61 @@
+Code style
+==========
+
+Github conventions
+------------------
+
+Because the Fairlearn team squash merges pull requests, you do not need to put
+much effort into the commit messages you submit when pushing code.
+
+Titles should be descriptive and include one of the following prefixes:
+* DOC: any documentation-related PRs (including the user guide, API reference, and other 
+website-related PRs).
+* MNT: code maintenance (refactoring, improve efficiency, etc.).
+* CI: anything related to our automated tests (nightly builds, CircleCI, releases, etc.).
+* FIX: bug fixes.
+* FEAT/ENH: adds or removes a new feature in the codebase.
+
+Test coverage is checked with ``codecov`` and line missing tests will show up in CI 
+as a failure. Therefore, we recommend contributors ensure all new content 
+they introduce has adequate test coverage.
+
+
+Code conventions
+----------------
+
+Linting
+^^^^^^^
+
+We recommend using a linter to check your code before you submit a PR. 
+We use ``ruff`` to check for PEP8 compatibility issues. You can either follow
+the guidelines, or you can run ``black`` on your code. The generated
+formatting by ``black`` is compatible our formatting requirements. You can
+configure your IDE to use ``black`` to format your code. Please refer to your
+IDE's instructions for further details.
+
+Considerations for new methods
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are introducing new estimators to the Fairlearn, you must ensure the 
+estimator is fully compatible with scikit-learn (defined `here <https://scikit-learn.org/stable/developers/develop.html>`_
+). For more resources on how to develop scikit-learn estimators, review this 
+`post <https://tamaraatanasoska.github.io/learning/2025/01/15/week-2-2024.html>`_ 
+by one of the Fairlearn maintainers.
+
+The Fairlearn team is in the process of swapping out the ``pandas`` library for
+``narwhals`` for data manipulation tasks. If you are contributing code that 
+includes Pandas, we recommend you use Narwhals instead to stay ahead of this effort.
+
+Because there are many complex sources of unfairness — some societal and some technical — it is not 
+possible to fully “debias” a system or to guarantee fairness. In Fairlearn, we therefore try to 
+avoid naming mitigation techniques in a way that could suggest they offer a simple fix towards a 
+"fair" model. Instead, we opt for descriptive names, such as "ThresholdOptimizer" (rather than 
+e.g. "FairThresholder") and "CorrelationRemover" (instead of e.g. "BiasRemover").
+
+Documentation
+-------------
+
+All restructured text (ReST) files submitted for documentation issues should adhere to a max line 
+limit of 99 characters. If a line of text runs past that limit, start a new 
+line with the overflow text. You should be able to set this limit in ``black``
+so you can automatically ensure you meet this requirement. 
