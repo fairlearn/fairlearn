@@ -32,6 +32,7 @@ the guidelines, or you can run ``black`` on your code. The generated
 formatting by ``black`` is compatible our formatting requirements. You can
 configure your IDE to use ``black`` to format your code. Please refer to your
 IDE's instructions for further details.
+Attaining the project compatible linting is also possible without changing your local setup. You can enable the pre-commit hooks, which will run the linters described above with the settings defined in the [pyproject.toml](https://github.com/fairlearn/fairlearn/blob/main/pyproject.toml). The installation instructions are described in step 6 of `"Contributing a Pull Request"`<https://fairlearn.org/main/contributor_guide/development_process.html#contributing-a-pull-request>`_ .
 
 Considerations for new methods
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
