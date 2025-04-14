@@ -6,8 +6,8 @@ import logging
 import warnings
 from typing import Callable
 
-import numpy as np
-import pandas as pd
+import narwhals.stable.v1 as nw
+from narwhals.typing import IntoDataFrame
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class AnnotatedMetricFunction:
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 
-    def __call__(self, df: pd.DataFrame):
+    def __call__(self, df: IntoDataFrame):
         """Invoke the wrapped function on the supplied DataFrame.
 
         The function extracts its arguments from the supplied DataFrame :code:`df`.
@@ -93,16 +93,12 @@ class AnnotatedMetricFunction:
         For this reason, we perform some extra list-washing, to make sure the
         expected types are passed to the underlying metric function.
         """
-        args = []
-        for arg_name in self.postional_argument_names:
-            # Need to convert to list first in case we have 2D arrays
-            args.append(np.asarray(list(df[arg_name])))
-
-        kwargs = dict()
-        for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
-            # Need to convert to list first in case we have 2D arrays
-            kwargs[func_arg_name] = np.asarray(list(df[data_arg_name]))
-
-        result = self.func(*args, **kwargs)
-
-        return result
+        df_nw = nw.from_native(df, eager_only=True, pass_through=False)
+        args = [
+            df_nw.get_column(arg_name).to_numpy() for arg_name in self.postional_argument_names
+        ]
+        kwargs = {
+            func_arg_name: df_nw.get_column(data_arg_name).to_numpy()
+            for func_arg_name, data_arg_name in self.kw_argument_mapping.items()
+        }
+        return self.func(*args, **kwargs)
