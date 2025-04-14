@@ -7,6 +7,7 @@ import warnings
 from typing import Callable
 
 import narwhals.stable.v1 as nw
+import numpy as np
 from narwhals.typing import IntoDataFrame
 
 logger = logging.getLogger(__name__)
@@ -90,15 +91,16 @@ class AnnotatedMetricFunction:
 
         The second issue is coping with when users have passed in a 2D array as
         a named argument (especially, `y_true` or `y_pred`).
-        For this reason, we perform some extra list-washing, to make sure the
+        For this reason, we perform an extra `np.stack` operation, to make sure the
         expected types are passed to the underlying metric function.
         """
         df_nw = nw.from_native(df, eager_only=True, pass_through=False)
         args = [
-            df_nw.get_column(arg_name).to_numpy() for arg_name in self.postional_argument_names
+            np.stack(df_nw.get_column(arg_name).to_numpy())
+            for arg_name in self.postional_argument_names
         ]
         kwargs = {
-            func_arg_name: df_nw.get_column(data_arg_name).to_numpy()
+            func_arg_name: np.stack(df_nw.get_column(data_arg_name).to_numpy())
             for func_arg_name, data_arg_name in self.kw_argument_mapping.items()
         }
         return self.func(*args, **kwargs)
