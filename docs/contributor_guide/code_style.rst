@@ -13,9 +13,9 @@ website-related PRs).
 * MNT: code maintenance (refactoring, improve efficiency, etc.).
 * CI: anything related to our automated tests (nightly builds, CircleCI, releases, etc.).
 * FIX: bug fixes.
-* FEAT/ENH: adds or removes a new feature in the codebase.
+* FEAT/ENH: adds a new feature or removes a feature in the codebase.
 
-Test coverage is checked with ``codecov`` and lines missing tests will show up in CI 
+Test coverage is checked with ``codecov`` and line(s) missing tests will show up in CI 
 as a failure. Therefore, we recommend contributors ensure all new content 
 they introduce has adequate test coverage.
 
