@@ -15,7 +15,7 @@ website-related PRs).
 * FIX: bug fixes.
 * FEAT/ENH: adds or removes a new feature in the codebase.
 
-Test coverage is checked with ``codecov`` and line missing tests will show up in CI 
+Test coverage is checked with ``codecov`` and lines missing tests will show up in CI 
 as a failure. Therefore, we recommend contributors ensure all new content 
 they introduce has adequate test coverage.
 
