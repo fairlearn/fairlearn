@@ -52,11 +52,3 @@ possible to fully “debias” a system or to guarantee fairness. In Fairlearn, 
 avoid naming mitigation techniques in a way that could suggest they offer a simple fix towards a 
 "fair" model. Instead, we opt for descriptive names, such as "ThresholdOptimizer" (rather than 
 e.g. "FairThresholder") and "CorrelationRemover" (instead of e.g. "BiasRemover").
-
-Documentation
--------------
-
-All restructured text (ReST) files submitted for documentation issues should adhere to a max line 
-limit of 99 characters. If a line of text runs past that limit, start a new 
-line with the overflow text. You should be able to set this limit in ``black``
-so you can automatically ensure you meet this requirement. 
