@@ -19,6 +19,10 @@ For metrics, Fairlearn currently only supports disaggregated methods, so
 any proposed metrics that do not fall into the group fairness metric
 paradigm would first require thorough discussion with maintainers.
 
+Code Style
+----------
+View the :ref:`code_style` section for an overview of the style we expect for contributed code.
+
 
 API conventions
 ---------------
@@ -88,12 +92,3 @@ optional if the sensitive features are already provided through :code:`X`.
 
     postprocessor.fit(X, y, sensitive_features=sensitive_features)
     postprocessor.predict(X, sensitive_features=sensitive_features)
-
-Code Style
-----------
-
-We use ``ruff`` to check for PEP8 compatibility issues. You can either follow
-the guidelines, or you could run ``black`` on your code. The generated
-formatting by ``black`` is compatible with the requirements we have. You can
-configure your IDE to use ``black`` to format your code. Please refer to your
-IDE's instructions for further details.
