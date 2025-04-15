@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import Callable
+from typing import Callable, Generic, Tuple, TypeVar
 
 import narwhals.stable.v1 as nw
 import numpy as np
 from narwhals.typing import IntoDataFrame
+
+R = TypeVar("R")
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,7 @@ _METRIC_FUNCTION_NONE = "Found 'None' instead of metric function"
 _METRIC_FUNCTION_NOT_CALLABLE = "Object passed as metric function not callable"
 
 
-class AnnotatedMetricFunction:
+class AnnotatedMetricFunction(Generic[R]):
     """Wraps functions to make them callable with a DataFrame argument.
 
     The :class:`MetricFrame` makes extensive use of `pandas` DataFrames
@@ -48,7 +50,7 @@ class AnnotatedMetricFunction:
     def __init__(
         self,
         *,
-        func: Callable,
+        func: Callable[[*Tuple[np.ndarray, ...]], R],
         name: str | None = None,
         positional_argument_names: list[str] | None = None,
         kw_argument_mapping: dict[str, str] | None = None,
@@ -75,7 +77,7 @@ class AnnotatedMetricFunction:
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 
-    def __call__(self, df: IntoDataFrame):
+    def __call__(self, df: IntoDataFrame) -> R:
         """Invoke the wrapped function on the supplied DataFrame.
 
         The function extracts its arguments from the supplied DataFrame :code:`df`.
