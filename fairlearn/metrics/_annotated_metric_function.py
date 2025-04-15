@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import Callable
+from typing import Callable, Generic, Tuple, TypeVar
 
+import narwhals.stable.v1 as nw
 import numpy as np
-import pandas as pd
+from narwhals.typing import IntoDataFrame
+
+R = TypeVar("R")
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +20,7 @@ _METRIC_FUNCTION_NONE = "Found 'None' instead of metric function"
 _METRIC_FUNCTION_NOT_CALLABLE = "Object passed as metric function not callable"
 
 
-class AnnotatedMetricFunction:
+class AnnotatedMetricFunction(Generic[R]):
     """Wraps functions to make them callable with a DataFrame argument.
 
     The :class:`MetricFrame` makes extensive use of `pandas` DataFrames
@@ -47,7 +50,7 @@ class AnnotatedMetricFunction:
     def __init__(
         self,
         *,
-        func: Callable,
+        func: Callable[[*Tuple[np.ndarray, ...]], R],
         name: str | None = None,
         positional_argument_names: list[str] | None = None,
         kw_argument_mapping: dict[str, str] | None = None,
@@ -74,7 +77,7 @@ class AnnotatedMetricFunction:
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 
-    def __call__(self, df: pd.DataFrame):
+    def __call__(self, df: IntoDataFrame) -> R:
         """Invoke the wrapped function on the supplied DataFrame.
 
         The function extracts its arguments from the supplied DataFrame :code:`df`.
@@ -90,19 +93,16 @@ class AnnotatedMetricFunction:
 
         The second issue is coping with when users have passed in a 2D array as
         a named argument (especially, `y_true` or `y_pred`).
-        For this reason, we perform some extra list-washing, to make sure the
+        For this reason, we perform an extra `np.stack` operation, to make sure the
         expected types are passed to the underlying metric function.
         """
-        args = []
-        for arg_name in self.postional_argument_names:
-            # Need to convert to list first in case we have 2D arrays
-            args.append(np.asarray(list(df[arg_name])))
-
-        kwargs = dict()
-        for func_arg_name, data_arg_name in self.kw_argument_mapping.items():
-            # Need to convert to list first in case we have 2D arrays
-            kwargs[func_arg_name] = np.asarray(list(df[data_arg_name]))
-
-        result = self.func(*args, **kwargs)
-
-        return result
+        df_nw = nw.from_native(df, eager_only=True, pass_through=False)
+        args = [
+            np.stack(df_nw.get_column(arg_name).to_numpy())
+            for arg_name in self.postional_argument_names
+        ]
+        kwargs = {
+            func_arg_name: np.stack(df_nw.get_column(data_arg_name).to_numpy())
+            for func_arg_name, data_arg_name in self.kw_argument_mapping.items()
+        }
+        return self.func(*args, **kwargs)
