@@ -259,10 +259,10 @@ class MetricFrame:
 
         # Add sensitive and conditional features to all_data
         for sf in sf_list:
-            all_data[sf.name_] = list(sf.raw_feature_)
+            all_data[sf.name_] = sf.raw_feature_
         if cf_list is not None:
             for cf in cf_list:
-                all_data[cf.name_] = list(cf.raw_feature_)
+                all_data[cf.name_] = cf.raw_feature_
 
         # Check for duplicate feature names
         nameset = set()
