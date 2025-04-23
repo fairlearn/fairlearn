@@ -10,19 +10,15 @@ A good example notebook exhibits the following attributes:
 
 1. **Deployment context**: Describes a real deployment context, not just a
    dataset.
-2. **Real harms**: Focuses on real harms to real people.
-   See `Blodget et al. (2020) <https://arxiv.org/abs/2005.14050>`_.
+2. **Real harms**: Focuses on real harms to real people :footcite:`blodgett2020languagepower`.
 3. **Sociotechnical**: Models the Fairlearn team's value that fairness is a
    sociotechnical challenge.
-   Avoids abstraction traps.
-   See `Selbst et al. (2020) <https://andrewselbst.files.wordpress.com/2019/10/selbst-et-al-fairness-and-abstraction-in-sociotechnical-systems.pdf>`_.
+   Avoids abstraction traps :footcite:`selbst2019fairness`.
 4. **Substantiated**: Discusses trade-offs and compares alternatives.
    Describes why using particular Fairlearn functionalities makes sense.
 5. **For developers**: Speaks the language of developers and data scientists.
    Considers real practitioner needs.
-   Fits within the lifecycle of real practitioner work.
-   See `Holstein et al (2019) <https://arxiv.org/pdf/1812.05239.pdf>`_,
-   `Madaio et al. (2020) <http://www.jennwv.com/papers/checklists.pdf>`_.
+   Fits within the lifecycle of real practitioner work :footcite:`holstein2019improving`, :footcite:`madaio2020codesigning`.
 
 Please keep these in mind when creating, discussing, and critiquing examples.
 
@@ -45,7 +41,7 @@ The filename *must* begin with `plot_` for the cell output to be rendered as a w
 The instructions on how to build the webpage are in the
 :ref:`contributing_documentation` section.
 
-To edit the notebook we recommend using 
+To edit the notebook we recommend using
 `Visual Studio Code <https://code.visualstudio.com/docs/python/jupyter-support>`_.
 VS Code recognizes the lines starting with :code:`# %%` as new cells.
 Each cell can be executed individually by clicking on *Run Cell*, and VS Code
@@ -64,3 +60,7 @@ ReST to markdown by sphinx-gallery. This currently only works for basic ReST
 functionality, so try to limit use of ReST directives (e.g., `.. note::`),
 internal links (e.g., `:ref:`), and other functionality that won't render well
 in markdown.
+
+.. topic:: References
+
+   .. footbibliography::

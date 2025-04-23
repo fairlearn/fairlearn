@@ -6,11 +6,6 @@
 This is based on M. Hardt, E. Price, N. Srebro's paper
 "Equality of Opportunity in Supervised Learning" :footcite:`hardt2016equality`
 for binary classification with one categorical sensitive feature.
-
-References
-----------
-.. footbibliography::
-
 """
 
 import logging
@@ -202,10 +197,6 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     -----
     The procedure is based on the algorithm of
     Hardt et al. :footcite:`hardt2016equality`.
-
-    References
-    ----------
-    .. footbibliography::
 
     Examples
     --------
