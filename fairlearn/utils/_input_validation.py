@@ -75,9 +75,9 @@ def _validate_and_reformat_input(
 
     Parameters
     ----------
-    X : numpy.ndarray, IntoFrameT
+    X : numpy.ndarray, or a DataFrame
         The feature matrix
-    y : numpy.ndarray, IntoFrameT, IntoSeriesT, or list
+    y : numpy.ndarray, a DataFrame, a Series, or list
         The label vector. Must be of shape (n,) or (n,1).
     expect_y : bool, default=True
         If True, y needs to be provided and non-empty (np.asarray(y).size > 0),
@@ -88,14 +88,14 @@ def _validate_and_reformat_input(
     enforce_binary_labels : bool
         If True, raise an exception if `y` contains values other than 0 and 1.
         Default is False.
-    sensitive_features : numpy.ndarray, IntoFrameT, IntoSeriesT, or list
+    sensitive_features : numpy.ndarray, a DataFrame, a Series, or list
         The sensitive feature matrix
-    control_features : numpy.ndarray, IntoFrameT, IntoSeriesT, or list
+    control_features : numpy.ndarray, a DataFrame , a Series, or list
         The control feature matrix
 
     Returns
     -------
-    Tuple(numpy.ndarray | IntoFrameT, IntoSeriesT, IntoSeriesT | None, IntoSeriesT | None)
+    Tuple(numpy.ndarray or a DataFrame, a Series, a Series or None, a Series or None)
         The validated and reformatted X, y, sensitive_features and control_features; note
         that certain estimators rely on metadata encoded in X which may be stripped during
         the reformatting process, so mitigation methods should ideally use the input X instead
