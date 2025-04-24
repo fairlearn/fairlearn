@@ -45,6 +45,4 @@ def all_to_native(*args) -> tuple:
 
     Temporary function to use while narwhals is not fully integrated.
     """
-    return tuple(
-        nw.to_native(arg) if is_into_dataframe(arg) or is_into_series(arg) else arg for arg in args
-    )
+    return tuple(nw.to_native(arg, pass_through=True) for arg in args)
