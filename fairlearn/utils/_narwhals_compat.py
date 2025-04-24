@@ -17,7 +17,7 @@ from narwhals.stable.v1 import Implementation, nw
 def get_default_dataframe_backend() -> Implementation:
     """Get the default dataframe backend.
 
-    The backend priority is polars > pandas.
+    The backend priority is polars > pandas > pyarrow.
     """
     if get_polars():
         return Implementation.POLARS
