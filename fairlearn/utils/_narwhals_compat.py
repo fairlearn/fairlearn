@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from narwhals.dependencies import (
     get_pandas,
@@ -11,10 +11,6 @@ from narwhals.dependencies import (
     is_into_series,
 )
 from narwhals.stable.v1 import Implementation, nw
-
-if TYPE_CHECKING:
-    import numpy as np
-    from narwhals.typing import IntoFrame, IntoSeries
 
 
 def get_default_dataframe_backend() -> Implementation:
@@ -31,10 +27,20 @@ def get_default_dataframe_backend() -> Implementation:
     )
 
 
-def get_native_namespace_or_default(
-    X: np.ndarray | IntoFrame, y: np.ndarray | IntoSeries | IntoFrame | list | None
-) -> Any:
-    narwhals_objects = tuple(o for o in (X, y) if is_into_dataframe(o) or is_into_series(o))
+def get_native_namespace_or_default(*maybe_narwhals_objects: Any) -> Any:
+    """Try to get the native namespace of the objects.
+
+    If none of the object is a narwhals-supported DataFrame or Series,
+    return the default dataframe backend.
+
+    Raises
+    ------
+    ValueError
+        If the DataFrame and Series objects are not from the same native namespace.
+    """
+    narwhals_objects = tuple(
+        o for o in maybe_narwhals_objects if is_into_dataframe(o) or is_into_series(o)
+    )
     if narwhals_objects:
         return nw.get_native_namespace(*narwhals_objects)
     return get_default_dataframe_backend().to_native_namespace()
