@@ -7,6 +7,7 @@ from typing import Any
 from narwhals.dependencies import (
     get_pandas,
     get_polars,
+    get_pyarrow,
     is_into_dataframe,
     is_into_series,
 )
@@ -22,6 +23,8 @@ def get_default_dataframe_backend() -> Implementation:
         return Implementation.POLARS
     if get_pandas():
         return Implementation.PANDAS
+    if get_pyarrow():
+        return Implementation.PYARROW
     raise ImportError(
         "No supported dataframe backend found. Please install either pandas or polars."
     )
