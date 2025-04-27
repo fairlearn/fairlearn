@@ -141,9 +141,9 @@ we would expect with :math:`\alpha=0.5`.
     :target: ../../auto_examples/plot_correlationremover_before_after.html
 
 
-.. _prototyped_representation_learner:
+.. _prototype_representation_learner:
 
-Prototyped Representation Learner
+Prototype Representation Learner
 ---------------------------
 
 :class:`~fairlearn.preprocessing.PrototypeRepresentationLearner` is a preprocessing algorithm and

@@ -165,7 +165,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
     def fit(self, X, y=None, *, sensitive_features=None) -> PrototypeRepresentationLearner:
         r"""
-        Fit the Prototyped Representation Learner to the provided data.
+        Fit the Prototype Representation Learner to the provided data.
 
         Parameters
         ----------
@@ -351,7 +351,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
     def transform(self, X) -> np.ndarray:
         r"""
-        Transform the input data X using the learned prototyped representation. Each sample is
+        Transform the input data X using the learned prototype representation. Each sample is
         transformed to its associated learned latent mapping, i.e. the softmax of its negative
         distance to the prototypes.
 
@@ -368,7 +368,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         Notes
         -----
         This method checks if the model is fitted, validates the input data,
-        and then applies the learned prototyped representation.
+        and then applies the learned prototype representation.
         """
         check_is_fitted(self)
 
