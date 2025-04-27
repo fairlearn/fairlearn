@@ -123,6 +123,7 @@ API Docs
    BoundedGroupLoss
    SquareLoss
    ZeroOneLoss
+   MeanLoss
 
 :py:mod:`fairlearn.adversarial`
 ===============================
