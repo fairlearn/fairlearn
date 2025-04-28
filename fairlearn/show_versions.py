@@ -4,7 +4,7 @@
 """Utility methods to print system info for debugging.
 
 Adapted from :py:func:`pandas.show_versions` and :py:func:`sklearn.show_versions`.
-"""  # noqa: RST304
+"""
 
 import platform
 import sys
