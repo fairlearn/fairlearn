@@ -48,9 +48,13 @@ def test_unnamed_Series():
     common_validations(target)
 
 
-def test_named_Series():
+def test_named_Series(request, constructor):
+    # Pyarrow chunked_array's are nameless
+    if "pyarrow" in str(request):
+        request.applymarker(pytest.mark.xfail)
+
     name = "My Feature"
-    rf = pd.Series(data=raw_feature, name=name)
+    rf = constructor({name: raw_feature})[name]
 
     target = metrics._group_feature.GroupFeature("Ignored", rf, 2, None)
 
@@ -58,11 +62,11 @@ def test_named_Series():
     common_validations(target)
 
 
-def test_named_Series_override_name():
+def test_named_Series_override_name(constructor):
     expected_name = "Some Feature"
     series_name = "Unused Name"
 
-    rf = pd.Series(data=raw_feature, name=series_name)
+    rf = constructor({series_name: raw_feature})[series_name]
     target = metrics._group_feature.GroupFeature("Not seen", rf, 2, expected_name)
 
     assert target.name_ == expected_name
