@@ -23,8 +23,6 @@ with a maintainer. For changes that fix bugs, add new features, change APIs,
 etc., i.e., for changes that are relevant to developers and/or users please
 also add an entry in :ref:`version_guide` in the section corresponding to the
 *next* release, since that's where your change will be included.
-If you're a new contributor please also add yourself to
-`AUTHORS.md <https://github.com/fairlearn/fairlearn/blob/main/AUTHORS.md>`_.
 
 Docstrings should follow
 `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
@@ -206,7 +204,7 @@ Follow the steps below to create a pull request.
       * Opening a pull request comes with filling up an already provided description template.
         Please fill it up! If you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
 
-#. Celebration time! We would like to encourage you to become a part of our Fairlearn community. To do so, join our communication channels: :ref:`communication`.
+#. Celebration time! We would like to encourage you to become a part of our Fairlearn community. To do so, join our communication channels: :ref:`communication`. Please respect our `Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`_.
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

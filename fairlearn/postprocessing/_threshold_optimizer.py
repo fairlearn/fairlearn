@@ -6,11 +6,6 @@
 This is based on M. Hardt, E. Price, N. Srebro's paper
 "Equality of Opportunity in Supervised Learning" :footcite:`hardt2016equality`
 for binary classification with one categorical sensitive feature.
-
-References
-----------
-.. footbibliography::
-
 """
 
 import logging
@@ -203,10 +198,6 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     The procedure is based on the algorithm of
     Hardt et al. :footcite:`hardt2016equality`.
 
-    References
-    ----------
-    .. footbibliography::
-
     Examples
     --------
     >>> from fairlearn.postprocessing import ThresholdOptimizer
@@ -273,7 +264,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         X : numpy.ndarray or pandas.DataFrame
             The feature matrix
         y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
-            The label vector
+            The label vector. This must only contain binary labels (0 and 1).
         sensitive_features : numpy.ndarray, list, pandas.DataFrame, or pandas.Series
             sensitive features to identify groups by
         """

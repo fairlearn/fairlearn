@@ -93,11 +93,6 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
     Notes
     -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
-
-    References
-    ----------
-    .. footbibliography::
-
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME

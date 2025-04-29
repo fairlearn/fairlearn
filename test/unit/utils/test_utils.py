@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import pytest
 
 import fairlearn.utils._input_validation as iv
 
@@ -61,3 +62,51 @@ def test_validate_and_reformat_input_allow_ndims_greater_than_2() -> None:
     X_update, _, _, _ = iv._validate_and_reformat_input(X=X, sensitive_features=sf, expect_y=False)
 
     np.testing.assert_array_equal(X, X_update)
+
+
+@pytest.mark.parametrize(
+    ("input_data", "expected"),
+    [
+        (np.array([["A", "B"], ["C", "D"]]), np.array(["A,B", "C,D"])),
+        (
+            np.array(
+                [
+                    ["test\\with\\backslash", "normal"],
+                    ["normal", "test,with,,separator"],
+                    ["both\\types,test", "value"],
+                ]
+            ),
+            np.array(
+                [
+                    "test\\\\with\\\\backslash,normal",
+                    "normal,test\\,with\\,\\,separator",
+                    "both\\\\types\\,test,value",
+                ]
+            ),
+        ),
+    ],
+)
+def test_merge_columns(input_data, expected):
+    result = iv._merge_columns(input_data)
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_merge_columns_value_error():
+    with pytest.raises(
+        ValueError, match=r"Received argument of type list instead of expected numpy\.ndarray"
+    ):
+        iv._merge_columns([["A", "1"], ["B", "2"]])
+
+
+@pytest.mark.parametrize(
+    "y", [[], np.asarray([]), pd.Series(dtype="float64"), pd.DataFrame(), None]
+)
+def test_validate_and_reformat_input_empty_y(y):
+    """Test that _validate_and_reformat_input raises as expected when y is expected, but
+    passed as an empty list, nd.array, series or dataframe or None."""
+    X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
+
+    with pytest.raises(ValueError, match=iv._MESSAGE_Y_NONE):
+        X, y, _, _ = iv._validate_and_reformat_input(
+            X=X, y=y, expect_y=True, expect_sensitive_features=False
+        )

@@ -528,7 +528,6 @@ But more simply to relabel a tree you just have to call the :code:`relabeling` f
 
 
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::

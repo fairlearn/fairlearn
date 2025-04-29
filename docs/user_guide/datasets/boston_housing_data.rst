@@ -419,7 +419,6 @@ We strongly discourage using the Boston Housing dataset for machine learning
 benchmarking purposes, and hope this article gives
 you pause about using it in the future.
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::

@@ -92,6 +92,7 @@ API Docs
    :template: class.rst
 
    CorrelationRemover
+   PrototypeRepresentationLearner
 
 :py:mod:`fairlearn.reductions`
 ==============================
@@ -122,6 +123,7 @@ API Docs
    BoundedGroupLoss
    SquareLoss
    ZeroOneLoss
+   MeanLoss
 
 :py:mod:`fairlearn.adversarial`
 ===============================

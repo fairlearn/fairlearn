@@ -195,7 +195,7 @@ the predicted labels.
     ...                                      y_pred=y_pred,
     ...                                      sensitive_features=pd.Series(sensitive_features, name="SF 0"))
     >>> selection_rate_summary.overall.item()
-        0.4
+    0.4
     >>> selection_rate_summary.by_group
     SF 0
     a    0.6
@@ -352,6 +352,70 @@ and false positive rate.
                    b           0.2380...
     dtype: float64
 
+
+.. _error_rate:
+
+Error Rate
+~~~~~~~~~~
+
+We can use the :class:`ErrorRate` either to measure performance of a trained model that does or
+does not take sensitive features into account, or as an
+objective function during the training of a fairness aware model.
+
+To measure the ErrorRate in respect to a trained estimator we use its :code:`gamma` method:
+
+.. doctest:: mitigation_reductions
+
+    >>> from fairlearn.reductions import ErrorRate
+    >>> from sklearn.datasets import make_classification
+    >>> from sklearn.model_selection import train_test_split
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> import numpy as np
+    >>> rng = np.random.default_rng(42) 
+    >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
+    >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
+    >>> sensitive_features = X[:, -1]
+    >>> classifier = LogisticRegression().fit(X, y)
+    >>> costs = {"fp":0.1, "fn":0.9}
+    >>> errorrate = ErrorRate(costs=costs)
+    >>> errorrate.load_data(X, y, sensitive_features=sensitive_features)
+    >>> errorrate.gamma(classifier.predict)
+    all    0.139
+    dtype: float64
+
+
+Using :class:`ErrorRate` as part of a reductions approach for fairness mitigation is equivalent
+to a cost-sensitive classification problem.
+
+.. doctest:: mitigation_reductions
+
+    >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
+    >>> from fairlearn.metrics import MetricFrame
+    >>> from sklearn.metrics import accuracy_score
+    >>> import numpy as np
+    >>> rng = np.random.default_rng(42) 
+    >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
+    >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
+    >>> sensitive_features = X[:, -1]
+    >>> objective = ErrorRate(costs={"fp":0.1, "fn":0.9})
+    >>> constraint = EqualizedOdds(difference_bound=0.01)
+    >>> classifier = LogisticRegression()
+    >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
+    >>> X_train, X_test, y_train, y_test, sensitive_train, sensitive_test = train_test_split(
+    ... X, y, sensitive_features, test_size=0.33, random_state=42)
+    >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +ELLIPSIS
+    ExponentiatedGradient(...)
+    >>> y_pred = mitigator.predict(X_test)
+    >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=sensitive_test)
+    >>> mf_mitigated.overall.item()
+    0.5151515151515151
+    >>> mf_mitigated.by_group
+    sensitive_feature_0
+    0.0    0.611111
+    1.0    0.400000
+    Name: accuracy_score, dtype: float64
+
+
 .. _error_rate_parity:
 
 Error Rate Parity
@@ -376,6 +440,10 @@ the overall error rate by more than the value of :code:`difference_bound`.
 
     >>> from fairlearn.reductions import ErrorRateParity
     >>> from sklearn.metrics import accuracy_score
+    >>> X                  = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
+    >>> y_true             = np.array([ 1 ,  1 ,  1 ,  1 ,  1,   1 ,  1 ,  0 ,  0 ,  0 ])
+    >>> y_pred             = np.array([ 1 ,  1 ,  1 ,  1 ,  0,   0 ,  0 ,  1 ,  0 ,  0 ])
+    >>> sensitive_features = np.array(["a", "b", "a", "a", "b", "a", "b", "b", "a", "b"])
     >>> accuracy_summary = MetricFrame(metrics=accuracy_score,
     ...                                y_true=y_true,
     ...                                y_pred=y_pred,
@@ -579,7 +647,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     >>> from fairlearn.datasets import fetch_adult
     >>> from fairlearn.metrics import plot_model_comparison, equal_opportunity_difference
     >>> from fairlearn.reductions import ExponentiatedGradient, EqualizedOdds
-    >>> from sklearn.ensemble import  RandomForestClassifier
+    >>> from sklearn.ensemble import HistGradientBoostingClassifier
     >>> from sklearn.metrics import accuracy_score
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.preprocessing import OneHotEncoder, LabelEncoder
@@ -595,18 +663,18 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     >>> preprocessor = ColumnTransformer(
     ...     transformers=[
     ...         ('num', 'passthrough', numeric_features),
-    ...         ('cat', OneHotEncoder(drop='first'), categorical_features)])
+    ...         ('cat', OneHotEncoder(drop='first', sparse_output=False), categorical_features)])
     >>> # Transform y to numerical values
     >>> le = LabelEncoder()
     >>> y = le.fit_transform(y)
     >>> # Create a pipeline with the preprocessor and estimator
     >>> estimator = Pipeline([
     ...     ('preprocessor', preprocessor),
-    ...     ('classifier', RandomForestClassifier(n_estimators=10, random_state=42))])
+    ...     ('classifier', HistGradientBoostingClassifier(random_state=42))])
     >>> # Split the data
     >>> X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(X, y, A, test_size=0.2, random_state=42)
     >>> # Train and evaluate the base model
-    >>> _ = estimator.fit(X_train, y_train) #variable assignment only there to prevent large output
+    >>> _ = estimator.fit(X_train, y_train)
     >>> y_pred_base = estimator.predict(X_test)
     >>> # Create a list of ExponentiatedGradient models with different epsilons
     >>> epsilons = [0.001, 0.01, 0.05, 0.1, 0.2]
@@ -616,7 +684,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     ...         estimator=estimator,
     ...         constraints=EqualizedOdds(difference_bound=eps),
     ...         sample_weight_name="classifier__sample_weight")
-    ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train) #variable assignment only there to prevent large output
+    ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train)
     ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(X_test)
     >>> # Add the base model predictions
     >>> exp_grad_models["Base Model"] = y_pred_base
@@ -636,7 +704,6 @@ sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparam
 and iterated over a range of potential values.
 
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::

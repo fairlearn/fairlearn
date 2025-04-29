@@ -12,27 +12,12 @@ usage.
 
 Website: https://fairlearn.org/
 
--  `Current release <#current-release>`__
 -  `What we mean by *fairness* <#what-we-mean-by-fairness>`__
 -  `Overview of Fairlearn <#overview-of-fairlearn>`__
--  `Fairlearn metrics <#fairlearn-metrics>`__
--  `Fairlearn algorithms <#fairlearn-algorithms>`__
--  `Install Fairlearn <#install-fairlearn>`__
--  `Usage <#usage>`__
--  `Contributing <#contributing>`__
+-  `Getting started with fairlearn <#getting-started-with-fairlearn>`__
 -  `Maintainers <#maintainers>`__
+-  `Code of conduct <#code-of-conduct>`__
 -  `Issues <#issues>`__
-
-Current release
----------------
-
--  The current stable release is available on
-   `PyPI <https://pypi.org/project/fairlearn/>`__.
-
--  Our current version may differ substantially from earlier versions.
-   Users of earlier versions should visit our
-   `version guide <https://fairlearn.org/main/user_guide/installation_and_version_guide/version_guide.html>`__
-   to navigate significant changes and find information on how to migrate.
 
 What we mean by *fairness*
 --------------------------
@@ -83,36 +68,58 @@ The Fairlearn Python package has two components:
    along a variety of fairness definitions.
 
 Fairlearn metrics
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 Check out our in-depth `guide on the Fairlearn metrics <https://fairlearn.org/main/user_guide/assessment>`__.
 
 Fairlearn algorithms
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 For an overview of our algorithms please refer to our
 `website <https://fairlearn.org/main/user_guide/mitigation/index.html>`__.
 
-Install Fairlearn
------------------
+Getting Started with Fairlearn
+-----------------------------
 
-For instructions on how to install Fairlearn check out our `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__.
+First steps
+~~~~~~~~~~~
 
-Usage
------
+- Install via pip: ``pip install fairlearn``
 
-For common usage refer to the `Jupyter notebooks <https://fairlearn.org/main/auto_examples/index.html>`__ and
-our `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
-Please note that our APIs are subject to change, so notebooks downloaded
-from ``main`` may not be compatible with Fairlearn installed with
-``pip``. In this case, please navigate the tags in the repository (e.g.
-`v0.7.0 <https://github.com/fairlearn/fairlearn/tree/v0.7.0>`__) to
-locate the appropriate version of the notebook.
+- Visit the `Quickstart guide <https://fairlearn.org/main/quickstart.html>`__.
 
-Contributing
-------------
+- **Learning Resources**:
 
-To contribute please check our `contributor guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
+  - Read the comprehensive `user guide <https://fairlearn.org/main/user_guide/index.html>`__.
+
+  - Look through the `example notebooks <https://fairlearn.org/main/auto_examples/index.html>`__.
+
+
+For Users & Practitioners
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__. 
+Please note that notebooks downloaded from `main` may not be compatible with pip-installed versions.
+
+- Check the `API reference <https://fairlearn.org/main/api_reference/index.html>`__.
+
+- **Get Help**:
+
+  - Ask questions on `Stack Overflow <https://stackoverflow.com/questions/tagged/fairlearn>`__ with tag ``fairlearn``.
+
+  - Join the `Discord community <https://discord.gg/R22yCfgsRn>`__ for discussions.
+
+For Contributors
+~~~~~~~~~~~~~~~
+
+- Read the `contributor guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
+
+- Check out the `good first issues <https://github.com/fairlearn/fairlearn/labels/good%20first%20issue>`__.
+
+- Follow the `development process <https://fairlearn.org/main/contributor_guide/development_process.html>`__.
+
+- Join the `Discord <https://discord.gg/R22yCfgsRn>`__ for contributor discussions. Please use the ``#development`` channel.
+
 
 Maintainers
 -----------
@@ -120,16 +127,12 @@ Maintainers
 A list of current maintainers is
 `on our website <https://fairlearn.org/main/about/index.html>`__.
 
+Code of conduct
+---------------
+Fairlearn follows the `Fairlearn Organization's Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`__.
+
 Issues
 ------
-
-Usage Questions
-~~~~~~~~~~~~~~~
-
-Pose questions and help answer them on `Stack
-Overflow <https://stackoverflow.com/questions/tagged/fairlearn>`__ with
-the tag ``fairlearn`` or on
-`Discord <https://discord.gg/R22yCfgsRn>`__.
 
 Regular (non-security) issues
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
