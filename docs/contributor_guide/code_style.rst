@@ -52,3 +52,8 @@ possible to fully “debias” a system or to guarantee fairness. In Fairlearn, 
 avoid naming mitigation techniques in a way that could suggest they offer a simple fix towards a 
 "fair" model. Instead, we opt for descriptive names, such as "ThresholdOptimizer" (rather than 
 e.g. "FairThresholder") and "CorrelationRemover" (instead of e.g. "BiasRemover").
+
+Code coverage
+^^^^^^^^^^^^^
+For more information about Fairlean's default coverage settings check the `codecov documentation <https://docs.codecov.com/docs/coverage-
+configuration#:~:text=Codecov%20will%20round%20coverage%20down,45.15313%25%20would%20become%2045.15%25>`_.
