@@ -481,7 +481,6 @@ scikit-learn's convention of setting all members with trailing underscore
 during :code:`fit()`, so this is unfortunately an imperfect check.
 
 
-References
-----------
+.. topic:: References
 
-.. footbibliography::
+   .. footbibliography::

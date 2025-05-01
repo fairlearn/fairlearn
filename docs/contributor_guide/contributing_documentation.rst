@@ -112,7 +112,7 @@ To add a citation:
    For example, :code:`:footcite:`agarwal2018reductions`` will be rendered as :footcite:`agarwal2018reductions`.
 4. You can also use :code:`:footcite:t:`bibtex-id`` to create a textual citation.
    The role :code:`:footcite:t:`agarwal2018reductions`` will be rendered as :footcite:t:`agarwal2018reductions`.
-5. To add the bibliography use :code:`.. footbibliography::` directive at the bottom of your file if not already present.
+5. To add the bibliography, use :code:`.. footbibliography::` directive at the bottom of your file if not already present.
    This will list all the citations for the current document.
 
    For example :code:`.. footbibliography::` will be rendered as shown below:

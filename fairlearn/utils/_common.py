@@ -35,11 +35,6 @@ def _get_soft_predictions(estimator, X, predict_method):
     -------
     predictions : ndarray
         The output from estimator's desired predict method.
-
-    References
-    ----------
-    .. footbibliography::
-
     """
     if predict_method == "auto":
         if hasattr(estimator, "predict_proba"):
