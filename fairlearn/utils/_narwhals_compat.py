@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import narwhals.stable.v1 as nw
 from narwhals.dependencies import (
     get_pandas,
     get_polars,
@@ -11,7 +12,7 @@ from narwhals.dependencies import (
     is_into_dataframe,
     is_into_series,
 )
-from narwhals.stable.v1 import Implementation, nw
+from narwhals.stable.v1 import Implementation
 
 
 def get_default_dataframe_backend() -> Implementation:
@@ -30,11 +31,22 @@ def get_default_dataframe_backend() -> Implementation:
     )
 
 
-def get_native_namespace_or_default(*maybe_narwhals_objects: Any) -> Any:
+def get_native_namespace_or_default(
+    *maybe_narwhals_objects: Any, default_backend: Implementation | None = None
+) -> Any:
     """Try to get the native namespace of the objects.
 
     If none of the object is a narwhals-supported DataFrame or Series,
     return the default dataframe backend.
+
+    Parameters
+    ----------
+    maybe_narwhals_objects : Any
+        Objects to check for narwhals DataFrame or Series.
+    default_implementation : Implementation, optional
+        Default implementation to use if no narwhals objects are found.
+        If not provided, the default implementation is determined by
+        the available backends (polars > pandas > pyarrow).
 
     Raises
     ------
@@ -45,7 +57,15 @@ def get_native_namespace_or_default(*maybe_narwhals_objects: Any) -> Any:
         o for o in maybe_narwhals_objects if is_into_dataframe(o) or is_into_series(o)
     )
     if narwhals_objects:
-        return nw.get_native_namespace(*narwhals_objects)
+        objects_namespace = nw.get_native_namespace(*narwhals_objects)
+        objects_implementation = Implementation.from_native_namespace(objects_namespace)
+        if default_backend and objects_implementation != default_backend:
+            raise ValueError(
+                f"The objects implementation ({objects_implementation}) does not match the provided default implementation ({default_backend})."
+            )
+        return objects_namespace
+    if default_backend:
+        return default_backend
     return get_default_dataframe_backend().to_native_namespace()
 
 

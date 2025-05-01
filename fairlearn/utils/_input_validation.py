@@ -70,6 +70,7 @@ def _validate_and_reformat_input(
     enforce_binary_labels: bool = False,
     sensitive_features: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
     control_features: np.ndarray | IntoSeriesT | IntoFrameT | list | None = None,
+    default_backend: nw.Implementation | None = None,
 ) -> tuple[np.ndarray | IntoFrameT, IntoSeriesT, IntoSeriesT | None, IntoSeriesT | None]:
     """Validate input data and return the data in an appropriate format.
 
@@ -92,6 +93,9 @@ def _validate_and_reformat_input(
         The sensitive feature matrix
     control_features : numpy.ndarray, a DataFrame , a Series, or list
         The control feature matrix
+    default_backend : narwhals.Implementation, optional
+        The default dataframe backend to use if any input data is a dataframe or series.
+        If not provided, the default backend is determined by the available backends.
 
     Returns
     -------
@@ -105,7 +109,7 @@ def _validate_and_reformat_input(
     if X is None:
         raise ValueError(_MESSAGE_X_NONE)
 
-    plx = get_native_namespace_or_default(X, y)
+    plx = get_native_namespace_or_default(X, y, default_backend=default_backend)
 
     if expect_y:
         if y is None:

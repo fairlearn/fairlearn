@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Callable
 
+import narwhals.stable.v1 as nw
 from numpy import array, zeros
 from sklearn.utils.validation import check_array
 
@@ -119,6 +120,8 @@ def plot_model_comparison(
         zeros((len(y_true), 1)),  # Dummy values for X
         y=y_true,
         sensitive_features=sensitive_features,
+        # TODO: remove this once we supports all narwhals inputs in this module
+        default_backend=nw.Implementation.PANDAS,
     )
     y_true = y_true.values
     sensitive_features = sensitive_features.values
