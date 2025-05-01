@@ -58,7 +58,7 @@ def maximize_objective_with_tolerance(
     # Initialize a deque for each DataFrame to store indices in descending order of y values.
     # Throughout the execution we will enforce the following INVARIANT(start, end):
     #     Let I = {start, start+1, ... , end} be the set of sliding window indices.
-    #     Then deque[k] contains indices i_1, i_2, ... , i_N in I such that:
+    #     Then deques[k] contains indices i_1, i_2, ... , i_N in I such that:
     #         * i_1 < i_2 < ... < i_N
     #         * i_1 = argmax_{i in I} y_columns[k][i]
     #         * i_j = argmax_{i in I, and i > i_{j-1}} y_columns[k][i]
