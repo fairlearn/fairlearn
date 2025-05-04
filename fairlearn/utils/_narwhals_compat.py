@@ -65,7 +65,7 @@ def get_native_namespace_or_default(
             )
         return objects_namespace
     if default_backend:
-        return default_backend
+        return default_backend.to_native_namespace()
     return get_default_dataframe_backend().to_native_namespace()
 
 
