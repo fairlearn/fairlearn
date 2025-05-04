@@ -58,10 +58,10 @@ def get_native_namespace_or_default(
     )
     if narwhals_objects:
         objects_namespace = nw.get_native_namespace(*narwhals_objects)
-        objects_implementation = Implementation.from_native_namespace(objects_namespace)
-        if default_backend and objects_implementation != default_backend:
+        objects_backend = Implementation.from_native_namespace(objects_namespace)
+        if default_backend and objects_backend != default_backend:
             raise ValueError(
-                f"The objects implementation ({objects_implementation}) does not match the provided default implementation ({default_backend})."
+                f"The objects implementation ({objects_backend}) does not match the provided default implementation ({default_backend})."
             )
         return objects_namespace
     if default_backend:
