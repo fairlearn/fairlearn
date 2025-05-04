@@ -27,7 +27,7 @@ def get_default_dataframe_backend() -> Implementation:
     if get_pyarrow():
         return Implementation.PYARROW
     raise ImportError(
-        "No supported dataframe backend found. Please install either pandas or polars."
+        "No supported dataframe backend found. Please install either polars, pandas or pyarrow."
     )
 
 
