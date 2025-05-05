@@ -17,6 +17,7 @@ The contribution guide explains how to structure your contributions. Please
    fairlearn_repository_overview
    development_process
    contributing_code
+   code_style
    contributing_example_notebooks
    contributing_documentation
    fairlearn_proposals
