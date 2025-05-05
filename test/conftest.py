@@ -3,19 +3,19 @@ from importlib.util import find_spec
 import pandas as pd
 import pytest
 from narwhals.typing import IntoDataFrame
-from narwhals.utils import parse_version
 
 
-def pandas_constructor(obj) -> pd.DataFrame:
+def pandas_constructor(obj) -> IntoDataFrame:
     return pd.DataFrame(obj)  # type: ignore[no-any-return]
 
 
-def pandas_nullable_constructor(obj) -> pd.DataFrame:
-    return pd.DataFrame(obj).convert_dtypes(dtype_backend="numpy_nullable")  # type: ignore[no-any-return]
+# TODO: sklearn.utils.validation.check_array does not support it
+# def pandas_nullable_constructor(obj) -> IntoDataFrame:
+#     return pd.DataFrame(obj).convert_dtypes(dtype_backend="numpy_nullable")  # type: ignore[no-any-return]
 
-
-def pandas_pyarrow_constructor(obj) -> pd.DataFrame:
-    return pd.DataFrame(obj).convert_dtypes(dtype_backend="pyarrow")  # type: ignore[no-any-return]
+# TODO: sklearn.utils.validation.check_array does not support it
+# def pandas_pyarrow_constructor(obj) -> IntoDataFrame:
+#     return pd.DataFrame(obj).convert_dtypes(dtype_backend="pyarrow")  # type: ignore[no-any-return]
 
 
 def polars_eager_constructor(obj) -> IntoDataFrame:
@@ -33,17 +33,19 @@ def pyarrow_table_constructor(obj) -> IntoDataFrame:
 constructors = [pandas_constructor]
 backends = ["pandas"]
 
-if parse_version(pd.__version__) >= parse_version("2.0.0"):
-    constructors.extend(
-        [
-            pandas_nullable_constructor,
-            pandas_pyarrow_constructor,
-        ]
-    )
+# TODO: sklearn.utils.validation.check_array does not support these, see above
+# if parse_version(pd.__version__) >= parse_version("2.0.0"):
+#     constructors.extend(
+#         [
+#             pandas_nullable_constructor,
+#             pandas_pyarrow_constructor,
+#         ]
+#     )
 
 if find_spec("polars"):
     constructors.append(polars_eager_constructor)
     backends.append("polars")
+
 
 if find_spec("pyarrow"):
     constructors.append(pyarrow_table_constructor)

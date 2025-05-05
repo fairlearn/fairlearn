@@ -42,6 +42,7 @@ def check_array(X, **kwargs):  # pragma: no cover
     Wrapper for sklearn's check_array function that handles version compatibility.
     Using this private function is only necessary if the call contains
     force_all_finite for sklearn version < 1.6 or ensure_all_finite for sklearn version >= 1.6.
+
     Parameters
     ----------
     X : array-like

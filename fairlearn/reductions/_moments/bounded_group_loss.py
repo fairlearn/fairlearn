@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
 
@@ -48,7 +49,12 @@ class ConditionalLossMoment(LossMoment):
     def load_data(self, X, y, *, sensitive_features) -> None:
         """Load data into the moment object."""
         _, y_train, sf_train, _ = _validate_and_reformat_input(
-            X, y, enforce_binary_labels=False, sensitive_features=sensitive_features
+            X,
+            y,
+            enforce_binary_labels=False,
+            sensitive_features=sensitive_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
         if self.no_groups:
             sf_train = y_train.apply(lambda v: _ALL)

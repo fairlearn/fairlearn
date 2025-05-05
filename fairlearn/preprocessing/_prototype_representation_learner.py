@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
 from scipy.optimize import OptimizeResult, minimize
@@ -193,6 +194,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             expect_y=False,
             expect_sensitive_features=False,
             enforce_binary_labels=False,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         self.n_features_in_ = X.shape[1]
