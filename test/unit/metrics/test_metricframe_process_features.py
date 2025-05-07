@@ -121,7 +121,7 @@ class TestTwoFeatures:
 
     def test_nested_list(self):
         a, b, y_true = self._get_raw_data()
-        rf = [a, b]
+        rf = [("a", 1), ("b", 2), ("a", 1), ("b", 2)]
 
         target = _get_raw_MetricFrame()
         msg = "Feature lists must be of scalar types"
@@ -176,3 +176,13 @@ class TestTwoFeatures:
         target = _get_raw_MetricFrame()
         result = target._process_features("Unused", rf, y_true)
         self._common_validations(result, ["Alpha", "Beta"])
+
+    def test_tuple_entries(self):
+        raw_feature = [(1, 2), (1, 2), (3, 4), (5, 6)]
+        y_true = pd.Series([0, 0, 1, 1])
+
+        target = _get_raw_MetricFrame()
+        msg = "Feature lists must be of scalar types"
+        with pytest.raises(ValueError) as execInfo:
+            _ = target._process_features("Ignored", raw_feature, y_true)
+        assert msg in str(execInfo.value)
