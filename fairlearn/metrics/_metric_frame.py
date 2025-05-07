@@ -985,6 +985,10 @@ class MetricFrame:
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
+                if not np.all([np.isscalar(x) and not isinstance(x, float) for x in f_arr]):
+                    raise ValueError(
+                        "Entries of sensitive_features must be scalar non-float values (e.g., strings or integers)"
+                    )
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0, None))
