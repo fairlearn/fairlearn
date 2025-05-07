@@ -11,7 +11,7 @@ import fairlearn.utils._compatibility as compat
 # FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
 
 
-class FloatTransformer(BaseEstimator, TransformerMixin):
+class FloatTransformer(TransformerMixin, BaseEstimator):
     """
     Transformer that converts input data to numpy arrays of floats.
 
