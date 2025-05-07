@@ -6,6 +6,19 @@ on:
   workflow_dispatch:
 
 jobs:
+  all-deps-min:
+    strategy:
+      # Keep running remaining matrix jobs even if one fails
+      # to see all issues rather than just the first failure.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-14]
+    uses: ./.github/workflows/test-min-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: "3.9"
+      codeCovPython: "3.9"
+
   all-deps:
     strategy:
       # Keep running remaining matrix jobs even if one fails
@@ -14,12 +27,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
         python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        requirementsPinned: ["true", "false"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      requirementsPinned: ${{ matrix.requirementsPinned }}
       codeCovPython: "3.12"
 
   minimal-deps:
