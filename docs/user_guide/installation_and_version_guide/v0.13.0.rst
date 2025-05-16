@@ -16,3 +16,4 @@ Other improvements
 * Implemented the :code:`PrototypeRepresentationLearner`  introduced in Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`:
   :pr:`1478` by :user:`Tahar Allouche <taharallouche>`.
 * Make `preprocessing` module dataframe agnostic through Narwhals: :pr:`1525` by :user:`Francesco Bruzzesi <FBruzzesi>`
+* Make :code:`GroupFeature` class dataframe agnostic through Narwhals: :pr:`1546` by :user:`Francesco Bruzzesi <FBruzzesi>`
