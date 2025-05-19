@@ -128,8 +128,8 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
         "link": "https://fairlearn.org",
-        "image_light": "_static/images/fairlearn_full_color_lightmode.svg", 
-        "image_dark": "_static/images/fairlearn_full_color_darkmode.svg",
+        "image_light": "fairlearn_full_color_lightmode.svg",
+        "image_dark": "fairlearn_full_color_darkmode.svg",
     },
     "icon_links": [
         {
@@ -334,7 +334,7 @@ def notebook_modification_function(notebook_content, notebook_filename):
                 "pyodide_http.patch_all()",
             ]
         )
-    # always import matplotlib and pandas to avoid Pyodide limitation with
+    # always import Matplotlib and pandas to avoid Pyodide limitation with
     # imports inside functions
     code_lines.extend(["import matplotlib", "import pandas"])
 
