@@ -33,13 +33,15 @@ class ErrorRate(ClassificationMoment):
       c_{FP} P[h(X)=1, Y=0] + c_{FN} P[h(X)=0, Y=1]
 
     where :math:`c_{FP}` and :math:`c_{FN}` are the costs of false positive
-    and false negative errors respectively. The standard misclassification
+    and false negative errors respectively. The default misclassification
     error corresponds to :math:`c_{FP}=c_{FN}=1.0`.
+
+    Read more in the :ref:`User Guide <error_rate>`.
 
     Parameters
     ----------
     costs : dict
-        The dictionary with keys :code:`'fp'` and :code:`'fn'` containing the
+        Dictionary with keys :code:`'fp'` and :code:`'fn'` containing the
         costs of false positives and false negatives. If none are provided
         costs of 1.0 are assumed.
     """
@@ -67,12 +69,12 @@ class ErrorRate(ClassificationMoment):
 
         Parameters
         ----------
-        X : numpy.ndarray, DataFrame object supported by narwhals, or list of lists
-            The feature array.
-        y : numpy.ndarray, Series object supported by narwhals or list
-            The label vector.
-        sensitive_features : numpy.ndarray, Series object supported by narwhals, or list, default=None
-            The sensitive feature vector.
+        X : array of shape (n_samples, n_features)
+            The feature array
+        y : array-like of shape (n_samples,)
+            The label vector
+        sensitive_features : array-like of shape (n_samples, n_sensitive_features)
+            The sensitive feature vector
         """
         _, y_train, sf_train, _ = _validate_and_reformat_input(
             X,
@@ -95,17 +97,32 @@ class ErrorRate(ClassificationMoment):
         return self._index
 
     def gamma(self, predictor: Callable) -> nw.typing.IntoSeries:
-        """Return the gamma values for the given predictor."""
+        """Calculate a vector of moments.
+
+        When ErrorRate() is used as a constraint, then `gamma[j]≤0 for all j` is used as
+        the set of constraints. When ErrorRate() is used as an objective, then
+        `gamma[0]` is used as the objective.
+
+        Parameters
+        ----------
+        predictor : func
+            bound function returning predictions
+
+        Returns
+        -------
+        error : :class:`pandas.Series`
+            gamma value for the predictor
+        """
         # self.X passed into the predict function of an estimator needs not to be a
         # narwhals type, in case third party libraries don't depend on narwhals:
-        pred = predictor(self.X)
-        pred = nw.from_native(pred, pass_through=True, eager_only=True)
-        if isinstance(pred, np.ndarray):
+        y_pred = predictor(self.X)
+        y_pred = nw.from_native(y_pred, pass_through=True, eager_only=True)
+        if isinstance(y_pred, np.ndarray):
             # TensorFlow is returning an (n,1) array, which results
             # in the subtraction in the 'error =' line generating an
             # (n,n) array
-            pred = np.squeeze(pred)
-        signed_errors = self.tags[_LABEL] - pred
+            y_pred = np.squeeze(y_pred)
+        signed_errors = self.tags[_LABEL] - y_pred
         total_fn_cost = (signed_errors.filter(signed_errors > 0) * self.fn_cost).sum()
         total_fp_cost = (signed_errors.filter(signed_errors < 0) * self.fp_cost * -1).sum()
         error_value = (total_fn_cost + total_fp_cost) / self.total_samples
