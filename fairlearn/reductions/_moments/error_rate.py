@@ -130,15 +130,17 @@ class ErrorRate(ClassificationMoment):
             # TODO (when dependency from pandas is removed): remove this check to always
             # return the default backend type introduced in PR #1533; for now: if user
             # has passed np.array for X, still return a pd.Series as before
-            error = nw.new_series(name="error", values=error_value, native_namespace=pd)
+            error = pd.Series(data=error_value, index=self.index)
+            self._gamma_descr = str(error)
+            return error
         else:
             error = nw.new_series(
                 name="error",
                 values=[error_value],
                 native_namespace=nw.get_native_namespace(self.X),
             )
-        self._gamma_descr = str(error)
-        return error.to_native()
+            self._gamma_descr = str(error)
+            return error.to_native()
 
     def project_lambda(self, lambda_vec: nw.typing.IntoSeries) -> nw.typing.IntoSeries:
         """Return the lambda values."""
