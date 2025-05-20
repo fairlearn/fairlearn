@@ -15,7 +15,7 @@ from sklearn.dummy import DummyClassifier
 
 from fairlearn.reductions._moments import ClassificationMoment
 from fairlearn.reductions._moments.moment import Moment
-from fairlearn.utils._input_validation import _filter_kwargs
+from fairlearn.utils._common import _filter_kwargs
 
 from ._constants import _INDENTATION, _LINE, _PRECISION
 
