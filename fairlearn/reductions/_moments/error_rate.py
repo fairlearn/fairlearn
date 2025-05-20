@@ -135,7 +135,7 @@ class ErrorRate(ClassificationMoment):
             return error
         else:
             error = nw.new_series(
-                name="error",
+                name="weighted_error",
                 values=[error_value],
                 native_namespace=nw.get_native_namespace(self.X),
             )
