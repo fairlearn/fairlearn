@@ -94,6 +94,12 @@ ensure that they all render properly.
     pull request) and need help, simply @mention
     :code:`@fairlearn/fairlearn-maintainers` to get help.
 
+Code Style
+^^^^^^^^^^
+All restructured text (ReST) files submitted for documentation issues should adhere to a max line 
+limit of 99 characters. If a line of text runs past that limit, start a new 
+line with the overflow text. You should be able to set this limit in ``black``
+so you can automatically ensure you meet this requirement. 
 
 Citations
 ^^^^^^^^^
