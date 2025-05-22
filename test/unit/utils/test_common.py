@@ -6,7 +6,7 @@ import pytest
 from numpy.testing import assert_array_almost_equal
 from sklearn.base import BaseEstimator, ClassifierMixin
 
-from fairlearn.utils._common import _get_soft_predictions
+from fairlearn.utils._common import _filter_kwargs, _get_soft_predictions
 
 
 class DummyClassifier(BaseEstimator, ClassifierMixin):
@@ -45,3 +45,19 @@ def test_soft_predictions(method, y_true):
 
     output = _get_soft_predictions(clf, None, method)
     assert_array_almost_equal(y_true, output)
+
+
+@pytest.mark.parametrize(
+    "func, kwargs, expected",
+    [
+        (lambda a, b=0: (a, b), {}, {}),
+        (lambda a, **kwargs: a, {}, {}),
+        (lambda a, b=0: (a, b), {"a": 1, "b": 1, "c": 1}, {"a": 1, "b": 1}),
+        (lambda a, **kwargs: a, {"a": 1, "b": 1, "c": 1}, {"a": 1, "b": 1, "c": 1}),
+    ],
+)
+def test_filter_kwargs(func, kwargs, expected):
+    """Test that `_filter_kwargs` correctly filters the kwargs accepted by a function or
+    method."""
+    filtered_kwargs = _filter_kwargs(func=func, kwargs=kwargs)
+    assert filtered_kwargs == expected
