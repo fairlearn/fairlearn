@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import narwhals.stable.v1 as nw
-import numpy as np
 
 _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
 
@@ -50,7 +49,6 @@ class GroupFeature:
         nw_feature_vector = nw.from_native(feature_vector, pass_through=True, allow_series=True)
         is_nw_series = isinstance(nw_feature_vector, nw.Series)
 
-        self.classes_ = np.unique(nw_feature_vector)
         self.raw_feature_ = (
             list(nw_feature_vector) if not is_nw_series else nw_feature_vector.to_list()
         )
