@@ -17,4 +17,5 @@ Other improvements
   :pr:`1478` by :user:`Tahar Allouche <taharallouche>`.
 * Make `preprocessing` module dataframe agnostic through Narwhals: :pr:`1525` by :user:`Francesco Bruzzesi <FBruzzesi>`
 * Removed the keyword argument `control_features` from :func:`ErrorRate.load_data`, since it was without functionality for the method: :pr:`1531` by :user:`Stefanie Senger <StefanieSenger>`.
+* Make :code:`AnnotatedMetricFunction` class dataframe agnostic through Narwhals: :pr:`1545` by :user:`Francesco Bruzzesi <FBruzzesi>`.
 
