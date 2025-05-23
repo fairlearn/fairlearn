@@ -2,6 +2,9 @@
 # Licensed under the MIT License.
 
 
+import inspect
+
+
 def _get_soft_predictions(estimator, X, predict_method):
     r"""Return soft predictions of a classifier.
 
@@ -48,3 +51,32 @@ def _get_soft_predictions(estimator, X, predict_method):
     if predict_method == "predict_proba":
         return output[:, 1]
     return output
+
+
+def _filter_kwargs(func, kwargs):
+    """Helper function to filter kwargs that are accepted by `func` according to its
+    signature. Returns all `kwargs` if `func` accepts `**kwargs` (or similar).
+
+    Parameters
+    ----------
+    func : callable
+        Function or method to pass params to.
+    kwargs : dict
+        Dictionary of params to pass to `func`.
+
+    Returns
+    -------
+    filtered_kwargs : dict
+    """
+    sig = inspect.signature(func)
+
+    accepts_var_kwargs = any(
+        p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+    )
+
+    if accepts_var_kwargs:
+        return kwargs
+
+    else:
+        valid_params = set(sig.parameters.keys())
+        return {k: v for k, v in kwargs.items() if k in valid_params}
