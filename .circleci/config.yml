@@ -47,7 +47,7 @@ jobs:
       - run:
           name: 'Install required packages'
           command: |
-            python scripts/install_requirements.py --pinned False
+            python scripts/install_requirements.py
             pip install matplotlib>=3.2.1
 
       - run:
@@ -120,7 +120,7 @@ jobs:
       - run:
           name: 'Install required packages'
           command: |
-            python scripts/install_requirements.py --pinned False
+            python scripts/install_requirements.py
             pip install matplotlib>=3.2.1
 
       - run:
