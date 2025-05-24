@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Callable, Literal
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
 
@@ -80,6 +81,8 @@ class ErrorRate(ClassificationMoment):
             y,
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
         # The following uses X so that the estimators get X untouched
         super().load_data(X, y_train, sensitive_features=sf_train)

@@ -3,6 +3,7 @@
 
 from warnings import warn
 
+import narwhals.stable.v1 as nw
 import numpy as np
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
@@ -134,6 +135,8 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             sensitive_features=sensitive_features,
             expect_y=True,
             enforce_binary_labels=False,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         positive_probs = 0.0 * base_predictions_vector

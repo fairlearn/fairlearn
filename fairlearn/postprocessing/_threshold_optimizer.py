@@ -14,6 +14,7 @@ import logging
 from typing import Literal
 from warnings import warn
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
 from sklearn import clone
@@ -308,6 +309,8 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             y,
             sensitive_features=sensitive_features,
             enforce_binary_labels=True,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         # postprocessing can't handle 0/1 as floating point numbers, so this
