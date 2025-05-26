@@ -602,7 +602,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         # a) the proportion of negative labels multiplied by x which represents
         #    the conditional probability P[Y_hat=1 | Y=0], i.e. the probability
         #    of a positive prediction given a negative label.
-        # b) the propotion of positive labels multiplied by 1-y_min, where y_min
+        # b) the proportion of positive labels multiplied by 1-y_min, where y_min
         #    represents the conditional probability P[Y_hat=1 | Y=1], i.e. the
         #    probability of a correct prediction of a positive label, so 1-y_min
         #    represents a negative prediction given a positive label.
