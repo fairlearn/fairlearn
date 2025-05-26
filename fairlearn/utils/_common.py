@@ -14,7 +14,7 @@ def _get_soft_predictions(estimator, X, predict_method):
         A scikit-learn compatible estimator
 
     X : array-like
-        The intput for which the output is desired
+        The input for which the output is desired
 
     predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
             }, default='auto'
