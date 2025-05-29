@@ -153,6 +153,12 @@ html_theme_options = {
             "icon": "fa-brands fa-discord",
         },
     ],
+    "external_links": [
+        {
+            "name": "📋 Survey",
+            "url": "https://docs.google.com/forms/d/e/1FAIpQLSeOTRNgAc2RYnDDO5-GE7scMysPHrBLs8XV21ZP--XATr34aA/viewform",
+        },
+    ],
     "use_edit_page_button": True,
     "show_prev_next": False,
     "switcher": {
@@ -160,6 +166,7 @@ html_theme_options = {
         "version_match": tag_or_branch,
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_end": ["navbar-icon-links"],
     "navbar_persistent": [],
     "header_links_before_dropdown": 7,
     "secondary_sidebar_items": [
@@ -195,6 +202,15 @@ html_sidebars = {
 }
 
 html_favicon = "_static/images/fairlearn-favicon.ico"
+
+# link to survey button
+html_context = {
+    "survey_link": {
+        "name": "📋 Survey",
+        "url": "https://docs.google.com/forms/d/e/1FAIpQLSeOTRNgAc2RYnDDO5-GE7scMysPHrBLs8XV21ZP--XATr34aA/viewform",
+    }
+}
+
 
 # Auto-Doc Options
 # ----------------
