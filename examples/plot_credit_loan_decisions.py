@@ -1,10 +1,11 @@
 # %%
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+#personal use
 
 """
 =====================
-Credit Loan Decisions
+Credit Loan Decisions 
 =====================
 """
 
