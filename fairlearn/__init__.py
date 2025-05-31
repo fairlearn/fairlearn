@@ -23,8 +23,7 @@ if fairlearn_logs is not None:
     handler = logging.FileHandler(fairlearn_logs, mode="w")
     handler.setLevel(logging.INFO)
     logger.addHandler(handler)
-    logger.info("Initializing logging file for fairlearn")
-
+    
     def close_handler():  # noqa: D103
         handler.close()
         logger.removeHandler(handler)
