@@ -64,7 +64,7 @@ class ErrorRate(ClassificationMoment):
         else:
             raise ValueError(_MESSAGE_BAD_COSTS)
 
-    def load_data(self, X, y, *, sensitive_features, control_features=None) -> None:
+    def load_data(self, X, y, *, sensitive_features) -> None:
         """Load the specified data into the object.
 
         Parameters
@@ -81,7 +81,6 @@ class ErrorRate(ClassificationMoment):
             y,
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
-            control_features=control_features,
         )
         # TODO: remove following line when _validate_and_reformat_input returns sf_train
         # as a narwhals series (while with PR #1533 it comes as whatever native
