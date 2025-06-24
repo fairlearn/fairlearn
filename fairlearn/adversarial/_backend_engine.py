@@ -187,7 +187,7 @@ class BackendEngine:
         """
         Shuffle the rows of X, Y, A.
 
-        Needs to be overriden by backends that are non-compatible such as torch.
+        Needs to be overridden by backends that are non-compatible such as torch.
         """
         X, Y, A = shuffle(X, Y, A, random_state=self.base.random_state_)
         return X, Y, A

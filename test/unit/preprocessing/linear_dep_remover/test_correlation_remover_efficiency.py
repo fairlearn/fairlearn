@@ -46,18 +46,18 @@ class FairnessComparisonData:
 
 def _get_adult_fairness_comparison_data() -> FairnessComparisonData:
     features_to_keep = ["fnlwgt", "capital-gain", "capital-loss", "hours-per-week", "age"]
-    senstive_feature_id = "race_White"
+    sensitive_feature_id = "race_White"
     raw_data = fetch_adult().frame
     data, target = (
         raw_data[features_to_keep + ["race"]],
         raw_data["class"] == ">50K",
     )
-    data = pd.get_dummies(data)[features_to_keep + [senstive_feature_id]]
+    data = pd.get_dummies(data)[features_to_keep + [sensitive_feature_id]]
     X_train, X_test, y_train, y_test = train_test_split(
         data, target, test_size=0.2, random_state=0
     )
 
-    cr = CorrelationRemover(sensitive_feature_ids=[senstive_feature_id])
+    cr = CorrelationRemover(sensitive_feature_ids=[sensitive_feature_id])
     cr.fit(X_train)
     X_train_transformed = cr.transform(X_train)
     X_test_transformed = cr.transform(X_test)
@@ -68,7 +68,7 @@ def _get_adult_fairness_comparison_data() -> FairnessComparisonData:
     estimator_without_correlation.fit(X_train_transformed, y_train)
 
     return FairnessComparisonData(
-        sensitive_feature=X_test[senstive_feature_id],
+        sensitive_feature=X_test[sensitive_feature_id],
         y_true=y_test,
         y_pred_without_mitigation=estimator_with_correlation.predict(X_test),
         y_pred_with_mitigation=estimator_without_correlation.predict(X_test_transformed),
