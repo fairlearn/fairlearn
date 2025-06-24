@@ -1200,7 +1200,7 @@ metricframe_postprocess.overall[metrics_to_report]
 #
 # A key facet of Responsible Machine Learning is responsible documentation
 # practices. :footcite:ct:`mitchell2019model`
-# proposed the model card framework for documentating and reporting model
+# proposed the model card framework for documenting and reporting model
 # training details and deployment considerations.
 #
 # A *model card* contains sections for documenting training and evaluation
