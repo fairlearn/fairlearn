@@ -211,14 +211,14 @@ features have less influence on the predictions of a downstream model.
     >>> from sklearn.preprocessing import StandardScaler
     >>> import pandas as pd
     >>> features_to_keep = ["fnlwgt", "capital-gain", "capital-loss", "hours-per-week", "age"]
-    >>> senstive_feature_id = "race_White"
+    >>> sensitive_feature_id = "race_White"
     >>> raw_data = fetch_adult().frame
     >>> data, target = (
     ...     raw_data[features_to_keep + ["race"]],
     ...     raw_data["class"] == ">50K",
     ... )
     >>> data = pd.get_dummies(data)
-    >>> data, sensitive_features = data[features_to_keep], data[senstive_feature_id]
+    >>> data, sensitive_features = data[features_to_keep], data[sensitive_feature_id]
     >>> X_train, X_test, y_train, y_test, sf_train, sf_test = train_test_split(
     ...     data, target, sensitive_features, test_size=0.3, random_state=42
     ... )
