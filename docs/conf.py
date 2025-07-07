@@ -334,7 +334,7 @@ def notebook_modification_function(notebook_content, notebook_filename):
                 "pyodide_http.patch_all()",
             ]
         )
-    # always import matplotlib and pandas to avoid Pyodide limitation with
+    # always import Matplotlib and pandas to avoid Pyodide limitation with
     # imports inside functions
     code_lines.extend(["import matplotlib", "import pandas"])
 
