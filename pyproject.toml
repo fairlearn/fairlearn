@@ -31,6 +31,9 @@ filterwarnings = [
 
     # Warnings in test_othermlpackages
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
+
+    # Warnings in scipy.optimize due to incompatibility with sklearn
+    "ignore:.*The `disp` and `iprint` options of the L-BFGS-B solver are deprecated and will be removed in SciPy 1.18.0.:DeprecationWarning",
 ]
 
 [tool.ruff]
