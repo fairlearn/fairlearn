@@ -24,6 +24,7 @@ filterwarnings = [
     "default:Auto-removal of overlapping axes is deprecated:Warning",
     "default:DataFrame is highly fragmented:Warning",
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:DeprecationWarning",
+    "ignore:.*The `disp` and `iprint` options of the L-BFGS-B solver are deprecated and will be removed in SciPy 1.18.0.:DeprecationWarning",
 
     # Warnings in other-ml (tensorflow)
     "default:Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new:DeprecationWarning",
@@ -31,9 +32,6 @@ filterwarnings = [
 
     # Warnings in test_othermlpackages
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
-
-    # Warnings in scipy.optimize due to incompatibility with sklearn
-    "ignore:.*The `disp` and `iprint` options of the L-BFGS-B solver are deprecated and will be removed in SciPy 1.18.0.:DeprecationWarning",
 ]
 
 [tool.ruff]
