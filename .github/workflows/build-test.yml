@@ -18,6 +18,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  all-deps-min:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-14]
+    uses: ./.github/workflows/test-min-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: "3.9"
+      codeCovPython: "3.9"
+
   all-deps:
     strategy:
       matrix:
