@@ -38,7 +38,7 @@ pandas_ge_v2 = parse_version(pd.__version__) >= parse_version("2.0.0")
 
 if pandas_ge_v2:
     constructors.append(pandas_nullable_constructor)
-    
+
 if pandas_ge_v2 and is_pyarrow_installed:
     # pandas 2.0+ supports pyarrow dtype backend
     # https://pandas.pydata.org/docs/whatsnew/v2.0.0.html#new-dtype-backends
