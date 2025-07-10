@@ -28,5 +28,5 @@ jupyterlite_sphinx==0.19.1
 jupyterlite-pyodide-kernel==0.5.2
 packaging==24.2
 seaborn==0.13.2
-torch==2.6.0
+torch==2.7.1
 sphinx-issues==5.0.1
