@@ -357,9 +357,9 @@ and false positive rate.
 Error Rate
 ~~~~~~~~~~
 
-We can use the :class:`ErrorRate` either to measure performance of a trained model that does or
-does not take sensitive features into account, or as an
-objective function during the training of a fairness aware model.
+We can use the :class:`ErrorRate` either to measure performance of a trained model that
+does or does not take sensitive features into account, or as an objective function
+during the training of a fairness aware model.
 
 To measure the ErrorRate in respect to a trained estimator we use its :code:`gamma` method:
 
@@ -370,7 +370,7 @@ To measure the ErrorRate in respect to a trained estimator we use its :code:`gam
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.linear_model import LogisticRegression
     >>> import numpy as np
-    >>> rng = np.random.default_rng(42) 
+    >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
     >>> sensitive_features = X[:, -1]
@@ -392,7 +392,7 @@ to a cost-sensitive classification problem.
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
     >>> import numpy as np
-    >>> rng = np.random.default_rng(42) 
+    >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
     >>> sensitive_features = X[:, -1]
