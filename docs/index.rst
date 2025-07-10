@@ -3,12 +3,11 @@ Fairlearn Documentation
 
 .. raw:: html
 
-    <div style="background-color: #e6f4ea; padding: 1em; margin-bottom: 2em; border-left: 5px solid #34a853; border-radius: 6px;">
-        <strong>Help Us Improve Fairlearn:</strong>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeOTRNgAc2RYnDDO5-GE7scMysPHrBLs8XV21ZP--XATr34aA/viewform" target="_blank" style="margin-left; font-weight: bold;">
-         Take the Survey
-        </a>
-    </div>
+   <div style="background-color:rgb(211, 237, 252); color: black; padding: 1em; margin-bottom: 2em; border-left: 5px; border-radius: 6px;">
+      <strong>Help Us Improve Fairlearn:</strong>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSeOTRNgAc2RYnDDO5-GE7scMysPHrBLs8XV21ZP--XATr34aA/viewform"
+      target="_blank" style="margin-left; font-weight: bold">Take the Survey → </a>
+   </div>
 
 Table of Contents
 =================
