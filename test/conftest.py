@@ -33,19 +33,22 @@ def pyarrow_table_constructor(obj) -> IntoDataFrame:
 constructors = [pandas_constructor]
 backends = ["pandas"]
 
-if parse_version(pd.__version__) >= parse_version("2.0.0"):
-    constructors.extend(
-        [
-            pandas_nullable_constructor,
-            pandas_pyarrow_constructor,
-        ]
-    )
+is_pyarrow_installed = find_spec("pyarrow") is not None
+pandas_ge_v2 = parse_version(pd.__version__) >= parse_version("2.0.0")
+
+if pandas_ge_v2:
+    constructors.append(pandas_nullable_constructor)
+
+if pandas_ge_v2 and is_pyarrow_installed:
+    # pandas 2.0+ supports pyarrow dtype backend
+    # https://pandas.pydata.org/docs/whatsnew/v2.0.0.html#new-dtype-backends
+    constructors.append(pandas_pyarrow_constructor)
 
 if find_spec("polars"):
     constructors.append(polars_eager_constructor)
     backends.append("polars")
 
-if find_spec("pyarrow"):
+if is_pyarrow_installed:
     constructors.append(pyarrow_table_constructor)
     backends.append("pyarrow")
 
