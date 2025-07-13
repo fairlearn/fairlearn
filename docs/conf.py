@@ -156,7 +156,7 @@ html_theme_options = {
     "external_links": [
         {
             "name": "Survey",
-            "url": "https://docs.google.com/forms/d/e/1FAIpQLSeOTRNgAc2RYnDDO5-GE7scMysPHrBLs8XV21ZP--XATr34aA/viewform",
+            "url": "https://forms.gle/U3wdiNAPeQWgenKh8",
         },
     ],
     "use_edit_page_button": True,
