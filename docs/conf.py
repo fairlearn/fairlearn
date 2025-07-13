@@ -207,7 +207,7 @@ html_favicon = "_static/images/fairlearn-favicon.ico"
 html_context = {
     "survey_link": {
         "name": "Survey",
-        "url": "https://docs.google.com/forms/d/e/1FAIpQLSeOTRNgAc2RYnDDO5-GE7scMysPHrBLs8XV21ZP--XATr34aA/viewform",
+        "url": "https://forms.gle/U3wdiNAPeQWgenKh8",
     }
 }
 
