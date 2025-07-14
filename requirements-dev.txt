@@ -27,7 +27,6 @@ pyarrow
 
 # Required for documentation
 pypandoc
-sphinx==7.1.2; python_version=="3.8"
 sphinx==7.2.6; python_version>"3.8"
 sphinx-gallery>=0.18.0
 numpydoc

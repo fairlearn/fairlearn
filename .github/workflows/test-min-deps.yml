@@ -1,4 +1,4 @@
-name: test-all-deps
+name: test-all-deps-min
 
 on:
   workflow_call:
@@ -12,10 +12,9 @@ on:
       codeCovPython:
         required: true
         type: string
-        default: "3.12"
 
 jobs:
-  all-deps:
+  all-deps-min:
     # This job installs all dependencies and runs most tests.
     # CodeCov limits us to 150 uploads per commit id, so have an extra check so
     # we only upload results if the current commit is under 48 hours old
@@ -36,7 +35,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
-      - run: python scripts/install_requirements.py
+      - run: python scripts/install_requirements.py --min
 
       - run: pip install .
       - run: pip install matplotlib
