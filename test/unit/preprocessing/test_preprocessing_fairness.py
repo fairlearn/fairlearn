@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Union
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,7 @@ from fairlearn.metrics import (
 )
 from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationLearner
 
-PreprocessingAlgorithm: TypeAlias = CorrelationRemover | PrototypeRepresentationLearner
+PreprocessingAlgorithm: TypeAlias = Union[CorrelationRemover, PrototypeRepresentationLearner]
 
 
 @dataclass(frozen=True, kw_only=True)
