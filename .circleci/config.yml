@@ -52,7 +52,7 @@ jobs:
 
       - run:
           name: "Build Documentation"
-          command: make doc
+          command: make -j1 doc
           no_output_timeout: 30m
 
       - run:
