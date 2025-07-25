@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, TypeAlias
+from typing import Callable
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,7 @@ from numpy.typing import NDArray
 from scipy.stats import wilcoxon
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from typing_extensions import TypeAlias
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
@@ -122,7 +123,7 @@ def fairness_comparison_data(
     ],
     indirect=True,
 )
-@pytest.mark.parametrize("dataset", ["preprocessed_adult_dataset"], indirect=True)
+@pytest.mark.parametrize("dataset", ["adult_dataset"], indirect=True)
 def test_preprocessing_mitigates_bias(
     fairness_metric: Callable,
     fairness_comparison_data: FairnessComparisonData,
