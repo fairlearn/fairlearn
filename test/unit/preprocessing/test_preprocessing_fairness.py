@@ -23,7 +23,7 @@ from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationL
 PreprocessingAlgorithm: TypeAlias = Union[CorrelationRemover, PrototypeRepresentationLearner]
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True)
 class Dataset:
     sensitive_feature: pd.Series
     X_train: pd.DataFrame
@@ -32,7 +32,7 @@ class Dataset:
     y_test: pd.Series
 
 
-@dataclass(frozen=True, kw_only=True)
+@dataclass(frozen=True)
 class FairnessComparisonData:
     sensitive_feature: pd.Series
     y_true: pd.Series
