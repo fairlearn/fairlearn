@@ -144,7 +144,7 @@ we would expect with :math:`\alpha=0.5`.
 .. _prototype_representation_learner:
 
 Prototype Representation Learner
----------------------------
+--------------------------------
 
 :class:`~fairlearn.preprocessing.PrototypeRepresentationLearner` is a preprocessing algorithm and
 a classifier that aims to learn a latent representation of the data that minimizes reconstruction
