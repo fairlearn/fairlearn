@@ -325,6 +325,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         if self._has_target:
             w = x[self._prototype_vectors_size : -self._prototype_dim]
             y_hat = M @ w
+            y_hat = np.clip(y_hat, 0, 1)  # To deal with precision errors
             classification_error = log_loss(y, y_hat)
 
         fairness_error = 0.0
