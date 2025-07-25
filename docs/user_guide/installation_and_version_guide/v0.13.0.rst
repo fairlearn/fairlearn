@@ -16,7 +16,6 @@ Other improvements
 * Implemented the :code:`PrototypeRepresentationLearner`  introduced in Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`:
   :pr:`1478` by :user:`Tahar Allouche <taharallouche>`.
 * Make `preprocessing` module dataframe agnostic through Narwhals: :pr:`1525` by :user:`Francesco Bruzzesi <FBruzzesi>`
-* Removed the keyword argument `control_features` from :func:`ErrorRate.load_data`, since it was without functionality for the method: :pr:`1531` by :user:`Stefanie Senger <StefanieSenger>`.
+* Removed the keyword argument `control_features` from :code:`ErrorRate.load_data`, since it was without functionality for the method: :pr:`1531` by :user:`Stefanie Senger <StefanieSenger>`.
 * Make :code:`AnnotatedMetricFunction` class dataframe agnostic through Narwhals: :pr:`1545` by :user:`Francesco Bruzzesi <FBruzzesi>`.
 * Removed local logging using environment variable `FAIRLEARN_LOGS` at initialization: :pr:`1561` by :user: `Parul Gupta <parulgupta1004>`.
-
