@@ -41,3 +41,4 @@ packaging
 seaborn
 torch
 sphinx-issues
+memory_profiler

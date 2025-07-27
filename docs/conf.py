@@ -96,6 +96,7 @@ intersphinx_mapping = {
             "tensorflow-intersphinx/master/tf2_py_objects.inv"
         ),
     ),
+    "show_memory": True,
 }
 
 # Add any paths that contain templates here, relative to this directory.
