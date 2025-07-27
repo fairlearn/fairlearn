@@ -381,6 +381,7 @@ sphinx_gallery_conf = {
     },
     "show_memory": True,
     "compress_images": ("images", "thumbnails"),
+    "ignore_pattern": r"__init__\.py|plot_adversarial_basics\.py",
 }
 
 # Setup for sphinx-bibtex
