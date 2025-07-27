@@ -96,7 +96,6 @@ intersphinx_mapping = {
             "tensorflow-intersphinx/master/tf2_py_objects.inv"
         ),
     ),
-    "show_memory": True,
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -380,6 +379,8 @@ sphinx_gallery_conf = {
     "jupyterlite": {
         "notebook_modification_function": notebook_modification_function,
     },
+    "show_memory": True,
+    "compress_images": ("images", "thumbnails"),
 }
 
 # Setup for sphinx-bibtex

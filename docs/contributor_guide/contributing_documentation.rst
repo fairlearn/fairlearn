@@ -37,7 +37,7 @@ The instructions below are an addition to the instructions on the
 instructions on that page, and return to follow the further
 documentation specific guidelines.
 
-You may also need to `install pandoc <https://pandoc.org/installing.html>`_. and :code:`matplotlib`.
+You may also need to install `pandoc <https://pandoc.org/installing.html>`_, `optipng <https://optipng.sourceforge.net>`_ and :code:`matplotlib`.
 
 .. prompt:: bash
 
@@ -96,10 +96,10 @@ ensure that they all render properly.
 
 Code Style
 ^^^^^^^^^^
-All restructured text (ReST) files submitted for documentation issues should adhere to a max line 
-limit of 99 characters. If a line of text runs past that limit, start a new 
+All restructured text (ReST) files submitted for documentation issues should adhere to a max line
+limit of 99 characters. If a line of text runs past that limit, start a new
 line with the overflow text. You should be able to set this limit in ``black``
-so you can automatically ensure you meet this requirement. 
+so you can automatically ensure you meet this requirement.
 
 Citations
 ^^^^^^^^^

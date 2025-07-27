@@ -37,8 +37,8 @@ jobs:
           command: sudo apt update
 
       - run:
-          name: Install pandoc
-          command: sudo apt-get install pandoc pandoc-citeproc
+          name: Install additional dependencies
+          command: sudo apt-get install pandoc pandoc-citeproc optipng
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
@@ -110,8 +110,8 @@ jobs:
           command: sudo apt update
 
       - run:
-          name: Install pandoc
-          command: sudo apt-get install pandoc pandoc-citeproc
+          name: Install additional dependencies
+          command: sudo apt-get install pandoc pandoc-citeproc optipng
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
