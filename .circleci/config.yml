@@ -11,6 +11,7 @@ jobs:
     docker:
       - image: cimg/python:3.12
 
+    resource_class: large
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch
@@ -84,6 +85,7 @@ jobs:
     docker:
       - image: cimg/python:3.12
 
+    resource_class: large
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch

@@ -385,7 +385,7 @@ sphinx_gallery_conf = {
     },
     "show_memory": True,
     "compress_images": ("images", "thumbnails"),
-    "ignore_pattern": r"__init__\.py|plot_adversarial_basics\.py|plot_adversarial_fine_tuning\.py",
+    # "ignore_pattern": r"__init__\.py|plot_adversarial_basics\.py|plot_adversarial_fine_tuning\.py",
 }
 
 # Setup for sphinx-bibtex
