@@ -27,8 +27,8 @@ pyarrow
 
 # Required for documentation
 pypandoc
-sphinx==7.2.6; python_version>"3.8"
-sphinx-gallery>=0.18.0
+sphinx==7.3.7
+sphinx-gallery==0.19.0
 numpydoc
 pydata-sphinx-theme>=0.14.4
 sphinx-autodoc-typehints
@@ -41,3 +41,4 @@ packaging
 seaborn
 torch
 sphinx-issues
+memory_profiler
