@@ -11,6 +11,7 @@ jobs:
     docker:
       - image: cimg/python:3.12
 
+    resource_class: large
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch
@@ -37,8 +38,8 @@ jobs:
           command: sudo apt update
 
       - run:
-          name: Install pandoc
-          command: sudo apt-get install pandoc pandoc-citeproc
+          name: Install additional dependencies
+          command: sudo apt-get install pandoc pandoc-citeproc optipng
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
@@ -84,6 +85,7 @@ jobs:
     docker:
       - image: cimg/python:3.12
 
+    resource_class: large
     working_directory: ~/tmp-fairlearn
     steps:
       # check out PR branch
@@ -110,8 +112,8 @@ jobs:
           command: sudo apt update
 
       - run:
-          name: Install pandoc
-          command: sudo apt-get install pandoc pandoc-citeproc
+          name: Install additional dependencies
+          command: sudo apt-get install pandoc pandoc-citeproc optipng
 
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies

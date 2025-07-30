@@ -216,7 +216,11 @@ html_context = {
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_default_options = {"member-order": "groupwise"}
+autodoc_default_options = {
+    "member-order": "groupwise",
+    "undoc-members": False,
+    "private-members": False,
+}
 
 # Options for the `::plot` directive
 # ----------------------------------
@@ -379,6 +383,8 @@ sphinx_gallery_conf = {
     "jupyterlite": {
         "notebook_modification_function": notebook_modification_function,
     },
+    "show_memory": True,
+    "compress_images": ("images", "thumbnails"),
 }
 
 # Setup for sphinx-bibtex
