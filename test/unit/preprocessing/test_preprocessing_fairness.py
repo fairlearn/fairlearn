@@ -40,7 +40,7 @@ class FairnessComparisonData:
     y_pred_without_mitigation: NDArray
 
     def bootstrap(self, seed: int) -> FairnessComparisonData:
-        sample_indices = np.random.RandomState(seed=seed).choice(
+        sample_indices = np.random.default_rng(seed=seed).choice(
             len(self.sensitive_feature), len(self.sensitive_feature), replace=True
         )
         sampled_sensitive_feature = self.sensitive_feature.iloc[sample_indices]
