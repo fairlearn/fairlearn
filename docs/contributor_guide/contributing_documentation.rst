@@ -37,7 +37,7 @@ The instructions below are an addition to the instructions on the
 instructions on that page, and return to follow the further
 documentation specific guidelines.
 
-You may also need to `install pandoc <https://pandoc.org/installing.html>`_. and :code:`matplotlib`.
+You may also need to install `pandoc <https://pandoc.org/installing.html>`_, `optipng <https://optipng.sourceforge.net>`_ and :code:`matplotlib`.
 
 .. prompt:: bash
 
@@ -94,6 +94,12 @@ ensure that they all render properly.
     pull request) and need help, simply @mention
     :code:`@fairlearn/fairlearn-maintainers` to get help.
 
+Code Style
+^^^^^^^^^^
+All restructured text (ReST) files submitted for documentation issues should adhere to a max line
+limit of 99 characters. If a line of text runs past that limit, start a new
+line with the overflow text. You should be able to set this limit in ``black``
+so you can automatically ensure you meet this requirement.
 
 Citations
 ^^^^^^^^^
@@ -112,7 +118,7 @@ To add a citation:
    For example, :code:`:footcite:`agarwal2018reductions`` will be rendered as :footcite:`agarwal2018reductions`.
 4. You can also use :code:`:footcite:t:`bibtex-id`` to create a textual citation.
    The role :code:`:footcite:t:`agarwal2018reductions`` will be rendered as :footcite:t:`agarwal2018reductions`.
-5. To add the bibliography use :code:`.. footbibliography::` directive at the bottom of your file if not already present.
+5. To add the bibliography, use :code:`.. footbibliography::` directive at the bottom of your file if not already present.
    This will list all the citations for the current document.
 
    For example :code:`.. footbibliography::` will be rendered as shown below:

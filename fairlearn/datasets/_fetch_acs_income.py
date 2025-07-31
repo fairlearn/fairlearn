@@ -96,11 +96,6 @@ def fetch_acs_income(
     Notes
     -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
-
-    References
-    ----------
-    .. footbibliography::
-
     """
     # State Code based on 2010 Census definitions
     _STATE_CODES = {

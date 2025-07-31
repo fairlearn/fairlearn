@@ -96,11 +96,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         (defaults to `sample_weight`)
 
         .. versionadded:: 0.5.0
-
-    References
-    ----------
-    .. footbibliography::
-
     """
 
     def __init__(
@@ -164,7 +159,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         # Stores the best gap at each iteration among the ones EG and Linear Programming (LP) yield
         gaps: list[float] = []
 
-        # Stores the best-reponse estimators' weights at each iteration
+        # Stores the best-response estimators' weights at each iteration
         # The appended weights come either from (EG) or (LP), depending on their respective gaps
         Qs: list[pd.Series] = []
 

@@ -16,7 +16,7 @@ _KW_SENSITIVE_FEATURES = "sensitive_features"
 _KW_CONTROL_FEATURES = "control_features"
 
 _MESSAGE_X_NONE = "Must supply X"
-_MESSAGE_Y_NONE = "Must supply y"
+_MESSAGE_Y_NONE = "Must supply nonempty y"
 _MESSAGE_SENSITIVE_FEATURES_NONE = "Must specify {0} (for now)".format(_KW_SENSITIVE_FEATURES)
 _MESSAGE_X_Y_ROWS = "X and y must have same number of rows"
 _MESSAGE_X_SENSITIVE_ROWS = "X and the sensitive features must have same number of rows"
@@ -56,10 +56,11 @@ def _validate_and_reformat_input(
     ----------
     X : numpy.ndarray, pandas.DataFrame
         The feature matrix
-    y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
-        The label vector
-    expect_y : bool
-        If True y needs to be provided, otherwise ignores the argument; default True
+    y : numpy.ndarray, pandas.DataFrame, pandas.Series, list, or None
+        The label vector. Must be of shape (n,) or (n,1).
+    expect_y : bool, default=True
+        If True, y needs to be provided and non-empty (np.asarray(y).size > 0),
+        otherwise ignores the argument
     expect_sensitive_features : bool
         If true, sensitive_features must be provided to the call to this function.
         This is the default setting.
@@ -77,24 +78,24 @@ def _validate_and_reformat_input(
         estimator.
 
     """
-
-    if y is not None:
-        # calling check_X_y with a 2-dimensional y causes a warning, so ensure it is 1-dimensional
-        if isinstance(y, np.ndarray) and len(y.shape) == 2 and y.shape[1] == 1:
-            y = y.reshape(-1)
-        elif isinstance(y, pd.DataFrame) and y.shape[1] == 1:
-            y = y.to_numpy().reshape(-1)
-
-        # Using an adapted version of check_array to avoid a warning in sklearn version < 1.6
-        y = check_array(y, ensure_2d=False, dtype="numeric", ensure_all_finite=False)
+    if expect_y:
+        if y is None:
+            raise ValueError(_MESSAGE_Y_NONE + f", got y={y}.")
+        y = np.asarray(y)
+        if y.size == 0:
+            raise ValueError(_MESSAGE_Y_NONE + f", got y={y}.")
+        if not (y.ndim == 1 or (y.ndim == 2 and y.shape[1] == 1)):
+            raise ValueError(f"`y` must be of shape (n,) or (n,1), got y of shape=({y.shape}).")
         if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
             raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
-    elif expect_y:
-        raise ValueError(_MESSAGE_Y_NONE)
+        y = check_array(y.reshape(-1), ensure_2d=False, dtype="numeric", ensure_all_finite=False)
 
     result_X = check_array(X, dtype=None, ensure_all_finite=False, allow_nd=True)
     if isinstance(X, pd.DataFrame):
         result_X = pd.DataFrame(result_X)
+
+    if (y is not None) and y.shape[0] != result_X.shape[0]:
+        raise ValueError(_MESSAGE_X_Y_ROWS)
 
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:

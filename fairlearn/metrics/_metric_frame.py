@@ -40,7 +40,7 @@ _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
 _BOOTSTRAP_NEED_N_AND_CI = "Must specify both n_boot and ci_quantiles"
 _BOOTSTRAP_N_BOOT_INT_GT_ZERO = "Must have n_boot be a positive integer"
 _BOOTSTRAP_CI_INVALID = "Must have all ci_quantiles be floats in (0, 1)"
-_BOOTSTRAP_NOT_INIITIALIZED = (
+_BOOTSTRAP_NOT_INITIALIZED = (
     "Could not compute confidence intervals:"
     " Bootstrapping parameters n_boot and ci_quantiles were not specified"
     " in the MetricFrame constructor."
@@ -136,7 +136,7 @@ class MetricFrame:
         metric function name, with the values being the string-to-array-like dictionaries.
 
     n_boot : int | None
-        If set to a postive integer, generate this number of bootstrap samples of the
+        If set to a positive integer, generate this number of bootstrap samples of the
         supplied data, and use to estimate confidence intervals for all of the metrics.
         Must be set with `ci_quantiles`.
 
@@ -481,7 +481,7 @@ class MetricFrame:
 
             The distinction applies even if the dictionary contains a
             single metric function. This is to allow for a consistent
-            interface when calling programatically, while also reducing
+            interface when calling programmatically, while also reducing
             typing for those using Fairlearn interactively.
         """
         return self._result_cache["overall"]
@@ -920,7 +920,7 @@ class MetricFrame:
         # The supplied 'metric' is a dictionary of functions
         self._user_supplied_callable = False
 
-        # The keys of sample_params must be a subset of the supplied metric dictionnary
+        # The keys of sample_params must be a subset of the supplied metric dictionary
         sample_params_keys = set(sample_params.keys())
         metric_functions_keys = set(metric.keys())
         if not sample_params_keys.issubset(metric_functions_keys):
@@ -1023,4 +1023,4 @@ class MetricFrame:
     def _check_bootstrap_initialized(self):
         """Check that the bootstrap parameters n_boot and ci_quantiles were correctly initialized."""
         if self._ci_quantiles is None or len(self._ci_quantiles) == 0 or self._n_boot is None:
-            raise ValueError(_BOOTSTRAP_NOT_INIITIALIZED)
+            raise ValueError(_BOOTSTRAP_NOT_INITIALIZED)

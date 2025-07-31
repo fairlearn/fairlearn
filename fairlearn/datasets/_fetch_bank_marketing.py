@@ -88,11 +88,6 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
     Notes
     -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
-
-    References
-    ----------
-    .. footbibliography::
-
     """
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME

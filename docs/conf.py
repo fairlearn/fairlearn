@@ -128,8 +128,8 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "logo": {
         "link": "https://fairlearn.org",
-        "image_light": "_static/images/fairlearn_full_color_lightmode.svg", 
-        "image_dark": "_static/images/fairlearn_full_color_darkmode.svg",
+        "image_light": "fairlearn_full_color_lightmode.svg",
+        "image_dark": "fairlearn_full_color_darkmode.svg",
     },
     "icon_links": [
         {
@@ -153,6 +153,12 @@ html_theme_options = {
             "icon": "fa-brands fa-discord",
         },
     ],
+    "external_links": [
+        {
+            "name": "Survey",
+            "url": "https://forms.gle/U3wdiNAPeQWgenKh8",
+        },
+    ],
     "use_edit_page_button": True,
     "show_prev_next": False,
     "switcher": {
@@ -160,6 +166,7 @@ html_theme_options = {
         "version_match": tag_or_branch,
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_end": ["navbar-icon-links"],
     "navbar_persistent": [],
     "header_links_before_dropdown": 7,
     "secondary_sidebar_items": [
@@ -196,11 +203,24 @@ html_sidebars = {
 
 html_favicon = "_static/images/fairlearn-favicon.ico"
 
+# link to survey button
+html_context = {
+    "survey_link": {
+        "name": "Survey",
+        "url": "https://forms.gle/U3wdiNAPeQWgenKh8",
+    }
+}
+
+
 # Auto-Doc Options
 # ----------------
 
 # Change the ordering of the member documentation
-autodoc_default_options = {"member-order": "groupwise"}
+autodoc_default_options = {
+    "member-order": "groupwise",
+    "undoc-members": False,
+    "private-members": False,
+}
 
 # Options for the `::plot` directive
 # ----------------------------------
@@ -334,7 +354,7 @@ def notebook_modification_function(notebook_content, notebook_filename):
                 "pyodide_http.patch_all()",
             ]
         )
-    # always import matplotlib and pandas to avoid Pyodide limitation with
+    # always import Matplotlib and pandas to avoid Pyodide limitation with
     # imports inside functions
     code_lines.extend(["import matplotlib", "import pandas"])
 
@@ -363,6 +383,8 @@ sphinx_gallery_conf = {
     "jupyterlite": {
         "notebook_modification_function": notebook_modification_function,
     },
+    "show_memory": True,
+    "compress_images": ("images", "thumbnails"),
 }
 
 # Setup for sphinx-bibtex

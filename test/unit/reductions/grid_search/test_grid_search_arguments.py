@@ -2,7 +2,7 @@
 # Licensed under the MIT License.
 
 import logging
-from test.unit.fixes import get_sklearn_expected_1d_message
+import re
 from test.unit.input_convertors import (
     conversions_for_1d,
     ensure_dataframe,
@@ -37,6 +37,7 @@ from fairlearn.reductions._grid_search._grid_generator import (
 )
 from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
+    _MESSAGE_X_Y_ROWS,
     _MESSAGE_Y_NONE,
 )
 
@@ -108,10 +109,8 @@ class ArgumentTests:
         )
         X, _, A = _quick_data()
 
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(ValueError, match=_MESSAGE_Y_NONE):
             gs.fit(transformX(X), None, sensitive_features=transformA(A))
-
-        assert _MESSAGE_Y_NONE == execInfo.value.args[0]
 
     # ----------------------------
 
@@ -129,11 +128,8 @@ class ArgumentTests:
         X, _, A = _quick_data()
         Y = np.random.randint(2, size=len(A) + 1)
 
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(ValueError, match=_MESSAGE_X_Y_ROWS):
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
-
-        expected_exception_message = "Found input variables with inconsistent numbers of samples"
-        assert expected_exception_message in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -319,9 +315,13 @@ class ArgumentTests:
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_df = pd.DataFrame({"a": Y, "b": Y})
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                f"`y` must be of shape (n,) or (n,1), got y of shape=({Y_two_col_df.shape})."
+            ),
+        ):
             gs.fit(transformX(X), Y_two_col_df, sensitive_features=transformA(A))
-        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformX", candidate_X_transforms)
@@ -336,9 +336,13 @@ class ArgumentTests:
         X, Y, A = _quick_data(A_two_dim)
 
         Y_two_col_ndarray = np.stack((Y, Y), -1)
-        with pytest.raises(ValueError) as execInfo:
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                f"`y` must be of shape (n,) or (n,1), got y of shape=({Y_two_col_ndarray.shape})."
+            ),
+        ):
             gs.fit(transformX(X), Y_two_col_ndarray, sensitive_features=transformA(A))
-        assert get_sklearn_expected_1d_message() in execInfo.value.args[0]
 
     # ----------------------------
 

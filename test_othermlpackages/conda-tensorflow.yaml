@@ -4,10 +4,8 @@ channels:
 dependencies:
 - python>=3.10
 - pip>=19.1.1
-- numpy>=1.24.4, <2
+- numpy>=1.24.4
 - pytest
 - pytest-cov
 - tensorflow
 - keras
-- pip:
-   - scikeras
