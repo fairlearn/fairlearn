@@ -360,7 +360,7 @@ class MetricFrame:
             for err_string in _VALID_ERROR_STRING:
                 try:
                     self._result_cache[k][err_string] = self._group(raw_result, v, err_string)
-                except Exception as e:  # noqa: B902
+                except Exception as e:
                     # Store any exception for later
                     self._result_cache[k][err_string] = e
 
@@ -385,7 +385,7 @@ class MetricFrame:
                         self._result_cache[c_t][c_m][err_string] = self._extract_result(
                             result, no_control_levels=False
                         )
-                    except Exception as e:  # noqa: B902
+                    except Exception as e:
                         # Store any exception for later
                         self._result_cache[c_t][c_m][err_string] = e
 
