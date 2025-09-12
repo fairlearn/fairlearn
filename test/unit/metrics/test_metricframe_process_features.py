@@ -4,10 +4,8 @@
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.metrics import accuracy_score
 
 import fairlearn.metrics as metrics
-from fairlearn.metrics import MetricFrame
 
 from .utils import _get_raw_MetricFrame
 
@@ -191,8 +189,8 @@ class TestTwoFeatures:
 
     def test_float_entries(self):
         y_true = [0, 1, 0, 1]
-        y_pred = [0, 1, 0, 1]  # same as y_true for simplicity
         sensitive = [1.1, 2.2, 3.3, 4.4]  # float values should raise error
+        target = _get_raw_MetricFrame()
 
-        with pytest.raises(ValueError, match=".*scalar values.*"):
-            MetricFrame(accuracy_score, y_true, y_pred, sensitive_features=sensitive)
+        with pytest.raises(ValueError, match=".*scalar non-float values.*"):
+            _ = target._process_features("unused", sensitive, y_true)
