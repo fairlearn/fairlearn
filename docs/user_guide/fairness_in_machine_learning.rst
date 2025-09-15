@@ -481,6 +481,67 @@ Note: Some have identified that using the term *stakeholder* may perpetuate colo
 
 **Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
+Identifying stakeholders
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+When developing AI systems, it is crucial to engage a diverse set of stakeholders early and
+throughout the development process. Key stakeholder groups include data scientists who design
+and implement the models, UX researchers who understand user needs and behaviors, social
+scientists who can provide insights into societal impacts, and domain experts who bring
+specialized knowledge about the specific application area. Beyond these technical roles,
+organizations should also consider engaging with community representatives, advocacy groups,
+and individuals who may be directly or indirectly impacted by the system
+:footcite:`madaio2022assess`.
+
+To determine which stakeholders are relevant for a particular AI system, practitioners should
+start by mapping out the system's lifecycle and identifying all touchpoints where people might
+interact with or be affected by the system. This includes not only direct users but also those
+whose data is used to train the system, those who make decisions based on the system's outputs,
+and those who might experience secondary effects. For instance, in a hiring algorithm, 
+stakeholders would include job applicants, hiring managers, HR professionals, existing employees
+who might be affected by team composition changes, and even family members of applicants who
+could be impacted by employment decisions.
+
+Microsoft's guidance on responsible AI emphasizes the importance of creating structured processes
+for stakeholder engagement, including establishing feedback mechanisms and ensuring that diverse
+perspectives are represented throughout the development process. This engagement should be
+ongoing rather than a one-time activity, as stakeholder needs and concerns may evolve as the
+system is developed and deployed. Additionally, special attention should be paid to including
+marginalized or underrepresented groups who might be disproportionately affected by the system
+but may have less power or fewer opportunities to provide input through traditional channels.
+
+Identifying factors and groups affecting stakeholders
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Once stakeholders have been identified, the next critical step is to understand the various
+factors and groups that might affect how different stakeholders experience the AI system.
+This analysis must go beyond simple demographic categories to consider the complex,
+intersectional nature of human identity and experience. Context-specific factors such as
+geographic location, language proficiency, technological literacy, and access to resources
+can significantly impact how individuals interact with and are affected by AI systems
+:footcite:`barocas2021disagg`.
+
+Historical disparities play a crucial role in shaping current experiences with technology.
+Practitioners must examine how past discrimination, systemic inequalities, and historical
+exclusion might influence present-day outcomes. For example, credit scoring algorithms must
+consider how historical redlining and discriminatory lending practices have created wealth
+gaps that persist today. Similarly, healthcare AI systems should account for how historical
+medical racism has led to disparities in health outcomes and mistrust of medical institutions
+among certain communities. Understanding these historical contexts helps prevent AI systems
+from perpetuating or amplifying existing inequalities.
+
+Cultural context is another essential consideration when identifying relevant factors and groups.
+Different cultural backgrounds can lead to varying expectations, behaviors, and interpretations
+of AI system outputs. This includes considerations such as collectivist versus individualist
+cultural orientations, different concepts of privacy and data sharing, varying levels of trust
+in technology and institutions, and diverse communication styles and preferences. Additionally,
+the concept of construct validity becomes crucial when defining social categories for fairness
+analysis. Practitioners must carefully consider whether the categories they use actually capture
+the intended social phenomena and whether these categories are meaningful and respectful to the
+communities being described. This requires moving beyond simplistic categorizations to develop
+nuanced understandings of how social identities are constructed, experienced, and relevant to
+the specific context of the AI system being developed.
+
 .. topic:: References
 
    .. footbibliography::
