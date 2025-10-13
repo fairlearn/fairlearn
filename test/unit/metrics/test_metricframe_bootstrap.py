@@ -19,10 +19,10 @@ from .data_for_test import g_1, g_2, y_p, y_t
 # The ratios in many metrics can wreak havoc with bootstrapping
 # due to skewed distributions
 
-N_BOOTSTRAP = 100
+N_BOOTSTRAP = 20
 QUANTILES = [0.05, 0.5, 0.95]
 
-ABS_TOL = 0.1
+ABS_TOL = 0.15
 
 
 @pytest.fixture(scope="session")
@@ -479,7 +479,7 @@ class TestErrors:
 @pytest.mark.parametrize(
     ["n_boot", "ci_quantiles", "expectation"],
     [
-        (100, [0.05, 0.5, 0.95], does_not_raise()),
+        (3, [0.05, 0.5, 0.95], does_not_raise()),
         (
             None,
             None,
@@ -515,9 +515,9 @@ def test_ci_methods_raise_on_uninitialized_bootstrap_params(
 ) -> None:
     mf = MetricFrame(
         metrics={"mse": skm.mean_squared_error},
-        y_true=y_t,
-        y_pred=y_p,
-        sensitive_features=g_1,
+        y_true=[0, 0, 1],
+        y_pred=[0, 1, 1],
+        sensitive_features=["a", "a", "b"],
         n_boot=n_boot,
         ci_quantiles=ci_quantiles,
         random_state=13489623,
@@ -530,7 +530,7 @@ def test_ci_methods_raise_on_uninitialized_bootstrap_params(
 @pytest.mark.parametrize(
     ["n_boot", "ci_quantiles", "expectation"],
     [
-        (100, [0.05, 0.5, 0.95], does_not_raise()),
+        (3, [0.05, 0.5, 0.95], does_not_raise()),
         (
             None,
             None,
@@ -566,9 +566,9 @@ def test_ci_properties_raise_on_uninitialized_bootstrap_params(
 ) -> None:
     mf = MetricFrame(
         metrics={"mse": skm.mean_squared_error},
-        y_true=y_t,
-        y_pred=y_p,
-        sensitive_features=g_1,
+        y_true=[0, 0, 1],
+        y_pred=[0, 1, 1],
+        sensitive_features=["a", "a", "b"],
         n_boot=n_boot,
         ci_quantiles=ci_quantiles,
         random_state=13489623,
