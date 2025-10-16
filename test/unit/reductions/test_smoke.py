@@ -17,20 +17,32 @@ from fairlearn.reductions import (
     GridSearch,
 )
 
-_ESTIMATORS = [LogisticRegression, SVC, DecisionTreeClassifier]
+_ESTIMATORS = [LogisticRegression(solver="liblinear"), SVC(), DecisionTreeClassifier(max_depth=5)]
 
 if platform.system() != "Darwin":
     # MacOS requires extra steps to install lightgbm properly, skipping for now
     from lightgbm import LGBMClassifier
 
-    _ESTIMATORS.append(LGBMClassifier)
+    _ESTIMATORS.append(
+        LGBMClassifier(
+            n_estimators=1,
+            max_depth=1,
+            num_leaves=2,
+            learning_rate=1.0,
+            min_data_in_leaf=1,
+            boosting_type="gbdt",
+            objective="binary",
+            n_jobs=1,
+            force_col_wise=True,
+        )
+    )
 
 
 @pytest.mark.parametrize("Mitigator", [ExponentiatedGradient, GridSearch])
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
-@pytest.mark.parametrize("Estimator", _ESTIMATORS)
+@pytest.mark.parametrize("estimator", _ESTIMATORS)
 @pytest.mark.parametrize("n_sensitive_feature_values", [2, 3, 4, 10])
-def test_smoke(Mitigator, Constraints, Estimator, n_sensitive_feature_values):
+def test_smoke(Mitigator, Constraints, estimator, n_sensitive_feature_values):
     # This test case ensures that input validation doesn't remove metadata from the input
     # matrix X, as described at https://github.com/fairlearn/fairlearn/issues/312
     np.random.seed(0)
@@ -43,6 +55,6 @@ def test_smoke(Mitigator, Constraints, Estimator, n_sensitive_feature_values):
     # Set X1 as categorical
     df["X1"] = df["X1"].astype("category")
 
-    mitigator = Mitigator(Estimator(), Constraints())
+    mitigator = Mitigator(estimator, Constraints())
     mitigator.fit(df, Y, sensitive_features=A)
     mitigator.predict(df)
