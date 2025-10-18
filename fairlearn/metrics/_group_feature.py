@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
@@ -47,7 +46,6 @@ class GroupFeature:
 
     def __init__(self, base_name: str, feature_vector, index: int, name: str | None = None):
         """Help with the metrics."""
-        self.classes_ = np.unique(feature_vector)
         self.raw_feature_ = feature_vector
 
         self.name_ = "{0}{1}".format(base_name, index)
