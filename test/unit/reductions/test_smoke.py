@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import platform
+from functools import partial
 
 import numpy as np
 import pandas as pd
@@ -17,7 +18,7 @@ from fairlearn.reductions import (
     GridSearch,
 )
 
-_ESTIMATORS = [LogisticRegression(solver="liblinear"), SVC(), DecisionTreeClassifier(max_depth=5)]
+_ESTIMATORS = [LogisticRegression(solver="liblinear"), SVC(), DecisionTreeClassifier()]
 
 if platform.system() != "Darwin":
     # MacOS requires extra steps to install lightgbm properly, skipping for now
@@ -38,7 +39,7 @@ if platform.system() != "Darwin":
     )
 
 
-@pytest.mark.parametrize("Mitigator", [ExponentiatedGradient, GridSearch])
+@pytest.mark.parametrize("Mitigator", [partial(ExponentiatedGradient, max_iter=3), GridSearch])
 @pytest.mark.parametrize("Constraints", [DemographicParity, EqualizedOdds])
 @pytest.mark.parametrize("estimator", _ESTIMATORS)
 @pytest.mark.parametrize("n_sensitive_feature_values", [2, 3, 4, 10])
