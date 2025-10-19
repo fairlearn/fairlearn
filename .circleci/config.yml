@@ -8,6 +8,8 @@ version: 2.0
 
 jobs:
   build-doc:
+    env:
+      UV_SYSTEM_PYTHON: 1
     docker:
       - image: cimg/python:3.12
 
@@ -41,15 +43,20 @@ jobs:
           name: Install additional dependencies
           command: sudo apt-get install pandoc pandoc-citeproc optipng
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: python -m pip install --upgrade pip setuptools wheel
+          command: uv pip install --upgrade pip setuptools wheel
 
       - run:
           name: 'Install required packages'
           command: |
-            python scripts/install_requirements.py
-            pip install matplotlib>=3.2.1
+            uv run python scripts/install_requirements.py
+            uv pip install matplotlib>=3.2.1
 
       - run:
           name: "Build Documentation"
@@ -82,6 +89,8 @@ jobs:
             - static_landing_page
 
   build-doctest:
+    env:
+      UV_SYSTEM_PYTHON: 1
     docker:
       - image: cimg/python:3.12
 
@@ -115,19 +124,24 @@ jobs:
           name: Install additional dependencies
           command: sudo apt-get install pandoc pandoc-citeproc optipng
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
       - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: python -m pip install --upgrade pip setuptools wheel
+          command: uv pip install --upgrade pip setuptools wheel
 
       - run:
           name: 'Install required packages'
           command: |
-            python scripts/install_requirements.py
-            pip install matplotlib>=3.2.1
+            uv run python scripts/install_requirements.py
+            uv pip install matplotlib>=3.2.1
 
       - run:
           name: 'Build doctest'
-          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+          command: uv run python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
 
       - save_cache:
