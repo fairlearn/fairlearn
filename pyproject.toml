@@ -32,7 +32,9 @@ filterwarnings = [
 
     # Warnings in test_othermlpackages
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
-]
+
+    # Warnings in release-wheel
+    "ignore:Auto-close.*backend switching is deprecated"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
