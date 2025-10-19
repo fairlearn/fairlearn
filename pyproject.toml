@@ -36,6 +36,7 @@ filterwarnings = [
     # Warnings in release-wheel
     # Matplotlib
     "ignore:Auto-close.*backend switching is deprecated"
+]
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
