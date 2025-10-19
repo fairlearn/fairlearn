@@ -21,6 +21,7 @@ jobs:
     runs-on: ${{ inputs.os }}
     env:
       MPLBACKEND: Agg
+      UV_SYSTEM_PYTHON: 1
     steps:
       - uses: actions/checkout@v4
       - name: Get commit date
@@ -35,12 +36,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
-      - run: python scripts/install_requirements.py --min
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv run python scripts/install_requirements.py --min
 
-      - run: pip install .
-      - run: pip install matplotlib
+      - run: uv pip install .
+      - run: uv pip install matplotlib
       - run: >
-          pytest --mpl
+          uv run pytest --mpl
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install --cov=fairlearn --cov-report=xml -vl test/
       - name: Upload coverage reports to Codecov with GitHub Action

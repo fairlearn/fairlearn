@@ -14,16 +14,17 @@ on:
         type: string
         default: "3.12"
 
+
 jobs:
   all-deps:
-    # This job installs all dependencies and runs most tests.
-    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
-    # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     env:
       MPLBACKEND: Agg
+      UV_SYSTEM_PYTHON: 1
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Get commit date
         id: get_date
         shell: bash
@@ -33,17 +34,30 @@ jobs:
           AGE=$((CURRENT_DATE - COMMIT_DATE))
           echo "AGE=$AGE" >> $GITHUB_OUTPUT
           echo "AGE in seconds: $AGE"
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
-      - run: python scripts/install_requirements.py
 
-      - run: pip install .
-      - run: pip install matplotlib
-      - run: >
-          pytest --mpl
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv run python scripts/install_requirements.py
+
+      - name: Install fairlearn and extras
+        run: |
+          uv pip install .
+          uv pip install matplotlib
+
+      - name: Run tests
+        run: >
+          uv run pytest --mpl
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install --cov=fairlearn --cov-report=xml -vl test/
+
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v4.2.0
