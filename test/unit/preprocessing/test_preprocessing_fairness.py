@@ -10,7 +10,6 @@ from numpy.typing import NDArray
 from scipy.stats import wilcoxon
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from typing_extensions import TypeAlias
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
@@ -20,7 +19,7 @@ from fairlearn.metrics import (
 )
 from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationLearner
 
-PreprocessingAlgorithm: TypeAlias = Union[CorrelationRemover, PrototypeRepresentationLearner]
+PreprocessingAlgorithm = Union[CorrelationRemover, PrototypeRepresentationLearner]
 
 
 @dataclass(frozen=True)
