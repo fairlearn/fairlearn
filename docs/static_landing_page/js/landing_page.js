@@ -142,12 +142,12 @@ $(document).ready(function () {
       $(".navbar-toggler").click();
     }
   });
-  
-  
+
+
   $(document).ready(function () {
     // Check if the user has changed the theme before
     const savedTheme = localStorage.getItem('theme');
-  
+
     // If no saved preference, check system preference
     if (savedTheme) {
       $("body").addClass(savedTheme);
@@ -157,10 +157,10 @@ $(document).ready(function () {
         $("body").addClass("dark-theme");
       }
     }
-  
+
     $("#lightmode").click(function () {
       $("body").toggleClass("dark-theme");
-  
+
       // Save the current theme
       if ($("body").hasClass("dark-theme")) {
         localStorage.setItem('theme', 'dark-theme');
@@ -175,7 +175,7 @@ $(document).ready(function () {
 
 async function setLinks() {
   // update this version with every release
-  const latestVersion = 'v0.12'; // Do not include the patch
+  const latestVersion = 'v0.13'; // Do not include the patch
   const prefix = "./" + latestVersion;
 
   const contribGuideLink = prefix + "/contributor_guide/index.html";
