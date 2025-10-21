@@ -5,3 +5,9 @@ v0.14.0
 
    v0.14.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.14.0.
+
+
+Other improvements
+------------------
+
+* Removed support for python 3.9 and added support for python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
