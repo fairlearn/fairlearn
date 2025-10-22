@@ -268,18 +268,15 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             + [(0, None)] * self._prototype_dim  # The dimension weights are non-negative
         )
 
-        try:
-            result: OptimizeResult = minimize(
-                self._objective,
-                x0=x0,
-                bounds=bounds,
-                args=(X, y, sensitive_features),
-                method="L-BFGS-B",
-                tol=self.tol,
-                options={"maxiter": self.max_iter},
-            )
-        except Exception as optimization_error:
-            raise RuntimeError("The loss minimization failed.") from optimization_error
+        result: OptimizeResult = minimize(
+            self._objective,
+            x0=x0,
+            bounds=bounds,
+            args=(X, y, sensitive_features),
+            method="L-BFGS-B",
+            tol=self.tol,
+            options={"maxiter": self.max_iter},
+        )
 
         self.coef_ = result.x[self._prototype_vectors_size : -self._prototype_dim]
         self._prototypes_ = result.x[: self._prototype_vectors_size].reshape(
@@ -328,6 +325,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         if self._has_target:
             w = x[self._prototype_vectors_size : -self._prototype_dim]
             y_hat = M @ w
+            y_hat = np.clip(y_hat, 0, 1)  # To deal with precision errors
             classification_error = log_loss(y, y_hat)
 
         fairness_error = 0.0
