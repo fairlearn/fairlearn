@@ -2,8 +2,6 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from importlib.metadata import PackageNotFoundError
-
 import pytest
 
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
@@ -48,7 +46,7 @@ def is_mpl_installed():
         import pytest_mpl  # noqa: F401
 
         return True
-    except PackageNotFoundError:
+    except ModuleNotFoundError:
         return False
 
 
