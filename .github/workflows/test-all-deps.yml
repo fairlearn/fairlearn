@@ -43,9 +43,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.DATA_HOME }}
-          key: ${{ runner.os }}-sklearn-datasets-v1
+          key: ${{ runner.os }}-openml-datasets-v1
           restore-keys: |
-            ${{ runner.os }}-sklearn-datasets-
+            ${{ runner.os }}-openml-datasets-
 
       - run: python scripts/install_requirements.py
       - run: pip install .
