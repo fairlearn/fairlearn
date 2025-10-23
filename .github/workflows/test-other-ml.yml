@@ -30,7 +30,7 @@ jobs:
       - name: Cache openml datasets
         uses: actions/cache@v3
         with:
-          path: ${{ env.SKLEARN_DATA_PATH }}
+          path: ${{ env.DATA_HOME }}
           key: ${{ runner.os }}-sklearn-datasets-v1
           restore-keys: |
             ${{ runner.os }}-sklearn-datasets-
