@@ -11,6 +11,8 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fairlearn.preprocessing import CorrelationRemover
 
+pytestmark = pytest.mark.narwhals
+
 
 @parametrize_with_checks(
     [
