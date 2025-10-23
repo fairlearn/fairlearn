@@ -39,6 +39,11 @@ filterwarnings = [
     "ignore:.*parameter is deprecated and will be removed in Pillow 13.*:DeprecationWarning"
 ]
 
+markers = [
+    "narwhals: tests that involve dataframe logic backed by Narwhals (deselect with '-m \"not narwhals\"')",
+    "mpl_image_compare: tests that require 'pytest-mpl' to be installed"
+]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
