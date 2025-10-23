@@ -14,6 +14,9 @@ on:
         type: string
         default: "3.13"
 
+env:
+  DATA_HOME: "~/openml_data"
+
 jobs:
   minimal-deps:
     # This job installs minimal dependencies and runs tests for the minimal
@@ -36,6 +39,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
+      - name: Cache openml datasets
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.SKLEARN_DATA_PATH }}
+          key: ${{ runner.os }}-sklearn-datasets-v1
+          restore-keys: |
+            ${{ runner.os }}-sklearn-datasets-
       - run: pip install .
       - run: pip install pytest pytest-cov
       - run: pytest --cov=fairlearn --cov-report=xml test/install
