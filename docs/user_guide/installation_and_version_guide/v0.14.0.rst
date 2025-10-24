@@ -11,4 +11,3 @@ Other improvements
 ------------------
 
 * Removed support for python 3.9 and added support for python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
-* Make :code:`GroupFeature` class dataframe agnostic through Narwhals: :pr:`1546` by :user:`Francesco Bruzzesi <FBruzzesi>`.

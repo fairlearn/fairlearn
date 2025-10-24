@@ -7,6 +7,8 @@ import pytest
 
 import fairlearn.metrics as metrics
 
+pytestmark = pytest.mark.narwhals
+
 raw_feature = ["a", "b", "c", "a"]
 
 

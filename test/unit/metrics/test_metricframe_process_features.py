@@ -9,6 +9,8 @@ import fairlearn.metrics as metrics
 
 from .utils import _get_raw_MetricFrame
 
+pytestmark = pytest.mark.narwhals
+
 
 class TestSingleFeature:
     def _get_raw_data(self):
