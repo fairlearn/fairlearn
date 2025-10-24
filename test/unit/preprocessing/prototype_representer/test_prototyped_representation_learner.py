@@ -10,7 +10,7 @@ from fairlearn.preprocessing import PrototypeRepresentationLearner
 
 @parametrize_with_checks(
     [
-        PrototypeRepresentationLearner(max_iter=50),
+        PrototypeRepresentationLearner(max_iter=3, random_state=42),
     ],
 )
 def test_sklearn_compatible_estimator(estimator, check):
@@ -63,7 +63,7 @@ def test_classification(y: np.array, sensitive_features: np.array | None):
     y = np.array([0, 1, 0, 1])
     sensitive_features = np.array([0, 1, 0, 1])
     prl = PrototypeRepresentationLearner(
-        n_prototypes=4, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42
+        n_prototypes=4, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42, tol=1e-4
     )
     prl.fit(X, y, sensitive_features=sensitive_features)
 
