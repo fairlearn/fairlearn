@@ -9,6 +9,8 @@ from sklearn.metrics import accuracy_score, recall_score, roc_auc_score
 
 from fairlearn.metrics._annotated_metric_function import AnnotatedMetricFunction
 
+pytestmark = pytest.mark.narwhals
+
 
 def test_constructor_unnamed():
     fc = AnnotatedMetricFunction(func=recall_score, name=None)
