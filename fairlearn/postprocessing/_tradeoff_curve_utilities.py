@@ -5,7 +5,7 @@ from typing import Literal, Tuple
 
 import narwhals.stable.v1 as nw
 import numpy as np
-from narwhals.typing import IntoDataFrameT
+from narwhals.typing import IntoDataFrame, IntoDataFrameT
 from numpy.typing import NDArray
 from sklearn.utils import Bunch
 
@@ -89,7 +89,7 @@ def _tradeoff_curve(
 
     Parameters
     ----------
-    data : pandas.DataFrame
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         Data frame with columns 'score' and 'label'.
 
     sensitive_feature_value : str or int
@@ -112,7 +112,7 @@ def _tradeoff_curve(
 
     Returns
     -------
-    result : pandas.DataFrame
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The convex hull over the achievable trade-off points with columns
         'x', 'y', and 'operation'.
     """
@@ -128,12 +128,12 @@ def _filter_points_to_get_convex_hull(points_sorted: IntoDataFrameT) -> IntoData
 
     Parameters
     ----------
-    points_sorted : pandas.DataFrame
+    points_sorted : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         Points represented as rows with 'x' and 'y' columns, sorted lexicographically by 'x' and 'y'.
 
     Returns
     -------
-    result : pandas.DataFrame
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         Points that make the upper convex hull.
 
     Notes
@@ -169,6 +169,8 @@ def _filter_points_to_get_convex_hull(points_sorted: IntoDataFrameT) -> IntoData
         selected_rows.append(r2)
         selected_indexes.append(_idx)
 
+    # The reason for this workaround is to be able to maintain the original dtype_backend
+    # in case of pandas DataFrame's.
     return nw.maybe_reset_index(nw_points_sorted[selected_indexes, :]).to_native()
 
 
@@ -182,7 +184,7 @@ def _interpolate_curve(
 
     Parameters
     ----------
-    data : :class:`pandas:pandas.DataFrame`
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The convex hull data points.
     x_col : str
         Name of the x-column in `data`.
@@ -195,7 +197,7 @@ def _interpolate_curve(
 
     Returns
     -------
-    result : :class:`pandas:pandas.DataFrame`
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         DataFrame with the points of the interpolated curve.
     """
     nw_data = nw.from_native(data, eager_only=True, pass_through=False)
@@ -288,7 +290,7 @@ def _calculate_tradeoff_points(
 
     Parameters
     ----------
-    data : :class:`pandas:pandas.DataFrame`
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The DataFrame containing scores and labels.
     sensitive_feature_value : str, int
         The sensitive feature value of the samples provided in `data`.
@@ -306,7 +308,7 @@ def _calculate_tradeoff_points(
 
     Returns
     -------
-    result : :class:`pandas:pandas.DataFrame`
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The ROC curve points with their corresponding threshold operations.
     """
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
@@ -371,14 +373,14 @@ def _calculate_tradeoff_points(
     ).to_native()
 
 
-def _get_scores_labels_and_counts(data: IntoDataFrameT) -> Tuple[list, list, int, int, int]:
+def _get_scores_labels_and_counts(data: IntoDataFrame) -> Tuple[list, list, int, int, int]:
     """Order samples by scores, counting number of positive, negative, and overall samples.
 
     The samples are sorted into descending order.
 
     Parameters
     ----------
-    data : :class:`pandas:pandas.DataFrame`
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The DataFrame containing scores and labels.
 
     Returns

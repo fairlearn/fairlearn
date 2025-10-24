@@ -26,6 +26,8 @@ from .conftest import (
     sensitive_features_ex1,
 )
 
+pytestmark = pytest.mark.narwhals
+
 
 def test_assert_interpolated_curve(constructor):
     # An easily interpretable test to make sure the assertion method works as expected
