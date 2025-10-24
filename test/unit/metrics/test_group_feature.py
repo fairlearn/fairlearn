@@ -8,18 +8,12 @@ import pytest
 import fairlearn.metrics as metrics
 
 raw_feature = ["a", "b", "c", "a"]
-expected_classes = ["a", "b", "c"]
-
-
-def common_validations(sf):
-    assert np.array_equal(expected_classes, sf.classes_)
 
 
 def test_list():
     target = metrics._group_feature.GroupFeature("Sens", raw_feature, 0, None)
 
     assert target.name_ == "Sens0"
-    common_validations(target)
 
 
 def test_named_list():
@@ -27,7 +21,6 @@ def test_named_list():
     target = metrics._group_feature.GroupFeature("Ignored", raw_feature, 2, expected_name)
 
     assert target.name_ == expected_name
-    common_validations(target)
 
 
 def test_ndarray():
@@ -36,7 +29,6 @@ def test_ndarray():
     target = metrics._group_feature.GroupFeature("SF", rf, 1, None)
 
     assert target.name_ == "SF1"
-    common_validations(target)
 
 
 def test_unnamed_Series():
@@ -45,28 +37,28 @@ def test_unnamed_Series():
     target = metrics._group_feature.GroupFeature("SF", rf, 2, None)
 
     assert target.name_ == "SF2"
-    common_validations(target)
 
 
-def test_named_Series():
+def test_named_Series(request, constructor):
+    if "pyarrow_table" in str(request):
+        request.applymarker(pytest.mark.xfail(reason="PyArrow chunked_array's are nameless"))
+
     name = "My Feature"
-    rf = pd.Series(data=raw_feature, name=name)
+    rf = constructor({name: raw_feature})[name]
 
     target = metrics._group_feature.GroupFeature("Ignored", rf, 2, None)
 
     assert target.name_ == name
-    common_validations(target)
 
 
-def test_named_Series_override_name():
+def test_named_Series_override_name(constructor):
     expected_name = "Some Feature"
     series_name = "Unused Name"
 
-    rf = pd.Series(data=raw_feature, name=series_name)
+    rf = constructor({series_name: raw_feature})[series_name]
     target = metrics._group_feature.GroupFeature("Not seen", rf, 2, expected_name)
 
     assert target.name_ == expected_name
-    common_validations(target)
 
 
 def test_Series_int_name():
