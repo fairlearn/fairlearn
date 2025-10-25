@@ -14,7 +14,7 @@ on:
         type: string
 
 env:
-  DATA_HOME: "$HOME/openml_data"
+  DATA_HOME: "~/openml_data"
 
 jobs:
   all-deps-min:
