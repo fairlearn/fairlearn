@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-import fairlearn.metrics as metrics
+from fairlearn.metrics._group_feature import GroupFeature
 
 pytestmark = pytest.mark.narwhals
 
@@ -13,22 +13,15 @@ raw_feature = ["a", "b", "c", "a"]
 
 
 def test_list():
-    target = metrics._group_feature.GroupFeature("Sens", raw_feature, 0, None)
+    target = GroupFeature("Sens", raw_feature, 0)
 
     assert target.name_ == "Sens0"
-
-
-def test_named_list():
-    expected_name = "My Named List"
-    target = metrics._group_feature.GroupFeature("Ignored", raw_feature, 2, expected_name)
-
-    assert target.name_ == expected_name
 
 
 def test_ndarray():
     rf = np.asarray(raw_feature)
 
-    target = metrics._group_feature.GroupFeature("SF", rf, 1, None)
+    target = GroupFeature("SF", rf, 1)
 
     assert target.name_ == "SF1"
 
@@ -36,37 +29,26 @@ def test_ndarray():
 def test_unnamed_Series():
     rf = pd.Series(data=raw_feature)
 
-    target = metrics._group_feature.GroupFeature("SF", rf, 2, None)
+    target = GroupFeature("SF", rf, 2)
 
     assert target.name_ == "SF2"
 
 
-def test_named_Series(request, constructor):
+def test_named_Series(request: pytest.FixtureRequest, constructor):
     if "pyarrow_table" in str(request):
         request.applymarker(pytest.mark.xfail(reason="PyArrow chunked_array's are nameless"))
 
     name = "My Feature"
     rf = constructor({name: raw_feature})[name]
 
-    target = metrics._group_feature.GroupFeature("Ignored", rf, 2, None)
+    target = GroupFeature("Ignored", rf, 2)
 
     assert target.name_ == name
-
-
-def test_named_Series_override_name(constructor):
-    expected_name = "Some Feature"
-    series_name = "Unused Name"
-
-    rf = constructor({series_name: raw_feature})[series_name]
-    target = metrics._group_feature.GroupFeature("Not seen", rf, 2, expected_name)
-
-    assert target.name_ == expected_name
 
 
 def test_Series_int_name():
     rf = pd.Series(data=raw_feature, name=1)
 
     msg = "Series name must be a string. Value '1' was of type <class 'int'>"
-    with pytest.raises(ValueError) as execInfo:
-        _ = metrics._group_feature.GroupFeature("Not seen", rf, 2, None)
-    assert execInfo.value.args[0] == msg
+    with pytest.raises(ValueError, match=msg):
+        GroupFeature("Not seen", rf, 2)
