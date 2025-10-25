@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from test.utils import DATA_HOME
 from typing import Callable, Union
 
 import numpy as np
@@ -59,7 +60,7 @@ class FairnessComparisonData:
 def adult_dataset() -> Dataset:
     features_to_keep = ["fnlwgt", "capital-gain", "capital-loss", "hours-per-week", "age"]
     sensitive_feature_id = "race_White"
-    raw_data = fetch_adult().frame
+    raw_data = fetch_adult(data_home=DATA_HOME).frame
     data, target = (
         raw_data[features_to_keep + ["race"]],
         raw_data["class"] == ">50K",

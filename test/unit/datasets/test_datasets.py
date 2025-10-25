@@ -1,6 +1,8 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from test.utils import DATA_HOME
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -34,7 +36,7 @@ class TestFairlearnDataset:
         if as_frame is False and fetch_function is fetch_diabetes_hospital:
             msg = "fetch_diabetes_hospital will be skipped until dataset is fixed."
             pytest.skip(msg)
-        dataset = fetch_function(as_frame=as_frame)
+        dataset = fetch_function(as_frame=as_frame, data_home=DATA_HOME)
         assert dataset is not None
         assert dataset["data"].shape is not None
         assert isinstance(dataset["data"], pd.DataFrame if as_frame else np.ndarray)
@@ -61,7 +63,7 @@ class TestFairlearnDataset:
         if as_frame is False and fetch_function is fetch_diabetes_hospital:
             msg = "fetch_diabetes_hospital will be skipped until dataset is fixed."
             pytest.skip(msg)
-        X, y = fetch_function(as_frame=as_frame, return_X_y=True)
+        X, y = fetch_function(as_frame=as_frame, return_X_y=True, data_home=DATA_HOME)
         assert X is not None
         assert isinstance(X, pd.DataFrame if as_frame else np.ndarray)
         assert y is not None
@@ -73,10 +75,10 @@ class TestFairlearnDataset:
         # both dataset tests can be removed because the OpenML dataset has
         # been fixed.
         with pytest.raises(ValueError):
-            fetch_diabetes_hospital(as_frame=False)
+            fetch_diabetes_hospital(as_frame=False, data_home=DATA_HOME)
 
     def test_fetch_acs_income_dataframe(self):
-        dataset = fetch_acs_income()
+        dataset = fetch_acs_income(data_home=DATA_HOME)
         expected_columns = [
             "AGEP",
             "COW",
@@ -94,4 +96,4 @@ class TestFairlearnDataset:
 
     def test_fetch_acs_income_value_error(self):
         with pytest.raises(ValueError):
-            fetch_acs_income(states=["XY"])
+            fetch_acs_income(states=["XY"], data_home=DATA_HOME)
