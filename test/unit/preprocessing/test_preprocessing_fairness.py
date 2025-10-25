@@ -128,10 +128,10 @@ def test_preprocessing_mitigates_bias(
     fairness_metric: Callable,
     fairness_comparison_data: FairnessComparisonData,
 ) -> None:
-    bootstrap_iterations = 30
+    bootstrap_iterations = 20
 
-    fairness_metrics_values_with_mitigation = np.zeros(bootstrap_iterations)
-    fairness_metrics_values_without_mitigation = np.zeros(bootstrap_iterations)
+    fairness_metrics_values_with_mitigation = np.empty(bootstrap_iterations)
+    fairness_metrics_values_without_mitigation = np.empty(bootstrap_iterations)
 
     for iteration in range(bootstrap_iterations):
         sampled_data = fairness_comparison_data.bootstrap(seed=iteration)

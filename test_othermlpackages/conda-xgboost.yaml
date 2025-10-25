@@ -8,7 +8,7 @@ dependencies:
 - pytest-cov
 - xgboost>=1.7.0
 - pandas
-- scipy<1.16.0
+- scipy
 
 # Note xgboost not available for Windows on conda-forge
 # See
