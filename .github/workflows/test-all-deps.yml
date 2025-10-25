@@ -15,7 +15,7 @@ on:
         default: "3.13"
 
 env:
-  DATA_HOME: "~/openml_data"
+  DATA_HOME: "$HOME/openml_data"
 
 jobs:
   all-deps:
@@ -40,12 +40,11 @@ jobs:
         with:
           python-version: ${{ inputs.python }}
       - name: Cache openml datasets
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.DATA_HOME }}
-          key: ${{ runner.os }}-openml-datasets-v1
-          restore-keys: |
-            ${{ runner.os }}-openml-datasets-
+          key: openml-datasets-v1
+          restore-keys: openml-datasets-
 
       - run: python scripts/install_requirements.py
       - run: pip install .

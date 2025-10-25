@@ -28,12 +28,11 @@ jobs:
         with:
           python-version: ${{ inputs.python }}
       - name: Cache openml datasets
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ env.DATA_HOME }}
-          key: ${{ runner.os }}-openml-datasets-v1
-          restore-keys: |
-            ${{ runner.os }}-openml-datasets-
+          key: openml-datasets-v1
+          restore-keys: openml-datasets-
       - run: |
           conda update -n base -c defaults conda
         name: Update and initialise conda
