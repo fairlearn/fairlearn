@@ -22,6 +22,8 @@ jobs:
     # CodeCov limits us to 150 uploads per commit id, so have an extra check so
     # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
+    env:
+      UV_SYSTEM_PYTHON: 1
     steps:
       - uses: actions/checkout@v4
       - name: Get commit date
@@ -36,9 +38,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
-      - run: pip install .
-      - run: pip install pytest pytest-cov
-      - run: pytest --cov=fairlearn --cov-report=xml test/install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv pip install .
+      - run: uv pip install pytest pytest-cov
+      - run: uv run pytest --cov=fairlearn --cov-report=xml test/install
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v4.2.0

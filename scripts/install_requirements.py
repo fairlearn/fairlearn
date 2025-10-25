@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def _build_argument_parser():
-    desc = "Install requirements using pip"
+    desc = "Install requirements using pip or uv (preferred if available)."
 
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
@@ -37,13 +37,25 @@ def _build_argument_parser():
     return parser
 
 
+def _detect_installer():
+    """Return ['uv', 'pip'] or ['pip'] depending on what's available."""
+    try:
+        subprocess.run(["uv", "--version"], check=True, capture_output=True)
+        _logger.info("Detected uv; using 'uv pip' for installation.")
+        return ["uv", "pip"]
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        _logger.info("uv not found; falling back to pip.")
+        return ["pip"]
+
+
 def _install_requirements_file(file_stem):
     _logger.info("Processing %s", file_stem)
 
-    requirements_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)
+    requirements_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
+    installer = _detect_installer()
 
-    with _LogWrapper("Running pip on {0}".format(requirements_file)):
-        command_args = ["pip", "install", "-r", requirements_file]
+    with _LogWrapper(f"Running {' '.join(installer)} install -r {requirements_file}"):
+        command_args = installer + ["install", "-r", requirements_file]
         subprocess.check_call(command_args)
 
 
