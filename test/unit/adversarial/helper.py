@@ -67,11 +67,6 @@ class fake_torch:
     def randperm(X):
         return np.random.choice(range(X), size=X, replace=False)
 
-    class Tensor:
-        """Mock of torch.Tensor for scipy compatibility."""
-
-        pass
-
     class nn:
         """Mock of torch.nn."""
 
