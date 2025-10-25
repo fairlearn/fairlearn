@@ -43,8 +43,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.DATA_HOME }}
-          key: openml-datasets-v1
-          restore-keys: openml-datasets-
+          key: ${{ runner.os }}-openml-datasets-v1
+          restore-keys: ${{ runner.os }}-openml-datasets-
+
       - run: pip install .
       - run: pip install pytest pytest-cov
       - run: pytest --cov=fairlearn --cov-report=xml test/install
