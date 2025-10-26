@@ -1,6 +1,8 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from test.utils import DATA_HOME
+
 import pytest
 from numpy import asarray, issubdtype, ndarray
 
@@ -33,7 +35,7 @@ def data_generator():
     yield [0.1, 2.0, 0.999999, 100000.1], "continuous"
 
     # Larger examples.
-    X, y = fetch_adult(return_X_y=True)
+    X, y = fetch_adult(return_X_y=True, data_home=DATA_HOME)
     yield y.tolist(), "binary"
     non_NaN_rows = ~X.isna().any(axis=1)
     X = X[non_NaN_rows]
