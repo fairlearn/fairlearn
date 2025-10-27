@@ -17,13 +17,14 @@ import fairlearn.utils._compatibility as compat
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
+from test_othermlpackages.utils import DATA_HOME
 
 logger = logging.getLogger(__name__)
 
 
 def fetch_adult():
     """Grab dataset for testing."""
-    data = fld.fetch_adult()
+    data = fld.fetch_adult(data_home=DATA_HOME)
     X = data.data.drop(labels=["sex"], axis=1)
     X = pd.get_dummies(X)
     Y = (data.target == ">50K") * 1
@@ -122,7 +123,7 @@ def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
     random.seed(123)
 
-    X, y = fld.fetch_adult(return_X_y=True)
+    X, y = fld.fetch_adult(return_X_y=True, data_home=DATA_HOME)
 
     non_NaN_rows = ~X.isna().any(axis=1)
 
