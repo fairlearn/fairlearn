@@ -10,7 +10,10 @@ should adhere to. Breaking changes in Torch/TF API should be manually reflected
 here. Additionally, we generate data here.
 """
 
+import contextlib
 import sys
+from typing import Literal
+from unittest.mock import patch
 
 import numpy as np
 
@@ -63,11 +66,6 @@ class fake_torch:
 
     def randperm(X):
         return np.random.choice(range(X), size=X, replace=False)
-
-    class Tensor:
-        """Mock of torch.Tensor for scipy compatibility."""
-
-        pass
 
     class nn:
         """Mock of torch.nn."""
@@ -293,12 +291,12 @@ def get_instance(
     cls=_AdversarialFairness,
     fake_mixin=False,
     fake_training=False,
-    torch=True,
-    tensorflow=False,
+    fake_backend: Literal["torch", "tensorflow"] | None = "torch",
     **kwargs,
 ):
     """
     Shared set up of test cases that create an instance of the model.
+    Should be used with the fake_backend_env pytest fixture.
 
     Parameters
     ----------
@@ -311,29 +309,15 @@ def get_instance(
     fake_training: bool
         only remove training step from backendEngine
 
-    torch: bool
-        Use torch (and set the fake torch module)
-
-    tensorflow: bool
-        Use tensorflow (and set the fake tensorflow module)
+    fake_backend : Literal["torch", "tensorflow"] | None
+        which backend to use
     """
-    if torch:
-        sys.modules["torch"] = fake_torch
-    else:
-        sys.modules["torch"] = None
-    if tensorflow:
-        sys.modules["tensorflow"] = fake_tensorflow
-        sys.modules["keras"] = fake_keras
-    else:
-        sys.modules["tensorflow"] = None
-        sys.modules["keras"] = None
-
     default_kwargs = dict()
 
-    if torch:
+    if fake_backend == "torch":
         default_kwargs["predictor_model"] = fake_torch.nn.Module()
         default_kwargs["adversary_model"] = fake_torch.nn.Module()
-    elif tensorflow:
+    elif fake_backend == "tensorflow":
         default_kwargs["predictor_model"] = fake_keras.Model()
         default_kwargs["adversary_model"] = fake_keras.Model()
 
@@ -343,14 +327,54 @@ def get_instance(
     if fake_mixin:
         mitigator.backend = RemoveAll
     elif fake_training:
-        if tensorflow:
+        if fake_backend == "tensorflow":
             mitigator.backend = RemoveTrainStepTensorflow
-        if torch:
+        if fake_backend == "torch":
             mitigator.backend = RemoveTrainStepPytorch
 
     return mitigator
 
 
-sys.modules["torch"] = None
-sys.modules["tensorflow"] = None
-sys.modules["keras"] = None
+def get_backend_patches(backend: Literal["torch", "tensorflow"] | None = "torch"):
+    patches = {"torch": None, "tensorflow": None, "keras": None}
+
+    if backend == "torch":
+        patches["torch"] = fake_torch
+    elif backend == "tensorflow":
+        patches["tensorflow"] = fake_tensorflow
+        patches["keras"] = fake_keras
+    elif backend is not None:
+        raise ValueError(f"Unknown backend: {backend}")
+
+    return patches
+
+
+@contextlib.contextmanager
+def _patched_modules(backend: Literal["torch", "tensorflow"] | None = "torch"):
+    """Temporarily patch sys.modules to fake torch/tensorflow."""
+    with patch.dict(sys.modules, get_backend_patches(backend)):
+        yield
+
+
+def get_instance_with_context(
+    cls=_AdversarialFairness,
+    fake_mixin=False,
+    fake_training=False,
+    fake_backend: Literal["torch", "tensorflow"] | None = "torch",
+    **kwargs,
+):
+    """
+    Needed for tests that require the estimator to be created in the parameters, e.g.,
+    scikit-learn's parametrize_with_checks. The tests still need the fake_backend_env
+    fixture to patch sys.modules during the test function execution.
+
+    In other cases, using get_instance with the fake_backend_env pytest fixture suffices.
+    """
+    with _patched_modules(backend=fake_backend):
+        return get_instance(
+            cls=cls,
+            fake_mixin=fake_mixin,
+            fake_training=fake_training,
+            fake_backend=fake_backend,
+            **kwargs,
+        )
