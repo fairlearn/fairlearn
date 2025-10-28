@@ -13,6 +13,8 @@ on:
         required: true
         type: string
 
+env:
+  DATA_HOME: "~/openml_data"
 
 jobs:
   other-ml:
@@ -25,6 +27,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
+      - name: Cache openml datasets
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DATA_HOME }}
+          key: ${{ runner.os }}-openml-datasets-v1
+          restore-keys: ${{ runner.os }}-openml-datasets-
+
       - run: |
           conda update -n base -c defaults conda
         name: Update and initialise conda

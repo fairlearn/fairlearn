@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from test.utils import DATA_HOME
+
 import pandas as pd
 from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
@@ -67,7 +69,7 @@ def test_random_state_exponentiated_gradient():
 
 def _get_test_data():
     # fetch data from OpenML
-    data = fetch_openml(data_id=42193, parser="auto")
+    data = fetch_openml(data_id=42193, parser="auto", data_home=DATA_HOME)
     X = (
         pd.DataFrame(data["data"], columns=data["feature_names"])
         .drop(columns=["race_Caucasian", "c_charge_degree_F"])
