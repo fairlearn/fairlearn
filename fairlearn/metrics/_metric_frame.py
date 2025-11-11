@@ -972,7 +972,7 @@ class MetricFrame:
 
         if isinstance(features, pd.Series):
             check_consistent_length(features, sample_array)
-            result.append(GroupFeature(base_name, features, 0, None))
+            result.append(GroupFeature(base_name, features, 0))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
                 col_name = features.columns[i]
@@ -981,13 +981,13 @@ class MetricFrame:
                     raise ValueError(msg)
                 column = features.iloc[:, i]
                 check_consistent_length(column, sample_array)
-                result.append(GroupFeature(base_name, column, i, None))
+                result.append(GroupFeature(base_name, column, i))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
-                result.append(GroupFeature(base_name, f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0))
             else:
                 raise ValueError(_FEATURE_LIST_NONSCALAR)
         elif isinstance(features, dict):
@@ -1002,19 +1002,19 @@ class MetricFrame:
                     raise ValueError(msg)
                 column = df.iloc[:, i]
                 check_consistent_length(column, sample_array)
-                result.append(GroupFeature(base_name, column, i, None))
+                result.append(GroupFeature(base_name, column, i))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=object))
             if len(f_arr.shape) == 1:
                 check_consistent_length(f_arr, sample_array)
-                result.append(GroupFeature(base_name, f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0))
             elif len(f_arr.shape) == 2:
                 # Work similarly to pd.DataFrame(data=ndarray)
                 for i in range(f_arr.shape[1]):
                     col = f_arr[:, i]
                     check_consistent_length(col, sample_array)
-                    result.append(GroupFeature(base_name, col, i, None))
+                    result.append(GroupFeature(base_name, col, i))
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 
