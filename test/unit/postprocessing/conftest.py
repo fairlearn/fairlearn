@@ -92,6 +92,18 @@ _data_ex3 = _data(
     scores_ex,
 )
 
+def pytest_configure(config):
+    # Runs very early (before tests are collected), so is safe place to ensure no open figures
+    import matplotlib.pyplot as plt
+    plt.close("all")
+
+@pytest.fixture(autouse=True)
+def _close_figs_around_test():
+    # Close before AND after each test to avoid lingering figures between tests
+    import matplotlib.pyplot as plt
+    plt.close("all")     # pre-test (important for backend switches)
+    yield
+    plt.close("all")     # post-test cleanup
 
 @pytest.fixture(params=[_data_ex1, _data_ex2, _data_ex3])
 def data(request):

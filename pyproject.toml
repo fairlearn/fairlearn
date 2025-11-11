@@ -34,7 +34,7 @@ filterwarnings = [
 
     # Warnings in release-wheel
     # Matplotlib
-    "ignore:Auto-close.*backend switching is deprecated",
+    #"ignore:Auto-close.*backend switching is deprecated",
     # Pillow
     "ignore:.*parameter is deprecated and will be removed in Pillow 13.*:DeprecationWarning"
 ]
