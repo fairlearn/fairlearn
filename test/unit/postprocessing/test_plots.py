@@ -21,6 +21,16 @@ a typical pytest command without extra options) or to actually compare the
 generated images with the baseline plots (using pytest --mpl)."""
 
 
+@pytest.fixture()
+def close_figs():
+    # Close before and after each test to avoid lingering figures between tests
+    import matplotlib.pyplot as plt
+
+    plt.close("all")  # pre-test (important for backend switches)
+    yield
+    plt.close("all")  # post-test cleanup
+
+
 def _fit_and_plot(constraints, plotting_data, tol: float | None = None):
     import matplotlib.pyplot as plt
 
@@ -50,6 +60,7 @@ def is_mpl_installed():
         return False
 
 
+@pytest.mark.usefixtures("close_figs")
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="post_processing_equalized_odds_ex1.png")
