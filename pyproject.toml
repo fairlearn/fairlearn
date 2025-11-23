@@ -33,7 +33,11 @@ filterwarnings = [
     "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
 
     # Warnings in release-wheel
-    
+    # TODO: Remove this filter when matplotlib v3.10.5+ is released and fairlearn updates to it
+    # This warning comes from matplotlib's internal use of PIL.Image.fromarray() with the deprecated 'mode' parameter
+    # See: https://github.com/matplotlib/matplotlib/issues/30249
+    # See: https://github.com/fairlearn/fairlearn/issues/1586
+    "ignore:.*'mode' parameter is deprecated.*:DeprecationWarning:PIL.Image",
 ]
 
 markers = [
