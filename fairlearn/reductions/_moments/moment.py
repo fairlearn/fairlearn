@@ -18,6 +18,8 @@ _SIGN = "sign"
 class Moment:
     """Generic moment.
 
+    .. versionadded:: 0.7
+
     Our implementations of the reductions approach to fairness
     :footcite:p:`agarwal2018reductions` make use
     of :class:`Moment` objects to describe both the optimization objective
@@ -101,6 +103,8 @@ Moment.__module__ = "fairlearn.reductions"
 class ClassificationMoment(Moment):
     """Moment that can be expressed as weighted classification error."""
 
+    .. versionadded:: 0.7
+
     def _moment_type(self):
         return ClassificationMoment
 
@@ -112,6 +116,8 @@ ClassificationMoment.__module__ = "fairlearn.reductions"
 
 class LossMoment(Moment):
     """Moment that can be expressed as weighted loss."""
+
+    .. versionadded:: 0.7
 
     def __init__(self, loss):
         super().__init__()
