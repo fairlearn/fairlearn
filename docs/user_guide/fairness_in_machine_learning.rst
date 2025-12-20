@@ -26,7 +26,7 @@ the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 Types of harms
 --------------
 
-There are many types of harms: :footcite:`barocas2017problem`.
+There are many types of harms :footcite:`barocas2017problem`.
 Some of these are:
 
 * *Allocation harms* can occur when AI systems extend or withhold
