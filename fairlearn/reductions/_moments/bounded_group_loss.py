@@ -15,8 +15,6 @@ from .moment import _ALL, _GROUP_ID, _LABEL, _LOSS, _PREDICTION, LossMoment
 class ConditionalLossMoment(LossMoment):
     r"""A moment for constraining the mean loss or the worst-case loss by a group.
 
-    .. versionadded:: 0.7
-
     Read more in the :ref:`User Guide <bounded_group_loss>`.
 
     Parameters
@@ -116,8 +114,6 @@ ConditionalLossMoment.__module__ = "fairlearn.reductions"
 class MeanLoss(ConditionalLossMoment):
     """Moment for evaluating the mean loss.
 
-    .. versionadded:: 0.7
-
     Read more in the :ref:`User Guide <constraints_regression>`.
     """
 
@@ -133,8 +129,6 @@ MeanLoss.__module__ = "fairlearn.reductions"
 class BoundedGroupLoss(ConditionalLossMoment):
     """Moment for constraining the worst-case loss by a group.
 
-    .. versionadded:: 0.7
-
     For more information refer to the :ref:`user guide <bounded_group_loss>`.
     """
 
@@ -144,8 +138,6 @@ class BoundedGroupLoss(ConditionalLossMoment):
 
 class SquareLoss:
     """Class to evaluate the square loss.
-
-    .. versionadded:: 0.7
 
     Read more in the :ref:`User Guide <constraints_regression>`.
     """
@@ -166,8 +158,6 @@ class SquareLoss:
 
 class AbsoluteLoss:
     """Class to evaluate absolute loss.
-
-    .. versionadded:: 0.7
 
     Read more in the :ref:`User Guide <constraints_regression>`.
     """
@@ -193,8 +183,6 @@ AbsoluteLoss.__module__ = "fairlearn.reductions"
 
 class ZeroOneLoss(AbsoluteLoss):
     """Class to evaluate a zero-one loss.
-
-    .. versionadded:: 0.7
 
     Read more in the :ref:`User Guide <constraints_regression>`.
     """

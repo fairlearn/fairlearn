@@ -38,8 +38,6 @@ def _merge_event_and_control_columns(event_col: pd.Series, control_col) -> pd.Se
 class UtilityParity(ClassificationMoment):
     r"""A generic moment for parity in utilities (or costs) under classification.
 
-    .. versionadded:: 0.7
-
     This serves as the base class for :class:`DemographicParity`,
     :class:`EqualizedOdds`, and others. All subclasses can be used as
     difference-based constraints or ratio-based constraints.
@@ -289,8 +287,6 @@ UtilityParity.__module__ = "fairlearn.reductions"
 
 class DemographicParity(UtilityParity):
     r"""Implementation of demographic parity as a moment.
-
-    .. versionadded:: 0.7
 
     A classifier :math:`h(X)` satisfies demographic parity if
 

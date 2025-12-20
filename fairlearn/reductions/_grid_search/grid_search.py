@@ -87,7 +87,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         grid=None,
         sample_weight_name="sample_weight",
     ):
-        """Construct a GridSearch object."""
+        """Construct a GridSearch object.""" 
         self.estimator = estimator
         if not isinstance(constraints, Moment):
             raise RuntimeError("Unsupported disparity metric")

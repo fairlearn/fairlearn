@@ -20,8 +20,6 @@ _MESSAGE_BAD_COSTS = (
 class ErrorRate(ClassificationMoment):
     r"""Misclassification error as a moment.
 
-    .. versionadded:: 0.7
-
     A classifier :math:`h(X)` has the misclassification error equal to
 
     .. math::
