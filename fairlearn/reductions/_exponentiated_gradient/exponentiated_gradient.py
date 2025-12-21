@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient reduction.
 
-    .. versionadded:: 0.7
+    .. versionadded:: 0.5
 
     The exponentiated gradient algorithm is described in detail by
     :footcite:t:`agarwal2018reductions`.
@@ -125,8 +125,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
     def fit(self, X, y, **kwargs):
         """Return a fair classifier under specified fairness constraints.
-
-        .. versionadded:: 0.7
 
         Parameters
         ----------
@@ -288,8 +286,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
     def predict(self, X, random_state=None):
         """Provide predictions for the given input data.
-
-        .. versionadded:: 0.7
 
         Predictions are randomized, i.e., repeatedly calling `predict` with
         the same feature data may yield different output. This

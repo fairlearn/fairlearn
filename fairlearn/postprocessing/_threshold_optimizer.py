@@ -111,7 +111,7 @@ NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
 class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     """A classifier based on the threshold optimization approach.
 
-     .. versionadded:: 0.7
+     .. versionadded:: 0.5
 
     The classifier is obtained by applying group-specific thresholds to the
     provided estimator. The thresholds are chosen to optimize the provided
@@ -268,8 +268,6 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     def fit(self, X, y, *, sensitive_features, **kwargs):
         """Fit the model.
 
-        .. versionadded:: 0.7
-
         The fit is based on training features and labels, sensitive features,
         as well as the fairness-unaware predictor or estimator. If an estimator was passed
         in the constructor this fit method will call `fit(X, y, **kwargs)` on said estimator.
@@ -351,8 +349,6 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     def predict(self, X, *, sensitive_features, random_state=None):
         """Predict label for each sample in X while taking into account \
             sensitive features.
-
-        .. versionadded:: 0.7
 
         Parameters
         ----------
