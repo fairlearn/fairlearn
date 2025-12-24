@@ -703,6 +703,52 @@ sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparam
 and iterated over a range of potential values.
 
 
+GridSearch
+~~~~~~~~~~
+
+The :class:`GridSearch` algorithm in Fairlearn allows you to perform a grid search
+over Lagrange multipliers to find a set of predictors that satisfy fairness
+constraints while optimizing a weighted combination of error and constraint violation.
+
+.. doctest:: mitigation_reductions
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> from sklearn.model_selection import train_test_split
+    >>> from fairlearn.reductions import GridSearch, DemographicParity
+    >>> from fairlearn.metrics import demographic_parity_difference
+    >>> import numpy as np
+    >>> import pandas as pd
+    >>> # Create a slightly larger toy dataset
+    >>> X = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9],
+    ...               [10], [11], [12], [13], [14], [15]])
+    >>> y = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0])
+    >>> sensitive_features = np.array(
+    ...     ["a", "b", "a", "a", "b", "a", "b", "b", "a", "b", "a", "b", "a", "b", "a", "b"]
+    ... )
+    >>> X_train, X_test, y_train, y_test, groups_train, groups_test = train_test_split(
+    ...     X, y, sensitive_features, test_size=0.4, random_state=42
+    ... )
+    >>> estimator = LogisticRegression(solver='liblinear')
+    >>> # Define the fairness constraint
+    >>> constraint = DemographicParity(difference_bound=0.01)
+    >>> # Create and fit the GridSearch mitigator
+    >>> mitigator = GridSearch(estimator=estimator, constraints=constraint, grid_size=5)
+    >>> mitigator.fit(X_train, y_train, sensitive_features=groups_train)
+    >>> # Make predictions using the best model
+    >>> y_pred = mitigator.predict(X_test)
+    >>> y_pred
+    array([0, 1, 1, 0, 0, 1])
+    >>> # Compute demographic parity difference
+    >>> dp_diff = demographic_parity_difference(
+    ...     y_true=y_test,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=groups_test
+    ... )
+    >>> dp_diff
+    0.1
+
+
 .. topic:: References
 
    .. footbibliography::
