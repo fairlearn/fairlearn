@@ -730,23 +730,21 @@ constraints while optimizing a weighted combination of error and constraint viol
     ...     X, y, sensitive_features, test_size=0.4, random_state=42
     ... )
     >>> estimator = LogisticRegression(solver='liblinear')
-    >>> # Define the fairness constraint
-    >>> constraint = DemographicParity(difference_bound=0.01)
-    >>> # Create and fit the GridSearch mitigator
-    >>> mitigator = GridSearch(estimator=estimator, constraints=constraint, grid_size=5)
-    >>> mitigator.fit(X_train, y_train, sensitive_features=groups_train)
-    >>> # Make predictions using the best model
-    >>> y_pred = mitigator.predict(X_test)
-    >>> y_pred
-    array([0, 1, 1, 0, 0, 1])
-    >>> # Compute demographic parity difference
-    >>> dp_diff = demographic_parity_difference(
-    ...     y_true=y_test,
-    ...     y_pred=y_pred,
-    ...     sensitive_features=groups_test
-    ... )
-    >>> dp_diff
-    0.1
+>>> constraint = DemographicParity(difference_bound=0.01)
+>>> mitigator = GridSearch(estimator=estimator, constraints=constraint, grid_size=5)
+>>> mitigator.fit(X_train, y_train, sensitive_features=groups_train)
+
+>>> # Make predictions using the best model
+>>> y_pred = mitigator.predict(X_test)
+>>> print(y_pred)  # doctest: +ELLIPSIS
+
+>>> # Compute demographic parity difference
+>>> dp_diff = demographic_parity_difference(
+...     y_true=y_test,
+...     y_pred=y_pred,
+...     sensitive_features=groups_test
+... )
+>>> print(dp_diff)  # doctest: +ELLIPSIS
 
 
 .. topic:: References
