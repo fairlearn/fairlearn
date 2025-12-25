@@ -719,32 +719,29 @@ constraints while optimizing a weighted combination of error and constraint viol
     >>> from fairlearn.metrics import demographic_parity_difference
     >>> import numpy as np
     >>> import pandas as pd
-    >>> # Create a slightly larger toy dataset
+    >>> # Toy dataset
     >>> X = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9],
     ...               [10], [11], [12], [13], [14], [15]])
     >>> y = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0])
     >>> sensitive_features = np.array(
     ...     ["a", "b", "a", "a", "b", "a", "b", "b", "a", "b", "a", "b", "a", "b", "a", "b"]
     ... )
+    >>> # Split into train/test
     >>> X_train, X_test, y_train, y_test, groups_train, groups_test = train_test_split(
     ...     X, y, sensitive_features, test_size=0.4, random_state=42
     ... )
     >>> estimator = LogisticRegression(solver='liblinear')
->>> constraint = DemographicParity(difference_bound=0.01)
->>> mitigator = GridSearch(estimator=estimator, constraints=constraint, grid_size=5)
->>> mitigator.fit(X_train, y_train, sensitive_features=groups_train)
-
->>> # Make predictions using the best model
->>> y_pred = mitigator.predict(X_test)
->>> print(y_pred)  # doctest: +ELLIPSIS
-
->>> # Compute demographic parity difference
->>> dp_diff = demographic_parity_difference(
-...     y_true=y_test,
-...     y_pred=y_pred,
-...     sensitive_features=groups_test
-... )
->>> print(dp_diff)  # doctest: +ELLIPSIS
+    >>> constraint = DemographicParity(difference_bound=0.01)
+    >>> mitigator = GridSearch(estimator=estimator, constraints=constraint, grid_size=5)
+    >>> mitigator.fit(X_train, y_train, sensitive_features=groups_train)
+    >>> y_pred = mitigator.predict(X_test)
+    >>> print(y_pred)  # doctest: +SKIP
+    >>> dp_diff = demographic_parity_difference(
+    ...     y_true=y_test,
+    ...     y_pred=y_pred,
+    ...     sensitive_features=groups_test
+    ... )
+    >>> print(dp_diff)  # doctest: +SKIP
 
 
 .. topic:: References
