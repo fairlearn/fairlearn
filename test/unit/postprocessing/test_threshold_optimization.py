@@ -950,3 +950,69 @@ def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
     with does_not_raise():
         threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
         threshold_optimizer.predict(X, sensitive_features=sensitive_features)
+
+# -------------------------------------------------------------------------
+# Additional edge-case tests for ThresholdOptimizer
+# These tests focus on edge scenarios that were previously untested:
+#   1) single sensitive feature group
+#   2) prefit estimator behavior
+#   3) floating-point tie thresholds
+# -------------------------------------------------------------------------
+
+def test_all_sensitive_features_one_group():
+    """All points belong to the same sensitive feature group."""
+    X = pd.DataFrame(np.arange(10).reshape(-1, 1))
+    y = pd.Series([0, 1] * 5)
+    sf = pd.Series([0] * 10)  # only one sensitive group
+
+    thr_optimizer = ThresholdOptimizer(
+        estimator=PassThroughPredictor(),
+        constraints="demographic_parity",
+        grid_size=5,
+    )
+
+    thr_optimizer.fit(X, y, sensitive_features=sf)
+    preds = thr_optimizer.predict(X, sensitive_features=sf)
+
+    # still must produce binary predictions
+    assert set(preds).issubset({0, 1})
+
+
+def test_prefit_estimator_small_grid():
+    """Check that prefit=True path works and supports small grid sizes."""
+    X = pd.DataFrame(np.arange(6).reshape(-1, 1))
+    y = pd.Series([0, 1, 0, 1, 1, 0])
+    sf = pd.Series([0, 0, 1, 1, 0, 1])
+
+    base_est = PassThroughPredictor()
+    base_est.fit(X, y)
+
+    thr_optimizer = ThresholdOptimizer(
+        estimator=base_est,
+        constraints="equalized_odds",
+        grid_size=2,
+        prefit=True,
+    )
+
+    thr_optimizer.fit(X, y, sensitive_features=sf)
+    preds = thr_optimizer.predict(X, sensitive_features=sf)
+
+    assert set(preds).issubset({0, 1})
+
+
+def test_threshold_optimizer_tie_thresholds():
+    """Handle ties in threshold values without numerical instability."""
+    X = pd.DataFrame([0.5, 0.5, 0.5, 1.0, 1.0, 1.0])
+    y = pd.Series([0, 1, 0, 1, 0, 1])
+    sf = pd.Series([0, 0, 1, 1, 0, 1])
+
+    thr_optimizer = ThresholdOptimizer(
+        estimator=PassThroughPredictor(),
+        constraints="demographic_parity",
+        grid_size=3,
+    )
+
+    thr_optimizer.fit(X, y, sensitive_features=sf)
+    preds = thr_optimizer.predict(X, sensitive_features=sf)
+
+    assert set(preds).issubset({0, 1})
