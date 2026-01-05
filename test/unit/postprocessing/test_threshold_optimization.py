@@ -951,6 +951,7 @@ def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
         threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
         threshold_optimizer.predict(X, sensitive_features=sensitive_features)
 
+
 # -------------------------------------------------------------------------
 # Additional edge-case tests for ThresholdOptimizer
 # These tests focus on edge scenarios that were previously untested:
@@ -958,6 +959,7 @@ def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
 #   2) prefit estimator behavior
 #   3) floating-point tie thresholds
 # -------------------------------------------------------------------------
+
 
 def test_all_sensitive_features_one_group():
     """All points belong to the same sensitive feature group."""
