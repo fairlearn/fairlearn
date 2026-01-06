@@ -44,6 +44,7 @@ required arguments to the metric function:
     >>> import functools
     >>> from sklearn.metrics import fbeta_score
     >>> fbeta_06 = functools.partial(fbeta_score, beta=0.6)
+    >>> fbeta_06.__name__ = "fbeta_06"           # <-- ADD THIS LINE
     >>> metric_beta = MetricFrame(metrics=fbeta_06,
     ...                           y_true=y_true,
     ...                           y_pred=y_pred,
@@ -55,7 +56,8 @@ required arguments to the metric function:
     a    0.365591
     b    0.850000
     c    0.468966
-    Name: metric, dtype: float64
+    Name: fbeta_06, dtype: float64
+
 
 
 Per-Sample Arguments
