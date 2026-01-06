@@ -31,6 +31,8 @@ logger = logging.getLogger(__name__)
 class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient reduction.
 
+    .. versionadded:: 0.5
+
     The exponentiated gradient algorithm is described in detail by
     :footcite:t:`agarwal2018reductions`.
 
