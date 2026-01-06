@@ -958,6 +958,7 @@ def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
 #   1) single sensitive feature group
 #   2) prefit estimator behavior
 #   3) floating-point tie thresholds
+#   4) support for X with ndim > 2 (e.g., image-like tensors)
 # -------------------------------------------------------------------------
 
 
@@ -1018,3 +1019,90 @@ def test_threshold_optimizer_tie_thresholds():
     preds = thr_optimizer.predict(X, sensitive_features=sf)
 
     assert set(preds).issubset({0, 1})
+
+def test_ThresholdOptimizer_handles_X_with_ndims_greater_than_2():
+    """ThresholdOptimizer should accept X with ndim > 2 without error."""
+
+    # 3D input tensor (e.g., image-like data): shape (n_samples, h, w)
+    X = np.random.rand(25, 3, 3)
+    y = pd.Series(np.random.randint(0, 2, size=25))
+    sf = pd.Series(np.random.randint(0, 2, size=25))
+
+    class DummyEstimator(BaseEstimator):
+        def fit(self, X, y):
+            # mark as fitted so check_is_fitted passes
+            self.fitted_ = True
+            return self
+
+        def predict(self, X):
+            return np.zeros(X.shape[0], dtype=int)
+
+        def predict_proba(self, X):
+            zeros = np.zeros(X.shape[0])
+            ones = np.ones(X.shape[0])
+            return np.vstack([zeros, ones]).T
+
+
+    thr = ThresholdOptimizer(
+        estimator=DummyEstimator(),
+        constraints="demographic_parity",
+        grid_size=5,
+    )
+
+    with does_not_raise():
+        thr.fit(X, y, sensitive_features=sf)
+        preds = thr.predict(X, sensitive_features=sf)
+
+    assert set(preds).issubset({0, 1})
+
+def test_threshold_optimizer_works_with_3d_X():
+    # 3-D feature array (e.g., images or time-series windows)
+    X = np.random.rand(20, 3, 2)  # shape = (n_samples, dim1, dim2)
+
+    y = np.random.randint(0, 2, size=20)
+    sensitive_features = np.random.randint(0, 2, size=20)
+
+    # simple score function
+    scores = np.random.rand(20)
+
+    # ThresholdOptimizer should handle 3-D X inputs without shape errors
+    # The estimator is already prefit; behavior should not depend on X dimensionality
+    class DummyEstimator(BaseEstimator):
+        def fit(self, X, y=None):
+            # mark as fitted
+            self.fitted_ = True
+            return self
+
+        def predict(self, X):
+            return np.zeros(X.shape[0], dtype=int)
+
+        def predict_proba(self, X):
+            p0 = np.zeros(X.shape[0])
+            p1 = np.ones(X.shape[0])
+            return np.vstack([p0, p1]).T
+
+    # prefit the estimator
+    est = DummyEstimator()
+    est.fit(np.zeros((1,1)), np.zeros(1))  # dummy fit
+
+    postprocessor = ThresholdOptimizer(
+        estimator=est,
+        constraints="demographic_parity",
+        prefit=True,
+    )
+
+
+    postprocessor.fit(
+        X=X,
+        y=y,
+        sensitive_features=sensitive_features,
+        predicted_scores=scores,
+    )
+
+    # predict should run without error on 3-D X
+    preds = postprocessor.predict(
+        X=X,
+        sensitive_features=sensitive_features,
+    )
+
+    assert len(preds) == len(y)
