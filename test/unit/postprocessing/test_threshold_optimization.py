@@ -1020,6 +1020,7 @@ def test_threshold_optimizer_tie_thresholds():
 
     assert set(preds).issubset({0, 1})
 
+
 def test_ThresholdOptimizer_handles_X_with_ndims_greater_than_2():
     """ThresholdOptimizer should accept X with ndim > 2 without error."""
 
@@ -1042,7 +1043,6 @@ def test_ThresholdOptimizer_handles_X_with_ndims_greater_than_2():
             ones = np.ones(X.shape[0])
             return np.vstack([zeros, ones]).T
 
-
     thr = ThresholdOptimizer(
         estimator=DummyEstimator(),
         constraints="demographic_parity",
@@ -1054,6 +1054,7 @@ def test_ThresholdOptimizer_handles_X_with_ndims_greater_than_2():
         preds = thr.predict(X, sensitive_features=sf)
 
     assert set(preds).issubset({0, 1})
+
 
 def test_threshold_optimizer_works_with_3d_X():
     # 3-D feature array (e.g., images or time-series windows)
@@ -1083,14 +1084,13 @@ def test_threshold_optimizer_works_with_3d_X():
 
     # prefit the estimator
     est = DummyEstimator()
-    est.fit(np.zeros((1,1)), np.zeros(1))  # dummy fit
+    est.fit(np.zeros((1, 1)), np.zeros(1))  # dummy fit
 
     postprocessor = ThresholdOptimizer(
         estimator=est,
         constraints="demographic_parity",
         prefit=True,
     )
-
 
     postprocessor.fit(
         X=X,
