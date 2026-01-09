@@ -327,7 +327,6 @@ of sex.
     >>> y = df["Cl."]
     >>> reweigher = KamiranCaldersReweighing(drop_target=True)
     >>> X_weighted = reweigher.fit_transform(X, y, sensitive_features=["Sex"])
-    >>> X_weighted
 
 The returned dataset contains all original features along with a :code:`weight` column,
 which can be passed directly to a downstream estimator that supports sample weighting.
