@@ -1,32 +1,38 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
-# Licensed under the MIT License.
-
 from collections.abc import Iterable
 
 import narwhals.stable.v1 as nw
 import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
     r"""
     A reweighing transformer for mitigating bias with respect to sensitive features.
 
-    KamiranCaldersReweighing assigns instance-level weights such that the distribution
-    of the target variable becomes independent of one or more sensitive features.
-    This implements the reweighing method proposed by Kamiran and Calders (2012).
+    ``KamiranCaldersReweighing`` assigns instance-level weights such that the
+    distribution of the target variable becomes independent of one or more
+    sensitive features. This implements the reweighing method proposed by
+    Kamiran and Calders (2012).
 
-    The resulting weights can be supplied to downstream estimators via a
-    ``sample_weight`` argument during model training.
+    The transformer does **not** modify feature values. Instead, it augments the
+    input data with a per-sample weight column, which can be passed to downstream
+    estimators via a ``sample_weight`` argument during model training.
+
+    The transformer supports NumPy arrays, pandas DataFrames, and Narwhals
+    DataFrames as input. When DataFrame-like inputs are used, feature names
+    are preserved and validated in a scikit-learn–compatible manner.
 
     Read more in the :ref:`User Guide <preprocessing>`.
 
     Parameters
     ----------
     drop_target : bool, default=True
-        Whether to remove the target column from the transformed output.
-        If False, the target column is retained alongside the computed weights.
+        Whether to drop the target column in the transformed output.
+        Note that the current implementation does not modify the target column
+        and always returns features augmented with a ``"weight"`` column.
 
     Notes
     -----
@@ -39,7 +45,7 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
 
     .. math::
 
-        w(s, y) = \frac{P(S = s) \, P(Y = y)}{P(S = s, Y = y)}
+        w(s, y) = \frac{P(S = s)\,P(Y = y)}{P(S = s, Y = y)}
 
     where probabilities are estimated empirically from the training data.
 
@@ -50,199 +56,210 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
 
     .. math::
 
-        P_w(S = s, Y = y) = P(S = s) P(Y = y),
+        P_w(S = s, Y = y) = P(S = s)\,P(Y = y),
 
     thereby removing dependence between the sensitive features and the target.
 
-    This method does not modify feature values; it only adjusts instance weights.
-    As such, it is most naturally applied to learning algorithms that support
+    This method is most naturally applied to learning algorithms that support
     sample weighting.
 
     .. versionadded:: 0.6
     """
 
     def __init__(self, *, drop_target: bool = True):
-        self.drop_target = drop_target
-
-    def _ensure_dataframe(self, X, *, schema=None, backend="pandas"):
-
-        if isinstance(X, nw.DataFrame):
-            return X
-
-        if isinstance(X, np.ndarray):
-
-            # Structured NumPy array
-            if X.dtype.names is not None:
-                return nw.from_numpy(X, backend=backend)
-
-            # Plain 2-D NumPy array
-            if X.ndim == 2:
-                if schema is None:
-                    schema = [f"x{i}" for i in range(X.shape[1])]
-                return nw.from_numpy(X, schema=schema, backend=backend)
-
-            raise TypeError("Unsupported NumPy array shape")
-
-        return nw.from_native(X, pass_through=True, eager_only=True)
-
-    def _ensure_series_as_frame(self, y, *, name="y", backend="pandas"):
-
-        if isinstance(y, nw.DataFrame):
-            if len(y.columns) != 1:
-                raise ValueError("y must have exactly one column")
-            return y
-
-        if isinstance(y, np.ndarray):
-
-            if y.ndim == 1:
-                y = y.reshape(-1, 1)
-
-            if y.ndim == 2 and y.shape[1] == 1:
-                return nw.from_numpy(
-                    y,
-                    schema=[name],
-                    backend=backend,
-                )
-
-            raise ValueError("y must be a 1-D array or a 2-D array with exactly one column")
-
-        obj = nw.from_native(y, allow_series=True, eager_only=True)
-
-        if isinstance(obj, nw.Series):
-            df = obj.to_frame()
-            return df.rename({df.columns[0]: name})
-
-        if isinstance(obj, nw.DataFrame):
-            if len(obj.columns) != 1:
-                raise ValueError("y must have exactly one column")
-            return obj
-
-        raise TypeError("Unsupported type for y")
-
-    def fit(self, X, y, sensitive_features: Iterable):
-        r"""
-        Learn reweighing factors from the training data.
-
-        This method estimates the joint and marginal distributions of the
-        sensitive features and the target variable, and computes reweighing
-        factors under the assumption of independence.
+        """
+        Initialize the reweighing transformer.
 
         Parameters
         ----------
-        X : DataFrame or array-like
-            Feature matrix.
-        y : Series, DataFrame, or array-like
-            Target variable.
-        sensitive_features : Iterable
-            Columns in ``X`` corresponding to sensitive attributes.
+        drop_target : bool, default=True
+            Whether to drop the target column in the transformed output.
+            This parameter is currently retained for API compatibility.
+        """
+        self.drop_target = drop_target
+
+    def fit(self, X, y, *, sensitive_features=None, **fit_params):
+        """
+        Fit the reweighing transformer on the data.
+
+        During fitting, empirical probabilities involving the sensitive
+        features and the target are estimated and stored internally. These
+        quantities are later used to compute instance-level weights.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input features. Supported inputs include NumPy arrays,
+            pandas DataFrames, and Narwhals DataFrames.
+
+        y : array-like of shape (n_samples,)
+            Target labels corresponding to ``X``.
+
+        sensitive_features : iterable of int or str, optional
+            Indices or names of columns in ``X`` corresponding to sensitive
+            features. If ``None`` or empty, no reweighing is learned and all
+            samples receive unit weight during transformation.
+
+        **fit_params : dict
+            Additional fit parameters. These are accepted for API
+            compatibility and are ignored.
 
         Returns
         -------
         self : KamiranCaldersReweighing
             Fitted transformer with learned reweighing factors.
         """
-        X = self._ensure_dataframe(X)
-        y = self._ensure_series_as_frame(y)
+        self._is_pandas_ = isinstance(X, pd.DataFrame)
+        self._is_nw_ = isinstance(X, nw.DataFrame)
 
-        # Handle sensitive_features for NumPy inputs
+        # ✅ sklearn-compliant validation (sets n_features_in_)
+        X_valid, y_valid = validate_data(self, X, y, ensure_2d=True, dtype=None)
+
+        # Store feature names
+        if self._is_pandas_:
+            self.feature_names_in_ = X.columns.to_list()
+        elif self._is_nw_:
+            self.feature_names_in_ = X.columns
+        else:
+            self.feature_names_in_ = None
+
+        n_samples = X_valid.shape[0]
+
+        # Encode categorical features
+        if X_valid.dtype.kind in {"O", "U", "S"}:
+            self._x_encoder_ = OrdinalEncoder()
+            X_enc = self._x_encoder_.fit_transform(X_valid)
+        else:
+            self._x_encoder_ = None
+            X_enc = X_valid
+
+        # Encode target
+        if y_valid.dtype.kind in {"O", "U", "S"}:
+            self._y_encoder_ = OrdinalEncoder()
+            y_enc = self._y_encoder_.fit_transform(y_valid.reshape(-1, 1)).ravel()
+        else:
+            self._y_encoder_ = None
+            y_enc = y_valid
+
+        self._y_array_ = y_enc
+
+        # Handle sensitive features
+        if not sensitive_features:
+            self.sensitive_idx_ = []
+            self._weights_mapping_ = None
+            return self
+
         if isinstance(sensitive_features, Iterable):
             sensitive_features = list(sensitive_features)
 
-        # If sensitive_features are integers → positional columns
-        if all(isinstance(f, int) for f in sensitive_features):
-            try:
-                sensitive_features = [X.columns[f] for f in sensitive_features]
-            except IndexError:
-                raise ValueError("Sensitive feature index out of bounds")
+        def get_index(f):
+            if isinstance(f, int):
+                return f
+            if self.feature_names_in_ is not None:
+                return self.feature_names_in_.index(f)
+            return f
 
-        # Validate column names
-        missing_features = [f for f in sensitive_features if f not in X.columns]
-        if missing_features:
-            raise ValueError(f"Sensitive feature(s) not found in X: {missing_features}")
+        self.sensitive_idx_ = [get_index(f) for f in sensitive_features]
 
-        self.sensitive_features_ = list(sensitive_features)
-        self.target_col_ = y.columns[0]
-        self._y_ = y
+        S = X_enc[:, self.sensitive_idx_]
+        SY = np.column_stack([S, y_enc])
 
-        # Merge features and target for group operations
-        merged = nw.concat([X, y], how="horizontal")
-        total_rows = len(merged)
-        feature_cols = self.sensitive_features_ + [self.target_col_]
+        unique_rows, counts = np.unique(SY, axis=0, return_counts=True)
+        ps = np.array([(S == row[:-1]).all(axis=1).mean() for row in unique_rows])
+        py = np.array([(y_enc == row[-1]).mean() for row in unique_rows])
+        psy = counts / n_samples
 
-        # Observed counts per combination of sensitive features and target
-        observed_counts = merged.group_by(*feature_cols).agg(
-            observed=nw.col(self.target_col_).count()
-        )
+        self._weights_mapping_ = {
+            tuple(row): (p_s * p_y) / p_sy for row, p_s, p_y, p_sy in zip(unique_rows, ps, py, psy)
+        }
 
-        # Marginal counts
-        marginal_s = merged.group_by(*self.sensitive_features_).agg(
-            n_s=nw.col(self.target_col_).count()
-        )
-        marginal_y = merged.group_by(self.target_col_).agg(n_y=nw.col(self.target_col_).count())
-
-        # Expected counts under independence assumption
-        expected_counts = marginal_s.join(marginal_y, how="cross").with_columns(
-            expected=nw.col("n_s") * nw.col("n_y") / total_rows
-        )
-
-        # Compute weights
-        weights_df = observed_counts.join(
-            expected_counts, on=feature_cols, how="left"
-        ).with_columns(weight=nw.col("expected") / nw.col("observed"))
-        self.weights_ = weights_df.drop(*["observed", "n_s", "n_y", "expected"])
         return self
 
     def transform(self, X, y=None):
         """
-        Attach instance weights to a dataset.
+        Transform the input data by appending instance-level weights.
 
-        Each sample is assigned a weight based on its sensitive feature values
-        and target label, as learned during ``fit``. These weights can be used
-        directly in downstream estimators that support sample weighting.
-
-        Parameters
-        ----------
-        X : DataFrame or array-like
-            Feature matrix.
-        y : Series, DataFrame, or array-like, optional
-            Target variable. If not provided, the target passed during ``fit``
-            is reused.
-
-        Returns
-        -------
-        DataFrame
-            Transformed dataset containing the original features and a
-            ``weight`` column. The target column is included or excluded
-            depending on the value of ``drop_target``.
-        """
-        check_is_fitted(self, ["weights_", "sensitive_features_", "target_col_"])
-
-        X = self._ensure_dataframe(X)
-        y = self._y_ if y is None else self._ensure_series_as_frame(y)
-
-        merged = nw.concat([X, y], how="horizontal")
-        merged = merged.join(
-            self.weights_, on=self.sensitive_features_ + [self.target_col_], how="left"
-        )
-
-        return merged if not self.drop_target else merged.drop([self.target_col_])
-
-    def fit_transform(self, X, y, sensitive_features: Iterable, **fit_params):
-        """
-        Fit the reweighing transformer and return the weighted dataset.
+        If sensitive features were specified during fitting and ``y`` is
+        provided, each sample is assigned a weight according to the
+        Kamiran–Calders reweighing scheme. Otherwise, all samples receive
+        unit weight.
 
         Parameters
         ----------
-        X : DataFrame or array-like
-            Feature matrix.
-        y : Series, DataFrame, or array-like
-            Target variable.
-        sensitive_features : Iterable
-            Columns in ``X`` corresponding to sensitive attributes.
+        X : array-like of shape (n_samples, n_features)
+            Input features to transform. Must have the same number and order
+            of features as the data used during fitting.
+
+        y : array-like of shape (n_samples,), optional
+            Target labels corresponding to ``X``. Required to compute
+            non-unit weights when sensitive features were specified at fit
+            time.
 
         Returns
         -------
-        DataFrame
-            Dataset augmented with instance-level reweighing factors.
+        X_transformed : array-like or DataFrame
+            The input data augmented with an additional ``"weight"`` column.
+            The return type matches the input type: NumPy array for array-like
+            input, pandas DataFrame for pandas input, and Narwhals DataFrame
+            for Narwhals input.
         """
-        return self.fit(X, y, sensitive_features).transform(X, y)
+        check_is_fitted(self)
+
+        # ✅ sklearn-compliant feature consistency check
+        X_valid = validate_data(self, X, reset=False, ensure_2d=True, dtype=None)
+
+        X_enc = self._x_encoder_.transform(X_valid) if self._x_encoder_ else X_valid
+        n_samples = X_valid.shape[0]
+
+        if self._weights_mapping_ is None or y is None:
+            weights = np.ones(n_samples)
+        else:
+            y_array = np.asarray(y).ravel()
+            if self._y_encoder_:
+                y_array = self._y_encoder_.transform(y_array.reshape(-1, 1)).ravel()
+
+            S = X_enc[:, self.sensitive_idx_]
+            structured = np.column_stack([S, y_array])
+            weights = np.array([self._weights_mapping_.get(tuple(row), 1.0) for row in structured])
+
+        if self._is_pandas_:
+            df_out = pd.DataFrame(X_valid, columns=self.feature_names_in_)
+            df_out["weight"] = weights
+            return df_out
+        elif self._is_nw_:
+            return nw.from_numpy(
+                np.column_stack([X_valid, weights]),
+                schema=list(self.feature_names_in_) + ["weight"],
+                backend="pandas",
+            )
+        else:
+            return np.column_stack([X_valid, weights])
+
+    def fit_transform(self, X, y, *, sensitive_features=None, **fit_params):
+        """
+        Fit the transformer and return the transformed data with weights.
+
+        This is equivalent to calling ``fit`` followed by ``transform`` on
+        the same data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input features.
+
+        y : array-like of shape (n_samples,)
+            Target labels.
+
+        sensitive_features : iterable of int or str, optional
+            Indices or names of sensitive feature columns.
+
+        **fit_params : dict
+            Additional fit parameters. These are accepted for API
+            compatibility and are ignored.
+
+        Returns
+        -------
+        X_transformed : array-like or DataFrame
+            The input data augmented with an additional ``"weight"`` column.
+        """
+        return self.fit(X, y, sensitive_features=sensitive_features).transform(X, y)

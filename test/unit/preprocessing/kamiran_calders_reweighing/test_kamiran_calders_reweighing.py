@@ -1,30 +1,26 @@
 # # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # # Licensed under the MIT License.
 
-# import math
-# from contextlib import nullcontext as does_not_raise
 
-# import narwhals.stable.v1 as nw
-# import numpy as np
-# import pandas as pd
-# import pytest
-# from sklearn.utils.estimator_checks import parametrize_with_checks
+import pytest
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
-# from fairlearn.preprocessing import KamiranCaldersReweighing
+from fairlearn.preprocessing import KamiranCaldersReweighing
 
-# pytestmark = pytest.mark.narwhals
+pytestmark = pytest.mark.narwhals
 
-# # ----------------------------------------------------------------------
-# # sklearn compatibility
-# # ----------------------------------------------------------------------
-# @parametrize_with_checks(
-#     [
-#         KamiranCaldersReweighing(drop_target=True),
-#         KamiranCaldersReweighing(drop_target=False),
-#     ]
-# )
-# def test_sklearn_compatible_estimator(estimator, check):
-#     check(estimator)
+
+# ----------------------------------------------------------------------
+# sklearn compatibility
+# ----------------------------------------------------------------------
+@parametrize_with_checks(
+    [
+        KamiranCaldersReweighing(drop_target=True),
+        KamiranCaldersReweighing(drop_target=False),
+    ]
+)
+def test_sklearn_compatible_estimator(estimator, check):
+    check(estimator)
 
 
 # # ----------------------------------------------------------------------
