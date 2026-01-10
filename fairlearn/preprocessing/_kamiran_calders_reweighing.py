@@ -112,10 +112,9 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
         self._is_pandas_ = isinstance(X, pd.DataFrame)
         self._is_nw_ = isinstance(X, nw.DataFrame)
 
-        # ✅ sklearn-compliant validation (sets n_features_in_)
         X_valid, y_valid = validate_data(self, X, y, ensure_2d=True, dtype=None)
+        n_samples = X_valid.shape[0]
 
-        # Store feature names
         if self._is_pandas_:
             self.feature_names_in_ = X.columns.to_list()
         elif self._is_nw_:
@@ -123,9 +122,6 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
         else:
             self.feature_names_in_ = None
 
-        n_samples = X_valid.shape[0]
-
-        # Encode categorical features
         if X_valid.dtype.kind in {"O", "U", "S"}:
             self._x_encoder_ = OrdinalEncoder()
             X_enc = self._x_encoder_.fit_transform(X_valid)
@@ -133,17 +129,14 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
             self._x_encoder_ = None
             X_enc = X_valid
 
-        # Encode target
         if y_valid.dtype.kind in {"O", "U", "S"}:
             self._y_encoder_ = OrdinalEncoder()
             y_enc = self._y_encoder_.fit_transform(y_valid.reshape(-1, 1)).ravel()
         else:
             self._y_encoder_ = None
             y_enc = y_valid
-
         self._y_array_ = y_enc
 
-        # Handle sensitive features
         if not sensitive_features:
             self.sensitive_idx_ = []
             self._weights_mapping_ = None
@@ -152,14 +145,18 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
         if isinstance(sensitive_features, Iterable):
             sensitive_features = list(sensitive_features)
 
-        def get_index(f):
+        self.sensitive_idx_ = []
+        for f in sensitive_features:
             if isinstance(f, int):
-                return f
-            if self.feature_names_in_ is not None:
-                return self.feature_names_in_.index(f)
-            return f
-
-        self.sensitive_idx_ = [get_index(f) for f in sensitive_features]
+                if f < 0 or f >= X_valid.shape[1]:
+                    raise ValueError(f"Sensitive feature index {f} is out of bounds")
+                self.sensitive_idx_.append(f)
+            else:
+                if self.feature_names_in_ is None:
+                    raise ValueError(f"Sensitive feature {f} provided, but X has no column names")
+                if f not in self.feature_names_in_:
+                    raise ValueError(f"Sensitive feature {f} not found in columns")
+                self.sensitive_idx_.append(self.feature_names_in_.index(f))
 
         S = X_enc[:, self.sensitive_idx_]
         SY = np.column_stack([S, y_enc])
@@ -204,6 +201,9 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
             for Narwhals input.
         """
         check_is_fitted(self)
+
+        if isinstance(X, nw.DataFrame):
+            X = X.to_pandas()
 
         # ✅ sklearn-compliant feature consistency check
         X_valid = validate_data(self, X, reset=False, ensure_2d=True, dtype=None)
