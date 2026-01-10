@@ -1,5 +1,5 @@
-# # Copyright (c) Microsoft Corporation and Fairlearn contributors.
-# # Licensed under the MIT License.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
 
 import math
 from contextlib import nullcontext as does_not_raise
@@ -25,6 +25,7 @@ pytestmark = pytest.mark.narwhals
     ]
 )
 def test_sklearn_compatible_estimator(estimator, check):
+    """Verify that the transformer passes standard scikit-learn checks."""
     check(estimator)
 
 
@@ -33,7 +34,16 @@ def test_sklearn_compatible_estimator(estimator, check):
 # ----------------------------------------------------------------------
 @pytest.fixture
 def kamiran_example_dataframe():
-    """Classic Kamiran-Calders toy dataset."""
+    """
+    Classic Kamiran-Calders toy dataset.
+
+    Features:
+        - Sex: M/F
+        - Ethnicity: Native / Non-native
+        - Job type: Board / Healthcare / Education
+    Target:
+        - Cl.: + / -
+    """
     return pd.DataFrame(
         {
             "Sex": ["M", "M", "M", "M", "M", "F", "F", "F", "F", "F"],
@@ -70,6 +80,10 @@ def kamiran_example_dataframe():
 # 1. Alignment with Kamiran-Calders example weights
 # ----------------------------------------------------------------------
 def test_weights_match_kamiran_calders_example(kamiran_example_dataframe):
+    """
+    Verify that reweighing produces weights matching the Kamiran-Calders
+    toy example for a single sensitive feature.
+    """
     X = kamiran_example_dataframe.drop(columns=["Cl."])
     y = kamiran_example_dataframe["Cl."]
 
@@ -90,6 +104,10 @@ def test_weights_match_kamiran_calders_example(kamiran_example_dataframe):
 # 2. Probabilistic invariance test
 # ----------------------------------------------------------------------
 def test_reweighing_enforces_independence(kamiran_example_dataframe):
+    """
+    Verify that weighted joint distribution satisfies independence between
+    sensitive feature and target (P(S,Y) = P(S) * P(Y)).
+    """
     X = kamiran_example_dataframe.drop(columns=["Cl."])
     y = kamiran_example_dataframe["Cl."]
 
@@ -119,6 +137,9 @@ def test_reweighing_enforces_independence(kamiran_example_dataframe):
 # ----------------------------------------------------------------------
 def test_multiple_sensitive_features_supported(kamiran_example_dataframe):
     """
+    Verify that multiple sensitive features can be provided and that
+    the weights column is added correctly.
+
     When multiple sensitive features are provided, Kamiran-Calders
     reweighing enforces independence between the joint sensitive
     attribute and the target, but does not guarantee marginal
@@ -138,7 +159,7 @@ def test_multiple_sensitive_features_supported(kamiran_example_dataframe):
 
 
 # ----------------------------------------------------------------------
-# defensive & edge-case tests
+# Defensive & edge-case tests
 # ----------------------------------------------------------------------
 @pytest.mark.parametrize(
     ["sensitive_features", "expectation"],
@@ -150,6 +171,10 @@ def test_multiple_sensitive_features_supported(kamiran_example_dataframe):
     ],
 )
 def test_sensitive_feature_validation(kamiran_example_dataframe, sensitive_features, expectation):
+    """
+    Validate that specifying invalid sensitive features raises ValueError
+    and valid features pass silently.
+    """
     X = kamiran_example_dataframe.drop(columns=["Cl."])
     y = kamiran_example_dataframe["Cl."]
 
@@ -160,8 +185,10 @@ def test_sensitive_feature_validation(kamiran_example_dataframe, sensitive_featu
 
 
 def test_transform_requires_fit(kamiran_example_dataframe):
+    """
+    Verify that calling transform before fit raises an exception.
+    """
     X = kamiran_example_dataframe.drop(columns=["Cl."])
-
     rw = KamiranCaldersReweighing()
 
     with pytest.raises(Exception):
@@ -169,9 +196,13 @@ def test_transform_requires_fit(kamiran_example_dataframe):
 
 
 # ----------------------------------------------------------------------
-# narwhals / pandas interoperability
+# Narwhals / pandas interoperability
 # ----------------------------------------------------------------------
 def test_narwhals_dataframe_roundtrip(kamiran_example_dataframe):
+    """
+    Verify that the transformer supports Narwhals DataFrames and
+    returns a Narwhals DataFrame with the weight column.
+    """
     X = nw.from_native(kamiran_example_dataframe.drop(columns=["Cl."]), eager_only=True)
     y = kamiran_example_dataframe["Cl."]
 
