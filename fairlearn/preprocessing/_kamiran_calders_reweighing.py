@@ -5,7 +5,9 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OrdinalEncoder
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils.validation import check_is_fitted
+
+from fairlearn.utils._fixes import validate_data
 
 
 class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
@@ -63,7 +65,7 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
     This method is most naturally applied to learning algorithms that support
     sample weighting.
 
-    .. versionadded:: 0.6
+    .. versionadded:: 0.14.0
     """
 
     def __init__(self, *, drop_target: bool = True):
@@ -98,7 +100,8 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
         self._is_pandas_ = isinstance(X, pd.DataFrame)
         self._is_nw_ = isinstance(X, nw.DataFrame)
 
-        X_valid, y_valid = validate_data(self, X, y, ensure_2d=True, dtype=None)
+        X_valid = validate_data(self, X, ensure_2d=True, dtype=None)
+        y_valid = validate_data(self, y, ensure_2d=False, dtype=None)
         n_samples = X_valid.shape[0]
 
         if self._is_pandas_:
