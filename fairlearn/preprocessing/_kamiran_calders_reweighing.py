@@ -114,7 +114,10 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
         # Encode features
         if X_valid.dtype.kind in {"O", "U", "S"}:
             self._x_encoder_ = OrdinalEncoder()
-            X_enc = self._x_encoder_.fit_transform(X_valid)
+            try:
+                X_enc = self._x_encoder_.fit_transform(X_valid)
+            except TypeError as e:
+                raise TypeError("argument must be a string or number") from e
         else:
             self._x_encoder_ = None
             X_enc = X_valid
@@ -122,7 +125,10 @@ class KamiranCaldersReweighing(TransformerMixin, BaseEstimator):
         # Encode target
         if y_valid.dtype.kind in {"O", "U", "S"}:
             self._y_encoder_ = OrdinalEncoder()
-            y_enc = self._y_encoder_.fit_transform(y_valid.reshape(-1, 1)).ravel()
+            try:
+                y_enc = self._y_encoder_.fit_transform(y_valid.reshape(-1, 1)).ravel()
+            except TypeError as e:
+                raise TypeError("argument must be a string or number") from e
         else:
             self._y_encoder_ = None
             y_enc = y_valid
