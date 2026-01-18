@@ -71,6 +71,29 @@ def test_model_init(fake_backend_env):
     assert len(layers) == 7
 
 
+@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+def test_model_init_3d(fake_backend_env):
+    """Test model init with 3D input (verifying the fix for >2D arrays)."""
+    X = np.random.rand(10, 5, 5)
+    Y = np.random.randint(0, 2, 10)
+    Z = np.random.randint(0, 2, 10)
+
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_mixin=False,
+        fake_training=True,
+        predictor_model=[10, "ReLU"],
+        skip_validation=True,
+    )
+    mitigator.fit(X, Y, sensitivefeatures=Z)
+
+    layers = mitigator.backendEngine_.predictor_model.layers_
+    if hasattr(layers, "layers"):
+        layers = layers.layers
+
+    assert layers[0].a == 25
+
+
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_model_params(fake_backend_env):
     """Test training params."""
