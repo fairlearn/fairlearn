@@ -12,7 +12,7 @@ pytest==8.3.5
 pytest_cov==6.1.1
 pytest-mock==3.14.0
 pytest-mpl==0.17.0
-matplotlib==3.10.5
+matplotlib==3.10.8
 wheel==0.45.1
 lightgbm==4.6.0
 xlrd==2.0.1

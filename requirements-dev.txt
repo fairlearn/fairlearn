@@ -19,7 +19,7 @@ pytest
 pytest-cov
 pytest-mock
 pytest-mpl
-matplotlib>=3.10.5
+matplotlib>=3.10.8
 wheel
 lightgbm
 xlrd
