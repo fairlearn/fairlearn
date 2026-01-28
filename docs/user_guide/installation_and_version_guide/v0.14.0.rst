@@ -6,6 +6,11 @@ v0.14.0
    v0.14.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.14.0.
 
+New methods
+-----------
+
+* Added support for Kamiran and Calders reweighing through the :code:`KamiranCaldersReweighing` preprocessing transformer, based on Kamiran and Calders (2012) :footcite:`kamiran2012`: :pr:`1612` by :user:`Wilson Cheung <wirrywoo>`.
+
 
 Other improvements
 ------------------
