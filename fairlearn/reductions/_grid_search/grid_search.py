@@ -223,7 +223,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         else:
             raise RuntimeError("Unsupported selection rule")
 
-        return
+        return self
 
     def predict(self, X):
         """Provide a prediction using the best model found by the grid search.
