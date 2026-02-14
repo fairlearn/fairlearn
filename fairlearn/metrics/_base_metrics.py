@@ -270,6 +270,11 @@ def mean_prediction(y_true, y_pred, sample_weight=None) -> float:
 
     sample_weight : array_like
         Optional array of sample weights
+
+    Returns
+    -------
+    float
+        The (weighted) mean prediction
     """
     y_p = _convert_to_ndarray_and_squeeze(y_pred)
     s_w = np.ones(len(y_p))
@@ -300,6 +305,11 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
 
     sample_weight : array_like
         Optional array of sample weights
+
+    Returns
+    -------
+    float
+        The selection rate
     """
     selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
     if len(selected) == 0:

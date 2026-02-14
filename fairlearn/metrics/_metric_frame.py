@@ -606,7 +606,7 @@ class MetricFrame:
 
         Returns
         -------
-        typing.Any pandas.Series or pandas.DataFrame
+        typing.Any or pandas.Series or pandas.DataFrame
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
@@ -688,7 +688,7 @@ class MetricFrame:
     def group_min(
         self, errors: Literal["raise", "coerce"] = "raise"
     ) -> Any | pd.Series | pd.DataFrame:
-        """Return the maximum value of the metric over the sensitive features.
+        """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
         sensitive features for each underlying metric function in the :attr:`.by_group`
@@ -708,7 +708,7 @@ class MetricFrame:
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
-            The maximum value over sensitive features. The exact type
+            The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in _VALID_ERROR_STRING:

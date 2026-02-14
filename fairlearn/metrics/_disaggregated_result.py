@@ -182,7 +182,7 @@ class DisaggregatedResult:
         control_feature_names: list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        method : {'between_groups', 'overall'}, default :code:`between_groups`
+        method : {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
         errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
@@ -243,7 +243,7 @@ class DisaggregatedResult:
         control_feature_names: list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        method : {'between_groups', 'overall'}, default :code:`between_groups`
+        method : {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
         errors: {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
