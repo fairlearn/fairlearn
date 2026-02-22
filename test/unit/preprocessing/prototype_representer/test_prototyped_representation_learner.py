@@ -17,11 +17,10 @@ def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize(["sensitive_features"], [(np.array([0, 1]),), (None,)])
+@pytest.mark.parametrize("sensitive_features", [np.array([0, 1]), None])
 def test_reconstruction(sensitive_features: np.array | None):
     X = np.array([[10, 10], [20, 20]])
     y = np.array([0, 1])
-    sensitive_features = np.array([0, 1])
     expected_transformed_X = np.array([[1.0, 0.0], [0.0, 1.0]])
     prl = PrototypeRepresentationLearner(
         n_prototypes=2, fairness_weight=0.0, target_weight=0.0, random_state=42
@@ -54,14 +53,13 @@ def test_statistical_parity():
     np.testing.assert_allclose(fairness_error, 0.0, atol=1e-4)
 
 
-@pytest.mark.parametrize(["sensitive_features"], [(np.array([0, 1, 0, 1]),), (None,)])
+@pytest.mark.parametrize("sensitive_features", [np.array([0, 1, 0, 1]), None])
 @pytest.mark.parametrize(
     ["y"], [(np.array([0, 1, 0, 1]),), (pd.Series(["no", "yes", "no", "yes"]),)]
 )
 def test_classification(y: np.array, sensitive_features: np.array | None):
     X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
     y = np.array([0, 1, 0, 1])
-    sensitive_features = np.array([0, 1, 0, 1])
     prl = PrototypeRepresentationLearner(
         n_prototypes=4, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42, tol=1e-4
     )
