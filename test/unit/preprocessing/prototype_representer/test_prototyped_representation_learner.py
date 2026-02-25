@@ -34,6 +34,17 @@ def test_reconstruction(sensitive_features: np.array | None):
     np.testing.assert_allclose(prl.prototypes_, X, atol=1e-4)
 
 
+def test_fit_with_degenerate_sensitive_features():
+    X = np.array([[10, 10], [20, 20]])
+    y = np.array([0, 1])
+    sensitive_features = np.array([0, 0])
+    prl = PrototypeRepresentationLearner(
+        n_prototypes=2, fairness_weight=0.0, random_state=42
+    )
+    # Should not raise - fairness error is trivially 0 with one group
+    prl.fit(X, y, sensitive_features=sensitive_features)
+
+
 def test_statistical_parity():
     X = np.array([[10, 10], [20, 20], [30, 30], [40, 40]])
     y = np.array([0, 1, 0, 1])
