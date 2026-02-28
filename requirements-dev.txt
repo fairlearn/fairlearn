@@ -14,6 +14,9 @@ requirements-parser
 # .pre-commit-config.yaml
 black==24.4.2
 
+# Required for building sdist and wheel
+build
+
 # Required for test
 pytest
 pytest-cov
