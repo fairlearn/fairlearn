@@ -30,9 +30,9 @@ format and how to load it from a stored pickle file.
     c    0.375000
     Name: accuracy_score, dtype: float64
     >>> file_name = 'metric_frame_save_load_example.pkl'
-    >>> with open(file_name, 'wb') as f:                      # <-- change
+    >>> with open(file_name, 'wb') as f:                      
     ...     pickle.dump(metric_frame, f)
-    >>> with open(file_name, 'rb') as f:                      # <-- change
+    >>> with open(file_name, 'rb') as f:                      
     ...     loaded_metric_frame = pickle.load(f)
     >>> loaded_metric_frame.overall.item()
     0.444...
