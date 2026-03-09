@@ -180,8 +180,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 if self.nu is None:
                     self.nu = (
                         _ACCURACY_MUL
-                        * (h(X) - self.constraints._y_as_series).abs().std()
-                        / np.sqrt(self.constraints.total_samples)
+                        * (h(X) - lagrangian.constraints._y_as_series).abs().std()
+                        / np.sqrt(lagrangian.constraints.total_samples)
                     )
                 eta = self.eta0 / B
                 logger.debug(
@@ -246,7 +246,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 last_gap = best_gap
 
             # update theta based on learning rate
-            theta += eta * (gamma - self.constraints.bound())
+            theta += eta * (gamma - lagrangian.constraints.bound())
 
         # retain relevant result data
         gaps_series = pd.Series(gaps)

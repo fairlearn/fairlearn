@@ -145,7 +145,16 @@ class TestExponentiatedGradientArguments:
         estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
         expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
-        mocker.patch("copy.deepcopy", return_value=estimator)
+        
+        from copy import deepcopy
+        original_deepcopy = deepcopy
+
+        def mock_deepcopy(obj, *args, **kwargs):
+            if obj is estimator:
+                return estimator
+            return original_deepcopy(obj, *args, **kwargs)
+
+        mocker.patch("copy.deepcopy", side_effect=mock_deepcopy)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
