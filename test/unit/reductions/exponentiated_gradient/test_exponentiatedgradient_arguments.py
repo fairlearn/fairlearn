@@ -145,8 +145,9 @@ class TestExponentiatedGradientArguments:
         estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
         expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
-        
+
         from copy import deepcopy
+
         original_deepcopy = deepcopy
 
         def mock_deepcopy(obj, *args, **kwargs):
