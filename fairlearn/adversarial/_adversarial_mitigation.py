@@ -499,7 +499,7 @@ class _AdversarialFairness(BaseEstimator):
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
-                (LP, LA) = self.backendEngine_.train_step(
+                LP, LA = self.backendEngine_.train_step(
                     X[batch_slice], y[batch_slice], A[batch_slice]
                 )
                 predictor_losses.append(LP)

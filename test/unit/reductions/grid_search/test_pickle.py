@@ -18,7 +18,6 @@ from fairlearn.reductions import GridSearch
 
 from .utilities import _quick_data
 
-
 classification_moments = [
     DemographicParity,
     TruePositiveRateParity,

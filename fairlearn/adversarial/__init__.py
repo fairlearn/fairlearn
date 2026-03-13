@@ -8,7 +8,6 @@ from ._adversarial_mitigation import (
     AdversarialFairnessRegressor,
 )
 
-
 __all__ = [
     "AdversarialFairnessClassifier",
     "AdversarialFairnessRegressor",
