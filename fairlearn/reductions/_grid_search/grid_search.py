@@ -210,7 +210,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             self.oracle_execution_times_.append(oracle_call_execution_time)
 
         self.lambda_vecs_ = pd.DataFrame(lambda_vecs_dict, dtype=np.float64)
-        self.gammas_ = pd.DataFrame(gammas_dict)
+        self.gammas_ = pd.DataFrame(gammas_dict, dtype=np.float64)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:

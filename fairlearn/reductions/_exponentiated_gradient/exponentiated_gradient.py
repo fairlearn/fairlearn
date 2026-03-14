@@ -165,13 +165,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.inf
+        lambda_cumsum = pd.Series(0.0, dtype="float64", index=lagrangian.constraints.index)
         for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
             lambda_vecs_EG_dict[t] = lambda_vec
-            lambda_EG = pd.DataFrame(lambda_vecs_EG_dict).mean(axis=1)
+            lambda_cumsum += lambda_vec
+            lambda_EG = lambda_cumsum / (t + 1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
@@ -266,7 +268,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.oracle_execution_times_ = lagrangian.oracle_execution_times
         self.lambda_vecs_EG_ = pd.DataFrame(lambda_vecs_EG_dict)
         self.lambda_vecs_LP_ = pd.DataFrame(lambda_vecs_LP_dict)
-        self.lambda_vecs_ = lagrangian.lambdas.copy()
+        self.lambda_vecs_ = lagrangian.lambdas
 
         logger.debug(
             "...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
