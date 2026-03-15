@@ -12,4 +12,9 @@ Other improvements
 
 * Removed support for python 3.9 and added support for python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
 * Added support for scipy 1.16 :pr:`1596` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+
+Bug fixes
+---------
+
+* Fixed ``AssertionError: data can be loaded only once`` when reusing a constraints object across multiple calls to ``GridSearch.fit`` or ``ExponentiatedGradient.fit`` by deep-copying constraints before loading data. Also resolves associated ``PerformanceWarning`` due to DataFrame fragmentation: :pr:`1632` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
 * Fixed handling of degenerate sensitive feature values in ``PrototypeRepresentationLearner``: :pr:`1626` by :user:`BALOGUN-DAVID`.

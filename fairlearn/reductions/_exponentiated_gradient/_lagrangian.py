@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import logging
 from collections.abc import Callable
 from time import time
@@ -78,7 +79,10 @@ class _Lagrangian:
         sample_weight_name: str = "sample_weight",
         **kwargs,
     ):
-        self.constraints = constraints
+        # Deepcopy constraints so the user's original object is not mutated,
+        # allowing the same constraints instance to be reused across multiple
+        # calls to fit() or shared between different mitigators.
+        self.constraints = copy.deepcopy(constraints)
         self.constraints.load_data(X, y, **kwargs)
         if objective is None:
             self.obj = self.constraints.default_objective()

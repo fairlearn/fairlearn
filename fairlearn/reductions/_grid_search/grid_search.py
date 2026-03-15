@@ -130,9 +130,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             feature used by the constraints object.
         """
         self.predictors_ = []
-        self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
+        lambda_vecs_dict = {}
         self.objectives_ = []
-        self.gammas_ = pd.DataFrame(dtype=np.float64)
+        gammas_dict = {}
         self.oracle_execution_times_ = []
 
         if isinstance(self.constraints, ClassificationMoment):
@@ -143,16 +143,20 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             is_classification_reduction = False
 
         # Prep the parity constraints and objective
+        # Deepcopy constraints so the user's original object is not mutated,
+        # allowing the same constraints instance to be reused across multiple
+        # calls to fit() or shared between different mitigators.
         logger.debug("Preparing constraints and objective")
-        self.constraints.load_data(X, y, **kwargs)
-        objective = self.constraints.default_objective()
+        constraints = copy.deepcopy(self.constraints)
+        constraints.load_data(X, y, **kwargs)
+        objective = constraints.default_objective()
         objective.load_data(X, y, **kwargs)
 
         # Basis information
-        pos_basis = self.constraints.pos_basis
-        neg_basis = self.constraints.neg_basis
-        neg_allowed = self.constraints.neg_basis_present
-        objective_in_the_span = self.constraints.default_objective_lambda_vec is not None
+        pos_basis = constraints.pos_basis
+        neg_basis = constraints.neg_basis
+        neg_allowed = constraints.neg_basis_present
+        objective_in_the_span = constraints.default_objective_lambda_vec is not None
 
         if self.grid is None:
             logger.debug("Creating grid of size %i", self.grid_size)
@@ -174,7 +178,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         for i in grid.columns:
             lambda_vec = grid[i]
             logger.debug("Obtaining weights")
-            weights = self.constraints.signed_weights(lambda_vec)
+            weights = constraints.signed_weights(lambda_vec)
             if not objective_in_the_span:
                 weights = weights + objective.signed_weights()
 
@@ -183,7 +187,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 y_reduction = 1 * (weights > 0)
                 weights = weights.abs()
             else:
-                y_reduction = self.constraints._y_as_series
+                y_reduction = constraints._y_as_series
 
             y_reduction_unique = np.unique(y_reduction)
             if len(y_reduction_unique) == 1:
@@ -204,10 +208,13 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 return current_estimator.predict(X)
 
             self.predictors_.append(current_estimator)
-            self.lambda_vecs_[i] = lambda_vec
+            lambda_vecs_dict[i] = lambda_vec
             self.objectives_.append(objective.gamma(predict_fct).iloc[0])
-            self.gammas_[i] = self.constraints.gamma(predict_fct)
+            gammas_dict[i] = constraints.gamma(predict_fct)
             self.oracle_execution_times_.append(oracle_call_execution_time)
+
+        self.lambda_vecs_ = pd.DataFrame(lambda_vecs_dict, dtype=np.float64)
+        self.gammas_ = pd.DataFrame(gammas_dict)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
