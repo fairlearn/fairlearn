@@ -18,7 +18,6 @@ from fairlearn.reductions import ExponentiatedGradient
 
 from .test_utilities import _get_data
 
-
 classification_moments = [
     DemographicParity,
     TruePositiveRateParity,
