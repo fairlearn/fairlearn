@@ -7,8 +7,30 @@ from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 
 import fairlearn.utils._compatibility as compat
+from collections import OrderedDict
 
-# FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
+
+# FIXED: memoize type_of_target. It is quite expensive and called repeatedly.
+
+_TYPE_OF_TARGET_CACHE = OrderedDict()
+_MAX_CACHE_SIZE = 10 # We limit the cache to the 10 most recent arrays to avoid memory leaks
+
+def _memoized_type_of_target(X):
+    # Robust and Fast Key
+    key = (X.ctypes.data, X.shape, X.dtype, X.strides)
+    
+    if key in _TYPE_OF_TARGET_CACHE:
+        _TYPE_OF_TARGET_CACHE.move_to_end(key) # to maintain LRU behavior
+        return _TYPE_OF_TARGET_CACHE[key]
+    
+    result = type_of_target(X)
+    _TYPE_OF_TARGET_CACHE[key] = result
+    
+    # Remove oldest entry if cache is too large
+    if len(_TYPE_OF_TARGET_CACHE) > _MAX_CACHE_SIZE:
+        _TYPE_OF_TARGET_CACHE.popitem(last=False)
+        
+    return result
 
 
 class FloatTransformer(TransformerMixin, BaseEstimator):
@@ -80,7 +102,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
         """Fit the three transformers."""
         # Sci-kit learn parameter
         if isinstance(self.transformer, str) or self.transformer is None:
-            self.inferred_type_ = type_of_target(X)
+            self.inferred_type_ = _memoized_type_of_target(X)
             X = self._check(X, init=True)
             self.n_features_in_, self.n_features_out_ = X.shape[0], X.shape[1]
 
@@ -101,7 +123,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
         if isinstance(self.transformer, str) or self.transformer is None:
-            if not type_of_target(X) == self.inferred_type_:
+            if not _memoized_type_of_target(X) == self.inferred_type_:
                 raise ValueError("Unknown label type")
             return (
                 self.transform_.transform(self._check(X)).astype(float)
