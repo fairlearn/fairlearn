@@ -219,8 +219,6 @@ for i in range(len(non_dominated)):
     )
 
 
-
-
 # %%
 # We see a Pareto front forming - the set of predictors which represent optimal
 # tradeoffs between accuracy and disparity in predictions. In the ideal case,
