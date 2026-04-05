@@ -48,7 +48,15 @@ from fairlearn.metrics import (
     selection_rate,
     selection_rate_difference,
 )
-from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
+from fairlearn.metrics import (
+    MetricFrame,
+    count,
+    demographic_parity_difference,
+    plot_model_comparison,
+    selection_rate,
+    selection_rate_difference,
+)
+from fairlearn.reductions import DemographicParity, GridSearch
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
@@ -121,6 +129,7 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Accuracy and selection rate by group",
 )
+plt.show()
 
 # %%
 #
@@ -182,17 +191,9 @@ predictors = sweep.predictors_
 
 errors, disparities = [], []
 for m in predictors:
-
-    def classifier(X):
-        return m.predict(X)
-
-    error = ErrorRate()
-    error.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
-    disparity = DemographicParity()
-    disparity.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
-
-    errors.append(error.gamma(classifier).iloc[0])
-    disparities.append(disparity.gamma(classifier).max())
+    y_pred = m.predict(X_train)
+    errors.append(1 - skm.accuracy_score(Y_train, y_pred))
+    disparities.append(demographic_parity_difference(Y_train, y_pred, sensitive_features=A_train))
 
 all_results = pd.DataFrame({"predictor": predictors, "error": errors, "disparity": disparities})
 
@@ -225,14 +226,7 @@ for i in range(len(non_dominated)):
     )
 
 
-x = [metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()]
-y = [metric_frame.difference()["selection_rate"] for metric_frame in metric_frames.values()]
-keys = list(metric_frames.keys())
-plt.scatter(x, y)
-for i in range(len(x)):
-    plt.annotate(keys[i], (x[i] + 0.0003, y[i]))
-plt.xlabel("accuracy")
-plt.ylabel("selection rate difference")
+
 
 # %%
 # We see a Pareto front forming - the set of predictors which represent optimal
