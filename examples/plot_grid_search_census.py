@@ -44,13 +44,6 @@ from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
     MetricFrame,
     count,
-    plot_model_comparison,
-    selection_rate,
-    selection_rate_difference,
-)
-from fairlearn.metrics import (
-    MetricFrame,
-    count,
     demographic_parity_difference,
     plot_model_comparison,
     selection_rate,
