@@ -432,10 +432,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
 
         sensitive_feature_proportions = {}
 
-        for (
-            sensitive_feature_value,
-            group,
-        ) in data_grouped_by_sensitive_feature:
+        for sensitive_feature_value, group in data_grouped_by_sensitive_feature:
             # Determine probability of current sensitive feature group based on data.
             p_sensitive_feature_value = len(group) / n
             sensitive_feature_proportions[sensitive_feature_value] = p_sensitive_feature_value

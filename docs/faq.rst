@@ -172,7 +172,7 @@ Does Fairlearn work for image and text data?
     data it is operating on).
 
 Is Fairlearn available in languages other than Python?
-    For the moment, we only support Python >= 3.9
+    For the moment, we only support Python >= 3.10
 
 Can I contribute to Fairlearn?
     Absolutely! Please see our :ref:`contributor guide <contributor_guide>` to

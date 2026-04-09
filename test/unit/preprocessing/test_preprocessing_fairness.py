@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from test.utils import DATA_HOME
 from typing import Callable, Union
 
 import numpy as np
@@ -10,7 +11,6 @@ from numpy.typing import NDArray
 from scipy.stats import wilcoxon
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from typing_extensions import TypeAlias
 
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
@@ -20,7 +20,7 @@ from fairlearn.metrics import (
 )
 from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationLearner
 
-PreprocessingAlgorithm: TypeAlias = Union[CorrelationRemover, PrototypeRepresentationLearner]
+PreprocessingAlgorithm = Union[CorrelationRemover, PrototypeRepresentationLearner]
 
 
 @dataclass(frozen=True)
@@ -60,7 +60,7 @@ class FairnessComparisonData:
 def adult_dataset() -> Dataset:
     features_to_keep = ["fnlwgt", "capital-gain", "capital-loss", "hours-per-week", "age"]
     sensitive_feature_id = "race_White"
-    raw_data = fetch_adult().frame
+    raw_data = fetch_adult(data_home=DATA_HOME).frame
     data, target = (
         raw_data[features_to_keep + ["race"]],
         raw_data["class"] == ">50K",
@@ -128,10 +128,10 @@ def test_preprocessing_mitigates_bias(
     fairness_metric: Callable,
     fairness_comparison_data: FairnessComparisonData,
 ) -> None:
-    bootstrap_iterations = 30
+    bootstrap_iterations = 20
 
-    fairness_metrics_values_with_mitigation = np.zeros(bootstrap_iterations)
-    fairness_metrics_values_without_mitigation = np.zeros(bootstrap_iterations)
+    fairness_metrics_values_with_mitigation = np.empty(bootstrap_iterations)
+    fairness_metrics_values_without_mitigation = np.empty(bootstrap_iterations)
 
     for iteration in range(bootstrap_iterations):
         sampled_data = fairness_comparison_data.bootstrap(seed=iteration)

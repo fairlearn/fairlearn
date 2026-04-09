@@ -259,10 +259,10 @@ class MetricFrame:
 
         # Add sensitive and conditional features to all_data
         for sf in sf_list:
-            all_data[sf.name_] = list(sf.raw_feature_)
+            all_data[sf.name_] = sf.raw_feature_
         if cf_list is not None:
             for cf in cf_list:
-                all_data[cf.name_] = list(cf.raw_feature_)
+                all_data[cf.name_] = cf.raw_feature_
 
         # Check for duplicate feature names
         nameset = set()
@@ -606,7 +606,7 @@ class MetricFrame:
 
         Returns
         -------
-        typing.Any pandas.Series or pandas.DataFrame
+        typing.Any or pandas.Series or pandas.DataFrame
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
@@ -688,7 +688,7 @@ class MetricFrame:
     def group_min(
         self, errors: Literal["raise", "coerce"] = "raise"
     ) -> Any | pd.Series | pd.DataFrame:
-        """Return the maximum value of the metric over the sensitive features.
+        """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
         sensitive features for each underlying metric function in the :attr:`.by_group`
@@ -708,7 +708,7 @@ class MetricFrame:
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
-            The maximum value over sensitive features. The exact type
+            The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in _VALID_ERROR_STRING:
@@ -972,7 +972,7 @@ class MetricFrame:
 
         if isinstance(features, pd.Series):
             check_consistent_length(features, sample_array)
-            result.append(GroupFeature(base_name, features, 0, None))
+            result.append(GroupFeature(base_name, features, 0))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
                 col_name = features.columns[i]
@@ -981,13 +981,13 @@ class MetricFrame:
                     raise ValueError(msg)
                 column = features.iloc[:, i]
                 check_consistent_length(column, sample_array)
-                result.append(GroupFeature(base_name, column, i, None))
+                result.append(GroupFeature(base_name, column, i))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
-                result.append(GroupFeature(base_name, f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0))
             else:
                 raise ValueError(_FEATURE_LIST_NONSCALAR)
         elif isinstance(features, dict):
@@ -1002,19 +1002,19 @@ class MetricFrame:
                     raise ValueError(msg)
                 column = df.iloc[:, i]
                 check_consistent_length(column, sample_array)
-                result.append(GroupFeature(base_name, column, i, None))
+                result.append(GroupFeature(base_name, column, i))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=object))
             if len(f_arr.shape) == 1:
                 check_consistent_length(f_arr, sample_array)
-                result.append(GroupFeature(base_name, f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0))
             elif len(f_arr.shape) == 2:
                 # Work similarly to pd.DataFrame(data=ndarray)
                 for i in range(f_arr.shape[1]):
                     col = f_arr[:, i]
                     check_consistent_length(col, sample_array)
-                    result.append(GroupFeature(base_name, col, i, None))
+                    result.append(GroupFeature(base_name, col, i))
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 

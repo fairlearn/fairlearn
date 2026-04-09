@@ -6,6 +6,7 @@
 Metrics with Multiple Features
 ==============================
 """
+
 # %%
 # This notebook demonstrates the new API for metrics, which supports
 # multiple sensitive and conditional features. This example does not
@@ -134,7 +135,7 @@ A["Loan Size"] = col_loan_size
 # any transforms or scaling:
 
 
-(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
     X_raw, y, A, test_size=0.3, random_state=54321, stratify=y
 )
 

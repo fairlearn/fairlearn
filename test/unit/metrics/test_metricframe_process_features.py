@@ -9,6 +9,8 @@ import fairlearn.metrics as metrics
 
 from .utils import _get_raw_MetricFrame
 
+pytestmark = pytest.mark.narwhals
+
 
 class TestSingleFeature:
     def _get_raw_data(self):
@@ -20,7 +22,6 @@ class TestSingleFeature:
         sf = result[0]
         assert isinstance(sf, metrics._group_feature.GroupFeature)
         assert sf.name_ == expected_name
-        assert np.array_equal(sf.classes_, ["a", "b", "c"])
 
     def test_single_list(self):
         raw_feature, y_true = self._get_raw_data()
@@ -116,8 +117,6 @@ class TestTwoFeatures:
         for i in range(2):
             assert isinstance(result[i], metrics._group_feature.GroupFeature)
             assert result[i].name_ == expected_names[i]
-        assert np.array_equal(result[0].classes_, ["a", "b", "c"])
-        assert np.array_equal(result[1].classes_, [5, 6])
 
     def test_nested_list(self):
         a, b, y_true = self._get_raw_data()

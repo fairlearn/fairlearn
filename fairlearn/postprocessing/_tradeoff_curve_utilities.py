@@ -1,10 +1,11 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import Literal
+from typing import Literal, Tuple
 
+import narwhals.stable.v1 as nw
 import numpy as np
-import pandas as pd
+from narwhals.typing import IntoDataFrame, IntoDataFrameT
 from numpy.typing import NDArray
 from sklearn.utils import Bunch
 
@@ -63,7 +64,7 @@ def _extend_confusion_matrix(*, true_positives, false_positives, true_negatives,
 
 
 def _tradeoff_curve(
-    data: pd.DataFrame,
+    data: IntoDataFrameT,
     sensitive_feature_value,
     flip: bool = False,
     x_metric: Literal[
@@ -80,7 +81,7 @@ def _tradeoff_curve(
         "true_positive_rate",
         "true_negative_rate",
     ] = "true_positive_rate",
-) -> pd.DataFrame:
+) -> IntoDataFrameT:
     """Get a convex hull of achievable trade-offs between the two provided metrics.
 
     The metrics are based on considering all possible thresholds of 'score' column of `data` and
@@ -88,7 +89,7 @@ def _tradeoff_curve(
 
     Parameters
     ----------
-    data : pandas.DataFrame
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         Data frame with columns 'score' and 'label'.
 
     sensitive_feature_value : str or int
@@ -111,36 +112,39 @@ def _tradeoff_curve(
 
     Returns
     -------
-    result : pandas.DataFrame
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The convex hull over the achievable trade-off points with columns
         'x', 'y', and 'operation'.
     """
+    nw_data = nw.from_native(data, eager_only=True, pass_through=False)
     points_sorted = _calculate_tradeoff_points(
-        data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric
+        nw_data, sensitive_feature_value, flip=flip, x_metric=x_metric, y_metric=y_metric
     )
-    points_selected = _filter_points_to_get_convex_hull(points_sorted)
-    return points_selected
+    return _filter_points_to_get_convex_hull(points_sorted)
 
 
-def _filter_points_to_get_convex_hull(points_sorted: pd.DataFrame) -> pd.DataFrame:
+def _filter_points_to_get_convex_hull(points_sorted: IntoDataFrameT) -> IntoDataFrameT:
     """Find the upper convex hull.
 
     Parameters
     ----------
-    points_sorted : pandas.DataFrame
+    points_sorted : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         Points represented as rows with 'x' and 'y' columns, sorted lexicographically by 'x' and 'y'.
 
     Returns
     -------
-    result : pandas.DataFrame
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         Points that make the upper convex hull.
 
     Notes
     -----
     Uses Andrew's monotone chain convex hull algorithm :footcite:`wikibooks2010monotone`
     """
-    selected = []
-    for r2 in points_sorted.itertuples():
+    selected_rows, selected_indexes = [], []
+    output_cols = ("x", "y", "operation")
+    nw_points_sorted = nw.from_native(points_sorted, eager_only=True).select(*output_cols)
+
+    for _idx, r2 in enumerate(nw_points_sorted.iter_rows(named=True)):
         # For each set of three points, i.e. the last two points in selected
         # and the next point from the sorted list of base points, check
         # whether the middle point (r1) lies above the line between the
@@ -148,24 +152,31 @@ def _filter_points_to_get_convex_hull(points_sorted: pd.DataFrame) -> pd.DataFra
         # it is indeed required for the convex hull. If it is below or
         # on the line, then it is part of the convex hull as defined with
         # just r0 and r2 and we can drop it from the list of selected points.
-        while len(selected) >= 2:
-            r1 = selected[-1]
-            r0 = selected[-2]
+        while len(selected_rows) >= 2:
+            r1 = selected_rows[-1]
+            r0 = selected_rows[-2]
             # Compare slopes of lines between r0 and r1/r2 to determine
             # whether or not to drop r1. Instead of delta_y/delta_x we
             # multiplied both sides of the inequation by the delta_xs.
-            if (r1.y - r0.y) * (r2.x - r0.x) <= (r2.y - r0.y) * (r1.x - r0.x):
+            if (r1["y"] - r0["y"]) * (r2["x"] - r0["x"]) <= (r2["y"] - r0["y"]) * (
+                r1["x"] - r0["x"]
+            ):
                 # drop r1
-                selected.pop()
+                selected_rows.pop()
+                selected_indexes.pop()
             else:
                 break
-        selected.append(r2)
-    return pd.DataFrame(selected)[["x", "y", "operation"]]
+        selected_rows.append(r2)
+        selected_indexes.append(_idx)
+
+    # The reason for this workaround is to be able to maintain the original dtype_backend
+    # in case of pandas DataFrame's.
+    return nw.maybe_reset_index(nw_points_sorted[selected_indexes, :]).to_native()
 
 
 def _interpolate_curve(
-    data: pd.DataFrame, x_col: str, y_col: str, content_col: str, x_grid: NDArray
-) -> pd.DataFrame:
+    data: IntoDataFrameT, x_col: str, y_col: str, content_col: str, x_grid: NDArray
+) -> IntoDataFrameT:
     """Interpolates the DataFrame in `data` along the values in `x_grid`.
 
     Assumes: (1) data[y_col] is concave in data[x_col]
@@ -173,7 +184,7 @@ def _interpolate_curve(
 
     Parameters
     ----------
-    data : :class:`pandas:pandas.DataFrame`
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The convex hull data points.
     x_col : str
         Name of the x-column in `data`.
@@ -186,12 +197,13 @@ def _interpolate_curve(
 
     Returns
     -------
-    result : :class:`pandas:pandas.DataFrame`
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         DataFrame with the points of the interpolated curve.
     """
-    x_values = data[x_col].values
-    y_values = data[y_col].values
-    content_values = data[content_col].values
+    nw_data = nw.from_native(data, eager_only=True, pass_through=False)
+    x_values = nw_data.get_column(x_col).to_numpy()
+    y_values = nw_data.get_column(y_col).to_numpy()
+    content_values = nw_data.get_column(content_col).to_numpy()
 
     content_col_0 = content_col + "0"
     content_col_1 = content_col + "1"
@@ -206,7 +218,7 @@ def _interpolate_curve(
     p1 = 1 - p0
     y = p0 * y_values[interpolation_indices] + p1 * y_values[interpolation_indices + 1]
 
-    return pd.DataFrame(
+    return nw.from_dict(
         {
             x_col: x_grid,
             y_col: y,
@@ -214,8 +226,9 @@ def _interpolate_curve(
             content_col_0: content_values[interpolation_indices],
             "p1": p1,
             content_col_1: content_values[interpolation_indices + 1],
-        }
-    )
+        },
+        backend=nw.get_native_namespace(data),
+    ).to_native()
 
 
 def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
@@ -252,7 +265,7 @@ def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
 
 
 def _calculate_tradeoff_points(
-    data: pd.DataFrame,
+    data: IntoDataFrameT,
     sensitive_feature_value,
     flip: bool = False,
     x_metric: Literal[
@@ -269,7 +282,7 @@ def _calculate_tradeoff_points(
         "true_positive_rate",
         "true_negative_rate",
     ] = "true_positive_rate",
-) -> pd.DataFrame:
+) -> IntoDataFrameT:
     """Calculate the ROC points from the scores and labels.
 
     This is done by iterating through all possible
@@ -277,7 +290,7 @@ def _calculate_tradeoff_points(
 
     Parameters
     ----------
-    data : :class:`pandas:pandas.DataFrame`
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The DataFrame containing scores and labels.
     sensitive_feature_value : str, int
         The sensitive feature value of the samples provided in `data`.
@@ -295,7 +308,7 @@ def _calculate_tradeoff_points(
 
     Returns
     -------
-    result : :class:`pandas:pandas.DataFrame`
+    result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The ROC curve points with their corresponding threshold operations.
     """
     scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
@@ -314,6 +327,10 @@ def _calculate_tradeoff_points(
     i = 0
     count = [0, 0]
     x_list, y_list, operation_list = [], [], []
+
+    x_metric_fn = METRIC_DICT[x_metric]
+    y_metric_fn = METRIC_DICT[y_metric]
+
     while i < n:
         # special handling of the initial point
         if x_list == []:
@@ -331,40 +348,39 @@ def _calculate_tradeoff_points(
             true_negatives=(n_negative - count[0]),
             false_negatives=(n_positive - count[1]),
         )
-        flipped_counts = _extend_confusion_matrix(
-            false_positives=(n_negative - count[0]),
-            true_positives=(n_positive - count[1]),
-            true_negatives=count[0],
-            false_negatives=count[1],
-        )
+        operations = [(">", actual_counts)]
+
         if flip:
-            operations = [(">", actual_counts), ("<", flipped_counts)]
-        else:
-            operations = [(">", actual_counts)]
+            flipped_counts = _extend_confusion_matrix(
+                false_positives=(n_negative - count[0]),
+                true_positives=(n_positive - count[1]),
+                true_negatives=count[0],
+                false_negatives=count[1],
+            )
+
+            operations.append(("<", flipped_counts))
 
         for operation_string, counts in operations:
-            x = METRIC_DICT[x_metric](counts)
-            y = METRIC_DICT[y_metric](counts)
-            operation = ThresholdOperation(operation_string, threshold)
-            x_list.append(x)
-            y_list.append(y)
-            operation_list.append(operation)
+            x_list.append(x_metric_fn(counts))
+            y_list.append(y_metric_fn(counts))
+            operation_list.append(ThresholdOperation(operation_string, threshold))
 
-    return (
-        pd.DataFrame({"x": x_list, "y": y_list, "operation": operation_list})
-        .sort_values(by=["x", "y"])
-        .reset_index(drop=True)
-    )
+    return nw.maybe_reset_index(
+        nw.from_dict(
+            {"x": x_list, "y": y_list, "operation": operation_list},
+            backend=nw.get_native_namespace(data),
+        ).sort(by=["x", "y"])
+    ).to_native()
 
 
-def _get_scores_labels_and_counts(data: pd.DataFrame):
+def _get_scores_labels_and_counts(data: IntoDataFrame) -> Tuple[list, list, int, int, int]:
     """Order samples by scores, counting number of positive, negative, and overall samples.
 
     The samples are sorted into descending order.
 
     Parameters
     ----------
-    data : :class:`pandas:pandas.DataFrame`
+    data : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The DataFrame containing scores and labels.
 
     Returns
@@ -373,17 +389,19 @@ def _get_scores_labels_and_counts(data: pd.DataFrame):
         A tuple containing the sorted scores, labels, the number of samples, \
         the number of positive samples, and the number of negative samples.
     """
-    data_sorted = data.sort_values(by=SCORE_KEY, ascending=False)
+    data_sorted = nw.from_native(data, eager_only=True, pass_through=False).sort(
+        by=SCORE_KEY, descending=True
+    )
 
-    scores = list(data_sorted[SCORE_KEY])
-    labels = list(data_sorted[LABEL_KEY])
+    scores = data_sorted.get_column(SCORE_KEY)
+    labels = data_sorted.get_column(LABEL_KEY)
 
     n, n_positive, n_negative = _get_counts(labels)
 
-    return scores, labels, n, n_positive, n_negative
+    return scores.to_list(), labels.to_list(), n, n_positive, n_negative
 
 
-def _get_counts(labels):
+def _get_counts(labels: nw.Series) -> Tuple[int, int, int]:
     """Return the overall, positive, and negative counts of the labels.
 
     Parameters
@@ -394,10 +412,9 @@ def _get_counts(labels):
     Returns
     -------
     result : tuple[int, int, int]
-        A tuple containing the overall, positive, and negative counts of \
-        the labels.
+        A tuple containing the overall, positive, and negative counts of the labels.
     """
     n = len(labels)
-    n_positive = sum(labels)
+    n_positive = labels.sum()
     n_negative = n - n_positive
     return n, n_positive, n_negative

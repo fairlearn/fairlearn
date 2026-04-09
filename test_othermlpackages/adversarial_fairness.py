@@ -16,6 +16,7 @@ import fairlearn.utils._compatibility as compat
 from fairlearn.adversarial import AdversarialFairnessClassifier
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import MetricFrame, demographic_parity_difference, selection_rate
+from test_othermlpackages.utils import DATA_HOME
 
 # Global variables of test_examples()
 schedulers = []
@@ -24,7 +25,7 @@ step = 1
 
 def test_examples():
     # EXAMPLE 1
-    X, y = fetch_adult(return_X_y=True)
+    X, y = fetch_adult(return_X_y=True, data_home=DATA_HOME)
     pos_label = y[0]
 
     z = X["sex"]  # In this example, we consider 'sex' the sensitive feature.

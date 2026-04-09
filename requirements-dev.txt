@@ -12,13 +12,17 @@ requirements-parser
 # requirements-dev.txt
 # linting.yml
 # .pre-commit-config.yaml
-black==24.4.2
+black==26.3.1
+
+# Required for building sdist and wheel
+build
 
 # Required for test
 pytest
 pytest-cov
 pytest-mock
 pytest-mpl
+matplotlib>=3.10.8
 wheel
 lightgbm
 xlrd

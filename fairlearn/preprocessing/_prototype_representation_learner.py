@@ -329,7 +329,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             classification_error = log_loss(y, y_hat)
 
         fairness_error = 0.0
-        if sensitive_features is not None:
+        if sensitive_features is not None and len(self._groups) > 1:
             # Compute the fairness error
             # Compute the mean prototype probabilities for each group
             M_gk = np.array(

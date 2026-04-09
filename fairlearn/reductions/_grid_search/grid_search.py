@@ -130,9 +130,9 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             feature used by the constraints object.
         """
         self.predictors_ = []
-        self.lambda_vecs_ = pd.DataFrame(dtype=np.float64)
+        lambda_vecs_dict = {}
         self.objectives_ = []
-        self.gammas_ = pd.DataFrame(dtype=np.float64)
+        gammas_dict = {}
         self.oracle_execution_times_ = []
 
         if isinstance(self.constraints, ClassificationMoment):
@@ -204,10 +204,13 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
                 return current_estimator.predict(X)
 
             self.predictors_.append(current_estimator)
-            self.lambda_vecs_[i] = lambda_vec
+            lambda_vecs_dict[i] = lambda_vec
             self.objectives_.append(objective.gamma(predict_fct).iloc[0])
-            self.gammas_[i] = self.constraints.gamma(predict_fct)
+            gammas_dict[i] = self.constraints.gamma(predict_fct)
             self.oracle_execution_times_.append(oracle_call_execution_time)
+
+        self.lambda_vecs_ = pd.DataFrame(lambda_vecs_dict, dtype=np.float64)
+        self.gammas_ = pd.DataFrame(gammas_dict, dtype=np.float64)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:

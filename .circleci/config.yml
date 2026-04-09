@@ -69,7 +69,7 @@ jobs:
       - save_cache:
           key: v1-build-doc-datasets-{{ .Branch }}
           paths:
-            - ~/scikit_learn_data
+            - ~/.fairlearn-data
 
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
@@ -139,7 +139,7 @@ jobs:
       - save_cache:
           key: v1-build-doctest-datasets-{{ .Branch }}
           paths:
-            - ~/scikit_learn_data
+            - ~/.fairlearn-data
 
   deploy-doc:
     docker:

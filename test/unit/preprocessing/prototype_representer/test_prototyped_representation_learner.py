@@ -6,22 +6,22 @@ import pytest
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fairlearn.preprocessing import PrototypeRepresentationLearner
+from fairlearn.utils._input_validation import _merge_columns
 
 
 @parametrize_with_checks(
     [
-        PrototypeRepresentationLearner(max_iter=50),
+        PrototypeRepresentationLearner(max_iter=3, random_state=42),
     ],
 )
 def test_sklearn_compatible_estimator(estimator, check):
     check(estimator)
 
 
-@pytest.mark.parametrize(["sensitive_features"], [(np.array([0, 1]),), (None,)])
+@pytest.mark.parametrize("sensitive_features", [np.array([0, 1]), None])
 def test_reconstruction(sensitive_features: np.array | None):
     X = np.array([[10, 10], [20, 20]])
     y = np.array([0, 1])
-    sensitive_features = np.array([0, 1])
     expected_transformed_X = np.array([[1.0, 0.0], [0.0, 1.0]])
     prl = PrototypeRepresentationLearner(
         n_prototypes=2, fairness_weight=0.0, target_weight=0.0, random_state=42
@@ -32,6 +32,15 @@ def test_reconstruction(sensitive_features: np.array | None):
 
     np.testing.assert_allclose(X_transformed, expected_transformed_X, atol=1e-4)
     np.testing.assert_allclose(prl.prototypes_, X, atol=1e-4)
+
+
+def test_fit_with_degenerate_sensitive_features():
+    X = np.array([[10, 10], [20, 20]])
+    y = np.array([0, 1])
+    sensitive_features = np.array([0, 0])
+    prl = PrototypeRepresentationLearner(n_prototypes=2, fairness_weight=0.0, random_state=42)
+    # Should not raise - fairness error is trivially 0 with one group
+    prl.fit(X, y, sensitive_features=sensitive_features)
 
 
 def test_statistical_parity():
@@ -54,16 +63,38 @@ def test_statistical_parity():
     np.testing.assert_allclose(fairness_error, 0.0, atol=1e-4)
 
 
-@pytest.mark.parametrize(["sensitive_features"], [(np.array([0, 1, 0, 1]),), (None,)])
+def test_statistical_parity_multi_dimension_sensitive_features():
+    X = np.array([[10, 10], [20, 20], [30, 30], [40, 40]])
+    y = np.array([0, 1, 0, 1])
+    sensitive_features = np.array([[0, 1], [0, 1], [1, 0], [1, 0]])
+    prl = PrototypeRepresentationLearner(
+        n_prototypes=4, reconstruct_weight=0.0, target_weight=0.0, random_state=42
+    )
+    prl.fit(X, y, sensitive_features=sensitive_features)
+
+    M = prl._get_latent_mapping(X, prl.prototypes_, prl.alpha_)
+
+    merged_sensitive_features = _merge_columns(sensitive_features)
+    M_gk = np.array(
+        [np.mean(M[merged_sensitive_features == group], axis=0) for group in prl._groups]
+    )
+    # Compute the mean difference between prototype probabilities for each group
+    group_combinations = np.triu_indices(n=len(prl._groups), k=1)
+    fairness_error = np.mean(
+        np.abs(M_gk[group_combinations[0], None] - M_gk[group_combinations[1], None])
+    )
+
+    np.testing.assert_allclose(fairness_error, 0.0, atol=1e-4)
+
+
+@pytest.mark.parametrize("sensitive_features", [np.array([0, 1, 0, 1]), None])
 @pytest.mark.parametrize(
     ["y"], [(np.array([0, 1, 0, 1]),), (pd.Series(["no", "yes", "no", "yes"]),)]
 )
 def test_classification(y: np.array, sensitive_features: np.array | None):
     X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
-    y = np.array([0, 1, 0, 1])
-    sensitive_features = np.array([0, 1, 0, 1])
     prl = PrototypeRepresentationLearner(
-        n_prototypes=4, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42
+        n_prototypes=4, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42, tol=1e-4
     )
     prl.fit(X, y, sensitive_features=sensitive_features)
 
@@ -76,6 +107,21 @@ def test_transform_without_target():
     X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
     y = None
     sensitive_features = np.array([0, 1, 0, 1])
+    expected_X_transformed = np.array(
+        [[0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+    )
+    prl = PrototypeRepresentationLearner(n_prototypes=4, random_state=42)
+    prl.fit(X, y, sensitive_features=sensitive_features)
+
+    X_transformed = prl.transform(X)
+
+    np.testing.assert_allclose(expected_X_transformed, X_transformed, atol=1e-4)
+
+
+def test_transform_sensitive_features_with_two_dimensions():
+    X = np.array([[10, 10], [200, 200], [10, 10], [300, 300]])
+    y = np.array([0, 1, 0, 1])
+    sensitive_features = np.array([[0, 1], [1, 0], [0, 1], [1, 0]])
     expected_X_transformed = np.array(
         [[0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
     )

@@ -80,7 +80,7 @@ To verify that the code works as expected run:
 .. note::
 
    If there is a :code:`torch` related error during the installation,
-   please downgrade keep your :code:`python` version between 3.9-3.12.
+   please downgrade keep your :code:`python` version between 3.10-3.13.
 
 Fairlearn currently includes plotting functionality provided by
 :code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:

@@ -1,0 +1,15 @@
+v0.14.0
+=======
+
+.. note::
+
+   v0.14.0 is not yet released. This page reflects changes on the current
+   :code:`main` branch that will eventually be a part of v0.14.0.
+
+
+Other improvements
+------------------
+
+* Removed support for python 3.9 and added support for python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Added support for scipy 1.16 :pr:`1596` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Fixed handling of degenerate sensitive feature values in ``PrototypeRepresentationLearner``: :pr:`1626` by :user:`BALOGUN-DAVID`.

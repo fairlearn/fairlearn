@@ -112,7 +112,7 @@ metrics_dict = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def sample_metric_frame():
     return MetricFrame(metrics=metrics_dict, y_true=y_t, y_pred=y_p, sensitive_features=g_1)
 

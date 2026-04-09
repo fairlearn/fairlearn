@@ -2,8 +2,6 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from importlib.metadata import PackageNotFoundError
-
 import pytest
 
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
@@ -21,6 +19,16 @@ Make sure to have `pytest-mpl` installed or this will not work.
 pytest can run the tests either to check that there are no exceptions (using
 a typical pytest command without extra options) or to actually compare the
 generated images with the baseline plots (using pytest --mpl)."""
+
+
+@pytest.fixture()
+def close_figs():
+    # Close before and after each test to avoid lingering figures between tests
+    import matplotlib.pyplot as plt
+
+    plt.close("all")  # pre-test (important for backend switches)
+    yield
+    plt.close("all")  # post-test cleanup
 
 
 def _fit_and_plot(constraints, plotting_data, tol: float | None = None):
@@ -48,10 +56,11 @@ def is_mpl_installed():
         import pytest_mpl  # noqa: F401
 
         return True
-    except PackageNotFoundError:
+    except ModuleNotFoundError:
         return False
 
 
+@pytest.mark.usefixtures("close_figs")
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="post_processing_equalized_odds_ex1.png")
