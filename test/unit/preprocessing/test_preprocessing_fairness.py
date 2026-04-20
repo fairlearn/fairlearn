@@ -18,9 +18,15 @@ from fairlearn.metrics import (
     equal_opportunity_difference,
     equalized_odds_difference,
 )
-from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationLearner
+from fairlearn.preprocessing import (
+    CorrelationRemover,
+    KamiranCaldersReweighing,
+    PrototypeRepresentationLearner,
+)
 
-PreprocessingAlgorithm = Union[CorrelationRemover, PrototypeRepresentationLearner]
+PreprocessingAlgorithm = Union[
+    CorrelationRemover, PrototypeRepresentationLearner, KamiranCaldersReweighing
+]
 
 
 @dataclass(frozen=True)
