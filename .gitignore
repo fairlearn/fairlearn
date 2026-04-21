@@ -128,3 +128,6 @@ docs/api_reference/generated/
 
 # Doc build generated files
 *.pkl
+
+# Auto-generated file
+fairlearn/_version.py
