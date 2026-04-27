@@ -108,6 +108,7 @@ class MetricFrame:
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
+        All entries in these structures must be scalar non-float values (e.g., strings, integers).
         We also forbid DataFrames with column names of ``None``.
         For cases where no names are provided we generate names ``sensitive_feature_[n]``.
 
@@ -985,6 +986,10 @@ class MetricFrame:
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
+                if not np.all([np.isscalar(x) and not isinstance(x, float) for x in f_arr]):
+                    raise ValueError(
+                        "Entries of sensitive_features must be scalar non-float values (e.g., strings or integers)"
+                    )
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0))
