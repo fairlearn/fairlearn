@@ -86,6 +86,8 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
 
     Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
+    .. versionadded:: 0.4.6
+
     Parameters
     ----------
     y_true : array-like
@@ -122,6 +124,8 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
     r"""Calculate the true negative rate (also called specificity or selectivity).
 
     Read more in the :ref:`User Guide <custom_fairness_metrics>`.
+
+    .. versionadded:: 0.4.6
 
     Parameters
     ----------
@@ -160,6 +164,8 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
 
     Read more in the :ref:`User Guide <custom_fairness_metrics>`.
 
+    .. versionadded:: 0.4.6
+
     Parameters
     ----------
     y_true : array-like
@@ -196,6 +202,8 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
     r"""Calculate the false negative rate (also called miss rate).
 
     Read more in the :ref:`User Guide <custom_fairness_metrics>`.
+
+    .. versionadded:: 0.4.6
 
     Parameters
     ----------
@@ -237,6 +245,8 @@ def count(y_true, y_pred) -> int:
 
     Read more in the :ref:`User Guide <assessment>`.
 
+    .. versionadded:: 0.7.0
+
     Parameters
     ----------
     y_true : array_like
@@ -259,6 +269,8 @@ def mean_prediction(y_true, y_pred, sample_weight=None) -> float:
 
     The true values are ignored, but required as an argument in order
     to maintain a consistent interface
+
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
@@ -291,6 +303,8 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
     other metric functions, the ``y_true`` argument is required, but ignored.
 
     Read more in the :ref:`User Guide <custom_fairness_metrics>`.
+
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------

@@ -41,6 +41,8 @@ def plot_model_comparison(
     (e.g., balanced_accuracy) and the other is a fairness metric
     (e.g., false_negative_rate_difference).
 
+    .. versionadded:: 0.8.0
+
     Parameters
     ----------
     y_preds : array-like, dict of array-like

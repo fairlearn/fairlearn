@@ -82,6 +82,12 @@ class MetricFrame:
 
     Read more in the :ref:`User Guide <assessment>`.
 
+    .. versionadded:: 0.5.0
+
+    .. versionchanged:: 0.7.0
+        The ``metric`` argument was renamed to ``metrics`` and constructor
+        arguments became keyword-only; the previous form is deprecated.
+
     Parameters
     ----------
     metrics : callable or dict
