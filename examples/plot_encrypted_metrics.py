@@ -26,22 +26,22 @@ Computing Fairlearn metrics on encrypted predictions
 #
 # This example requires ``fairlearn-fhe`` (which transitively pulls in
 # ``tenseal`` for the default CKKS backend). If you have not installed
-# it, the example exits early with a helpful message rather than
-# erroring out the whole gallery build.
+# it, the remaining cells are skipped (guarded by ``HAS_FHE``) so the
+# gallery build still completes cleanly.
 
 try:
     from fairlearn_fhe import build_context, encrypt
-    from fairlearn_fhe.metrics import (
-        demographic_parity_difference as enc_dp,
-        equal_opportunity_difference as enc_eopp,
-        equalized_odds_difference as enc_eo,
-    )
+    from fairlearn_fhe.metrics import demographic_parity_difference as enc_dp
+    from fairlearn_fhe.metrics import equal_opportunity_difference as enc_eopp
+    from fairlearn_fhe.metrics import equalized_odds_difference as enc_eo
+
+    HAS_FHE = True
 except ImportError:
     print(
         "Skipping encrypted-metrics example: install fairlearn-fhe to run it.\n"
         "    pip install fairlearn-fhe"
     )
-    raise SystemExit(0)
+    HAS_FHE = False
 
 # %%
 # Train a baseline classifier
@@ -52,43 +52,44 @@ except ImportError:
 # logistic regression — fairlearn-fhe does not constrain the model
 # choice; only the post-hoc metric evaluation runs under encryption.
 
-import pandas as pd
-from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+if HAS_FHE:
+    import pandas as pd
+    from sklearn.compose import ColumnTransformer
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from fairlearn.datasets import fetch_adult
-from fairlearn.metrics import (
-    demographic_parity_difference,
-    equal_opportunity_difference,
-    equalized_odds_difference,
-)
+    from fairlearn.datasets import fetch_adult
+    from fairlearn.metrics import (
+        demographic_parity_difference,
+        equal_opportunity_difference,
+        equalized_odds_difference,
+    )
 
-data = fetch_adult(as_frame=True)
-X_raw = data.data
-y_true = (data.target == ">50K").astype(int)
-sensitive = X_raw["sex"].astype(str)
+    data = fetch_adult(as_frame=True)
+    X_raw = data.data
+    y_true = (data.target == ">50K").astype(int)
+    sensitive = X_raw["sex"].astype(str)
 
-X = X_raw.drop(columns=["sex"])
-X_train, X_test, y_train, y_test, sf_train, sf_test = train_test_split(
-    X, y_true, sensitive, test_size=0.3, random_state=12345, stratify=y_true
-)
+    X = X_raw.drop(columns=["sex"])
+    X_train, X_test, y_train, y_test, sf_train, sf_test = train_test_split(
+        X, y_true, sensitive, test_size=0.3, random_state=12345, stratify=y_true
+    )
 
-numeric = X_train.select_dtypes(include="number").columns
-categorical = X_train.select_dtypes(exclude="number").columns
-preprocess = ColumnTransformer(
-    [
-        ("num", StandardScaler(), numeric),
-        ("cat", OneHotEncoder(handle_unknown="ignore"), categorical),
-    ]
-)
-model = Pipeline(
-    [("prep", preprocess), ("clf", LogisticRegression(max_iter=1000))]
-).fit(X_train, y_train)
-y_pred = model.predict(X_test)
-print(f"Trained on {len(X_train)} rows, evaluating on {len(y_pred)}.")
+    numeric = X_train.select_dtypes(include="number").columns
+    categorical = X_train.select_dtypes(exclude="number").columns
+    preprocess = ColumnTransformer(
+        [
+            ("num", StandardScaler(), numeric),
+            ("cat", OneHotEncoder(handle_unknown="ignore"), categorical),
+        ]
+    )
+    model = Pipeline([("prep", preprocess), ("clf", LogisticRegression(max_iter=1000))]).fit(
+        X_train, y_train
+    )
+    y_pred = model.predict(X_test)
+    print(f"Trained on {len(X_train)} rows, evaluating on {len(y_pred)}.")
 
 # %%
 # Plaintext baseline
@@ -97,18 +98,19 @@ print(f"Trained on {len(X_train)} rows, evaluating on {len(y_pred)}.")
 # Compute the canonical fairness metrics in plaintext so the encrypted
 # verdicts have a reference value.
 
-plain = {
-    "demographic_parity_difference": demographic_parity_difference(
-        y_test, y_pred, sensitive_features=sf_test
-    ),
-    "equalized_odds_difference": equalized_odds_difference(
-        y_test, y_pred, sensitive_features=sf_test
-    ),
-    "equal_opportunity_difference": equal_opportunity_difference(
-        y_test, y_pred, sensitive_features=sf_test
-    ),
-}
-print(pd.Series(plain, name="plaintext").to_string())
+if HAS_FHE:
+    plain = {
+        "demographic_parity_difference": demographic_parity_difference(
+            y_test, y_pred, sensitive_features=sf_test
+        ),
+        "equalized_odds_difference": equalized_odds_difference(
+            y_test, y_pred, sensitive_features=sf_test
+        ),
+        "equal_opportunity_difference": equal_opportunity_difference(
+            y_test, y_pred, sensitive_features=sf_test
+        ),
+    }
+    print(pd.Series(plain, name="plaintext").to_string())
 
 # %%
 # Encrypted run
@@ -119,21 +121,16 @@ print(pd.Series(plain, name="plaintext").to_string())
 # remain plaintext on the auditor side — this is *Mode A* in
 # fairlearn-fhe's trust-models guide (depth-1 CKKS circuit per metric).
 
-ctx = build_context(backend="tenseal")
-y_pred_enc = encrypt(ctx, y_pred.astype(float))
+if HAS_FHE:
+    ctx = build_context(backend="tenseal")
+    y_pred_enc = encrypt(ctx, y_pred.astype(float))
 
-encrypted = {
-    "demographic_parity_difference": enc_dp(
-        y_test, y_pred_enc, sensitive_features=sf_test
-    ),
-    "equalized_odds_difference": enc_eo(
-        y_test, y_pred_enc, sensitive_features=sf_test
-    ),
-    "equal_opportunity_difference": enc_eopp(
-        y_test, y_pred_enc, sensitive_features=sf_test
-    ),
-}
-print(pd.Series(encrypted, name="encrypted").to_string())
+    encrypted = {
+        "demographic_parity_difference": enc_dp(y_test, y_pred_enc, sensitive_features=sf_test),
+        "equalized_odds_difference": enc_eo(y_test, y_pred_enc, sensitive_features=sf_test),
+        "equal_opportunity_difference": enc_eopp(y_test, y_pred_enc, sensitive_features=sf_test),
+    }
+    print(pd.Series(encrypted, name="encrypted").to_string())
 
 # %%
 # Numerical agreement
@@ -142,16 +139,16 @@ print(pd.Series(encrypted, name="encrypted").to_string())
 # CKKS is an approximate scheme; small rounding noise is expected. The
 # default settings give ``< 1e-3`` absolute error in practice.
 
-import math
+if HAS_FHE:
+    import math
 
-for name in plain:
-    delta = abs(plain[name] - encrypted[name])
-    flag = "OK" if delta < 1e-3 else "!!"
-    print(
-        f"{flag} {name}: plain={plain[name]:.6f} fhe={encrypted[name]:.6f} "
-        f"|Δ|={delta:.2e}"
-    )
-    assert math.isclose(plain[name], encrypted[name], abs_tol=1e-3)
+    for name in plain:
+        delta = abs(plain[name] - encrypted[name])
+        flag = "OK" if delta < 1e-3 else "!!"
+        print(
+            f"{flag} {name}: plain={plain[name]:.6f} fhe={encrypted[name]:.6f} " f"|Δ|={delta:.2e}"
+        )
+        assert math.isclose(plain[name], encrypted[name], abs_tol=1e-3)
 
 # %%
 # Audit envelope
@@ -163,30 +160,31 @@ for name in plain:
 # validated from the CLI without importing an FHE backend
 # (``fairlearn-fhe verify envelope.json``).
 
-from fairlearn_fhe import audit_metric
+if HAS_FHE:
+    from fairlearn_fhe import audit_metric
 
-env = audit_metric(
-    "demographic_parity_difference",
-    y_true=y_test,
-    y_pred=y_pred_enc,
-    sensitive_features=sf_test,
-    ctx=ctx,
-    min_group_size=30,
-)
-env_dict = env.to_dict()
-print(
-    {
-        k: env_dict[k]
-        for k in [
-            "metric_name",
-            "value",
-            "observed_depth",
-            "op_counts",
-            "n_samples",
-            "n_groups",
-        ]
-    }
-)
+    env = audit_metric(
+        "demographic_parity_difference",
+        y_true=y_test,
+        y_pred=y_pred_enc,
+        sensitive_features=sf_test,
+        ctx=ctx,
+        min_group_size=30,
+    )
+    env_dict = env.to_dict()
+    print(
+        {
+            k: env_dict[k]
+            for k in [
+                "metric_name",
+                "value",
+                "observed_depth",
+                "op_counts",
+                "n_samples",
+                "n_groups",
+            ]
+        }
+    )
 
 # %%
 # Trust models
