@@ -625,6 +625,46 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     detected by :code:`gamma` is identical to the mean absolute error.
 
 
+
+.. _grid_search:
+
+Grid Search
+-----------
+
+The :class:`GridSearch` algorithm is a simpler alternative to
+:class:`ExponentiatedGradient`. It works by generating a grid of re-weightings
+and relabelings, and training a separate predictor for each. The resulting
+collection of predictors represents various trade-offs between the performance
+objective and the fairness constraints.
+
+Here is a short example of how to use :class:`GridSearch` with :class:`DemographicParity`:
+
+.. doctest:: mitigation_reductions
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.reductions import GridSearch, DemographicParity
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> import numpy as np
+    >>> # Sample data
+    >>> X = np.array([[0], [1], [2], [3], [4], [5], [6], [7]])
+    >>> y = np.array([0, 1, 0, 1, 0, 1, 1, 1])
+    >>> sf = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    >>> # Initialize and fit
+    >>> mitigator = GridSearch(
+    ...     LogisticRegression(solver='liblinear'),
+    ...     constraints=DemographicParity(),
+    ...     grid_size=10
+    ... )
+    >>> mitigator.fit(X, y, sensitive_features=sf) # doctest: +ELLIPSIS
+    GridSearch(...)
+    >>> # Predict
+    >>> y_pred = mitigator.predict(X)
+
+The full collection of predictors generated during the search is available
+via the :attr:`GridSearch.predictors_` attribute, allowing users to manually
+explore the Pareto front of models.
+
+
 Exponentiated Gradient
 ----------------------
 
