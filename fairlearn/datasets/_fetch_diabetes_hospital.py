@@ -49,10 +49,6 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical).
 
-        .. note::
-            If set to False, this will raise an exception because of a type mismatch
-            in the OpenML dataset.
-
         .. versionadded:: 0.9.0
 
     cache : bool, default=True
@@ -94,16 +90,41 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
     -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
     """
+    import numpy as np
+    import pandas as pd
+    from sklearn.utils import Bunch
+
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
     # For data_home see
     # https://github.com/scikit-learn/scikit-learn/issues/27447
-    return fetch_openml(
+    dataset = fetch_openml(
         data_id=43874,
         data_home=str(data_home),
         cache=cache,
-        as_frame=as_frame,
-        return_X_y=return_X_y,
+        as_frame=True,  # Always fetch as frame to handle type conversion
+        return_X_y=False,
         parser="auto",
     )
+
+    if not as_frame:
+        # Convert DataFrame to numpy arrays
+        data = dataset.data.values.astype(np.float64)
+        target = dataset.target.values.astype(np.int64)
+
+        if return_X_y:
+            return data, target
+        else:
+            return Bunch(
+                data=data,
+                target=target,
+                feature_names=dataset.feature_names,
+                DESCR=dataset.DESCR,
+                categories=None,
+            )
+    else:
+        if return_X_y:
+            return dataset.data, dataset.target
+        else:
+            return dataset
