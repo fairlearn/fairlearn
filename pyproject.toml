@@ -1,3 +1,51 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fairlearn"
+description = "A Python package to assess and improve fairness of machine learning models."
+readme = "README.rst"
+license = "MIT"
+dynamic = ["version"]
+requires-python = ">=3.10"
+authors = [
+    { name = "Miroslav Dudik" },
+    { name = "Richard Edgar" },
+    { name = "Adrin Jalali" },
+    { name = "Roman Lutz" },
+    { name = "Michael Madaio" },
+    { name = "Hilde Weerts" },
+    { name = "Allie Saizan" },
+    { name = "Tamara Atanasoska" },
+    { name = "Tahar Allouche" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+]
+dependencies = [
+    "narwhals>=1.14.0",
+    "numpy>=1.24.4",
+    "pandas>=2.0.3",
+    "scikit-learn>=1.2.1",
+    "scipy>=1.9.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/fairlearn/fairlearn"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "fairlearn/_version.py"
+
 [tool.black]
 line-length = 99
 target_version = ['py39', 'py310', 'py311', 'py312']
