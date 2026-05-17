@@ -249,6 +249,99 @@ not provided, the classification error term will not be included in the loss fun
     >>> X_test_transformed = prl.transform(X_test)
 
 
+
+.. _kamiran_calders_reweighing:
+
+Kamiran-Calders Reweighing
+---------------------------
+
+:class:`~fairlearn.preprocessing.KamiranCaldersReweighing` is a preprocessing algorithm
+that mitigates bias or discrimination by assigning **instance-level weights** to training
+samples. These weights are computed such that the target variable becomes statistically
+independent of one or more sensitive features. This implements the reweighing method
+introduced by Kamiran and Calders (2012) :footcite:`Kamiran2012`.
+
+Unlike methods that modify feature values or labels, reweighing leaves the dataset
+unchanged and instead adjusts the importance of each training instance. The resulting
+weights can be passed to downstream estimators via the :code:`sample_weight` argument
+during model training.
+
+Mathematically, let :math:`S` denote a (possibly multivariate) sensitive attribute and
+:math:`Y` the target variable. The goal of reweighing is to enforce independence
+between :math:`S` and :math:`Y` in the weighted empirical distribution.
+
+For each combination of sensitive feature values :math:`s` and target label :math:`y`,
+the reweighing method computes a weight
+
+.. math::
+
+    w(s, y) = \frac{P(S = s)\, P(Y = y)}{P(S = s, Y = y)}
+
+where probabilities are estimated empirically from the training data. Each instance
+with sensitive attributes :math:`s` and label :math:`y` is assigned the corresponding
+weight :math:`w(s, y)`.
+
+When a learning algorithm is trained using these weights, the weighted empirical
+distribution satisfies
+
+.. math::
+
+    P_w(S = s, Y = y) = P(S = s)\, P(Y = y),
+
+thereby removing dependence between the sensitive features and the target. This makes
+reweighing particularly suitable for models that natively support sample weighting,
+such as generalized linear models or tree-based methods.
+
+The :class:`KamiranCaldersReweighing` transformer appends a :code:`weight` column to the
+dataset. By default, the target column is dropped after the transformation, but this
+behavior can be controlled using the :code:`drop_target` parameter.
+
+Example
+-------
+
+In the following example, we apply Kamiran-Calders reweighing to a toy dataset
+containing a binary sensitive attribute (:code:`Sex`) and a binary target (:code:`Cl.`).
+The transformer computes instance-level weights such that the target distribution is
+independent of sex.
+
+.. doctest:: mitigation_preprocessing
+    :options: +NORMALIZE_WHITESPACE
+
+    >>> import pandas as pd
+    >>> from fairlearn.preprocessing import KamiranCaldersReweighing
+    >>> df = pd.DataFrame({
+    ...     "Sex": ["M", "M", "M", "M", "M", "F", "F", "F", "F", "F"],
+    ...     "Ethnicity": [
+    ...         "Native", "Native", "Native", "Non-nat.", "Non-nat.",
+    ...         "Non-nat.", "Native", "Native", "Non-nat.", "Native"
+    ...     ],
+    ...     "Highest degree": [
+    ...         "H. school", "Univ.", "H. school", "H. school", "Univ.",
+    ...         "Univ.", "H. school", "None", "Univ.", "H. school"
+    ...     ],
+    ...     "Job type": [
+    ...         "Board", "Board", "Board", "Healthcare", "Healthcare",
+    ...         "Education", "Education", "Healthcare", "Education", "Board"
+    ...     ],
+    ...     "Cl.": ["+", "+", "+", "+", "-", "-", "-", "+", "-", "+"],
+    ... })
+    >>> X = df.drop(columns=["Cl."])
+    >>> y = df["Cl."]
+    >>> reweigher = KamiranCaldersReweighing(drop_target=True)
+    >>> X_weighted = reweigher.fit_transform(X, y, sensitive_features=["Sex"])
+
+The returned dataset contains all original features along with a :code:`weight` column,
+which can be passed directly to a downstream estimator that supports sample weighting.
+
+Notes
+-----
+
+- Reweighing supports multiple sensitive features; independence is enforced for the
+  joint sensitive attributes, not necessarily marginally for each feature.
+- Works with pandas, NumPy, and Narwhals DataFrames while preserving feature names.
+- Suitable for any estimator that accepts a :code:`sample_weight` argument during
+  training.
+
 References
 ----------
 
