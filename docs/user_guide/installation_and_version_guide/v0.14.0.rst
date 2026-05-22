@@ -23,3 +23,4 @@ Bug fixes
   ``PerformanceWarning`` due to DataFrame fragmentation: :pr:`1632` by
   :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
 * Fixed handling of degenerate sensitive feature values in ``PrototypeRepresentationLearner``: :pr:`1626` by :user:`BALOGUN-DAVID`.
+* Added ``versionadded`` and ``versionchanged`` directives to the ``fairlearn.metrics`` API reference docstrings: :pr:`1640` by :user:`BAder82t`.

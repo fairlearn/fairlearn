@@ -6,6 +6,7 @@
 Passing pipelines to mitigation techniques
 ==========================================
 """
+
 # %%
 # This notebook shows how to pass :class:`sklearn.pipeline.Pipeline` to
 # mitigation techniques from Fairlearn. Note that the notebook is not to be
@@ -37,7 +38,7 @@ X_raw = data.data
 y = (data.target == ">50K") * 1
 A = X_raw["sex"]
 
-(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
 )
 

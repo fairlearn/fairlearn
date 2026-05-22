@@ -48,7 +48,7 @@ def fake_backend_env(request: pytest.FixtureRequest):
 def test_model_init(fake_backend_env):
     """Test model init from list."""
 
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -74,7 +74,7 @@ def test_model_init(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_model_params(fake_backend_env):
     """Test training params."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -97,7 +97,7 @@ def test_model_params(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_model_early_stop(fake_backend_env):
     """Test training params."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -121,7 +121,7 @@ def test_model_early_stop(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_model_equalized_odds_model_setup(fake_backend_env):
     """Test model initialization with equalized_odds."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -138,7 +138,7 @@ def test_model_equalized_odds_model_setup(fake_backend_env):
 def test_model_kw_error_constraint(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -154,7 +154,7 @@ def test_model_kw_error_constraint(fake_backend_env):
 def test_model_kw_error_ints(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -171,7 +171,7 @@ def test_model_kw_error_ints(fake_backend_env):
 def test_model_kw_error_bools(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -187,7 +187,7 @@ def test_model_kw_error_bools(fake_backend_env):
 def test_model_kw_error_callback(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -203,7 +203,7 @@ def test_model_kw_error_callback(fake_backend_env):
 def test_model_kw_error_callbacks(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -218,7 +218,7 @@ def test_model_kw_error_callbacks(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_model_kw_error_tf(fake_backend_env):
     """Test kw error."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     other = get_instance(
         fake_backend="tensorflow",
         fake_mixin=False,
@@ -240,7 +240,7 @@ def test_model_kw_error_tf(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["tensorflow"], indirect=True)
 def test_model_kw_error_torch(fake_backend_env):
     """Test kw error."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     other = get_instance(
         fake_backend="torch",
         fake_mixin=False,

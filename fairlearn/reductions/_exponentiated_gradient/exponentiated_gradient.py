@@ -153,8 +153,6 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         # Stores the weights of the best-response estimators without LP and before averaging
         Qsum = pd.Series(dtype="float64")
 
-        lambda_cumsum = pd.Series(0.0, dtype="float64", index=lagrangian.constraints.index)
-
         # Stores the duality gap of the Exponentiated Gradient (EG) at each iteration
         gaps_EG: list[float] = []
 
@@ -167,6 +165,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.inf
+        lambda_cumsum = pd.Series(0.0, dtype="float64", index=lagrangian.constraints.index)
         for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
