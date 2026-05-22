@@ -153,6 +153,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         # Stores the weights of the best-response estimators without LP and before averaging
         Qsum = pd.Series(dtype="float64")
 
+        lambda_cumsum = pd.Series(0.0, dtype="float64", index=lagrangian.constraints.index)
+
         # Stores the duality gap of the Exponentiated Gradient (EG) at each iteration
         gaps_EG: list[float] = []
 
@@ -171,7 +173,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
             lambda_vecs_EG_dict[t] = lambda_vec
-            lambda_EG = pd.DataFrame(lambda_vecs_EG_dict).mean(axis=1)
+            lambda_cumsum += lambda_vec
+            lambda_EG = lambda_cumsum / (t + 1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
@@ -261,6 +264,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         self.last_iter_ = len(Qs) - 1
         self.predictors_ = lagrangian.predictors
+        self.constraints_ = lagrangian.constraints
         self.n_oracle_calls_ = lagrangian.n_oracle_calls
         self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned
         self.oracle_execution_times_ = lagrangian.oracle_execution_times

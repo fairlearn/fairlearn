@@ -81,7 +81,9 @@ class _Lagrangian:
     ):
         # Deepcopy constraints so the user's original object is not mutated,
         # allowing the same constraints instance to be reused across multiple
-        # calls to fit() or shared between different mitigators.
+        # calls to fit() or shared between different mitigators. This preserves
+        # isolation for custom moments with mutable constructor state while the
+        # estimator's stored constraints remain unloaded between fit() calls.
         self.constraints = copy.deepcopy(constraints)
         self.constraints.load_data(X, y, **kwargs)
         if objective is None:

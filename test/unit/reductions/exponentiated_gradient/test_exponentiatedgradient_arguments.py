@@ -33,6 +33,24 @@ candidate_A_transforms = conversions_for_1d
 _PRECISION = 1e-6
 
 
+def test_constraints_reused_across_multiple_fits():
+    """Same constraints instance must be reusable for multiple fit() calls (#1210)."""
+    X, y, A = _get_data()
+    constraints = DemographicParity()
+    expgrad = ExponentiatedGradient(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=constraints,
+        max_iter=5,
+    )
+
+    expgrad.fit(X, y, sensitive_features=A)
+    expgrad.fit(X, y, sensitive_features=A)
+
+    assert not constraints.data_loaded
+    assert expgrad.constraints_ is not constraints
+    assert expgrad.constraints_.data_loaded
+
+
 class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -151,6 +169,8 @@ class TestExponentiatedGradientArguments:
         original_deepcopy = deepcopy
 
         def mock_deepcopy(obj, *args, **kwargs):
+            # Only intercept deepcopy of the estimator so the constraints copy follows
+            # the production path.
             if obj is estimator:
                 return estimator
             return original_deepcopy(obj, *args, **kwargs)

@@ -145,10 +145,13 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         # Prep the parity constraints and objective
         # Deepcopy constraints so the user's original object is not mutated,
         # allowing the same constraints instance to be reused across multiple
-        # calls to fit() or shared between different mitigators.
+        # calls to fit() or shared between different mitigators. This preserves
+        # isolation for custom moments with mutable constructor state while the
+        # estimator's stored constraints remain unloaded between fit() calls.
         logger.debug("Preparing constraints and objective")
         constraints = copy.deepcopy(self.constraints)
         constraints.load_data(X, y, **kwargs)
+        self.constraints_ = constraints
         objective = constraints.default_objective()
         objective.load_data(X, y, **kwargs)
 
@@ -214,7 +217,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             self.oracle_execution_times_.append(oracle_call_execution_time)
 
         self.lambda_vecs_ = pd.DataFrame(lambda_vecs_dict, dtype=np.float64)
-        self.gammas_ = pd.DataFrame(gammas_dict)
+        self.gammas_ = pd.DataFrame(gammas_dict, dtype=np.float64)
 
         logger.debug("Selecting best_result")
         if self.selection_rule == TRADEOFF_OPTIMIZATION:
