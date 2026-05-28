@@ -14,3 +14,4 @@ Other improvements
 * Added support for scipy 1.16 :pr:`1596` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
 * Fixed handling of degenerate sensitive feature values in ``PrototypeRepresentationLearner``: :pr:`1626` by :user:`BALOGUN-DAVID`.
 * Added ``versionadded`` and ``versionchanged`` directives to the ``fairlearn.metrics`` API reference docstrings: :pr:`1640` by :user:`BAder82t`.
+* Excluded top-level ``test*`` from ``fairlearn`` packaging distribution :pr:`1644` by :user:`Parul Gupta <parulgupta1004>`.
