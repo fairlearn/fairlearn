@@ -15,3 +15,8 @@ Other improvements
 * Fixed handling of degenerate sensitive feature values in ``PrototypeRepresentationLearner``: :pr:`1626` by :user:`BALOGUN-DAVID`.
 * Added ``versionadded`` and ``versionchanged`` directives to the ``fairlearn.metrics`` API reference docstrings: :pr:`1640` by :user:`BAder82t`.
 * Excluded top-level ``test*`` from ``fairlearn`` packaging distribution :pr:`1644` by :user:`Parul Gupta <parulgupta1004>`.
+* Raised the minimum supported version of :code:`scikit-learn` to 1.5.0 and bumped the
+  pinned :code:`torch` version in :code:`requirements-min.txt` to 2.8.0 to address
+  Dependabot security advisories (GHSA scikit-learn sensitive data leakage,
+  PyTorch CTC loss denial of service, and PyTorch improper resource shutdown):
+  :pr:`1645` by :user:`Roman Lutz <romanlutz>`.
