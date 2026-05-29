@@ -43,6 +43,7 @@ Other improvements
 
 * Removed support for Python 3.9 and added support for Python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
 * Added support for scipy 1.16: :pr:`1596` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Raised the minimum supported :code:`scikit-learn` to 1.5.0 and the pinned :code:`torch` in :code:`requirements-min.txt` to 2.8.0 to clear Dependabot security advisories: :pr:`1645` by :user:`Roman Lutz <romanlutz>`.
 * Removed an unused :code:`name` argument from :code:`GroupFeature`: :pr:`1599` by :user:`Tahar Allouche <taharallouche>`.
 * Avoided a :code:`sys` module patching leak in the test suite: :pr:`1600` by :user:`Tahar Allouche <taharallouche>`.
 * Removed a Pillow deprecation warning by requiring :code:`matplotlib>=3.10.5`: :pr:`1618` by :user:`Ibim Braide <iclectic>`.
