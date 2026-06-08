@@ -1,0 +1,19 @@
+v0.15.0
+=======
+
+.. note::
+
+   v0.15.0 is not yet released. This page reflects changes on the current
+   :code:`main` branch that will eventually be a part of v0.15.0.
+
+Bug fixes
+---------
+
+* Fixed :code:`AssertionError: data can be loaded only once` raised when a
+  :class:`~fairlearn.reductions.Moment` instance is passed as :code:`constraints`
+  to more than one call of :code:`ExponentiatedGradient.fit` or
+  :code:`GridSearch.fit`, or shared between estimators. The fitted estimators
+  now deep-copy the user-supplied constraints before loading data, leave the
+  original object unmodified, and expose the loaded copy as the fitted
+  attribute :code:`constraints_`: :pr:`1632` by
+  :user:`BALOGUN DAVID TAIWO <BALOGUN-DAVID>`.
