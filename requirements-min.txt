@@ -1,14 +1,14 @@
 #requirements
 numpy==1.24.4
 pandas==2.0.3
-scikit-learn==1.2.1
+scikit-learn==1.5.0
 scipy==1.9.3
 
 #requirements-dev
 ruff==0.4.5
 requirements_parser==0.11.0
 black==26.3.1
-pytest==8.3.5
+pytest==9.0.3
 pytest_cov==6.1.1
 pytest-mock==3.14.0
 pytest-mpl==0.17.0
@@ -29,5 +29,5 @@ jupyterlite_sphinx==0.19.1
 jupyterlite-pyodide-kernel==0.5.2
 packaging==24.2
 seaborn==0.13.2
-torch==2.6.0
+torch==2.8.0
 sphinx-issues==5.0.1

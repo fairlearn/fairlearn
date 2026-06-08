@@ -175,7 +175,7 @@ $(document).ready(function () {
 
 async function setLinks() {
   // update this version with every release
-  const latestVersion = 'v0.13'; // Do not include the patch
+  const latestVersion = 'v0.14'; // Do not include the patch
   const prefix = "./" + latestVersion;
 
   const contribGuideLink = prefix + "/contributor_guide/index.html";

@@ -125,6 +125,11 @@ def make_derived_metric(
     A :ref:`sample notebook <sphx_glr_auto_examples_plot_make_derived_metric.py>` is
     also available.
 
+    .. versionadded:: 0.4.6
+
+    .. versionchanged:: 0.6.0
+        Implementation now uses :class:`MetricFrame` internally.
+
     Parameters
     ----------
     metric : callable
