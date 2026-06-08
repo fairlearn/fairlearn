@@ -4,6 +4,7 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+from sklearn.utils import Bunch
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
@@ -90,41 +91,41 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
     -----
     Our API largely follows the API of :func:`sklearn.datasets.fetch_openml`.
     """
-    import numpy as np
-    import pandas as pd
-    from sklearn.utils import Bunch
-
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # Always fetch as a DataFrame so that pandas handles the heterogeneous
+    # (numeric / categorical / string) column types from OpenML. When the
+    # caller asked for ``as_frame=False`` we convert to numpy arrays below.
     # For data_home see
     # https://github.com/scikit-learn/scikit-learn/issues/27447
     dataset = fetch_openml(
         data_id=43874,
         data_home=str(data_home),
         cache=cache,
-        as_frame=True,  # Always fetch as frame to handle type conversion
+        as_frame=True,
         return_X_y=False,
         parser="auto",
     )
 
-    if not as_frame:
-        # Convert DataFrame to numpy arrays
-        data = dataset.data.values.astype(np.float64)
-        target = dataset.target.values.astype(np.int64)
-
-        if return_X_y:
-            return data, target
-        else:
-            return Bunch(
-                data=data,
-                target=target,
-                feature_names=dataset.feature_names,
-                DESCR=dataset.DESCR,
-                categories=None,
-            )
-    else:
+    if as_frame:
         if return_X_y:
             return dataset.data, dataset.target
-        else:
-            return dataset
+        return dataset
+
+    # ``as_frame=False``: hand back numpy arrays. The dataset contains mixed
+    # numeric and string/categorical columns, so we let pandas pick the
+    # resulting dtype (object for the heterogeneous data matrix, native dtype
+    # for the integer target).
+    data = dataset.data.to_numpy()
+    target = dataset.target.to_numpy()
+
+    if return_X_y:
+        return data, target
+    return Bunch(
+        data=data,
+        target=target,
+        feature_names=dataset.feature_names,
+        DESCR=dataset.DESCR,
+        categories=None,
+    )
