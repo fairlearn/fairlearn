@@ -11,6 +11,11 @@ Bug fixes
 
 * Fixed :code:`fetch_diabetes_hospital` so that :code:`as_frame=False` returns numpy arrays instead of raising. The data is now always fetched as a pandas DataFrame internally and converted to numpy when needed. The skipped tests and the obsolete :code:`test_fetch_diabetes_hospital_as_ndarray_raises_value_error` test were removed: :pr:`1636` by :user:`Richard Ogundele <richardogundele>`.
 
+Documentation
+-------------
+
+* Removed stale deprecation notices in docstrings for changes that completed in v0.10 (:code:`ThresholdOptimizer.predict_method` default, :code:`InterpolatedThresholder.predict_method` default, and :code:`MetricFrame` constructor positional-argument deprecation).
+
 Other improvements
 ------------------
 
