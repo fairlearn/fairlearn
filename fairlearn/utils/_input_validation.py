@@ -6,9 +6,7 @@ from typing import Sequence
 
 import numpy as np
 import pandas as pd
-from sklearn.utils.validation import check_consistent_length
-
-from fairlearn.utils._fixes import check_array
+from sklearn.utils.validation import check_array, check_consistent_length
 
 logger = logging.getLogger(__file__)
 
