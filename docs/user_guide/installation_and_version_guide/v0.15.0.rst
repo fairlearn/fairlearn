@@ -15,3 +15,4 @@ Other improvements
 ------------------
 
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
+* Enabled the :code:`flake8-logging-format` (:code:`G`) ruff rule set and converted existing logging calls to use lazy :code:`%s` formatting.

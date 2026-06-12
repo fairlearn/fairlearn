@@ -89,7 +89,7 @@ notice-rgx = "# (?i)Copyright \\(C\\) (Microsoft Corporation and )?Fairlearn con
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 #Enable linting according to the new numpy API with NPY201
-select = ["E4", "E7", "E9", "F", "NPY201"]
+select = ["E4", "E7", "E9", "F", "G", "NPY201"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
