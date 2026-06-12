@@ -15,4 +15,4 @@ Other improvements
 ------------------
 
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
-* Removed support for Python 3.10. The minimum supported Python version is now 3.11.
+* Removed support for Python 3.10. The minimum supported Python version is now 3.11: :pr:`1653` by :user:`Roman Lutz <romanlutz>`.
