@@ -33,7 +33,7 @@ class BackendEngine:
         """
         self.base = base
 
-        n_X_features = X.shape[1]  # FIXME: what if X.ndim > 2?
+        n_X_features = X.shape[1]  # FIXME(#1656): silently assumes X is 2D
         n_Y_features = base._y_transform.n_features_out_
         n_A_features = base._sf_transform.n_features_out_
 

@@ -8,7 +8,8 @@ from sklearn.utils.multiclass import type_of_target
 
 import fairlearn.utils._compatibility as compat
 
-# FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
+# FIXME(#1480): memoize type_of_target (expensive, called repeatedly);
+# likely moot once FloatTransformer is replaced by sklearn's ColumnTransformer.
 
 
 class FloatTransformer(TransformerMixin, BaseEstimator):

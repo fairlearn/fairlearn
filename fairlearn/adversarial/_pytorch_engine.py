@@ -190,9 +190,8 @@ class PytorchEngine(BackendEngine):
                             layers.append(torch.nn.LeakyReLU())
                         else:
                             raise ValueError(_MODEL_UNRECOGNIZED_STR.format(item))
-                        # TODO support more strings? Or better option?
-                        # possibly gather all activation classes, get __name__,
-                        # and do pattern matching.
+                        # TODO(#1659): replace hard-coded activation lookup with a table;
+                        # consider gathering torch.nn activation classes by __name__.
                     else:
                         raise ValueError(_MODEL_UNRECOGNIZED_ITEM.format(item))
                 self.layers_ = torch.nn.ModuleList(layers)

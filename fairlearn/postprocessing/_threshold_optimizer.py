@@ -682,7 +682,7 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
     """
     data_dict = {}
 
-    # TODO: extend to multiple columns for additional group data
+    # TODO(#1658): extend to multiple columns for additional group data
     # and name columns after original column names if possible
     # or store the original column names
     sensitive_feature_name = SENSITIVE_FEATURE_KEY
@@ -724,12 +724,12 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         if len(additional_data.shape) > 2 or (
             len(additional_data.shape) == 2 and additional_data.shape[1] > 1
         ):
-            # TODO: extend to multiple columns for additional_group data
+            # TODO(#1658): extend to multiple columns for additional_group data
             raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
         else:
             data_dict[key] = additional_data.squeeze()
     elif isinstance(additional_data, pd.DataFrame):
-        # TODO: extend to multiple columns for additional_data by using column names
+        # TODO(#1658): extend to multiple columns for additional_data by using column names
         for attribute_column in additional_data.columns:
             data_dict[key] = additional_data[attribute_column].values
     elif isinstance(additional_data, pd.Series):
@@ -737,7 +737,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
     elif isinstance(additional_data, list):
         if isinstance(additional_data[0], list):
             if len(additional_data[0]) > 1:
-                # TODO: extend to multiple columns for additional_data
+                # TODO(#1658): extend to multiple columns for additional_data
                 raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:

@@ -242,7 +242,7 @@ class UtilityParity(ClassificationMoment):
         """
         return pd.Series(self.eps, index=self.index)
 
-    # TODO: this can be further improved using the overcompleteness in group membership
+    # TODO(#1655): exploit overcompleteness in group membership when projecting lambda
     def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
         """Return the projected lambda values.
 

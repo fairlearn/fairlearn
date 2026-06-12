@@ -687,7 +687,7 @@ class _AdversarialFairness(BaseEstimator):
                     "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
                 )
 
-        try:  # TODO check this
+        try:  # TODO(#1657): revisit this try/except probe of fit state
             check_is_fitted(self)
             is_fitted = True
         except NotFittedError:
