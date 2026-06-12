@@ -15,3 +15,4 @@ Other improvements
 ------------------
 
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
+* Removed dead :code:`# noqa` comments throughout :code:`fairlearn/` whose suppressed rule codes are not enabled in the project's ruff configuration, plus the invalid :code:`# noqa : G003` (extra space) typo variants.

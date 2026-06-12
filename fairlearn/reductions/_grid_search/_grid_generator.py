@@ -89,7 +89,7 @@ class _GridGenerator:
                 # re-scale the integer grid, separate into positive and negative parts
                 pos_coefs = pd.DataFrame(self.accumulator[:grid_size]).T * (
                     float(grid_limit) / n_units
-                )  # noqa: E501
+                )
                 neg_coefs = -pos_coefs.copy()
                 pos_coefs[pos_coefs < 0] = 0.0
                 neg_coefs[neg_coefs < 0] = 0.0
@@ -123,4 +123,4 @@ class _GridGenerator:
 
             for current_value in values:
                 self.entry[index] = current_value
-                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))  # noqa: E501
+                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))
