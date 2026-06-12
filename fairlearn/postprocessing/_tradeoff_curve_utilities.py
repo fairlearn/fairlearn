@@ -232,16 +232,18 @@ def _interpolate_curve(
 
 
 def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
-    """
-    This function finds the indices of `x_values` that are just to the left of each value in `x_grid`.
+    """Find the indices of `x_values` that are just to the left of each value in `x_grid`.
+
     The returned indices are such that:
     `x_values[indices[i]] < x_grid[i] <= x_values[indices[i] + 1]`.
+
     Parameters
     ----------
     x_grid : array-like
         The grid of x values where interpolation is desired.
     x_values : array-like
         The sorted array of x values from which to interpolate.
+
     Returns
     -------
     indices : ndarray

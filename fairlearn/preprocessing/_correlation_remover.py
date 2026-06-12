@@ -110,7 +110,6 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
-
         first_call = not hasattr(self, "_n_features_in_")
 
         self._check_sensitive_features_in_X(X)

@@ -88,8 +88,10 @@ notice-rgx = "# (?i)Copyright \\(C\\) (Microsoft Corporation and )?Fairlearn con
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
-#Enable linting according to the new numpy API with NPY201
-select = ["E4", "E7", "E9", "F", "NPY201"]
+# Enable linting according to the new numpy API with NPY201.
+# Enable pydocstyle (`D`); the numpy convention is configured below to match
+# the project's use of numpydoc.
+select = ["E4", "E7", "E9", "F", "NPY201", "D"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -98,6 +100,9 @@ unfixable = []
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -128,5 +133,11 @@ docstring-code-line-length = "dynamic"
 
 [tool.ruff.lint.per-file-ignores]
 # It's fine not to put the import at the top of the file in the examples
-# folder.
-"examples/*"=["E402"]
+# folder. Docstrings (`D`) are not required for tests, examples, scripts,
+# the docs build configuration, or the top-level setup script.
+"examples/*" = ["E402", "D"]
+"test/**" = ["D"]
+"test_othermlpackages/**" = ["D"]
+"scripts/**" = ["D"]
+"docs/**" = ["D"]
+"setup.py" = ["D"]

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""This module contains algorithms implementing the reductions approach to disparity mitigation.
+"""Algorithms implementing the reductions approach to disparity mitigation.
 
 In this approach, disparity constraints are cast as Lagrange multipliers, which cause the
 reweighting and relabelling of the input data. This *reduces* the problem back to standard machine

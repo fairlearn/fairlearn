@@ -25,10 +25,10 @@ LOGGER = logging.getLogger(__name__)
 
 
 class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator):
-    r"""
-    A transformer and classifier that learns a latent representation of the input data to
-    obfuscate the sensitive features while preserving the classification and reconstruction
-    performance.
+    r"""Learn a latent representation of the input data that obfuscates sensitive features.
+
+    The transformer/classifier learns a latent representation of the input data to obfuscate the
+    sensitive features while preserving the classification and reconstruction performance.
 
     The model minimizes a loss function that consists of three terms: the reconstruction error,
     the classification error, and an approximation of the demographic parity difference.
@@ -288,8 +288,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         return self
 
     def _objective(self, x: np.ndarray, X, y, sensitive_features: pd.Series | None) -> float:
-        r"""
-        Compute the objective function for the optimization problem at the given point :code:`x`.
+        r"""Compute the objective function for the optimization problem at the given point :code:`x`.
 
         This method extracts the current prototype vectors, the prototype predictions, and the
         dimension weights, and calculates the current loss, which is the weighted sum of the
@@ -306,12 +305,12 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             The target values.
         sensitive_features : pd.Series or None
             The sensitive features for each sample.
+
         Returns
         -------
         float
             The computed objective value.
         """
-
         assert x.shape == (self._optimizer_size,)
         # Compute the reconstruction error
         V = x[: self._prototype_vectors_size].reshape((self.n_prototypes, self._prototype_dim))
@@ -348,10 +347,10 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         )
 
     def transform(self, X) -> np.ndarray:
-        r"""
-        Transform the input data X using the learned prototype representation. Each sample is
-        transformed to its associated learned latent mapping, i.e. the softmax of its negative
-        distance to the prototypes.
+        r"""Transform the input data X using the learned prototype representation.
+
+        Each sample is transformed to its associated learned latent mapping, i.e. the softmax of
+        its negative distance to the prototypes.
 
         Parameters
         ----------
@@ -482,8 +481,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         return M
 
     def _validate_X_y(self, X, y) -> tuple[np.ndarray, np.ndarray]:
-        r"""
-        Validate and preprocess the input features and target labels.
+        r"""Validate and preprocess the input features and target labels.
 
         Parameters
         ----------
@@ -502,7 +500,6 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         ValueError
             If the target labels are not binary.
         """
-
         if y is None:
             X = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
             self._has_target = False

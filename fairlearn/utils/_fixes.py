@@ -3,9 +3,10 @@ from sklearn.utils.validation import check_array as _check_array
 
 
 def validate_data(estimator, X, **kwargs):  # pragma: no cover
-    """
-    Validate data for sklearn estimators. This function provides compatibility across
-    different sklearn versions by handling the validation method changes between versions.
+    """Validate data for sklearn estimators.
+
+    This function provides compatibility across different sklearn versions by
+    handling the validation method changes between versions.
 
     Parameters
     ----------
@@ -38,10 +39,11 @@ def validate_data(estimator, X, **kwargs):  # pragma: no cover
 
 
 def check_array(X, **kwargs):  # pragma: no cover
-    """
-    Wrapper for sklearn's check_array function that handles version compatibility.
+    """Wrap sklearn's check_array function so it works across sklearn versions.
+
     Using this private function is only necessary if the call contains
     force_all_finite for sklearn version < 1.6 or ensure_all_finite for sklearn version >= 1.6.
+
     Parameters
     ----------
     X : array-like
@@ -70,8 +72,8 @@ def check_array(X, **kwargs):  # pragma: no cover
 # the two functions below were copied from sklearn-compat PR #15
 # both functions are use to accommodate the usage of sklearn 1.6 and the versions below with one API
 def patched_more_tags(estimator, expected_failed_checks):  # pragma: no cover
-    """
-    Patch an estimator's _more_tags method to include expected failed checks.
+    """Patch an estimator's _more_tags method to include expected failed checks.
+
     This is used for compatibility with sklearn's estimator checks framework.
 
     Parameters
@@ -107,8 +109,7 @@ def parametrize_with_checks(  # pragma: no cover
     legacy=True,
     expected_failed_checks=None,
 ):
-    """
-    Parametrize a test with a list of estimators and their expected failed checks.
+    """Parametrize a test with a list of estimators and their expected failed checks.
 
     This function is a wrapper around sklearn's parametrize_with_checks, allowing
     for additional handling of expected failed checks for each estimator.
