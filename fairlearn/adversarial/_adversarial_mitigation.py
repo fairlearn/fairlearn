@@ -21,9 +21,8 @@ from sklearn.utils.validation import (
     check_consistent_length,
     check_is_fitted,
     check_random_state,
+    validate_data,
 )
-
-from fairlearn.utils._fixes import validate_data
 
 from ._backend_engine import BackendEngine
 from ._constants import (
