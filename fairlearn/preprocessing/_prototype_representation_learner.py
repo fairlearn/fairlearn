@@ -18,7 +18,8 @@ from sklearn.dummy import check_random_state
 from sklearn.metrics import log_loss
 from sklearn.utils.multiclass import type_of_target
 
-from fairlearn.utils._fixes import validate_data
+from sklearn.utils.validation import validate_data
+
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 LOGGER = logging.getLogger(__name__)
