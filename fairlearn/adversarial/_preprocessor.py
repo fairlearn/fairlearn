@@ -6,8 +6,6 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 
-import fairlearn.utils._compatibility as compat
-
 # FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
 
 
@@ -90,7 +88,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
                 self.transform_ = OneHotEncoder(
                     drop="if_binary",
                     handle_unknown="error",
-                    **compat._SPARSE_OUTPUT_FALSE,
+                    sparse_output=False,
                 )
                 self.transform_.fit(X)
                 self.n_features_out_ = sum(

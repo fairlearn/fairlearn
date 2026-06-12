@@ -15,3 +15,4 @@ Other improvements
 ------------------
 
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
+* Removed the :code:`fairlearn.utils._compatibility` shim, which only existed to bridge the :code:`OneHotEncoder(sparse=...)` → :code:`sparse_output=...` rename completed in :code:`scikit-learn` 1.4. No longer needed now that the minimum supported :code:`scikit-learn` is ≥ 1.5.
