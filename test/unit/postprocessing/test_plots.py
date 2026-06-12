@@ -60,8 +60,33 @@ def is_mpl_installed():
         return False
 
 
+def _mpl_baselines_match_installed_version():
+    # The committed baselines under test/unit/plot_snapshots/ were rendered with
+    # matplotlib 3.11 and produce large RMS differences (~20-37 vs. tolerance 2)
+    # against matplotlib 3.10.x output. matplotlib 3.11 dropped Python 3.10
+    # wheels, so any Python 3.10 environment is stuck on the 3.10.x line and
+    # the comparison would always fail. Skip the comparison there.
+    if not is_mpl_installed():
+        return False
+    from packaging.version import Version
+
+    import matplotlib
+
+    return Version(matplotlib.__version__) >= Version("3.11")
+
+
+MPL_VERSION_SKIP_MSG = (
+    "skipping plot snapshot tests because the committed baselines target "
+    "matplotlib>=3.11 and the installed matplotlib is older (typically on "
+    "Python 3.10, which matplotlib 3.11 no longer ships wheels for)"
+)
+
+
 @pytest.mark.usefixtures("close_figs")
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
+@pytest.mark.skipif(
+    not _mpl_baselines_match_installed_version(), reason=MPL_VERSION_SKIP_MSG
+)
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="post_processing_equalized_odds_ex1.png")
     def test_plot_equalized_odds_ex1(self):
