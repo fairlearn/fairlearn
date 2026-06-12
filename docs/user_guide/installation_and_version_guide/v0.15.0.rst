@@ -10,7 +10,7 @@ Bug fixes
 ---------
 
 * Fixed :code:`fetch_diabetes_hospital` so that :code:`as_frame=False` returns numpy arrays instead of raising. The data is now always fetched as a pandas DataFrame internally and converted to numpy when needed. The skipped tests and the obsolete :code:`test_fetch_diabetes_hospital_as_ndarray_raises_value_error` test were removed: :pr:`1636` by :user:`Richard Ogundele <richardogundele>`.
-* De-flaked :code:`test_bgl_unfair` by adding a small ridge regularization (via a new :code:`alpha` parameter on the test-only :code:`LeastSquaresRegressor`) so the inner least-squares optimum is uniquely defined at the extreme :code:`BoundedGroupLoss` grid points. This removes a long-standing platform-dependent failure where the unregularized problem was rank-deficient and LAPACK could pick different equally-optimal solutions, closing :issue:`265` by :user:`Roman Lutz <romanlutz>`.
+* De-flaked :code:`test_bgl_unfair` by adding a small ridge regularization (via a new :code:`alpha` parameter on the test-only :code:`LeastSquaresRegressor`) so the inner least-squares optimum is uniquely defined at the extreme :code:`BoundedGroupLoss` grid points. This removes a long-standing platform-dependent failure where the unregularized problem was rank-deficient and LAPACK could pick different equally-optimal solutions, closing :issue:`265`: :pr:`1652` by :user:`Roman Lutz <romanlutz>`.
 
 Other improvements
 ------------------
