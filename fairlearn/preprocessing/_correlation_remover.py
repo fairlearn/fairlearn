@@ -6,9 +6,7 @@ from collections.abc import Iterable
 import narwhals.stable.v1 as nw
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
-
-from fairlearn.utils._fixes import validate_data
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class CorrelationRemover(TransformerMixin, BaseEstimator):
