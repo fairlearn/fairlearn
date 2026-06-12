@@ -62,16 +62,6 @@ def is_mpl_installed():
 
 @pytest.mark.usefixtures("close_figs")
 @pytest.mark.skipif(not is_mpl_installed(), reason=PYTEST_MPL_NOT_INSTALLED_MSG)
-@pytest.mark.xfail(
-    strict=False,
-    reason=(
-        "The committed matplotlib baselines under test/unit/plot_snapshots/ are stale "
-        "for the current matplotlib stack and produce large RMS differences (~20-37 vs. "
-        "tolerance 2) on every platform that runs `pytest --mpl`. Marked xfail "
-        "(strict=False) so CI is not blocked while baselines are regenerated. See "
-        "https://github.com/fairlearn/fairlearn/pull/1654 for context."
-    ),
-)
 class TestPlots:
     @pytest.mark.mpl_image_compare(filename="post_processing_equalized_odds_ex1.png")
     def test_plot_equalized_odds_ex1(self):
