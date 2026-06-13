@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 99
-target_version = ['py39', 'py310', 'py311', 'py312', 'py313', 'py314']
+target_version = ['py311', 'py312', 'py313', 'py314']
 preview = true
 extend-exclude = '''
 (
@@ -77,8 +77,8 @@ exclude = [
 line-length = 99
 indent-width = 4
 
-# Assume Python 3.8
-target-version = "py38"
+# Assume Python 3.11
+target-version = "py311"
 
 # Copyright
 [tool.ruff.lint.flake8-copyright]
