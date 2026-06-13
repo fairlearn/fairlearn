@@ -86,7 +86,7 @@ class MetricFrame:
 
     .. versionchanged:: 0.7.0
         The ``metric`` argument was renamed to ``metrics`` and constructor
-        arguments became keyword-only; the previous form is deprecated.
+        arguments became keyword-only.
 
     Parameters
     ----------
