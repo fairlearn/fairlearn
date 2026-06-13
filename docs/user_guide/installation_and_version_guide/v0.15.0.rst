@@ -9,6 +9,14 @@ v0.15.0
 Bug fixes
 ---------
 
+* Fixed :code:`AssertionError: data can be loaded only once` raised when a
+  :class:`~fairlearn.reductions.Moment` instance is passed as :code:`constraints`
+  to more than one call of :code:`ExponentiatedGradient.fit` or
+  :code:`GridSearch.fit`, or shared between estimators. The fitted estimators
+  now deep-copy the user-supplied constraints before loading data, leave the
+  original object unmodified, and expose the loaded copy as the fitted
+  attribute :code:`constraints_`: :pr:`1632` by
+  :user:`BALOGUN DAVID TAIWO <BALOGUN-DAVID>`.
 * Fixed :code:`fetch_diabetes_hospital` so that :code:`as_frame=False` returns numpy arrays instead of raising. The data is now always fetched as a pandas DataFrame internally and converted to numpy when needed. The skipped tests and the obsolete :code:`test_fetch_diabetes_hospital_as_ndarray_raises_value_error` test were removed: :pr:`1636` by :user:`Richard Ogundele <richardogundele>`.
 
 Documentation
