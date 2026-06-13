@@ -4,7 +4,6 @@
 
 """This module contains datasets that can be used for benchmarking and education."""
 
-
 from ._fetch_acs_income import fetch_acs_income
 from ._fetch_adult import fetch_adult
 from ._fetch_bank_marketing import fetch_bank_marketing

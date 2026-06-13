@@ -44,7 +44,7 @@ def main(argv):
             version_file.write(fairlearn.__version__)
 
     with _LogWrapper("creation of packages"):
-        subprocess.check_call(["python", "setup.py", "sdist", "bdist_wheel"])
+        subprocess.check_call([sys.executable, "-m", "build"])
 
 
 if __name__ == "__main__":

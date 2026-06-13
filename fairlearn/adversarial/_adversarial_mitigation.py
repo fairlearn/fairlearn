@@ -21,9 +21,8 @@ from sklearn.utils.validation import (
     check_consistent_length,
     check_is_fitted,
     check_random_state,
+    validate_data,
 )
-
-from fairlearn.utils._fixes import validate_data
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -499,7 +498,7 @@ class _AdversarialFairness(BaseEstimator):
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
-                (LP, LA) = self.backendEngine_.train_step(
+                LP, LA = self.backendEngine_.train_step(
                     X[batch_slice], y[batch_slice], A[batch_slice]
                 )
                 predictor_losses.append(LP)

@@ -4,7 +4,6 @@
 import re
 from contextlib import nullcontext as does_not_raise
 from copy import deepcopy
-from test.unit.input_convertors import _map_into_single_column
 
 import numpy as np
 import pandas as pd
@@ -26,6 +25,7 @@ from fairlearn.utils._input_validation import (
     _MESSAGE_X_Y_ROWS,
     _MESSAGE_Y_NONE,
 )
+from test.unit.input_convertors import _map_into_single_column
 
 from .conftest import (
     ExamplePredictor,
@@ -160,7 +160,9 @@ def test_threshold_optimization_different_input_lengths(data_X_y_sf, constraints
     }
 
     empty_exception_messages = {
-        "empty_sklearn": "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required.",
+        "empty_sklearn": (
+            "Found array with 0 sample(s) (shape=(0,)) while a minimum of 1 is required."
+        ),
         "empty_pandas": "Found array with 0 sample",
         "empty_fairlearn": _MESSAGE_Y_NONE,
     }

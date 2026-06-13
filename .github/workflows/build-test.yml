@@ -25,14 +25,14 @@ jobs:
     uses: ./.github/workflows/test-min-deps.yml
     with:
       os: ${{ matrix.os }}
-      python: "3.10"
-      codeCovPython: "3.10"
+      python: "3.11"
+      codeCovPython: "3.11"
 
   all-deps:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        python: ["3.11", "3.12", "3.13", "3.14"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.10", "3.11", "3.12", "3.13"]
+        python: ["3.11", "3.12", "3.13", "3.14"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:
       os: ${{ matrix.os }}
