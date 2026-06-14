@@ -106,6 +106,18 @@ class fake_torch:
         Sigmoid = lambda: type("Sigmoid", (), {"__call__": lambda x: x})  # noqa: E731
         Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
 
+        def Tanh():
+            return type("Tanh", (), {"__call__": lambda x: x})  # noqa: E731
+
+        def GELU():
+            return type("GELU", (), {"__call__": lambda x: x})  # noqa: E731
+
+        def ELU():
+            return type("ELU", (), {"__call__": lambda x: x})  # noqa: E731
+
+        def SELU():
+            return type("SELU", (), {"__call__": lambda x: x})  # noqa: E731
+
         class ModuleList:  # noqa: D106
             def __init__(self, layers):
                 self.layers = layers
