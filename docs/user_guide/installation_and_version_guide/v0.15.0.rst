@@ -9,6 +9,14 @@ v0.15.0
 Bug fixes
 ---------
 
+* Fixed :code:`AssertionError: data can be loaded only once` raised when a
+  :class:`~fairlearn.reductions.Moment` instance is passed as :code:`constraints`
+  to more than one call of :code:`ExponentiatedGradient.fit` or
+  :code:`GridSearch.fit`, or shared between estimators. The fitted estimators
+  now deep-copy the user-supplied constraints before loading data, leave the
+  original object unmodified, and expose the loaded copy as the fitted
+  attribute :code:`constraints_`: :pr:`1632` by
+  :user:`BALOGUN DAVID TAIWO <BALOGUN-DAVID>`.
 * Fixed :code:`fetch_diabetes_hospital` so that :code:`as_frame=False` returns numpy arrays instead of raising. The data is now always fetched as a pandas DataFrame internally and converted to numpy when needed. The skipped tests and the obsolete :code:`test_fetch_diabetes_hospital_as_ndarray_raises_value_error` test were removed: :pr:`1636` by :user:`Richard Ogundele <richardogundele>`.
 * De-flaked :code:`test_bgl_unfair` by adding a small ridge regularization (via a new :code:`alpha` parameter on the test-only :code:`LeastSquaresRegressor`) so the inner least-squares optimum is uniquely defined at the extreme :code:`BoundedGroupLoss` grid points. This removes a long-standing platform-dependent failure where the unregularized problem was rank-deficient and LAPACK could pick different equally-optimal solutions, closing :issue:`265`: :pr:`1652` by :user:`Roman Lutz <romanlutz>`.
 
@@ -21,5 +29,6 @@ Other improvements
 ------------------
 
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
+* Modernized internal type annotations to PEP 585 / PEP 604 syntax (:code:`list[T]`, :code:`tuple[T, ...]`, :code:`T | U`) where the imports from :code:`typing` were no longer necessary.
 * Removed support for Python 3.10. The minimum supported Python version is now 3.11: :pr:`1653` by :user:`Roman Lutz <romanlutz>`.
 * Raised the minimum supported :code:`scikit-learn` version to :code:`1.6.0` and removed the :code:`fairlearn.utils._fixes` compatibility shim, which existed to bridge the :code:`scikit-learn` 1.5 ↔ 1.6 API change (:code:`validate_data` import location, :code:`force_all_finite` → :code:`ensure_all_finite` rename, and the wrapped :code:`parametrize_with_checks`). Internal callers now import directly from :code:`sklearn.utils.validation` and :code:`sklearn.utils.estimator_checks`. Also added a second set of :code:`pytest-mpl` baseline snapshots under :code:`test/unit/plot_snapshots_mpl310/` so the snapshot comparison runs on both :code:`matplotlib==3.10.x` (used on Python 3.10 and in :code:`requirements-min.txt`) and :code:`matplotlib>=3.11` (used on Python 3.11+), since the two render-engine versions produce noticeably different output: :pr:`1654` by :user:`Roman Lutz <romanlutz>`.
