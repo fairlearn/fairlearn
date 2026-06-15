@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "fairlearn"
@@ -25,7 +25,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Development Status :: 3 - Alpha",
 ]
@@ -40,24 +39,12 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/fairlearn/fairlearn"
 
-[tool.hatch.version]
-source = "vcs"
+[tool.setuptools.dynamic]
+version = { attr = "fairlearn.__version__" }
 
-[tool.hatch.build.hooks.vcs]
-version-file = "fairlearn/_version.py"
-
-[tool.hatch.build.targets.wheel]
-packages = ["fairlearn"]
-
-[tool.hatch.build.targets.sdist]
-exclude = [
-    "/.github",
-    "/docs",
-    "/notebooks",
-    "/scripts",
-    "/test",
-    "/test_othermlpackages",
-]
+[tool.setuptools.packages.find]
+include = ["fairlearn*"]
+exclude = ["test*", "test_othermlpackages*"]
 
 [tool.black]
 line-length = 99
