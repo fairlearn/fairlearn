@@ -28,10 +28,9 @@ setuptools.setup(
     packages=setuptools.find_packages(
         exclude=["test", "test.*", "test_othermlpackages", "test_othermlpackages.*"]
     ),
-    python_requires=">=3.10",
+    python_requires=">=3.11",
     install_requires=install_requires,
     classifiers=[
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",

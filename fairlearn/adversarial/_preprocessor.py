@@ -6,8 +6,6 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 
-# FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
-
 
 class FloatTransformer(TransformerMixin, BaseEstimator):
     """
@@ -99,8 +97,6 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
         if isinstance(self.transformer, str) or self.transformer is None:
-            if not type_of_target(X) == self.inferred_type_:
-                raise ValueError("Unknown label type")
             return (
                 self.transform_.transform(self._check(X)).astype(float)
                 if self.inferred_type_ in ["binary", "multiclass"]
