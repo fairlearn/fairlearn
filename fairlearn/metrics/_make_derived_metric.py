@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import functools
 import inspect
-from typing import Callable, Union
+from collections.abc import Callable
 
 from ._metric_frame import MetricFrame
 
@@ -50,7 +50,7 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params) -> Union[float, int]:
+    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params) -> float | int:
         sample_params = dict()
         params = dict()
         transform_parameters = dict()
