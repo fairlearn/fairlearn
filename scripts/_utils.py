@@ -36,9 +36,7 @@ def _get_fairlearn_version():
         if isinstance(node, ast.Assign):
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__version__":
-                    if isinstance(node.value, ast.Constant) and isinstance(
-                        node.value.value, str
-                    ):
+                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
                         return node.value.value
     raise RuntimeError(
         "Could not find a string literal assignment to __version__ in {}".format(init_path)
