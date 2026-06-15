@@ -107,16 +107,16 @@ class fake_torch:
         Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
 
         def Tanh():
-            return type("Tanh", (), {"__call__": lambda x: x})  # noqa: E731
+            return type("Tanh", (), {"__call__": lambda x: x})
 
         def GELU():
-            return type("GELU", (), {"__call__": lambda x: x})  # noqa: E731
+            return type("GELU", (), {"__call__": lambda x: x})
 
         def ELU():
-            return type("ELU", (), {"__call__": lambda x: x})  # noqa: E731
+            return type("ELU", (), {"__call__": lambda x: x})
 
         def SELU():
-            return type("SELU", (), {"__call__": lambda x: x})  # noqa: E731
+            return type("SELU", (), {"__call__": lambda x: x})
 
         class ModuleList:  # noqa: D106
             def __init__(self, layers):

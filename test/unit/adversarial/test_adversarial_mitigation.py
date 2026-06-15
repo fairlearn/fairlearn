@@ -89,13 +89,13 @@ def test_model_init(fake_backend_env):
 def test_model_init_unknown_pytorch_activation(fake_backend_env):
     """Test unknown activation string raises ValueError for PyTorch backend."""
     X, Y, Z = Bin2d, Bin1d, Bin1d
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_mixin=False,
+        fake_training=True,
+        predictor_model=[10, "NotAnActivation"],
+    )
     with pytest.raises(ValueError, match="NotAnActivation"):
-        mitigator = get_instance(
-            fake_backend=fake_backend_env,
-            fake_mixin=False,
-            fake_training=True,
-            predictor_model=[10, "NotAnActivation"],
-        )
         mitigator.fit(X, Y, sensitive_features=Z)
 
 
