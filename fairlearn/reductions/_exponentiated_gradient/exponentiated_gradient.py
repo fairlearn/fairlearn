@@ -182,8 +182,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 if self.nu is None:
                     self.nu = (
                         _ACCURACY_MUL
-                        * (h(X) - self.constraints._y_as_series).abs().std()
-                        / np.sqrt(self.constraints.total_samples)
+                        * (h(X) - lagrangian.constraints._y_as_series).abs().std()
+                        / np.sqrt(lagrangian.constraints.total_samples)
                     )
                 eta = self.eta0 / B
                 logger.debug(
@@ -248,7 +248,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 last_gap = best_gap
 
             # update theta based on learning rate
-            theta += eta * (gamma - self.constraints.bound())
+            theta += eta * (gamma - lagrangian.constraints.bound())
 
         # retain relevant result data
         gaps_series = pd.Series(gaps)
@@ -263,12 +263,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         self.last_iter_ = len(Qs) - 1
         self.predictors_ = lagrangian.predictors
+        self.constraints_ = lagrangian.constraints
         self.n_oracle_calls_ = lagrangian.n_oracle_calls
         self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned
         self.oracle_execution_times_ = lagrangian.oracle_execution_times
         self.lambda_vecs_EG_ = pd.DataFrame(lambda_vecs_EG_dict)
         self.lambda_vecs_LP_ = pd.DataFrame(lambda_vecs_LP_dict)
-        self.lambda_vecs_ = lagrangian.lambdas
+        self.lambda_vecs_ = lagrangian.lambdas.copy()
 
         logger.debug(
             "...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
