@@ -15,7 +15,7 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._preprocessor import FloatTransformer
-from sklearn.utils.estimator_checks import parametrize_with_checks
+from test._sklearn_compat import parametrize_with_checks
 
 from .helper import (
     Bin1d,
