@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from functools import reduce
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -51,7 +50,7 @@ def generate_bootstrap_samples(
     annotated_functions: dict[str, AnnotatedMetricFunction],
     sensitive_feature_names: list[str],
     control_feature_names: list[str] | None = None,
-) -> List[DisaggregatedResult]:
+) -> list[DisaggregatedResult]:
     """Create a list of bootstrapped DisaggregatedResults.
 
     The list will contain n_samples, and a random_state must be supplied.

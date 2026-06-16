@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import Callable, Generic, Tuple, TypeVar
+from collections.abc import Callable
+from typing import Generic, TypeVar
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -50,7 +51,7 @@ class AnnotatedMetricFunction(Generic[R]):
     def __init__(
         self,
         *,
-        func: Callable[[*Tuple[np.ndarray, ...]], R],
+        func: Callable[[*tuple[np.ndarray, ...]], R],
         name: str | None = None,
         positional_argument_names: list[str] | None = None,
         kw_argument_mapping: dict[str, str] | None = None,
