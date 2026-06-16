@@ -604,9 +604,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        disagg_result: The DisaggregatedResult containing all the metrics
-        grouping_function: string {'min', 'max'}
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        disagg_result : The DisaggregatedResult containing all the metrics
+        grouping_function : string {'min', 'max'}
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -656,7 +656,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -707,7 +707,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -772,7 +772,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -852,7 +852,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 

@@ -83,7 +83,7 @@ issues_user_prefix = "@"
 
 
 intersphinx_mapping = {
-    "python3": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
@@ -106,6 +106,18 @@ templates_path = ["templates"]
 autosummary_generate = True
 class_members_toctree = False
 numpydoc_show_class_members = False
+numpydoc_xref_param_type = True
+numpydoc_xref_ignore = "all"
+numpydoc_xref_aliases = {
+    "DataFrame": "pandas.DataFrame",
+    "numpy.ndarray": ":class:`numpy.ndarray`",
+    "numpy.random.RandomState": ":class:`numpy.random.RandomState`",
+    "Series": "pandas.Series",
+    "pd.DataFrame": "pandas.DataFrame",
+    "pd.Series": "pandas.Series",
+    "pandas.DataFrame": ":class:`pandas.DataFrame`",
+    "pandas.Series": ":class:`pandas.Series`",
+}
 
 
 # List of patterns, relative to source directory, that match files and
