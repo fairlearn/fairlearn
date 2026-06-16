@@ -71,14 +71,16 @@ def test_model_init(fake_backend_env):
         layers = layers.layers
     assert not hasattr(layers[0], "a") or layers[0].a == cols
     assert layers[0].b == 10
-    assert layers[1].__name__ == "Sigmoid"
-    assert layers[2].__name__ == "Softmax"
-    assert layers[3].__name__ == "ReLU"
-    assert layers[4].__name__.replace("_", "") == "LeakyReLU"
-    assert layers[5].__name__ == "Tanh"
-    assert layers[6].__name__ == "GELU"
-    assert layers[7].__name__ == "ELU"
-    assert layers[8].__name__ == "SELU"
+    assert layers[1].__name__.lower() == "sigmoid"
+    assert layers[2].__name__.lower() == "softmax"
+    assert layers[3].__name__.lower() == "relu"
+    assert layers[4].__name__.replace("_", "").lower() == "leakyrelu"
+    assert layers[5].__name__.lower() == "tanh"
+    assert layers[6].__name__.lower() == "gelu"
+    assert layers[7].__name__.lower() == "elu"
+    assert layers[8].__name__.lower() == "selu"
+    for activation in layers[1:9]:
+        assert callable(activation)
     assert not hasattr(layers[0], "a") or layers[9].a == 10
     assert layers[9].b == 1
     assert layers[10].__name__.lower() == "sigmoid"

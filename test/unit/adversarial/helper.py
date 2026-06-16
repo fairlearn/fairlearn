@@ -160,7 +160,24 @@ class fake_keras:
 
     class activations:  # noqa: D106
         def deserialize(item):
-            return type(item, (), {"__call__": lambda x: x})
+            # Mirror keras.activations.deserialize: recognized lowercase
+            # activation identifiers resolve to a callable, while
+            # unrecognized strings (such as capitalized names) are returned
+            # unchanged, exactly as real keras does. This ensures the engine
+            # must lower-case activation strings before deserializing them.
+            known = {
+                "sigmoid",
+                "softmax",
+                "relu",
+                "leaky_relu",
+                "tanh",
+                "gelu",
+                "elu",
+                "selu",
+            }
+            if item in known:
+                return type(item, (), {"__call__": lambda x: x})
+            return item
 
     class layers:  # noqa: D106
         class Dense:  # noqa: D106
