@@ -27,6 +27,7 @@ Documentation
 Other improvements
 ------------------
 
+* Replaced the PyTorch adversarial engine's hard-coded activation string checks with a lookup table and added support for :code:`Tanh`, :code:`GELU`, :code:`ELU`, and :code:`SELU` activation strings. Activation strings are now matched case-insensitively on both the PyTorch and TensorFlow backends (the TensorFlow backend previously failed on capitalized strings such as :code:`Sigmoid`): :pr:`1665` by :user:`Aryan <Aryankn29>`.
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
 * Modernized internal type annotations to PEP 585 / PEP 604 syntax (:code:`list[T]`, :code:`tuple[T, ...]`, :code:`T | U`) where the imports from :code:`typing` were no longer necessary.
 * Removed support for Python 3.10. The minimum supported Python version is now 3.11: :pr:`1653` by :user:`Roman Lutz <romanlutz>`.

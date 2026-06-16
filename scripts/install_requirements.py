@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""Script to install the requirements files, optionally pinning versions."""
+"""Script to install development dependencies, optionally pinning versions."""
 
 import argparse
 import logging
@@ -10,8 +10,8 @@ import sys
 
 from _utils import _LogWrapper
 
-_REQUIREMENTS_STEMS = ["requirements", "requirements-dev"]
-_MIN_REQUIREMENTS_STEM = ["requirements-min"]
+_DEV_REQUIREMENTS_STEM = "requirements-dev"
+_MIN_REQUIREMENTS_STEM = "requirements-min"
 
 _REQUIREMENTS_EXTENSION = "txt"
 
@@ -20,12 +20,19 @@ logging.basicConfig(level=logging.INFO)
 
 
 def _build_argument_parser():
-    desc = "Install requirements using pip"
+    desc = (
+        "Install Fairlearn's development requirements using pip. "
+        "Runtime dependencies are declared in pyproject.toml and installed "
+        "via `pip install .` (or `-e .`) separately."
+    )
 
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
         "--min",
-        help="Install fairlearn with minimum package versions",
+        help=(
+            "Install Fairlearn with the minimum supported runtime and development "
+            "package versions pinned in requirements-min.txt"
+        ),
         action="store_true",
     )
     parser.add_argument(
@@ -54,11 +61,13 @@ def main(argv):
     if args.loglevel:
         logging.basicConfig(level=getattr(logging, args.loglevel))
 
-    # Choose requirements files based on --min argument
-    requirements_stems = _MIN_REQUIREMENTS_STEM if args.min else _REQUIREMENTS_STEMS
-    for rs in requirements_stems:
-        _install_requirements_file(rs)
-    _logger.info("All requirements files installed")
+    # Pick the appropriate requirements file. In --min mode requirements-min.txt
+    # pins both runtime and development dependencies to their minimum supported
+    # versions; otherwise we install the unpinned development requirements and
+    # leave runtime dependency resolution to `pip install .` against pyproject.toml.
+    file_stem = _MIN_REQUIREMENTS_STEM if args.min else _DEV_REQUIREMENTS_STEM
+    _install_requirements_file(file_stem)
+    _logger.info("Requirements file %s installed", file_stem)
 
 
 if __name__ == "__main__":
