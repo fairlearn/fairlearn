@@ -1,12 +1,24 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import matplotlib.pyplot as plt
+from sklearn.metrics import RocCurveDisplay, auc, roc_auc_score, roc_curve
 
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-from sklearn.metrics import RocCurveDisplay
+from ..postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
+from ._metric_frame import MetricFrame
 
-from fairlearn.metrics import MetricFrame
+
+def _get_pyplot():
+    """Return ``matplotlib.pyplot`` or raise a helpful error if it is missing.
+
+    Matplotlib is an optional dependency of Fairlearn, so it must only be
+    imported when a plotting method is actually called.
+    """
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+    return plt
+
 
 class RocAuc:
     """
@@ -52,10 +64,8 @@ class RocAuc:
         For cases where no names are provided we generate names ``sensitive_feature_[n]``.
 
     """
-    def __init__(self,
-                 y_true,
-                 y_score,
-                 sensitive_features):
+
+    def __init__(self, y_true, y_score, sensitive_features):
         """
         Initiate class with required parameters to generate metrics and plots.
 
@@ -111,13 +121,14 @@ class RocAuc:
             'tpr', 'roc_auc', 'pos_label', 'line_', 'ax_', 'figure_'.
 
         """
+        _get_pyplot()
         fpr, tpr, _ = roc_curve(y_true, y_score, pos_label=pos_label, **kwargs)
         auc_score = auc(fpr, tpr)
-        display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=auc_score, estimator_name=name)
+        display = RocCurveDisplay(fpr=fpr, tpr=tpr, roc_auc=auc_score, name=name)
         display.plot(ax=ax)
         return display
 
-    def plot_baseline(self, ax=None, name='Baseline'):
+    def plot_baseline(self, ax=None, name="Baseline"):
         """
         Plot baseline indicator. Adds an optional axes to include a
         baseline axes on the plot representing selection at random for
@@ -126,6 +137,7 @@ class RocAuc:
 
         # Generate plot figure, ax if not provided
         if not ax:
+            plt = _get_pyplot()
             figure, ax = plt.subplots()
 
         # Plot baseline - 'no skill'
@@ -136,13 +148,13 @@ class RocAuc:
         ax.plot(
             ns_fpr,
             ns_tpr,
-            linestyle='--',
-            color='0.8',
-            label=f'{name} (AUC = {round(baseline_auc, 2)})'
-               )
+            linestyle="--",
+            color="0.8",
+            label=f"{name} (AUC = {round(baseline_auc, 2)})",
+        )
         return ax
 
-    def plot_overall(self, ax=None, name='Overall', pos_label=1, **kwargs):
+    def plot_overall(self, ax=None, name="Overall", pos_label=1, **kwargs):
         """
         Plot the overall performance of the model. Adds an optional axes to plot
         the overall ROC curve for the data as a whole.
@@ -169,16 +181,14 @@ class RocAuc:
         """
         # Generate plot figure, ax if not provided
         if not ax:
+            plt = _get_pyplot()
             figure, ax = plt.subplots()
 
         # Plot overall model performance
         overall_fpr, overall_tpr, _ = roc_curve(
-            self.y_true,
-            self.y_score,
-            pos_label=pos_label,
-            **kwargs
+            self.y_true, self.y_score, pos_label=pos_label, **kwargs
         )
-        label=f'{name} (AUC = {round(self.overall_auc, 2)})'
+        label = f"{name} (AUC = {round(self.overall_auc, 2)})"
         ax.plot(overall_fpr, overall_tpr, label=label)
         return ax
 
@@ -199,23 +209,24 @@ class RocAuc:
 
         """
         mf = MetricFrame(
-            metrics = self.splitter,
-            y_true = self.y_true,
-            y_pred = self.y_score,
-            sensitive_features = self.sensitive_features)
+            metrics=self.splitter,
+            y_true=self.y_true,
+            y_pred=self.y_score,
+            sensitive_features=self.sensitive_features,
+        )
         self.sensitive_series = mf.by_group
         return self.sensitive_series
 
     def plot_by_group(
         self,
         sensitive_index=None,
-        title = None,
+        title=None,
         ax=None,
         include_overall=True,
         include_baseline=True,
         pos_label=1,
-        **kwargs
-                ):
+        **kwargs,
+    ):
         """
         Plots ROC curve by sensitive feature subgroup.
 
@@ -268,6 +279,7 @@ class RocAuc:
 
         # Generate plot figure, ax if not provided
         if not ax:
+            plt = _get_pyplot()
             figure, ax = plt.subplots()
 
         # Set plot title to name of estimator
@@ -289,10 +301,10 @@ class RocAuc:
             display = self.plot_roc(
                 y_true=grp_y_true,
                 y_score=grp_y_score,
-                name=name, #apply subgroup name to legend label
+                name=name,  # apply subgroup name to legend label
                 ax=ax,
                 pos_label=pos_label,
-                **kwargs
+                **kwargs,
             )
 
         return display.ax_
