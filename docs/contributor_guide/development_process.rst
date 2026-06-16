@@ -93,23 +93,31 @@ Fairlearn currently includes plotting functionality provided by
 The Requirements Files
 """"""""""""""""""""""
 
-The prerequisites for Fairlearn are split between two separate files:
+Fairlearn's runtime dependencies (the packages required to actually use Fairlearn)
+are declared in the ``[project] dependencies`` table of
+`pyproject.toml <https://github.com/fairlearn/fairlearn/blob/main/pyproject.toml>`_ and
+are installed automatically when you run ``pip install .`` (or ``pip install -e .``).
 
-* `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
-  contains the prerequisites for the core Fairlearn package
+Development dependencies are tracked in two additional files:
 
-* `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
-  the prerequisites for Fairlearn development (such as :code:`ruff` and :code:`pytest`)
+* `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_
+  contains the prerequisites for Fairlearn development (such as :code:`ruff`, :code:`pytest`,
+  and the Sphinx documentation toolchain).
 
-The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
-file is consumed
-by `setup.py <https://github.com/fairlearn/fairlearn/blob/main/setup.py>`_ to specify the dependencies to be
-documented in the wheel files.
-To help simplify installation of the prerequisites, we have the
+* `requirements-min.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-min.txt>`_
+  pins both runtime and development dependencies to the minimum supported versions
+  and is used in CI to test against the oldest combination of dependencies we claim to support.
+
+To install the unpinned development dependencies, run the
 `install_requirements.py <https://github.com/fairlearn/fairlearn/blob/main/scripts/install_requirements.py>`_
-script which runs :code:`pip install` on both the above files.
-This script will also optionally pin the requirements to any lower bound specified (by changing any
-occurrences of :code:`>=` to :code:`==` in each file).
+helper script:
+
+.. prompt:: bash
+
+   python ./scripts/install_requirements.py
+
+Pass :code:`--min` to install the pinned minimum-version set from :code:`requirements-min.txt`
+instead.
 
 .. _contributing_pull_requests:
 
