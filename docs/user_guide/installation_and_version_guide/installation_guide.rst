@@ -9,14 +9,14 @@ Installation
 Fairlearn can be installed with :code:`pip` from
 `PyPI <https://pypi.org/project/fairlearn>`_ as follows:
 
-.. code-block:: bash
+.. prompt:: bash
 
     pip install fairlearn
 
 Fairlearn is also available on
 `conda-forge <https://anaconda.org/conda-forge/fairlearn>`_:
 
-.. code-block:: bash
+.. prompt:: bash
 
     conda install -c conda-forge fairlearn
 
@@ -27,7 +27,7 @@ the basic installation.
 These dependencies are grouped in **extras**, which can be installed
 like so (by the example of the ``customplot`` extra):
 
-.. code-block:: bash
+.. prompt:: bash
 
     pip install fairlearn[customplot]
 
@@ -36,10 +36,10 @@ like so (by the example of the ``customplot`` extra):
 Dependencies
 ------------
 
-Fairlearn has the following optional dependencies which can be 
+Fairlearn has the following optional dependencies which can be
 installed via the corresponding **extra**, ordered by dependent module:
 
-.. list-table:: 
+.. list-table::
     :widths: 50 25 25
     :header-rows: 1
 

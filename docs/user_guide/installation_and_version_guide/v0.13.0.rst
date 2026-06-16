@@ -1,0 +1,47 @@
+v0.13.0
+=======
+
+Summary
+-------
+
+This release introduces a new method implementation, :code:`PrototypeRepresentationLearner`,
+which is based on the work of Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`.
+You can learn more about it :ref:`here <prototype_representation_learner>`.
+
+Additionally, this release includes several improvements to existing
+functionality: enhanced support for relaxed constraints and multi-dimensional
+input data in optimization methods, performance improvements through
+vectorization, updating the supported Python versions (removed 3.8, added 3.12),
+first efforts concerning Narwhals integration, removal of unused functionality,
+and cleanup of local logging initialization.
+
+
+New methods
+-----------
+
+* Implemented the :code:`PrototypeRepresentationLearner`  introduced in Zemel et al. (2013) :footcite:`pmlr-v28-zemel13`:
+  :pr:`1478` by :user:`Tahar Allouche <taharallouche>`.
+
+New features
+------------
+
+* Allowed relaxed constraints (except :code:`equalized_odds`) in :code:`ThresholdOptimizer`: :pr:`1453` by :user:`Tahar Allouche <taharallouche>`
+* Allowed multi-dimensional input data :code:`X` (:code:`ndims > 2`) in :code:`ThresholdOptimizer` and :code:`ExponentiatedGradient`: :pr:`1470` by :user:`Tahar Allouche <taharallouche>`.
+
+Performance improvements
+------------------------
+
+* Vectorized the curve interpolation step in :code:`ThresholdOptimizer` to improve performance and readability: :pr:`1448` by :user:`Tahar Allouche <taharallouche>`.
+
+Narwhals integration
+--------------------
+
+* Make `preprocessing` module dataframe agnostic through Narwhals: :pr:`1525` by :user:`Francesco Bruzzesi <FBruzzesi>`.
+* Make :code:`AnnotatedMetricFunction` class dataframe agnostic through Narwhals: :pr:`1545` by :user:`Francesco Bruzzesi <FBruzzesi>`.
+
+Other improvements
+------------------
+
+* Removed support for python 3.8 and added support for python 3.12: :pr:`1488` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Removed the keyword argument `control_features` from :code:`ErrorRate.load_data`, since it was without functionality for the method: :pr:`1531` by :user:`Stefanie Senger <StefanieSenger>`.
+* Removed local logging using environment variable `FAIRLEARN_LOGS` at initialization: :pr:`1561` by :user:`Parul Gupta <parulgupta1004>`.

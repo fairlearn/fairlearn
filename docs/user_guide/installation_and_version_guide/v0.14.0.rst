@@ -1,0 +1,58 @@
+v0.14.0
+=======
+
+Summary
+-------
+
+This release updates the supported Python range (drops 3.9, adds 3.13)
+and adds compatibility with scipy 1.16. It continues the Narwhals
+integration work in the postprocessing module and :code:`GroupFeature`,
+fixes a polars dataframe-interchange deprecation, and corrects the
+handling of degenerate sensitive feature values in
+:code:`PrototypeRepresentationLearner`.
+
+
+Bug fixes
+---------
+
+* Fixed handling of single-group (degenerate) sensitive features in :code:`PrototypeRepresentationLearner.fit`, which previously failed during the fairness-error computation: :pr:`1626` by :user:`BALOGUN DAVID TAIWO <BALOGUN-DAVID>`.
+* Changed :code:`GridSearch.fit` to return :code:`self`, matching the scikit-learn estimator convention: :pr:`1622` by :user:`Nithin <k-nithin>`.
+* Fixed a polars dataframe-interchange protocol deprecation in :code:`AnnotatedMetricFunction` and corrected the 1D-array branch at the same time: :pr:`1639` by :user:`Tahar Allouche <taharallouche>`.
+* Added a :code:`MANIFEST.in` so that :code:`requirements*.txt` are included in the source distribution, and switched the build pipeline to the PEP 517 :code:`build` frontend: :pr:`1628` by :user:`Christian Heimes <tiran>`.
+* Excluded the :code:`test` and :code:`test_othermlpackages` directories from the :code:`fairlearn` packaging distribution: :pr:`1644` by :user:`Parul Gupta <parulgupta1004>`.
+
+Narwhals integration
+--------------------
+
+* Made :code:`postprocessing/_tradeoff_curve_utilities.py` dataframe agnostic through Narwhals: :pr:`1553` by :user:`Francesco Bruzzesi <FBruzzesi>`.
+* Made :code:`GroupFeature` dataframe agnostic through Narwhals: :pr:`1546` by :user:`Francesco Bruzzesi <FBruzzesi>`.
+
+Documentation
+-------------
+
+* Added a GridSearch algorithm overview and usage example to the reductions user guide: :pr:`1622` by :user:`Nithin <k-nithin>`.
+* Added a usage example for :code:`mean_prediction` in the advanced :code:`MetricFrame` guide: :pr:`1637` by :user:`3Paradox`.
+* Improved docstrings for base metrics, :code:`DisaggregatedResult` methods, and :code:`MetricFrame` group methods: :pr:`1621` by :user:`Nithin <k-nithin>`.
+* Added :code:`versionadded` and :code:`versionchanged` directives to the public docstrings in :code:`fairlearn.metrics`: :pr:`1640` by :user:`Bader <BAder82t>`.
+* Corrected the true-positive-rate formula in the :code:`equal_opportunity_difference` and :code:`equal_opportunity_ratio` docstrings (from :code:`E[h(X) | A=a]` to :code:`P[h(X)=1 | A=a, Y=1]`): :pr:`1605` by :user:`Ophy Boamah Ampoh <OphyBoamah>`.
+* Removed the outdated Fairlearn repository overview page from the contributor guide: :pr:`1606` by :user:`Anish8800`.
+* Fixed minor spacing and punctuation in :code:`docs/user_guide/fairness_in_machine_learning.rst`: :pr:`1611` by :user:`Anish8800`.
+* Updated the Maintainers link in the README to point directly to the Maintainers section of the website instead of the general About page: :pr:`1601` by :user:`itz8bitstudios`.
+
+Other improvements
+------------------
+
+* Removed support for Python 3.9 and added support for Python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Added support for scipy 1.16: :pr:`1596` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Raised the minimum supported :code:`scikit-learn` to 1.5.0 and the pinned :code:`torch` in :code:`requirements-min.txt` to 2.8.0 to clear Dependabot security advisories: :pr:`1645` by :user:`Roman Lutz <romanlutz>`.
+* Removed an unused :code:`name` argument from :code:`GroupFeature`: :pr:`1599` by :user:`Tahar Allouche <taharallouche>`.
+* Avoided a :code:`sys` module patching leak in the test suite: :pr:`1600` by :user:`Tahar Allouche <taharallouche>`.
+* Removed a Pillow deprecation warning by requiring :code:`matplotlib>=3.10.5`: :pr:`1618` by :user:`Ibim Braide <iclectic>`.
+* Fixed a :code:`DataFrame` fragmentation :code:`PerformanceWarning` in the reductions module: :pr:`1631` by :user:`BALOGUN DAVID TAIWO <BALOGUN-DAVID>`.
+* Closed Matplotlib figures before/after tests to avoid a deprecation warning: :pr:`1603` by :user:`lolashaffy`.
+* Sped up the reductions test suite: :pr:`1574` by :user:`Tahar Allouche <taharallouche>`.
+* Sped up the preprocessing test suite: :pr:`1573` by :user:`Tahar Allouche <taharallouche>`.
+* Sped up the metrics test suite: :pr:`1572` by :user:`Tahar Allouche <taharallouche>`.
+* Improved unit tests for :code:`PrototypeRepresentationLearner`: stopped overriding parametrized :code:`sensitive_features` values inside the test bodies and added coverage for multi-dimensional sensitive features: :pr:`1623` by :user:`Tahar Allouche <taharallouche>`.
+* Cached OpenML datasets in CI runs: :pr:`1598` by :user:`Francesco Bruzzesi <FBruzzesi>`.
+* Added a Narwhals pytest marker: :pr:`1597` by :user:`Francesco Bruzzesi <FBruzzesi>`.

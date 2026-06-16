@@ -1,11 +1,180 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fairlearn"
+description = "A Python package to assess and improve fairness of machine learning models."
+readme = "README.rst"
+license = "MIT"
+dynamic = ["version"]
+requires-python = ">=3.11"
+authors = [
+    { name = "Miroslav Dudik" },
+    { name = "Richard Edgar" },
+    { name = "Adrin Jalali" },
+    { name = "Roman Lutz" },
+    { name = "Michael Madaio" },
+    { name = "Hilde Weerts" },
+    { name = "Allie Saizan" },
+    { name = "Tamara Atanasoska" },
+    { name = "Tahar Allouche" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+]
+dependencies = [
+    "narwhals>=1.14.0",
+    "numpy>=1.24.4",
+    "pandas>=2.0.3",
+    "scikit-learn>=1.6.0",
+    "scipy>=1.9.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/fairlearn/fairlearn"
+
+[tool.setuptools.dynamic]
+version = { attr = "fairlearn.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["fairlearn*"]
+exclude = ["test*", "test_othermlpackages*"]
+
 [tool.black]
-line-length = 79
+line-length = 99
+target_version = ['py311', 'py312', 'py313', 'py314']
+preview = true
+extend-exclude = '''
+(
+    ^/docs/
+    | ^/examples/
+    ^/notebooks/
+    ^/build/
+    ^/.git/
+)
+'''
+
+[tool.isort]
+profile = "black"
 
 [tool.pytest.ini_options]
 filterwarnings = [
-    "error::DeprecationWarning",
-    "error::FutureWarning",
-    'ignore:the imp module is deprecated:DeprecationWarning',
-    'ignore:Using or importing the ABCs from:DeprecationWarning',
-    "ignore:tostring:DeprecationWarning",
+    "error",
+
+    # Warnings in all-deps
+    "default:You are about to use a dataset with known fairness issues:Warning",
+    "default:Auto-removal of overlapping axes is deprecated:Warning",
+    "default:DataFrame is highly fragmented:Warning",
+    "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:DeprecationWarning",
+
+    # Warnings in other-ml (tensorflow)
+    "default:Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new:DeprecationWarning",
+    "default:Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new:DeprecationWarning",
+
+    # Warnings in test_othermlpackages
+    "default:The LGBMClassifier or classes from which it inherits use `_get_tags` and `_more_tags`:FutureWarning",
+
 ]
+
+markers = [
+    "narwhals: tests that involve dataframe logic backed by Narwhals (deselect with '-m \"not narwhals\"')",
+    "mpl_image_compare: tests that require 'pytest-mpl' to be installed"
+]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "docs/_build",
+    "docs/auto_examples",
+    "notebooks/",
+]
+
+# Same as Black.
+line-length = 99
+indent-width = 4
+
+# Assume Python 3.11
+target-version = "py311"
+
+# Copyright
+[tool.ruff.lint.flake8-copyright]
+notice-rgx = "# (?i)Copyright \\(C\\) (Microsoft Corporation and )?Fairlearn contributors.\n# Licensed under the MIT license."
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+#Enable linting according to the new numpy API with NPY201
+select = ["E4", "E7", "E9", "F", "NPY201"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.per-file-ignores]
+# It's fine not to put the import at the top of the file in the examples
+# folder.
+"examples/*"=["E402"]

@@ -1,0 +1,43 @@
+v0.11.0
+=======
+
+This release greately improves upon the :code:`scikit-learn` compatibility of the
+:code:`AdversarialFairnessClassifier` and :code:`AdversarialFairnessRegressor`
+estimators. It also includes a number of other improvements.
+
+:code:`scikit-learn` compatibility
+----------------------------------
+
+* The estimators :code:`AdversarialFairnessClassifier` and :code:`AdversarialFairnessRegressor`
+  now pass all but one :code:`scikit-learn` estimator checks. Changes in
+  `#1410 <https://github.com/fairlearn/fairlearn/pull/1410>`_,
+  `#1405 <https://github.com/fairlearn/fairlearn/pull/1405>`_,
+  `#1399 <https://github.com/fairlearn/fairlearn/pull/1399>`_,
+  `#1398 <https://github.com/fairlearn/fairlearn/pull/1398>`_,
+  `#1394 <https://github.com/fairlearn/fairlearn/pull/1394>`_,
+  `#1393 <https://github.com/fairlearn/fairlearn/pull/1393>`_,
+  `#1369 <https://github.com/fairlearn/fairlearn/pull/1369>`_,
+  and the ones included below in this section.
+
+* Added :code:`classes_` attribute to :code:`AdversarialFairnessClassifier` and
+  :code:`AdversarialFairnessRegressor` in `#1384 <https://github.com/fairlearn/fairlearn/pull/1384>`_.
+
+* Removed :code:`_AdversarialFairness.decision_function` because it did not follow the
+  expected contract with :code:`_AdversarialFairness.predict` in
+  `#1397 <https://github.com/fairlearn/fairlearn/pull/1397>`_.
+
+
+
+Other improvements
+------------------
+
+* Added disparity metric :code:`equal_opportunity_{difference,ratio}` as a frequently
+  used alias for :code:`true_positive_rate_{difference,ratio}`.
+
+* Added :code:`numpy` 2.0.0 compatibility in `#1387 <https://github.com/fairlearn/fairlearn/pull/1387>`_.
+
+* Fixed :code:`pandas` warnings in `#1363 <https://github.com/fairlearn/fairlearn/pull/1363>`_ and
+  `#1339 <https://github.com/fairlearn/fairlearn/pull/1339>`_.
+
+* Fixed output dimensions bug in :code:`FloatingPointTransformer` in
+  `#1333 <https://github.com/fairlearn/fairlearn/pull/1333>`_.

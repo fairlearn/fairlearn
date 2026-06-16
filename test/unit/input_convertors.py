@@ -87,11 +87,13 @@ def ensure_dataframe(X):
     raise ValueError("Failed to convert to Series")
 
 
-conversions_for_1d = [ensure_list,
-                      ensure_ndarray,
-                      ensure_ndarray_2d,
-                      ensure_series,
-                      ensure_dataframe]
+conversions_for_1d = [
+    ensure_list,
+    ensure_ndarray,
+    ensure_ndarray_2d,
+    ensure_series,
+    ensure_dataframe,
+]
 
 
 def _map_into_single_column(matrix):

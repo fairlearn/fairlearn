@@ -1,19 +1,26 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-import numpy as np
+from test.unit.reductions.data_generators import loan_scenario_generator
+
 import pandas as pd
 import pytest
-
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate, true_positive_rate, false_positive_rate
-from fairlearn.reductions import DemographicParity, ErrorRateParity,\
-    TruePositiveRateParity, FalsePositiveRateParity, EqualizedOdds
-
-from test.unit.reductions.data_generators import loan_scenario_generator
+from fairlearn.metrics import (
+    MetricFrame,
+    false_positive_rate,
+    selection_rate,
+    true_positive_rate,
+)
+from fairlearn.reductions import (
+    DemographicParity,
+    EqualizedOdds,
+    ErrorRateParity,
+    FalsePositiveRateParity,
+    TruePositiveRateParity,
+)
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -45,27 +52,36 @@ def _simple_compare(moment, metric):
     y_pred = est.predict(X_dummy)
 
     target = moment()
-    target.load_data(np.asarray(X_dummy), np.asarray(y),
-                     sensitive_features=X['sens'],
-                     control_features=X['ctrl'])
+    target.load_data(
+        X_dummy,
+        y,
+        sensitive_features=X["sens"],
+        control_features=X["ctrl"],
+    )
 
     # gamma measures the constraint violation relative to the overall value
     results = target.gamma(est.predict)
 
     # Compute the constraint violation using the metrics
-    mf_pred = MetricFrame(metrics=metric, y_true=y, y_pred=y_pred,
-                          sensitive_features=X['sens'],
-                          control_features=X['ctrl'])
+    mf_pred = MetricFrame(
+        metrics=metric,
+        y_true=y,
+        y_pred=y_pred,
+        sensitive_features=X["sens"],
+        control_features=X["ctrl"],
+    )
     diffs = mf_pred.by_group - mf_pred.overall
 
     # Compare (with a very small amount of wriggle room)
     for ib in ibs:
         for sf in sfs:
             event_format = "control={0},all"
-            assert diffs[(ib, sf)] == pytest.approx(results[('+', event_format.format(ib), sf)],
-                                                    rel=1e-10, abs=1e-12)
-            assert diffs[(ib, sf)] == pytest.approx(-results[('-', event_format.format(ib), sf)],
-                                                    rel=1e-10, abs=1e-12)
+            assert diffs[(ib, sf)] == pytest.approx(
+                results[("+", event_format.format(ib), sf)], rel=1e-10, abs=1e-12
+            )
+            assert diffs[(ib, sf)] == pytest.approx(
+                -results[("-", event_format.format(ib), sf)], rel=1e-10, abs=1e-12
+            )
 
 
 def test_demographic_parity():
@@ -89,17 +105,24 @@ def _selected_label_compare(moment, metric, selected_label):
     y_pred = est.predict(X_dummy)
 
     target = moment()
-    target.load_data(np.asarray(X_dummy), np.asarray(y),
-                     sensitive_features=X['sens'],
-                     control_features=X['ctrl'])
+    target.load_data(
+        X_dummy,
+        y,
+        sensitive_features=X["sens"],
+        control_features=X["ctrl"],
+    )
 
     # gamma measures the constraint violation relative to the overall value
     results = target.gamma(est.predict)
 
     # Compute the constraint violation using the metrics
-    mf_pred = MetricFrame(metrics=metric, y_true=y, y_pred=y_pred,
-                          sensitive_features=X['sens'],
-                          control_features=X['ctrl'])
+    mf_pred = MetricFrame(
+        metrics=metric,
+        y_true=y,
+        y_pred=y_pred,
+        sensitive_features=X["sens"],
+        control_features=X["ctrl"],
+    )
     diffs = mf_pred.by_group - mf_pred.overall
 
     # Compare (with a very small amount of wriggle room)
@@ -108,10 +131,12 @@ def _selected_label_compare(moment, metric, selected_label):
             # Format defined within utility_parity._combine_event_and_control
             label_format = "control={0},label={1}"
             label = label_format.format(ib, selected_label)
-            assert diffs[(ib, sf)] == pytest.approx(results[('+', label, sf)],
-                                                    rel=1e-10, abs=1e-12)
-            assert diffs[(ib, sf)] == pytest.approx(-results[('-', label, sf)],
-                                                    rel=1e-10, abs=1e-12)
+            assert diffs[(ib, sf)] == pytest.approx(
+                results[("+", label, sf)], rel=1e-10, abs=1e-12
+            )
+            assert diffs[(ib, sf)] == pytest.approx(
+                -results[("-", label, sf)], rel=1e-10, abs=1e-12
+            )
 
 
 def test_true_positive_parity():

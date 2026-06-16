@@ -6,6 +6,7 @@
 Metrics with Multiple Features
 ==============================
 """
+
 # %%
 # This notebook demonstrates the new API for metrics, which supports
 # multiple sensitive and conditional features. This example does not
@@ -52,27 +53,25 @@ Metrics with Multiple Features
 # We start with some uncontroversial `import` statements:
 
 import functools
-import numpy as np
 
+import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
-from sklearn.datasets import fetch_openml
+from sklearn.compose import make_column_selector as selector
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from fairlearn.metrics import MetricFrame
-from fairlearn.metrics import selection_rate, count
-
+from fairlearn.datasets import fetch_adult
+from fairlearn.metrics import MetricFrame, count, selection_rate
 
 # %%
 # Next, we import the data:
 
-data = fetch_openml(data_id=1590, as_frame=True)
-X_raw = data.data
+data = fetch_adult()
+X_raw = data.data.copy()
 y = (data.target == ">50K") * 1
 
 # %%
@@ -88,9 +87,7 @@ def race_transform(input_str):
     return result
 
 
-X_raw["race"] = (
-    X_raw["race"].map(race_transform).fillna("Other").astype("category")
-)
+X_raw["race"] = X_raw["race"].map(race_transform).fillna("Other").astype("category")
 print(np.unique(X_raw["race"]))
 
 # %%
@@ -113,7 +110,9 @@ def marriage_transform(m_s_string):
 def occupation_transform(occ_string):
     """Perform some simple manipulations."""
     result = "Small"
-    if occ_string.startswith("Machine"):
+    # The isinstance check is to guard against 'missing'
+    # data marked with NaN
+    if not isinstance(occ_string, float) and occ_string.startswith("Machine"):
         result = "Large"
     return result
 
@@ -123,10 +122,10 @@ col_credit.name = "Credit Score"
 col_loan_size = X_raw["occupation"].map(occupation_transform).fillna("Small")
 col_loan_size.name = "Loan Size"
 
-A = X_raw[["race", "sex"]]
+A = X_raw[["race", "sex"]].copy()
 A["Credit Score"] = col_credit
 A["Loan Size"] = col_loan_size
-A
+
 
 # %%
 # Now that we have imported our dataset and manufactured a few features, we
@@ -136,7 +135,7 @@ A
 # any transforms or scaling:
 
 
-(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
     X_raw, y, A, test_size=0.3, random_state=54321, stratify=y
 )
 
@@ -162,19 +161,17 @@ A_test = A_test.reset_index(drop=True)
 # missing data could also cause trouble, if particular subgroups
 # have poorer data quality.
 
-numeric_transformer = Pipeline(
-    steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())]
-)
+numeric_transformer = Pipeline(steps=[("impute", SimpleImputer()), ("scaler", StandardScaler())])
 categorical_transformer = Pipeline(
     [
         ("impute", SimpleImputer(strategy="most_frequent")),
-        ("ohe", OneHotEncoder(handle_unknown="ignore"))
+        ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ]
 )
 preprocessor = ColumnTransformer(
     transformers=[
         ("num", numeric_transformer, selector(dtype_exclude="category")),
-        ("cat", categorical_transformer, selector(dtype_include="category"))
+        ("cat", categorical_transformer, selector(dtype_include="category")),
     ]
 )
 
@@ -185,10 +182,7 @@ preprocessor = ColumnTransformer(
 unmitigated_predictor = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
-        (
-            "classifier",
-            LogisticRegression(solver="liblinear", fit_intercept=True)
-        )
+        ("classifier", LogisticRegression(solver="liblinear", fit_intercept=True)),
     ]
 )
 
@@ -232,17 +226,10 @@ print("fbeta:", skm.fbeta_score(y_test, y_pred, beta=0.6))
 
 fbeta_06 = functools.partial(skm.fbeta_score, beta=0.6, zero_division=1)
 
-metric_fns = {
-    "selection_rate": selection_rate,
-    "fbeta_06": fbeta_06,
-    "count": count
-}
+metric_fns = {"selection_rate": selection_rate, "fbeta_06": fbeta_06, "count": count}
 
 grouped_on_sex = MetricFrame(
-    metrics=metric_fns,
-    y_true=y_test,
-    y_pred=y_pred,
-    sensitive_features=A_test["sex"]
+    metrics=metric_fns, y_true=y_test, y_pred=y_pred, sensitive_features=A_test["sex"]
 )
 
 # %%
@@ -268,12 +255,8 @@ grouped_on_sex = MetricFrame(
 # the metrics evaluated on the entire dataset. We see that this contains the
 # same values calculated above:
 
-assert grouped_on_sex.overall["selection_rate"] == selection_rate(
-    y_test, y_pred
-)
-assert grouped_on_sex.overall["fbeta_06"] == skm.fbeta_score(
-    y_test, y_pred, beta=0.6
-)
+assert grouped_on_sex.overall["selection_rate"] == selection_rate(y_test, y_pred)
+assert grouped_on_sex.overall["fbeta_06"] == skm.fbeta_score(y_test, y_pred, beta=0.6)
 print(grouped_on_sex.overall)
 
 # %%
@@ -293,10 +276,7 @@ grouped_on_sex.by_group
 # using race as the sensitive feature:
 
 grouped_on_race = MetricFrame(
-    metrics=metric_fns,
-    y_true=y_test,
-    y_pred=y_pred,
-    sensitive_features=A_test["race"]
+    metrics=metric_fns, y_true=y_test, y_pred=y_pred, sensitive_features=A_test["race"]
 )
 
 # %%
@@ -335,7 +315,7 @@ random_weights = np.random.rand(len(y_test))
 
 example_sample_params = {
     "selection_rate": {"sample_weight": random_weights},
-    "fbeta_06": {"sample_weight": random_weights}
+    "fbeta_06": {"sample_weight": random_weights},
 }
 
 
@@ -344,7 +324,7 @@ grouped_with_weights = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test["sex"],
-    sample_params=example_sample_params
+    sample_params=example_sample_params,
 )
 
 # %%
@@ -414,19 +394,18 @@ grouped_on_race.ratio(method="to_overall")
 # and we have already found some serious issues in our example data.
 # However, sometimes serious issues can be hiding in intersections of
 # features. For example, the
-# `Gender Shades project <https://www.media.mit.edu/projects/gender-shades/overview/>`_
+# Gender Shades project :footcite:`buolamwini2018gender`
 # found that facial recognition algorithms performed worse for blacks
 # than whites, and also worse for women than men (despite overall high
 # accuracy score). Moreover, performance on black females was *terrible*.
 # We can examine the intersections of sensitive features by passing
 # multiple columns to the :class:`fairlearn.metrics.MetricFrame`
 # constructor:
-
 grouped_on_race_and_sex = MetricFrame(
     metrics=metric_fns,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test[["race", "sex"]]
+    sensitive_features=A_test[["race", "sex"]],
 )
 
 # %%
@@ -469,7 +448,7 @@ cond_credit_score = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test["Credit Score"]
+    control_features=A_test["Credit Score"],
 )
 
 # %%
@@ -502,7 +481,7 @@ cond_both = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test[["Loan Size", "Credit Score"]]
+    control_features=A_test[["Loan Size", "Credit Score"]],
 )
 
 # %%
@@ -529,7 +508,7 @@ counts = MetricFrame(
     y_true=y_test,
     y_pred=y_pred,
     sensitive_features=A_test[["race", "sex"]],
-    control_features=A_test[["Loan Size", "Credit Score"]]
+    control_features=A_test[["Loan Size", "Credit Score"]],
 )
 
 counts.by_group
@@ -537,7 +516,6 @@ counts.by_group
 # %%
 # Recall that ``NaN`` indicates that there were no individuals
 # in a cell - ``member_counts()`` will not even have been called.
-
 # %%
 # Exporting from MetricFrame
 # ==========================
@@ -560,3 +538,9 @@ print(csv_output)
 #
 # The :meth:`~fairlearn.metrics.MetricFrame.overall` property can
 # be handled similarly, in the cases that it is not a scalar.
+#
+# References
+# ----------
+#
+# .. footbibliography::
+#

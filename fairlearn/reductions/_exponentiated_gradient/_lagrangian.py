@@ -1,19 +1,39 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from __future__ import annotations
+
+import copy
 import logging
+from collections.abc import Callable
+from time import time
+
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
 from sklearn import clone
 from sklearn.dummy import DummyClassifier
-from time import time
-
-from ._constants import _PRECISION, _INDENTATION, _LINE
 
 from fairlearn.reductions._moments import ClassificationMoment
+from fairlearn.reductions._moments.moment import Moment
+from fairlearn.utils._common import _filter_kwargs
+
+from ._constants import _INDENTATION, _LINE, _PRECISION
 
 logger = logging.getLogger(__name__)
+
+
+_MESSAGE_BAD_OBJECTIVE = (
+    "Objective needs to be of the same type as constraints. Objective is {}, constraints are {}."
+)
+
+
+class _PredictorAsCallable:
+    def __init__(self, classifier):
+        self._classifier = classifier
+
+    def __call__(self, X):
+        return self._classifier.predict(X)
 
 
 class _Lagrangian:
@@ -31,8 +51,11 @@ class _Lagrangian:
         the estimator to fit in every iteration of :meth:`best_h` using a
         :meth:`fit` method with arguments `X`, `y`, and `sample_weight`
     constraints : fairlearn.reductions.Moment
-        Object describing the parity constraints. This provides the reweighting
+        Object describing the fairness constraints. This provides the reweighting
         and relabelling.
+    objective : fairlearn.reductions.Moment
+        Object describing the optimization objective. The default is :code:`ErrorRate()` for
+        binary classification and :code:`MeanLoss(...)` for regression.
     B : float
         bound on the L1-norm of the lambda vector
     opt_lambda : bool
@@ -43,17 +66,44 @@ class _Lagrangian:
         (defaults to `sample_weight`)
     """
 
-    def __init__(self, X, y, estimator, constraints, B, opt_lambda=True,
-                 sample_weight_name='sample_weight', **kwargs):
-        self.constraints = constraints
+    def __init__(
+        self,
+        *,
+        X,
+        y,
+        estimator,
+        constraints: Moment,
+        B: float,
+        objective: Moment | None = None,
+        opt_lambda: bool = True,
+        sample_weight_name: str = "sample_weight",
+        **kwargs,
+    ):
+        # Deepcopy constraints so the user's original object is not mutated,
+        # allowing the same constraints instance to be reused across multiple
+        # calls to fit() or shared between different mitigators. This preserves
+        # isolation for custom moments with mutable constructor state while the
+        # estimator's stored constraints remain unloaded between fit() calls.
+        self.constraints = copy.deepcopy(constraints)
         self.constraints.load_data(X, y, **kwargs)
-        self.obj = self.constraints.default_objective()
-        self.obj.load_data(X, y, **kwargs)
+        if objective is None:
+            self.obj = self.constraints.default_objective()
+        elif objective._moment_type() == constraints._moment_type():
+            self.obj = objective
+        else:
+            raise ValueError(
+                _MESSAGE_BAD_OBJECTIVE.format(objective._moment_type(), constraints._moment_type())
+            )
+        filtered_kwargs = _filter_kwargs(func=self.obj.load_data, kwargs=kwargs)
+        self.obj.load_data(X, y, **filtered_kwargs)
         self.estimator = estimator
         self.B = B
         self.opt_lambda = opt_lambda
-        self.hs = pd.Series(dtype="float64")
-        self.predictors = pd.Series(dtype="float64")
+
+        # Stores the best-response estimators as _PredictorAsCallable instances
+        self.hs = pd.Series(dtype="object")
+
+        self.predictors = pd.Series(dtype="object")
         self.errors = pd.Series(dtype="float64")
         self.gammas = pd.DataFrame()
         self.lambdas = pd.DataFrame()
@@ -64,7 +114,9 @@ class _Lagrangian:
         self.last_linprog_result = None
         self.sample_weight_name = sample_weight_name
 
-    def _eval(self, Q, lambda_vec):
+    def _eval(
+        self, Q: pd.Series | Callable, lambda_vec: pd.Series
+    ) -> tuple[float, float, pd.Series, float]:
         """Return the value of the Lagrangian.
 
         Parameters
@@ -86,31 +138,30 @@ class _Lagrangian:
             violations, and `error` is the empirical error
         """
         if callable(Q):
-            error = self.obj.gamma(Q)[0]
+            error = self.obj.gamma(Q).iloc[0]
             gamma = self.constraints.gamma(Q)
         else:
             error = self.errors[Q.index].dot(Q)
             gamma = self.gammas[Q.index].dot(Q)
 
         if self.opt_lambda:
-            lambda_projected = self.constraints.project_lambda(lambda_vec)
-            L = error + np.sum(lambda_projected * (gamma - self.constraints.bound()))
-        else:
-            L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
+            lambda_vec = self.constraints.project_lambda(lambda_vec)
+
+        L = error + np.sum(lambda_vec * (gamma - self.constraints.bound()))
 
         max_constraint = (gamma - self.constraints.bound()).max()
-        if max_constraint <= 0:
-            L_high = error
-        else:
-            L_high = error + self.B * max_constraint
+
+        L_high = error
+        if max_constraint > 0:
+            L_high += self.B * max_constraint
         return L, L_high, gamma, error
 
-    def eval_gap(self, Q, lambda_hat, nu):
+    def eval_gap(self, Q: pd.Series, lambda_hat: pd.Series, nu: float) -> _GapResult:
         r"""Return the duality gap object for the given :math:`Q` and :math:`\hat{\lambda}`."""
         L, L_high, gamma, error = self._eval(Q, lambda_hat)
         result = _GapResult(L, L, L_high, gamma, error)
         for mul in [1.0, 2.0, 5.0, 10.0]:
-            h_hat, h_hat_idx = self.best_h(mul * lambda_hat)
+            _, h_hat_idx = self.best_h(mul * lambda_hat)
             logger.debug("%smul=%.0f", _INDENTATION, mul)
             L_low_mul, _, _, _ = self._eval(pd.Series({h_hat_idx: 1.0}), lambda_hat)
             if L_low_mul < result.L_low:
@@ -119,34 +170,47 @@ class _Lagrangian:
                 break
         return result
 
-    def solve_linprog(self, nu):
+    def solve_linprog(self, nu: float) -> tuple[pd.Series, pd.Series, _GapResult]:
         n_hs = len(self.hs)
         n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
-        A_ub = np.concatenate((self.gammas.sub(self.constraints.bound(), axis=0),
-                               -np.ones((n_constraints, 1))), axis=1)
+        A_ub = np.concatenate(
+            (
+                self.gammas.sub(self.constraints.bound(), axis=0),
+                -np.ones((n_constraints, 1)),
+            ),
+            axis=1,
+        )
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method='simplex')
+        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="highs-ds")
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
         dual_b_ub = c
-        dual_bounds = [(None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)]  # noqa: E501
-        result_dual = opt.linprog(dual_c,
-                                  A_ub=dual_A_ub,
-                                  b_ub=dual_b_ub,
-                                  bounds=dual_bounds,
-                                  method='simplex')
+        dual_bounds = [
+            (None, None) if i == n_constraints else (0, None) for i in range(n_constraints + 1)
+        ]
+        result_dual = opt.linprog(
+            dual_c,
+            A_ub=dual_A_ub,
+            b_ub=dual_b_ub,
+            bounds=dual_bounds,
+            method="highs-ds",
+        )
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
-        self.last_linprog_result = (Q, lambda_vec, self.eval_gap(Q, lambda_vec, nu))
+        self.last_linprog_result = (
+            Q,
+            lambda_vec,
+            self.eval_gap(Q, lambda_vec, nu),
+        )
         return self.last_linprog_result
 
-    def _call_oracle(self, lambda_vec):
+    def _call_oracle(self, lambda_vec: pd.Series):
         signed_weights = self.obj.signed_weights() + self.constraints.signed_weights(lambda_vec)
         if isinstance(self.constraints, ClassificationMoment):
             redY = 1 * (signed_weights > 0)
@@ -160,8 +224,7 @@ class _Lagrangian:
         estimator = None
         if len(redY_unique) == 1:
             logger.debug("redY had single value. Using DummyClassifier")
-            estimator = DummyClassifier(strategy='constant',
-                                        constant=redY_unique[0])
+            estimator = DummyClassifier(strategy="constant", constant=redY_unique[0])
             self.n_oracle_calls_dummy_returned += 1
         else:
             # use sklearn.base.clone to clone the estimator.
@@ -178,23 +241,18 @@ class _Lagrangian:
 
         return estimator
 
-    def best_h(self, lambda_vec):
+    def best_h(self, lambda_vec: pd.Series) -> tuple[_PredictorAsCallable, int]:
         """Solve the best-response problem.
 
         Returns the classifier that solves the best-response problem for
-        the vector of Lagrange multipliers `lambda_vec`.
+        the vector of Lagrange multipliers `lambda_vec` and its index in the series storing the
+        best-response classifiers.
         """
         classifier = self._call_oracle(lambda_vec)
 
-        def h(X):
-            pred = classifier.predict(X)
-            # Some estimators return an output of the shape (num_preds, 1) - flatten such
-            # results
-            if getattr(pred, "flatten", None) is not None:
-                pred = pred.flatten()
-            return pred
+        h = _PredictorAsCallable(classifier)
 
-        h_error = self.obj.gamma(h)[0]
+        h_error = self.obj.gamma(h).iloc[0]
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
 
@@ -204,7 +262,7 @@ class _Lagrangian:
             best_value = values[best_idx]
         else:
             best_idx = -1
-            best_value = np.PINF
+            best_value = np.inf
 
         if h_value < best_value - _PRECISION:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
@@ -222,12 +280,12 @@ class _Lagrangian:
 class _GapResult:
     """The result of a duality gap computation."""
 
-    def __init__(self, L, L_low, L_high, gamma, error):
+    def __init__(self, L: float, L_low: float, L_high: float, gamma: pd.Series, error: float):
         self.L = L
         self.L_low = L_low
         self.L_high = L_high
         self.gamma = gamma
         self.error = error
 
-    def gap(self):
+    def gap(self) -> float:
         return max(self.L - self.L_low, self.L_high - self.L)

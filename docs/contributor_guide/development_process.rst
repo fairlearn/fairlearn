@@ -1,3 +1,5 @@
+.. _development_process:
+
 Development process
 -------------------
 
@@ -19,9 +21,8 @@ functionality. This includes comments in the code itself, docstrings, and user
 guides. For exceptions to this rule the pull request author should coordinate
 with a maintainer. For changes that fix bugs, add new features, change APIs,
 etc., i.e., for changes that are relevant to developers and/or users please
-also add an entry in CHANGES.md in the section corresponding to the *next*
-release, since that's where your change will be included.
-If you're a new contributor please also add yourself to AUTHORS.md.
+also add an entry in :ref:`version_guide` in the section corresponding to the
+*next* release, since that's where your change will be included.
 
 Docstrings should follow
 `numpydoc format <https://numpydoc.readthedocs.io/en/latest/format.html>`_.
@@ -29,69 +30,189 @@ This is a `recent decision by the community <https://github.com/fairlearn/fairle
 The new policy is to update docstrings that a PR touches, as opposed to
 changing all the docstrings in one PR.
 
-Advanced installation instructions
+
+Installation instructions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You will need a GitHub account to contribute to this project. Authenticating with Github
+using an ssh connection is highly recommended. You can learn more about it
+`here <https://docs.github.com/en/get-started/onboarding/getting-started-with-your-github-account>`_.
 
-While working on Fairlearn itself you may want to install it in editable mode.
-This allows you to test the changed functionality. First, clone the repository
-locally via
+First, clone the repository locally via:
 
-.. code-block::
+.. prompt:: bash
 
-    git clone git@github.com:fairlearn/fairlearn.git
+   git clone git@github.com:fairlearn/fairlearn.git
 
-To install in editable mode using :code:`pip` run 
 
-.. code-block::
+(Optional) Set up a virtual environment:
 
-    pip install -e .
+   While you can use :code:`pip` to install the fairlearn package globally, we strongly
+   recommend developing using a virtual environment. Virtual environments are a great way
+   to isolate project dependencies, especially if you're working on multiple issues that
+   require different versions of the package.
 
-from the repository root path.
+   To create a Python virtual environment using :code:`conda`, make your virtual environment
+   inside the fairlearn project directory. This will create a new :code:`fairlearn` folder
+   and seed it with a :code:`python=3.12` environment. Then activate the virtual environment:
 
-To verify that the code works as expected run
+   .. prompt:: bash
 
-.. code-block::
+      conda create --name fairlearn python=3.12  # creates virtual env
+      conda activate fairlearn # activates virtual env
+      (fairlearn) $ # notice the shell prompt includes name of active virtual env
 
-    python ./scripts/install_requirements.py --pinned False
-    python -m pytest -s ./test/unit
+   If you see the name of the environment in the shell prompt,
+   then the virtual environment is activated. To deactivate it, run: :code:`conda deactivate`.
 
-Fairlearn currently includes plotting functionality that requires the
-:code:`matplotlib` package to be installed. Since this is for a niche use case
-Fairlearn comes without :code:`matplotlib` by default. To install Fairlearn
-with its full feature set simply append :code:`customplots` to the install
-command
+To install in editable mode, from the repository root path run:
 
-.. code-block::
+.. prompt:: bash
 
-    pip install -e .[customplots]
+   pip install -e .
+
+To verify that the code works as expected run:
+
+.. prompt:: bash
+
+   python ./scripts/install_requirements.py
+   python -m pytest -s ./test/unit
+
+.. note::
+
+   If there is a :code:`torch` related error during the installation,
+   please downgrade keep your :code:`python` version between 3.11-3.14.
+
+Fairlearn currently includes plotting functionality provided by
+:code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
+
+.. prompt:: bash
+
+   pip install -e .
+   pip install matplotlib
 
 The Requirements Files
 """"""""""""""""""""""
 
-The prerequisites for Fairlearn are split between three separate files:
+Fairlearn's runtime dependencies (the packages required to actually use Fairlearn)
+are declared in the ``[project] dependencies`` table of
+`pyproject.toml <https://github.com/fairlearn/fairlearn/blob/main/pyproject.toml>`_ and
+are installed automatically when you run ``pip install .`` (or ``pip install -e .``).
 
-    -  `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
-       contains the prerequisites for the core Fairlearn package
+Development dependencies are tracked in two additional files:
 
-    -  `requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-customplots.txt>`_
-       contains additional prerequisites for the :code:`[customplots]` extension for Fairlearn
+* `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_
+  contains the prerequisites for Fairlearn development (such as :code:`ruff`, :code:`pytest`,
+  and the Sphinx documentation toolchain).
 
-    -  `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_ contains
-       the prerequisites for Fairlearn development (such as flake8 and pytest)
+* `requirements-min.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-min.txt>`_
+  pins both runtime and development dependencies to the minimum supported versions
+  and is used in CI to test against the oldest combination of dependencies we claim to support.
 
-The `requirements.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements.txt>`_
-and
-`requirements-customplots.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-customplots.txt>`_
-files are consumed
-by `setup.py <https://github.com/fairlearn/fairlearn/blob/main/setup.py>`_ to specify the dependencies to be
-documented in the wheel files.
-To help simplify installation of the prerequisites, we have the
+To install the unpinned development dependencies, run the
 `install_requirements.py <https://github.com/fairlearn/fairlearn/blob/main/scripts/install_requirements.py>`_
-script which runs :code:`pip install` on all three of the above files.
-This script will also optionally pin the requirements to any lower bound specified (by changing any
-occurrences of :code:`>=` to :code:`==` in each file).
+helper script:
+
+.. prompt:: bash
+
+   python ./scripts/install_requirements.py
+
+Pass :code:`--min` to install the pinned minimum-version set from :code:`requirements-min.txt`
+instead.
+
+.. _contributing_pull_requests:
+
+Contributing a pull request
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Follow the steps below to create a pull request.
+
+#. Get a `GitHub account <https://github.com/>`_.
+
+#. Install `GIT <https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>`_.
+
+#. Look at Fairlearn's issues on GitHub, specifically the ones marked
+   `"help wanted" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22>`_.
+   Within this category we've marked issues with labels:
+
+   * `"good first issue" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22good+first+issue%22>`_:
+     Issues suitable for first time contributors, including people with no prior experience with coding or GitHub.
+     This is an excellent way to get started!
+
+   * `"easy" <https://github.com/fairlearn/fairlearn/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+label%3A%22easy%22>`_:
+     Issues suitable for folks with at least a bit of experience and/or able to allocate some time to look for a solution.
+
+   *  Neither of the two above:
+      issues that are demanding or awaiting scope. Likely to take more than a day or two.
+      If you think this is something for you, please:
+
+      * Identify an issue that you would like to work on.
+      * Leave a comment on the issue indicating interest and outlining possible questions.
+      * Once we know you are working on it, we will support you on your contribution journey!
+
+.. note::
+
+   If you claim an issue, please try to keep it updated each week, either by continuing a discussion in the issue itself or in a pull request.
+   Issues which are not receiving updates may be claimed by someone else.
+
+#. The communication channels are outlined here: :ref:`communication`.
+
+#. Fork the `project repository
+   <https://github.com/fairlearn/fairlearn.git>`__ by clicking on the 'Fork'
+   button near the top of the page. This creates a copy of the code on your GitHub user account.
+   For more details on how to fork a
+   repository see `this guide <https://help.github.com/articles/fork-a-repo/>`_.
+
+#. Clone your fork of the fairlern repo from your GitHub account to your
+   local machine:
+
+   .. prompt:: bash
+
+      git clone git@github.com:YourLogin/fairlearn.git  # add --depth 1 if your connection is slow
+      cd fairlearn
+
+#. Add the ``upstream`` remote. This saves a reference to the main
+   fairlearn repository, which you can use to keep your repository
+   synchronized with the latest changes:
+
+   .. prompt:: bash
+
+      $ git remote add upstream git@github.com:fairlearn/fairlearn.git
+
+#. Check that the :code:`upstream` and :code:`origin` remote aliases are configured correctly
+   by running
+
+   :code:`git remote -v` which should display:
+
+   .. code-block:: text
+
+        origin	git@github.com:YourLogin/fairlearn.git (fetch)
+        origin	git@github.com:YourLogin/fairlearn.git (push)
+        upstream	git@github.com:fairlearn/fairlearn.git (fetch)
+        upstream	git@github.com:fairlearn/fairlearn.git (push)
 
 
+#. (Optional) Install `pre-commit <https://pre-commit.com/#install>`_ to run code style checks before each commit:
+
+   .. prompt:: bash
+
+      pip install pre-commit
+      pre-commit install
+
+   Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
+
+#. To contribute, you will need to create a branch on your forked repository and make a pull request to the original fairlearn repository.
+   Detailed description of this process you can find here:
+
+   * `Create a branch <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#creating-a-branch-to-work-on>`_.
+   * `Commit and push changes <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-and-pushing-changes>`_.
+   * `Open a pull request <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project#making-a-pull-request>`_.
+
+
+      * Build the website following the guidelines in :ref:`contributing_documentation` and run the tests if necessary.
+      * Opening a pull request comes with filling up an already provided description template.
+        Please fill it up! If you created the pull request in response to an issue add :code:`#<issue-number>` for reference.
+
+#. Celebration time! We would like to encourage you to become a part of our Fairlearn community. To do so, join our communication channels: :ref:`communication`. Please respect our `Code of Conduct <https://github.com/fairlearn/governance/blob/main/code-of-conduct.md>`_.
 
 Investigating automated test failures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

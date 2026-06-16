@@ -6,6 +6,7 @@
 Making Derived Metrics
 ======================
 """
+
 # %%
 # This notebook demonstrates the use of the :func:`fairlearn.metrics.make_derived_metric`
 # function.
@@ -30,24 +31,24 @@ Making Derived Metrics
 # We start with some uncontroversial `import` statements:
 
 import functools
-import numpy as np
 
+import numpy as np
 import sklearn.metrics as skm
 from sklearn.compose import ColumnTransformer
-from sklearn.datasets import fetch_openml
+from sklearn.compose import make_column_selector as selector
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import make_column_selector as selector
 from sklearn.pipeline import Pipeline
-from fairlearn.metrics import MetricFrame, make_derived_metric
-from fairlearn.metrics import accuracy_score_group_min
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+from fairlearn.datasets import fetch_adult
+from fairlearn.metrics import MetricFrame, accuracy_score_group_min, make_derived_metric
 
 # %%
 # Next, we import the data, dropping any rows which are missing data:
 
-data = fetch_openml(data_id=1590, as_frame=True)
+data = fetch_adult()
 X_raw = data.data
 y = (data.target == ">50K") * 1
 A = X_raw[["race", "sex"]]
@@ -61,7 +62,7 @@ A = X_raw[["race", "sex"]]
 # `problem in machine learning <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_).
 # So, first we split the data:
 
-(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
 )
 
@@ -141,7 +142,7 @@ acc_frame = MetricFrame(
     metrics=skm.accuracy_score,
     y_true=y_test,
     y_pred=y_pred,
-    sensitive_features=A_test["sex"]
+    sensitive_features=A_test["sex"],
 )
 print("Minimum accuracy_score: ", acc_frame.group_min())
 
@@ -253,9 +254,7 @@ print("From function:", beta_from_func)
 
 from_myacc = my_acc(y_test, y_pred, sensitive_features=A_test["race"])
 
-from_pregen = accuracy_score_group_min(
-    y_test, y_pred, sensitive_features=A_test["race"]
-)
+from_pregen = accuracy_score_group_min(y_test, y_pred, sensitive_features=A_test["race"])
 
 print("From my function :", from_myacc)
 print("From pregenerated:", from_pregen)

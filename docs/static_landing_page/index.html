@@ -25,7 +25,7 @@
         	<span class="navbar-toggler-icon icon-bar"></span>
       		</button>
       		<div class="collapse navbar-collapse" id="navbarResponsive">
-		        <ul class="navbar-nav pt-2 mt-1 mr-xl-auto ml-xl-2 pl-xl-1 text-center text-nowrap">
+		        <ul class="navbar-nav pt-2 mt-1 mx-xl-auto mx-xl-2 px-xl-1 text-center text-nowrap">
 				  <li class="nav-item px-1">
 					  <a id="gettingStartedLinkNavBar" class="nav-link" href="">Get Started</a>
 				  </li>
@@ -53,15 +53,35 @@
 		            <a id="aboutLinkNavBar" class="nav-link" href="">About Us</a>
 		          </li>
 				</ul>
-		        <span class="nav-item card benefit-card mr-xl-3 pt-1 mt-1">
+				<span class="nav-item card benefit-card mr-xl-3 py-2" id="lightmode">
+					<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Nav_LightMode_Default.svg">
+					<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Nav_LightMode_Hover.svg">
+		        </span>
+		        <span class="nav-item card benefit-card mr-xl-3 py-2">
 		            <a href="https://github.com/fairlearn/fairlearn">
-						<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Button_GH_Default.svg">
-						<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Button_GH_Hover.svg">
+						<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Nav_GH_Default.svg">
+						<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Nav_GH_Hover.svg">
 					</a>
 		        </span>
-	</div>
+				<span class="nav-item card benefit-card mr-xl-3 py-2">
+		            <a href="https://discord.gg/R22yCfgsRn">
+						<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Nav_Discord_Default.svg">
+						<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Nav_Discord_Hover.svg">
+					</a>
+		        </span>
+		</div>
   	</nav>
   	<!-- NAVIGATION -->
+	<div style="height: 80px;"></div>
+
+	<!-- SURVEY BANNER-->
+	<div class="container-fluid py-2 text-center"
+	style="background-color: #c4e8fd; padding: 8px 0; color: black; font-weight: bold;">
+		<strong> Help Us Improve Fairlearn:</strong><a href="https://forms.gle/U3wdiNAPeQWgenKh8"
+		target="_blank" class="font-weight-bold text-primary">
+		Take the Survey → </a>
+	</div>
+	<!-- SURVEY BANNER-->
 
   	<!-- MASTHEAD -->
 	<div class="container-fluid gradient masthead white">
@@ -80,7 +100,7 @@
 							<p class="white text-left text-md-left pb-3 d-md-block">
 							Learn about AI fairness from our guides and use cases.
 							Assess and mitigate fairness issues using our Python toolkit.
-							Join our community and contribute metrics, algorithms, and other resources.	
+							Join our community and contribute metrics, algorithms, and other resources.
 							</p>
 							<a id="gettingStartedLinkMastHead" class="quickstart-btn mt-2 mb-5 px-4 text-center width=80px" href="">Get Started</a>
 				</div>
@@ -124,7 +144,7 @@
 						We use Fairlearn to assess how different groups, defined in terms of their sex, are affected and how the observed disparities may be mitigated.
 					</p>
 					<div class="pt-2">
-						<a class="quickstart-btn mb-5 px-3 text-center" href="https://github.com/fairlearn/fairlearn/blob/main/notebooks/Binary%20Classification%20with%20the%20UCI%20Credit-card%20Default%20Dataset.ipynb">Jupyter Notebook</a>
+						<a class="quickstart-btn mb-5 px-3 text-center" href="https://fairlearn.org/main/auto_examples/plot_credit_loan_decisions.html">Jupyter Notebook</a>
 					</div>
 				</div>
 			</div>
@@ -138,7 +158,7 @@
 			<div class="mx-0">
 			<div class="row pb-5">
 			<div class="col-12 col-lg-6 text-left pr-lg-4">
-			    <div class="line mx-0 my-5"></div>	
+			    <div class="line mx-0 my-5"></div>
 		    	<h2 class="pt-3 pb-3 text-left dark">Get started with Fairlearn</h2>
 			    <p class="text-left">
 				    To get started, install the Fairlearn package.
@@ -202,6 +222,7 @@
 						Fairlearn community consists of open source contributors, data science practitioners, and responsible AI enthusiasts
 						across many disciplines and locations.
 						Join the latest conversation, ask usage questions, learn about the most recent updates, and find out how to get involved.
+						Please respect our <a href="https://github.com/fairlearn/governance/blob/main/code-of-conduct.md" target="_blank">Code of conduct</a>.
 					</p>
 				</div>
 			</div>
@@ -238,11 +259,11 @@
 					</a>
 				</div>
 				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
-					<a href="https://twitter.com/fairlearn" target="_blank">
+					<a href="https://www.linkedin.com/company/fairlearn/" target="_blank">
 						<div class="card h-100 benefit-card py-4 px-3">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Twitter_Color.svg">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Twitter_Inverse.svg">
-							<h5 class="dark pb-2 benefit-text">Twitter</h5>
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/LinkedIn_Color.svg">
+							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/LinkedIn_Inverse.svg">
+							<h5 class="dark pb-2 benefit-text">LinkedIn</h5>
 							<p class="benefit-text mb-0">Follow us for the latest updates.</p>
 						</div>
 					</a>
@@ -278,8 +299,8 @@
 			<div class="mx-0">
 				<div class="d-flex flex-column flex-md-row align-items-center">
 				<div class="mb-3 pr-md-3">
-					<a class="pr-3" href="https://twitter.com/fairlearn" target="_blank">
-						<img class="img-fluid" src="./images/Twitter_Color.svg" alt=""></a>
+					<a class="pr-3" href="https://www.linkedin.com/company/fairlearn/" target="_blank">
+						<img class="img-fluid benefits-icons" src="./images/LinkedIn_Color.svg" alt=""></a>
 					<a class="pr-3" href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank">
 						<img class="img-fluid" src="./images/Stack_Overflow_Color.svg" alt=""></a>
 					<a class="pr-3" href="https://discord.gg/R22yCfgsRn" target="_blank">
@@ -289,7 +310,7 @@
 					#fairlearn
 				</div>
 				<div class="flex-grow-1 text-md-right text-nowrap mb-3">
-					<p class="my-0">Copyright © 2021 Fairlearn contributors.</p>
+					<p class="my-0">Copyright © <script>document.write(new Date().getFullYear());</script> Fairlearn contributors.</p>
 				</div>
 			    </div>
 			</div>

@@ -1,0 +1,27 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+    -   id: check-yaml
+        exclude: .github/conda/meta.yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: check-case-conflict
+    -   id: check-merge-conflict
+-   repo: https://github.com/psf/black
+# Need to keep black version consistent in
+# requirements-dev.txt
+# linting.yml
+# .pre-commit-config.yaml
+    rev: 26.3.1
+    hooks:
+    -   id: black
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+    -   id: isort
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.5
+    hooks:
+    -   id: ruff
+        args: [ --fix ]

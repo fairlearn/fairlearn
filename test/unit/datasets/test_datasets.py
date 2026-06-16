@@ -1,40 +1,85 @@
-# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-import pandas as pd
+from test.utils import DATA_HOME
+
 import numpy as np
+import pandas as pd
 import pytest
 
 from fairlearn.datasets import (
+    fetch_acs_income,
     fetch_adult,
+    fetch_bank_marketing,
     fetch_boston,
-    fetch_bank_marketing
+    fetch_credit_card,
+    fetch_diabetes_hospital,
 )
 
 # =============================================
 
 
 class TestFairlearnDataset:
-
     @pytest.mark.parametrize("as_frame", [True, False])
-    @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston, fetch_bank_marketing])
+    @pytest.mark.parametrize(
+        "fetch_function",
+        [
+            fetch_acs_income,
+            fetch_adult,
+            fetch_bank_marketing,
+            fetch_boston,
+            fetch_credit_card,
+            fetch_diabetes_hospital,
+        ],
+    )
     def test_dataset_as_bunch(self, as_frame, fetch_function):
-        dataset = fetch_function(as_frame=as_frame)
+        dataset = fetch_function(as_frame=as_frame, data_home=DATA_HOME)
         assert dataset is not None
-        assert dataset['data'].shape is not None
-        assert isinstance(dataset['data'], pd.DataFrame if as_frame else np.ndarray)
-        assert dataset['target'].shape is not None
-        assert isinstance(dataset['target'], pd.Series if as_frame else np.ndarray)
-        assert dataset['feature_names'] is not None
-        assert isinstance(dataset['feature_names'], list)
-        assert dataset['DESCR'] is not None
-        assert isinstance(dataset['DESCR'], str)
+        assert dataset["data"].shape is not None
+        assert isinstance(dataset["data"], pd.DataFrame if as_frame else np.ndarray)
+        assert dataset["target"].shape is not None
+        assert isinstance(dataset["target"], pd.Series if as_frame else np.ndarray)
+        assert dataset["feature_names"] is not None
+        assert isinstance(dataset["feature_names"], list)
+        assert dataset["DESCR"] is not None
+        assert isinstance(dataset["DESCR"], str)
 
     @pytest.mark.parametrize("as_frame", [True, False])
-    @pytest.mark.parametrize("fetch_function", [fetch_adult, fetch_boston, fetch_bank_marketing])
+    @pytest.mark.parametrize(
+        "fetch_function",
+        [
+            fetch_acs_income,
+            fetch_adult,
+            fetch_bank_marketing,
+            fetch_boston,
+            fetch_credit_card,
+            fetch_diabetes_hospital,
+        ],
+    )
     def test_dataset_as_X_y(self, as_frame, fetch_function):
-        X, y = fetch_function(as_frame=as_frame, return_X_y=True)
+        X, y = fetch_function(as_frame=as_frame, return_X_y=True, data_home=DATA_HOME)
         assert X is not None
         assert isinstance(X, pd.DataFrame if as_frame else np.ndarray)
         assert y is not None
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
+
+    def test_fetch_acs_income_dataframe(self):
+        dataset = fetch_acs_income(data_home=DATA_HOME)
+        expected_columns = [
+            "AGEP",
+            "COW",
+            "SCHL",
+            "MAR",
+            "OCCP",
+            "POBP",
+            "RELP",
+            "WKHP",
+            "SEX",
+            "RAC1P",
+        ]
+        assert dataset["data"].columns.to_list() == expected_columns
+        assert dataset["data"].shape == (1664500, 10)
+
+    def test_fetch_acs_income_value_error(self):
+        with pytest.raises(ValueError):
+            fetch_acs_income(states=["XY"], data_home=DATA_HOME)

@@ -9,9 +9,7 @@ Fairness of AI systems
 
 AI systems can behave unfairly for a variety of reasons. Sometimes it is
 because of societal biases reflected in the training data and in the decisions
-made during the development and deployment of these systems. In other cases,
-AI systems behave unfairly not because of societal biases, but because of
-characteristics of the data (e.g., too few data points about some group of
+made during the development and deployment of these systems. In other cases, AI systems behave unfairly due to characteristics of the data (e.g., too few data points about some group of
 people) or characteristics of the systems themselves. It can be hard to
 distinguish between these reasons, especially since they are not mutually
 exclusive and often exacerbate one another. Therefore, we define whether an AI
@@ -23,15 +21,13 @@ terms of intent, such as prejudice.
 rather than specific causes (such as societal biases), we avoid the usage of
 the words *bias* or *debiasing* in describing the functionality of Fairlearn.
 
-
 .. _types_of_harms:
 
 Types of harms
 --------------
 
-There are many types of harms (see, e.g., the
-`keynote by K. Crawford at NeurIPS 2017 <https://www.youtube.com/watch?v=fMym_BKWQzk>`_).
-The Fairlearn package is most applicable to two kinds of harms:
+There are many types of harms :footcite:`barocas2017problem`.
+Some of these are:
 
 * *Allocation harms* can occur when AI systems extend or withhold
   opportunities, resources, or information. Some of the key applications are in
@@ -42,23 +38,60 @@ The Fairlearn package is most applicable to two kinds of harms:
   information are extended or withheld. Examples include varying accuracy in
   face recognition, document search, or product recommendation.
 
+* *Stereotyping harms* can occur when a system suggests completions which
+  perpetuate stereotypes.
+  These are often seen when search engines propose completions to partially
+  typed queries.
+  See :footcite:cts:`umojanoble2018algorithmsoppression` for an in-depth
+  look at this issue.
+  Note that even stereotypes which are nominally positive are also
+  problematic, since they still create expectations based on outward
+  characteristics, rather than treating people as individuals.
+
+* *Erasure harms* can occur when a system behaves as if groups (or their
+  works) do not exist.
+  For example, a text generator prompted about "Female scientists of the 1800s"
+  might not produce a result.
+  When asked about historical sites near St. Louis, Missouri, a search engine
+  might fail to mention `Cahokia <https://en.wikipedia.org/wiki/Cahokia>`_.
+  A similar query about southern Africa might overlook
+  `Great Zimbabwe <https://en.wikipedia.org/wiki/Great_Zimbabwe>`_, instead
+  concentrating on colonial era sites.
+  More subtly, a short biography of Alan Turing might not mention his
+  sexuality.
+
+This list is not exhaustive, and it is important to remember that harms
+are not mutually exclusive.
+A system can harm multiple groups of people in different ways, and also
+visit multiple harms on a single group of people.
+The Fairlearn package is most applicable to allocation and quality of service harms,
+since these are easiest to measure.
+
+.. _concept_glossary:
+
 Concept glossary
 ----------------------------
 
-The concepts outlined in this glossary are relevant to sociotechnical contexts. 
+The concepts outlined in this glossary are relevant to sociotechnical contexts.
 
 Construct validity
 ^^^^^^^^^^^^^^^^^^
-In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task. Which target variable do we intend to predict? What features will be included? What (fairness) constraints do we consider? Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
+In many cases, fairness-related harms can be traced back to the way a real-world problem is translated into a machine learning task.
+Which target variable do we intend to predict?
+What features will be included?
+What (fairness) constraints do we consider?
+Many of these decisions boil down to what social scientists refer to as measurement: the way we measure (abstract) phenomena.
 
-The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in Measurement and Fairness [#4]_ . This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation. In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
+The concepts outlined in this glossary give an introduction into the language of measurement modeling - as described in :footcite:cts:`jacobs2021measurement`.
+This framework can be a useful tool to test the validity of (implicit) assumptions of a problem formulation.
+In this way, it can help to mitigate fairness-related harms that can arise from mismatches between the formulation and the real-world context of an application.
 
-Key Terms 
+Key Terms
 ~~~~~~~~~
 
 - **Sociotechnical context** – The context surrounding a technical system, including both social aspects (e.g., people, institutions, communities) and technical aspects (e.g., algorithms, technical processes). The sociotechnical context of a system shapes who might benefit or is harmed by AI systems.
 
-- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model. 
+- **Unobservable theoretical construct** – An idea or concept that is unobservable and cannot be directly measured but must instead be inferred through observable measurements defined in a measurement model.
 
 - **Measurement model** – The method and approach used to measure the unobservable theoretical construct.
 
@@ -69,54 +102,57 @@ Key Terms
 Key Term Examples  - Unobservable theoretical constructs and Measurement models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **Fairness** is an example of an unobservable theoretical construct. Several measurement models exist for measuring fairness, including demographic parity. These measurements may come together to form a measurement model, where several measurements are combined to ultimately measure fairness.See :code:`fairlearn.metrics` for more examples of measurement models for measuring fairness.
+- **Fairness** is an example of an unobservable theoretical construct. Several measurement models exist for measuring fairness, including demographic parity. These measurements may come together to form a measurement model, where several measurements are combined to ultimately measure fairness. See :code:`fairlearn.metrics` for more examples of measurement models for measuring fairness.
 
 - **Teacher effectiveness** is an example of an unobservable theoretical construct. Common measurement models include student performance on standardized exams and qualitative feedback for the teacher’s students.
 
-- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income. 
+- **Socioeconomic status** is an example of an unobservable theoretical construct. A common measurement model includes annual household income.
 
-- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See [#5]_ for a related example. 
+- **Patient benefit** is an example of an unobservable theoretical construct. A common measurement model involves patient care costs. See :footcite:`obermeyer2019dissecting` for a related example.
 
-**Note:** We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.  Please reference Measurement and Fairness [#4]_ for more detailed examples.
- 
- 
+**Note:**
+We cite several examples of unobservable theoretical constructs and measurement models for the purpose of explaining the key terms outlined above.
+Please reference :footcite:cts:`jacobs2021measurement` for more detailed examples.
+
+
 .. _construct_validity:
 
-What is construct validity? 
+What is construct validity?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Though the Measurement and Fairness [#4]_ paper explores both construct reliability and construct validity, we focus our 
-exploration below on construct Validity. We note that both play an important role in understanding fairness in sociotechnical 
-contexts. With that said, Measurement and Fairness [#4]_ offers a fairness-oriented conceptualization of construct validity, that 
-is helpful in thinking about fairness in sociotechnical contexts. We capture the idea in seven key parts that when combined 
-can serve as a framework for analyzing an AI task and attempting to establish construct validity:
+Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our
+exploration below on construct validity.
+We note that both play an important role in understanding fairness in sociotechnical contexts.
+With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that
+is helpful in thinking about fairness in sociotechnical contexts.
+We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
 1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
 
 2. **Content validity** – This has three subcomponents:
 
-   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context        dependent).
-   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable 			   theoretical constructs related to the construct of interest (and only those)?
-   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured           observable properties and other unobservable theoretical constructs?
+   a. **Contestedness** – Is there a single understanding of the unobservable theoretical construct? Or is that understanding contested (and thus context dependent).
+   b. **Substantive validity** – Can we demonstrate that the measurement model contains the observable properties and other unobservable theoretical constructs related to the construct of interest (and only those)?
+   c. **Structural validity** – Does the measurement model appropriately capture the relationships between the construct of interest and the measured observable properties and other unobservable theoretical constructs?
 
-3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from 
-   measurement models for which construct validity has been established? 
- 
-4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with 
-   related constructs as appropriate?  
+3. **Convergent validity** – Do the measurements obtained correlate with other measurements (that exist) from
+   measurement models for which construct validity has been established?
 
-5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements 
+4. **Discriminant validity** – Do the measurements obtained for the construct of interest correlate with
+   related constructs as appropriate?
+
+5. **Predictive validity** – Are the measurements obtained from the measurement model predictive of measurements
    of any relevant observable properties or other unobservable theoretical constructs?
 
-6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements 
+6. **Hypothesis validity** – This describes the nature of the hypotheses that could emerge from the measurements
    produced by the measurement model, and whether those are “substantively interesting”.
 
-7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the 
-   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the 
+7. **Consequential validity** – Identify and evaluate the consequences and societal impacts of using the
+   measurements obtained for the measurement model. Framed as questions: how is the world shaped by using the
    measurements, and what world do we wish to live in?
 
-**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific 
-sociotechnical context. This is only intended to explain the key concepts that could be used in a 
+**Note:** The order in which the parts above are explored and the way in which they are used may vary depending on the specific
+sociotechnical context. This is only intended to explain the key concepts that could be used in a
 framework for analyzing a task.
 
 Fairness assessment and unfairness mitigation
@@ -173,18 +209,18 @@ For example, in Fairlearn, we consider the following types of parity constraints
   :math:`h` satisfies demographic parity under a distribution over
   :math:`(X, A, Y)` if its prediction :math:`h(X)` is statistically
   independent of the sensitive feature :math:`A`. This is equivalent to
-  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`. [#2]_
+  :math:`\E[h(X) \given A=a] = \E[h(X)] \quad \forall a`.  :footcite:`agarwal2018reductions`
 
 * *Equalized odds*: A classifier :math:`h` satisfies equalized odds under a
   distribution over :math:`(X, A, Y)` if its prediction :math:`h(X)` is
   conditionally independent of the sensitive feature :math:`A` given the label
   :math:`Y`. This is equivalent to
   :math:`\E[h(X) \given A=a, Y=y] = \E[h(X) \given Y=y] \quad \forall a, y`.
-  [#2]_
+  :footcite:`agarwal2018reductions`
 
 * *Equal opportunity*: a relaxed version of equalized odds that only considers
   conditional expectations with respect to positive labels, i.e., :math:`Y=1`.
-  [#1]_
+  :footcite:`hardt2016equality`
 
 *Regression*:
 
@@ -192,11 +228,11 @@ For example, in Fairlearn, we consider the following types of parity constraints
   under a distribution over :math:`(X, A, Y)` if :math:`f(X)` is independent
   of the sensitive feature :math:`A`. This is equivalent to
   :math:`\P[f(X) \geq z \given A=a] = \P[f(X) \geq z] \quad \forall a, z`.
-  [#0]_
+  :footcite:`agarwal2019fair`
 
 * *Bounded group loss*: A predictor :math:`f` satisfies bounded group loss at
   level :math:`\zeta` under a distribution over :math:`(X, A, Y)` if
-  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. [#0]_
+  :math:`\E[loss(Y, f(X)) \given A=a] \leq \zeta \quad \forall a`. :footcite:`agarwal2019fair`
 
 Above, demographic parity seeks to mitigate allocation harms, whereas bounded
 group loss primarily seeks to mitigate quality-of-service harms. Equalized
@@ -228,6 +264,7 @@ between the maximum and the minimum values. For more information refer to the
 subpackage :mod:`fairlearn.metrics`.
 
 
+
 .. _abstraction_traps:
 
 What traps can we fall into when modeling a social problem?
@@ -245,7 +282,7 @@ are interrelated.
 In this section, we explain what those traps are, and give some suggestions on
 how we can avoid them.
 
-In "Fairness and Abstraction in Sociotechnical Systems," Selbst et al. [#3]_
+In "Fairness and Abstraction in Sociotechnical Systems," :footcite:ct:`selbst2019fairness`
 identify failure modes that can arise from abstracting away the social context
 when modeling. They identify them as:
 
@@ -426,28 +463,24 @@ incorporate the processes associated with crime reporting, the offense-trial
 pipeline, and an awareness of how the relationship between various social actors and
 the algorithm may impact the intended outcomes of a given model.
 
-.. topic:: References:
+Stakeholder Identification
+--------------------------
+Introduction
+^^^^^^^^^^^^
 
-   .. [#0] Agarwal, Dudik, Wu `"Fair Regression: Quantitative Definitions and
-      Reduction-based Algorithms" <https://arxiv.org/pdf/1905.12843.pdf>`_,
-      ICML, 2019.
-   
-   .. [#1] Hardt, Price, Srebro `"Equality of Opportunity in Supervised
-      Learning"
-      <https://papers.nips.cc/paper/6374-equality-of-opportunity-in-supervised-learning.pdf>`_,
-      NIPS, 2016.
-   
-   .. [#2] Agarwal, Beygelzimer, Dudik, Langford, Wallach `"A Reductions
-      Approach to Fair Classification"
-      <https://arxiv.org/pdf/1803.02453.pdf>`_, ICML, 2018.
-	  
-   .. [#3] Selbst, Andrew D. and Boyd, Danah and Friedler, Sorelle and Venkatasubramanian,
-      Suresh and Vertesi, Janet, "Fairness and Abstraction in Sociotechnical Systems"
-      (August 23, 2018). 2019 ACM Conference on Fairness, Accountability, and Transparency
-      (FAT*), 59-68, Available at `SSRN: 	<https://ssrn.com/abstract=3265913>`_,
+Now that we've seen how AI systems can generate harms, what else should we account for when designing an AI system?
+AI systems impact not only end users but also organizations within a business, communities, civil society, government agencies, and entire industries. If practitioners do not have a process to engage stakeholders, they may rely on their personal experiences and identities instead and overlook fairness-related harms :footcite:`madaio2022assess`.  Therefore, it is important to identify the relevant stakeholders, factors, and groups that might be at the most risk of experiencing fairness-related harms before conducting a fairness assessment.
 
-   .. [#4] Jacobs, Wallach `"Measurement and Fairness"
-      <https://arxiv.org/pdf/1912.05511.pdf>`_, FAccT, 2021.
+.. _defining_terms:
 
-   .. [#5] Obermeyer, Powers, Vogeli, Mullainathan `"Dissecting racial bias in an algorithm used to manage the health of populations"
-      <https://science.sciencemag.org/content/366/6464/447>`_, Science, 2019.
+Defining terms
+^^^^^^^^^^^^^^
+**Stakeholders** include direct stakeholders, people that use or operate an AI system, or indirect stakeholders (people that could be harmed by a system that are not necessarily users or customers) :footcite:`madaio2022assess`. For example, in the case of a fraud detection AI system, there could be three types of stakeholders identified: a) people whose transactions might be mistakenly classified as fraudulent, b) companies running money-transfer platforms with the fraud detection AI system, and c) local government fraud auditors that audit the money transfer platforms' transactions.
+
+Note: Some have identified that using the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to pay attention to the context in which stakeholder identification occurs and adjust accordingly (e.g. opt for alternative terminology to avoid causing harm).
+
+**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
+
+.. topic:: References
+
+   .. footbibliography::

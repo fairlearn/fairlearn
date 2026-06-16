@@ -1,24 +1,25 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
-import numpy as np
+from test.unit.input_convertors import (
+    _map_into_single_column,
+    conversions_for_1d,
+    ensure_dataframe,
+    ensure_ndarray,
+)
+from test.unit.reductions.conftest import is_invalid_transformation
 
+import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from fairlearn.reductions import ExponentiatedGradient
-from fairlearn.reductions import DemographicParity
-from fairlearn.reductions import ErrorRate
-from fairlearn.utils._input_validation import \
-    (_LABELS_NOT_0_1_ERROR_MESSAGE)
+from fairlearn.reductions import DemographicParity, ErrorRate, ExponentiatedGradient
+from fairlearn.utils._input_validation import _LABELS_NOT_0_1_ERROR_MESSAGE
+
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data
-
-from test.unit.input_convertors import conversions_for_1d, ensure_ndarray, \
-    ensure_dataframe, _map_into_single_column
-from test.unit.reductions.conftest import is_invalid_transformation
 
 # ===============================================================
 
@@ -30,6 +31,24 @@ candidate_A_transforms = conversions_for_1d
 # ================================================================
 
 _PRECISION = 1e-6
+
+
+def test_constraints_reused_across_multiple_fits():
+    """Same constraints instance must be reusable for multiple fit() calls (#1210)."""
+    X, y, A = _get_data()
+    constraints = DemographicParity()
+    expgrad = ExponentiatedGradient(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=constraints,
+        max_iter=5,
+    )
+
+    expgrad.fit(X, y, sensitive_features=A)
+    expgrad.fit(X, y, sensitive_features=A)
+
+    assert not constraints.data_loaded
+    assert expgrad.constraints_ is not constraints
+    assert expgrad.constraints_.data_loaded
 
 
 class TestExponentiatedGradientArguments:
@@ -51,10 +70,13 @@ class TestExponentiatedGradientArguments:
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(difference_bound=eps),
-            eps=eps)
+            eps=eps,
+        )
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
-        def Q(X): return expgrad._pmf_predict(X)[:, 1]
+        def Q(X):
+            return expgrad._pmf_predict(X)[:, 1]
+
         n_predictors = len(expgrad.predictors_)
 
         disparity_moment = DemographicParity(difference_bound=eps)
@@ -64,13 +86,13 @@ class TestExponentiatedGradientArguments:
         disparity = disparity_moment.gamma(Q).max()
         disp = disparity_moment.gamma(Q)
         disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
-        error = error.gamma(Q)[0]
+        error = error.gamma(Q).iloc[0]
 
         assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
         assert expgrad.last_iter_ == 5
         assert expgrad.best_iter_ == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
-        assert (np.all(np.isclose(disp - eps, disp_eps)))
+        assert np.all(np.isclose(disp - eps, disp_eps))
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad.n_oracle_calls_ == 32
         assert n_predictors == 3
@@ -94,10 +116,12 @@ class TestExponentiatedGradientArguments:
         expgrad = ExponentiatedGradient(
             LeastSquaresBinaryClassifierLearner(),
             constraints=DemographicParity(ratio_bound_slack=eps, ratio_bound=ratio),
-            eps=eps)
+            eps=eps,
+        )
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
-        def Q(X): return expgrad._pmf_predict(X)[:, 1]
+        def Q(X):
+            return expgrad._pmf_predict(X)[:, 1]
 
         n_predictors = len(expgrad.predictors_)
 
@@ -108,13 +132,13 @@ class TestExponentiatedGradientArguments:
         disparity = disparity_moment.gamma(Q).max()
         disp = disparity_moment.gamma(Q)
         disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
-        error = error.gamma(Q)[0]
+        error = error.gamma(Q).iloc[0]
 
         assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
         assert expgrad.last_iter_ == 5
         assert expgrad.best_iter_ == 5
         assert disparity == pytest.approx(0.1, abs=_PRECISION)
-        assert (np.all(np.isclose(disp - eps, disp_eps)))
+        assert np.all(np.isclose(disp - eps, disp_eps))
         assert error == pytest.approx(0.25, abs=_PRECISION)
         assert expgrad.n_oracle_calls_ == 32
         assert n_predictors == 3
@@ -138,9 +162,20 @@ class TestExponentiatedGradientArguments:
         estimator.predict = mocker.Mock(return_value=y)
         estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
-        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(),
-                                        max_iter=1)
-        mocker.patch('copy.deepcopy', return_value=estimator)
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
+
+        from copy import deepcopy
+
+        original_deepcopy = deepcopy
+
+        def mock_deepcopy(obj, *args, **kwargs):
+            # Only intercept deepcopy of the estimator so the constraints copy follows
+            # the production path.
+            if obj is estimator:
+                return estimator
+            return original_deepcopy(obj, *args, **kwargs)
+
+        mocker.patch("copy.deepcopy", side_effect=mock_deepcopy)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
@@ -151,36 +186,39 @@ class TestExponentiatedGradientArguments:
         assert len(kwargs) == 1  # sample_weight
         assert isinstance(args[0], type(transformed_X))
         assert isinstance(args[1], pd.Series)
-        assert isinstance(kwargs['sample_weight'], pd.Series)
+        assert isinstance(kwargs["sample_weight"], pd.Series)
 
     def test_binary_classifier_0_1_required(self):
         X, y, A = _get_data()
         y = 2 * y
 
-        expgrad = ExponentiatedGradient(LogisticRegression(),
-                                        constraints=DemographicParity(),
-                                        max_iter=1)
+        expgrad = ExponentiatedGradient(
+            LogisticRegression(), constraints=DemographicParity(), max_iter=1
+        )
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
         assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
 
     def test_sample_weights_argument(self):
         estimator = Pipeline(
-            [('scaler', StandardScaler()),
-             ('logistic', LogisticRegression(solver='liblinear'))])
+            [
+                ("scaler", StandardScaler()),
+                ("logistic", LogisticRegression(solver="liblinear")),
+            ]
+        )
 
         X, y, A = _get_data()
 
-        expgrad = ExponentiatedGradient(estimator,
-                                        constraints=DemographicParity(),
-                                        max_iter=1)
+        expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
 
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
-        assert 'Pipeline.fit does not accept the sample_weight parameter' in execInfo.value.args[0]
+        assert "Pipeline.fit does not accept the sample_weight parameter" in execInfo.value.args[0]
 
-        expgrad = ExponentiatedGradient(estimator,
-                                        constraints=DemographicParity(),
-                                        max_iter=1,
-                                        sample_weight_name='logistic__sample_weight')
+        expgrad = ExponentiatedGradient(
+            estimator,
+            constraints=DemographicParity(),
+            max_iter=1,
+            sample_weight_name="logistic__sample_weight",
+        )
         expgrad.fit(X, y, sensitive_features=(A))
