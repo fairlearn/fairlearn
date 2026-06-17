@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 
-from fairlearn.metrics import RocAuc, plot_model_comparison
+from fairlearn.metrics import plot_model_comparison, plot_roc_curve_by_group
 from fairlearn.postprocessing import ThresholdOptimizer, plot_threshold_optimizer
 from fairlearn.postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from fairlearn.postprocessing._threshold_optimizer import SIMPLE_CONSTRAINTS
@@ -59,10 +59,6 @@ def test_no_matplotlib_roc_auc():
     y_score = np.array([0.1, 0.9, 0.2, 0.8, 0.3, 0.7, 0.25, 0.75])
     sensitive_features = np.array(["a", "a", "b", "b", "a", "a", "b", "b"])
 
-    # Constructing the object and computing scores must not require matplotlib.
-    roc_auc = RocAuc(y_true=y_true, y_score=y_score, sensitive_features=sensitive_features)
-    roc_auc.auc_by_group()
-
     with pytest.raises(RuntimeError) as exc:
-        roc_auc.plot_by_group()
+        plot_roc_curve_by_group(y_true, y_score, sensitive_features=sensitive_features)
     assert str(exc.value) == _MATPLOTLIB_IMPORT_ERROR_MESSAGE
