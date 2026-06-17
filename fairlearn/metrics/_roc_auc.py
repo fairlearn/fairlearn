@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import pandas as pd
 from numpy import asarray, zeros
 from sklearn.metrics import RocCurveDisplay
 
@@ -26,7 +27,6 @@ def plot_roc_curve_by_group(
     plot_chance_level=True,
     pos_label=None,
     title=None,
-    **kwargs,
 ):
     r"""Plot ROC curves for a binary classifier disaggregated by sensitive feature.
 
@@ -78,11 +78,6 @@ def plot_roc_curve_by_group(
     title : str, optional
         The title to set on the axes, for example the name of the estimator.
 
-    **kwargs
-        Additional keyword arguments forwarded to every
-        :meth:`sklearn.metrics.RocCurveDisplay.from_predictions` call, which in
-        turn forwards them to :meth:`matplotlib.axes.Axes.plot`.
-
     Returns
     -------
     matplotlib.axes.Axes
@@ -107,22 +102,30 @@ def plot_roc_curve_by_group(
         mf.overall   # AUC over the whole dataset
 
     Each subgroup must contain both classes for its ROC curve and AUC to be
-    well defined.
+    well defined. To further customize the appearance of the plot, pass an
+    existing :class:`matplotlib.axes.Axes` via ``ax`` or restyle the returned
+    Axes.
     """
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
 
-    _, y_true, sensitive_features, _ = _validate_and_reformat_input(
-        zeros((len(y_true), 1)),  # dummy X; only y and sensitive_features are needed
-        y=y_true,
-        sensitive_features=sensitive_features,
-    )
-    y_true = y_true.values
+    y_true = asarray(y_true)
     y_score = asarray(y_score)
     if y_score.shape[0] != y_true.shape[0]:
         raise ValueError(_INCONSISTENT_ARRAY_LENGTH.format("y_true and y_score"))
+
+    # Validate and merge the sensitive feature(s) into a single Series of group
+    # names without coercing y_true, so that non-numeric class labels remain
+    # usable together with pos_label.
+    if isinstance(sensitive_features, dict):
+        sensitive_features = pd.DataFrame(sensitive_features)
+    *_, sensitive_features, _ = _validate_and_reformat_input(
+        zeros((len(y_true), 1)),  # dummy X; only sensitive_features is needed
+        expect_y=False,
+        sensitive_features=sensitive_features,
+    )
 
     if ax is None:
         _, ax = plt.subplots()
@@ -137,7 +140,6 @@ def plot_roc_curve_by_group(
             name=_OVERALL_LABEL,
             pos_label=pos_label,
             ax=ax,
-            **kwargs,
         )
 
     for group in sorted(sensitive_features.unique()):
@@ -148,7 +150,6 @@ def plot_roc_curve_by_group(
             name=str(group),
             pos_label=pos_label,
             ax=ax,
-            **kwargs,
         )
 
     if title is not None:

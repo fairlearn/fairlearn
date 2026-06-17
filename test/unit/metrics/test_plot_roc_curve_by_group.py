@@ -134,3 +134,84 @@ class TestPlotRocCurveByGroup:
     def test_inconsistent_lengths_raise(self):
         with pytest.raises(ValueError):
             plot_roc_curve_by_group(y_t, y_score[:-1], sensitive_features=g_1)
+
+    def test_accepts_list_inputs(self):
+        ax = plot_roc_curve_by_group(
+            list(y_t),
+            list(y_score),
+            sensitive_features=list(g_1),
+            plot_overall=False,
+            plot_chance_level=False,
+        )
+        assert len(ax.get_lines()) == len(np.unique(g_1))
+
+    def test_accepts_pandas_series_inputs(self):
+        import pandas as pd
+
+        ax = plot_roc_curve_by_group(
+            pd.Series(y_t),
+            pd.Series(y_score),
+            sensitive_features=pd.Series(g_1),
+            plot_overall=False,
+            plot_chance_level=False,
+        )
+        assert len(ax.get_lines()) == len(np.unique(g_1))
+
+    def test_accepts_dict_sensitive_features(self):
+        ax = plot_roc_curve_by_group(
+            y_t,
+            y_score,
+            sensitive_features={"first": g_1, "second": g_2},
+            plot_overall=False,
+            plot_chance_level=False,
+        )
+        assert len(ax.get_lines()) == len(set(zip(g_1, g_2)))
+
+    def test_single_subgroup(self):
+        sensitive_features = np.zeros_like(y_t)
+        ax = plot_roc_curve_by_group(
+            y_t,
+            y_score,
+            sensitive_features=sensitive_features,
+            plot_overall=False,
+            plot_chance_level=False,
+        )
+        assert len(ax.get_lines()) == 1
+
+    def test_overall_only(self):
+        ax = plot_roc_curve_by_group(
+            y_t,
+            y_score,
+            sensitive_features=g_1,
+            plot_chance_level=False,
+        )
+        labels = [line.get_label() for line in ax.get_lines()]
+        assert len(ax.get_lines()) == len(np.unique(g_1)) + 1
+        assert "Chance level (AUC = 0.50)" not in labels
+
+    def test_chance_only(self):
+        ax = plot_roc_curve_by_group(
+            y_t,
+            y_score,
+            sensitive_features=g_1,
+            plot_overall=False,
+        )
+        labels = [line.get_label() for line in ax.get_lines()]
+        assert len(ax.get_lines()) == len(np.unique(g_1)) + 1
+        assert _expected_label("Overall", y_t, y_score) not in labels
+
+    def test_string_labels_with_pos_label(self):
+        y_str = np.where(y_t == 1, "yes", "no")
+        ax = plot_roc_curve_by_group(
+            y_str,
+            y_score,
+            sensitive_features=g_1,
+            pos_label="yes",
+            plot_overall=False,
+            plot_chance_level=False,
+        )
+        labels = [line.get_label() for line in ax.get_lines()]
+        for group in np.unique(g_1):
+            mask = g_1 == group
+            expected_auc = roc_auc_score((y_str[mask] == "yes").astype(int), y_score[mask])
+            assert f"{group} (AUC = {expected_auc:0.2f})" in labels
