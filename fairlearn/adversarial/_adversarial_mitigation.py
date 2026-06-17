@@ -482,11 +482,7 @@ class _AdversarialFairness(BaseEstimator):
                                     " " * round(20 * (1 - progress)),
                                     epoch + 1,
                                     epochs,
-                                    " "
-                                    * (
-                                        len(str(batch + 1))
-                                        - len(str(batches))
-                                    ),
+                                    " " * (len(str(batch + 1)) - len(str(batches))),
                                     batch + 1,
                                     batches,
                                     ETA,
