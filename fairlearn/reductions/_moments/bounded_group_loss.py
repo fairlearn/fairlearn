@@ -148,7 +148,7 @@ class SquareLoss:
         self.min = 0
         self.max = (max_val - min_val) ** 2
 
-    def eval(self, y_true, y_pred):  # noqa: A003
+    def eval(self, y_true, y_pred):
         """Evaluate the square loss for the given set of true and predicted values."""
         return (
             np.clip(y_true, self.min_val, self.max_val)
@@ -168,7 +168,7 @@ class AbsoluteLoss:
         self.min = 0
         self.max = np.abs(max_val - min_val)
 
-    def eval(self, y_true, y_pred):  # noqa: A003
+    def eval(self, y_true, y_pred):
         """Evaluate the absolute loss for the given set of true and predicted values."""
         return np.abs(
             np.clip(y_true, self.min_val, self.max_val)

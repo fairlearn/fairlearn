@@ -6,8 +6,6 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 
-import fairlearn.utils._compatibility as compat
-
 
 class FloatTransformer(TransformerMixin, BaseEstimator):
     """Transformer that converts input data to numpy arrays of floats.
@@ -88,7 +86,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
                 self.transform_ = OneHotEncoder(
                     drop="if_binary",
                     handle_unknown="error",
-                    **compat._SPARSE_OUTPUT_FALSE,
+                    sparse_output=False,
                 )
                 self.transform_.fit(X)
                 self.n_features_out_ = sum(
