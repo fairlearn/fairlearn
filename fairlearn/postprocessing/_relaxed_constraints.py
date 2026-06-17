@@ -14,10 +14,7 @@ def maximize_objective_with_tolerance(
     x_col: str = "x",
     y_col: str = "y",
 ) -> tuple[list[int], float]:
-    """Find indices that maximize the sum of weighted `y` values across multiple DataFrames.
-
-    The selection is made under the constraint that the range of the associated `x` values is
-    at most equal to `tol`.
+    """Find the indices that maximize the sum of weighted `y` values across multiple DataFrames under the constraint that the range of the associated `x` values is at most equal to `tol`.
 
     Parameters
     ----------

@@ -136,9 +136,7 @@ def _calc_dataframe_quantiles(
 
 
 def _align_sample_indices(samples: list[pd.DataFrame]) -> list[pd.DataFrame]:
-    """Align indices of bootstrapped DataFrames so all feature combinations are present.
-
-    All combinations of sensitive and control feature values are made present in all the samples.
+    """Align the indices of the bootstrapped DataFrames, so that all the combinations of sensitive and control feature values are present in all the samples.
 
     This is achieved by reindexing them to a common outer union of all indices, filling the missing
     combinations with NaNs.

@@ -26,10 +26,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator):
-    r"""Learn a latent representation of the input data that obfuscates sensitive features.
-
-    The transformer/classifier learns a latent representation of the input data to obfuscate the
-    sensitive features while preserving the classification and reconstruction performance.
+    r"""A transformer and classifier that learns a latent representation of the input data to obfuscate the sensitive features while preserving the classification and reconstruction performance.
 
     The model minimizes a loss function that consists of three terms: the reconstruction error,
     the classification error, and an approximation of the demographic parity difference.
