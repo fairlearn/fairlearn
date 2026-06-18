@@ -29,6 +29,25 @@ found in the files of the respective classes and methods. For example, take a lo
 of the :code:`CorrelationRemover` and the corresponding
 `generated page <file:///Users/tamara/FOSS/fairlearn/docs/_build/html/api_reference/generated/fairlearn.preprocessing.CorrelationRemover.html>`_.
 
+API docstrings
+^^^^^^^^^^^^^^
+
+API reference pages are generated from NumPy style docstrings. In ``Parameters`` sections,
+write parameter declarations as ``name : type`` so numpydoc can parse the parameter name
+and render inline ReST in the type and default text. For example:
+
+.. code-block:: text
+
+    errors : {'raise', 'coerce'}, default :code:`coerce`
+
+Parameter types are cross-linked by numpydoc when they match known aliases in
+``docs/conf.py`` or are written with explicit ReST roles. Common Python, NumPy, and pandas
+types are configured there. Unknown type words are left as plain text, so the docs build
+does not require every third-party type to be linked. If a new third-party type should link,
+for example a scikit-learn or Narwhals class, either write an explicit ``:class:`` role
+targeting the fully qualified class or add a matching intersphinx mapping and alias in
+``docs/conf.py``.
+
 Contributing
 ^^^^^^^^^^^^
 
