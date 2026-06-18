@@ -122,6 +122,12 @@ master_doc = "index"
 #
 html_theme = "pydata_sphinx_theme"
 
+# Sphinx 8 introduced a config-cache feature that warns when a config value
+# can't be pickled. `sphinx_gallery_conf` contains a function reference
+# (`notebook_modification_function`), which is unpickleable. Suppress the
+# warning since incremental build caching for this value isn't needed.
+suppress_warnings = ["config.cache"]
+
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.

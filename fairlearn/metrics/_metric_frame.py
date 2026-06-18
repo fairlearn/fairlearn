@@ -182,9 +182,9 @@ class MetricFrame:
 
     Access the largest difference, smallest ratio, and worst case performance
 
-    >>> print(f"difference: {mf1.difference()[0]:.3}   "
-    ...      f"ratio: {mf1.ratio()[0]:.3}   "
-    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    >>> print(f"difference: {mf1.difference().iloc[0]:.3}   "
+    ...      f"ratio: {mf1.ratio().iloc[0]:.3}   "
+    ...      f"max across groups: {mf1.group_max().iloc[0]:.3}")
     difference: 0.4   ratio: 0.5   max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
