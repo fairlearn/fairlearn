@@ -13,7 +13,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 
 import fairlearn.datasets as fld
-import fairlearn.utils._compatibility as compat
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
@@ -139,7 +138,7 @@ def run_AdversarialFairness_classification(estimator):
         ct = make_column_transformer(
             (StandardScaler(), make_column_selector(dtype_include=number)),
             (
-                OneHotEncoder(drop="if_binary", **compat._SPARSE_OUTPUT_FALSE),
+                OneHotEncoder(drop="if_binary", sparse_output=False),
                 make_column_selector(dtype_include="category"),
             ),
         )
