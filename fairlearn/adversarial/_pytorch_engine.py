@@ -164,7 +164,6 @@ class PytorchEngine(BackendEngine):
         model : torch.nn.Module
             initialized model with layers as specified.
         """
-
         activation_lookup = {
             "sigmoid": torch.nn.Sigmoid,
             "softmax": torch.nn.Softmax,

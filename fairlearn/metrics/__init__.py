@@ -38,7 +38,7 @@ from ._fairness_metrics import equal_opportunity_difference  # noqa: F401
 from ._fairness_metrics import equal_opportunity_ratio  # noqa: F401
 from ._fairness_metrics import equalized_odds_difference  # noqa: F401
 from ._fairness_metrics import equalized_odds_ratio  # noqa: F401
-from ._generated_metrics import _generated_metric_dict  # noqa: F401
+from ._generated_metrics import _generated_metric_dict
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401
 from ._plot_model_comparison import plot_model_comparison  # noqa: F401
