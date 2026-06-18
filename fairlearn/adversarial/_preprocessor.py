@@ -8,8 +8,7 @@ from sklearn.utils.multiclass import type_of_target
 
 
 class FloatTransformer(TransformerMixin, BaseEstimator):
-    """
-    Transformer that converts input data to numpy arrays of floats.
+    """Transformer that converts input data to numpy arrays of floats.
 
     This class acts as a wrapper around scikit-learn transformers, automatically
     inferring the data type and applying appropriate transformations. It serves
@@ -20,19 +19,20 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
     3. Passes numerical data through without modification.
     4. Ensures all output is in the form of floating-point numpy arrays.
 
-    Attributes:
-        transformer : str, sklearn.base.TransformerMixin, or None
-            Specifies the transformation method. Can be "auto", a specific transformer
-            name (e.g., "one_hot_encoder"), None for pass-through, or a custom transformer object.
+    Attributes
+    ----------
+    transformer : str, sklearn.base.TransformerMixin, or None
+        Specifies the transformation method. Can be "auto", a specific transformer
+        name (e.g., "one_hot_encoder"), None for pass-through, or a custom transformer object.
 
-    Note:
-        When using "auto", the class will attempt to choose the most appropriate
-        transformation based on the input data type.
+    Notes
+    -----
+    When using "auto", the class will attempt to choose the most appropriate
+    transformation based on the input data type.
     """
 
     def __init__(self, transformer="auto"):
-        """
-        Initialize empty transformers with the given distribution assumption.
+        """Initialize empty transformers with the given distribution assumption.
 
         Parameters
         ----------

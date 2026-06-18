@@ -344,8 +344,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         return self
 
     def predict(self, X, *, sensitive_features, random_state=None):
-        """Predict label for each sample in X while taking into account \
-            sensitive features.
+        """Predict label for each sample in X while taking into account sensitive features.
 
         Parameters
         ----------

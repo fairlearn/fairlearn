@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-"""This module contains methods which operate on a predictor, rather than an estimator.
+"""Methods which operate on a predictor, rather than an estimator.
 
 The predictor's output is adjusted to fulfill specified parity constraints. The postprocessors
 learn how to adjust the predictor's output from the training data.

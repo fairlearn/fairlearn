@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+"""Custom warning and exception types raised by Fairlearn."""
+
 
 class DataFairnessWarning(UserWarning):
     """Custom warning meant to be raised when loading datasets with fairness issues."""
