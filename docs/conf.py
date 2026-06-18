@@ -87,6 +87,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
+    "narwhals": ("https://narwhals-dev.github.io/narwhals/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "pytorch": ("https://pytorch.org/docs/stable/", None),
     "tensorflow": (
@@ -109,14 +110,30 @@ numpydoc_show_class_members = False
 numpydoc_xref_param_type = True
 numpydoc_xref_ignore = "all"
 numpydoc_xref_aliases = {
+    "BaseEstimator": "sklearn.base.BaseEstimator",
+    "Bunch": "sklearn.utils.Bunch",
     "DataFrame": "pandas.DataFrame",
+    "IntoDataFrame": "narwhals.typing.IntoDataFrame",
+    "IntoDataFrameT": "narwhals.typing.IntoDataFrameT",
+    "LazyFrame": "narwhals.LazyFrame",
     "numpy.ndarray": ":class:`numpy.ndarray`",
     "numpy.random.RandomState": ":class:`numpy.random.RandomState`",
+    "Pipeline": "sklearn.pipeline.Pipeline",
     "Series": "pandas.Series",
+    "TransformerMixin": "sklearn.base.TransformerMixin",
+    "narwhals.DataFrame": ":class:`narwhals.DataFrame`",
+    "narwhals.LazyFrame": ":class:`narwhals.LazyFrame`",
+    "narwhals.Series": ":class:`narwhals.Series`",
+    "narwhals.typing.IntoDataFrame": "narwhals.typing.IntoDataFrame",
+    "narwhals.typing.IntoDataFrameT": "narwhals.typing.IntoDataFrameT",
     "pd.DataFrame": "pandas.DataFrame",
     "pd.Series": "pandas.Series",
     "pandas.DataFrame": ":class:`pandas.DataFrame`",
     "pandas.Series": ":class:`pandas.Series`",
+    "sklearn.base.BaseEstimator": ":class:`sklearn.base.BaseEstimator`",
+    "sklearn.base.TransformerMixin": ":class:`sklearn.base.TransformerMixin`",
+    "sklearn.pipeline.Pipeline": ":class:`sklearn.pipeline.Pipeline`",
+    "sklearn.utils.Bunch": ":class:`sklearn.utils.Bunch`",
 }
 
 
