@@ -206,7 +206,7 @@ class _AdversarialFairness(BaseEstimator):
         Maximum number of training iterations to perform. If set to -1, the number
         of iterations is determined by epochs parameter. Either epochs or max_iter
         must be positive.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -270,10 +270,14 @@ class _AdversarialFairness(BaseEstimator):
         Infers appropriate losses and functions if not explicitly defined.
         Called from `fit` method, not `__init__`, following sklearn API.
 
-        Parameters:
-        X : array-like, input features
-        y : array-like, target values
-        A : array-like, sensitive features
+        Parameters
+        ----------
+        X : array-like
+            Input features.
+        y : array-like
+            Target values.
+        A : array-like
+            Sensitive features.
         """
         self._validate_backend()
 
@@ -527,8 +531,7 @@ class _AdversarialFairness(BaseEstimator):
         return self
 
     def partial_fit(self, X, y, *, classes=None, sensitive_features=None):
-        """
-        Perform one training step on given samples and update model.
+        """Perform one training step on given samples and update model.
 
         This method allows for incremental fitting on batches of data.
 
@@ -554,7 +557,6 @@ class _AdversarialFairness(BaseEstimator):
         self : object
             Returns self.
         """
-
         first_call = not hasattr(self, "classes_")
 
         if first_call and classes is not None:
@@ -989,7 +991,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -1181,7 +1183,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,

@@ -110,7 +110,7 @@ def plot_model_comparison(
 
     In case no Axes object is supplied, axis labels are
     automatically inferred from their class name.
-    """  # noqa: E501
+    """
     # --- CHECK DEPENDENCY ---
     try:
         import matplotlib.pyplot as plt
