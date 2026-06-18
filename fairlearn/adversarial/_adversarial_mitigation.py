@@ -481,18 +481,17 @@ class _AdversarialFairness(BaseEstimator):
                             )
                             # + 1e-6 for numerical stability
                             logger.info(
-                                _PROGRESS_UPDATE.format(
-                                    "=" * round(20 * progress),
-                                    " " * round(20 * (1 - progress)),
-                                    epoch + 1,
-                                    epochs,
-                                    " " * (len(str(batch + 1)) - len(str(batches))),
-                                    batch + 1,
-                                    batches,
-                                    ETA,
-                                    predictor_losses[-1],
-                                    adversary_losses[-1],
-                                )
+                                _PROGRESS_UPDATE,
+                                "=" * round(20 * progress),
+                                " " * round(20 * (1 - progress)),
+                                epoch + 1,
+                                epochs,
+                                " " * (len(str(batch + 1)) - len(str(batches))),
+                                batch + 1,
+                                batches,
+                                ETA,
+                                predictor_losses[-1],
+                                adversary_losses[-1],
                             )
                 batch_slice = slice(
                     batch * batch_size,
