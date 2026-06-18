@@ -1,3 +1,51 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fairlearn"
+description = "A Python package to assess and improve fairness of machine learning models."
+readme = "README.rst"
+license = "MIT"
+dynamic = ["version"]
+requires-python = ">=3.11"
+authors = [
+    { name = "Miroslav Dudik" },
+    { name = "Richard Edgar" },
+    { name = "Adrin Jalali" },
+    { name = "Roman Lutz" },
+    { name = "Michael Madaio" },
+    { name = "Hilde Weerts" },
+    { name = "Allie Saizan" },
+    { name = "Tamara Atanasoska" },
+    { name = "Tahar Allouche" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+]
+dependencies = [
+    "narwhals>=1.14.0",
+    "numpy>=1.24.4",
+    "pandas>=2.0.3",
+    "scikit-learn>=1.6.0",
+    "scipy>=1.9.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/fairlearn/fairlearn"
+
+[tool.setuptools.dynamic]
+version = { attr = "fairlearn.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["fairlearn*"]
+exclude = ["test*", "test_othermlpackages*"]
+
 [tool.black]
 line-length = 99
 target_version = ['py311', 'py312', 'py313', 'py314']
@@ -88,8 +136,10 @@ notice-rgx = "# (?i)Copyright \\(C\\) (Microsoft Corporation and )?Fairlearn con
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
-#Enable linting according to the new numpy API with NPY201
-select = ["E4", "E7", "E9", "F", "NPY201"]
+# Enable linting according to the new numpy API with NPY201.
+# Enable pydocstyle (`D`); the numpy convention is configured below to match
+# the project's use of numpydoc.
+select = ["E4", "E7", "E9", "F", "NPY201", "D"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -98,6 +148,9 @@ unfixable = []
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -128,5 +181,10 @@ docstring-code-line-length = "dynamic"
 
 [tool.ruff.lint.per-file-ignores]
 # It's fine not to put the import at the top of the file in the examples
-# folder.
-"examples/*"=["E402"]
+# folder. Docstrings (`D`) are not required for tests, examples, scripts,
+# or the docs build configuration.
+"examples/*" = ["E402", "D"]
+"test/**" = ["D"]
+"test_othermlpackages/**" = ["D"]
+"scripts/**" = ["D"]
+"docs/**" = ["D"]

@@ -110,7 +110,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         eta0: float = 2.0,
         run_linprog_step: bool = True,
         sample_weight_name: str = "sample_weight",
-    ):  # noqa: D103
+    ):
         self.estimator = estimator
         self.constraints = constraints
         self.objective = objective

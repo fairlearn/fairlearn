@@ -18,7 +18,7 @@ from ._metric_frame import check_consistent_length
 _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE = "Empty y_pred passed to selection_rate function."
 _TOO_MANY_UNIQUE_Y_VALS = "Must have no more than two unique y values"
 _RESTRICTED_VALS_IF_POS_LABEL_NONE = (
-    "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"  # noqa: E501
+    "If pos_label is not specified, values must be from {0, 1} or {-1, 1}"
 )
 _NEED_POS_LABEL_IN_Y_VALS = "Must have pos_label in y values"
 
