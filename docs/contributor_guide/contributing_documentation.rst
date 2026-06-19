@@ -52,7 +52,8 @@ The instructions below are an addition to the instructions on the
 instructions on that page, and return to follow the further
 documentation specific guidelines.
 
-You may also need to install `pandoc <https://pandoc.org/installing.html>`_, `optipng <https://optipng.sourceforge.net>`_ and :code:`matplotlib`.
+You may also need to install `pandoc <https://pandoc.org/installing.html>`_,
+:code:`optipng`, and :code:`matplotlib`.
 
 .. prompt:: bash
 
