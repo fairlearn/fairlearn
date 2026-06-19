@@ -20,34 +20,29 @@ repository. The documentation is generated following paths of that folder.
 The home page is static and can be found in a
 `subfolder <https://github.com/fairlearn/fairlearn/tree/main/docs/static_landing_page>`_.
 
-The `API reference <file:///Users/tamara/FOSS/fairlearn/docs/_build/html/api_reference/index.html>`_
-documentation is also generated from the page structure defined
-in the `docs folder <https://github.com/fairlearn/fairlearn/tree/main/docs/api_reference>`_.
-However, the content of the generated pages is taken from the NumPy style docstrings
-found in the files of the respective classes and methods. For example, take a look at the
+The `API reference <https://fairlearn.org/main/api_reference/index.html>`_ is generated
+from the page structure defined in the
+`docs folder <https://github.com/fairlearn/fairlearn/tree/main/docs/api_reference>`_.
+The content of the generated API pages comes from NumPy style docstrings found in the
+files of the respective classes and methods. For example, take a look at the
 `code and docstrings <https://github.com/fairlearn/fairlearn/blob/main/fairlearn/preprocessing/_correlation_remover.py>`_
 of the :code:`CorrelationRemover` and the corresponding
-`generated page <file:///Users/tamara/FOSS/fairlearn/docs/_build/html/api_reference/generated/fairlearn.preprocessing.CorrelationRemover.html>`_.
+`generated page <https://fairlearn.org/main/api_reference/generated/fairlearn.preprocessing.CorrelationRemover.html>`_.
 
-API docstrings
-^^^^^^^^^^^^^^
-
-API reference pages are generated from NumPy style docstrings. In ``Parameters`` sections,
-write parameter declarations as ``name : type`` so numpydoc can parse the parameter name
-and render inline ReST in the type and default text. For example:
+In API docstring ``Parameters`` sections, numpydoc parses declarations of the form
+``name : type``. This lets it identify the parameter name and render inline ReST in the
+type and default text. For example:
 
 .. code-block:: text
 
     errors : {'raise', 'coerce'}, default :code:`coerce`
 
-Parameter types are cross-linked by numpydoc when they match known aliases in
-``docs/conf.py`` or are written with explicit ReST roles. Common Python, NumPy, pandas,
-scikit-learn, and Narwhals types are configured there. Unknown type words are left as
-plain text, so the docs build does not require every third-party type to be linked. If a
-new third-party type should link, either write an explicit ``:class:`` role targeting the
-fully qualified class or add a matching intersphinx mapping and alias in ``docs/conf.py``.
-Generic words such as ``estimator`` should stay plain text unless they refer to a specific
-class.
+Parameter types can be cross-linked when they match known aliases in ``docs/conf.py`` or
+are written with explicit ReST roles. Common Python, NumPy, pandas, scikit-learn, and
+Narwhals types are configured there. Unknown type words are left as plain text, which
+avoids unresolved references for generic descriptions such as ``estimator``. For new
+third-party types that should link, add a targeted intersphinx mapping and alias in
+``docs/conf.py`` or use an explicit ``:class:`` role.
 
 Contributing
 ^^^^^^^^^^^^
