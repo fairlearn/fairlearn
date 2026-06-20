@@ -108,6 +108,14 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
     -------
     float
         The true positive rate for the data
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import true_positive_rate
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> true_positive_rate(y_true, y_pred).item()
+    0.8
     """
     unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
@@ -147,6 +155,14 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
     -------
     float
         The true negative rate for the data
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import true_negative_rate
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> true_negative_rate(y_true, y_pred).item()
+    0.6666666666666666
     """
     unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
@@ -186,6 +202,14 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
     -------
     float
         The false positive rate for the data
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import false_positive_rate
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> false_positive_rate(y_true, y_pred).item()
+    0.3333333333333333
     """
     unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
@@ -225,6 +249,14 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
     -------
     float
         The false negative rate for the data
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import false_negative_rate
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> false_negative_rate(y_true, y_pred).item()
+    0.2
     """
     unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
@@ -259,6 +291,14 @@ def count(y_true, y_pred) -> int:
     -------
     int
         The number of data points in each group.
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import count
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> count(y_true, y_pred)
+    8
     """
     check_consistent_length(y_true, y_pred)
     return len(y_true)
@@ -287,6 +327,14 @@ def mean_prediction(y_true, y_pred, sample_weight=None) -> float:
     -------
     float
         The (weighted) mean prediction
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import mean_prediction
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> mean_prediction(y_true, y_pred).item()
+    0.625
     """
     y_p = _convert_to_ndarray_and_squeeze(y_pred)
     s_w = np.ones(len(y_p))
@@ -324,6 +372,14 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
     -------
     float
         The selection rate
+
+    Examples
+    --------
+    >>> from fairlearn.metrics import selection_rate
+    >>> y_true = [0, 1, 1, 0, 1, 1, 0, 1]
+    >>> y_pred = [0, 1, 0, 0, 1, 1, 1, 1]
+    >>> selection_rate(y_true, y_pred).item()
+    0.625
     """
     selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
     if len(selected) == 0:
