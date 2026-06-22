@@ -13,7 +13,7 @@ repos:
 # requirements-dev.txt
 # linting.yml
 # .pre-commit-config.yaml
-    rev: 24.4.2
+    rev: 26.3.1
     hooks:
     -   id: black
 -   repo: https://github.com/PyCQA/isort

@@ -60,6 +60,24 @@ not_fitted_error_msg = (
 )
 
 
+def test_constraints_reused_across_multiple_fits():
+    """Same constraints instance must be reusable for multiple fit() calls (#1210)."""
+    X, y, A = _quick_data()
+    constraints = DemographicParity()
+    gs = GridSearch(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=constraints,
+        grid_size=2,
+    )
+
+    gs.fit(X, y, sensitive_features=A)
+    gs.fit(X, y, sensitive_features=A)
+
+    assert not constraints.data_loaded
+    assert gs.constraints_ is not constraints
+    assert gs.constraints_.data_loaded
+
+
 # Base class for tests
 # Tests which must be passed by all calls to the GridSearch
 # go here

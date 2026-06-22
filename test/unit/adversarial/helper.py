@@ -106,6 +106,18 @@ class fake_torch:
         Sigmoid = lambda: type("Sigmoid", (), {"__call__": lambda x: x})  # noqa: E731
         Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
 
+        def Tanh():
+            return type("Tanh", (), {"__call__": lambda x: x})
+
+        def GELU():
+            return type("GELU", (), {"__call__": lambda x: x})
+
+        def ELU():
+            return type("ELU", (), {"__call__": lambda x: x})
+
+        def SELU():
+            return type("SELU", (), {"__call__": lambda x: x})
+
         class ModuleList:  # noqa: D106
             def __init__(self, layers):
                 self.layers = layers
@@ -148,7 +160,24 @@ class fake_keras:
 
     class activations:  # noqa: D106
         def deserialize(item):
-            return type(item, (), {"__call__": lambda x: x})
+            # Mirror keras.activations.deserialize: recognized lowercase
+            # activation identifiers resolve to a callable, while
+            # unrecognized strings (such as capitalized names) are returned
+            # unchanged, exactly as real keras does. This ensures the engine
+            # must lower-case activation strings before deserializing them.
+            known = {
+                "sigmoid",
+                "softmax",
+                "relu",
+                "leaky_relu",
+                "tanh",
+                "gelu",
+                "elu",
+                "selu",
+            }
+            if item in known:
+                return type(item, (), {"__call__": lambda x: x})
+            return item
 
     class layers:  # noqa: D106
         class Dense:  # noqa: D106

@@ -6,9 +6,7 @@ from collections.abc import Iterable
 import narwhals.stable.v1 as nw
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
-
-from fairlearn.utils._fixes import validate_data
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class CorrelationRemover(TransformerMixin, BaseEstimator):
@@ -103,17 +101,17 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         # correctly handle a 1d input
         X = validate_data(self, X, ensure_2d=False, ensure_min_samples=0)
         if len(X.shape) == 1:
-            return {0: 0}
+            self.lookup_ = {0: 0}
+            return X
         self.lookup_ = {i: i for i in range(X.shape[1])}
         return X
 
     def fit(self, X, y=None):
-        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
-
+        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""
         first_call = not hasattr(self, "_n_features_in_")
 
         self._check_sensitive_features_in_X(X)
-        self._create_lookup(X)
+        X = self._create_lookup(X)
         X = validate_data(self, X)
 
         if not first_call:
@@ -137,6 +135,10 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
     def transform(self, X):
         """Transform X by applying the correlation remover."""
         check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_", "sensitive_mean_"])
+
+        X = nw.from_native(X, pass_through=True, eager_only=True)
+        if isinstance(X, nw.DataFrame):
+            X = X.to_numpy()
 
         X = validate_data(self, X)
         if self._n_features_in_ != X.shape[1]:
