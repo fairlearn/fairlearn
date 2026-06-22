@@ -82,6 +82,12 @@ class MetricFrame:
 
     Read more in the :ref:`User Guide <assessment>`.
 
+    .. versionadded:: 0.5.0
+
+    .. versionchanged:: 0.7.0
+        The ``metric`` argument was renamed to ``metrics`` and constructor
+        arguments became keyword-only.
+
     Parameters
     ----------
     metrics : callable or dict
@@ -176,9 +182,9 @@ class MetricFrame:
 
     Access the largest difference, smallest ratio, and worst case performance
 
-    >>> print(f"difference: {mf1.difference()[0]:.3}   "
-    ...      f"ratio: {mf1.ratio()[0]:.3}   "
-    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    >>> print(f"difference: {mf1.difference().iloc[0]:.3}   "
+    ...      f"ratio: {mf1.ratio().iloc[0]:.3}   "
+    ...      f"max across groups: {mf1.group_max().iloc[0]:.3}")
     difference: 0.4   ratio: 0.5   max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
@@ -598,15 +604,15 @@ class MetricFrame:
 
         Parameters
         ----------
-        disagg_result: The DisaggregatedResult containing all the metrics
-        grouping_function: string {'min', 'max'}
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        disagg_result : The DisaggregatedResult containing all the metrics
+        grouping_function : string {'min', 'max'}
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
-        typing.Any pandas.Series or pandas.DataFrame
+        typing.Any or pandas.Series or pandas.DataFrame
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
@@ -650,7 +656,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -688,7 +694,7 @@ class MetricFrame:
     def group_min(
         self, errors: Literal["raise", "coerce"] = "raise"
     ) -> Any | pd.Series | pd.DataFrame:
-        """Return the maximum value of the metric over the sensitive features.
+        """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
         sensitive features for each underlying metric function in the :attr:`.by_group`
@@ -701,14 +707,14 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
-            The maximum value over sensitive features. The exact type
+            The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in _VALID_ERROR_STRING:
@@ -766,7 +772,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -846,7 +852,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
