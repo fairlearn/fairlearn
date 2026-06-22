@@ -1025,13 +1025,14 @@ def test_threshold_optimizer_tie_thresholds():
 
 def test_threshold_optimizer_works_with_3d_X():
     # 3-D feature array (e.g., images or time-series windows)
-    X = np.random.rand(20, 3, 2)  # shape = (n_samples, dim1, dim2)
+    rng = np.random.RandomState(42)
+    X = rng.rand(20, 3, 2)  # shape = (n_samples, dim1, dim2)
 
-    y = np.random.randint(0, 2, size=20)
-    sensitive_features = np.random.randint(0, 2, size=20)
+    y = rng.randint(0, 2, size=20)
+    sensitive_features = rng.randint(0, 2, size=20)
 
     # simple score function
-    scores = np.random.rand(20)
+    scores = rng.rand(20)
 
     # ThresholdOptimizer should handle 3-D X inputs without shape errors
     # The estimator is already prefit; behavior should not depend on X dimensionality
