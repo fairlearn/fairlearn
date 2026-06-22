@@ -6,6 +6,15 @@ v0.15.0
    v0.15.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.15.0.
 
+New features
+------------
+
+* Added :func:`~fairlearn.metrics.plot_roc_curve_by_group` to plot ROC curves
+  disaggregated by sensitive feature, together with the overall curve and a
+  chance-level baseline. The corresponding AUC scores can be obtained with
+  :class:`~fairlearn.metrics.MetricFrame` and :code:`sklearn.metrics.roc_auc_score`:
+  :pr:`869` by :user:`kstohr <kstohr>` and :user:`Roman Lutz <romanlutz>`.
+
 Bug fixes
 ---------
 
