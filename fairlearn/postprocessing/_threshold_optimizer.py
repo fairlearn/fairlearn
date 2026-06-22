@@ -194,9 +194,8 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             In previous versions only the ``predict`` method was used
             implicitly.
 
-        .. versionchanged:: 0.7
-            From version 0.7, 'predict' is deprecated as the default value and
-            the default changes to 'auto' from v0.10.
+        .. versionchanged:: 0.10
+            The default value changed from ``'predict'`` to ``'auto'``.
 
     tol : float | None, default=None
         The tolerance for the constraint metric. The range of the constraint metric's values across
@@ -347,8 +346,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         return self
 
     def predict(self, X, *, sensitive_features, random_state=None):
-        """Predict label for each sample in X while taking into account \
-            sensitive features.
+        """Predict label for each sample in X while taking into account sensitive features.
 
         Parameters
         ----------

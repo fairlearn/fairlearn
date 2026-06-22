@@ -15,7 +15,7 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._preprocessor import FloatTransformer
-from fairlearn.utils._fixes import parametrize_with_checks
+from test._sklearn_compat import parametrize_with_checks
 
 from .helper import (
     Bin1d,
@@ -48,12 +48,22 @@ def fake_backend_env(request: pytest.FixtureRequest):
 def test_model_init(fake_backend_env):
     """Test model init from list."""
 
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
         fake_training=True,
-        predictor_model=[10, "Sigmoid", "Softmax", "ReLU", "Leaky_ReLU"],
+        predictor_model=[
+            10,
+            "Sigmoid",
+            "Softmax",
+            "ReLU",
+            "Leaky_ReLU",
+            "Tanh",
+            "GELU",
+            "ELU",
+            "SELU",
+        ],
     )
     mitigator.fit(X, Y, sensitive_features=Z)
     layers = mitigator.backendEngine_.predictor_model.layers_
@@ -61,20 +71,40 @@ def test_model_init(fake_backend_env):
         layers = layers.layers
     assert not hasattr(layers[0], "a") or layers[0].a == cols
     assert layers[0].b == 10
-    assert layers[1].__name__ == "Sigmoid"
-    assert layers[2].__name__ == "Softmax"
-    assert layers[3].__name__ == "ReLU"
-    assert layers[4].__name__.replace("_", "") == "LeakyReLU"
-    assert not hasattr(layers[0], "a") or layers[5].a == 10
-    assert layers[5].b == 1
-    assert layers[6].__name__.lower() == "sigmoid"
-    assert len(layers) == 7
+    assert layers[1].__name__.lower() == "sigmoid"
+    assert layers[2].__name__.lower() == "softmax"
+    assert layers[3].__name__.lower() == "relu"
+    assert layers[4].__name__.replace("_", "").lower() == "leakyrelu"
+    assert layers[5].__name__.lower() == "tanh"
+    assert layers[6].__name__.lower() == "gelu"
+    assert layers[7].__name__.lower() == "elu"
+    assert layers[8].__name__.lower() == "selu"
+    for activation in layers[1:9]:
+        assert callable(activation)
+    assert not hasattr(layers[0], "a") or layers[9].a == 10
+    assert layers[9].b == 1
+    assert layers[10].__name__.lower() == "sigmoid"
+    assert len(layers) == 11
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+def test_model_init_unknown_pytorch_activation(fake_backend_env):
+    """Test unknown activation string raises ValueError for PyTorch backend."""
+    X, Y, Z = Bin2d, Bin1d, Bin1d
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_mixin=False,
+        fake_training=True,
+        predictor_model=[10, "NotAnActivation"],
+    )
+    with pytest.raises(ValueError, match="NotAnActivation"):
+        mitigator.fit(X, Y, sensitive_features=Z)
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_model_params(fake_backend_env):
     """Test training params."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -97,7 +127,7 @@ def test_model_params(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_model_early_stop(fake_backend_env):
     """Test training params."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -121,7 +151,7 @@ def test_model_early_stop(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_model_equalized_odds_model_setup(fake_backend_env):
     """Test model initialization with equalized_odds."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_mixin=False,
@@ -138,7 +168,7 @@ def test_model_equalized_odds_model_setup(fake_backend_env):
 def test_model_kw_error_constraint(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -154,7 +184,7 @@ def test_model_kw_error_constraint(fake_backend_env):
 def test_model_kw_error_ints(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -171,7 +201,7 @@ def test_model_kw_error_ints(fake_backend_env):
 def test_model_kw_error_bools(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -187,7 +217,7 @@ def test_model_kw_error_bools(fake_backend_env):
 def test_model_kw_error_callback(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -203,7 +233,7 @@ def test_model_kw_error_callback(fake_backend_env):
 def test_model_kw_error_callbacks(fake_backend_env):
     """Test kw error."""
     with pytest.raises(ValueError):
-        (X, Y, Z) = Bin2d, Bin1d, Bin1d
+        X, Y, Z = Bin2d, Bin1d, Bin1d
         mitigator = get_instance(
             fake_backend=fake_backend_env,
             fake_mixin=False,
@@ -218,7 +248,7 @@ def test_model_kw_error_callbacks(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_model_kw_error_tf(fake_backend_env):
     """Test kw error."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     other = get_instance(
         fake_backend="tensorflow",
         fake_mixin=False,
@@ -240,7 +270,7 @@ def test_model_kw_error_tf(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["tensorflow"], indirect=True)
 def test_model_kw_error_torch(fake_backend_env):
     """Test kw error."""
-    (X, Y, Z) = Bin2d, Bin1d, Bin1d
+    X, Y, Z = Bin2d, Bin1d, Bin1d
     other = get_instance(
         fake_backend="torch",
         fake_mixin=False,

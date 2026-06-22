@@ -83,10 +83,11 @@ issues_user_prefix = "@"
 
 
 intersphinx_mapping = {
-    "python3": ("https://docs.python.org/3", None),
+    "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "sklearn": ("https://scikit-learn.org/stable/", None),
+    "narwhals": ("https://narwhals-dev.github.io/narwhals/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
     "pytorch": ("https://pytorch.org/docs/stable/", None),
     "tensorflow": (
@@ -106,6 +107,34 @@ templates_path = ["templates"]
 autosummary_generate = True
 class_members_toctree = False
 numpydoc_show_class_members = False
+numpydoc_xref_param_type = True
+numpydoc_xref_ignore = "all"
+numpydoc_xref_aliases = {
+    "BaseEstimator": "sklearn.base.BaseEstimator",
+    "Bunch": "sklearn.utils.Bunch",
+    "DataFrame": "pandas.DataFrame",
+    "IntoDataFrame": "narwhals.typing.IntoDataFrame",
+    "IntoDataFrameT": "narwhals.typing.IntoDataFrameT",
+    "LazyFrame": "narwhals.LazyFrame",
+    "numpy.ndarray": ":class:`numpy.ndarray`",
+    "numpy.random.RandomState": ":class:`numpy.random.RandomState`",
+    "Pipeline": "sklearn.pipeline.Pipeline",
+    "Series": "pandas.Series",
+    "TransformerMixin": "sklearn.base.TransformerMixin",
+    "narwhals.DataFrame": ":class:`narwhals.DataFrame`",
+    "narwhals.LazyFrame": ":class:`narwhals.LazyFrame`",
+    "narwhals.Series": ":class:`narwhals.Series`",
+    "narwhals.typing.IntoDataFrame": "narwhals.typing.IntoDataFrame",
+    "narwhals.typing.IntoDataFrameT": "narwhals.typing.IntoDataFrameT",
+    "pd.DataFrame": "pandas.DataFrame",
+    "pd.Series": "pandas.Series",
+    "pandas.DataFrame": ":class:`pandas.DataFrame`",
+    "pandas.Series": ":class:`pandas.Series`",
+    "sklearn.base.BaseEstimator": ":class:`sklearn.base.BaseEstimator`",
+    "sklearn.base.TransformerMixin": ":class:`sklearn.base.TransformerMixin`",
+    "sklearn.pipeline.Pipeline": ":class:`sklearn.pipeline.Pipeline`",
+    "sklearn.utils.Bunch": ":class:`sklearn.utils.Bunch`",
+}
 
 
 # List of patterns, relative to source directory, that match files and
@@ -121,6 +150,12 @@ master_doc = "index"
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
+
+# Sphinx 8 introduced a config-cache feature that warns when a config value
+# can't be pickled. `sphinx_gallery_conf` contains a function reference
+# (`notebook_modification_function`), which is unpickleable. Suppress the
+# warning since incremental build caching for this value isn't needed.
+suppress_warnings = ["config.cache"]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

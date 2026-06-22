@@ -12,7 +12,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-import fairlearn.utils._compatibility as compat
 from fairlearn.adversarial import AdversarialFairnessClassifier
 from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import MetricFrame, demographic_parity_difference, selection_rate
@@ -46,7 +45,7 @@ def test_examples():
                     ("imputer", SimpleImputer(strategy="most_frequent")),
                     (
                         "encoder",
-                        OneHotEncoder(drop="if_binary", **compat._SPARSE_OUTPUT_FALSE),
+                        OneHotEncoder(drop="if_binary", sparse_output=False),
                     ),
                 ]
             ),

@@ -129,7 +129,8 @@ class TensorflowEngine(BackendEngine):
             a number of nodes.
             Callable keywords are added to the model as a layer directly,
             which is useful for activation functions. String keywords are
-            interpreted using :code:`keras.activations.deserialize`.
+            matched case-insensitively and interpreted using
+            :code:`keras.activations.deserialize`.
 
         Returns
         -------
@@ -159,7 +160,7 @@ class TensorflowEngine(BackendEngine):
                     elif callable(item):
                         layers.append(item)
                     elif isinstance(item, str):
-                        layers.append(keras.activations.deserialize(item))
+                        layers.append(keras.activations.deserialize(item.lower()))
                 self.layers_ = layers
 
             def call(self, x):
