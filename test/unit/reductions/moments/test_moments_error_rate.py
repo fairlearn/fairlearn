@@ -3,8 +3,6 @@
 
 import numpy as np
 import pandas as pd
-import polars as pl
-import pyarrow as pa
 import pytest
 from sklearn.datasets import make_classification
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -34,6 +32,8 @@ def test_error_rate_narwhals_compatible():
     """Test that `ErrorRate` is compatible with several dataframe backends via narwhals,
     that return values are the same across different backends and that they come in
     types from the dataframe backend used."""
+    pl = pytest.importorskip("polars")
+    pa = pytest.importorskip("pyarrow")
 
     # make up data for testing
     rng = np.random.default_rng(42)
