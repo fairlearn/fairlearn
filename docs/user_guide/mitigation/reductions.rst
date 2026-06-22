@@ -628,6 +628,42 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
 
 .. _grid_search:
 
+Grid Search
+-----------
+
+The :class:`GridSearch` algorithm is a simpler alternative to
+:class:`ExponentiatedGradient`. It works by generating a grid of re-weightings
+and relabelings, and training a separate predictor for each. The resulting
+collection of predictors represents various trade-offs between the performance
+objective and the fairness constraints.
+
+Here is a short example of how to use :class:`GridSearch` with :class:`DemographicParity`:
+
+.. doctest:: mitigation_reductions
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.reductions import GridSearch, DemographicParity
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> import numpy as np
+    >>> # Sample data
+    >>> X = np.array([[0], [1], [2], [3], [4], [5], [6], [7]])
+    >>> y = np.array([0, 1, 0, 1, 0, 1, 1, 1])
+    >>> sf = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    >>> # Initialize and fit
+    >>> mitigator = GridSearch(
+    ...     LogisticRegression(solver='liblinear'),
+    ...     constraints=DemographicParity(),
+    ...     grid_size=10
+    ... )
+    >>> mitigator.fit(X, y, sensitive_features=sf) # doctest: +ELLIPSIS
+    GridSearch(...)
+    >>> # Predict
+    >>> y_pred = mitigator.predict(X)
+
+The full collection of predictors generated during the search is available
+via the :attr:`GridSearch.predictors_` attribute, allowing users to manually
+explore the Pareto front of models.
+
 
 Exponentiated Gradient
 ----------------------
@@ -705,47 +741,6 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
 The performance-fairness trade-off learned by the ExponentiatedGradient model is
 sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparameter
 and iterated over a range of potential values.
-
-
-GridSearch
-~~~~~~~~~~
-
-The :class:`GridSearch` algorithm in Fairlearn allows you to perform a grid search
-over Lagrange multipliers to find a set of predictors that satisfy fairness
-constraints while optimizing a weighted combination of error and constraint violation.
-
-.. doctest:: mitigation_reductions
-    :options:  +NORMALIZE_WHITESPACE
-
-    >>> from sklearn.linear_model import LogisticRegression
-    >>> from sklearn.model_selection import train_test_split
-    >>> from fairlearn.reductions import GridSearch, DemographicParity
-    >>> from fairlearn.metrics import demographic_parity_difference
-    >>> import numpy as np
-    >>> import pandas as pd
-    >>> # Toy dataset
-    >>> X = np.array([[0], [1], [2], [3], [4], [5], [6], [7], [8], [9],
-    ...               [10], [11], [12], [13], [14], [15]])
-    >>> y = np.array([1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0])
-    >>> sensitive_features = np.array(
-    ...     ["a", "b", "a", "a", "b", "a", "b", "b", "a", "b", "a", "b", "a", "b", "a", "b"]
-    ... )
-    >>> # Split into train/test
-    >>> X_train, X_test, y_train, y_test, groups_train, groups_test = train_test_split(
-    ...     X, y, sensitive_features, test_size=0.4, random_state=42
-    ... )
-    >>> estimator = LogisticRegression(solver='liblinear')
-    >>> constraint = DemographicParity(difference_bound=0.01)
-    >>> mitigator = GridSearch(estimator=estimator, constraints=constraint, grid_size=5)
-    >>> mitigator.fit(X_train, y_train, sensitive_features=groups_train)
-    >>> y_pred = mitigator.predict(X_test)
-    >>> print(y_pred)  # doctest: +SKIP
-    >>> dp_diff = demographic_parity_difference(
-    ...     y_true=y_test,
-    ...     y_pred=y_pred,
-    ...     sensitive_features=groups_test
-    ... )
-    >>> print(dp_diff)  # doctest: +SKIP
 
 
 .. topic:: References
