@@ -1023,41 +1023,6 @@ def test_threshold_optimizer_tie_thresholds():
     assert set(preds).issubset({0, 1})
 
 
-def test_ThresholdOptimizer_handles_X_with_ndims_greater_than_2():
-    """ThresholdOptimizer should accept X with ndim > 2 without error."""
-
-    # 3D input tensor (e.g., image-like data): shape (n_samples, h, w)
-    X = np.random.rand(25, 3, 3)
-    y = pd.Series(np.random.randint(0, 2, size=25))
-    sf = pd.Series(np.random.randint(0, 2, size=25))
-
-    class DummyEstimator(BaseEstimator):
-        def fit(self, X, y):
-            # mark as fitted so check_is_fitted passes
-            self.fitted_ = True
-            return self
-
-        def predict(self, X):
-            return np.zeros(X.shape[0], dtype=int)
-
-        def predict_proba(self, X):
-            zeros = np.zeros(X.shape[0])
-            ones = np.ones(X.shape[0])
-            return np.vstack([zeros, ones]).T
-
-    thr = ThresholdOptimizer(
-        estimator=DummyEstimator(),
-        constraints="demographic_parity",
-        grid_size=5,
-    )
-
-    with does_not_raise():
-        thr.fit(X, y, sensitive_features=sf)
-        preds = thr.predict(X, sensitive_features=sf)
-
-    assert set(preds).issubset({0, 1})
-
-
 def test_threshold_optimizer_works_with_3d_X():
     # 3-D feature array (e.g., images or time-series windows)
     X = np.random.rand(20, 3, 2)  # shape = (n_samples, dim1, dim2)
