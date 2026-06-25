@@ -1,46 +1,78 @@
-<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <style>
-      @keyframes pulse-circle {
-        0%, 100% { r: 45; opacity: 0.3; }
-        50% { r: 55; opacity: 0.15; }
+      @keyframes pulse-center {
+        0%, 100% { r: 50; opacity: 0.2; }
+        50% { r: 65; opacity: 0.1; }
       }
-      .pulse { animation: pulse-circle 2s ease-in-out infinite; }
+      .pulse { animation: pulse-center 2.5s ease-in-out infinite; }
     </style>
+    <linearGradient id="bg-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f4ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8f0ff;stop-opacity:1" />
+    </linearGradient>
   </defs>
   
-  <!-- Background -->
-  <rect width="400" height="300" fill="transparent"/>
+  <rect width="500" height="400" fill="url(#bg-grad2)"/>
   
-  <!-- Central circles representing connection -->
-  <circle cx="200" cy="150" r="50" class="pulse"/>
-  <circle cx="200" cy="150" r="50" fill="none" stroke="#74A2FF" stroke-width="2" opacity="0.4"/>
+  <!-- Central pulsing circle -->
+  <circle cx="250" cy="200" r="55" class="pulse" fill="none" stroke="#74a2ff"/>
+  <circle cx="250" cy="200" r="55" fill="none" stroke="#74a2ff" stroke-width="2" opacity="0.4"/>
   
-  <!-- Five diverse people in a circle -->
-  <!-- Person 1 - top left -->
-  <circle cx="120" cy="80" r="16" fill="#FF6B6B"/>
-  <circle cx="120" cy="100" r="12" fill="#FF6B6B" opacity="0.7"/>
+  <!-- Person 1 - top left (red) -->
+  <g>
+    <circle cx="140" cy="100" r="22" fill="#ffb88a"/>
+    <path d="M 118 95 Q 118 70 140 65 Q 162 70 162 95" fill="#8b5a3c"/>
+    <rect x="125" y="125" width="30" height="35" rx="6" fill="#ff6b6b"/>
+    <rect x="105" y="133" width="50" height="12" rx="6" fill="#ffb88a"/>
+    <rect x="128" y="165" width="10" height="30" rx="5" fill="#4a5f8f"/>
+    <rect x="142" y="165" width="10" height="30" rx="5" fill="#4a5f8f"/>
+  </g>
   
-  <!-- Person 2 - top right -->
-  <circle cx="280" cy="80" r="16" fill="#4ECDC4"/>
-  <circle cx="280" cy="100" r="12" fill="#4ECDC4" opacity="0.7"/>
+  <!-- Person 2 - top right (teal) -->
+  <g>
+    <circle cx="360" cy="100" r="22" fill="#f4a582"/>
+    <ellipse cx="360" cy="80" rx="25" ry="18" fill="#3d2817"/>
+    <rect x="345" y="125" width="30" height="35" rx="6" fill="#4ecdc4"/>
+    <rect x="325" y="133" width="50" height="12" rx="6" fill="#f4a582"/>
+    <rect x="348" y="165" width="10" height="30" rx="5" fill="#4a5f8f"/>
+    <rect x="362" y="165" width="10" height="30" rx="5" fill="#4a5f8f"/>
+  </g>
   
-  <!-- Person 3 - left -->
-  <circle cx="80" cy="150" r="16" fill="#FFE66D"/>
-  <circle cx="80" cy="170" r="12" fill="#FFE66D" opacity="0.7"/>
+  <!-- Person 3 - left (yellow) -->
+  <g>
+    <circle cx="85" cy="210" r="22" fill="#e8b4a8"/>
+    <ellipse cx="85" cy="190" rx="25" ry="18" fill="#6b4423"/>
+    <rect x="70" y="235" width="30" height="35" rx="6" fill="#ffe66d"/>
+    <rect x="50" y="243" width="50" height="12" rx="6" fill="#e8b4a8"/>
+    <rect x="73" y="275" width="10" height="30" rx="5" fill="#4a5f8f"/>
+    <rect x="87" y="275" width="10" height="30" rx="5" fill="#4a5f8f"/>
+  </g>
   
-  <!-- Person 4 - right -->
-  <circle cx="320" cy="150" r="16" fill="#95E1D3"/>
-  <circle cx="320" cy="170" r="12" fill="#95E1D3" opacity="0.7"/>
+  <!-- Person 4 - right (mint) -->
+  <g>
+    <circle cx="415" cy="210" r="22" fill="#a8d5d5"/>
+    <path d="M 393 200 Q 393 175 415 170 Q 437 175 437 200" fill="#5a7a7a"/>
+    <rect x="400" y="235" width="30" height="35" rx="6" fill="#95e1d3"/>
+    <rect x="380" y="243" width="50" height="12" rx="6" fill="#a8d5d5"/>
+    <rect x="403" y="275" width="10" height="30" rx="5" fill="#4a5f8f"/>
+    <rect x="417" y="275" width="10" height="30" rx="5" fill="#4a5f8f"/>
+  </g>
   
-  <!-- Person 5 - bottom -->
-  <circle cx="200" cy="240" r="16" fill="#A8E6CF"/>
-  <circle cx="200" cy="260" r="12" fill="#A8E6CF" opacity="0.7"/>
+  <!-- Person 5 - bottom (light blue) -->
+  <g>
+    <circle cx="250" cy="310" r="22" fill="#b3d9ff"/>
+    <ellipse cx="250" cy="290" rx="25" ry="18" fill="#3d5a7f"/>
+    <rect x="235" y="335" width="30" height="35" rx="6" fill="#74a2ff"/>
+    <rect x="215" y="343" width="50" height="12" rx="6" fill="#b3d9ff"/>
+    <rect x="238" y="375" width="10" height="20" rx="5" fill="#4a5f8f"/>
+    <rect x="252" y="375" width="10" height="20" rx="5" fill="#4a5f8f"/>
+  </g>
   
   <!-- Connection lines -->
-  <line x1="130" y1="95" x2="170" y2="130" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
-  <line x1="270" y1="95" x2="230" y2="130" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
-  <line x1="95" y1="165" x2="155" y2="165" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
-  <line x1="305" y1="165" x2="245" y2="165" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
-  <line x1="200" y1="190" x2="200" y2="225" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="155" y1="118" x2="210" y2="180" stroke="#74a2ff" stroke-width="2" opacity="0.3"/>
+  <line x1="345" y1="118" x2="290" y2="180" stroke="#74a2ff" stroke-width="2" opacity="0.3"/>
+  <line x1="107" y1="228" x2="195" y2="210" stroke="#74a2ff" stroke-width="2" opacity="0.3"/>
+  <line x1="393" y1="228" x2="305" y2="210" stroke="#74a2ff" stroke-width="2" opacity="0.3"/>
+  <line x1="250" y1="332" x2="250" y2="255" stroke="#74a2ff" stroke-width="2" opacity="0.3"/>
 </svg>

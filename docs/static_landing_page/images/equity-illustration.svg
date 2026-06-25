@@ -1,46 +1,78 @@
-<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <style>
-      @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-12px); }
+      @keyframes gentle-float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
       }
-      .floating { animation: float 3s ease-in-out infinite; }
+      .floating { animation: gentle-float 4s ease-in-out infinite; }
     </style>
   </defs>
   
-  <!-- Background -->
-  <rect width="400" height="300" fill="transparent"/>
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f4ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8f0ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="500" height="400" fill="url(#bg-grad)"/>
   
-  <!-- Three people of different heights on boxes (equity concept) -->
-  <g class="floating" style="animation-delay: 0s;">
-    <!-- Person 1 - short, on tall box -->
-    <rect x="80" y="140" width="40" height="80" fill="#E8F0FE" rx="4"/>
-    <circle cx="100" cy="120" r="18" fill="#74A2FF"/>
-    <rect x="90" y="138" width="20" height="8" fill="#74A2FF"/>
-    <rect x="88" y="148" width="24" height="30" fill="#74A2FF"/>
+  <!-- Ground -->
+  <ellipse cx="250" cy="380" rx="200" ry="30" fill="#d4e2ff" opacity="0.4"/>
+  
+  <!-- Person 1 (Short, on tall box) -->
+  <g class="floating">
+    <rect x="80" y="140" width="70" height="120" rx="8" fill="#e3f2fd" stroke="#9db4d4" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="115" cy="110" r="25" fill="#ffb88a"/>
+    <!-- Hair -->
+    <path d="M 90 100 Q 90 70 115 65 Q 140 70 140 100" fill="#8b5a3c"/>
+    <!-- Body -->
+    <rect x="100" y="138" width="30" height="40" rx="8" fill="#74a2ff"/>
+    <!-- Arms -->
+    <rect x="80" y="145" width="50" height="15" rx="7" fill="#ffb88a"/>
+    <!-- Legs -->
+    <rect x="103" y="182" width="12" height="35" rx="6" fill="#4a5f8f"/>
+    <rect x="119" y="182" width="12" height="35" rx="6" fill="#4a5f8f"/>
   </g>
   
-  <g class="floating" style="animation-delay: 0.3s;">
-    <!-- Person 2 - medium, on medium box -->
-    <rect x="170" y="160" width="40" height="60" fill="#E8F0FE" rx="4"/>
-    <circle cx="190" cy="140" r="18" fill="#74A2FF"/>
-    <rect x="180" y="158" width="20" height="8" fill="#74A2FF"/>
-    <rect x="178" y="168" width="24" height="30" fill="#74A2FF"/>
+  <!-- Person 2 (Medium, on medium box) -->
+  <g class="floating" style="animation-delay: 0.2s;">
+    <rect x="210" y="170" width="70" height="90" rx="8" fill="#e3f2fd" stroke="#9db4d4" stroke-width="2"/>
+    <!-- Head -->
+    <circle cx="245" cy="140" r="25" fill="#f4a582"/>
+    <!-- Hair -->
+    <path d="M 220 130 Q 220 100 245 95 Q 270 100 270 130 L 270 140 Q 270 150 245 155 Q 220 150 220 140" fill="#3d2817"/>
+    <!-- Body -->
+    <rect x="230" y="168" width="30" height="40" rx="8" fill="#64d6ff"/>
+    <!-- Arms -->
+    <rect x="210" y="175" width="50" height="15" rx="7" fill="#f4a582"/>
+    <!-- Legs -->
+    <rect x="233" y="212" width="12" height="35" rx="6" fill="#4a5f8f"/>
+    <rect x="249" y="212" width="12" height="35" rx="6" fill="#4a5f8f"/>
   </g>
   
-  <g class="floating" style="animation-delay: 0.6s;">
-    <!-- Person 3 - tall, on small/no box -->
-    <circle cx="280" cy="160" r="18" fill="#74A2FF"/>
-    <rect x="270" y="178" width="20" height="8" fill="#74A2FF"/>
-    <rect x="268" y="188" width="24" height="30" fill="#74A2FF"/>
+  <!-- Person 3 (Tall, no box) -->
+  <g class="floating" style="animation-delay: 0.4s;">
+    <!-- Head -->
+    <circle cx="375" cy="130" r="25" fill="#e8b4a8"/>
+    <!-- Hair -->
+    <ellipse cx="375" cy="115" rx="28" ry="22" fill="#6b4423"/>
+    <!-- Body -->
+    <rect x="360" y="158" width="30" height="50" rx="8" fill="#95e1d3"/>
+    <!-- Arms -->
+    <rect x="340" y="165" width="50" height="15" rx="7" fill="#e8b4a8"/>
+    <!-- Legs -->
+    <rect x="363" y="212" width="12" height="45" rx="6" fill="#4a5f8f"/>
+    <rect x="379" y="212" width="12" height="45" rx="6" fill="#4a5f8f"/>
   </g>
   
-  <!-- Horizon line -->
-  <line x1="60" y1="220" x2="340" y2="220" stroke="#C7D0EA" stroke-width="2"/>
+  <!-- Horizon line they all reach -->
+  <line x1="50" y1="250" x2="450" y2="250" stroke="#74a2ff" stroke-width="3" stroke-dasharray="5,5"/>
   
-  <!-- Stars/sparkles -->
-  <circle cx="280" cy="80" r="3" fill="#64D6FF" opacity="0.6"/>
-  <circle cx="320" cy="100" r="2" fill="#64D6FF" opacity="0.4"/>
-  <circle cx="80" cy="60" r="2.5" fill="#64D6FF" opacity="0.5"/>
+  <!-- Target/goal symbol -->
+  <circle cx="250" cy="250" r="40" fill="none" stroke="#ff6b6b" stroke-width="2" opacity="0.3"/>
+  <circle cx="250" cy="250" r="25" fill="none" stroke="#ff6b6b" stroke-width="2" opacity="0.5"/>
+  <circle cx="250" cy="250" r="10" fill="#ff6b6b" opacity="0.7"/>
 </svg>
