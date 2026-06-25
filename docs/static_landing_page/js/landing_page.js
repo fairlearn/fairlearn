@@ -1,203 +1,119 @@
-$(document).ready(function () {
-  // executes when HTML-Document is loaded and DOM is ready
-  console.log("document is ready");
+const latestVersion = "v0.14"; // Do not include the patch version.
+const versionPrefix = `./${latestVersion}`;
 
-  setLinks();
+const versionedLinks = {
+  gettingStartedLinkNavBar: "/quickstart.html",
+  userGuideLinkNavBar: "/user_guide/index.html",
+  apiRefLinkNavBar: "/api_reference/index.html",
+  exampleNotebooksLinkNavBar: "/auto_examples/index.html",
+  contribGuideLinkNavBar: "/contributor_guide/index.html",
+  faqLinkNavBar: "/faq.html",
+  aboutLinkNavBar: "/about/index.html",
+  gettingStartedLinkHero: "/quickstart.html",
+  fairnessGuideLinkHero: "/user_guide/fairness_in_machine_learning.html#fairness-of-ai-systems",
+  caseStudyLinkCredit: "/auto_examples/plot_credit_loan_decisions.html",
+  caseStudyLinkHealthcare: "/auto_examples/index.html",
+  caseStudyLinkHiring: "/user_guide/mitigation/index.html",
+  assessmentPathLink: "/user_guide/assessment/index.html",
+  mitigationPathLink: "/user_guide/mitigation/index.html",
+  datasetsPathLink: "/user_guide/datasets/index.html",
+  userGuidePathLink: "/user_guide/index.html",
+  apiRefPathLink: "/api_reference/index.html",
+  contribGuidePathLink: "/contributor_guide/index.html",
+  contribGuideLinkContribSection: "/contributor_guide/index.html",
+};
 
-  $(".masthead-card").hover(
-    function () {
-      $(this).addClass('blue-card').css('cursor', 'pointer');
-      $(".masthead-text", this).addClass('white');
-      $(".icon-blue", this).addClass('inactive');
-      $(".icon-blue", this).removeClass('active');
-      $(".icon-white", this).addClass('active');
-      $(".icon-white", this).removeClass('inactive');
-    }, function () {
-      $(this).removeClass('blue-card');
-      $(".icon-blue", this).addClass('active');
-      $(".icon-blue", this).removeClass('inactive');
-      $(".icon-white", this).removeClass('active');
-      $(".icon-white", this).addClass('inactive');
-      $(".masthead-text", this).removeClass('white');
-    }
-  );
-
-
-  $(".benefit-card").hover(
-    function () {
-      $(this).addClass('blue-card').css('cursor', 'pointer');
-      $(".benefit-text", this).addClass('white');
-      $(".icon-blue", this).addClass('inactive');
-      $(".icon-blue", this).removeClass('active');
-      $(".icon-white", this).addClass('active');
-      $(".icon-white", this).removeClass('inactive');
-    }, function () {
-      $(this).removeClass('blue-card');
-      $(".icon-blue", this).addClass('active');
-      $(".icon-blue", this).removeClass('inactive');
-      $(".icon-white", this).removeClass('active');
-      $(".icon-white", this).addClass('inactive');
-      $(".benefit-text", this).removeClass('white');
-    }
-  );
-
-
-
-  $(".tc-1").hover(
-    function () {
-      $(this).addClass('white-card').css('cursor', 'pointer');
-      $(".technique-text", this).addClass('dark');
-      $(".technique-text", this).removeClass('white');
-    }, function () {
-    }
-  );
-
-  $(".tc-2").hover(
-    function () {
-      $(this).addClass('white-card').css('cursor', 'pointer');
-      $(".technique-text", this).addClass('dark');
-      $(".technique-text", this).removeClass('white');
-      $(".global,.group,.feature").css("display", "none");
-      $(".local").css("display", "block");
-      globalFunctionOff();
-    }, function () {
-      $(this).removeClass('white-card');
-      $(".technique-text", this).removeClass('dark');
-      $(".technique-text", this).addClass('white');
-      $(".global").css("display", "block");
-      $(".local").css("display", "none");
-      globalFunctionOn();
-    }
-  );
-
-  $(".tc-3").hover(
-    function () {
-      $(this).addClass('white-card').css('cursor', 'pointer');
-      $(".technique-text", this).addClass('dark');
-      $(".technique-text", this).removeClass('white');
-      $(".global,.local,.feature").css("display", "none");
-      $(".group").css("display", "block");
-      globalFunctionOff();
-    }, function () {
-      $(this).removeClass('white-card');
-      $(".technique-text", this).removeClass('dark');
-      $(".technique-text", this).addClass('white');
-      $(".global").css("display", "block");
-      $(".group").css("display", "none");
-      globalFunctionOn();
-    }
-  );
-
-  $(".tc-4").hover(
-    function () {
-      $(this).addClass('white-card').css('cursor', 'pointer');
-      $(".technique-text", this).addClass('dark');
-      $(".technique-text", this).removeClass('white');
-      $(".global,.local,.group").css("display", "none");
-      $(".feature").css("display", "block");
-      globalFunctionOff();
-    }, function () {
-      $(this).removeClass('white-card');
-      $(".technique-text", this).removeClass('dark');
-      $(".technique-text", this).addClass('white');
-      $(".global").css("display", "block");
-      $(".feature").css("display", "none");
-      globalFunctionOn();
-    }
-  );
-
-  function globalFunctionOff() {
-    $(".tc-1 .technique-text").removeClass("dark")
-    $(".tc-1 .technique-text").addClass("white")
-    $(".tc-1").removeClass("white-card")
-  };
-
-  function globalFunctionOn() {
-    $(".tc-1 .technique-text").addClass('dark');
-    $(".tc-1 .technique-text").removeClass('white');
-    $(".tc-1").addClass("white-card")
-  };
-
-  $(".box-card-1").click(
-    function () {
-      console.log("box 1 clicked");
-      $(".glass").removeClass('inactive');
-      $(".black").removeClass('active');
-    }
-  );
-
-  $(".box-card-2").click(
-    function () {
-      console.log("box 2 clicked");
-      $(".glass").addClass('inactive');
-      $(".black").addClass('active');
-    }
-  );
-
-
-  $(document).click(function (event) {
-    var clickover = $(event.target);
-    var _opened = $(".navbar-collapse").hasClass("show");
-    if (_opened === true && !clickover.hasClass("navbar-toggler")) {
-      $(".navbar-toggler").click();
+function setLinks() {
+  Object.entries(versionedLinks).forEach(([elementId, versionedPath]) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.href = `${versionPrefix}${versionedPath}`;
     }
   });
+}
 
+function syncThemeToggleIcon(isDarkMode) {
+  const themeToggleButton = document.getElementById("lightmode");
+  if (!themeToggleButton) {
+    return;
+  }
 
-  $(document).ready(function () {
-    // Check if the user has changed the theme before
-    const savedTheme = localStorage.getItem('theme');
+  const lightModeIcon = themeToggleButton.querySelector(".icon-blue");
+  const darkModeIcon = themeToggleButton.querySelector(".icon-white");
 
-    // If no saved preference, check system preference
-    if (savedTheme) {
-      $("body").addClass(savedTheme);
-    } else {
-      const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDarkMode) {
-        $("body").addClass("dark-theme");
-      }
-    }
+  if (lightModeIcon) {
+    lightModeIcon.classList.toggle("active", !isDarkMode);
+    lightModeIcon.classList.toggle("inactive", isDarkMode);
+  }
 
-    $("#lightmode").click(function () {
-      $("body").toggleClass("dark-theme");
+  if (darkModeIcon) {
+    darkModeIcon.classList.toggle("active", isDarkMode);
+    darkModeIcon.classList.toggle("inactive", !isDarkMode);
+  }
 
-      // Save the current theme
-      if ($("body").hasClass("dark-theme")) {
-        localStorage.setItem('theme', 'dark-theme');
-      } else {
-        localStorage.setItem('theme', '');
+  themeToggleButton.setAttribute(
+    "aria-label",
+    isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+  );
+}
+
+function setTheme(isDarkMode) {
+  document.body.classList.toggle("dark-theme", isDarkMode);
+  syncThemeToggleIcon(isDarkMode);
+}
+
+function initializeThemeToggle() {
+  const savedTheme = localStorage.getItem("theme");
+  const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
+  const shouldUseDarkMode = savedTheme ? savedTheme === "dark-theme" : prefersDarkMode.matches;
+
+  setTheme(shouldUseDarkMode);
+
+  const themeToggleButton = document.getElementById("lightmode");
+  if (!themeToggleButton) {
+    return;
+  }
+
+  themeToggleButton.addEventListener("click", () => {
+    const isDarkMode = !document.body.classList.contains("dark-theme");
+    setTheme(isDarkMode);
+    localStorage.setItem("theme", isDarkMode ? "dark-theme" : "");
+  });
+
+  if (!savedTheme) {
+    prefersDarkMode.addEventListener("change", (event) => {
+      setTheme(event.matches);
+    });
+  }
+}
+
+function initializeFooterYear() {
+  const yearElement = document.getElementById("currentYear");
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear().toString();
+  }
+}
+
+function initializeMobileNavClose() {
+  const navbar = document.getElementById("navbarResponsive");
+  const toggleButton = document.querySelector(".navbar-toggler");
+  if (!navbar || !toggleButton) {
+    return;
+  }
+
+  const navLinks = navbar.querySelectorAll(".nav-link");
+  navLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth < 1200 && navbar.classList.contains("show")) {
+        toggleButton.click();
       }
     });
   });
-
-
-});
-
-async function setLinks() {
-  // update this version with every release
-  const latestVersion = 'v0.14'; // Do not include the patch
-  const prefix = "./" + latestVersion;
-
-  const contribGuideLink = prefix + "/contributor_guide/index.html";
-  const exampleNotebooksLink = prefix + "/auto_examples/index.html";
-  const apiRefLink = prefix + "/api_reference/index.html";
-  const userGuideLink = prefix + "/user_guide/index.html";
-  const gettingStartedLink = prefix + "/quickstart.html";
-  const faqLink = prefix + "/faq.html";
-  const aboutLink = prefix + "/about/index.html";
-
-  document.getElementById('contribGuideLinkNavBar').href = contribGuideLink;
-  document.getElementById('exampleNotebooksLinkNavBar').href = exampleNotebooksLink;
-  document.getElementById('apiRefLinkNavBar').href = apiRefLink;
-  document.getElementById('userGuideLinkNavBar').href = userGuideLink;
-  document.getElementById('gettingStartedLinkNavBar').href = gettingStartedLink;
-  document.getElementById('faqLinkNavBar').href = faqLink;
-  document.getElementById('aboutLinkNavBar').href = aboutLink;
-
-  document.getElementById('gettingStartedLinkMastHead').href = gettingStartedLink;
-  document.getElementById('gettingStartedLinkBody').href = gettingStartedLink;
-  document.getElementById('apiRefLinkBody').href = apiRefLink;
-  document.getElementById('userGuideLinkBody').href = userGuideLink;
-  document.getElementById('contribGuideLinkBody').href = contribGuideLink;
-  document.getElementById('contribGuideLinkContribSection').href = contribGuideLink;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  setLinks();
+  initializeThemeToggle();
+  initializeFooterYear();
+  initializeMobileNavClose();
+});

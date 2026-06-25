@@ -1,0 +1,58 @@
+<svg viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .node-circle { fill: currentColor; opacity: 0.15; }
+      .node-core { fill: currentColor; opacity: 0.85; }
+      .connection-line { stroke: currentColor; stroke-width: 1.5; opacity: 0.3; fill: none; }
+      .node-glow { filter: drop-shadow(0 0 8px currentColor); opacity: 0.5; }
+      @keyframes pulse-node {
+        0%, 100% { r: 18; opacity: 0.85; }
+        50% { r: 20; opacity: 0.95; }
+      }
+      .pulse { animation: pulse-node 2s ease-in-out infinite; }
+      @keyframes draw-line {
+        from { stroke-dashoffset: 100; }
+        to { stroke-dashoffset: 0; }
+      }
+      .animated-line { 
+        stroke-dasharray: 100; 
+        animation: draw-line 4s ease-in-out infinite;
+      }
+    </style>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Connection lines from center -->
+  <line x1="150" y1="140" x2="60" y2="60" class="connection-line animated-line"/>
+  <line x1="150" y1="140" x2="240" y2="60" class="connection-line animated-line" style="animation-delay: 0.2s"/>
+  <line x1="150" y1="140" x2="60" y2="220" class="connection-line animated-line" style="animation-delay: 0.4s"/>
+  <line x1="150" y1="140" x2="240" y2="220" class="connection-line animated-line" style="animation-delay: 0.6s"/>
+  <line x1="60" y1="60" x2="240" y2="60" class="connection-line" opacity="0.15"/>
+  <line x1="60" y1="220" x2="240" y2="220" class="connection-line" opacity="0.15"/>
+  
+  <!-- Outer nodes -->
+  <circle cx="60" cy="60" r="16" class="node-circle"/>
+  <circle cx="60" cy="60" r="14" class="node-core pulse"/>
+  
+  <circle cx="240" cy="60" r="16" class="node-circle"/>
+  <circle cx="240" cy="60" r="14" class="node-core pulse" style="animation-delay: 0.5s"/>
+  
+  <circle cx="60" cy="220" r="16" class="node-circle"/>
+  <circle cx="60" cy="220" r="14" class="node-core pulse" style="animation-delay: 1s"/>
+  
+  <circle cx="240" cy="220" r="16" class="node-circle"/>
+  <circle cx="240" cy="220" r="14" class="node-core pulse" style="animation-delay: 1.5s"/>
+  
+  <!-- Center core node (larger, always glowing) -->
+  <circle cx="150" cy="140" r="20" class="node-circle" opacity="0.25"/>
+  <circle cx="150" cy="140" r="18" class="node-core" opacity="1" filter="url(#glow)"/>
+  
+  <!-- Subtle background accent -->
+  <circle cx="150" cy="140" r="80" fill="none" stroke="currentColor" opacity="0.05" stroke-width="1" stroke-dasharray="5,5"/>
+</svg>

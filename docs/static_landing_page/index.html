@@ -1,328 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
-  	<head>
-	    <!-- Required meta tags -->
-	    <meta charset="utf-8">
-	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	    <title>Fairlearn</title>
-		<meta property="og:title" content="Fairlearn">
-		<meta property="og:type" content="website"/>
-		<meta property="og:description" content="An open source toolkit for assessing and improving fairness in AI">
-		<meta property="og:image" content="./images/fairlearn-meta-image.jpg">
-		<meta property="og:url" content="https://fairlearn.org">
-		<link rel="shortcut icon" type="./images/x-icon" href="./images/fairlearn-favicon.ico"/>
-	    <!-- Bootstrap CSS -->
-	    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-	    <link rel="stylesheet" type="text/css" href="./css/landing_page_style.css">
-  	</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Fairlearn</title>
+    <meta property="og:title" content="Fairlearn" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:description"
+      content="Fairness is a sociotechnical challenge. Fairlearn helps teams assess and improve fairness in AI systems."
+    />
+    <meta property="og:image" content="./images/fairlearn-meta-image.jpg" />
+    <meta property="og:url" content="https://fairlearn.org" />
+    <link rel="shortcut icon" type="image/x-icon" href="./images/fairlearn-favicon.ico" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="./css/landing_page_style.css" />
+  </head>
   <body>
+    <header class="site-header">
+      <nav class="navbar navbar-expand-xl fixed-top">
+        <div class="container nav-shell px-3">
+          <a class="navbar-brand d-flex align-items-center" href="https://fairlearn.org" aria-label="Fairlearn home">
+            <img class="img-fluid nav-logo" src="./images/fairlearn_logo.svg" alt="Fairlearn logo" />
+          </a>
+          <button
+            class="navbar-toggler navbar-light px-2"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarResponsive"
+            aria-controls="navbarResponsive"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon icon-bar"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav mt-3 mt-xl-0 mx-xl-auto nav-links text-center">
+              <li class="nav-item">
+                <a id="gettingStartedLinkNavBar" class="nav-link" href="">Get Started</a>
+              </li>
+              <li class="nav-item">
+                <a id="userGuideLinkNavBar" class="nav-link" href="">User Guide</a>
+              </li>
+              <li class="nav-item">
+                <a id="apiRefLinkNavBar" class="nav-link" href="">API Docs</a>
+              </li>
+              <li class="nav-item">
+                <a id="exampleNotebooksLinkNavBar" class="nav-link" href="">Example Notebooks</a>
+              </li>
+              <li class="nav-item">
+                <a id="contribGuideLinkNavBar" class="nav-link" href="">Contributor Guide</a>
+              </li>
+              <li class="nav-item">
+                <a id="faqLinkNavBar" class="nav-link" href="">FAQ</a>
+              </li>
+              <li class="nav-item">
+                <a id="aboutLinkNavBar" class="nav-link" href="">About</a>
+              </li>
+            </ul>
+            <div class="nav-actions d-flex flex-column flex-xl-row align-items-center pb-3 pb-xl-0">
+              <button class="nav-action-card theme-toggle py-2" id="lightmode" type="button" aria-label="Toggle dark mode">
+                <img class="img-fluid icon-blue active" src="./images/Nav_LightMode_Default.svg" alt="" aria-hidden="true" />
+                <img class="img-fluid icon-white inactive" src="./images/Nav_LightMode_Hover.svg" alt="" aria-hidden="true" />
+              </button>
+              <a class="nav-action-card py-2" href="https://github.com/fairlearn/fairlearn" target="_blank" rel="noopener noreferrer">
+                <img class="img-fluid icon-blue active" src="./images/Nav_GH_Default.svg" alt="GitHub" />
+                <img class="img-fluid icon-white inactive" src="./images/Nav_GH_Hover.svg" alt="" aria-hidden="true" />
+              </a>
+              <a class="nav-action-card py-2" href="https://discord.gg/R22yCfgsRn" target="_blank" rel="noopener noreferrer">
+                <img class="img-fluid icon-blue active" src="./images/Nav_Discord_Default.svg" alt="Discord" />
+                <img class="img-fluid icon-white inactive" src="./images/Nav_Discord_Hover.svg" alt="" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div class="survey-banner text-center">
+        <strong>Help us improve Fairlearn:</strong>
+        <a href="https://forms.gle/U3wdiNAPeQWgenKh8" target="_blank" rel="noopener noreferrer">Take the survey →</a>
+      </div>
+    </header>
 
-  	<!-- NAVIGATION -->
-	<nav class="navbar navbar-expand-xl fixed-top">
-		<div class="container py-3 my-xl-n2 px-0">
-			<img class="img-fluid nav-logo ml-3" src="./images/fairlearn_logo.svg" alt="">
-      		<button class="navbar-toggler navbar-light text-right px-2 mr-2" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        	<span class="navbar-toggler-icon icon-bar"></span>
-      		</button>
-      		<div class="collapse navbar-collapse" id="navbarResponsive">
-		        <ul class="navbar-nav pt-2 mt-1 mx-xl-auto mx-xl-2 px-xl-1 text-center text-nowrap">
-				  <li class="nav-item px-1">
-					  <a id="gettingStartedLinkNavBar" class="nav-link" href="">Get Started</a>
-				  </li>
-		          <li class="nav-item px-1">
-					  <!-- Versioned Link -->
-		            <a id="userGuideLinkNavBar" class="nav-link" href="">User Guide</a>
-		          </li>
-		          <li class="nav-item px-1">
-					<!-- Versioned Link -->
-		            <a id="apiRefLinkNavBar" class="nav-link" href="">API Docs</a>
-		          </li>
-				  <li class="nav-item px-1">
-					<!-- Versioned Link -->
-		            <a id="exampleNotebooksLinkNavBar" class="nav-link" href="">Example Notebooks</a>
-		          </li>
-		          <li class="nav-item px-1">
-		            <a id="contribGuideLinkNavBar" class="nav-link" href="">Contributor Guide</a>
-		          </li>
-				  <li class="nav-item px-1">
-					<!-- Versioned Link -->
-		            <a id="faqLinkNavBar" class="nav-link" href="">FAQ</a>
-		          </li>
-				  <li class="nav-item px-1">
-					<!-- Versioned Link -->
-		            <a id="aboutLinkNavBar" class="nav-link" href="">About Us</a>
-		          </li>
-				</ul>
-				<span class="nav-item card benefit-card mr-xl-3 py-2" id="lightmode">
-					<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Nav_LightMode_Default.svg">
-					<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Nav_LightMode_Hover.svg">
-		        </span>
-		        <span class="nav-item card benefit-card mr-xl-3 py-2">
-		            <a href="https://github.com/fairlearn/fairlearn">
-						<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Nav_GH_Default.svg">
-						<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Nav_GH_Hover.svg">
-					</a>
-		        </span>
-				<span class="nav-item card benefit-card mr-xl-3 py-2">
-		            <a href="https://discord.gg/R22yCfgsRn">
-						<img class="mx-auto mx-xl-0 img-fluid icon-blue active" src="./images/Nav_Discord_Default.svg">
-						<img class="mx-auto mx-xl-0 img-fluid icon-white inactive" src="./images/Nav_Discord_Hover.svg">
-					</a>
-		        </span>
-		</div>
-  	</nav>
-  	<!-- NAVIGATION -->
-	<div style="height: 80px;"></div>
+    <main>
+      <section class="hero gradient">
+        <div class="container hero-content">
+          <div class="row align-items-center">
+            <div class="col-12 col-lg-7 pr-lg-5">
+              <p class="eyebrow">Responsible AI in practice</p>
+              <h1>Fairness is a sociotechnical challenge</h1>
+              <p class="hero-lead">
+                Model outputs are only one part of the system. Data collection, labels, institutional decisions, and
+                real-world feedback loops all shape who benefits and who is harmed.
+              </p>
+              <p class="hero-subcopy">
+                Fairlearn is an open-source toolkit for teams who need rigorous fairness assessment and mitigation while
+                staying grounded in context, stakeholders, and impact.
+              </p>
+              <div class="hero-cta">
+                <a id="gettingStartedLinkHero" class="primary-btn" href="">Start with Quickstart</a>
+                <a id="fairnessGuideLinkHero" class="secondary-btn" href="">Read the sociotechnical guide</a>
+              </div>
+              <div class="hero-pill-row">
+                <span class="pill">Assess disparities</span>
+                <span class="pill">Mitigate responsibly</span>
+                <span class="pill">Document trade-offs</span>
+              </div>
+            </div>
+            <div class="col-12 col-lg-5 mt-5 mt-lg-0">
+              <div class="hero-illustration">
+                <svg class="scales-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                  <defs>
+                    <style>
+                      .scale-bar { fill: none; stroke: currentColor; stroke-width: 2; }
+                      .scale-weight { fill: currentColor; opacity: 0.8; }
+                      .scale-wobble { animation: wobble 3s ease-in-out infinite; transform-origin: 100px 80px; }
+                      @keyframes wobble {
+                        0%, 100% { transform: rotate(0deg); }
+                        25% { transform: rotate(-3deg); }
+                        75% { transform: rotate(3deg); }
+                      }
+                      @keyframes float-up-down {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-4px); }
+                      }
+                      .scale-left { animation: float-up-down 2s ease-in-out infinite; }
+                      .scale-right { animation: float-up-down 2s ease-in-out infinite 0.3s; }
+                    </style>
+                  </defs>
+                  <g class="scale-wobble">
+                    <circle cx="100" cy="90" r="6" class="scale-weight"/>
+                    <path d="M 85 90 L 100 75 L 115 90" class="scale-bar" stroke-linejoin="round"/>
+                    <g class="scale-left">
+                      <line x1="70" y1="90" x2="70" y2="105" class="scale-bar"/>
+                      <rect x="55" y="105" width="30" height="25" rx="2" class="scale-weight"/>
+                    </g>
+                    <g class="scale-right">
+                      <line x1="130" y1="90" x2="130" y2="110" class="scale-bar"/>
+                      <rect x="115" y="110" width="30" height="20" rx="2" class="scale-weight"/>
+                    </g>
+                    <line x1="70" y1="90" x2="130" y2="90" class="scale-bar" stroke-width="3"/>
+                  </g>
+                  <circle cx="30" cy="30" r="2" class="scale-weight" opacity="0.4"/>
+                  <circle cx="170" cy="40" r="3" class="scale-weight" opacity="0.3"/>
+                  <circle cx="40" cy="160" r="2.5" class="scale-weight" opacity="0.35"/>
+                </svg>
+              </div>
+              <aside class="systems-map-panel">
+                <h3>Sociotechnical systems map</h3>
+                <p>Fairness emerges from interactions across the entire lifecycle, not just model training.</p>
+                <div class="systems-grid">
+                  <div class="system-node">Impacted communities</div>
+                  <div class="system-node">Problem framing</div>
+                  <div class="system-node">Data and labels</div>
+                  <div class="system-node">Model behavior</div>
+                  <div class="system-node">Product decisions</div>
+                  <div class="system-node">Governance and policy</div>
+                </div>
+                <p class="panel-footnote">
+                  Fairlearn helps teams quantify and compare model behavior while connecting those results to broader
+                  deployment decisions.
+                </p>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </section>
 
-	<!-- SURVEY BANNER-->
-	<div class="container-fluid py-2 text-center"
-	style="background-color: #c4e8fd; padding: 8px 0; color: black; font-weight: bold;">
-		<strong> Help Us Improve Fairlearn:</strong><a href="https://forms.gle/U3wdiNAPeQWgenKh8"
-		target="_blank" class="font-weight-bold text-primary">
-		Take the Survey → </a>
-	</div>
-	<!-- SURVEY BANNER-->
+      <section class="section section-light">
+        <div class="container">
+          <div class="section-heading">
+            <p class="kicker">Why this framing matters</p>
+            <h2>Move from isolated model checks to end-to-end system accountability</h2>
+          </div>
+          <div class="challenge-content">
+            <div class="challenge-grid">
+            <article class="challenge-card">
+              <h3>1. Map stakeholders and harm pathways</h3>
+              <p>
+                Start by identifying who is affected, what outcomes matter, and where inequities may appear across the
+                decision pipeline.
+              </p>
+            </article>
+            <article class="challenge-card">
+              <h3>2. Quantify disparities with transparent metrics</h3>
+              <p>
+                Use disaggregated metrics and visual diagnostics to expose performance differences across relevant
+                groups and intersectional slices.
+              </p>
+            </article>
+            <article class="challenge-card">
+              <h3>3. Evaluate mitigation with trade-offs in view</h3>
+              <p>
+                Compare mitigation approaches in context, including impacts on utility, calibration, and downstream
+                decisions.
+              </p>
+            </article>
+            <article class="challenge-card">
+              <h3>4. Translate findings into governance actions</h3>
+              <p>
+                Integrate results into model cards, review checkpoints, and policy conversations so fairness work
+                survives deployment pressure.
+              </p>
+            </article>
+          </div>
+          <div class="challenge-illustration">
+            <svg class="systems-network-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                 <style>
+                   .node-circle { fill: currentColor; opacity: 0.15; }
+                   .node-core { fill: currentColor; opacity: 0.85; }
+                   .connection-line { stroke: currentColor; stroke-width: 1.5; opacity: 0.3; fill: none; }
+                   @keyframes pulse-node {
+                     0%, 100% { r: 18; opacity: 0.85; }
+                     50% { r: 20; opacity: 0.95; }
+                   }
+                   .pulse { animation: pulse-node 2s ease-in-out infinite; }
+                   @keyframes draw-line {
+                     from { stroke-dashoffset: 100; }
+                     to { stroke-dashoffset: 0; }
+                   }
+                   .animated-line { 
+                     stroke-dasharray: 100; 
+                     animation: draw-line 4s ease-in-out infinite;
+                   }
+                 </style>
+                 <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                   <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                   <feMerge>
+                     <feMergeNode in="coloredBlur"/>
+                     <feMergeNode in="SourceGraphic"/>
+                   </feMerge>
+                 </filter>
+              </defs>
+              <line x1="150" y1="140" x2="60" y2="60" class="connection-line animated-line"/>
+              <line x1="150" y1="140" x2="240" y2="60" class="connection-line animated-line" style="animation-delay: 0.2s"/>
+              <line x1="150" y1="140" x2="60" y2="220" class="connection-line animated-line" style="animation-delay: 0.4s"/>
+              <line x1="150" y1="140" x2="240" y2="220" class="connection-line animated-line" style="animation-delay: 0.6s"/>
+              <line x1="60" y1="60" x2="240" y2="60" class="connection-line" opacity="0.15"/>
+              <line x1="60" y1="220" x2="240" y2="220" class="connection-line" opacity="0.15"/>
+              <circle cx="60" cy="60" r="16" class="node-circle"/>
+              <circle cx="60" cy="60" r="14" class="node-core pulse"/>
+              <circle cx="240" cy="60" r="16" class="node-circle"/>
+              <circle cx="240" cy="60" r="14" class="node-core pulse" style="animation-delay: 0.5s"/>
+              <circle cx="60" cy="220" r="16" class="node-circle"/>
+              <circle cx="60" cy="220" r="14" class="node-core pulse" style="animation-delay: 1s"/>
+              <circle cx="240" cy="220" r="16" class="node-circle"/>
+              <circle cx="240" cy="220" r="14" class="node-core pulse" style="animation-delay: 1.5s"/>
+              <circle cx="150" cy="140" r="20" class="node-circle" opacity="0.25"/>
+              <circle cx="150" cy="140" r="18" class="node-core" opacity="1" filter="url(#glow)"/>
+              <circle cx="150" cy="140" r="80" fill="none" stroke="currentColor" opacity="0.05" stroke-width="1" stroke-dasharray="5,5"/>
+            </svg>
+          </div>
+        </div>
+      </section>
 
-  	<!-- MASTHEAD -->
-	<div class="container-fluid gradient masthead white">
-	    <div class="container pt-5">
-		<div class="mx-0">
-	      	<div class="row align-items-left justify-content-left">
-		        <div class="col-12 col-lg-8">
-		          			<h1 class="text-left text-md-left pb-2">
-							Improve fairness<br>
-							of AI systems
-							</h1>
-							<h3 class="white text-left text-md-left pb-3 d-md-block">
-							Fairlearn is an open-source, community-driven project to help
-							data scientists improve fairness of AI systems.
-							</h3>
-							<p class="white text-left text-md-left pb-3 d-md-block">
-							Learn about AI fairness from our guides and use cases.
-							Assess and mitigate fairness issues using our Python toolkit.
-							Join our community and contribute metrics, algorithms, and other resources.
-							</p>
-							<a id="gettingStartedLinkMastHead" class="quickstart-btn mt-2 mb-5 px-4 text-center width=80px" href="">Get Started</a>
-				</div>
-			</div>
-		</div>
-		</div>
-  	</div>
-  	<!-- MASTHEAD -->
+      <section class="section section-dark">
+        <div class="container">
+          <div class="section-heading narrow">
+            <p class="kicker">Casebook</p>
+            <h2>From fairness concerns to actionable decisions</h2>
+            <p>
+              Explore realistic scenarios where technical metrics are necessary, but insufficient without domain
+              context and institutional judgment.
+            </p>
+          </div>
+          <div class="case-grid">
+            <article class="case-card">
+              <p class="case-label">Financial services</p>
+              <h3>Credit decisions and default risk</h3>
+              <p>
+                Assess group-level errors, inspect disparity patterns, and evaluate mitigation under business and
+                regulatory constraints.
+              </p>
+              <a id="caseStudyLinkCredit" href="">Explore credit-card notebook →</a>
+            </article>
+            <article class="case-card">
+              <p class="case-label">Healthcare analytics</p>
+              <h3>Risk triage across patient groups</h3>
+              <p>
+                Understand how proxy labels and data gaps can hide harm and why fairness metrics must be interpreted
+                with clinical context.
+              </p>
+              <a id="caseStudyLinkHealthcare" href="">Browse the example gallery →</a>
+            </article>
+            <article class="case-card">
+              <p class="case-label">Hiring workflows</p>
+              <h3>Decision support and human oversight</h3>
+              <p>
+                Pair model diagnostics with policy guardrails, reviewer training, and feedback loops that surface new
+                risks over time.
+              </p>
+              <a id="caseStudyLinkHiring" href="">Review mitigation examples →</a>
+            </article>
+          </div>
+        </div>
+      </section>
 
-	<!-- SECTION 1 -->
-  	<div class="container-fluid section-2 pt-5 pb-0">
-  		<div class="container">
-			<div class="mx-0">
-				<div class="row justify-content-lg-left pb-4 pt-3">
-				<!-- Sociotechnical Aspect-->
-  				<div class="col-12 col-lg-6 pr-lg-4">
-  					<h6 class="text-left pb-1">FAIRNESS IS SOCIOTECHNICAL</h6>
-  					<p class="text-left pb-1 pt-2">
-						Fairness of AI systems is about more than simply running lines of code.
-						In each use case, both societal and technical aspects
-						shape who might be harmed by AI systems and how.
-						There are many complex sources of unfairness and a variety of societal and technical processes for mitigation,
-						not just the mitigation algorithms in our library.
-					</p>
-					<p class="text-left pb-5">
-						Throughout this website, you can find resources on how to think about fairness as sociotechnical,
-						and how to use Fairlearn's metrics and algorithms
-						while considering the AI system's broader societal context.
-					</p>
-  				</div>
-				<!-- Use Case -->
-				<div class="col-12 col-lg-6 pl-lg-4">
-					<h6 class="text-left pb-1">USE CASE&ensp;|&ensp;CREDIT-CARD LOANS</h6>
-					<h2 class="text-left pt-2 pb-3 dark">Assessment and mitigation of fairness issues in credit-card default models</h2>
-					<p class="text-left">
-						When making a decision to approve or decline a loan, financial services organizations use a variety of models, including a model that predicts the applicant's probability of default.
-						These predictions are sometimes used to automatically reject or accept an application, directly impacting both the applicant and the organization.
-					</p>
-					<p class="text-left">
-						In this scenario, fairness-related harms may arise when the model makes more mistakes for some groups of applicants compared to others.
-						We use Fairlearn to assess how different groups, defined in terms of their sex, are affected and how the observed disparities may be mitigated.
-					</p>
-					<div class="pt-2">
-						<a class="quickstart-btn mb-5 px-3 text-center" href="https://fairlearn.org/main/auto_examples/plot_credit_loan_decisions.html">Jupyter Notebook</a>
-					</div>
-				</div>
-			</div>
-  			</div>
-  		</div>
-  	</div>
+      <section class="section section-light boundary-section">
+        <div class="container">
+          <div class="section-heading narrow">
+            <p class="kicker">Boundaries</p>
+            <h2>What Fairlearn does and what still needs sociotechnical practice</h2>
+          </div>
+          <div class="boundary-grid">
+            <article class="boundary-card does">
+              <h3>Fairlearn helps teams:</h3>
+              <ul>
+                <li>Measure group disparities with consistent, auditable workflows</li>
+                <li>Compare mitigation strategies with explicit metric trade-offs</li>
+                <li>Visualize model behavior across groups and thresholds</li>
+                <li>Integrate fairness checks into iterative model development</li>
+              </ul>
+            </article>
+            <article class="boundary-card doesnt">
+              <h3>Teams still must:</h3>
+              <ul>
+                <li>Define fairness goals with domain and community stakeholders</li>
+                <li>Set governance processes for launch and post-launch monitoring</li>
+                <li>Address data generation, labeling, and policy constraints</li>
+                <li>Own accountability for decisions beyond model optimization</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
 
-	<!-- SECTION 3 -->
-	<div class="container-fluid section-3 pb-5">
-		<div class="container">
-			<div class="mx-0">
-			<div class="row pb-5">
-			<div class="col-12 col-lg-6 text-left pr-lg-4">
-			    <div class="line mx-0 my-5"></div>
-		    	<h2 class="pt-3 pb-3 text-left dark">Get started with Fairlearn</h2>
-			    <p class="text-left">
-				    To get started, install the Fairlearn package.
-				    But the process does not end there!
-				    See our user guide and other resources to understand what fairness means for your use case.
-			    </p>
-			    <p class="text-left">
-				    If you run into any issues, reach out on <a href="https://discord.gg/R22yCfgsRn">Discord</a>.</p>
-			    <div class="pt-4 pb-2 text-dark text-left">
-				    Fairlearn can be installed with pip from PyPI as follows
-				</div>
-			    <div class="code col-8 col-lg-10 pl-4 pr-1 py-2 text-dark bg-light text-left">
-						pip install fairlearn
-				</div>
-			    <div class="pt-4">
-				    <a id="gettingStartedLinkBody" class="quickstart-btn mb-5 px-4 text-center" href="">Quickstart Guide</a>
-			    </div>
-		    </div>
-		    <div class="col-12 col-lg-6 text-left pl-lg-4">
-				<div class="line mx-0 my-5"></div>
-				<h2 class="pt-3 pb-3 text-center text-lg-left dark">Resources</h2>
-					<a id="userGuideLinkBody" href="" target="_blank">
-						<h3 class="text-center text-lg-left dark my-0">
-							User Guide
-						</h3>
-					</a>
-					<p class="text-center text-lg-left pt-2 pb-3">
-						Learn more about fairness in AI, fairness metrics, and mitigation algorithms.
-					</p>
-					<a id="apiRefLinkBody" href="" target="_blank">
-						<h3 class="text-center text-lg-left dark my-0">
-							API Documentation
-						</h3>
-					</a>
-					<p class="text-center text-lg-left pt-2 pb-3">
-						Library reference with examples.
-					</p>
-					<a id="contribGuideLinkBody" href="" target="_blank">
-						<h3 class="text-center text-lg-left dark my-0">
-							Contributor Guide
-						</h3>
-					</a>
-					<p class="text-center text-lg-left py-2">
-						Help us with case studies, documentation, or code.
-						There are many ways to contribute, regardless of your background or expertise.
-					</p>
-		    </div>
-			</div>
-			</div>
-		</div>
-	</div>
+      <section class="section section-light-alt">
+        <div class="container">
+          <div class="section-heading narrow">
+            <p class="kicker">Choose your path</p>
+            <h2>Jump to the resources you need</h2>
+          </div>
+          <div class="path-grid">
+            <a id="assessmentPathLink" class="path-card" href="">
+              <h3>Assess</h3>
+              <p>Evaluate metrics and disparities for your current model.</p>
+            </a>
+            <a id="mitigationPathLink" class="path-card" href="">
+              <h3>Mitigate</h3>
+              <p>Apply and compare mitigation algorithms grounded in your constraints.</p>
+            </a>
+            <a id="datasetsPathLink" class="path-card" href="">
+              <h3>Experiment</h3>
+              <p>Use benchmark datasets and notebooks to understand common fairness patterns.</p>
+            </a>
+            <a id="userGuidePathLink" class="path-card" href="">
+              <h3>Learn</h3>
+              <p>Read the full user guide for practical, sociotechnical fairness workflows.</p>
+            </a>
+            <a id="apiRefPathLink" class="path-card" href="">
+              <h3>Build</h3>
+              <p>Use API docs to integrate metrics and mitigation in production code.</p>
+            </a>
+            <a id="contribGuidePathLink" class="path-card" href="">
+              <h3>Contribute</h3>
+              <p>Join the project with case studies, docs updates, and code contributions.</p>
+            </a>
+          </div>
+        </div>
+      </section>
 
-  <!-- SECTION 5 -->
-	<div class="container-fluid section-5 py-5">
-		<div class="container">
-			<div class="mx-0">
-				<div class="row justify-content-lg-center pt-3 pb-4">
-				<div class="col-12 col-lg-8 text-center">
-					<h2 class="pb-3">Join the community</h2>
-					<p>
-						Fairlearn community consists of open source contributors, data science practitioners, and responsible AI enthusiasts
-						across many disciplines and locations.
-						Join the latest conversation, ask usage questions, learn about the most recent updates, and find out how to get involved.
-						Please respect our <a href="https://github.com/fairlearn/governance/blob/main/code-of-conduct.md" target="_blank">Code of conduct</a>.
-					</p>
-				</div>
-			</div>
-			<div class="row justify-content-lg-center pb-0">
-				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
-					<!-- Card -->
-					<a href="https://discord.gg/R22yCfgsRn" target="_blank">
-						<div class="card h-100 benefit-card py-4 px-3">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Discord_Color.svg">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Discord_Inverse.svg">
-							<h5 class="dark py-1 benefit-text">Discord</h5>
-							<p class="benefit-text mb-0">Join the community and ask usage questions.</p>
-						</div>
-					</a>
-				</div>
-				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
-					<a href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank">
-						<div class="card h-100 benefit-card py-4 px-3">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Stack_Overflow_Color.svg">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Stack_Overflow_Inverse.svg">
-							<h5 class="dark pb-2 benefit-text">StackOverflow</h5>
-							<p class="benefit-text mb-0">Ask usage questions.</p>
-						</div>
-					</a>
-				</div>
-				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
-					<a href="https://github.com/fairlearn/fairlearn/" target="_blank">
-						<div class="card h-100 benefit-card py-4 px-3">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/Github_Color.svg">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/Github_Inverse.svg">
-							<h5 class="dark pb-2 benefit-text">GitHub</h5>
-							<p class="benefit-text mb-0">Contribute code, documentation, use cases. Submit bug reports and feature requests.</p>
-						</div>
-					</a>
-				</div>
-				<div class="col-12 col-sm-6 col-lg-3 text-center text-lg-left mb-5">
-					<a href="https://www.linkedin.com/company/fairlearn/" target="_blank">
-						<div class="card h-100 benefit-card py-4 px-3">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-blue pb-3" src="./images/LinkedIn_Color.svg">
-							<img class="mx-auto mx-lg-0 img-fluid benefits-icons icon-white inactive pb-3" src="./images/LinkedIn_Inverse.svg">
-							<h5 class="dark pb-2 benefit-text">LinkedIn</h5>
-							<p class="benefit-text mb-0">Follow us for the latest updates.</p>
-						</div>
-					</a>
-				</div>
-			</div>
-		</div>
-		</div>
-	</div>
+      <section class="section section-community">
+        <div class="container">
+          <div class="section-heading narrow">
+            <p class="kicker">Community</p>
+            <h2>Build fairness practice in the open</h2>
+            <p>
+              Fairlearn brings together practitioners, researchers, and policy-minded builders working across domains.
+              Join discussions, share lessons, and help shape future releases.
+            </p>
+          </div>
+          <div class="community-grid">
+            <a class="community-card" href="https://discord.gg/R22yCfgsRn" target="_blank" rel="noopener noreferrer">
+              <img class="community-icon icon-blue active" src="./images/Discord_Color.svg" alt="Discord" />
+              <img class="community-icon icon-white inactive" src="./images/Discord_Inverse.svg" alt="" aria-hidden="true" />
+              <h3>Discord</h3>
+              <p>Connect with maintainers and practitioners, and ask implementation questions.</p>
+            </a>
+            <a class="community-card" href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank" rel="noopener noreferrer">
+              <img class="community-icon icon-blue active" src="./images/Stack_Overflow_Color.svg" alt="Stack Overflow" />
+              <img class="community-icon icon-white inactive" src="./images/Stack_Overflow_Inverse.svg" alt="" aria-hidden="true" />
+              <h3>Stack Overflow</h3>
+              <p>Find and share usage patterns for real projects and deployment constraints.</p>
+            </a>
+            <a class="community-card" href="https://github.com/fairlearn/fairlearn" target="_blank" rel="noopener noreferrer">
+              <img class="community-icon icon-blue active" src="./images/Github_Color.svg" alt="GitHub" />
+              <img class="community-icon icon-white inactive" src="./images/Github_Inverse.svg" alt="" aria-hidden="true" />
+              <h3>GitHub</h3>
+              <p>Contribute code, docs, examples, and issue reports that improve fairness tooling.</p>
+            </a>
+            <a class="community-card" href="https://www.linkedin.com/company/fairlearn/" target="_blank" rel="noopener noreferrer">
+              <img class="community-icon icon-blue active" src="./images/LinkedIn_Color.svg" alt="LinkedIn" />
+              <img class="community-icon icon-white inactive" src="./images/LinkedIn_Inverse.svg" alt="" aria-hidden="true" />
+              <h3>LinkedIn</h3>
+              <p>Follow releases and community updates from the Fairlearn ecosystem.</p>
+            </a>
+          </div>
+        </div>
+      </section>
 
-	<!-- CONTRIBUTE -->
-	<div id="contribute" class="container-fluid gradient section-7 py-5">
-		<div class="container">
-			<div class="mx-0">
-				<div class="row justify-content-lg-center pt-3 pb-5">
-				<div class="col-12 col-lg-8 text-center">
-					<h2 class="white pb-3">Contribute to Fairlearn</h2>
-					<p class="white pb-3">
-						Fairlearn is built and maintained by open source contributors with a variety of backgrounds and expertise.
-						Join the effort and contribute feedback, metrics, algorithms, visualizations, ideas and more, so we can evolve the toolkit together!
-					</p>
-					  <!-- Versioned Link -->
-					  <a id="contribGuideLinkContribSection" class="contribute-btn mb-0 text-center" href="">Contributor Guide</a>
-				</div>
-			</div>
-		</div>
-		</div>
-	</div>
-	<!-- CONTRIBUTE -->
+      <section class="contribute gradient">
+        <div class="container">
+          <div class="contribute-shell">
+            <p class="kicker white">Open source collaboration</p>
+            <h2>Contribute to Fairlearn</h2>
+            <p>
+              Help evolve fairness tooling with better metrics, stronger documentation, and sociotechnical examples
+              grounded in practice.
+            </p>
+            <a id="contribGuideLinkContribSection" class="contribute-btn" href="">Contributor Guide</a>
+          </div>
+        </div>
+      </section>
+    </main>
 
-	<!-- FOOTER -->
-	<footer class="container-fluid">
-		<div class="container mt-3">
-			<div class="mx-0">
-				<div class="d-flex flex-column flex-md-row align-items-center">
-				<div class="mb-3 pr-md-3">
-					<a class="pr-3" href="https://www.linkedin.com/company/fairlearn/" target="_blank">
-						<img class="img-fluid benefits-icons" src="./images/LinkedIn_Color.svg" alt=""></a>
-					<a class="pr-3" href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank">
-						<img class="img-fluid" src="./images/Stack_Overflow_Color.svg" alt=""></a>
-					<a class="pr-3" href="https://discord.gg/R22yCfgsRn" target="_blank">
-						<img class="img-fluid" src="./images/Discord_Color.svg" alt=""></a>
-					<a class="pr-3" href="https://github.com/fairlearn/fairlearn" target="_blank">
-						<img class="img-fluid" src="./images/Github_Color.svg" alt=""></a>
-					#fairlearn
-				</div>
-				<div class="flex-grow-1 text-md-right text-nowrap mb-3">
-					<p class="my-0">Copyright © <script>document.write(new Date().getFullYear());</script> Fairlearn contributors.</p>
-				</div>
-			    </div>
-			</div>
-		</div>
-	</footer>
-	<!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-shell">
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/company/fairlearn/" target="_blank" rel="noopener noreferrer">
+              <img class="img-fluid benefits-icons" src="./images/LinkedIn_Color.svg" alt="LinkedIn" />
+            </a>
+            <a href="https://stackoverflow.com/questions/tagged/Fairlearn" target="_blank" rel="noopener noreferrer">
+              <img class="img-fluid benefits-icons" src="./images/Stack_Overflow_Color.svg" alt="Stack Overflow" />
+            </a>
+            <a href="https://discord.gg/R22yCfgsRn" target="_blank" rel="noopener noreferrer">
+              <img class="img-fluid benefits-icons" src="./images/Discord_Color.svg" alt="Discord" />
+            </a>
+            <a href="https://github.com/fairlearn/fairlearn" target="_blank" rel="noopener noreferrer">
+              <img class="img-fluid benefits-icons" src="./images/Github_Color.svg" alt="GitHub" />
+            </a>
+            <span>#fairlearn</span>
+          </div>
+          <div class="footer-copy">
+            <p>Copyright © <span id="currentYear"></span> Fairlearn contributors.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"
+    ></script>
     <script src="./js/landing_page.js"></script>
   </body>
 </html>
