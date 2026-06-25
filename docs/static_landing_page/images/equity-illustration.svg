@@ -1,0 +1,46 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+      }
+      .floating { animation: float 3s ease-in-out infinite; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="transparent"/>
+  
+  <!-- Three people of different heights on boxes (equity concept) -->
+  <g class="floating" style="animation-delay: 0s;">
+    <!-- Person 1 - short, on tall box -->
+    <rect x="80" y="140" width="40" height="80" fill="#E8F0FE" rx="4"/>
+    <circle cx="100" cy="120" r="18" fill="#74A2FF"/>
+    <rect x="90" y="138" width="20" height="8" fill="#74A2FF"/>
+    <rect x="88" y="148" width="24" height="30" fill="#74A2FF"/>
+  </g>
+  
+  <g class="floating" style="animation-delay: 0.3s;">
+    <!-- Person 2 - medium, on medium box -->
+    <rect x="170" y="160" width="40" height="60" fill="#E8F0FE" rx="4"/>
+    <circle cx="190" cy="140" r="18" fill="#74A2FF"/>
+    <rect x="180" y="158" width="20" height="8" fill="#74A2FF"/>
+    <rect x="178" y="168" width="24" height="30" fill="#74A2FF"/>
+  </g>
+  
+  <g class="floating" style="animation-delay: 0.6s;">
+    <!-- Person 3 - tall, on small/no box -->
+    <circle cx="280" cy="160" r="18" fill="#74A2FF"/>
+    <rect x="270" y="178" width="20" height="8" fill="#74A2FF"/>
+    <rect x="268" y="188" width="24" height="30" fill="#74A2FF"/>
+  </g>
+  
+  <!-- Horizon line -->
+  <line x1="60" y1="220" x2="340" y2="220" stroke="#C7D0EA" stroke-width="2"/>
+  
+  <!-- Stars/sparkles -->
+  <circle cx="280" cy="80" r="3" fill="#64D6FF" opacity="0.6"/>
+  <circle cx="320" cy="100" r="2" fill="#64D6FF" opacity="0.4"/>
+  <circle cx="80" cy="60" r="2.5" fill="#64D6FF" opacity="0.5"/>
+</svg>

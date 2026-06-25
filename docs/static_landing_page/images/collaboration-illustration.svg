@@ -1,0 +1,46 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes pulse-circle {
+        0%, 100% { r: 45; opacity: 0.3; }
+        50% { r: 55; opacity: 0.15; }
+      }
+      .pulse { animation: pulse-circle 2s ease-in-out infinite; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="transparent"/>
+  
+  <!-- Central circles representing connection -->
+  <circle cx="200" cy="150" r="50" class="pulse"/>
+  <circle cx="200" cy="150" r="50" fill="none" stroke="#74A2FF" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Five diverse people in a circle -->
+  <!-- Person 1 - top left -->
+  <circle cx="120" cy="80" r="16" fill="#FF6B6B"/>
+  <circle cx="120" cy="100" r="12" fill="#FF6B6B" opacity="0.7"/>
+  
+  <!-- Person 2 - top right -->
+  <circle cx="280" cy="80" r="16" fill="#4ECDC4"/>
+  <circle cx="280" cy="100" r="12" fill="#4ECDC4" opacity="0.7"/>
+  
+  <!-- Person 3 - left -->
+  <circle cx="80" cy="150" r="16" fill="#FFE66D"/>
+  <circle cx="80" cy="170" r="12" fill="#FFE66D" opacity="0.7"/>
+  
+  <!-- Person 4 - right -->
+  <circle cx="320" cy="150" r="16" fill="#95E1D3"/>
+  <circle cx="320" cy="170" r="12" fill="#95E1D3" opacity="0.7"/>
+  
+  <!-- Person 5 - bottom -->
+  <circle cx="200" cy="240" r="16" fill="#A8E6CF"/>
+  <circle cx="200" cy="260" r="12" fill="#A8E6CF" opacity="0.7"/>
+  
+  <!-- Connection lines -->
+  <line x1="130" y1="95" x2="170" y2="130" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="270" y1="95" x2="230" y2="130" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="95" y1="165" x2="155" y2="165" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="305" y1="165" x2="245" y2="165" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
+  <line x1="200" y1="190" x2="200" y2="225" stroke="#74A2FF" stroke-width="1.5" opacity="0.3"/>
+</svg>

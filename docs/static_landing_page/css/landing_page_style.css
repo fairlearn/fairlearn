@@ -472,24 +472,23 @@ body.dark-theme .gradient {
     justify-content: center;
 }
 
-.icon-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(2, 1fr);
-    padding: 1.5rem;
+.hero-graphic {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
-.challenge-icon {
-    color: var(--brand-500);
-    filter: drop-shadow(0 2px 8px rgba(36, 94, 234, 0.15));
-    height: 64px;
-    transition: filter 200ms ease, transform 200ms ease;
-    width: 64px;
+.hero-illustration-img {
+    height: auto;
+    max-width: 320px;
+    width: 100%;
 }
 
-.challenge-icon:hover {
-    filter: drop-shadow(0 4px 12px rgba(36, 94, 234, 0.3));
-    transform: scale(1.08);
+.challenge-illustration-img {
+    height: auto;
+    max-width: 280px;
+    width: 100%;
 }
 
 .systems-network-svg {
