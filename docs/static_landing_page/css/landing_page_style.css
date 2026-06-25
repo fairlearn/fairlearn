@@ -481,14 +481,15 @@ body.dark-theme .gradient {
 
 .challenge-icon {
     color: var(--brand-500);
+    filter: drop-shadow(0 2px 8px rgba(36, 94, 234, 0.15));
     height: 64px;
+    transition: filter 200ms ease, transform 200ms ease;
     width: 64px;
-    transition: transform 200ms ease, color 200ms ease;
 }
 
 .challenge-icon:hover {
-    color: var(--brand-600);
-    transform: scale(1.1);
+    filter: drop-shadow(0 4px 12px rgba(36, 94, 234, 0.3));
+    transform: scale(1.08);
 }
 
 .systems-network-svg {
