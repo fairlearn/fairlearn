@@ -112,44 +112,6 @@
               </div>
             </div>
             <div class="col-12 col-lg-5 mt-5 mt-lg-0">
-              <div class="hero-illustration">
-                <svg class="scales-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                  <defs>
-                    <style>
-                      .scale-bar { fill: none; stroke: currentColor; stroke-width: 2; }
-                      .scale-weight { fill: currentColor; opacity: 0.8; }
-                      .scale-wobble { animation: wobble 3s ease-in-out infinite; transform-origin: 100px 80px; }
-                      @keyframes wobble {
-                        0%, 100% { transform: rotate(0deg); }
-                        25% { transform: rotate(-3deg); }
-                        75% { transform: rotate(3deg); }
-                      }
-                      @keyframes float-up-down {
-                        0%, 100% { transform: translateY(0); }
-                        50% { transform: translateY(-4px); }
-                      }
-                      .scale-left { animation: float-up-down 2s ease-in-out infinite; }
-                      .scale-right { animation: float-up-down 2s ease-in-out infinite 0.3s; }
-                    </style>
-                  </defs>
-                  <g class="scale-wobble">
-                    <circle cx="100" cy="90" r="6" class="scale-weight"/>
-                    <path d="M 85 90 L 100 75 L 115 90" class="scale-bar" stroke-linejoin="round"/>
-                    <g class="scale-left">
-                      <line x1="70" y1="90" x2="70" y2="105" class="scale-bar"/>
-                      <rect x="55" y="105" width="30" height="25" rx="2" class="scale-weight"/>
-                    </g>
-                    <g class="scale-right">
-                      <line x1="130" y1="90" x2="130" y2="110" class="scale-bar"/>
-                      <rect x="115" y="110" width="30" height="20" rx="2" class="scale-weight"/>
-                    </g>
-                    <line x1="70" y1="90" x2="130" y2="90" class="scale-bar" stroke-width="3"/>
-                  </g>
-                  <circle cx="30" cy="30" r="2" class="scale-weight" opacity="0.4"/>
-                  <circle cx="170" cy="40" r="3" class="scale-weight" opacity="0.3"/>
-                  <circle cx="40" cy="160" r="2.5" class="scale-weight" opacity="0.35"/>
-                </svg>
-              </div>
               <aside class="systems-map-panel">
                 <h3>Sociotechnical systems map</h3>
                 <p>Fairness emerges from interactions across the entire lifecycle, not just model training.</p>
@@ -209,52 +171,33 @@
             </article>
           </div>
           <div class="challenge-illustration">
-            <svg class="systems-network-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-              <defs>
-                 <style>
-                   .node-circle { fill: currentColor; opacity: 0.15; }
-                   .node-core { fill: currentColor; opacity: 0.85; }
-                   .connection-line { stroke: currentColor; stroke-width: 1.5; opacity: 0.3; fill: none; }
-                   @keyframes pulse-node {
-                     0%, 100% { r: 18; opacity: 0.85; }
-                     50% { r: 20; opacity: 0.95; }
-                   }
-                   .pulse { animation: pulse-node 2s ease-in-out infinite; }
-                   @keyframes draw-line {
-                     from { stroke-dashoffset: 100; }
-                     to { stroke-dashoffset: 0; }
-                   }
-                   .animated-line { 
-                     stroke-dasharray: 100; 
-                     animation: draw-line 4s ease-in-out infinite;
-                   }
-                 </style>
-                 <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                   <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                   <feMerge>
-                     <feMergeNode in="coloredBlur"/>
-                     <feMergeNode in="SourceGraphic"/>
-                   </feMerge>
-                 </filter>
-              </defs>
-              <line x1="150" y1="140" x2="60" y2="60" class="connection-line animated-line"/>
-              <line x1="150" y1="140" x2="240" y2="60" class="connection-line animated-line" style="animation-delay: 0.2s"/>
-              <line x1="150" y1="140" x2="60" y2="220" class="connection-line animated-line" style="animation-delay: 0.4s"/>
-              <line x1="150" y1="140" x2="240" y2="220" class="connection-line animated-line" style="animation-delay: 0.6s"/>
-              <line x1="60" y1="60" x2="240" y2="60" class="connection-line" opacity="0.15"/>
-              <line x1="60" y1="220" x2="240" y2="220" class="connection-line" opacity="0.15"/>
-              <circle cx="60" cy="60" r="16" class="node-circle"/>
-              <circle cx="60" cy="60" r="14" class="node-core pulse"/>
-              <circle cx="240" cy="60" r="16" class="node-circle"/>
-              <circle cx="240" cy="60" r="14" class="node-core pulse" style="animation-delay: 0.5s"/>
-              <circle cx="60" cy="220" r="16" class="node-circle"/>
-              <circle cx="60" cy="220" r="14" class="node-core pulse" style="animation-delay: 1s"/>
-              <circle cx="240" cy="220" r="16" class="node-circle"/>
-              <circle cx="240" cy="220" r="14" class="node-core pulse" style="animation-delay: 1.5s"/>
-              <circle cx="150" cy="140" r="20" class="node-circle" opacity="0.25"/>
-              <circle cx="150" cy="140" r="18" class="node-core" opacity="1" filter="url(#glow)"/>
-              <circle cx="150" cy="140" r="80" fill="none" stroke="currentColor" opacity="0.05" stroke-width="1" stroke-dasharray="5,5"/>
-            </svg>
+            <div class="icon-grid">
+              <!-- Icon 1: Data -->
+              <svg class="challenge-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                 <rect x="4" y="4" width="24" height="24" rx="2"/>
+                 <line x1="4" y1="10" x2="28" y2="10"/>
+                 <line x1="10" y1="4" x2="10" y2="28"/>
+                 <circle cx="16" cy="17" r="3"/>
+              </svg>
+              <!-- Icon 2: People -->
+              <svg class="challenge-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                 <circle cx="10" cy="9" r="3"/>
+                 <circle cx="22" cy="9" r="3"/>
+                 <path d="M7 15c0-2 2-3 3-3h6c1 0 3 1 3 3"/>
+                 <path d="M19 15c0-2 2-3 3-3h6c1 0 3 1 3 3"/>
+                 <path d="M4 28c0-3 2-5 6-5h12c4 0 6 2 6 5"/>
+              </svg>
+              <!-- Icon 3: Scale/Balance -->
+              <svg class="challenge-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                 <line x1="6" y1="8" x2="26" y2="8" stroke-width="2"/>
+                 <line x1="16" y1="8" x2="16" y2="26"/>
+                 <path d="M10 26l-3 2M22 26l3 2M4 18l4-8M28 18l-4-8"/>
+              </svg>
+              <!-- Icon 4: Checkmark -->
+              <svg class="challenge-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <path d="M4 16l7 7L28 8"/>
+              </svg>
+            </div>
           </div>
         </div>
       </section>

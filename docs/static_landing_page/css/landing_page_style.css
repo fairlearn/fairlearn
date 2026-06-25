@@ -363,8 +363,8 @@ body.dark-theme .gradient {
 
 .scales-svg {
     color: rgba(255, 255, 255, 0.9);
-    height: 280px;
-    max-width: 280px;
+    height: 120px;
+    max-width: 120px;
     width: 100%;
 }
 
@@ -470,6 +470,25 @@ body.dark-theme .gradient {
     align-items: center;
     display: flex;
     justify-content: center;
+}
+
+.icon-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 1.5rem;
+}
+
+.challenge-icon {
+    color: var(--brand-500);
+    height: 64px;
+    width: 64px;
+    transition: transform 200ms ease, color 200ms ease;
+}
+
+.challenge-icon:hover {
+    color: var(--brand-600);
+    transform: scale(1.1);
 }
 
 .systems-network-svg {
