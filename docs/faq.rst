@@ -125,6 +125,43 @@ Can the Fairlearn library recommend ways to make my model fairer?
 What unfairness mitigation techniques does Fairlearn support?
     Please see our :ref:`mitigation` section.
 
+How does Fairlearn compare with other toolkits?
+    These projects share a broad goal (measuring and mitigating unfairness), but
+    differ in scope, ease of use, and continued support/maintenance.
+
+    .. list-table::
+       :header-rows: 1
+       :widths: 28 22 50
+
+       * - Toolkit
+         - Latest release (as of June 2026)
+         - Focus
+       * - `Fairlearn <https://github.com/fairlearn/fairlearn>`_
+         - v0.14.0 (2026-06-08)
+         - Assessment and mitigation, with scikit-learn-style APIs and a
+           sociotechnical framing in documentation and guidance.
+       * - `AIF360 <https://github.com/Trusted-AI/AIF360>`_
+         - v0.6.1 (2024-04-08)
+         - Assessment and mitigation, with a broad catalog of fairness methods.
+       * - `Seldonian Toolkit (Engine) <https://github.com/seldonian-toolkit/Engine>`_
+         - alpha (2022-09-30)
+         - Probabilistic safety/fairness-constrained learning (a different
+           paradigm from Fairlearn's metric/mitigation workflow).
+       * - `Aequitas <https://github.com/dssg/aequitas>`_
+         - 1.1.0 (2026-02-03, PyPI)
+         - Fairness auditing and reporting.
+       * - `TensorFlow Model Analysis (Fairness Indicators) <https://github.com/tensorflow/model-analysis>`_
+         - v0.52.0 (2026-06-12)
+         - Slice-based fairness evaluation and monitoring in TensorFlow/TFX
+           pipelines.
+       * - `What-If Tool <https://github.com/PAIR-code/what-if-tool>`_
+         - v1.8.1 (2021-10-12)
+         - Interactive subgroup exploration and model debugging.
+
+    Cloud providers also offer managed fairness services, including Amazon
+    SageMaker Clarify and Microsoft Responsible AI Toolbox (which builds on
+    Fairlearn).
+
 Which ML libraries does Fairlearn support?
     We have generally followed conventions of `scikit-learn`.
     However, our mitigation algorithms can be used to augment
