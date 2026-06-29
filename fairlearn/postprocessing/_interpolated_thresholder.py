@@ -72,9 +72,8 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             In previous versions only the ``predict`` method was used
             implicitly.
 
-        .. versionchanged:: 0.7
-            From version 0.7, 'predict' is deprecated as the default value and
-            the default changes to 'auto' from v0.10.
+        .. versionchanged:: 0.10
+            The default value changed from ``'predict'`` to ``'auto'``.
     """
 
     def __init__(self, estimator, interpolation_dict, prefit=False, predict_method="auto"):

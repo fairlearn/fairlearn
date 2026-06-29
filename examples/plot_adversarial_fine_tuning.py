@@ -125,12 +125,13 @@ from fairlearn.metrics import demographic_parity_difference
 
 def validate(pipeline, X, y, z, pos_label):
     predictions = pipeline.predict(X)
+
     dp_diff = demographic_parity_difference(
         y == pos_label,
         predictions == pos_label,
         sensitive_features=z,
     )
-    accuracy = mean(predictions == y.values)
+    accuracy = mean(predictions == y)
     selection_rate = mean(predictions == pos_label)
     print(
         "DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
@@ -219,7 +220,7 @@ from sklearn.metrics import accuracy_score
 from fairlearn.metrics import MetricFrame, selection_rate
 
 # to see DP difference, accuracy, and selection_rate
-print(validate(pipeline, X_test, y_test, z=Z_test, pos_label=pos_label))
+validate(pipeline, X_test, y_test, z=Z_test, pos_label=pos_label)
 predictions = pipeline.predict(X_test)
 mf = MetricFrame(
     metrics={"accuracy": accuracy_score, "selection_rate": selection_rate},

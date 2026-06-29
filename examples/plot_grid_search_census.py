@@ -7,6 +7,7 @@
 GridSearch with Census Data
 ===========================
 """
+
 # %% This notebook shows how to use Fairlearn to generate predictors for the
 # Census dataset. This dataset is a classification problem - given a range of
 # data about 32,000 individuals, predict whether their annual income is above

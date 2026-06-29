@@ -370,7 +370,7 @@ To measure the ErrorRate in respect to a trained estimator we use its :code:`gam
     >>> from sklearn.model_selection import train_test_split
     >>> from sklearn.linear_model import LogisticRegression
     >>> import numpy as np
-    >>> rng = np.random.default_rng(42) 
+    >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
     >>> sensitive_features = X[:, -1]
@@ -392,7 +392,7 @@ to a cost-sensitive classification problem.
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score
     >>> import numpy as np
-    >>> rng = np.random.default_rng(42) 
+    >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
     >>> sensitive_features = X[:, -1]
@@ -625,6 +625,46 @@ Group :code:`"a"` has an average loss of :math:`0.05`, while group
     detected by :code:`gamma` is identical to the mean absolute error.
 
 
+
+.. _grid_search:
+
+Grid Search
+-----------
+
+The :class:`GridSearch` algorithm is a simpler alternative to
+:class:`ExponentiatedGradient`. It works by generating a grid of re-weightings
+and relabelings, and training a separate predictor for each. The resulting
+collection of predictors represents various trade-offs between the performance
+objective and the fairness constraints.
+
+Here is a short example of how to use :class:`GridSearch` with :class:`DemographicParity`:
+
+.. doctest:: mitigation_reductions
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.reductions import GridSearch, DemographicParity
+    >>> from sklearn.linear_model import LogisticRegression
+    >>> import numpy as np
+    >>> # Sample data
+    >>> X = np.array([[0], [1], [2], [3], [4], [5], [6], [7]])
+    >>> y = np.array([0, 1, 0, 1, 0, 1, 1, 1])
+    >>> sf = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+    >>> # Initialize and fit
+    >>> mitigator = GridSearch(
+    ...     LogisticRegression(solver='liblinear'),
+    ...     constraints=DemographicParity(),
+    ...     grid_size=10
+    ... )
+    >>> mitigator.fit(X, y, sensitive_features=sf) # doctest: +ELLIPSIS
+    GridSearch(...)
+    >>> # Predict
+    >>> y_pred = mitigator.predict(X)
+
+The full collection of predictors generated during the search is available
+via the :attr:`GridSearch.predictors_` attribute, allowing users to manually
+explore the Pareto front of models.
+
+
 Exponentiated Gradient
 ----------------------
 
@@ -676,7 +716,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     >>> _ = estimator.fit(X_train, y_train)
     >>> y_pred_base = estimator.predict(X_test)
     >>> # Create a list of ExponentiatedGradient models with different epsilons
-    >>> epsilons = [0.001, 0.01, 0.05, 0.1, 0.2]
+    >>> epsilons = [0.001, 0.01, 0.1]
     >>> exp_grad_models = {}
     >>> for eps in epsilons:
     ...     exp_grad_est = ExponentiatedGradient(

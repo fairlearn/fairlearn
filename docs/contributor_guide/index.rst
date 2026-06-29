@@ -14,7 +14,6 @@ The contribution guide explains how to structure your contributions. Please
 
    ways_to_contribute
    how_to_talk_about_fairness
-   fairlearn_repository_overview
    development_process
    contributing_code
    code_style

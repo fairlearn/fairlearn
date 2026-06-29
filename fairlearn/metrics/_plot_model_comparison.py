@@ -42,6 +42,8 @@ def plot_model_comparison(
     (e.g., balanced_accuracy) and the other is a fairness metric
     (e.g., false_negative_rate_difference).
 
+    .. versionadded:: 0.8.0
+
     Parameters
     ----------
     y_preds : array-like, dict of array-like
@@ -109,7 +111,7 @@ def plot_model_comparison(
 
     In case no Axes object is supplied, axis labels are
     automatically inferred from their class name.
-    """  # noqa: E501
+    """
     # --- CHECK DEPENDENCY ---
     try:
         import matplotlib.pyplot as plt

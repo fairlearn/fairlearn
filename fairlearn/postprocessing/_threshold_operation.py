@@ -55,5 +55,5 @@ class ThresholdOperation:
         else:
             raise ValueError("Unrecognized operator: " + self._operator)
 
-    def __repr__(self):  # noqa: D105
+    def __repr__(self):
         return "[{}{}]".format(self._operator, self._threshold)

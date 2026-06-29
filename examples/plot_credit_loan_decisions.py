@@ -1056,12 +1056,12 @@ def filter_models_by_unmitigiated_score(
 
     Parameters
     ----------
-    all_models: Dictionary (Epsilon, Index) mapping (epilson, index number) pairs to a Model object
-    models_frames: A DataFrame representing each model's performance and fairness score.
-    unmitigated_score: The performance score of the unmitigated model.
-    performance_metric: The model performance metric to threshold on.
-    fairness_metric: The fairness metric to optimize for
-    threshold: The threshold padding added to the :code:`unmitigated_score`.
+    all_models : Dictionary (Epsilon, Index) mapping (epilson, index number) pairs to a Model object
+    models_frames : A DataFrame representing each model's performance and fairness score.
+    unmitigated_score : The performance score of the unmitigated model.
+    performance_metric : The model performance metric to threshold on.
+    fairness_metric : The fairness metric to optimize for
+    threshold : The threshold padding added to the :code:`unmitigated_score`.
 
     """
     # Create threshold based on balanced_error of unmitigated model and filter
@@ -1200,7 +1200,7 @@ metricframe_postprocess.overall[metrics_to_report]
 #
 # A key facet of Responsible Machine Learning is responsible documentation
 # practices. :footcite:ct:`mitchell2019model`
-# proposed the model card framework for documentating and reporting model
+# proposed the model card framework for documenting and reporting model
 # training details and deployment considerations.
 #
 # A *model card* contains sections for documenting training and evaluation

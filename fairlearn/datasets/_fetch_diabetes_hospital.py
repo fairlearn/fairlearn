@@ -4,6 +4,7 @@
 import pathlib
 
 from sklearn.datasets import fetch_openml
+from sklearn.utils import Bunch
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
@@ -49,10 +50,6 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
         If True, the data is a pandas DataFrame including columns with
         appropriate dtypes (numeric, string or categorical).
 
-        .. note::
-            If set to False, this will raise an exception because of a type mismatch
-            in the OpenML dataset.
-
         .. versionadded:: 0.9.0
 
     cache : bool, default=True
@@ -97,13 +94,38 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 
+    # Always fetch as a DataFrame so that pandas handles the heterogeneous
+    # (numeric / categorical / string) column types from OpenML. When the
+    # caller asked for ``as_frame=False`` we convert to numpy arrays below.
     # For data_home see
     # https://github.com/scikit-learn/scikit-learn/issues/27447
-    return fetch_openml(
+    dataset = fetch_openml(
         data_id=43874,
         data_home=str(data_home),
         cache=cache,
-        as_frame=as_frame,
-        return_X_y=return_X_y,
+        as_frame=True,
+        return_X_y=False,
         parser="auto",
+    )
+
+    if as_frame:
+        if return_X_y:
+            return dataset.data, dataset.target
+        return dataset
+
+    # ``as_frame=False``: hand back numpy arrays. The dataset contains mixed
+    # numeric and string/categorical columns, so we let pandas pick the
+    # resulting dtype (object for the heterogeneous data matrix, native dtype
+    # for the integer target).
+    data = dataset.data.to_numpy()
+    target = dataset.target.to_numpy()
+
+    if return_X_y:
+        return data, target
+    return Bunch(
+        data=data,
+        target=target,
+        feature_names=dataset.feature_names,
+        DESCR=dataset.DESCR,
+        categories=None,
     )

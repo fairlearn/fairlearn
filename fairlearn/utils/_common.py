@@ -14,7 +14,7 @@ def _get_soft_predictions(estimator, X, predict_method):
         A scikit-learn compatible estimator
 
     X : array-like
-        The intput for which the output is desired
+        The input for which the output is desired
 
     predict_method : {'auto', 'predict_proba', 'decision_function', 'predict'\
             }, default='auto'
@@ -54,8 +54,9 @@ def _get_soft_predictions(estimator, X, predict_method):
 
 
 def _filter_kwargs(func, kwargs):
-    """Helper function to filter kwargs that are accepted by `func` according to its
-    signature. Returns all `kwargs` if `func` accepts `**kwargs` (or similar).
+    """Filter kwargs to those accepted by ``func`` according to its signature.
+
+    Returns all `kwargs` if `func` accepts `**kwargs` (or similar).
 
     Parameters
     ----------

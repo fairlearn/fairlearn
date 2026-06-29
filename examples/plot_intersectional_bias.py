@@ -521,6 +521,8 @@ Intersectionality in Mental Health Care
 
 # %%
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 
 # Import relevant libraries
@@ -535,7 +537,8 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from fairlearn.metrics import MetricFrame, false_positive_rate
 
 # Read in dataset
-data_openml = fetch_openml(data_id=45040)
+data_home = Path().home() / ".fairlearn-data"
+data_openml = fetch_openml(data_id=45040, data_home=data_home)
 data = data_openml.data
 data["Diagnosis"] = data_openml.target
 

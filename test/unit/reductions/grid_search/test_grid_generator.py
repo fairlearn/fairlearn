@@ -120,7 +120,7 @@ def test_grid_generator_equalized_odds(grid_limit, grid_size):
     for i in range(grid_size):
         expected_grid[i] = pd.Series(0.0, index=expected_index)
 
-    gl = grid_limit  # abbreviation for readibility
+    gl = grid_limit  # abbreviation for readability
     expected_grid.loc["+", label0, 1] = [
         0,
         0,
@@ -220,7 +220,7 @@ def test_grid_generator_equalized_odds_with_center(grid_limit, grid_size, grid_o
     for i in range(grid_size):
         expected_grid[i] = pd.Series(0.0, index=expected_index)
 
-    gl = grid_limit  # abbreviation for readibility
+    gl = grid_limit  # abbreviation for readability
     expected_grid.loc["+", label0, 1] = [
         0,
         0,

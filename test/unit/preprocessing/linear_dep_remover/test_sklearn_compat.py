@@ -7,9 +7,11 @@ from contextlib import nullcontext as does_not_raise
 import narwhals.stable.v1 as nw
 import numpy as np
 import pytest
-from sklearn.utils.estimator_checks import parametrize_with_checks
+from test._sklearn_compat import parametrize_with_checks
 
 from fairlearn.preprocessing import CorrelationRemover
+
+pytestmark = pytest.mark.narwhals
 
 
 @parametrize_with_checks(

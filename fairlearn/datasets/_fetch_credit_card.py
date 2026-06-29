@@ -29,7 +29,7 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
         Whether to cache downloaded datasets using joblib
 
     data_home : optional, default: None
-        Specifiy another download and cache folder for the datasets. By default,
+        Specify another download and cache folder for the datasets. By default,
         all scikit-learn data is stored in '~/.fairlearn-data' subfolders.
 
     as_frame : boolean, default=True

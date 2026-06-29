@@ -10,10 +10,12 @@ should adhere to. Breaking changes in Torch/TF API should be manually reflected
 here. Additionally, we generate data here.
 """
 
+import contextlib
 import sys
+from typing import Literal
+from unittest.mock import patch
 
 import numpy as np
-from sklearn.datasets import make_classification
 
 from fairlearn.adversarial._adversarial_mitigation import (
     _AdversarialFairness,  # We just test the base class because this covers all
@@ -104,6 +106,18 @@ class fake_torch:
         Sigmoid = lambda: type("Sigmoid", (), {"__call__": lambda x: x})  # noqa: E731
         Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
 
+        def Tanh():
+            return type("Tanh", (), {"__call__": lambda x: x})
+
+        def GELU():
+            return type("GELU", (), {"__call__": lambda x: x})
+
+        def ELU():
+            return type("ELU", (), {"__call__": lambda x: x})
+
+        def SELU():
+            return type("SELU", (), {"__call__": lambda x: x})
+
         class ModuleList:  # noqa: D106
             def __init__(self, layers):
                 self.layers = layers
@@ -146,7 +160,24 @@ class fake_keras:
 
     class activations:  # noqa: D106
         def deserialize(item):
-            return type(item, (), {"__call__": lambda x: x})
+            # Mirror keras.activations.deserialize: recognized lowercase
+            # activation identifiers resolve to a callable, while
+            # unrecognized strings (such as capitalized names) are returned
+            # unchanged, exactly as real keras does. This ensures the engine
+            # must lower-case activation strings before deserializing them.
+            known = {
+                "sigmoid",
+                "softmax",
+                "relu",
+                "leaky_relu",
+                "tanh",
+                "gelu",
+                "elu",
+                "selu",
+            }
+            if item in known:
+                return type(item, (), {"__call__": lambda x: x})
+            return item
 
     class layers:  # noqa: D106
         class Dense:  # noqa: D106
@@ -201,10 +232,7 @@ Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(
     rows,
 )
-MultiClass2d, _ = make_classification(
-    random_state=42, n_classes=3, n_clusters_per_class=1, n_samples=rows, n_features=cols
-)
-MultiClass1d = np.random.choice([0.0, 1.0, 0.2], size=(rows,))
+MultiClass2d = np.random.choice([0.0, 1.0, 2.0], size=(rows, cols))
 
 
 def generate_data_combinations(n=10):
@@ -292,12 +320,12 @@ def get_instance(
     cls=_AdversarialFairness,
     fake_mixin=False,
     fake_training=False,
-    torch=True,
-    tensorflow=False,
+    fake_backend: Literal["torch", "tensorflow"] | None = "torch",
     **kwargs,
 ):
     """
     Shared set up of test cases that create an instance of the model.
+    Should be used with the fake_backend_env pytest fixture.
 
     Parameters
     ----------
@@ -310,29 +338,15 @@ def get_instance(
     fake_training: bool
         only remove training step from backendEngine
 
-    torch: bool
-        Use torch (and set the fake torch module)
-
-    tensorflow: bool
-        Use tensorflow (and set the fake tensorflow module)
+    fake_backend : Literal["torch", "tensorflow"] | None
+        which backend to use
     """
-    if torch:
-        sys.modules["torch"] = fake_torch
-    else:
-        sys.modules["torch"] = None
-    if tensorflow:
-        sys.modules["tensorflow"] = fake_tensorflow
-        sys.modules["keras"] = fake_keras
-    else:
-        sys.modules["tensorflow"] = None
-        sys.modules["keras"] = None
-
     default_kwargs = dict()
 
-    if torch:
+    if fake_backend == "torch":
         default_kwargs["predictor_model"] = fake_torch.nn.Module()
         default_kwargs["adversary_model"] = fake_torch.nn.Module()
-    elif tensorflow:
+    elif fake_backend == "tensorflow":
         default_kwargs["predictor_model"] = fake_keras.Model()
         default_kwargs["adversary_model"] = fake_keras.Model()
 
@@ -342,14 +356,54 @@ def get_instance(
     if fake_mixin:
         mitigator.backend = RemoveAll
     elif fake_training:
-        if tensorflow:
+        if fake_backend == "tensorflow":
             mitigator.backend = RemoveTrainStepTensorflow
-        if torch:
+        if fake_backend == "torch":
             mitigator.backend = RemoveTrainStepPytorch
 
     return mitigator
 
 
-sys.modules["torch"] = None
-sys.modules["tensorflow"] = None
-sys.modules["keras"] = None
+def get_backend_patches(backend: Literal["torch", "tensorflow"] | None = "torch"):
+    patches = {"torch": None, "tensorflow": None, "keras": None}
+
+    if backend == "torch":
+        patches["torch"] = fake_torch
+    elif backend == "tensorflow":
+        patches["tensorflow"] = fake_tensorflow
+        patches["keras"] = fake_keras
+    elif backend is not None:
+        raise ValueError(f"Unknown backend: {backend}")
+
+    return patches
+
+
+@contextlib.contextmanager
+def _patched_modules(backend: Literal["torch", "tensorflow"] | None = "torch"):
+    """Temporarily patch sys.modules to fake torch/tensorflow."""
+    with patch.dict(sys.modules, get_backend_patches(backend)):
+        yield
+
+
+def get_instance_with_context(
+    cls=_AdversarialFairness,
+    fake_mixin=False,
+    fake_training=False,
+    fake_backend: Literal["torch", "tensorflow"] | None = "torch",
+    **kwargs,
+):
+    """
+    Needed for tests that require the estimator to be created in the parameters, e.g.,
+    scikit-learn's parametrize_with_checks. The tests still need the fake_backend_env
+    fixture to patch sys.modules during the test function execution.
+
+    In other cases, using get_instance with the fake_backend_env pytest fixture suffices.
+    """
+    with _patched_modules(backend=fake_backend):
+        return get_instance(
+            cls=cls,
+            fake_mixin=fake_mixin,
+            fake_training=fake_training,
+            fake_backend=fake_backend,
+            **kwargs,
+        )

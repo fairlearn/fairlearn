@@ -112,6 +112,8 @@ NOT_SUPPORTED_OBJECTIVES_FOR_EQUALIZED_ODDS_ERROR_MESSAGE = (
 class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
     """A classifier based on the threshold optimization approach.
 
+     .. versionadded:: 0.3.0
+
     The classifier is obtained by applying group-specific thresholds to the
     provided estimator. The thresholds are chosen to optimize the provided
     performance objective subject to the provided fairness constraints.
@@ -193,9 +195,8 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             In previous versions only the ``predict`` method was used
             implicitly.
 
-        .. versionchanged:: 0.7
-            From version 0.7, 'predict' is deprecated as the default value and
-            the default changes to 'auto' from v0.10.
+        .. versionchanged:: 0.10
+            The default value changed from ``'predict'`` to ``'auto'``.
 
     tol : float | None, default=None
         The tolerance for the constraint metric. The range of the constraint metric's values across
@@ -348,8 +349,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         return self
 
     def predict(self, X, *, sensitive_features, random_state=None):
-        """Predict label for each sample in X while taking into account \
-            sensitive features.
+        """Predict label for each sample in X while taking into account sensitive features.
 
         Parameters
         ----------
@@ -435,10 +435,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
 
         sensitive_feature_proportions = {}
 
-        for (
-            sensitive_feature_value,
-            group,
-        ) in data_grouped_by_sensitive_feature:
+        for sensitive_feature_value, group in data_grouped_by_sensitive_feature:
             # Determine probability of current sensitive feature group based on data.
             p_sensitive_feature_value = len(group) / n
             sensitive_feature_proportions[sensitive_feature_value] = p_sensitive_feature_value
@@ -605,7 +602,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         # a) the proportion of negative labels multiplied by x which represents
         #    the conditional probability P[Y_hat=1 | Y=0], i.e. the probability
         #    of a positive prediction given a negative label.
-        # b) the propotion of positive labels multiplied by 1-y_min, where y_min
+        # b) the proportion of positive labels multiplied by 1-y_min, where y_min
         #    represents the conditional probability P[Y_hat=1 | Y=1], i.e. the
         #    probability of a correct prediction of a positive label, so 1-y_min
         #    represents a negative prediction given a positive label.

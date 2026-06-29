@@ -21,9 +21,8 @@ from sklearn.utils.validation import (
     check_consistent_length,
     check_is_fitted,
     check_random_state,
+    validate_data,
 )
-
-from fairlearn.utils._fixes import validate_data
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -81,7 +80,7 @@ class _AdversarialFairness(BaseEstimator):
     real-valued features, the network output is left as is, and the
     loss is a square loss.
 
-    The adversarial model for equalized odds additionaly takes
+    The adversarial model for equalized odds additionally takes
     :code:`y` as input. For multi-class classification, :code:`y` is
     transformed using one-hot encoding.
 
@@ -176,7 +175,7 @@ class _AdversarialFairness(BaseEstimator):
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
         at an earlier stage. Note that not only checking :code:`X`
-        is skipped, but also no tranform is applied to :code:`y` and
+        is skipped, but also no transform is applied to :code:`y` and
         :code:`sensitive_features`.
 
     callbacks : callable
@@ -195,7 +194,7 @@ class _AdversarialFairness(BaseEstimator):
 
     warm_start : bool, default = False
         Normally, when set to False, a call to :code:`fit()` triggers reinitialization,
-        which discards the models and intializes them again. Setting to
+        which discards the models and initializes them again. Setting to
         True triggers reuse of these models. Note: if pre-initialized models
         are passed, the models (and their parameters) are never discarded.
 
@@ -207,7 +206,7 @@ class _AdversarialFairness(BaseEstimator):
         Maximum number of training iterations to perform. If set to -1, the number
         of iterations is determined by epochs parameter. Either epochs or max_iter
         must be positive.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -271,10 +270,14 @@ class _AdversarialFairness(BaseEstimator):
         Infers appropriate losses and functions if not explicitly defined.
         Called from `fit` method, not `__init__`, following sklearn API.
 
-        Parameters:
-        X : array-like, input features
-        y : array-like, target values
-        A : array-like, sensitive features
+        Parameters
+        ----------
+        X : array-like
+            Input features.
+        y : array-like
+            Target values.
+        A : array-like
+            Sensitive features.
         """
         self._validate_backend()
 
@@ -478,28 +481,23 @@ class _AdversarialFairness(BaseEstimator):
                             )
                             # + 1e-6 for numerical stability
                             logger.info(
-                                _PROGRESS_UPDATE.format(  # noqa : G001
-                                    "=" * round(20 * progress),
-                                    " " * round(20 * (1 - progress)),  # noqa : G003
-                                    epoch + 1,  # noqa : G003
-                                    epochs,
-                                    " "  # noqa : G003
-                                    * (
-                                        len(str(batch + 1))  # noqa : G003
-                                        - len(str(batches))  # noqa : G003
-                                    ),  # noqa : G003
-                                    batch + 1,  # noqa : G003
-                                    batches,
-                                    ETA,
-                                    predictor_losses[-1],
-                                    adversary_losses[-1],
-                                )
+                                _PROGRESS_UPDATE,
+                                "=" * round(20 * progress),
+                                " " * round(20 * (1 - progress)),
+                                epoch + 1,
+                                epochs,
+                                " " * (len(str(batch + 1)) - len(str(batches))),
+                                batch + 1,
+                                batches,
+                                ETA,
+                                predictor_losses[-1],
+                                adversary_losses[-1],
                             )
                 batch_slice = slice(
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
-                (LP, LA) = self.backendEngine_.train_step(
+                LP, LA = self.backendEngine_.train_step(
                     X[batch_slice], y[batch_slice], A[batch_slice]
                 )
                 predictor_losses.append(LP)
@@ -514,8 +512,14 @@ class _AdversarialFairness(BaseEstimator):
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
+                        y_true = self._y_transform.inverse_transform(y)
                         result = cb(
-                            self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=1
+                            self,
+                            step=self.n_iter_,
+                            X=X,
+                            y=y_true,
+                            z=sensitive_features,
+                            pos_label=self.classes_[1],
                         )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
@@ -527,8 +531,7 @@ class _AdversarialFairness(BaseEstimator):
         return self
 
     def partial_fit(self, X, y, *, classes=None, sensitive_features=None):
-        """
-        Perform one training step on given samples and update model.
+        """Perform one training step on given samples and update model.
 
         This method allows for incremental fitting on batches of data.
 
@@ -554,7 +557,6 @@ class _AdversarialFairness(BaseEstimator):
         self : object
             Returns self.
         """
-
         first_call = not hasattr(self, "classes_")
 
         if first_call and classes is not None:
@@ -878,7 +880,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     real-valued features, the network output is left as is, and the
     loss is a square loss.
 
-    The adversarial model for equalized odds additionaly takes
+    The adversarial model for equalized odds additionally takes
     :code:`y` as input. For multi-class classification, :code:`y` is
     transformed using one-hot encoding.
 
@@ -957,7 +959,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
         at an earlier stage. Note that not only checking :code:`X`
-        is skipped, but also no tranform is applied to :code:`y` and
+        is skipped, but also no transform is applied to :code:`y` and
         :code:`sensitive_features`.
 
     callbacks : callable
@@ -982,14 +984,14 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
 
     warm_start : bool, default = False
         Normally, when set to False, a call to :code:`fit()` triggers reinitialization,
-        which discards the models and intializes them again. Setting to
+        which discards the models and initializes them again. Setting to
         True triggers reuse of these models. Note: if pre-initialized models
         are passed, the models (and their parameters) are never discarded.
 
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -1077,7 +1079,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     real-valued features, the network output is left as is, and the
     loss is a square loss.
 
-    The adversarial model for equalized odds additionaly takes
+    The adversarial model for equalized odds additionally takes
     :code:`y` as input.
 
     Parameters
@@ -1155,7 +1157,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
         Skip the validation of the data. Useful because validate_input is
         a costly operation, and we may instead pass all data to validate_input
         at an earlier stage. Note that not only checking :code:`X`
-        is skipped, but also no tranform is applied to :code:`y` and
+        is skipped, but also no transform is applied to :code:`y` and
         :code:`sensitive_features`.
 
     callbacks : callable
@@ -1174,14 +1176,14 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
 
     warm_start : bool, default = False
         Normally, when set to False, a call to :code:`fit()` triggers reinitialization,
-        which discards the models and intializes them again. Setting to
+        which discards the models and initializes them again. Setting to
         True triggers reuse of these models. Note: if pre-initialized models
         are passed, the models (and their parameters) are never discarded.
 
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,

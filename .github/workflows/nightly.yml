@@ -6,6 +6,19 @@ on:
   workflow_dispatch:
 
 jobs:
+  all-deps-min:
+    strategy:
+      # Keep running remaining matrix jobs even if one fails
+      # to see all issues rather than just the first failure.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-14]
+    uses: ./.github/workflows/test-min-deps.yml
+    with:
+      os: ${{ matrix.os }}
+      python: "3.11"
+      codeCovPython: "3.11"
+
   all-deps:
     strategy:
       # Keep running remaining matrix jobs even if one fails
@@ -13,14 +26,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        requirementsPinned: ["true", "false"]
+        python: ["3.11", "3.12", "3.13", "3.14"]
     uses: ./.github/workflows/test-all-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      requirementsPinned: ${{ matrix.requirementsPinned }}
-      codeCovPython: "3.12"
+      codeCovPython: "3.13"
 
   minimal-deps:
     strategy:
@@ -29,12 +40,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python: ["3.11", "3.12", "3.13", "3.14"]
     uses: ./.github/workflows/test-minimal-deps.yml
     with:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
-      codeCovPython: "3.12"
+      codeCovPython: "3.13"
 
   other-ml:
     strategy:
@@ -46,7 +57,7 @@ jobs:
     uses: ./.github/workflows/test-other-ml.yml
     with:
       os: ubuntu-latest
-      python: "3.12"
+      python: "3.13"
       mlpackage: ${{ matrix.mlpackage }}
 
 
@@ -54,7 +65,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python: ["3.12"]
+        python: ["3.13"]
     uses: ./.github/workflows/linting.yml
     with:
       os: ${{ matrix.os }}

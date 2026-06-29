@@ -15,11 +15,10 @@ of `fairlearn`) exists in the repo. Otherwise, the links won't work.
 
 import argparse
 import logging
-import os
 import re
 import sys
 
-from _utils import _LogWrapper
+from _utils import _get_fairlearn_version, _LogWrapper
 
 _logger = logging.getLogger(__name__)
 
@@ -92,10 +91,7 @@ def _process_line(line, target_version):
 
 
 def process_readme(input_file_name, output_file_name):
-    sys.path.append(os.getcwd())
-    import fairlearn
-
-    target_version = fairlearn.__version__
+    target_version = _get_fairlearn_version()
     _logger.info("fairlearn version: %s", target_version)
 
     text_lines = []

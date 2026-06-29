@@ -19,17 +19,15 @@ from sklearn.dummy import check_random_state
 from sklearn.metrics import log_loss
 from sklearn.utils.multiclass import type_of_target
 
-from fairlearn.utils._fixes import validate_data
+from sklearn.utils.validation import validate_data
+
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 
 LOGGER = logging.getLogger(__name__)
 
 
 class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEstimator):
-    r"""
-    A transformer and classifier that learns a latent representation of the input data to
-    obfuscate the sensitive features while preserving the classification and reconstruction
-    performance.
+    r"""A transformer and classifier that learns a latent representation of the input data to obfuscate the sensitive features while preserving the classification and reconstruction performance.
 
     The model minimizes a loss function that consists of three terms: the reconstruction error,
     the classification error, and an approximation of the demographic parity difference.
@@ -271,18 +269,15 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             + [(0, None)] * self._prototype_dim  # The dimension weights are non-negative
         )
 
-        try:
-            result: OptimizeResult = minimize(
-                self._objective,
-                x0=x0,
-                bounds=bounds,
-                args=(X, y, sensitive_features),
-                method="L-BFGS-B",
-                tol=self.tol,
-                options={"maxiter": self.max_iter},
-            )
-        except Exception as optimization_error:
-            raise RuntimeError("The loss minimization failed.") from optimization_error
+        result: OptimizeResult = minimize(
+            self._objective,
+            x0=x0,
+            bounds=bounds,
+            args=(X, y, sensitive_features),
+            method="L-BFGS-B",
+            tol=self.tol,
+            options={"maxiter": self.max_iter},
+        )
 
         self.coef_ = result.x[self._prototype_vectors_size : -self._prototype_dim]
         self._prototypes_ = result.x[: self._prototype_vectors_size].reshape(
@@ -294,8 +289,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         return self
 
     def _objective(self, x: np.ndarray, X, y, sensitive_features: pd.Series | None) -> float:
-        r"""
-        Compute the objective function for the optimization problem at the given point :code:`x`.
+        r"""Compute the objective function for the optimization problem at the given point :code:`x`.
 
         This method extracts the current prototype vectors, the prototype predictions, and the
         dimension weights, and calculates the current loss, which is the weighted sum of the
@@ -312,12 +306,12 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             The target values.
         sensitive_features : pd.Series or None
             The sensitive features for each sample.
+
         Returns
         -------
         float
             The computed objective value.
         """
-
         assert x.shape == (self._optimizer_size,)
         # Compute the reconstruction error
         V = x[: self._prototype_vectors_size].reshape((self.n_prototypes, self._prototype_dim))
@@ -331,10 +325,11 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         if self._has_target:
             w = x[self._prototype_vectors_size : -self._prototype_dim]
             y_hat = M @ w
+            y_hat = np.clip(y_hat, 0, 1)  # To deal with precision errors
             classification_error = log_loss(y, y_hat)
 
         fairness_error = 0.0
-        if sensitive_features is not None:
+        if sensitive_features is not None and len(self._groups) > 1:
             # Compute the fairness error
             # Compute the mean prototype probabilities for each group
             M_gk = np.array(
@@ -353,10 +348,10 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         )
 
     def transform(self, X) -> np.ndarray:
-        r"""
-        Transform the input data X using the learned prototype representation. Each sample is
-        transformed to its associated learned latent mapping, i.e. the softmax of its negative
-        distance to the prototypes.
+        r"""Transform the input data X using the learned prototype representation.
+
+        Each sample is transformed to its associated learned latent mapping, i.e. the softmax of
+        its negative distance to the prototypes.
 
         Parameters
         ----------
@@ -487,8 +482,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         return M
 
     def _validate_X_y(self, X, y) -> tuple[np.ndarray, np.ndarray]:
-        r"""
-        Validate and preprocess the input features and target labels.
+        r"""Validate and preprocess the input features and target labels.
 
         Parameters
         ----------
@@ -507,7 +501,6 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         ValueError
             If the target labels are not binary.
         """
-
         if y is None:
             X = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
             self._has_target = False

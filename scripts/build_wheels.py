@@ -6,7 +6,7 @@ import logging
 import subprocess
 import sys
 
-from _utils import _ensure_cwd_is_fairlearn_root_dir, _LogWrapper
+from _utils import _ensure_cwd_is_fairlearn_root_dir, _get_fairlearn_version, _LogWrapper
 from process_readme import process_readme
 
 _logger = logging.getLogger(__file__)
@@ -31,20 +31,16 @@ def main(argv):
     parser = build_argument_parser()
     args = parser.parse_args(argv)
 
-    with _LogWrapper("installation of fairlearn"):
-        subprocess.check_call(["pip", "install", "-e", "."])
-
     with _LogWrapper("processing README.rst"):
         process_readme("README.rst", "README.rst")
 
     with _LogWrapper("storing fairlearn version in {}".format(args.version_filename)):
-        import fairlearn
-
+        version = _get_fairlearn_version()
         with open(args.version_filename, "w") as version_file:
-            version_file.write(fairlearn.__version__)
+            version_file.write(version)
 
     with _LogWrapper("creation of packages"):
-        subprocess.check_call(["python", "setup.py", "sdist", "bdist_wheel"])
+        subprocess.check_call([sys.executable, "-m", "build"])
 
 
 if __name__ == "__main__":

@@ -11,8 +11,8 @@ from test.unit.input_convertors import (
     ensure_series,
 )
 
+import narwhals.stable.v1 as nw
 import numpy as np
-import pandas as pd
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -159,8 +159,8 @@ class ExampleNotEstimator2:
         pass
 
 
-def _get_grouped_data_and_base_points(sensitive_feature_value):
-    data = pd.DataFrame(
+def _get_grouped_data_and_base_points(constructor, sensitive_feature_value):
+    data = constructor(
         {
             SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
             SCORE_KEY: scores_ex.squeeze(),
@@ -168,17 +168,18 @@ def _get_grouped_data_and_base_points(sensitive_feature_value):
         }
     )
     grouped_data = (
-        data.groupby(SENSITIVE_FEATURE_KEY)
-        .get_group(sensitive_feature_value)
-        .sort_values(by=SCORE_KEY, ascending=False)
+        nw.from_native(data, eager_only=True, pass_through=False)
+        .filter(nw.col(SENSITIVE_FEATURE_KEY) == sensitive_feature_value)
+        .sort(by=SCORE_KEY, descending=True)
+        .to_native()
     )
     x_grid = np.linspace(0, 1, 100)
 
     if sensitive_feature_value == "A":
-        expected_roc_points = pd.DataFrame(
+        expected_roc_points = constructor(
             {
-                "x": [0, 0.25, 0.5, 0.5, 1],
-                "y": [0, 1 / 3, 2 / 3, 1, 1],
+                "x": [0.0, 0.25, 0.5, 0.5, 1.0],
+                "y": [0.0, 1 / 3, 2 / 3, 1.0, 1.0],
                 "operation": [
                     ThresholdOperation(">", np.inf),
                     ThresholdOperation("<", 0.5),
@@ -191,10 +192,10 @@ def _get_grouped_data_and_base_points(sensitive_feature_value):
         ignore_for_base_points = [1, 2]
 
     if sensitive_feature_value == "B":
-        expected_roc_points = pd.DataFrame(
+        expected_roc_points = constructor(
             {
-                "x": [0, 1 / 3, 1],
-                "y": [0, 3 / 4, 1],
+                "x": [0.0, 1 / 3, 1.0],
+                "y": [0.0, 3 / 4, 1.0],
                 "operation": [
                     ThresholdOperation(">", np.inf),
                     ThresholdOperation("<", 0.5),
@@ -205,10 +206,10 @@ def _get_grouped_data_and_base_points(sensitive_feature_value):
         ignore_for_base_points = []
 
     if sensitive_feature_value == "C":
-        expected_roc_points = pd.DataFrame(
+        expected_roc_points = constructor(
             {
-                "x": [0, 0, 2 / 3, 1],
-                "y": [0, 1 / 3, 1, 1],
+                "x": [0.0, 0.0, 2 / 3, 1.0],
+                "y": [0.0, 1 / 3, 1.0, 1.0],
                 "operation": [
                     ThresholdOperation(">", np.inf),
                     ThresholdOperation("<", 0.5),

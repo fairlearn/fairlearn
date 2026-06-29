@@ -10,9 +10,8 @@ import numpy as np
 import pandas as pd
 from narwhals.dependencies import is_into_dataframe
 from narwhals.typing import IntoFrameT, IntoSeriesT
-from sklearn.utils.validation import check_consistent_length
+from sklearn.utils.validation import check_array, check_consistent_length
 
-from fairlearn.utils._fixes import check_array
 from fairlearn.utils._narwhals_compat import (
     all_to_native,
     get_native_namespace_or_default,

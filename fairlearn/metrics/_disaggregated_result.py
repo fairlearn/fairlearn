@@ -104,11 +104,11 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        grouping_function: string {'min', 'max'}
-        control_feature_names: list[str] | None
+        grouping_function : string {'min', 'max'}
+        control_feature_names : list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        errors: string {'raise', 'coerce'}, default :code:`raise`
+        errors : string {'raise', 'coerce'}, default :code:`raise`
             How to deal with any errors. Either coerce to `np.nan` or wrap the
             exception and reraise
 
@@ -179,12 +179,12 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        control_feature_names: list[str] | None
+        control_feature_names : list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        method : {'between_groups', 'overall'}, default :code:`between_groups`
+        method : {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -240,12 +240,12 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        control_feature_names: list[str] | None
+        control_feature_names : list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        method : {'between_groups', 'overall'}, default :code:`between_groups`
+        method : {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 

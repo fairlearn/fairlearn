@@ -25,22 +25,43 @@ metric = [
 
 class Test1m1sf0cf:
     # Single metric supplied as callable
+
+    @classmethod
+    def setup_class(cls):
+        results = {}
+        for metric_fn in metric:
+            target = metrics.MetricFrame(
+                metrics=metric_fn, y_true=y_t, y_pred=y_p, sensitive_features=g_4
+            )
+
+            assert target.control_levels is None
+            assert isinstance(target.sensitive_levels, list)
+            assert target.sensitive_levels == ["sensitive_feature_0"]
+
+            overall = metric_fn(y_t, y_p)
+            mask_p = g_4 == "pp"
+            mask_q = g_4 == "q"
+            metric_p = metric_fn(y_t[mask_p], y_p[mask_p])
+            metric_q = metric_fn(y_t[mask_q], y_p[mask_q])
+
+            mfn = metric_fn.__name__
+
+            results[metric_fn.__name__] = {
+                "target": target,
+                "overall": overall,
+                "metric_p": metric_p,
+                "metric_q": metric_q,
+                "mfn": mfn,
+            }
+        cls.results = results
+
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(
-            metrics=metric_fn, y_true=y_t, y_pred=y_p, sensitive_features=g_4
-        )
-
-        assert self.target.control_levels is None
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sensitive_feature_0"]
-
-        self.overall = metric_fn(y_t, y_p)
-        mask_p = g_4 == "pp"
-        mask_q = g_4 == "q"
-        self.metric_p = metric_fn(y_t[mask_p], y_p[mask_p])
-        self.metric_q = metric_fn(y_t[mask_q], y_p[mask_q])
-
-        self.mfn = metric_fn.__name__
+        metric_name = metric_fn.__name__
+        self.target = self.results[metric_name]["target"]
+        self.overall = self.results[metric_name]["overall"]
+        self.metric_p = self.results[metric_name]["metric_p"]
+        self.metric_q = self.results[metric_name]["metric_q"]
+        self.mfn = self.results[metric_name]["mfn"]
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_min(self, metric_fn):
@@ -151,24 +172,44 @@ class Test1m1sf0cf:
 
 class Test1m1sf0cfFnDict:
     # Key difference is that the function is supplied as a dict
+    def setup_class(cls):
+        results = {}
+        for metric_fn in metric:
+            mfn = "Random name"
+            target = metrics.MetricFrame(
+                metrics={mfn: metric_fn},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=g_4,
+            )
+
+            assert target.control_levels is None
+            assert isinstance(target.sensitive_levels, list)
+            assert target.sensitive_levels == ["sensitive_feature_0"]
+
+            overall = metric_fn(y_t, y_p)
+            mask_p = g_4 == "pp"
+            mask_q = g_4 == "q"
+            metric_p = metric_fn(y_t[mask_p], y_p[mask_p])
+            metric_q = metric_fn(y_t[mask_q], y_p[mask_q])
+
+            results[metric_fn.__name__] = {
+                "mfn": mfn,
+                "target": target,
+                "overall": overall,
+                "metric_p": metric_p,
+                "metric_q": metric_q,
+            }
+
+        cls.results = results
+
     def _prepare(self, metric_fn):
-        self.mfn = "Random name"
-        self.target = metrics.MetricFrame(
-            metrics={self.mfn: metric_fn},
-            y_true=y_t,
-            y_pred=y_p,
-            sensitive_features=g_4,
-        )
-
-        assert self.target.control_levels is None
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sensitive_feature_0"]
-
-        self.overall = metric_fn(y_t, y_p)
-        mask_p = g_4 == "pp"
-        mask_q = g_4 == "q"
-        self.metric_p = metric_fn(y_t[mask_p], y_p[mask_p])
-        self.metric_q = metric_fn(y_t[mask_q], y_p[mask_q])
+        metric_name = metric_fn.__name__
+        self.target = self.results[metric_name]["target"]
+        self.overall = self.results[metric_name]["overall"]
+        self.metric_p = self.results[metric_name]["metric_p"]
+        self.metric_q = self.results[metric_name]["metric_q"]
+        self.mfn = self.results[metric_name]["mfn"]
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_min(self, metric_fn):
@@ -263,28 +304,27 @@ class Test1m1sf0cfFnDict:
 
 
 class Test2m1sf0cf:
-    def _prepare(self):
+    @classmethod
+    def setup_class(cls):
         fns = {"recall": skm.recall_score, "prec": skm.precision_score}
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns, y_true=y_t, y_pred=y_p, sensitive_features=pd.Series(data=g_4)
         )
 
-        assert self.target.control_levels is None
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sensitive_feature_0"]
+        assert cls.target.control_levels is None
+        assert isinstance(cls.target.sensitive_levels, list)
+        assert cls.target.sensitive_levels == ["sensitive_feature_0"]
 
-        self.recall = skm.recall_score(y_t, y_p)
-        self.prec = skm.precision_score(y_t, y_p)
+        cls.recall = skm.recall_score(y_t, y_p)
+        cls.prec = skm.precision_score(y_t, y_p)
         mask_p = g_4 == "pp"
         mask_q = g_4 == "q"
-        self.recall_p = skm.recall_score(y_t[mask_p], y_p[mask_p])
-        self.recall_q = skm.recall_score(y_t[mask_q], y_p[mask_q])
-        self.prec_p = skm.precision_score(y_t[mask_p], y_p[mask_p])
-        self.prec_q = skm.precision_score(y_t[mask_q], y_p[mask_q])
+        cls.recall_p = skm.recall_score(y_t[mask_p], y_p[mask_p])
+        cls.recall_q = skm.recall_score(y_t[mask_q], y_p[mask_q])
+        cls.prec_p = skm.precision_score(y_t[mask_p], y_p[mask_p])
+        cls.prec_q = skm.precision_score(y_t[mask_q], y_p[mask_q])
 
     def test_min(self):
-        self._prepare()
-
         target_mins = self.target.group_min()
         assert isinstance(target_mins, pd.Series)
         assert len(target_mins) == 2
@@ -292,16 +332,12 @@ class Test2m1sf0cf:
         assert target_mins["prec"] == min(self.prec_p, self.prec_q)
 
     def test_max(self):
-        self._prepare()
-
         target_maxes = self.target.group_max()
         assert isinstance(target_maxes, pd.Series)
         assert target_maxes["recall"] == max(self.recall_p, self.recall_q)
         assert target_maxes["prec"] == max(self.prec_p, self.prec_q)
 
     def test_difference_between_groups(self):
-        self._prepare()
-
         target_diffs = self.target.difference(method="between_groups")
         assert isinstance(target_diffs, pd.Series)
         assert len(target_diffs) == 2
@@ -309,8 +345,6 @@ class Test2m1sf0cf:
         assert target_diffs["prec"] == abs(self.prec_p - self.prec_q)
 
     def test_difference_to_overall(self):
-        self._prepare()
-
         target_diff_overall = self.target.difference(method="to_overall")
         assert isinstance(target_diff_overall, pd.Series)
         assert len(target_diff_overall) == 2
@@ -326,8 +360,6 @@ class Test2m1sf0cf:
         assert target_diff_overall["prec"] == max(prec_diffs_overall)
 
     def test_ratio_between_groups(self):
-        self._prepare()
-
         target_ratio = self.target.ratio(method="between_groups")
         assert isinstance(target_ratio, pd.Series)
         assert len(target_ratio) == 2
@@ -337,8 +369,6 @@ class Test2m1sf0cf:
         assert target_ratio["prec"] == min(self.prec_p / self.prec_q, self.prec_q / self.prec_p)
 
     def test_ratio_to_overall(self):
-        self._prepare()
-
         target_ratio_overall = self.target.ratio(method="to_overall")
         assert isinstance(target_ratio_overall, pd.Series)
         assert len(target_ratio_overall) == 2
@@ -368,39 +398,70 @@ class Test2m1sf0cf:
 
 class Test1m1cf1sf:
     # Metric function supplied in callable
+    @classmethod
+    def setup_class(cls):
+        results = {}
+        for metric_fn in metric:
+            target = metrics.MetricFrame(
+                metrics=metric_fn,
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=pd.Series(data=g_2, name="sf0"),
+                control_features=pd.Series(data=g_3, name="cf0"),
+            )
+
+            assert isinstance(target.control_levels, list)
+            assert target.control_levels == ["cf0"]
+            assert isinstance(target.sensitive_levels, list)
+            assert target.sensitive_levels == ["sf0"]
+
+            mask_f = g_2 == "f"
+            mask_g = g_2 == "g"
+            mask_k = g_3 == "kk"
+            mask_m = g_3 == "m"
+
+            mask_k_f = np.logical_and(mask_k, mask_f)
+            mask_k_g = np.logical_and(mask_k, mask_g)
+            mask_m_f = np.logical_and(mask_m, mask_f)
+            mask_m_g = np.logical_and(mask_m, mask_g)
+            metric_k = metric_fn(y_t[mask_k], y_p[mask_k])
+            metric_m = metric_fn(y_t[mask_m], y_p[mask_m])
+            metric_k_f = metric_fn(y_t[mask_k_f], y_p[mask_k_f])
+            metric_m_f = metric_fn(y_t[mask_m_f], y_p[mask_m_f])
+            metric_k_g = metric_fn(y_t[mask_k_g], y_p[mask_k_g])
+            metric_m_g = metric_fn(y_t[mask_m_g], y_p[mask_m_g])
+            metric_k_arr = [metric_k_f, metric_k_g]
+            metric_m_arr = [metric_m_f, metric_m_g]
+
+            mfn = metric_fn.__name__
+
+            results[metric_fn.__name__] = {
+                "mfn": mfn,
+                "target": target,
+                "metric_k_arr": metric_k_arr,
+                "metric_m_arr": metric_m_arr,
+                "metric_k": metric_k,
+                "metric_m": metric_m,
+                "metric_k_f": metric_k_f,
+                "metric_k_g": metric_k_g,
+                "metric_m_f": metric_m_f,
+                "metric_m_g": metric_m_g,
+            }
+
+        cls.results = results
+
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(
-            metrics=metric_fn,
-            y_true=y_t,
-            y_pred=y_p,
-            sensitive_features=pd.Series(data=g_2, name="sf0"),
-            control_features=pd.Series(data=g_3, name="cf0"),
-        )
-
-        assert isinstance(self.target.control_levels, list)
-        assert self.target.control_levels == ["cf0"]
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sf0"]
-
-        mask_f = g_2 == "f"
-        mask_g = g_2 == "g"
-        mask_k = g_3 == "kk"
-        mask_m = g_3 == "m"
-
-        mask_k_f = np.logical_and(mask_k, mask_f)
-        mask_k_g = np.logical_and(mask_k, mask_g)
-        mask_m_f = np.logical_and(mask_m, mask_f)
-        mask_m_g = np.logical_and(mask_m, mask_g)
-        self.metric_k = metric_fn(y_t[mask_k], y_p[mask_k])
-        self.metric_m = metric_fn(y_t[mask_m], y_p[mask_m])
-        self.metric_k_f = metric_fn(y_t[mask_k_f], y_p[mask_k_f])
-        self.metric_m_f = metric_fn(y_t[mask_m_f], y_p[mask_m_f])
-        self.metric_k_g = metric_fn(y_t[mask_k_g], y_p[mask_k_g])
-        self.metric_m_g = metric_fn(y_t[mask_m_g], y_p[mask_m_g])
-        self.metric_k_arr = [self.metric_k_f, self.metric_k_g]
-        self.metric_m_arr = [self.metric_m_f, self.metric_m_g]
-
-        self.mfn = metric_fn.__name__
+        metric_name = metric_fn.__name__
+        self.target = self.results[metric_name]["target"]
+        self.metric_k_arr = self.results[metric_name]["metric_k_arr"]
+        self.metric_m_arr = self.results[metric_name]["metric_m_arr"]
+        self.metric_k = self.results[metric_name]["metric_k"]
+        self.metric_m = self.results[metric_name]["metric_m"]
+        self.metric_k_f = self.results[metric_name]["metric_k_f"]
+        self.metric_k_g = self.results[metric_name]["metric_k_g"]
+        self.metric_m_f = self.results[metric_name]["metric_m_f"]
+        self.metric_m_g = self.results[metric_name]["metric_m_g"]
+        self.mfn = self.results[metric_name]["mfn"]
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_min(self, metric_fn):
@@ -485,38 +546,69 @@ class Test1m1cf1sf:
 
 class Test1m1cf1sfFnDict:
     # Key difference is that the metric function is supplied in a dict
+    @classmethod
+    def setup_class(cls):
+        results = {}
+        for metric_fn in metric:
+            mfn = "Some name"
+            target = metrics.MetricFrame(
+                metrics={mfn: metric_fn},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=pd.Series(data=g_2, name="sf0"),
+                control_features=pd.Series(data=g_3, name="cf0"),
+            )
+
+            assert isinstance(target.control_levels, list)
+            assert target.control_levels == ["cf0"]
+            assert isinstance(target.sensitive_levels, list)
+            assert target.sensitive_levels == ["sf0"]
+
+            mask_f = g_2 == "f"
+            mask_g = g_2 == "g"
+            mask_k = g_3 == "kk"
+            mask_m = g_3 == "m"
+
+            mask_k_f = np.logical_and(mask_k, mask_f)
+            mask_k_g = np.logical_and(mask_k, mask_g)
+            mask_m_f = np.logical_and(mask_m, mask_f)
+            mask_m_g = np.logical_and(mask_m, mask_g)
+            metric_k = metric_fn(y_t[mask_k], y_p[mask_k])
+            metric_m = metric_fn(y_t[mask_m], y_p[mask_m])
+            metric_k_f = metric_fn(y_t[mask_k_f], y_p[mask_k_f])
+            metric_m_f = metric_fn(y_t[mask_m_f], y_p[mask_m_f])
+            metric_k_g = metric_fn(y_t[mask_k_g], y_p[mask_k_g])
+            metric_m_g = metric_fn(y_t[mask_m_g], y_p[mask_m_g])
+            metric_k_arr = [metric_k_f, metric_k_g]
+            metric_m_arr = [metric_m_f, metric_m_g]
+
+            results[metric_fn.__name__] = {
+                "mfn": mfn,
+                "target": target,
+                "metric_k_arr": metric_k_arr,
+                "metric_m_arr": metric_m_arr,
+                "metric_k": metric_k,
+                "metric_m": metric_m,
+                "metric_k_f": metric_k_f,
+                "metric_k_g": metric_k_g,
+                "metric_m_f": metric_m_f,
+                "metric_m_g": metric_m_g,
+            }
+
+        cls.results = results
+
     def _prepare(self, metric_fn):
-        self.mfn = "Some name"
-        self.target = metrics.MetricFrame(
-            metrics={self.mfn: metric_fn},
-            y_true=y_t,
-            y_pred=y_p,
-            sensitive_features=pd.Series(data=g_2, name="sf0"),
-            control_features=pd.Series(data=g_3, name="cf0"),
-        )
-
-        assert isinstance(self.target.control_levels, list)
-        assert self.target.control_levels == ["cf0"]
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sf0"]
-
-        mask_f = g_2 == "f"
-        mask_g = g_2 == "g"
-        mask_k = g_3 == "kk"
-        mask_m = g_3 == "m"
-
-        mask_k_f = np.logical_and(mask_k, mask_f)
-        mask_k_g = np.logical_and(mask_k, mask_g)
-        mask_m_f = np.logical_and(mask_m, mask_f)
-        mask_m_g = np.logical_and(mask_m, mask_g)
-        self.metric_k = metric_fn(y_t[mask_k], y_p[mask_k])
-        self.metric_m = metric_fn(y_t[mask_m], y_p[mask_m])
-        self.metric_k_f = metric_fn(y_t[mask_k_f], y_p[mask_k_f])
-        self.metric_m_f = metric_fn(y_t[mask_m_f], y_p[mask_m_f])
-        self.metric_k_g = metric_fn(y_t[mask_k_g], y_p[mask_k_g])
-        self.metric_m_g = metric_fn(y_t[mask_m_g], y_p[mask_m_g])
-        self.metric_k_arr = [self.metric_k_f, self.metric_k_g]
-        self.metric_m_arr = [self.metric_m_f, self.metric_m_g]
+        metric_name = metric_fn.__name__
+        self.target = self.results[metric_name]["target"]
+        self.metric_k_arr = self.results[metric_name]["metric_k_arr"]
+        self.metric_m_arr = self.results[metric_name]["metric_m_arr"]
+        self.metric_k = self.results[metric_name]["metric_k"]
+        self.metric_m = self.results[metric_name]["metric_m"]
+        self.metric_k_f = self.results[metric_name]["metric_k_f"]
+        self.metric_k_g = self.results[metric_name]["metric_k_g"]
+        self.metric_m_f = self.results[metric_name]["metric_m_f"]
+        self.metric_m_g = self.results[metric_name]["metric_m_g"]
+        self.mfn = self.results[metric_name]["mfn"]
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_min(self, metric_fn):
@@ -601,63 +693,104 @@ class Test1m1cf1sfFnDict:
 
 class Test1m1sf2cf:
     # Single metric, supplied as callable
+    @classmethod
+    def setup_class(cls):
+        results = {}
+        for metric_fn in metric:
+            target = metrics.MetricFrame(
+                metrics=metric_fn,
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=pd.Series(data=g_2, name="sf0"),
+                control_features=pd.DataFrame(data={"cf0": g_3, "cf1": g_1}),
+            )
+
+            assert isinstance(target.control_levels, list)
+            assert target.control_levels == ["cf0", "cf1"]
+            assert isinstance(target.sensitive_levels, list)
+            assert target.sensitive_levels == ["sf0"]
+
+            mask_a = g_1 == "aa"
+            mask_b = g_1 == "ba"
+            mask_f = g_2 == "f"
+            mask_g = g_2 == "g"
+            mask_k = g_3 == "kk"
+            mask_m = g_3 == "m"
+
+            mask_k_a = np.logical_and(mask_k, mask_a)
+            mask_k_b = np.logical_and(mask_k, mask_b)
+            mask_m_a = np.logical_and(mask_m, mask_a)
+            mask_m_b = np.logical_and(mask_m, mask_b)
+            mask_k_a_f = np.logical_and(mask_k_a, mask_f)
+            mask_k_a_g = np.logical_and(mask_k_a, mask_g)
+            mask_k_b_f = np.logical_and(mask_k_b, mask_f)
+            mask_k_b_g = np.logical_and(mask_k_b, mask_g)
+            mask_m_a_f = np.logical_and(mask_m_a, mask_f)
+            mask_m_a_g = np.logical_and(mask_m_a, mask_g)
+            mask_m_b_f = np.logical_and(mask_m_b, mask_f)
+            mask_m_b_g = np.logical_and(mask_m_b, mask_g)
+
+            metric_k_a = metric_fn(y_t[mask_k_a], y_p[mask_k_a])
+            metric_k_b = metric_fn(y_t[mask_k_b], y_p[mask_k_b])
+            metric_m_a = metric_fn(y_t[mask_m_a], y_p[mask_m_a])
+            metric_m_b = metric_fn(y_t[mask_m_b], y_p[mask_m_b])
+            metric_k_a_f = metric_fn(y_t[mask_k_a_f], y_p[mask_k_a_f])
+            metric_k_a_g = metric_fn(y_t[mask_k_a_g], y_p[mask_k_a_g])
+            metric_k_b_f = metric_fn(y_t[mask_k_b_f], y_p[mask_k_b_f])
+            metric_k_b_g = metric_fn(y_t[mask_k_b_g], y_p[mask_k_b_g])
+            metric_m_a_f = metric_fn(y_t[mask_m_a_f], y_p[mask_m_a_f])
+            metric_m_a_g = metric_fn(y_t[mask_m_a_g], y_p[mask_m_a_g])
+            metric_m_b_f = metric_fn(y_t[mask_m_b_f], y_p[mask_m_b_f])
+            metric_m_b_g = metric_fn(y_t[mask_m_b_g], y_p[mask_m_b_g])
+            metric_k_a_arr = [metric_k_a_f, metric_k_a_g]
+            metric_k_b_arr = [metric_k_b_f, metric_k_b_g]
+            metric_m_a_arr = [metric_m_a_f, metric_m_a_g]
+            metric_m_b_arr = [metric_m_b_f, metric_m_b_g]
+
+            mfn = metric_fn.__name__
+            results[metric_fn.__name__] = {
+                "mfn": mfn,
+                "target": target,
+                "metric_k_a_arr": metric_k_a_arr,
+                "metric_k_b_arr": metric_k_b_arr,
+                "metric_m_a_arr": metric_m_a_arr,
+                "metric_m_b_arr": metric_m_b_arr,
+                "metric_k_a": metric_k_a,
+                "metric_k_b": metric_k_b,
+                "metric_m_a": metric_m_a,
+                "metric_m_b": metric_m_b,
+                "metric_k_a_f": metric_k_a_f,
+                "metric_k_a_g": metric_k_a_g,
+                "metric_k_b_f": metric_k_b_f,
+                "metric_k_b_g": metric_k_b_g,
+                "metric_m_a_f": metric_m_a_f,
+                "metric_m_a_g": metric_m_a_g,
+                "metric_m_b_f": metric_m_b_f,
+                "metric_m_b_g": metric_m_b_g,
+            }
+
+        cls.results = results
+
     def _prepare(self, metric_fn):
-        self.target = metrics.MetricFrame(
-            metrics=metric_fn,
-            y_true=y_t,
-            y_pred=y_p,
-            sensitive_features=list(g_2),
-            control_features=np.stack([g_3, g_1], axis=1),
-        )
-
-        assert isinstance(self.target.control_levels, list)
-        assert self.target.control_levels == ["control_feature_0", "control_feature_1"]
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sensitive_feature_0"]
-
-        # Check we have correct return types
-        assert isinstance(self.target.overall, pd.Series)
-        assert isinstance(self.target.by_group, pd.Series)
-
-        mask_a = g_1 == "aa"
-        mask_b = g_1 == "ba"
-        mask_f = g_2 == "f"
-        mask_g = g_2 == "g"
-        mask_k = g_3 == "kk"
-        mask_m = g_3 == "m"
-
-        mask_k_a = np.logical_and(mask_k, mask_a)
-        mask_k_b = np.logical_and(mask_k, mask_b)
-        mask_m_a = np.logical_and(mask_m, mask_a)
-        mask_m_b = np.logical_and(mask_m, mask_b)
-        mask_k_a_f = np.logical_and(mask_k_a, mask_f)
-        mask_k_a_g = np.logical_and(mask_k_a, mask_g)
-        mask_k_b_f = np.logical_and(mask_k_b, mask_f)
-        mask_k_b_g = np.logical_and(mask_k_b, mask_g)
-        mask_m_a_f = np.logical_and(mask_m_a, mask_f)
-        mask_m_a_g = np.logical_and(mask_m_a, mask_g)
-        mask_m_b_f = np.logical_and(mask_m_b, mask_f)
-        mask_m_b_g = np.logical_and(mask_m_b, mask_g)
-
-        self.metric_k_a = metric_fn(y_t[mask_k_a], y_p[mask_k_a])
-        self.metric_k_b = metric_fn(y_t[mask_k_b], y_p[mask_k_b])
-        self.metric_m_a = metric_fn(y_t[mask_m_a], y_p[mask_m_a])
-        self.metric_m_b = metric_fn(y_t[mask_m_b], y_p[mask_m_b])
-        self.metric_k_a_f = metric_fn(y_t[mask_k_a_f], y_p[mask_k_a_f])
-        self.metric_k_a_g = metric_fn(y_t[mask_k_a_g], y_p[mask_k_a_g])
-        self.metric_k_b_f = metric_fn(y_t[mask_k_b_f], y_p[mask_k_b_f])
-        self.metric_k_b_g = metric_fn(y_t[mask_k_b_g], y_p[mask_k_b_g])
-        self.metric_m_a_f = metric_fn(y_t[mask_m_a_f], y_p[mask_m_a_f])
-        self.metric_m_a_g = metric_fn(y_t[mask_m_a_g], y_p[mask_m_a_g])
-        self.metric_m_b_f = metric_fn(y_t[mask_m_b_f], y_p[mask_m_b_f])
-        self.metric_m_b_g = metric_fn(y_t[mask_m_b_g], y_p[mask_m_b_g])
-
-        self.metric_k_a_arr = [self.metric_k_a_f, self.metric_k_a_g]
-        self.metric_k_b_arr = [self.metric_k_b_f, self.metric_k_b_g]
-        self.metric_m_a_arr = [self.metric_m_a_f, self.metric_m_a_g]
-        self.metric_m_b_arr = [self.metric_m_b_f, self.metric_m_b_g]
-
-        self.mfn = metric_fn.__name__
+        metric_name = metric_fn.__name__
+        self.target = self.results[metric_name]["target"]
+        self.metric_k_a_arr = self.results[metric_name]["metric_k_a_arr"]
+        self.metric_k_b_arr = self.results[metric_name]["metric_k_b_arr"]
+        self.metric_m_a_arr = self.results[metric_name]["metric_m_a_arr"]
+        self.metric_m_b_arr = self.results[metric_name]["metric_m_b_arr"]
+        self.metric_k_a = self.results[metric_name]["metric_k_a"]
+        self.metric_k_b = self.results[metric_name]["metric_k_b"]
+        self.metric_m_a = self.results[metric_name]["metric_m_a"]
+        self.metric_m_b = self.results[metric_name]["metric_m_b"]
+        self.metric_k_a_f = self.results[metric_name]["metric_k_a_f"]
+        self.metric_k_a_g = self.results[metric_name]["metric_k_a_g"]
+        self.metric_k_b_f = self.results[metric_name]["metric_k_b_f"]
+        self.metric_k_b_g = self.results[metric_name]["metric_k_b_g"]
+        self.metric_m_a_f = self.results[metric_name]["metric_m_a_f"]
+        self.metric_m_a_g = self.results[metric_name]["metric_m_a_g"]
+        self.metric_m_b_f = self.results[metric_name]["metric_m_b_f"]
+        self.metric_m_b_g = self.results[metric_name]["metric_m_b_g"]
+        self.mfn = self.results[metric_name]["mfn"]
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_min(self, metric_fn):
@@ -753,62 +886,105 @@ class Test1m1sf2cf:
 
 class Test1m1sf2cfFnDict:
     # Single metric, supplied as dict
+    @classmethod
+    def setup_class(cls):
+        results = {}
+        for metric_fn in metric:
+            mfn = "Random name"
+            target = metrics.MetricFrame(
+                metrics={mfn: metric_fn},
+                y_true=y_t,
+                y_pred=y_p,
+                sensitive_features=pd.Series(data=g_2, name="sf0"),
+                control_features=pd.DataFrame(data={"cf0": g_3, "cf1": g_1}),
+            )
+
+            assert isinstance(target.control_levels, list)
+            assert target.control_levels == ["cf0", "cf1"]
+            assert isinstance(target.sensitive_levels, list)
+            assert target.sensitive_levels == ["sf0"]
+
+            mask_a = g_1 == "aa"
+            mask_b = g_1 == "ba"
+            mask_f = g_2 == "f"
+            mask_g = g_2 == "g"
+            mask_k = g_3 == "kk"
+            mask_m = g_3 == "m"
+
+            mask_k_a = np.logical_and(mask_k, mask_a)
+            mask_k_b = np.logical_and(mask_k, mask_b)
+            mask_m_a = np.logical_and(mask_m, mask_a)
+            mask_m_b = np.logical_and(mask_m, mask_b)
+            mask_k_a_f = np.logical_and(mask_k_a, mask_f)
+            mask_k_a_g = np.logical_and(mask_k_a, mask_g)
+            mask_k_b_f = np.logical_and(mask_k_b, mask_f)
+            mask_k_b_g = np.logical_and(mask_k_b, mask_g)
+            mask_m_a_f = np.logical_and(mask_m_a, mask_f)
+            mask_m_a_g = np.logical_and(mask_m_a, mask_g)
+            mask_m_b_f = np.logical_and(mask_m_b, mask_f)
+            mask_m_b_g = np.logical_and(mask_m_b, mask_g)
+
+            metric_k_a = metric_fn(y_t[mask_k_a], y_p[mask_k_a])
+            metric_k_b = metric_fn(y_t[mask_k_b], y_p[mask_k_b])
+            metric_m_a = metric_fn(y_t[mask_m_a], y_p[mask_m_a])
+            metric_m_b = metric_fn(y_t[mask_m_b], y_p[mask_m_b])
+            metric_k_a_f = metric_fn(y_t[mask_k_a_f], y_p[mask_k_a_f])
+            metric_k_a_g = metric_fn(y_t[mask_k_a_g], y_p[mask_k_a_g])
+            metric_k_b_f = metric_fn(y_t[mask_k_b_f], y_p[mask_k_b_f])
+            metric_k_b_g = metric_fn(y_t[mask_k_b_g], y_p[mask_k_b_g])
+            metric_m_a_f = metric_fn(y_t[mask_m_a_f], y_p[mask_m_a_f])
+            metric_m_a_g = metric_fn(y_t[mask_m_a_g], y_p[mask_m_a_g])
+            metric_m_b_f = metric_fn(y_t[mask_m_b_f], y_p[mask_m_b_f])
+            metric_m_b_g = metric_fn(y_t[mask_m_b_g], y_p[mask_m_b_g])
+            metric_k_a_arr = [metric_k_a_f, metric_k_a_g]
+            metric_k_b_arr = [metric_k_b_f, metric_k_b_g]
+            metric_m_a_arr = [metric_m_a_f, metric_m_a_g]
+            metric_m_b_arr = [metric_m_b_f, metric_m_b_g]
+
+            mfn = "Random name"
+            results[metric_fn.__name__] = {
+                "mfn": mfn,
+                "target": target,
+                "metric_k_a_arr": metric_k_a_arr,
+                "metric_k_b_arr": metric_k_b_arr,
+                "metric_m_a_arr": metric_m_a_arr,
+                "metric_m_b_arr": metric_m_b_arr,
+                "metric_k_a": metric_k_a,
+                "metric_k_b": metric_k_b,
+                "metric_m_a": metric_m_a,
+                "metric_m_b": metric_m_b,
+                "metric_k_a_f": metric_k_a_f,
+                "metric_k_a_g": metric_k_a_g,
+                "metric_k_b_f": metric_k_b_f,
+                "metric_k_b_g": metric_k_b_g,
+                "metric_m_a_f": metric_m_a_f,
+                "metric_m_a_g": metric_m_a_g,
+                "metric_m_b_f": metric_m_b_f,
+                "metric_m_b_g": metric_m_b_g,
+            }
+
+        cls.results = results
+
     def _prepare(self, metric_fn):
-        self.mfn = "Random name"
-        self.target = metrics.MetricFrame(
-            metrics={self.mfn: metric_fn},
-            y_true=y_t,
-            y_pred=y_p,
-            sensitive_features=list(g_2),
-            control_features=np.stack([g_3, g_1], axis=1),
-        )
-
-        assert isinstance(self.target.control_levels, list)
-        assert self.target.control_levels == ["control_feature_0", "control_feature_1"]
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sensitive_feature_0"]
-
-        # Check we have correct return types
-        assert isinstance(self.target.overall, pd.DataFrame)
-        assert isinstance(self.target.by_group, pd.DataFrame)
-
-        mask_a = g_1 == "aa"
-        mask_b = g_1 == "ba"
-        mask_f = g_2 == "f"
-        mask_g = g_2 == "g"
-        mask_k = g_3 == "kk"
-        mask_m = g_3 == "m"
-
-        mask_k_a = np.logical_and(mask_k, mask_a)
-        mask_k_b = np.logical_and(mask_k, mask_b)
-        mask_m_a = np.logical_and(mask_m, mask_a)
-        mask_m_b = np.logical_and(mask_m, mask_b)
-        mask_k_a_f = np.logical_and(mask_k_a, mask_f)
-        mask_k_a_g = np.logical_and(mask_k_a, mask_g)
-        mask_k_b_f = np.logical_and(mask_k_b, mask_f)
-        mask_k_b_g = np.logical_and(mask_k_b, mask_g)
-        mask_m_a_f = np.logical_and(mask_m_a, mask_f)
-        mask_m_a_g = np.logical_and(mask_m_a, mask_g)
-        mask_m_b_f = np.logical_and(mask_m_b, mask_f)
-        mask_m_b_g = np.logical_and(mask_m_b, mask_g)
-
-        self.metric_k_a = metric_fn(y_t[mask_k_a], y_p[mask_k_a])
-        self.metric_k_b = metric_fn(y_t[mask_k_b], y_p[mask_k_b])
-        self.metric_m_a = metric_fn(y_t[mask_m_a], y_p[mask_m_a])
-        self.metric_m_b = metric_fn(y_t[mask_m_b], y_p[mask_m_b])
-        self.metric_k_a_f = metric_fn(y_t[mask_k_a_f], y_p[mask_k_a_f])
-        self.metric_k_a_g = metric_fn(y_t[mask_k_a_g], y_p[mask_k_a_g])
-        self.metric_k_b_f = metric_fn(y_t[mask_k_b_f], y_p[mask_k_b_f])
-        self.metric_k_b_g = metric_fn(y_t[mask_k_b_g], y_p[mask_k_b_g])
-        self.metric_m_a_f = metric_fn(y_t[mask_m_a_f], y_p[mask_m_a_f])
-        self.metric_m_a_g = metric_fn(y_t[mask_m_a_g], y_p[mask_m_a_g])
-        self.metric_m_b_f = metric_fn(y_t[mask_m_b_f], y_p[mask_m_b_f])
-        self.metric_m_b_g = metric_fn(y_t[mask_m_b_g], y_p[mask_m_b_g])
-
-        self.metric_k_a_arr = [self.metric_k_a_f, self.metric_k_a_g]
-        self.metric_k_b_arr = [self.metric_k_b_f, self.metric_k_b_g]
-        self.metric_m_a_arr = [self.metric_m_a_f, self.metric_m_a_g]
-        self.metric_m_b_arr = [self.metric_m_b_f, self.metric_m_b_g]
+        metric_name = metric_fn.__name__
+        self.target = self.results[metric_name]["target"]
+        self.metric_k_a_arr = self.results[metric_name]["metric_k_a_arr"]
+        self.metric_k_b_arr = self.results[metric_name]["metric_k_b_arr"]
+        self.metric_m_a_arr = self.results[metric_name]["metric_m_a_arr"]
+        self.metric_m_b_arr = self.results[metric_name]["metric_m_b_arr"]
+        self.metric_k_a = self.results[metric_name]["metric_k_a"]
+        self.metric_k_b = self.results[metric_name]["metric_k_b"]
+        self.metric_m_a = self.results[metric_name]["metric_m_a"]
+        self.metric_m_b = self.results[metric_name]["metric_m_b"]
+        self.metric_k_a_f = self.results[metric_name]["metric_k_a_f"]
+        self.metric_k_a_g = self.results[metric_name]["metric_k_a_g"]
+        self.metric_k_b_f = self.results[metric_name]["metric_k_b_f"]
+        self.metric_k_b_g = self.results[metric_name]["metric_k_b_g"]
+        self.metric_m_a_f = self.results[metric_name]["metric_m_a_f"]
+        self.metric_m_a_g = self.results[metric_name]["metric_m_a_g"]
+        self.metric_m_b_f = self.results[metric_name]["metric_m_b_f"]
+        self.metric_m_b_g = self.results[metric_name]["metric_m_b_g"]
+        self.mfn = self.results[metric_name]["mfn"]
 
     @pytest.mark.parametrize("metric_fn", metric)
     def test_min(self, metric_fn):
@@ -907,9 +1083,9 @@ class Test1m1sf2cfFnDict:
 
 
 class Test2m1sf1cf:
-    def _prepare(self):
+    def setup_class(cls):
         fns = {"recall": skm.recall_score, "prec": skm.precision_score}
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns,
             y_true=y_t,
             y_pred=y_p,
@@ -917,14 +1093,14 @@ class Test2m1sf1cf:
             control_features=g_3,
         )
 
-        assert isinstance(self.target.control_levels, list)
-        assert self.target.control_levels == ["control_feature_0"]
-        assert isinstance(self.target.sensitive_levels, list)
-        assert self.target.sensitive_levels == ["sensitive_feature_0"]
+        assert isinstance(cls.target.control_levels, list)
+        assert cls.target.control_levels == ["control_feature_0"]
+        assert isinstance(cls.target.sensitive_levels, list)
+        assert cls.target.sensitive_levels == ["sensitive_feature_0"]
 
         # Check we have correct return types
-        assert isinstance(self.target.overall, pd.DataFrame)
-        assert isinstance(self.target.by_group, pd.DataFrame)
+        assert isinstance(cls.target.overall, pd.DataFrame)
+        assert isinstance(cls.target.by_group, pd.DataFrame)
 
         mask_f = g_2 == "f"
         mask_g = g_2 == "g"
@@ -935,26 +1111,24 @@ class Test2m1sf1cf:
         mask_k_g = np.logical_and(mask_k, mask_g)
         mask_m_f = np.logical_and(mask_m, mask_f)
         mask_m_g = np.logical_and(mask_m, mask_g)
-        self.recall_k = skm.recall_score(y_t[mask_k], y_p[mask_k])
-        self.recall_m = skm.recall_score(y_t[mask_m], y_p[mask_m])
-        self.recall_k_f = skm.recall_score(y_t[mask_k_f], y_p[mask_k_f])
-        self.recall_m_f = skm.recall_score(y_t[mask_m_f], y_p[mask_m_f])
-        self.recall_k_g = skm.recall_score(y_t[mask_k_g], y_p[mask_k_g])
-        self.recall_m_g = skm.recall_score(y_t[mask_m_g], y_p[mask_m_g])
-        self.recall_k_arr = [self.recall_k_f, self.recall_k_g]
-        self.recall_m_arr = [self.recall_m_f, self.recall_m_g]
-        self.precision_k = skm.precision_score(y_t[mask_k], y_p[mask_k])
-        self.precision_m = skm.precision_score(y_t[mask_m], y_p[mask_m])
-        self.precision_k_f = skm.precision_score(y_t[mask_k_f], y_p[mask_k_f])
-        self.precision_m_f = skm.precision_score(y_t[mask_m_f], y_p[mask_m_f])
-        self.precision_k_g = skm.precision_score(y_t[mask_k_g], y_p[mask_k_g])
-        self.precision_m_g = skm.precision_score(y_t[mask_m_g], y_p[mask_m_g])
-        self.precision_k_arr = [self.precision_k_f, self.precision_k_g]
-        self.precision_m_arr = [self.precision_m_f, self.precision_m_g]
+        cls.recall_k = skm.recall_score(y_t[mask_k], y_p[mask_k])
+        cls.recall_m = skm.recall_score(y_t[mask_m], y_p[mask_m])
+        cls.recall_k_f = skm.recall_score(y_t[mask_k_f], y_p[mask_k_f])
+        cls.recall_m_f = skm.recall_score(y_t[mask_m_f], y_p[mask_m_f])
+        cls.recall_k_g = skm.recall_score(y_t[mask_k_g], y_p[mask_k_g])
+        cls.recall_m_g = skm.recall_score(y_t[mask_m_g], y_p[mask_m_g])
+        cls.recall_k_arr = [cls.recall_k_f, cls.recall_k_g]
+        cls.recall_m_arr = [cls.recall_m_f, cls.recall_m_g]
+        cls.precision_k = skm.precision_score(y_t[mask_k], y_p[mask_k])
+        cls.precision_m = skm.precision_score(y_t[mask_m], y_p[mask_m])
+        cls.precision_k_f = skm.precision_score(y_t[mask_k_f], y_p[mask_k_f])
+        cls.precision_m_f = skm.precision_score(y_t[mask_m_f], y_p[mask_m_f])
+        cls.precision_k_g = skm.precision_score(y_t[mask_k_g], y_p[mask_k_g])
+        cls.precision_m_g = skm.precision_score(y_t[mask_m_g], y_p[mask_m_g])
+        cls.precision_k_arr = [cls.precision_k_f, cls.precision_k_g]
+        cls.precision_m_arr = [cls.precision_m_f, cls.precision_m_g]
 
     def test_min(self):
-        self._prepare()
-
         target_mins = self.target.group_min()
         assert isinstance(target_mins, pd.DataFrame)
         assert target_mins.shape == (2, 2)
@@ -964,8 +1138,6 @@ class Test2m1sf1cf:
         assert target_mins["prec"]["m"] == min(self.precision_m_arr)
 
     def test_max(self):
-        self._prepare()
-
         target_maxs = self.target.group_max()
         assert isinstance(target_maxs, pd.DataFrame)
         assert target_maxs.shape == (2, 2)
@@ -975,8 +1147,6 @@ class Test2m1sf1cf:
         assert target_maxs["prec"]["m"] == max(self.precision_m_arr)
 
     def test_difference_between_groups(self):
-        self._prepare()
-
         diffs = self.target.difference(method="between_groups")
         assert isinstance(diffs, pd.DataFrame)
         assert diffs.shape == (2, 2)
@@ -986,8 +1156,6 @@ class Test2m1sf1cf:
         assert diffs["prec"]["m"] == max(self.precision_m_arr) - min(self.precision_m_arr)
 
     def test_difference_to_overall(self):
-        self._prepare()
-
         diffs_overall = self.target.difference(method="to_overall")
         assert isinstance(diffs_overall, pd.DataFrame)
         assert diffs_overall.shape == (2, 2)
@@ -1001,8 +1169,6 @@ class Test2m1sf1cf:
         assert diffs_overall["prec"]["m"] == precision_m_overall
 
     def test_ratio_between_groups(self):
-        self._prepare()
-
         ratios = self.target.ratio(method="between_groups")
         assert isinstance(ratios, pd.DataFrame)
         assert ratios.shape == (2, 2)
@@ -1012,8 +1178,6 @@ class Test2m1sf1cf:
         assert ratios["prec"]["m"] == min(self.precision_m_arr) / max(self.precision_m_arr)
 
     def test_ratio_to_overall(self):
-        self._prepare()
-
         ratios_overall = self.target.ratio(method="to_overall")
         assert isinstance(ratios_overall, pd.DataFrame)
         assert ratios_overall.shape == (2, 2)
@@ -1166,9 +1330,9 @@ def test_2m_1sf_2cf():
 
 class Test2m1sf1cfErrorHandlingCM:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
-    def _prepare(self):
+    def setup_class(cls):
         fns = {"recall": skm.recall_score, "confusion_matrix": skm.confusion_matrix}
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns,
             y_true=y_t,
             y_pred=y_p,
@@ -1176,7 +1340,7 @@ class Test2m1sf1cfErrorHandlingCM:
             control_features=g_3,
         )
 
-        self.expected = metrics.MetricFrame(
+        cls.expected = metrics.MetricFrame(
             metrics={"recall": skm.recall_score},
             y_true=y_t,
             y_pred=y_p,
@@ -1185,106 +1349,90 @@ class Test2m1sf1cfErrorHandlingCM:
         )
 
     def test_min_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
-        self._prepare()
         target_mins = self.target.group_min(errors="coerce")
         expected_mins = self.expected.group_min()
         expected_mins["confusion_matrix"] = np.nan
         assert target_mins.equals(expected_mins)
 
     def test_min_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
-        self._prepare()
         target_maxs = self.target.group_max(errors="coerce")
         expected_maxs = self.expected.group_max()
         expected_maxs["confusion_matrix"] = np.nan
         assert target_maxs.equals(expected_maxs)
 
     def test_max_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
-        self._prepare()
         target_differences = self.target.difference(errors="coerce")
         expected_differences = self.expected.difference()
         expected_differences["confusion_matrix"] = np.nan
         assert target_differences.equals(expected_differences)
 
     def test_difference_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
-        self._prepare()
         target_differences = self.target.difference()
         expected_differences = self.expected.difference()
         expected_differences["confusion_matrix"] = np.nan
         assert target_differences.equals(expected_differences)
 
     def test_ratio_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
-        self._prepare()
         target_ratio = self.target.ratio(errors="coerce")
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
         assert target_ratio.equals(expected_ratio)
 
     def test_ratio_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
-        self._prepare()
         target_ratio = self.target.ratio()
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
@@ -1293,9 +1441,9 @@ class Test2m1sf1cfErrorHandlingCM:
 
 class Test1m1sf1cfErrorHandlingCM:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
-    def _prepare(self):
+    def setup_class(cls):
         fns = {"confusion_matrix": skm.confusion_matrix}
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns,
             y_true=y_t,
             y_pred=y_p,
@@ -1303,7 +1451,7 @@ class Test1m1sf1cfErrorHandlingCM:
             control_features=g_3,
         )
 
-        self.expected = metrics.MetricFrame(
+        cls.expected = metrics.MetricFrame(
             metrics={},
             y_true=y_t,
             y_pred=y_p,
@@ -1312,106 +1460,90 @@ class Test1m1sf1cfErrorHandlingCM:
         )
 
     def test_min_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
-        self._prepare()
         target_mins = self.target.group_min(errors="coerce")
         expected_mins = self.expected.group_min()
         expected_mins["confusion_matrix"] = np.nan
         assert target_mins.equals(expected_mins)
 
     def test_min_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
-        self._prepare()
         target_maxs = self.target.group_max(errors="coerce")
         expected_maxs = self.expected.group_max()
         expected_maxs["confusion_matrix"] = np.nan
         assert target_maxs.equals(expected_maxs)
 
     def test_max_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
-        self._prepare()
         target_differences = self.target.difference(errors="coerce")
         expected_differences = self.expected.difference()
         expected_differences["confusion_matrix"] = np.nan
         assert target_differences.equals(expected_differences)
 
     def test_difference_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
-        self._prepare()
         target_differences = self.target.difference()
         expected_differences = self.expected.difference()
         expected_differences["confusion_matrix"] = np.nan
         assert target_differences.equals(expected_differences)
 
     def test_ratio_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
-        self._prepare()
         target_ratio = self.target.ratio(errors="coerce")
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
         assert target_ratio.equals(expected_ratio)
 
     def test_ratio_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
-        self._prepare()
         target_ratio = self.target.ratio()
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
@@ -1420,13 +1552,13 @@ class Test1m1sf1cfErrorHandlingCM:
 
 class Test2m1sf0cfErrorHandlingCM:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
-    def _prepare(self):
+    def setup_class(cls):
         fns = {"recall": skm.recall_score, "confusion_matrix": skm.confusion_matrix}
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns, y_true=y_t, y_pred=y_p, sensitive_features=g_2
         )
 
-        self.expected = metrics.MetricFrame(
+        cls.expected = metrics.MetricFrame(
             metrics={"recall": skm.recall_score},
             y_true=y_t,
             y_pred=y_p,
@@ -1434,106 +1566,90 @@ class Test2m1sf0cfErrorHandlingCM:
         )
 
     def test_min_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
-        self._prepare()
         target_mins = self.target.group_min(errors="coerce")
         expected_mins = self.expected.group_min()
         expected_mins["confusion_matrix"] = np.nan
         assert target_mins.equals(expected_mins)
 
     def test_min_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
-        self._prepare()
         target_maxs = self.target.group_max(errors="coerce")
         expected_maxs = self.expected.group_max()
         expected_maxs["confusion_matrix"] = np.nan
         assert target_maxs.equals(expected_maxs)
 
     def test_max_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
-        self._prepare()
         target_differences = self.target.difference(errors="coerce")
         expected_differences = self.expected.difference()
         expected_differences["confusion_matrix"] = np.nan
         assert target_differences.equals(expected_differences)
 
     def test_difference_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
-        self._prepare()
         target_differences = self.target.difference()
         expected_differences = self.expected.difference()
         expected_differences["confusion_matrix"] = np.nan
         assert target_differences.equals(expected_differences)
 
     def test_ratio_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
-        self._prepare()
         target_ratio = self.target.ratio(errors="coerce")
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
         assert target_ratio.equals(expected_ratio)
 
     def test_ratio_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
-        self._prepare()
         target_ratio = self.target.ratio()
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
@@ -1542,103 +1658,87 @@ class Test2m1sf0cfErrorHandlingCM:
 
 class Test1m1sf0cfErrorHandlingCM:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
-    def _prepare(self):
+    def setup_class(cls):
         fns = {"confusion_matrix": skm.confusion_matrix}
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns, y_true=y_t, y_pred=y_p, sensitive_features=g_2
         )
 
     def test_min_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
-        self._prepare()
         target_mins = self.target.group_min(errors="coerce")
         assert target_mins.isna().all()
 
     def test_min_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
-        self._prepare()
         target_maxs = self.target.group_max(errors="coerce")
         assert target_maxs.isna().all()
 
     def test_max_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
-        self._prepare()
         target_differences = self.target.difference(errors="coerce")
         assert target_differences.isna().all()
 
     def test_difference_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
-        self._prepare()
         target_differences = self.target.difference()
         assert target_differences.isna().all()
 
     def test_ratio_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
-        self._prepare()
         target_ratio = self.target.ratio(errors="coerce")
         assert target_ratio.isna().all()
 
     def test_ratio_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
-        self._prepare()
         target_ratio = self.target.ratio()
         assert target_ratio.isna().all()
 
@@ -1646,106 +1746,90 @@ class Test1m1sf0cfErrorHandlingCM:
 class Test2m1sf0cfErrorHandlingCM2:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
     # Tests for two non-scalar columns in MetricFrame.
-    def _prepare(self):
+    def setup_class(cls):
         fns = {
             "confusion_matrix1": skm.confusion_matrix,
             "confusion_matrix2": functools.partial(skm.confusion_matrix, normalize="all"),
         }
-        self.target = metrics.MetricFrame(
+        cls.target = metrics.MetricFrame(
             metrics=fns, y_true=y_t, y_pred=y_p, sensitive_features=g_2
         )
 
     def test_min_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
-        self._prepare()
         target_mins = self.target.group_min(errors="coerce")
         assert target_mins.isna().all()
 
     def test_min_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
-        self._prepare()
         target_maxs = self.target.group_max(errors="coerce")
         assert target_maxs.isna().all()
 
     def test_max_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
-        self._prepare()
         target_differences = self.target.difference(errors="coerce")
         assert target_differences.isna().all()
 
     def test_difference_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
-        self._prepare()
         target_differences = self.target.difference()
         assert target_differences.isna().all()
 
     def test_ratio_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
-        self._prepare()
         target_ratio = self.target.ratio(errors="coerce")
         assert target_ratio.isna().all()
 
     def test_ratio_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
-        self._prepare()
         target_ratio = self.target.ratio()
         assert target_ratio.isna().all()
 
@@ -1753,101 +1837,85 @@ class Test2m1sf0cfErrorHandlingCM2:
 class Test1m1sf0cfErrorHandlingSeries:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
     # Tests for two non-scalar columns in MetricFrame.
-    def _prepare(self):
-        self.target = metrics.MetricFrame(
+    def setup_class(cls):
+        cls.target = metrics.MetricFrame(
             metrics=skm.confusion_matrix, y_true=y_t, y_pred=y_p, sensitive_features=g_2
         )
 
     def test_min_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_coerce(self):
-        self._prepare()
         target_mins = self.target.group_min(errors="coerce")
         assert np.isnan(target_mins)
 
     def test_min_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_min_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_min(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_coerce(self):
-        self._prepare()
         target_maxs = self.target.group_max(errors="coerce")
         assert np.isnan(target_maxs)
 
     def test_max_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_max_default(self):
         # default is 'raise'
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.group_max(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_coerce(self):
-        self._prepare()
         target_differences = self.target.difference(errors="coerce")
         assert np.isnan(target_differences)
 
     def test_difference_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.difference(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_difference_default(self):
         # default is 'coerce'
-        self._prepare()
         target_differences = self.target.difference()
         assert np.isnan(target_differences)
 
     def test_ratio_raise(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="raise")
         assert _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_coerce(self):
-        self._prepare()
         target_ratio = self.target.ratio(errors="coerce")
         assert np.isnan(target_ratio)
 
     def test_ratio_wrong_input(self):
-        self._prepare()
         with pytest.raises(ValueError) as exc:
             self.target.ratio(errors="WRONG")
         assert _INVALID_ERRORS_VALUE_ERROR_MESSAGE == exc.value.args[0]
 
     def test_ratio_default(self):
         # default is 'coerce'
-        self._prepare()
         target_ratio = self.target.ratio()
         assert np.isnan(target_ratio)
