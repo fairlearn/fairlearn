@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import copy
+from test.unit.reductions.exponentiated_gradient.simple_learners import LeastSquaresRegressor
 from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 from test.unit.utility_functions import logging_all_close
 
@@ -62,7 +63,14 @@ def test_bgl_unfair(A_two_dim):
     )
 
     bgl_square_loss = BoundedGroupLoss(SquareLoss(-np.inf, np.inf))
-    grid_search = GridSearch(LinearRegression(), constraints=bgl_square_loss, grid_size=grid_size)
+    # A tiny ridge regularization makes the inner least-squares optimum
+    # uniquely defined even at the extreme grid points (where the BGL
+    # Lagrangian effectively zeros out one group and the remaining design
+    # is rank-deficient). Without it, the predictions at that grid point
+    # depend on the underlying LAPACK driver; see
+    # https://github.com/fairlearn/fairlearn/issues/265.
+    estimator = LeastSquaresRegressor(alpha=1e-6)
+    grid_search = GridSearch(estimator, constraints=bgl_square_loss, grid_size=grid_size)
 
     grid_search.fit(X, Y, sensitive_features=A)
 
@@ -81,16 +89,9 @@ def test_bgl_unfair(A_two_dim):
 
     all_predict = [predictor.predict(test_X) for predictor in grid_search.predictors_]
 
-    # TODO: investigate where the different outcomes for the first grid point are from, likely
-    # due to some ignored data points at the edge resulting in another solution with the same
-    # least squares loss (i.e. both solutions acceptable).
-    # Reflects https://github.com/fairlearn/fairlearn/issues/265
-    assert logging_all_close([[3.2, 11.2]], [all_predict[0]]) or logging_all_close(
-        [[3.03010885, 11.2]], [all_predict[0]]
-    )
-
     assert logging_all_close(
         [
+            [3.2, 11.2],
             [-3.47346939, 10.64897959],
             [-2.68, 10.12],
             [-1.91764706, 9.61176471],
@@ -98,7 +99,7 @@ def test_bgl_unfair(A_two_dim):
             [-0.47924528, 8.65283019],
             [0.2, 0.7],
         ],
-        all_predict[1:],
+        all_predict,
     )
 
 
