@@ -10,6 +10,7 @@ from ._constants import (
     _LIST_MODEL_UNSUPPORTED,
     _NO_LOSS,
     _NOT_IMPLEMENTED,
+    _X_NOT_2D,
 )
 
 
@@ -33,7 +34,9 @@ class BackendEngine:
         """
         self.base = base
 
-        n_X_features = X.shape[1]  # FIXME: what if X.ndim > 2?
+        if X.ndim != 2:
+            raise ValueError(_X_NOT_2D.format(X.ndim))
+        n_X_features = X.shape[1]
         n_Y_features = base._y_transform.n_features_out_
         n_A_features = base._sf_transform.n_features_out_
 

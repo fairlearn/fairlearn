@@ -41,3 +41,4 @@ _LIST_MODEL_UNSUPPORTED = (
     + "supported when the accompanying {}_loss is not a keyword."
 )
 _CALLBACK_RETURNS_ERROR = "Callback function returned a non-boolean value"
+_X_NOT_2D = "Expected 'X' to be a two-dimensional array, but got an array with {} dimensions."
