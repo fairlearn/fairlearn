@@ -11,6 +11,11 @@ fixes a polars dataframe-interchange deprecation, and corrects the
 handling of degenerate sensitive feature values in
 :code:`PrototypeRepresentationLearner`.
 
+New methods
+-----------
+
+* Added support for Kamiran and Calders reweighing through the :code:`KamiranCaldersReweighing` preprocessing transformer, based on Kamiran and Calders (2012) :footcite:`kamiran2012`: :pr:`1612` by :user:`Wilson Cheung <wirrywoo>`.
+
 
 Bug fixes
 ---------
