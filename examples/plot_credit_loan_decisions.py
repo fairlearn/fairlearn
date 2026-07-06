@@ -993,7 +993,7 @@ performance_df_masked = performance_df.loc[mask, :]
 # %%
 # Now, let's plot the performance trade-offs between all of our models.
 
-for index, row in performance_df_masked.iterrows():
+for _index, row in performance_df_masked.iterrows():
     bal_error, eq_odds_diff = row["balanced_error"], row["equalized_odds"]
     epsilon_, index_ = row["epsilon"], row["index"]
     plt.scatter(bal_error, eq_odds_diff, color="green", label="ExponentiatedGradient")

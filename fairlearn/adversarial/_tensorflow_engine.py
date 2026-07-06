@@ -30,7 +30,7 @@ class TensorflowEngine(BackendEngine):
 
         self.model_class = keras.Model
         self.optim_class = keras.optimizers.Optimizer
-        super(TensorflowEngine, self).__init__(base, X, Y, A)
+        super().__init__(base, X, Y, A)
 
     def evaluate(self, X):
         """
@@ -82,10 +82,10 @@ class TensorflowEngine(BackendEngine):
             dW_LP[i] = dW_LP[i] - (proj * unit_dW_LA) - (self.base.alpha * dW_LA[i])
 
         self.predictor_optimizer.apply_gradients(
-            zip(dW_LP, self.predictor_model.trainable_variables)
+            zip(dW_LP, self.predictor_model.trainable_variables, strict=False)
         )
         self.adversary_optimizer.apply_gradients(
-            zip(dU_LA, self.adversary_model.trainable_variables)
+            zip(dU_LA, self.adversary_model.trainable_variables, strict=False)
         )
 
         return (LP.numpy().item(), LA.numpy().item())
@@ -111,7 +111,7 @@ class TensorflowEngine(BackendEngine):
             return keras.losses.CategoricalCrossentropy(from_logits=False)
         elif dist_type in ["continuous", "continuous-multioutput"]:
             return keras.losses.MeanSquaredError()
-        super(TensorflowEngine, self).get_loss(dist_type)
+        super().get_loss(dist_type)
 
     def get_model(self, list_nodes):
         """

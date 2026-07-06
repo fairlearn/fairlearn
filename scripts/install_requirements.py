@@ -47,9 +47,9 @@ def _build_argument_parser():
 def _install_requirements_file(file_stem):
     _logger.info("Processing %s", file_stem)
 
-    requirements_file = "{0}.{1}".format(file_stem, _REQUIREMENTS_EXTENSION)
+    requirements_file = f"{file_stem}.{_REQUIREMENTS_EXTENSION}"
 
-    with _LogWrapper("Running pip on {0}".format(requirements_file)):
+    with _LogWrapper(f"Running pip on {requirements_file}"):
         command_args = ["pip", "install", "-r", requirements_file]
         subprocess.check_call(command_args)
 

@@ -33,10 +33,10 @@ X_ex = np.stack(
 )
 
 sensitive_feature_names_ex1 = ["A", "B", "C"]
-sensitive_features_ex1 = np.array([x for x in "AAAAAAABBBBBBBCCCCCC"]).reshape(-1, 1)
+sensitive_features_ex1 = np.array(list("AAAAAAABBBBBBBCCCCCC")).reshape(-1, 1)
 
 sensitive_feature_names_ex2 = ["x", "Y"]
-sensitive_features_ex2 = np.array([x for x in "xxxYYYYxYYYYYxYYYYYY"]).reshape(-1, 1)
+sensitive_features_ex2 = np.array(list("xxxYYYYxYYYYYxYYYYYY")).reshape(-1, 1)
 
 labels_ex = np.array([int(x) for x in "01101000010111000111"])
 degenerate_labels_ex = np.array([int(x) for x in "00000000000000000000"])
@@ -104,12 +104,10 @@ def is_invalid_transformation(**kwargs):
 
     # Skip combinations where the multi-column sensitive features would have to be compressed
     # into a one-dimensional data structure.
-    if (sensitive_features == sensitive_features_ex3).all() and sensitive_feature_transform in [
-        ensure_list_1d,
-        ensure_series,
-    ]:
-        return True
-    return False
+    return bool(
+        (sensitive_features == sensitive_features_ex3).all()
+        and sensitive_feature_transform in [ensure_list_1d, ensure_series]
+    )
 
 
 @pytest.fixture(params=candidate_A_transforms)

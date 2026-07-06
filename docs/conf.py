@@ -41,10 +41,7 @@ author = "Fairlearn contributors"
 
 # The full version, including alpha/beta/rc tags
 release = fairlearn.__version__
-if "dev" in fairlearn.__version__:
-    tag_or_branch = "main"
-else:
-    tag_or_branch = fairlearn.__version__
+tag_or_branch = "main" if "dev" in fairlearn.__version__ else fairlearn.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -307,10 +304,7 @@ def linkcode_resolve(domain, info):
     except OSError:
         lineno = None
 
-    if lineno:
-        linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
-    else:
-        linespec = ""
+    linespec = f"#L{lineno}-L{lineno + len(source) - 1}" if lineno else ""
 
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, "/")
     if tag_or_branch == "main":

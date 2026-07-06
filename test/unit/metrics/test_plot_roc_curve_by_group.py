@@ -65,7 +65,7 @@ class TestPlotRocCurveByGroup:
 
     def test_draws_curve_per_group_plus_overall_and_chance(self, two_sensitive_features):
         ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=two_sensitive_features)
-        n_groups = len(set(zip(g_1, g_2)))
+        n_groups = len(set(zip(g_1, g_2, strict=False)))
         # One ROC curve per subgroup, plus the overall curve and the chance line.
         assert len(ax.get_lines()) == n_groups + 2
 
@@ -77,7 +77,7 @@ class TestPlotRocCurveByGroup:
             plot_overall=False,
             plot_chance_level=False,
         )
-        assert len(ax.get_lines()) == len(set(zip(g_1, g_2)))
+        assert len(ax.get_lines()) == len(set(zip(g_1, g_2, strict=False)))
 
     def test_chance_level_label(self):
         ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=g_1)
@@ -125,7 +125,7 @@ class TestPlotRocCurveByGroup:
             plot_overall=False,
             plot_chance_level=False,
         )
-        assert len(ax.get_lines()) == len(set(zip(g_1, g_2)))
+        assert len(ax.get_lines()) == len(set(zip(g_1, g_2, strict=False)))
 
     def test_sets_title(self):
         ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=g_1, title="My ROC")
@@ -165,7 +165,7 @@ class TestPlotRocCurveByGroup:
             plot_overall=False,
             plot_chance_level=False,
         )
-        assert len(ax.get_lines()) == len(set(zip(g_1, g_2)))
+        assert len(ax.get_lines()) == len(set(zip(g_1, g_2, strict=False)))
 
     def test_single_subgroup(self):
         sensitive_features = np.zeros_like(y_t)

@@ -20,7 +20,7 @@ def _get_debug_color(key):
         import matplotlib.cm as cm
         import matplotlib.colors
     except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE) from None
     if _debug_colors is None:
         tab_norm = matplotlib.colors.Normalize(vmin=0, vmax=7)
         tab_scalarMap = cm.ScalarMappable(norm=tab_norm, cmap="Dark2")
@@ -78,7 +78,7 @@ def _plot_curve(ax, sensitive_feature, x_col, y_col, points):
 def _raise_if_not_threshold_optimizer(obj):
     if not isinstance(obj, ThresholdOptimizer):
         raise ValueError(
-            "Argument {} needs to be of type {}.".format(obj.__name__, ThresholdOptimizer.__name__)
+            f"Argument {obj.__name__} needs to be of type {ThresholdOptimizer.__name__}."
         )
 
 
@@ -104,7 +104,7 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
     try:
         import matplotlib.pyplot as plt
     except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE) from None
 
     _raise_if_not_threshold_optimizer(threshold_optimizer)
     check_is_fitted(threshold_optimizer)
@@ -112,7 +112,7 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
     if ax is None:
         ax = plt.axes()
 
-    for sensitive_feature_value in threshold_optimizer._tradeoff_curve.keys():
+    for sensitive_feature_value in threshold_optimizer._tradeoff_curve:
         _plot_curve(
             ax,
             sensitive_feature_value,

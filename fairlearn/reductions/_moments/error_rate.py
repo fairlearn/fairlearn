@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from typing import Callable, Literal
+from collections.abc import Callable
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -47,7 +48,7 @@ class ErrorRate(ClassificationMoment):
 
     def __init__(self, *, costs: dict[Literal["fp", "fn"], float] | None = None):
         """Initialize the costs."""
-        super(ErrorRate, self).__init__()
+        super().__init__()
         if costs is None:
             self.fp_cost = 1.0
             self.fn_cost = 1.0

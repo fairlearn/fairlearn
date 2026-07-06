@@ -42,9 +42,9 @@ def test_missing_sensitive_feature_combinations(metric_fn):
         mask_B = g_B == idx[1]
         mask = np.logical_and(mask_A, mask_B)
         if idx == ("bb", "x"):
-            assert sum(mask) == 0, "idx={0}".format(idx)
+            assert sum(mask) == 0, f"idx={idx}"
         else:
-            assert sum(mask) != 0, "idx={0}".format(idx)
+            assert sum(mask) != 0, f"idx={idx}"
             nxt = metric_fn(y_t[mask], y_p[mask])
             direct_eval.append(nxt)
     assert len(direct_eval) == 5
@@ -75,13 +75,13 @@ def test_missing_conditional_feature_combinations(metric_fn):
     )
 
     # Build all the expected values
-    overall = dict()
-    by_groups = dict()
+    overall = {}
+    by_groups = {}
     for i_A in np.unique(g_A):
         mask_A = g_A == i_A
 
-        overall_B = dict()
-        by_groups_B = dict()
+        overall_B = {}
+        by_groups_B = {}
         for i_B in np.unique(g_B):
             mask_B = g_B == i_B
 
@@ -91,7 +91,7 @@ def test_missing_conditional_feature_combinations(metric_fn):
             else:
                 assert sum(mask_A_B) != 0
                 overall_B[i_B] = metric_fn(y_t[mask_A_B], y_p[mask_A_B])
-                b_g = dict()
+                b_g = {}
                 for i_1 in np.unique(g_1):
                     mask = np.logical_and(mask_A_B, g_1 == i_1)
                     if sum(mask) != 0:

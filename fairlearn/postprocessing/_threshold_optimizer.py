@@ -48,8 +48,8 @@ MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = (
     "Post processing currently only supports a single column in {}."
 )
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = (
-    "A sensitive feature named {} or {} "
-    "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
+    f"A sensitive feature named {SCORE_KEY} or {LABEL_KEY} "
+    "was detected. Please rename your column and try again."
 )
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
@@ -327,7 +327,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             try:
                 check_is_fitted(self.estimator)
             except NotFittedError:
-                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__))
+                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__), stacklevel=2)
             self.estimator_ = self.estimator
 
         scores = _get_soft_predictions(self.estimator_, X, self._predict_method)
@@ -474,9 +474,9 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             # sensitive feature value is identical by design.
             i_best = overall_tradeoff_curve.idxmax()
             self._x_best = self._x_grid[i_best]
-            self._x_best_per_group = {
-                group: self._x_best for group in sensitive_feature_proportions.keys()
-            }
+            self._x_best_per_group = dict.fromkeys(
+                sensitive_feature_proportions.keys(), self._x_best
+            )
             self._y_best = overall_tradeoff_curve[i_best]
             optimal_indices = [i_best] * len(sensitive_feature_proportions)
 
@@ -493,14 +493,14 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
 
         else:
             optimal_indices, self._y_best = maximize_objective_with_tolerance(
-                dataframes=[tradeoff_curve for tradeoff_curve in self._tradeoff_curve.values()],
+                dataframes=list(self._tradeoff_curve.values()),
                 weights=sensitive_feature_proportions.values(),
                 tol=self.tol,
             )
 
             self._x_best_per_group = {
                 group: self._x_grid[idx]
-                for group, idx in zip(self._tradeoff_curve.keys(), optimal_indices)
+                for group, idx in zip(self._tradeoff_curve.keys(), optimal_indices, strict=False)
             }
 
         max_x = max(self._x_best_per_group.values())
@@ -511,7 +511,9 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         # interpolation per sensitive feature value.
         interpolation_dict = {}
 
-        for sensitive_feature_value, idx_best in zip(self._tradeoff_curve, optimal_indices):
+        for sensitive_feature_value, idx_best in zip(
+            self._tradeoff_curve, optimal_indices, strict=False
+        ):
             best_interpolation = self._tradeoff_curve[sensitive_feature_value].iloc[idx_best]
             interpolation_dict[sensitive_feature_value] = Bunch(
                 p0=best_interpolation.p0,
@@ -556,10 +558,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
 
         n = len(labels)
 
-        if isinstance(labels, pd.DataFrame):
-            n_positive = labels.sum().loc[0]
-        else:
-            n_positive = sum(labels)
+        n_positive = labels.sum().loc[0] if isinstance(labels, pd.DataFrame) else sum(labels)
         n_negative = n - n_positive
         self._tradeoff_curve = {}
         self._x_grid = np.linspace(0, 1, self.grid_size + 1)
@@ -611,7 +610,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         # create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature
         interpolation_dict = {}
-        for sensitive_feature_value in self._tradeoff_curve.keys():
+        for sensitive_feature_value in self._tradeoff_curve:
             roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best_EO]
             # p_ignore * x_best represent the diagonal of the ROC plot.
             if roc_result.y == roc_result.x:
@@ -739,7 +738,7 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
                 raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
-            data_dict[key] = map(lambda a: a[0], additional_data)
+            data_dict[key] = (a[0] for a in additional_data)
         else:
             data_dict[key] = additional_data
     else:

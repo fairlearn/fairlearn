@@ -197,7 +197,7 @@ class TestExponentiatedGradientArguments:
         )
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
     def test_sample_weights_argument(self):
         estimator = Pipeline(

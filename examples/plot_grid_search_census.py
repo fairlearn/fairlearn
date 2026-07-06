@@ -183,7 +183,7 @@ predictors = sweep.predictors_
 errors, disparities = [], []
 for m in predictors:
 
-    def classifier(X):
+    def classifier(X, m=m):
         return m.predict(X)
 
     error = ErrorRate()
@@ -210,7 +210,7 @@ for row in all_results.itertuples():
 predictions = {"unmitigated": unmitigated_predictor.predict(X_test)}
 metric_frames = {"unmitigated": metric_frame}
 for i in range(len(non_dominated)):
-    key = "dominant_model_{0}".format(i)
+    key = f"dominant_model_{i}"
     predictions[key] = non_dominated[i].predict(X_test)
 
     metric_frames[key] = MetricFrame(

@@ -70,7 +70,7 @@ def run_expgrad_classification(estimator, moment):
     gamma_mitigated = verification_moment.gamma(lambda x: expgrad.predict(x))
 
     for idx in gamma_mitigated.index:
-        assert abs(gamma_mitigated[idx]) <= abs(gamma_unmitigated[idx]), "Checking {0}".format(idx)
+        assert abs(gamma_mitigated[idx]) <= abs(gamma_unmitigated[idx]), f"Checking {idx}"
 
 
 def run_gridsearch_classification(estimator, moment):
@@ -92,7 +92,7 @@ def run_gridsearch_classification(estimator, moment):
     gamma_mitigated = verification_moment.gamma(lambda x: gs.predict(x))
 
     for idx in gamma_mitigated.index:
-        assert abs(gamma_mitigated[idx]) <= abs(gamma_unmitigated[idx]), "Checking {0}".format(idx)
+        assert abs(gamma_mitigated[idx]) <= abs(gamma_unmitigated[idx]), f"Checking {idx}"
 
 
 def run_thresholdoptimizer_classification(estimator):

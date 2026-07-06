@@ -85,7 +85,7 @@ def test_examples():
     # EXAMPLE 2
     class PredictorModel(torch.nn.Module):
         def __init__(self):
-            super(PredictorModel, self).__init__()
+            super().__init__()
             self.layers = torch.nn.Sequential(
                 torch.nn.Linear(X_prep_train.shape[1], 200),
                 torch.nn.LeakyReLU(),
