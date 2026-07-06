@@ -23,12 +23,12 @@ jobs:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python }}
       - name: Cache openml datasets
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ env.DATA_HOME }}
           key: ${{ runner.os }}-openml-datasets-v1
@@ -68,7 +68,7 @@ jobs:
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@v4.2.0
+        uses: codecov/codecov-action@v7
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true
