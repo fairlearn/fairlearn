@@ -27,6 +27,15 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python }}
+      - name: Get commit date
+        id: get_date
+        shell: bash
+        run: |
+          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
+          CURRENT_DATE=$(date +%s)
+          AGE=$((CURRENT_DATE - COMMIT_DATE))
+          echo "AGE=$AGE" >> $GITHUB_OUTPUT
+          echo "AGE in seconds: $AGE"
       - name: Cache openml datasets
         uses: actions/cache@v6
         with:
@@ -67,7 +76,7 @@ jobs:
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
         name: Run ${{matrix.mlpackage}} tests
       - name: Upload coverage reports to Codecov with GitHub Action
-        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
+        if: ${{ steps.get_date.outputs.AGE < 172800 }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v7
         with:
           env_vars: OS,PYTHON
