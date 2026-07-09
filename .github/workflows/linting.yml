@@ -11,20 +11,19 @@ on:
         type: string
 
 jobs:
-  linting-black:
-    # Need to keep black version consistent in
-    # requirements-dev.txt
-    # linting.yml
-    # .pre-commit-config.yaml
-    runs-on: ${{ inputs.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: psf/black@26.3.1
   ruff:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: chartboost/ruff-action@v1
+  ruff-format:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/ruff-action@v4
+        with:
+          version: 0.15.20
+          args: "format --check --diff"
   build-wheel:
     runs-on: ${{ inputs.os }}
     steps:

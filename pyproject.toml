@@ -46,23 +46,6 @@ version = { attr = "fairlearn.__version__" }
 include = ["fairlearn*"]
 exclude = ["test*", "test_othermlpackages*"]
 
-[tool.black]
-line-length = 99
-target_version = ['py311', 'py312', 'py313', 'py314']
-preview = true
-extend-exclude = '''
-(
-    ^/docs/
-    | ^/examples/
-    ^/notebooks/
-    ^/build/
-    ^/.git/
-)
-'''
-
-[tool.isort]
-profile = "black"
-
 [tool.pytest.ini_options]
 filterwarnings = [
     "error",
@@ -144,7 +127,8 @@ notice-rgx = "# (?i)Copyright \\(C\\) (Microsoft Corporation and )?Fairlearn con
 # Enable flake8-bugbear (`B`) to catch likely bugs and design problems.
 # Enable flake8-simplify (`SIM`) to simplify verbose or redundant code.
 # Enable flake8-comprehensions (`C4`) for more idiomatic comprehensions.
-select = ["E4", "E7", "E9", "F", "G", "NPY201", "D", "UP", "B", "SIM", "C4"]
+# Enable isort (`I`) so Ruff owns import sorting (replaces standalone isort).
+select = ["E4", "E7", "E9", "F", "I", "G", "NPY201", "D", "UP", "B", "SIM", "C4"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -158,6 +142,17 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 convention = "numpy"
 
 [tool.ruff.format]
+# Mirror Black's former `extend-exclude`: these trees were never reformatted by
+# Black, so keep them out of `ruff format` too (they are still linted). Do NOT
+# move these into the global `[tool.ruff]` exclude, which would also skip
+# linting (examples/ relies on per-file-ignores).
+exclude = [
+    "examples/**",
+    "docs/**",
+    "notebooks/**",
+    "build/**",
+]
+
 # Like Black, use double quotes for strings.
 quote-style = "double"
 
