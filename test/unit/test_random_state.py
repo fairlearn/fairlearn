@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.utils import DATA_HOME
-
 import pandas as pd
 from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
@@ -10,6 +8,7 @@ from sklearn.model_selection import train_test_split
 
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import EqualizedOdds, ExponentiatedGradient
+from test.utils import DATA_HOME
 
 
 def test_random_state_threshold_optimizer():

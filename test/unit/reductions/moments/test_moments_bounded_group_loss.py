@@ -1,14 +1,13 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.unit.reductions.grid_search.utilities import _quick_data
-
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 from fairlearn.reductions import BoundedGroupLoss, SquareLoss
+from test.unit.reductions.grid_search.utilities import _quick_data
 
 
 class TestBoundedGroupLoss:

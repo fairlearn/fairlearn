@@ -1,13 +1,5 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
-from test.unit.input_convertors import (
-    _map_into_single_column,
-    conversions_for_1d,
-    ensure_dataframe,
-    ensure_ndarray,
-)
-from test.unit.reductions.conftest import is_invalid_transformation
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -17,6 +9,13 @@ from sklearn.preprocessing import StandardScaler
 
 from fairlearn.reductions import DemographicParity, ErrorRate, ExponentiatedGradient
 from fairlearn.utils._input_validation import _LABELS_NOT_0_1_ERROR_MESSAGE
+from test.unit.input_convertors import (
+    _map_into_single_column,
+    conversions_for_1d,
+    ensure_dataframe,
+    ensure_ndarray,
+)
+from test.unit.reductions.conftest import is_invalid_transformation
 
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data

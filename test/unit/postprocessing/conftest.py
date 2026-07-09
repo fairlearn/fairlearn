@@ -2,14 +2,6 @@
 # Licensed under the MIT License.
 
 from collections import defaultdict, namedtuple
-from test.unit.input_convertors import (
-    _map_into_single_column,
-    ensure_dataframe,
-    ensure_list_1d,
-    ensure_ndarray,
-    ensure_ndarray_2d,
-    ensure_series,
-)
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -22,6 +14,14 @@ from fairlearn.postprocessing._constants import (
     SENSITIVE_FEATURE_KEY,
 )
 from fairlearn.postprocessing._threshold_operation import ThresholdOperation
+from test.unit.input_convertors import (
+    _map_into_single_column,
+    ensure_dataframe,
+    ensure_list_1d,
+    ensure_ndarray,
+    ensure_ndarray_2d,
+    ensure_series,
+)
 
 X_ex = np.stack(
     (

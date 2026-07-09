@@ -2,9 +2,6 @@
 # Licensed under the MIT License.
 
 import copy
-from test.unit.reductions.exponentiated_gradient.simple_learners import LeastSquaresRegressor
-from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
-from test.unit.utility_functions import logging_all_close
 
 import numpy as np
 import pandas as pd
@@ -12,6 +9,9 @@ import pytest
 from sklearn.linear_model import LinearRegression
 
 from fairlearn.reductions import BoundedGroupLoss, GridSearch, SquareLoss, ZeroOneLoss
+from test.unit.reductions.exponentiated_gradient.simple_learners import LeastSquaresRegressor
+from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
+from test.unit.utility_functions import logging_all_close
 
 
 def _simple_regression_data(

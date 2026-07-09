@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.unit.reductions.grid_search.utilities import _quick_data
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -10,6 +8,7 @@ import pytest
 from fairlearn.reductions import DemographicParity, EqualizedOdds
 from fairlearn.reductions._grid_search.grid_search import _GridGenerator
 from fairlearn.reductions._moments.utility_parity import _ALL, _EVENT, _GROUP_ID, _SIGN
+from test.unit.reductions.grid_search.utilities import _quick_data
 
 
 @pytest.mark.parametrize("grid_size", [5, 6, 10, 11, 100, 101, 102])

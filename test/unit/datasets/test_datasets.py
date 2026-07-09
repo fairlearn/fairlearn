@@ -1,8 +1,6 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.utils import DATA_HOME
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -15,6 +13,7 @@ from fairlearn.datasets import (
     fetch_credit_card,
     fetch_diabetes_hospital,
 )
+from test.utils import DATA_HOME
 
 # =============================================
 

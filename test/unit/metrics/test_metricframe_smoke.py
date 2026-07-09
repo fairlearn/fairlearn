@@ -1,14 +1,13 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.unit.input_convertors import conversions_for_1d
-
 import numpy as np
 import pandas as pd
 import pytest
 import sklearn.metrics as skm
 
 import fairlearn.metrics as metrics
+from test.unit.input_convertors import conversions_for_1d
 
 # Bring in some pre-prepared input arrays
 from .data_for_test import g_1, g_2, g_3, g_4, s_w, y_p, y_t
