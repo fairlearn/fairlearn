@@ -253,6 +253,11 @@ def plot_metric_frame(
 
     df = metric_frame.by_group
 
+    # Normalise to DataFrame so column iteration works for single-metric
+    # frames where by_group is a Series.
+    if isinstance(df, pd.Series):
+        df = df.to_frame()
+
     # only plot metrics that aren't arrays (filters out metric errors)
     if metrics is None:
         metrics = []

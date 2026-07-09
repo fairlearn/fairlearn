@@ -207,7 +207,7 @@ def test_auto_ci_single_metric():
     for col, (ci_col, ci_values) in ci_map.items():
         assert col == "accuracy_score"
         assert ci_col == "__metricframe_ci_accuracy_score"
-        assert len(ci_values) == len(g_1.unique())
+        assert len(ci_values) == len(np.unique(g_1))
         for lower, upper in ci_values:
             assert isinstance(lower, float)
             assert isinstance(upper, float)
@@ -232,7 +232,7 @@ def test_auto_ci_multi_metric():
     # Verify the mapping has real CI values
     for col, (ci_col, ci_values) in ci_map.items():
         assert ci_col == f"__metricframe_ci_{col}"
-        assert len(ci_values) == len(g_1.unique())
+        assert len(ci_values) == len(np.unique(g_1))
 
 
 def test_no_ci_without_bootstrap():
