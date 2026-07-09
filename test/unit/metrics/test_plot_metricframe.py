@@ -14,6 +14,7 @@ from fairlearn.metrics._plotter import (
     _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR,
     _CONF_INTERVALS_MUST_BE_ARRAY,
     _METRIC_FRAME_INVALID_ERROR,
+    _get_conf_intervals_from_metric_frame,
 )
 
 from .data_for_test import g_1, y_p, y_t
@@ -188,3 +189,249 @@ def test_multi_ax_input(sample_metric_frame):
         kind="bar",
         colormap="Pastel1",
     )
+
+
+def test_auto_ci_single_metric():
+    """plot_metric_frame auto-detects by_group_ci for single metric."""
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    ci_map = _get_conf_intervals_from_metric_frame(mf)
+    assert len(ci_map) == 1
+    for col, (ci_col, ci_values) in ci_map.items():
+        assert col == "accuracy_score"
+        assert ci_col == "__metricframe_ci_accuracy_score"
+        assert len(ci_values) == len(g_1.unique())
+        for lower, upper in ci_values:
+            assert isinstance(lower, float)
+            assert isinstance(upper, float)
+            assert lower <= upper
+
+
+def test_auto_ci_multi_metric():
+    """plot_metric_frame auto-detects by_group_ci for multiple metrics."""
+    mf = MetricFrame(
+        metrics={"accuracy": accuracy_score, "recall": recall_score},
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    ci_map = _get_conf_intervals_from_metric_frame(mf)
+    assert len(ci_map) == 2
+    assert "accuracy" in ci_map
+    assert "recall" in ci_map
+    # Verify the mapping has real CI values
+    for col, (ci_col, ci_values) in ci_map.items():
+        assert ci_col == f"__metricframe_ci_{col}"
+        assert len(ci_values) == len(g_1.unique())
+
+
+def test_no_ci_without_bootstrap():
+    """Helper returns empty dict when MetricFrame has no CI."""
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+    )
+    ci_map = _get_conf_intervals_from_metric_frame(mf)
+    assert ci_map == {}
+
+
+def test_auto_ci_reversed_quantiles():
+    """Reversed ci_quantiles still produce valid lower <= upper CIs."""
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.975, 0.025],
+        random_state=0,
+    )
+    ci_map = _get_conf_intervals_from_metric_frame(mf)
+    assert len(ci_map) == 1
+    for _col, (_ci_col, ci_values) in ci_map.items():
+        for lower, upper in ci_values:
+            assert lower <= upper, f"Expected lower <= upper, got {lower}, {upper}"
+
+
+def test_auto_ci_more_than_two_quantiles():
+    """More than 2 quantiles should warn and use the outermost pair."""
+    import warnings
+
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.5, 0.975],
+        random_state=0,
+    )
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        ci_map = _get_conf_intervals_from_metric_frame(mf)
+        assert len(ci_map) == 1
+        assert len(w) == 1
+        assert "outermost" in str(w[0].message)
+
+
+def test_plot_metric_frame_auto_ci_reordered_metrics():
+    """Reordered metrics get their own error bars, not swapped."""
+    mf = MetricFrame(
+        metrics={"acc": accuracy_score, "rec": recall_score},
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    captured = {}
+
+    def fake_plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
+        captured["df_all_errors"] = df_all_errors
+        captured["metrics"] = metrics
+
+    import fairlearn.metrics._plotter as mod
+
+    monkeypatch = __import__("pytest").MonkeyPatch()
+    monkeypatch.setattr(mod, "_plot_df", fake_plot_df)
+    # Reverse the metric order: recall first, accuracy second
+    plot_metric_frame(mf, metrics=["rec", "acc"])
+    assert captured["df_all_errors"] is not None
+    # recall error bar should reflect recall CI, not accuracy CI
+    rec_err = captured["df_all_errors"]["rec"]
+    # recall should have non-zero errors (from bootstrapping)
+    assert not all(
+        e[0] == 0 and e[1] == 0 for e in rec_err
+    ), "recall CI should not be all-zero if bootstrapping produced variance"
+    monkeypatch.undo()
+
+
+def test_plot_metric_frame_auto_ci_subset_metrics():
+    """Subset of metrics should not crash."""
+    mf = MetricFrame(
+        metrics={"acc": accuracy_score, "rec": recall_score},
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    captured = {}
+
+    def fake_plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
+        captured["df_all_errors"] = df_all_errors
+        captured["metrics"] = metrics
+
+    import fairlearn.metrics._plotter as mod
+
+    monkeypatch = __import__("pytest").MonkeyPatch()
+    monkeypatch.setattr(mod, "_plot_df", fake_plot_df)
+    # Only request one of the two metrics
+    plot_metric_frame(mf, metrics=["acc"])
+    assert captured["df_all_errors"] is not None
+    assert len(captured["df_all_errors"].columns) == 1
+    monkeypatch.undo()
+
+
+def test_plot_metric_frame_auto_ci_single(monkeypatch):
+    """End-to-end: plot_metric_frame uses auto CI for single metric."""
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    captured = {}
+
+    def fake_plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
+        captured["df_all_errors"] = df_all_errors
+        captured["metrics"] = metrics
+        captured["df"] = df
+
+    monkeypatch.setattr("fairlearn.metrics._plotter._plot_df", fake_plot_df)
+    plot_metric_frame(mf)
+    assert captured["df_all_errors"] is not None, "auto CI should produce error bars"
+    assert len(captured["metrics"]) == 1
+
+
+def test_plot_metric_frame_auto_ci_multi(monkeypatch):
+    """End-to-end: plot_metric_frame uses auto CI for multiple metrics."""
+    mf = MetricFrame(
+        metrics={"acc": accuracy_score, "rec": recall_score},
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    captured = {}
+
+    def fake_plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
+        captured["df_all_errors"] = df_all_errors
+        captured["metrics"] = metrics
+
+    monkeypatch.setattr("fairlearn.metrics._plotter._plot_df", fake_plot_df)
+    plot_metric_frame(mf)
+    assert captured["df_all_errors"] is not None, "auto CI for multi metric"
+    assert len(captured["metrics"]) == 2
+
+
+def test_plot_metric_frame_no_ci_without_bootstrap(monkeypatch):
+    """End-to-end: no error bars when MetricFrame has no bootstrap CI."""
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+    )
+    captured = {}
+
+    def fake_plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kwargs):
+        captured["df_all_errors"] = df_all_errors
+
+    monkeypatch.setattr("fairlearn.metrics._plotter._plot_df", fake_plot_df)
+    plot_metric_frame(mf, metrics="accuracy_score")
+    assert captured["df_all_errors"] is None, "no CI without bootstrap"
+
+
+def test_explicit_conf_intervals_not_overridden_by_auto(monkeypatch):
+    """When user passes conf_intervals, auto-detect is skipped."""
+    mf = MetricFrame(
+        metrics=accuracy_score,
+        y_true=y_t,
+        y_pred=y_p,
+        sensitive_features=g_1,
+        n_boot=10,
+        ci_quantiles=[0.025, 0.975],
+        random_state=0,
+    )
+    calls = []
+
+    def spy(metric_frame):
+        calls.append(1)
+        return {}
+
+    monkeypatch.setattr("fairlearn.metrics._plotter._get_conf_intervals_from_metric_frame", spy)
+    try:
+        plot_metric_frame(mf, metrics=["accuracy_score"], conf_intervals=["custom_ci"])
+    except (KeyError, AttributeError):
+        pass
+    assert len(calls) == 0, "auto-detect must not fire when conf_intervals is explicitly passed"

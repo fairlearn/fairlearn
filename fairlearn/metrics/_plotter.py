@@ -114,6 +114,54 @@ def _plot_df(df, metrics, kind, subplots, legend_label, df_all_errors=None, **kw
     return axs
 
 
+def _get_conf_intervals_from_metric_frame(metric_frame):
+    """Build a ``{metric: ci_col}`` mapping from MetricFrame built-in bootstrap CI.
+
+    Returns an empty dict when no CI is available.
+    """
+    ci_quantiles = getattr(metric_frame, "ci_quantiles", None)
+    if ci_quantiles is None:
+        return {}
+
+    ci_data = getattr(metric_frame, "by_group_ci", None)
+    if ci_data is None:
+        return {}
+
+    # by_group_ci is a list indexed by ci_quantiles order
+    if len(ci_data) != len(ci_quantiles):
+        return {}
+
+    # Zip and sort by quantile value so lower < upper always
+    pairs = sorted(zip(ci_quantiles, ci_data), key=lambda x: x[0])
+
+    if len(pairs) > 2:
+        import warnings
+
+        warnings.warn(
+            f"ci_quantiles has {len(pairs)} entries; " "using the outermost pair for error bars.",
+            stacklevel=2,
+        )
+
+    lo_q, lo_data = pairs[0]
+    hi_q, hi_data = pairs[-1]
+
+    mapping = {}
+    if isinstance(lo_data, pd.DataFrame):
+        common_cols = set(lo_data.columns) & set(hi_data.columns)
+        for col in common_cols:
+            lower = lo_data[col].values
+            upper = hi_data[col].values
+            ci_col = f"__metricframe_ci_{col}"
+            mapping[col] = (ci_col, list(zip(lower, upper)))
+    else:
+        # Single metric: by_group_ci returns Series
+        col = lo_data.name or "metric"
+        ci_col = f"__metricframe_ci_{col}"
+        mapping[col] = (ci_col, list(zip(lo_data.values, hi_data.values)))
+
+    return mapping
+
+
 def plot_metric_frame(
     metric_frame: MetricFrame,
     *,
@@ -156,6 +204,10 @@ def plot_metric_frame(
     conf_intervals : list[str] | str | None
         The name of the confidence intervals to plot.
         Should match columns from the given :class:`fairlearn.metrics.MetricFrame`.
+
+        If ``None`` and the *metric_frame* was created with bootstrap
+        confidence intervals (``n_boot`` and ``ci_quantiles``), they are
+        auto-detected from :attr:`fairlearn.metrics.MetricFrame.by_group_ci`.
 
         Note:
             The return of the error function should be an array of the lower
@@ -207,6 +259,19 @@ def plot_metric_frame(
         for metric in list(df):
             if not _is_arraylike(df[metric].iloc[0]):
                 metrics.append(metric)
+
+    # When the user did not supply conf_intervals, try to auto-detect
+    # MetricFrame's built-in bootstrap confidence intervals.
+    if conf_intervals is None:
+        ci_map = _get_conf_intervals_from_metric_frame(metric_frame)
+        if ci_map:
+            conf_intervals = []
+            df = df.copy()
+            for m in metrics:
+                if m in ci_map:
+                    ci_col, ci_values = ci_map[m]
+                    df[ci_col] = [np.array(p) for p in ci_values]
+                    conf_intervals.append(ci_col)
 
     check_consistent_length(metrics, conf_intervals)
     if len(metrics) == 0:
