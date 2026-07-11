@@ -684,8 +684,9 @@ class _AdversarialFairness(BaseEstimator):
                 )
 
         # Probe whether the estimator has been fitted so _validate_input
-        # can decide whether to initialize the backend engine.
-        is_fitted = hasattr(self, 'backendEngine_')
+        # can decide whether to initialize the backend engine. `_is_setup`
+        # is the canonical fitted flag (see `__sklearn_is_fitted__`).
+        is_fitted = hasattr(self, "_is_setup")
 
         if A is None:
             logger.warning("No sensitive_features provided")
