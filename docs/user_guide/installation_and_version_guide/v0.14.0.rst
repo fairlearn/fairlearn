@@ -12,3 +12,5 @@ Other improvements
 
 * Removed support for python 3.9 and added support for python 3.13: :pr:`1592` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
 * Added support for scipy 1.16 :pr:`1596` by :user:`Tamara Atanasoska <tamaraatanasoska>`.
+* Preserved multi-column sensitive feature data in
+  :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers.
