@@ -14,6 +14,11 @@ New features
   chance-level baseline. The corresponding AUC scores can be obtained with
   :class:`~fairlearn.metrics.MetricFrame` and :code:`sklearn.metrics.roc_auc_score`:
   :pr:`869` by :user:`kstohr <kstohr>` and :user:`Roman Lutz <romanlutz>`.
+* When bootstrap confidence intervals are available on a
+  :class:`~fairlearn.metrics.MetricFrame`, :func:`~fairlearn.metrics.plot_metric_frame`
+  now auto-detects them from :attr:`~fairlearn.metrics.MetricFrame.by_group_ci` when
+  the *conf_intervals* argument is not supplied:
+  :pr:`1674` by :user:`Dresden <DresdenGman>`.
 
 Bug fixes
 ---------
