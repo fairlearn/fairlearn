@@ -23,7 +23,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.11"
     - name: Update pip and build
       run: |
         pip install --upgrade pip
@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-14]
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}

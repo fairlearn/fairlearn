@@ -156,13 +156,24 @@ class PytorchEngine(BackendEngine):
             a number of nodes.
             Callable keywords are added to the model as a layer directly,
             which is useful for activation functions. String keywords are
-            not supported in the Pytorch backend (try tensorflow instead).
+            supported for known activation functions (e.g. ``"relu"``,
+            ``"sigmoid"``, ``"tanh"``).
 
         Returns
         -------
         model : torch.nn.Module
             initialized model with layers as specified.
         """
+        activation_lookup = {
+            "sigmoid": torch.nn.Sigmoid,
+            "softmax": torch.nn.Softmax,
+            "relu": torch.nn.ReLU,
+            "leaky_relu": torch.nn.LeakyReLU,
+            "tanh": torch.nn.Tanh,
+            "gelu": torch.nn.GELU,
+            "elu": torch.nn.ELU,
+            "selu": torch.nn.SELU,
+        }
 
         class FullyConnected(torch.nn.Module):
             """Neural network class."""
@@ -180,19 +191,10 @@ class PytorchEngine(BackendEngine):
                     elif callable(item):
                         layers.append(item)
                     elif isinstance(item, str):
-                        if item.lower() == "sigmoid":
-                            layers.append(torch.nn.Sigmoid())
-                        elif item.lower() == "softmax":
-                            layers.append(torch.nn.Softmax())
-                        elif item.lower() == "relu":
-                            layers.append(torch.nn.ReLU())
-                        elif item.lower() == "leaky_relu":
-                            layers.append(torch.nn.LeakyReLU())
-                        else:
+                        activation_cls = activation_lookup.get(item.lower())
+                        if activation_cls is None:
                             raise ValueError(_MODEL_UNRECOGNIZED_STR.format(item))
-                        # TODO support more strings? Or better option?
-                        # possibly gather all activation classes, get __name__,
-                        # and do pattern matching.
+                        layers.append(activation_cls())
                     else:
                         raise ValueError(_MODEL_UNRECOGNIZED_ITEM.format(item))
                 self.layers_ = torch.nn.ModuleList(layers)

@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from typing import Literal, Tuple
+from typing import Literal
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -232,16 +232,18 @@ def _interpolate_curve(
 
 
 def _get_interpolation_indices(x_grid: NDArray, x_values: NDArray) -> NDArray:
-    """
-    This function finds the indices of `x_values` that are just to the left of each value in `x_grid`.
+    """Find the indices of `x_values` that are just to the left of each value in `x_grid`.
+
     The returned indices are such that:
     `x_values[indices[i]] < x_grid[i] <= x_values[indices[i] + 1]`.
+
     Parameters
     ----------
     x_grid : array-like
         The grid of x values where interpolation is desired.
     x_values : array-like
         The sorted array of x values from which to interpolate.
+
     Returns
     -------
     indices : ndarray
@@ -373,7 +375,7 @@ def _calculate_tradeoff_points(
     ).to_native()
 
 
-def _get_scores_labels_and_counts(data: IntoDataFrame) -> Tuple[list, list, int, int, int]:
+def _get_scores_labels_and_counts(data: IntoDataFrame) -> tuple[list, list, int, int, int]:
     """Order samples by scores, counting number of positive, negative, and overall samples.
 
     The samples are sorted into descending order.
@@ -401,7 +403,7 @@ def _get_scores_labels_and_counts(data: IntoDataFrame) -> Tuple[list, list, int,
     return scores.to_list(), labels.to_list(), n, n_positive, n_negative
 
 
-def _get_counts(labels: nw.Series) -> Tuple[int, int, int]:
+def _get_counts(labels: nw.Series) -> tuple[int, int, int]:
     """Return the overall, positive, and negative counts of the labels.
 
     Parameters
