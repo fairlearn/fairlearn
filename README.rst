@@ -158,3 +158,7 @@ To report security issues please send an email to
    :target: https://discord.gg/R22yCfgsRn
 .. |StackOverflow| image:: https://img.shields.io/badge/StackOverflow-questions-blueviolet
    :target: https://stackoverflow.com/questions/tagged/fairlearn
+
+---
+
+*[Mukller](https://github.com/Mukller)*
