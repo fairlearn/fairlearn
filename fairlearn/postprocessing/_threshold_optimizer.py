@@ -202,6 +202,8 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         all the sensitive groups is at most `tol`. If `None`, the constraint is not relaxed.
         Relaxation is not supported for `equalized_odds`.
 
+        .. versionadded:: 0.13.0
+
 
     Notes
     -----
