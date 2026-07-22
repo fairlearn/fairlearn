@@ -32,6 +32,7 @@ Bug fixes
   attribute :code:`constraints_`: :pr:`1632` by
   :user:`BALOGUN DAVID TAIWO <BALOGUN-DAVID>`.
 * Fixed :code:`fetch_diabetes_hospital` so that :code:`as_frame=False` returns numpy arrays instead of raising. The data is now always fetched as a pandas DataFrame internally and converted to numpy when needed. The skipped tests and the obsolete :code:`test_fetch_diabetes_hospital_as_ndarray_raises_value_error` test were removed: :pr:`1636` by :user:`Richard Ogundele <richardogundele>`.
+* :code:`BackendEngine` used to read :code:`X.shape[1]` without checking how many dimensions :code:`X` had, so passing data with more than two dimensions (for example an array of images) would silently build a predictor model with the wrong input size instead of failing. It now raises a :code:`ValueError` up front when :code:`X` is not two-dimensional: :pr:`1671` by :user:`Arnav <NotArnav03>`.
 
 Documentation
 -------------

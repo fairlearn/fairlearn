@@ -378,6 +378,22 @@ def test_fake_models_df_inputs(fake_backend_env):
         mitigator.fit(pd.DataFrame(X), pd.Series(Y), sensitive_features=pd.DataFrame(Z))
 
 
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_backend_engine_rejects_non_2d_X(fake_backend_env):
+    """BackendEngine should raise a clear error instead of silently mis-sizing layers."""
+    rng = np.random.default_rng(0)
+    X = rng.random((20, 3, 4))
+    Y = rng.integers(0, 2, size=20)
+    Z = rng.integers(0, 2, size=20)
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_training=True,
+        predictor_model=[10, "Sigmoid"],
+    )
+    with pytest.raises(ValueError, match="two-dimensional"):
+        mitigator.fit(X, Y, sensitive_features=Z)
+
+
 @pytest.mark.parametrize(
     "data, valid_choice",
     [
