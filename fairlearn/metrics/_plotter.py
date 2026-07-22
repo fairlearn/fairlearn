@@ -27,7 +27,7 @@ _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = (
 
 
 def _is_arraylike(input_):
-    return isinstance(input_, np.ndarray) or isinstance(input_, list)
+    return isinstance(input_, (np.ndarray, list))
 
 
 def _build_legend(ax, kind, legend_label):
@@ -245,7 +245,7 @@ def plot_metric_frame(
     if not isinstance(metric_frame, MetricFrame):
         raise (ValueError(_METRIC_FRAME_INVALID_ERROR))
     # ensure metrics is either list, str, or None
-    if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
+    if not (isinstance(metrics, (list, str)) or metrics is None):
         raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
 
     metrics = [metrics] if isinstance(metrics, str) else metrics
@@ -299,10 +299,12 @@ def plot_metric_frame(
     df_all_errors = pd.DataFrame([])
     df_all_bounds = pd.DataFrame([])
     # plotting with confidence intervals:
-    for metric, conf_interval in zip(metrics, conf_intervals):
+    for metric, conf_interval in zip(metrics, conf_intervals, strict=False):
         df_temp = pd.DataFrame([])
         df_temp[["lower", "upper"]] = pd.DataFrame(df[conf_interval].tolist(), index=df.index)
-        df_temp["error"] = list(zip(df[metric] - df_temp["lower"], df_temp["upper"] - df[metric]))
+        df_temp["error"] = list(
+            zip(df[metric] - df_temp["lower"], df_temp["upper"] - df[metric], strict=False)
+        )
         df_all_errors[metric] = df_temp["error"]
 
         if plot_ci_labels:

@@ -10,7 +10,7 @@ from fairlearn.metrics._base_metrics import _EMPTY_INPUT_PREDICTIONS_ERROR_MESSA
 def test_selection_rate_empty():
     with pytest.raises(ValueError) as exc:
         _ = metrics.selection_rate([], [])
-    assert _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE == exc.value.args[0]
+    assert exc.value.args[0] == _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE
 
 
 @pytest.mark.parametrize(

@@ -65,13 +65,11 @@ class ConditionalLossMoment(LossMoment):
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series(dtype="float64")
         zero_vec = pd.Series(0.0, self.index)
-        i = 0
-        for attr in attr_vals:
+        for i, attr in enumerate(attr_vals):
             self.pos_basis[i] = 0 + zero_vec
             self.neg_basis[i] = 0 + zero_vec
             self.pos_basis.loc[attr, i] = 1
             self.neg_basis_present.at[i] = False
-            i += 1
 
     def gamma(self, predictor: Callable) -> pd.Series:
         """Calculate the degree to which constraints are currently violated by the predictor."""

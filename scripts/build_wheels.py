@@ -34,7 +34,7 @@ def main(argv):
     with _LogWrapper("processing README.rst"):
         process_readme("README.rst", "README.rst")
 
-    with _LogWrapper("storing fairlearn version in {}".format(args.version_filename)):
+    with _LogWrapper(f"storing fairlearn version in {args.version_filename}"):
         version = _get_fairlearn_version()
         with open(args.version_filename, "w") as version_file:
             version_file.write(version)

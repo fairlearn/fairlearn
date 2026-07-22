@@ -25,7 +25,7 @@ class PytorchEngine(BackendEngine):
 
         self.model_class = torch.nn.Module
         self.optim_class = torch.optim.Optimizer
-        super(PytorchEngine, self).__init__(base, X, Y, A)
+        super().__init__(base, X, Y, A)
 
     def __move_model__(self):
         """Move model to CUDA."""
@@ -63,10 +63,7 @@ class PytorchEngine(BackendEngine):
             X = X.to(self.device)
         with torch.no_grad():
             Y_pred = self.predictor_model(X)
-        if self.cuda:
-            Y_pred = Y_pred.detach().cpu().numpy()
-        else:
-            Y_pred = Y_pred.numpy()
+        Y_pred = Y_pred.detach().cpu().numpy() if self.cuda else Y_pred.numpy()
         return Y_pred
 
     def train_step(self, X, Y, A):
@@ -138,7 +135,7 @@ class PytorchEngine(BackendEngine):
             return torch.nn.CrossEntropyLoss(reduction="mean")
         elif dist_type in ["continuous", "continuous-multioutput"]:
             return torch.nn.MSELoss(reduction="mean")
-        super(PytorchEngine, self).get_loss(dist_type)
+        super().get_loss(dist_type)
 
     def get_model(self, list_nodes):
         """

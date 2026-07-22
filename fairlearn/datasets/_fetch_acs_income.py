@@ -157,7 +157,7 @@ def fetch_acs_income(
     # check that user-provided state abbreviations are valid
     if states is not None:
         states = [state.upper() for state in states]
-        not_valid_states = [state for state in states if state not in _STATE_CODES.keys()]
+        not_valid_states = [state for state in states if state not in _STATE_CODES]
         if len(not_valid_states) > 0:
             raise ValueError(
                 f"Error with states: {not_valid_states}\n"

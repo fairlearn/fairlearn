@@ -704,13 +704,13 @@ class TestCount:
         y_true = []
         y_pred = []
 
-        assert 0 == metrics.count(y_true, y_pred)
+        assert metrics.count(y_true, y_pred) == 0
 
     def test_group_of_one(self):
         y_true = [1]
         y_pred = [0]
 
-        assert 1 == metrics.count(y_true, y_pred)
+        assert metrics.count(y_true, y_pred) == 1
 
     def test_multi_group(self):
         y_true = [
@@ -770,7 +770,7 @@ class TestCount:
             0,
         ]
 
-        assert 26 == metrics.count(y_true, y_pred)
+        assert metrics.count(y_true, y_pred) == 26
 
     def test_unequal_y_sizes(self):
         y_true = [0, 1, 0, 1, 0, 1, 1]

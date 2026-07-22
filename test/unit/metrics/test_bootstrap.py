@@ -142,5 +142,5 @@ from fairlearn.metrics._bootstrap import _align_sample_indices
 )
 def test_align_sample_indices(samples: list[pd.DataFrame], expected: list[pd.DataFrame]) -> None:
     aligned_samples = _align_sample_indices(samples=samples)
-    for aligned, exp in zip(aligned_samples, expected):
+    for aligned, exp in zip(aligned_samples, expected, strict=False):
         pd.testing.assert_frame_equal(aligned, exp)

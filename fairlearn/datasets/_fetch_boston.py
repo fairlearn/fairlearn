@@ -125,7 +125,7 @@ def fetch_boston(*, cache=True, data_home=None, as_frame=True, return_X_y=False,
     """
     if warn:
         msg = "You are about to use a dataset with known fairness issues."
-        warnings.warn(DataFairnessWarning(msg))
+        warnings.warn(DataFairnessWarning(msg), stacklevel=2)
     if not data_home:
         data_home = pathlib.Path().home() / _DOWNLOAD_DIRECTORY_NAME
 

@@ -98,7 +98,7 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             try:
                 check_is_fitted(self.estimator)
             except NotFittedError:
-                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__))
+                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__), stacklevel=2)
             self.estimator_ = self.estimator
         return self
 

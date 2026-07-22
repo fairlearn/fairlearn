@@ -355,7 +355,7 @@ def test_estimators_with_torch(estimator, check, fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_fake_models(fake_backend_env):
     """Test various data types and see if it is interpreted correctly."""
-    for (X, Y, Z), (X_type, Y_type, Z_type) in generate_data_combinations():
+    for (X, Y, Z), (_X_type, Y_type, Z_type) in generate_data_combinations():
         mitigator = get_instance(fake_training=True, fake_backend=fake_backend_env)
         mitigator.fit(X, Y, sensitive_features=Z)
         assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
@@ -365,7 +365,7 @@ def test_fake_models(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_fake_models_list_inputs(fake_backend_env):
     """Test model with lists as input."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
@@ -373,7 +373,7 @@ def test_fake_models_list_inputs(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_fake_models_df_inputs(fake_backend_env):
     """Test model with data frames as input."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(pd.DataFrame(X), pd.Series(Y), sensitive_features=pd.DataFrame(Z))
 
@@ -406,7 +406,7 @@ def check_2dnp(X):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data(fake_backend_env):
     """Test if validate_data properly preprocesses datasets to ndarray."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X, Y, Z)
         for x in (X, Y, Z):
@@ -416,7 +416,7 @@ def test_validate_data(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_list_inputs(fake_backend_env):
     """Test if validate_data properly preprocesses list datasets to ndarray."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
         for x in (X, Y, Z):
@@ -426,7 +426,7 @@ def test_validate_data_list_inputs(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_df_inputs(fake_backend_env):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.Series(Y), pd.DataFrame(Z))
         for x in (X, Y, Z):
@@ -436,10 +436,7 @@ def test_validate_data_df_inputs(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_not_correct_backend(fake_backend_env):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
-    if fake_backend_env == "torch":
-        backend = "tensorflow"
-    else:
-        backend = "torch"
+    backend = "tensorflow" if fake_backend_env == "torch" else "torch"
 
     mitigator = get_instance(
         fake_backend=fake_backend_env,
@@ -461,13 +458,12 @@ def test_no_backend(backend, fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_ambiguous_rows(fake_backend_env):
     """Test if an ambiguous number of rows are caught."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         X = X[:5, :]
         mitigator = get_instance(fake_mixin=True)
         with pytest.raises(ValueError) as exc:
             mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
-            assert str(
-                exc.value
-            ) == "Input data has an ambiguous number of rows: {}, {}, {}.".format(
-                X.shape[0], Y.shape[0], Z.shape[0]
+            assert (
+                str(exc.value)
+                == f"Input data has an ambiguous number of rows: {X.shape[0]}, {Y.shape[0]}, {Z.shape[0]}."
             )
