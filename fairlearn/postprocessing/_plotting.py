@@ -91,6 +91,8 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
     objects that have their constraint set to :code:`equalized_odds` this will
     result in a ROC curve plot.
 
+    .. versionadded:: 0.4.5
+
     Parameters
     ----------
     threshold_optimizer : :class:`.ThresholdOptimizer`
