@@ -304,7 +304,114 @@ However, by not considering whether false
 positive rates are equivalent across groups, equal opportunity does not
 capture the costs of missclassification disparities.
 
+.. _assessment_false_positive_rate_parity:
 
+False positive rate parity
+---------------------------
+
+False positive rate parity is the mirror image of equal opportunity:
+instead of requiring equal *true* positive rates across groups, it
+requires equal *false* positive rates. Another way of thinking about
+this metric is requiring equal treatment only within the subset of
+records belonging to the negative class. In a pre-trial risk
+assessment scenario, false positive rate parity requires that
+defendants in *group A* who would not have reoffended are just as
+likely to be incorrectly flagged as high-risk as defendants in
+*group B* who would not have reoffended.
+
+We mathematically define false positive rate parity using the
+following equation. A classifier :math:`h` satisfies false positive
+rate parity under a distribution over :math:`(X, A, Y)` if
+:math:`\E[h(X) \given A=a, Y=0] = \E[h(X) \given Y=0] \quad \forall a`.
+:footcite:cts:`hardt2016equality` Equivalently, the probability of a
+false positive prediction should not depend on group membership,
+among individuals who belong to the negative class.
+
+Just as equal opportunity does not capture the costs of
+misclassification disparities among the positive class, false
+positive rate parity does not capture disparities among the positive
+class. It should generally be considered alongside true positive
+rate parity (equal opportunity) rather than as a standalone
+criterion — used together, the two recover :ref:`equalized odds
+<assessment_equalized_odds>`. False positive rate parity on its own
+is most relevant when the *cost of a false positive* is the primary
+harm of concern, such as flagging someone for additional scrutiny,
+denying a benefit that would otherwise have been granted, or
+producing a false accusation.
+
+Fairlearn does not currently expose a dedicated
+:code:`false_positive_rate_parity_difference` convenience function,
+but the same result can be obtained directly from
+:class:`~fairlearn.metrics.MetricFrame` using
+:func:`~fairlearn.metrics.false_positive_rate` as the metric:
+
+.. doctest:: common_fairness_metrics_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import MetricFrame, false_positive_rate
+    >>> mf = MetricFrame(metrics=false_positive_rate,
+    ...                  y_true=y_true,
+    ...                  y_pred=y_pred,
+    ...                  sensitive_features=sf_data)
+    >>> print(mf.difference())
+    1.0
+    >>> print(mf.ratio())
+    0.0
+
+As with equalized odds, a difference of 0 (or ratio of 1) indicates
+that false positive rate parity has been achieved.
+
+.. _assessment_error_rate_parity:
+
+Error rate parity
+------------------
+
+Error rate parity requires that a classifier's overall error rate —
+the proportion of predictions that are wrong, regardless of whether
+they are false positives or false negatives — be the same across
+groups. Unlike demographic parity, equalized odds, or equal
+opportunity, error rate parity does not distinguish between the
+*type* of mistake being made. It only asks whether one group is, on
+the whole, being predicted for less accurately than another.
+
+We mathematically define error rate parity using the following
+equation. A classifier :math:`h` satisfies error rate parity under a
+distribution over :math:`(X, A, Y)` if
+:math:`\E[\mathbb{1}[h(X) \neq Y] \given A=a] = \E[\mathbb{1}[h(X) \neq Y]] \quad \forall a`.
+:footcite:cts:`agarwal2018reductions`
+
+Error rate parity can surface quality-of-service harms: if a model
+is consistently less accurate for one group than another, that group
+is receiving a worse-performing system even when demographic parity
+or equalized odds happen to hold. However, because it collapses false
+positives and false negatives into a single number, error rate parity
+can hide the fact that one group is experiencing mostly false
+positives while another is experiencing mostly false negatives —
+two very different kinds of harm that may warrant different
+remedies. For that reason, error rate parity is often used *as well
+as*, rather than *instead of*, equalized odds or equal opportunity,
+particularly in settings where false positives and false negatives
+carry meaningfully different costs.
+
+As with false positive rate parity, there is currently no dedicated
+convenience function in :code:`fairlearn.metrics` for this metric;
+it can be computed with :class:`~fairlearn.metrics.MetricFrame` using
+any standard error-rate function, such as scikit-learn's
+:code:`zero_one_loss`:
+
+.. doctest:: common_fairness_metrics_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from sklearn.metrics import zero_one_loss
+    >>> from fairlearn.metrics import MetricFrame
+    >>> mf = MetricFrame(metrics=zero_one_loss,
+    ...                  y_true=y_true,
+    ...                  y_pred=y_pred,
+    ...                  sensitive_features=sf_data)
+    >>> print(mf.difference())
+    0.41666...
+    >>> print(mf.ratio())
+    0.44444...
 
 .. _assessment_four_fifths:
 
@@ -373,8 +480,8 @@ with mathematical measures of disparity, see
 Summary
 -------
 
-We have introduced three commonly used fairness metrics in this section,
-which can be summed up as follows:
+We have introduced five commonly used fairness metrics in this
+section, which can be summed up as follows:
 
 * Demographic Parity
 
@@ -410,31 +517,37 @@ which can be summed up as follows:
       are much less likely to cause harm than missed true positives, equal
       opportunity may be useful
 
-    * *Caveats:* If there are historical biases in the data, then the original labels
-      may hold little value. A large imbalance between the positive and negative classes
-      will also accentuate any statistical issues related to sensitive groups with low
-      membership
+    * *Caveats:* Same as equalized odds. In addition, since it ignores false
+      positives entirely, it should not be relied on alone in settings where
+      false positives carry meaningful costs
+
+* False positive rate parity
+
+    * *What it compares:* False Positive rates between different groups
+
+    * *Reason to use:* If historical data are useful, and missed true
+      positives are much less likely to cause harm than extra false
+      positives, false positive rate parity may be useful
+
+    * *Caveats:* Same as equal opportunity, but mirrored: it ignores true
+      positives entirely, so it should not be relied on alone in settings
+      where missed true positives carry meaningful costs
+
+* Error rate parity
+
+    * *What it compares:* Overall error rate (false positives and false
+      negatives combined) between different groups
+
+    * *Reason to use:* Useful as a coarse check for quality-of-service harms,
+      i.e. whether the model is simply less accurate for some groups than
+      others
+
+    * *Caveats:* Collapses false positives and false negatives into a single
+      number, which can mask the fact that different groups are experiencing
+      different *types* of error. Best used alongside equalized odds or
+      equal opportunity rather than as a replacement for them
 
 
 However, the fact these are common metrics does not make them applicable to any given
 situation.
 In particular, :ref:`demographic parity is often misapplied <assessment_four_fifths>`.
-
-
-.. topic:: References
-
-   .. footbibliography::
-
-
-.. rubric:: Footnotes
-
-.. [#f1] For a related example, see the discussion on 'law' and 'justice' in
-         *The Caves of Steel* (Asimov, 1953)
-
-.. [#f2] Epistemic trespassing is the process of taking expertise in one field and
-         applying it to another in which one does not have an equivalent (or any)
-         competence.
-         This is not an intrinsically bad thing - one could label all
-         interdisciplinary research a form of epistemic trespassing.
-         However, doing so successfully requires a willingness to learn the subtleties
-         of the new field.
