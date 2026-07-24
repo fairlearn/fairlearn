@@ -727,20 +727,21 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
             len(additional_data.shape) == 2 and additional_data.shape[1] > 1
         ):
             # TODO: extend to multiple columns for additional_group data
-            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
         else:
             data_dict[key] = additional_data.squeeze()
     elif isinstance(additional_data, pd.DataFrame):
-        # TODO: extend to multiple columns for additional_data by using column names
-        for attribute_column in additional_data.columns:
-            data_dict[key] = additional_data[attribute_column].values
+        if len(additional_data.columns) > 1:
+            # TODO: extend to multiple columns for additional_data by using column names
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
+        data_dict[key] = additional_data[additional_data.columns[0]].values
     elif isinstance(additional_data, pd.Series):
         data_dict[key] = additional_data.values
     elif isinstance(additional_data, list):
         if isinstance(additional_data[0], list):
             if len(additional_data[0]) > 1:
                 # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
+                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
             data_dict[key] = map(lambda a: a[0], additional_data)
         else:
             data_dict[key] = additional_data
