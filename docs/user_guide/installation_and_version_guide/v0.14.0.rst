@@ -56,3 +56,5 @@ Other improvements
 * Improved unit tests for :code:`PrototypeRepresentationLearner`: stopped overriding parametrized :code:`sensitive_features` values inside the test bodies and added coverage for multi-dimensional sensitive features: :pr:`1623` by :user:`Tahar Allouche <taharallouche>`.
 * Cached OpenML datasets in CI runs: :pr:`1598` by :user:`Francesco Bruzzesi <FBruzzesi>`.
 * Added a Narwhals pytest marker: :pr:`1597` by :user:`Francesco Bruzzesi <FBruzzesi>`.
+* Preserved multi-column sensitive feature data in
+  :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers.

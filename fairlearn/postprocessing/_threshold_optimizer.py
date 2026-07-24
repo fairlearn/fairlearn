@@ -684,23 +684,29 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
     """
     data_dict = {}
 
-    # TODO: extend to multiple columns for additional group data
-    # and name columns after original column names if possible
-    # or store the original column names
-    sensitive_feature_name = SENSITIVE_FEATURE_KEY
-    if sensitive_feature_names is not None:
-        if sensitive_feature_name in [SCORE_KEY, LABEL_KEY]:
-            raise ValueError(SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
-        sensitive_feature_name = sensitive_feature_names[0]
-
-    _reformat_data_into_dict(sensitive_feature_name, data_dict, sensitive_features)
+    sensitive_feature_names = _reformat_data_into_dict(
+        SENSITIVE_FEATURE_KEY,
+        data_dict,
+        sensitive_features,
+        column_names=sensitive_feature_names,
+        allow_multiple_columns=True,
+    )
     _reformat_data_into_dict(SCORE_KEY, data_dict, scores)
     _reformat_data_into_dict(LABEL_KEY, data_dict, labels)
 
-    return pd.DataFrame(data_dict).groupby(sensitive_feature_name)
+    if len(sensitive_feature_names) == 1:
+        return pd.DataFrame(data_dict).groupby(sensitive_feature_names[0])
+    return pd.DataFrame(data_dict).groupby(sensitive_feature_names)
 
 
-def _reformat_data_into_dict(key, data_dict, additional_data):
+def _reformat_data_into_dict(
+    key,
+    data_dict,
+    additional_data,
+    *,
+    column_names=None,
+    allow_multiple_columns=False,
+):
     """Add `additional_data` to `data_dict` with key `key`.
 
     Before `additional_data` is added to `data_dict` it is first
@@ -716,33 +722,76 @@ def _reformat_data_into_dict(key, data_dict, additional_data):
         will be inserted at the key `key`.
     additional_data : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         the data to be added to `data_dict` at the specified `key`
+    column_names : list of strings, default=None
+        the names to use for the columns in `additional_data`
+    allow_multiple_columns : bool, default=False
+        whether `additional_data` may contain more than one column
 
     Returns
     -------
-    dict
-        The updated `data_dict` with reformatted data at the `key` slot
+    list of strings
+        The columns added to `data_dict`
     """
+
+    def _validate_column_names(names, column_count):
+        if names is not None:
+            if len(names) != column_count:
+                raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE.format("column names"))
+            for name in names:
+                if name in [SCORE_KEY, LABEL_KEY]:
+                    raise ValueError(SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
+            return names
+
+        if column_count == 1:
+            return [key]
+        return [f"{key}_{i}" for i in range(column_count)]
+
+    def _add_columns(columns, names):
+        if len(names) > 1 and not allow_multiple_columns:
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
+
+        for name, values in zip(names, columns):
+            data_dict[name] = values
+        return names
+
     if isinstance(additional_data, np.ndarray):
-        if len(additional_data.shape) > 2 or (
-            len(additional_data.shape) == 2 and additional_data.shape[1] > 1
-        ):
-            # TODO: extend to multiple columns for additional_group data
-            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
+        if len(additional_data.shape) > 2:
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
+
+        if len(additional_data.shape) == 1:
+            values = additional_data.reshape(-1, 1)
         else:
-            data_dict[key] = additional_data.squeeze()
+            values = additional_data
+
+        names = _validate_column_names(column_names, values.shape[1])
+        return _add_columns([values[:, i] for i in range(values.shape[1])], names)
+
     elif isinstance(additional_data, pd.DataFrame):
-        # TODO: extend to multiple columns for additional_data by using column names
-        for attribute_column in additional_data.columns:
-            data_dict[key] = additional_data[attribute_column].values
-    elif isinstance(additional_data, pd.Series):
-        data_dict[key] = additional_data.values
-    elif isinstance(additional_data, list):
-        if isinstance(additional_data[0], list):
-            if len(additional_data[0]) > 1:
-                # TODO: extend to multiple columns for additional_data
-                raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format("sensitive_features"))
-            data_dict[key] = map(lambda a: a[0], additional_data)
+        if allow_multiple_columns:
+            names = list(additional_data.columns) if column_names is None else column_names
         else:
-            data_dict[key] = additional_data
+            names = column_names
+        names = _validate_column_names(names, len(additional_data.columns))
+        columns = [additional_data.iloc[:, i].to_numpy() for i in range(len(names))]
+        return _add_columns(columns, names)
+
+    elif isinstance(additional_data, pd.Series):
+        names = _validate_column_names(column_names, 1)
+        data_dict[names[0]] = additional_data.values
+        return names
+
+    elif isinstance(additional_data, list):
+        values = np.asarray(additional_data, dtype=object)
+        if values.ndim > 2 or (
+            values.ndim == 1
+            and any(isinstance(row, (list, tuple, np.ndarray)) for row in additional_data)
+        ):
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
+        if values.ndim == 1:
+            values = values.reshape(-1, 1)
+
+        names = _validate_column_names(column_names, values.shape[1])
+        return _add_columns([values[:, i] for i in range(values.shape[1])], names)
+
     else:
         raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))
