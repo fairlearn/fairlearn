@@ -744,12 +744,12 @@ def _reformat_data_into_dict(
             return [key]
         return [f"{key}_{i}" for i in range(column_count)]
 
-    def _add_columns(values, names):
+    def _add_columns(columns, names):
         if len(names) > 1 and not allow_multiple_columns:
             raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
 
-        for i, name in enumerate(names):
-            data_dict[name] = values[:, i] if len(names) > 1 else values.squeeze()
+        for name, values in zip(names, columns):
+            data_dict[name] = values
         return names
 
     if isinstance(additional_data, np.ndarray):
@@ -761,7 +761,8 @@ def _reformat_data_into_dict(
         else:
             values = additional_data
 
-        return _add_columns(values, _validate_column_names(column_names, values.shape[1]))
+        names = _validate_column_names(column_names, values.shape[1])
+        return _add_columns([values[:, i] for i in range(values.shape[1])], names)
 
     elif isinstance(additional_data, pd.DataFrame):
         if allow_multiple_columns:
@@ -769,7 +770,8 @@ def _reformat_data_into_dict(
         else:
             names = column_names
         names = _validate_column_names(names, len(additional_data.columns))
-        return _add_columns(additional_data.to_numpy(), names)
+        columns = [additional_data.iloc[:, i].to_numpy() for i in range(len(names))]
+        return _add_columns(columns, names)
 
     elif isinstance(additional_data, pd.Series):
         names = _validate_column_names(column_names, 1)
@@ -777,12 +779,17 @@ def _reformat_data_into_dict(
         return names
 
     elif isinstance(additional_data, list):
-        if isinstance(additional_data[0], list):
-            values = np.asarray(additional_data, dtype=object)
-        else:
-            values = np.asarray(additional_data, dtype=object).reshape(-1, 1)
+        values = np.asarray(additional_data, dtype=object)
+        if values.ndim > 2 or (
+            values.ndim == 1
+            and any(isinstance(row, (list, tuple, np.ndarray)) for row in additional_data)
+        ):
+            raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
+        if values.ndim == 1:
+            values = values.reshape(-1, 1)
 
-        return _add_columns(values, _validate_column_names(column_names, values.shape[1]))
+        names = _validate_column_names(column_names, values.shape[1])
+        return _add_columns([values[:, i] for i in range(values.shape[1])], names)
 
     else:
         raise TypeError(UNEXPECTED_DATA_TYPE_ERROR_MESSAGE.format(type(additional_data)))
