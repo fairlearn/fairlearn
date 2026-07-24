@@ -1096,7 +1096,7 @@ intersectionalf(testy, predictions)
 # fairness assessment - it can manifest in impactful and pervasive ways in the systems where it is
 # potentially deployed. A Black man misdiagnosed with schizophrenia with the help of a ML model may
 # become more distrustful towards healthcare in the future. At any future visits, this distrust
-# might manifest in certain types of behaviours (e.g., an increased sense of tension) that could be
+# might manifest in certain types of behaviors (e.g., an increased sense of tension) that could be
 # interpreted as further evidence of schizophrenia, ultimately contributing to further
 # misdiagnosis. This type of feedback is extremely detrimental, as **algorithms reinforce and
 # propagate the unfairness** encoded within the data that is representative of society's own
