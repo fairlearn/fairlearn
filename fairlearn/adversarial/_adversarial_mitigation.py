@@ -594,7 +594,6 @@ class _AdversarialFairness(BaseEstimator):
             accept_sparse=False,
             accept_large_sparse=False,
             dtype=float,
-            allow_nd=True,
             reset=False,
         )
         y_pred = self.backendEngine_.evaluate(X)
