@@ -788,7 +788,7 @@ class _AdversarialFairness(BaseEstimator):
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
             raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
-        # Or all other cases, a mismatch between model model (and installation)
+        # Or all other cases, a mismatch between model (and installation)
         raise ValueError(
             _KWARG_ERROR_MESSAGE.format(
                 "predictor_model and adversary_model",
