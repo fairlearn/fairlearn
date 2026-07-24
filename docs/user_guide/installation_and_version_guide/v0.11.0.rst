@@ -1,7 +1,7 @@
 v0.11.0
 =======
 
-This release greately improves upon the :code:`scikit-learn` compatibility of the
+This release greatly improves upon the :code:`scikit-learn` compatibility of the
 :code:`AdversarialFairnessClassifier` and :code:`AdversarialFairnessRegressor`
 estimators. It also includes a number of other improvements.
 
