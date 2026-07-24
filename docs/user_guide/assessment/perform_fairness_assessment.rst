@@ -24,7 +24,7 @@ Identify types of harms
 See :ref:`types_of_harms` for a guide to types of fairness-related harms.
 The Fairlearn package is particularly suitable for measuring:
 
-* *Allocation Harms* occur when a system unfairly extends or witholds
+* *Allocation Harms* occur when a system unfairly extends or withholds
   opportunities, resources, or information.
   Common (but by no means exhaustive) examples are hiring for jobs, student
   admissions and loan origination.
