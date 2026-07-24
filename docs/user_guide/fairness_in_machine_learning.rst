@@ -481,6 +481,71 @@ Note: Some have identified that using the term *stakeholder* may perpetuate colo
 
 **Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
+Identifying stakeholders
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Identifying stakeholders is rarely a task for a single role. Fairness-related
+harms are easiest to miss when the people building a system share similar
+backgrounds, incentives, and blind spots, so the identification process
+benefits from involving a mix of roles: the data scientists and engineers
+building the model, UX researchers who understand how people actually
+interact with the system, social scientists and domain experts who
+understand the broader context the system is deployed into, and — wherever
+feasible — the stakeholders themselves, rather than proxies speaking on
+their behalf :footcite:`madaio2020codesigning`. Treating stakeholder
+identification as a cross-functional, participatory exercise rather than a
+box to check surfaces concerns that a purely technical review is likely to
+miss :footcite:`madaio2022assess`.
+
+In practice, determining *which* stakeholders are relevant starts from
+tracing the system's full deployment pipeline rather than just its most
+visible users. As discussed above, an AI system's effects extend beyond
+the people directly operating it to the organizations, communities, and
+downstream decision processes it touches. A useful starting question is
+not only "who uses this system?" but "who is affected by the decisions
+this system informs, even if they never see it or consent to it?"
+Revisiting the fraud detection example from :ref:`defining_terms`, this
+widens the stakeholder list from just the platform's direct customers to
+include, for instance, customer-support staff who handle disputed
+transactions and the auditors who rely on the system's outputs downstream.
+
+Identifying factors and groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Within a single stakeholder role, impact is rarely uniform. Two people who
+are both "end users" of the same system can experience very different
+outcomes depending on the factors and groups they belong to — the same
+demographic, sociocultural, behavioral, and morphological factors
+introduced in :ref:`defining_terms` :footcite:`barocas2021disagg`. Which
+factors matter most is generally specific to the AI feature, its use case,
+and its deployment context, rather than a fixed checklist that can be
+reused across projects. A speech recognition system and a hiring model, for
+example, are likely to put very different factors at the center of a
+fairness assessment, and the same feature deployed in two different
+markets may need to weigh those factors differently again.
+
+Historical and cultural context should also shape which groups get
+particular attention. Groups that have experienced disparities in a given
+domain historically are often the ones most likely to be underserved or
+mismeasured by a new system in that same domain, so stakeholder selection
+should account for that history rather than treating all groups as
+symmetric a priori. This context-specificity also holds across cultures and
+geographies: object recognition systems trained predominantly on data from
+a narrow set of regions have been shown to perform noticeably worse on
+images of everyday household items from other regions and income levels
+:footcite:`devries2019object`, illustrating how factors and groups that
+seem irrelevant in one deployment context can become central in another.
+
+Because "relevant" factors and groups shift with context, it is worth
+explicitly checking any candidate list against :ref:`construct validity
+<construct_validity>`: does this grouping actually capture the phenomenon
+that could cause harm here, or is it a convenient category imported from
+somewhere else? Reusing group definitions that worked well for a past
+project without re-examining them for the new context and use case is a
+specific instance of the :ref:`portability trap <portability_trap>`
+discussed above, and is one of the more common ways stakeholder and factor
+identification quietly goes wrong even when done with good intentions.
+
 .. topic:: References
 
    .. footbibliography::
