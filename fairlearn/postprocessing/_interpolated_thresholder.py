@@ -23,7 +23,7 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
 
     At prediction time, the predictor takes as input both standard and sensitive features.
     Based on the values of sensitive features, it then applies a randomized thresholding
-    transformation according to the provided `interpolation_dict`.
+    transformation according to the provided `threshold_interpolation`.
 
     Read more in the :ref:`User Guide <postprocessing>`.
 
@@ -33,8 +33,7 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
     ----------
     estimator :
         base estimator
-
-    interpolation_dict : dict
+    threshold_interpolation : dict
         maps sensitive feature values to `Bunch` that describes the
         interpolation transformation via the following fields:
 
@@ -47,6 +46,10 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
         The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
         operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
         between 0 and 1.
+
+        .. versionchanged:: 0.15
+            The :code:`interpolation_dict` argument was renamed to
+            :code:`threshold_interpolation`.
 
     prefit : bool
         if `True` then the base estimator is not fitted in :meth:`fit`.
@@ -77,9 +80,11 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             The default value changed from ``'predict'`` to ``'auto'``.
     """
 
-    def __init__(self, estimator, interpolation_dict, prefit=False, predict_method="auto"):
+    def __init__(
+        self, estimator, threshold_interpolation, prefit=False, predict_method="auto"
+    ):
         self.estimator = estimator
-        self.interpolation_dict = interpolation_dict
+        self.threshold_interpolation = threshold_interpolation
         self.prefit = prefit
         self.predict_method = predict_method
 
@@ -138,7 +143,7 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
         )
 
         positive_probs = 0.0 * base_predictions_vector
-        for a, interpolation in self.interpolation_dict.items():
+        for a, interpolation in self.threshold_interpolation.items():
             interpolated_predictions = interpolation.p0 * interpolation.operation0(
                 base_predictions_vector
             ) + interpolation.p1 * interpolation.operation1(base_predictions_vector)

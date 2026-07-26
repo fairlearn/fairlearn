@@ -9,6 +9,17 @@ v0.15.0
 New features
 ------------
 
+* Exposed :class:`~fairlearn.postprocessing.InterpolatedThresholder` and
+  :class:`~fairlearn.postprocessing.ThresholdOperation` as public objects in
+  :mod:`fairlearn.postprocessing`, and renamed
+  :class:`~fairlearn.postprocessing.InterpolatedThresholder`'s
+  :code:`interpolation_dict` constructor argument (and attribute) to
+  :code:`threshold_interpolation`. Users who construct
+  :class:`~fairlearn.postprocessing.InterpolatedThresholder` directly, or
+  who read the attribute off a fitted
+  :class:`~fairlearn.postprocessing.ThresholdOptimizer` via
+  :code:`interpolated_thresholder_`, need to update to the new name:
+  :pr:`918` by :user:`Roman Lutz <romanlutz>`.
 * Added :func:`~fairlearn.metrics.plot_roc_curve_by_group` to plot ROC curves
   disaggregated by sensitive feature, together with the overall curve and a
   chance-level baseline. The corresponding AUC scores can be obtained with
