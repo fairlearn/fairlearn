@@ -14,7 +14,7 @@ from sklearn.base import (
     TransformerMixin,
     is_classifier,
 )
-from sklearn.exceptions import DataConversionWarning, NotFittedError
+from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_scalar
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
@@ -683,11 +683,10 @@ class _AdversarialFairness(BaseEstimator):
                     "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
                 )
 
-        try:  # TODO check this
-            check_is_fitted(self)
-            is_fitted = True
-        except NotFittedError:
-            is_fitted = False
+        # Probe whether the estimator has been fitted so _validate_input
+        # can decide whether to initialize the backend engine. `_is_setup`
+        # is the canonical fitted flag (see `__sklearn_is_fitted__`).
+        is_fitted = hasattr(self, "_is_setup")
 
         if A is None:
             logger.warning("No sensitive_features provided")
