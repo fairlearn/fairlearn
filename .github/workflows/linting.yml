@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/ruff-action@v4
+      - uses: astral-sh/ruff-action@v4.1.0
   build-wheel:
     runs-on: ${{ inputs.os }}
     steps:
