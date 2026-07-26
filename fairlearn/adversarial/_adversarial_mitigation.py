@@ -884,6 +884,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     :code:`y` as input. For multi-class classification, :code:`y` is
     transformed using one-hot encoding.
 
+    .. versionadded:: 0.8.0
+
     Parameters
     ----------
     backend : str, BackendEngine, default = 'auto'
@@ -1081,6 +1083,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
 
     The adversarial model for equalized odds additionally takes
     :code:`y` as input.
+
+    .. versionadded:: 0.8.0
 
     Parameters
     ----------

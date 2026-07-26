@@ -1,0 +1,22 @@
+diff --git a/fairlearn/adversarial/_adversarial_mitigation.py b/fairlearn/adversarial/_adversarial_mitigation.py
+index 2a9fff9..67a284c 100644
+--- a/fairlearn/adversarial/_adversarial_mitigation.py
++++ b/fairlearn/adversarial/_adversarial_mitigation.py
+@@ -884,6 +884,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
+     :code:`y` as input. For multi-class classification, :code:`y` is
+     transformed using one-hot encoding.
+ 
++    .. versionadded:: 0.8.0
++
+     Parameters
+     ----------
+     backend : str, BackendEngine, default = 'auto'
+@@ -1082,6 +1084,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
+     The adversarial model for equalized odds additionally takes
+     :code:`y` as input.
+ 
++    .. versionadded:: 0.8.0
++
+     Parameters
+     ----------
+     backend : str, BackendEngine, default = 'auto'
