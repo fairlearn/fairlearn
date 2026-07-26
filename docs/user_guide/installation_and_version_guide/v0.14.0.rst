@@ -57,4 +57,5 @@ Other improvements
 * Cached OpenML datasets in CI runs: :pr:`1598` by :user:`Francesco Bruzzesi <FBruzzesi>`.
 * Added a Narwhals pytest marker: :pr:`1597` by :user:`Francesco Bruzzesi <FBruzzesi>`.
 * Preserved multi-column sensitive feature data in
-  :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers.
+  :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
+  :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
