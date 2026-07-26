@@ -1,0 +1,8 @@
+comment: false
+codecov:
+  branch: main
+  require_ci_to_pass: true
+  notify:
+    after_n_builds: 12
+    wait_for_ci: true
+  token: 363a2bcc-6585-4bdf-ac2d-3d9cb1bfdecf

@@ -1,0 +1,27 @@
+v0.4.5
+======
+
+* Changes to :class:`.ThresholdOptimizer`:
+
+  * Separate plotting for :class:`.ThresholdOptimizer` into its own plotting
+    function.
+  * :class:`.ThresholdOptimizer` now performs validations during :code:`fit`,
+    and not during :code:`__init__`. It also stores the fitted given estimator
+    in the :code:`estimator_` attribute.
+  * :class:`.ThresholdOptimizer` is now a scikit-learn meta-estimator, and
+    accepts an estimator through the :code:`estimator` parameter. To use a
+    pre-fitted estimator, pass :code:`prefit=True`.
+* Made :code:`_create_group_metric_set_()` private by prepending with
+  :code:`_`.
+  Also changed the arguments, so that this routine requires
+  dictionaries for the predictions and sensitive features. This is a
+  breaking change.
+* Remove :code:`Reduction` base class for reductions methods and replace it
+  with :class:`sklearn.base.BaseEstimator` and
+  :code:`MetaEstimatorMixin`.
+* Remove :code:`ExponentiatedGradientResult` and :code:`GridSearchResult` in
+  favor of storing the values and objects resulting from fitting the
+  meta-estimator directly in the :class:`.ExponentiatedGradient` and
+  :class:`.GridSearch` objects, respectively.
+* Fix regression in input validation that dropped metadata from :code:`X` if
+  it is provided as a :class:`pandas.DataFrame`.

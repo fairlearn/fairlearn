@@ -1,0 +1,28 @@
+v0.8.0
+======
+
+* Relaxed checks made on :code:`X` in :code:`_validate_and_reformat_input()`
+  since that is the concern of the underlying estimator and not Fairlearn.
+* Added support for Python 3.9 and 3.10, remove support for Python 3.6
+* Added error handling in :code:`MetricFrame`. Methods :code:`group_max`, :code:`group_min`,
+  :code:`difference` and :code:`ratio` now accept :code:`errors` as a parameter,
+  which could either be :code:`raise` or :code:`coerce`.
+* Fixed a bug whereby passing a custom :code:`grid` object to a :code:`GridSearch`
+  reduction would result in a :code:`KeyError` if the column names were not ordered
+  integers.
+* :class:`~fairlearn.preprocessing.CorrelationRemover` now exposes
+  :code:`n_features_in_` and :code:`feature_names_in_`.
+* Added the ACSIncome dataset and corresponding documentation.
+* Added `sphinxcontrib-bibtex` extension to manage citations in documentation using bibtex.
+* Added support for explicitly specifying optimization objective in
+  :class:`~fairlearn.reductions.ExponentiatedGradient`.
+  Added support for cost sensitive classification in
+  :class:`~fairlearn.reductions.ErrorRate`.
+* Internal performance improvements for :class:`~fairlearn.metrics.MetricFrame`.
+  Some results may now have a more appropriate type than :code:`object`, but otherwise
+  the only visible difference should be a substantial speed increase.
+* Added :meth:`~fairlearn.metrics.plot_model_comparison` to create scatter plots
+  for comparing multiple models along two metrics.
+* Added adversarial mitigation approaches
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` and
+  :class:`~fairlearn.adversarial.AdversarialFairnessRegressor`.

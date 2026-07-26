@@ -1,0 +1,12 @@
+v0.6.0
+======
+
+* Add :class:`fairlearn.preprocessing.CorrelationRemover` preprocessing
+  technique. This removes correlations between sensitive and non-sensitive
+  features while retaining as much information as possible.
+* Add :code:`control_features` to the classification moments. These allow for
+  data stratification, with fairness constraints enforced within each stratum,
+  but not between strata.
+* Update :code:`make_derived_metric()` to use
+  :class:`fairlearn.metrics.MetricFrame`
+* Assorted small documentation fixes

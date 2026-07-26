@@ -1,0 +1,21 @@
+v0.7.0
+======
+
+* Added new :func:`~fairlearn.metrics.count` metric, so that the number of
+  data points in each group is noted when using
+  :class:`~fairlearn.metrics.MetricFrame`.
+* Changed :class:`~fairlearn.metrics.MetricFrame` constructor API.
+  The :code:`metric` argument is now :code:`metrics` and all positional
+  arguments are now keyword arguments. The previous call format still works
+  (until v0.10.0), but issues a deprecation warning.
+* :class:`fairlearn.postprocessing.ThresholdOptimizer` now accepts
+  :code:`predict_method` as a parameter which allows users to define which
+  estimator method should be used to get the prediction values:
+  :code:`"predict_proba"` and :code:`"decision_function"` for
+  soft values and :code:`"predict"` for hard values from classifiers.
+* Removed :code:`fairlearn.widgets` module including the
+  :code:`FairlearnDashboard`.
+  Instead, the :class:`fairlearn.metrics.MetricFrame` supports plotting as
+  explained in :ref:`plot_metricframe`.
+* Added return value (:code:`self`) to
+  :class:`fairlearn.reductions.ExponentiatedGradient`'s :code:`fit` method.

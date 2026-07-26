@@ -1,27 +1,33 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from warnings import warn
+
 import numpy as np
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
-from warnings import warn
 
 from ..utils._common import _get_soft_predictions
 from ..utils._input_validation import _validate_and_reformat_input
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
-    BASE_ESTIMATOR_NOT_FITTED_WARNING)
+    BASE_ESTIMATOR_NOT_FITTED_WARNING,
+)
 
 
-class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
+class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
     r"""Binary predictor that thresholds continuous predictions of a base estimator.
 
     At prediction time, the predictor takes as input both standard and sensitive features.
     Based on the values of sensitive features, it then applies a randomized thresholding
     transformation according to the provided `threshold_interpolation`.
+
+    Read more in the :ref:`User Guide <postprocessing>`.
+
+    .. versionadded:: 0.5.0
 
     Parameters
     ----------
@@ -40,6 +46,10 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
         operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
         between 0 and 1.
+
+        .. versionchanged:: 0.15
+            The :code:`interpolation_dict` argument was renamed to
+            :code:`threshold_interpolation`.
 
     prefit : bool
         if `True` then the base estimator is not fitted in :meth:`fit`.
@@ -60,25 +70,19 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         - 'predict': use the hard values reported by the `predict` method if
           estimator is a classifier, and the regression values if estimator is
           a regressor.
-          This is equivalent to what is done in [1]_.
+          This is equivalent to what is done in :footcite:`hardt2016equality`.
 
         .. versionadded:: 0.7
             In previous versions only the ``predict`` method was used
             implicitly.
 
-        .. versionchanged:: 0.7
-            From version 0.7, 'predict' is deprecated as the default value and
-            the default will change to 'auto' from v0.10.
-
-    References
-    ----------
-    .. [1] M. Hardt, E. Price, and N. Srebro, "Equality of Opportunity in
-       Supervised Learning," arXiv.org, 07-Oct-2016.
-       [Online]. Available: https://arxiv.org/abs/1610.02413.
+        .. versionchanged:: 0.10
+            The default value changed from ``'predict'`` to ``'auto'``.
     """
 
-    def __init__(self, estimator, threshold_interpolation, prefit=False,
-                 predict_method='deprecated'):
+    def __init__(
+        self, estimator, threshold_interpolation, prefit=False, predict_method="auto"
+    ):
         self.estimator = estimator
         self.threshold_interpolation = threshold_interpolation
         self.prefit = prefit
@@ -93,17 +97,7 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
 
-        if self.predict_method == "deprecated":
-            warn(
-                "'predict_method' default value is changed from 'predict' to "
-                "'auto'. Explicitly pass `predict_method='predict' to "
-                "replicate the old behavior, or pass `predict_method='auto' "
-                "or other valid values to silence this warning.",
-                FutureWarning,
-            )
-            self._predict_method = "predict"
-        else:
-            self._predict_method = self.predict_method
+        self._predict_method = self.predict_method
 
         if not self.prefit:
             self.estimator_ = clone(self.estimator).fit(X, y, **kwargs)
@@ -135,21 +129,32 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         base_predictions = np.array(
             _get_soft_predictions(self.estimator_, X, self._predict_method)
         )
-        _, base_predictions_vector, sensitive_feature_vector, _ = _validate_and_reformat_input(
-            X, y=base_predictions, sensitive_features=sensitive_features, expect_y=True,
-            enforce_binary_labels=False)
+        (
+            _,
+            base_predictions_vector,
+            sensitive_feature_vector,
+            _,
+        ) = _validate_and_reformat_input(
+            X,
+            y=base_predictions,
+            sensitive_features=sensitive_features,
+            expect_y=True,
+            enforce_binary_labels=False,
+        )
 
-        positive_probs = 0.0*base_predictions_vector
+        positive_probs = 0.0 * base_predictions_vector
         for a, interpolation in self.threshold_interpolation.items():
-            interpolated_predictions = \
-                interpolation.p0 * interpolation.operation0(base_predictions_vector) + \
-                interpolation.p1 * interpolation.operation1(base_predictions_vector)
-            if 'p_ignore' in interpolation:
-                interpolated_predictions = \
-                    interpolation.p_ignore * interpolation.prediction_constant + \
-                    (1 - interpolation.p_ignore) * interpolated_predictions
-            positive_probs[sensitive_feature_vector == a] = \
-                interpolated_predictions[sensitive_feature_vector == a]
+            interpolated_predictions = interpolation.p0 * interpolation.operation0(
+                base_predictions_vector
+            ) + interpolation.p1 * interpolation.operation1(base_predictions_vector)
+            if "p_ignore" in interpolation:
+                interpolated_predictions = (
+                    interpolation.p_ignore * interpolation.prediction_constant
+                    + (1 - interpolation.p_ignore) * interpolated_predictions
+                )
+            positive_probs[sensitive_feature_vector == a] = interpolated_predictions[
+                sensitive_feature_vector == a
+            ]
         return np.array([1.0 - positive_probs, positive_probs]).transpose()
 
     def predict(self, X, *, sensitive_features, random_state=None):
@@ -176,6 +181,5 @@ class InterpolatedThresholder(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
         random_state = check_random_state(random_state)
-        positive_probs = self._pmf_predict(
-            X, sensitive_features=sensitive_features)[:, 1]
+        positive_probs = self._pmf_predict(X, sensitive_features=sensitive_features)[:, 1]
         return (positive_probs >= random_state.rand(len(positive_probs))) * 1

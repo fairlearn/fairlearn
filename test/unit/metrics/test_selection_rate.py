@@ -4,7 +4,7 @@
 import pytest
 
 import fairlearn.metrics as metrics
-from fairlearn.metrics._selection_rate import _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE
+from fairlearn.metrics._base_metrics import _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE
 
 
 def test_selection_rate_empty():
@@ -13,11 +13,25 @@ def test_selection_rate_empty():
     assert _EMPTY_INPUT_PREDICTIONS_ERROR_MESSAGE == exc.value.args[0]
 
 
-def test_selection_rate_single_element():
-    assert 1 == metrics.selection_rate([1], [1])
-    assert 1 == metrics.selection_rate([0], [1])
-    assert 0 == metrics.selection_rate([1], [0])
-    assert 0 == metrics.selection_rate([0], [0])
+@pytest.mark.parametrize(
+    ("y_true", "y_pred", "expected"),
+    (
+        ([1], [1], 1),
+        ([0], [1], 1),
+        ([1], [0], 0),
+        ([0], [0], 0),
+        (1, 1, 1),
+        (0, 0, 0),
+        (0, 1, 1),
+        (1, 0, 0),
+        ([False], [False], 0),
+        ([True], [True], 1),
+        (False, False, 0),
+        (True, True, 1),
+    ),
+)
+def test_selection_rate_single_element(y_true, y_pred, expected):
+    assert expected == metrics.selection_rate(y_true, y_pred)
 
 
 def test_selection_rate_unweighted():

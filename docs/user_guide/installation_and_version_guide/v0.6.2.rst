@@ -1,0 +1,7 @@
+v0.6.2
+======
+
+* Bugfix for :code:`_merge_columns()` when using multiple sensitive features
+  with long names. This previously caused groups to get merged if the
+  concatenation of their string representations was identical until the cutoff
+  limit.

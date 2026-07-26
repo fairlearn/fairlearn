@@ -1,0 +1,41 @@
+name: linting
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+
+jobs:
+  linting-black:
+    # Need to keep black version consistent in
+    # requirements-dev.txt
+    # linting.yml
+    # .pre-commit-config.yaml
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: psf/black@26.3.1
+  ruff:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: chartboost/ruff-action@v1
+  build-wheel:
+    runs-on: ${{ inputs.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    - name: Install build
+      run: |
+        pip install --upgrade pip
+        pip install --upgrade build
+    - name: Build sdist and wheel
+      run: python -m build

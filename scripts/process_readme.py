@@ -15,16 +15,17 @@ of `fairlearn`) exists in the repo. Otherwise, the links won't work.
 
 import argparse
 import logging
-import os
 import re
 import sys
 
-from _utils import _LogWrapper
+from _utils import _get_fairlearn_version, _LogWrapper
 
 _logger = logging.getLogger(__name__)
 
 _BASE_URI_FORMAT = "https://github.com/fairlearn/fairlearn/tree/v{0}"
-_CURRENT_RELEASE_PATTERN = r"\[fairlearn v(\S+)\]\(https://github.com/fairlearn/fairlearn/tree/v\1\)"  # noqa: E501
+_CURRENT_RELEASE_PATTERN = (
+    r"\[fairlearn v(\S+)\]\(https://github.com/fairlearn/fairlearn/tree/v\1\)"  # noqa: E501
+)
 _OTHER_MD_REF_PATTERN = r"\]\(\./(\w+\.md)"
 _SAME_MD_REF_PATTERN = r"\]\((#.+)\)"
 
@@ -90,21 +91,18 @@ def _process_line(line, target_version):
 
 
 def process_readme(input_file_name, output_file_name):
-    sys.path.append(os.getcwd())
-    import fairlearn
-    target_version = fairlearn.__version__
+    target_version = _get_fairlearn_version()
     _logger.info("fairlearn version: %s", target_version)
 
     text_lines = []
     with _LogWrapper("reading file {}".format(input_file_name)):
-
-        with open(input_file_name, 'r') as input_file:
+        with open(input_file_name, "r") as input_file:
             text_lines = input_file.readlines()
 
     result_lines = [_process_line(line, target_version) for line in text_lines]
 
     with _LogWrapper("writing file {}".format(output_file_name)):
-        with open(output_file_name, 'w') as output_file:
+        with open(output_file_name, "w") as output_file:
             output_file.writelines(result_lines)
 
 
@@ -112,10 +110,12 @@ def build_argument_parser():
     desc = "Process ReadMe file for PyPI"
 
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument("--input-file-name", help="Path to the file to be processed",
-                        required=True)
-    parser.add_argument("--output-file-name", help="Path to store the processed file",
-                        required=True)
+    parser.add_argument(
+        "--input-file-name", help="Path to the file to be processed", required=True
+    )
+    parser.add_argument(
+        "--output-file-name", help="Path to store the processed file", required=True
+    )
 
     return parser
 

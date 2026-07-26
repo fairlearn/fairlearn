@@ -4,12 +4,12 @@
 import numpy as np
 import pandas as pd
 
-sensitive_features = [str(x) for x in 'AAAAAAA' 'BBBBBBB' 'CCCCCC']
-labels =             [int(x) for x in '0110100' '0010111' '001111']  # noqa: E222
-X1 =                 [int(x) for x in '0110101' '0111101' '001011']  # noqa: E222
-X2 =                 [int(x) for x in '0000100' '0000011' '111111']  # noqa: E222
-X3 =                 [int(x) for x in '1111111' '1111111' '111111']  # noqa: E222
-scores =          [int(x)/10 for x in '0001124' '0223346' '134447']  # noqa: E222
+sensitive_features = [str(x) for x in "AAAAAAABBBBBBBCCCCCC"]
+labels = [int(x) for x in "01101000010111001111"]  # noqa: E222
+X1 = [int(x) for x in "01101010111101001011"]  # noqa: E222
+X2 = [int(x) for x in "00001000000011111111"]  # noqa: E222
+X3 = [int(x) for x in "11111111111111111111"]  # noqa: E222
+scores = [int(x) / 10 for x in "00011240223346134447"]  # noqa: E222
 
 
 def _get_data(A_two_dim=False, y_as_scores=False, flip_y=False):

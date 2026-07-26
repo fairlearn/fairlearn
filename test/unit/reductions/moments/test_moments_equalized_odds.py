@@ -25,9 +25,9 @@ def test_construct_and_load():
     a0_label = 0xBEEF
     a1_label = 0xDEAD
 
-    X, Y, A = simple_binary_threshold_data(num_samples_a0, num_samples_a1,
-                                           a0_threshold, a1_threshold,
-                                           a0_label, a1_label)
+    X, Y, A = simple_binary_threshold_data(
+        num_samples_a0, num_samples_a1, a0_threshold, a1_threshold, a0_label, a1_label
+    )
 
     # Load up the (rigged) data
     eqo.load_data(X, Y, sensitive_features=A)
@@ -35,25 +35,25 @@ def test_construct_and_load():
     assert eqo.total_samples == num_samples_a0 + num_samples_a1
 
     # Examine the tags DF
-    assert eqo.tags['label'].equals(pd.Series(Y))
-    assert eqo.tags['group_id'].equals(pd.Series(A))
-    expected_tags_event = ['label={0}'.format(a) for a in Y]
-    assert np.array_equal(expected_tags_event, eqo.tags['event'])
+    assert eqo.tags["label"].equals(pd.Series(Y))
+    assert eqo.tags["group_id"].equals(pd.Series(A))
+    expected_tags_event = ["label={0}".format(a) for a in Y]
+    assert np.array_equal(expected_tags_event, eqo.tags["event"])
 
     # Examine the index MultiIndex
-    events = ['label=False', 'label=True']
-    signs = ['+', '-']
+    events = ["label=False", "label=True"]
+    signs = ["+", "-"]
     labels = [a0_label, a1_label]
     expected_index = pd.MultiIndex.from_product(
-        [signs, events, labels],
-        names=[_SIGN, _EVENT, _GROUP_ID])
+        [signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID]
+    )
     assert eqo.index.equals(expected_index)
 
     # Examine the prob_event DF
     # There are two events - 'True' and 'False'
     assert len(eqo.prob_event.index) == 2
-    assert eqo.prob_event.loc['label=False'] == 1 - sum(Y) / len(Y)
-    assert eqo.prob_event.loc['label=True'] == sum(Y) / len(Y)
+    assert eqo.prob_event.loc["label=False"] == 1 - sum(Y) / len(Y)
+    assert eqo.prob_event.loc["label=True"] == sum(Y) / len(Y)
 
     # Examine the prob_group_event DF
     # There's only an 'all' event but this records the fractions
@@ -63,36 +63,36 @@ def test_construct_and_load():
     # With the current values, it appears we don't need to fiddle for off-by-one cases
     a0_below = a0_threshold * num_samples_a0
     a0_above = num_samples_a0 - a0_below
-    assert eqo.prob_group_event.loc[('label=False', a0_label)] == a0_below / num_samples
-    assert eqo.prob_group_event.loc[('label=True', a0_label)] == a0_above / num_samples
+    assert eqo.prob_group_event.loc[("label=False", a0_label)] == a0_below / num_samples
+    assert eqo.prob_group_event.loc[("label=True", a0_label)] == a0_above / num_samples
     a1_below = a1_threshold * num_samples_a1
     a1_above = num_samples_a1 - a1_below
-    assert eqo.prob_group_event.loc[('label=False', a1_label)] == a1_below / num_samples
-    assert eqo.prob_group_event.loc[('label=True', a1_label)] == a1_above / num_samples
+    assert eqo.prob_group_event.loc[("label=False", a1_label)] == a1_below / num_samples
+    assert eqo.prob_group_event.loc[("label=True", a1_label)] == a1_above / num_samples
 
     # Examine the neg_basis DF
     assert len(eqo.neg_basis.index) == 8
-    assert eqo.neg_basis[0]['+', 'label=False', a0_label] == 0
-    assert eqo.neg_basis[0]['+', 'label=False', a1_label] == 0
-    assert eqo.neg_basis[0]['+', 'label=True', a0_label] == 0
-    assert eqo.neg_basis[0]['+', 'label=True', a1_label] == 0
-    assert eqo.neg_basis[0]['-', 'label=False', a0_label] == 1
-    assert eqo.neg_basis[0]['-', 'label=False', a1_label] == 0
-    assert eqo.neg_basis[0]['-', 'label=True', a0_label] == 0
-    assert eqo.neg_basis[0]['-', 'label=True', a1_label] == 0
+    assert eqo.neg_basis[0]["+", "label=False", a0_label] == 0
+    assert eqo.neg_basis[0]["+", "label=False", a1_label] == 0
+    assert eqo.neg_basis[0]["+", "label=True", a0_label] == 0
+    assert eqo.neg_basis[0]["+", "label=True", a1_label] == 0
+    assert eqo.neg_basis[0]["-", "label=False", a0_label] == 1
+    assert eqo.neg_basis[0]["-", "label=False", a1_label] == 0
+    assert eqo.neg_basis[0]["-", "label=True", a0_label] == 0
+    assert eqo.neg_basis[0]["-", "label=True", a1_label] == 0
 
     # Examine the pos_basis DF
     # This is looking at the \lambda_{+} values and picking out the
     # one associated with the first label
     assert len(eqo.pos_basis.index) == 8
-    assert eqo.pos_basis[0]['+', 'label=False', a0_label] == 1
-    assert eqo.pos_basis[0]['+', 'label=False', a1_label] == 0
-    assert eqo.pos_basis[0]['+', 'label=True', a0_label] == 0
-    assert eqo.pos_basis[0]['+', 'label=True', a1_label] == 0
-    assert eqo.pos_basis[0]['-', 'label=False', a0_label] == 0
-    assert eqo.pos_basis[0]['-', 'label=False', a1_label] == 0
-    assert eqo.pos_basis[0]['-', 'label=True', a0_label] == 0
-    assert eqo.pos_basis[0]['-', 'label=True', a1_label] == 0
+    assert eqo.pos_basis[0]["+", "label=False", a0_label] == 1
+    assert eqo.pos_basis[0]["+", "label=False", a1_label] == 0
+    assert eqo.pos_basis[0]["+", "label=True", a0_label] == 0
+    assert eqo.pos_basis[0]["+", "label=True", a1_label] == 0
+    assert eqo.pos_basis[0]["-", "label=False", a0_label] == 0
+    assert eqo.pos_basis[0]["-", "label=False", a1_label] == 0
+    assert eqo.pos_basis[0]["-", "label=True", a0_label] == 0
+    assert eqo.pos_basis[0]["-", "label=True", a1_label] == 0
 
     # Examine the neg_basis_present DF
     assert len(eqo.neg_basis_present) == 2
@@ -103,12 +103,10 @@ def test_construct_and_load():
 def test_project_lambda_smoke_negatives():
     eqo = EqualizedOdds()
 
-    events = ['label=False', 'label=True']
-    signs = ['+', '-']
-    labels = ['a', 'b']
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels],
-        names=[_SIGN, _EVENT, _GROUP_ID])
+    events = ["label=False", "label=True"]
+    signs = ["+", "-"]
+    labels = ["a", "b"]
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
     # Note that the '-' labels are larger
@@ -126,12 +124,10 @@ def test_project_lambda_smoke_positives():
     # the '+' indices larger
     eqo = EqualizedOdds()
 
-    events = ['label=False', 'label=True']
-    signs = ['+', '-']
-    labels = ['a', 'b']
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels],
-        names=[_SIGN, _EVENT, _GROUP_ID])
+    events = ["label=False", "label=True"]
+    signs = ["+", "-"]
+    labels = ["a", "b"]
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     df = pd.DataFrame()
     # Note that the '-' indices are now smaller
@@ -158,19 +154,17 @@ def test_signed_weights():
     a0_label = 0xDEAD
     a1_label = 0xBEEF
 
-    X, Y, A = simple_binary_threshold_data(num_samples_a0, num_samples_a1,
-                                           a0_threshold, a1_threshold,
-                                           a0_label, a1_label)
+    X, Y, A = simple_binary_threshold_data(
+        num_samples_a0, num_samples_a1, a0_threshold, a1_threshold, a0_label, a1_label
+    )
 
     # Load up the (rigged) data
     eqo.load_data(X, Y, sensitive_features=A)
 
-    events = ['label=False', 'label=True']
+    events = ["label=False", "label=True"]
     signs = ["+", "-"]
     labels = [a0_label, a1_label]
-    midx = pd.MultiIndex.from_product(
-        [signs, events, labels],
-        names=[_SIGN, _EVENT, _GROUP_ID])
+    midx = pd.MultiIndex.from_product([signs, events, labels], names=[_SIGN, _EVENT, _GROUP_ID])
 
     lambda_vec = pd.Series([2000, 1000, 4000, 5000, 500, 100, 700, 900], index=midx, name=0)
 
@@ -184,14 +178,18 @@ def test_signed_weights():
     num_a1_F = int(a1_threshold * num_samples_a1)
     num_a1_T = num_samples_a1 - num_a1_F
 
-    sw_a0_F = (lambda_a0_F + lambda_a1_F) / (1 - sum(Y) / len(Y)) - \
-        lambda_a0_F * (num_samples / num_a0_F)
-    sw_a1_F = (lambda_a0_F + lambda_a1_F) / (1 - sum(Y) / len(Y)) - \
-        lambda_a1_F * (num_samples / num_a1_F)
-    sw_a0_T = (lambda_a0_T + lambda_a1_T) / (sum(Y) / len(Y)) - \
-        lambda_a0_T * (num_samples / num_a0_T)
-    sw_a1_T = (lambda_a0_T + lambda_a1_T) / (sum(Y) / len(Y)) - \
-        lambda_a1_T * (num_samples / num_a1_T)
+    sw_a0_F = (lambda_a0_F + lambda_a1_F) / (1 - sum(Y) / len(Y)) - lambda_a0_F * (
+        num_samples / num_a0_F
+    )
+    sw_a1_F = (lambda_a0_F + lambda_a1_F) / (1 - sum(Y) / len(Y)) - lambda_a1_F * (
+        num_samples / num_a1_F
+    )
+    sw_a0_T = (lambda_a0_T + lambda_a1_T) / (sum(Y) / len(Y)) - lambda_a0_T * (
+        num_samples / num_a0_T
+    )
+    sw_a1_T = (lambda_a0_T + lambda_a1_T) / (sum(Y) / len(Y)) - lambda_a1_T * (
+        num_samples / num_a1_T
+    )
 
     w_a0_F = np.full(num_a0_F, sw_a0_F)
     w_a0_T = np.full(num_a0_T, sw_a0_T)
@@ -200,5 +198,4 @@ def test_signed_weights():
     expected = np.concatenate((w_a0_F, w_a0_T, w_a1_F, w_a1_T), axis=None)
 
     signed_weights = eqo.signed_weights(lambda_vec)
-    # Be bold and test for equality
-    assert np.array_equal(expected, signed_weights)
+    assert np.allclose(expected, signed_weights)

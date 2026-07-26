@@ -66,6 +66,10 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/auto_examples/
+docs/sg_execution_times.rst
+docs/modules/
+docs/.jupyterlite.doit.db
+docs/jupyterlite_contents/
 
 # PyBuilder
 target/
@@ -118,3 +122,9 @@ docbuild/
 
 # OSX directory info files
 .DS_Store
+
+# Generated API stub files
+docs/api_reference/generated/
+
+# Doc build generated files
+*.pkl

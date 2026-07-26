@@ -1,0 +1,5 @@
+v0.4.3
+======
+
+* Various tweaks to :code:`GroupMetricResult` and :code:`GroupMetricSet` for
+  AzureML integration

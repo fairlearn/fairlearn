@@ -1,0 +1,10 @@
+v0.6.1
+======
+
+* Bugfix for :code:`_create_group_metric_set()`. Fixes the list of metrics
+  computed for regression and adds a set of metrics for 'probability' problems
+  `PR #727 <https://github.com/fairlearn/fairlearn/pull/727>`_
+* Updated 'Credit Card' notebook `PR #713 <https://github.com/fairlearn/fairlearn/pull/713>`_
+* Added some overlooked :class:`~fairlearn.metrics.MetricFrame` tests
+  `PR #701 <https://github.com/fairlearn/fairlearn/pull/701>`_
+* Various documentation tweaks and enhancements

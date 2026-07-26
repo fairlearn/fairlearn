@@ -1,12 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
-from typing import Any, List, Optional
-import numpy as np
-import pandas as pd
-
-from sklearn.preprocessing import LabelEncoder
-
+import narwhals.stable.v1 as nw
 
 _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
 
@@ -28,8 +24,8 @@ class GroupFeature:
     masks (used to select samples from the population) corresponding
     to the subgroups it identifies.
 
-    It also holds the feature name, which can be supplied by the caller,
-    or generated from a base and and index.
+    It also holds the feature name, which can be inferred from the feature vector,
+    or generated from a base and index.
 
     Parameters
     ----------
@@ -38,54 +34,24 @@ class GroupFeature:
         The value of `index` is appended
 
     feature_vector : array_like
-        Some sort of array encoding the feature. It is fed into
-        :class:`sklrearn.preprocessing.LabelEncoder` for easy masking
+        Some sort of array encoding the feature.
 
     index : int
         Used together with `base_name` when automatically generating a name
-
-    name : str
-        Optional name for the feature
     """
 
-    def __init__(self,
-                 base_name: str,
-                 feature_vector,
-                 index: int,
-                 name: Optional[str]):
+    def __init__(self, base_name: str, feature_vector, index: int):
         """Help with the metrics."""
-        self._encoder = LabelEncoder()
-        self._encoded = np.asarray(self._encoder.fit_transform(feature_vector))
+        nw_feature_vector = nw.from_native(feature_vector, pass_through=True, allow_series=True)
+        is_nw_series = isinstance(nw_feature_vector, nw.Series)
 
-        self._name = "{0}{1}".format(base_name, index)
-        if name is not None:
-            self._name = name
-        elif isinstance(feature_vector, pd.Series):
-            if feature_vector.name is not None:
-                if isinstance(feature_vector.name, str):
-                    self._name = feature_vector.name
-                else:
-                    msg = _SERIES_NAME_NOT_STRING.format(feature_vector.name,
-                                                         type(feature_vector.name))
-                    raise ValueError(msg)
+        self.raw_feature_ = (
+            list(nw_feature_vector) if not is_nw_series else nw_feature_vector.to_list()
+        )
 
-    def get_mask_for_class(self,
-                           target_class: Any) -> np.ndarray:
-        """Fetch a mask array for the given class."""
-        idx = self.classes.index(target_class)
-        return self.get_mask_for_class_index(idx)
+        self.name_ = f"{base_name}{index}"
 
-    def get_mask_for_class_index(self,
-                                 target_class_index: int) -> np.ndarray:
-        """Fetch a mask array for the given class index."""
-        return (self._encoded == target_class_index)
-
-    @property
-    def name(self) -> str:
-        """Return the name of the feature."""
-        return self._name
-
-    @property
-    def classes(self) -> List:
-        """Return list of unique classes."""
-        return list(self._encoder.classes_)
+        if is_nw_series and (name_ := nw_feature_vector.name) is not None:
+            if not isinstance(name_, str):
+                raise ValueError(_SERIES_NAME_NOT_STRING.format(name_, type(name_)))
+            self.name_ = name_
