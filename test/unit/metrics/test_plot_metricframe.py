@@ -1,6 +1,8 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from contextlib import suppress
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -430,8 +432,6 @@ def test_explicit_conf_intervals_not_overridden_by_auto(monkeypatch):
         return {}
 
     monkeypatch.setattr("fairlearn.metrics._plotter._get_conf_intervals_from_metric_frame", spy)
-    try:
+    with suppress(KeyError, AttributeError):
         plot_metric_frame(mf, metrics=["accuracy_score"], conf_intervals=["custom_ci"])
-    except (KeyError, AttributeError):
-        pass
     assert len(calls) == 0, "auto-detect must not fire when conf_intervals is explicitly passed"

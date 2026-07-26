@@ -132,7 +132,7 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
         return {}
 
     # Zip and sort by quantile value so lower < upper always
-    pairs = sorted(zip(ci_quantiles, ci_data), key=lambda x: x[0])
+    pairs = sorted(zip(ci_quantiles, ci_data, strict=True), key=lambda x: x[0])
 
     if len(pairs) > 2:
         import warnings
@@ -152,12 +152,12 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
             lower = lo_data[col].values
             upper = hi_data[col].values
             ci_col = f"__metricframe_ci_{col}"
-            mapping[col] = (ci_col, list(zip(lower, upper)))
+            mapping[col] = (ci_col, list(zip(lower, upper, strict=True)))
     else:
         # Single metric: by_group_ci returns Series
         col = lo_data.name or "metric"
         ci_col = f"__metricframe_ci_{col}"
-        mapping[col] = (ci_col, list(zip(lo_data.values, hi_data.values)))
+        mapping[col] = (ci_col, list(zip(lo_data.values, hi_data.values, strict=True)))
 
     return mapping
 
