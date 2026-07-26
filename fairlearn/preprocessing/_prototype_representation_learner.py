@@ -33,6 +33,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
     Read more in the :ref:`User Guide <preprocessing>`.
 
+    .. versionadded:: 0.13.0
+
     Parameters
     ----------
     n_prototypes : int, default=2
