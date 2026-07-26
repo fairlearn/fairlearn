@@ -969,8 +969,8 @@ f(testy, predictions)
 # - We see that Hispanic individuals are also poorly affected by this model, with a relative FPR of
 #   1.3 (but you should note that this is not an effect that has been explicitly noted in the
 #   literature and is likely an artifact of our simulated data)
-# - The white population has a relative FPR of 1 - this makes since they are our reference
-#   population, and other other group is being compared against the FPR for whites.
+# - The white population has a relative FPR of 1 - this makes sense since they are our reference
+#   population, and every other group is being compared against the FPR for whites.
 #
 # Intersectional bias
 # ~~~~~~~~~~~~~~~~~~~
