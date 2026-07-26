@@ -51,6 +51,9 @@ SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = (
     "A sensitive feature named {} or {} "
     "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
 )
+SENSITIVE_FEATURE_NAMES_NOT_UNIQUE_ERROR_MESSAGE = (
+    "Sensitive feature column names need to be unique."
+)
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
 
@@ -735,6 +738,8 @@ def _reformat_data_into_dict(
         if names is not None:
             if len(names) != column_count:
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE.format("column names"))
+            if not pd.Index(names).is_unique:
+                raise ValueError(SENSITIVE_FEATURE_NAMES_NOT_UNIQUE_ERROR_MESSAGE)
             for name in names:
                 if name in [SCORE_KEY, LABEL_KEY]:
                     raise ValueError(SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
