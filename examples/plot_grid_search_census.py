@@ -44,11 +44,12 @@ from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import (
     MetricFrame,
     count,
+    demographic_parity_difference,
     plot_model_comparison,
     selection_rate,
     selection_rate_difference,
 )
-from fairlearn.reductions import DemographicParity, ErrorRate, GridSearch
+from fairlearn.reductions import DemographicParity, GridSearch
 
 # %%
 # We can now load and inspect the data by using the `fairlearn.datasets` module:
@@ -121,6 +122,7 @@ metric_frame.by_group.plot.bar(
     figsize=[12, 8],
     title="Accuracy and selection rate by group",
 )
+plt.show()
 
 # %%
 #
@@ -182,17 +184,9 @@ predictors = sweep.predictors_
 
 errors, disparities = [], []
 for m in predictors:
-
-    def classifier(X):
-        return m.predict(X)
-
-    error = ErrorRate()
-    error.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
-    disparity = DemographicParity()
-    disparity.load_data(X_train, pd.Series(Y_train), sensitive_features=A_train)
-
-    errors.append(error.gamma(classifier).iloc[0])
-    disparities.append(disparity.gamma(classifier).max())
+    y_pred = m.predict(X_train)
+    errors.append(1 - skm.accuracy_score(Y_train, y_pred))
+    disparities.append(demographic_parity_difference(Y_train, y_pred, sensitive_features=A_train))
 
 all_results = pd.DataFrame({"predictor": predictors, "error": errors, "disparity": disparities})
 
@@ -206,33 +200,22 @@ for row in all_results.itertuples():
 
 # %%
 # Finally, we can evaluate the dominant models along with the unmitigated model.
+# Fairlearn provides the :func:`fairlearn.metrics.plot_model_comparison`
+# function to compare models easily:
 
 predictions = {"unmitigated": unmitigated_predictor.predict(X_test)}
-metric_frames = {"unmitigated": metric_frame}
-for i in range(len(non_dominated)):
-    key = "dominant_model_{0}".format(i)
-    predictions[key] = non_dominated[i].predict(X_test)
+for i, predictor in enumerate(non_dominated):
+    predictions["dominant_model_{0}".format(i)] = predictor.predict(X_test)
 
-    metric_frames[key] = MetricFrame(
-        metrics={
-            "accuracy": skm.accuracy_score,
-            "selection_rate": selection_rate,
-            "count": count,
-        },
-        sensitive_features=A_test,
-        y_true=Y_test,
-        y_pred=predictions[key],
-    )
-
-
-x = [metric_frame.overall["accuracy"] for metric_frame in metric_frames.values()]
-y = [metric_frame.difference()["selection_rate"] for metric_frame in metric_frames.values()]
-keys = list(metric_frames.keys())
-plt.scatter(x, y)
-for i in range(len(x)):
-    plt.annotate(keys[i], (x[i] + 0.0003, y[i]))
-plt.xlabel("accuracy")
-plt.ylabel("selection rate difference")
+plot_model_comparison(
+    x_axis_metric=skm.accuracy_score,
+    y_axis_metric=selection_rate_difference,
+    y_true=Y_test,
+    y_preds=predictions,
+    sensitive_features=A_test,
+    point_labels=True,
+    show_plot=True,
+)
 
 # %%
 # We see a Pareto front forming - the set of predictors which represent optimal
@@ -246,25 +229,6 @@ plt.ylabel("selection rate difference")
 #
 # In a real example, we would pick the model which represented the best trade-off
 # between accuracy and disparity given the relevant business constraints.
-
-# %%
-# Comparing models easily
-# -----------------------
-# Fairlearn also provides functionality to compare models much more easily.
-
-# %%
-
-# Plot model comparison
-plot_model_comparison(
-    x_axis_metric=skm.accuracy_score,
-    y_axis_metric=selection_rate_difference,
-    y_true=Y_test,
-    y_preds=predictions,
-    sensitive_features=A_test,
-    point_labels=True,
-    show_plot=True,
-)
-# End model comparison
 
 # %%
 # ===========================
