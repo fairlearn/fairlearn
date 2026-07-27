@@ -47,6 +47,21 @@ def test_reformat_and_group_data_preserves_dataframe_sensitive_feature_dtypes():
     ]
 
 
+@pytest.mark.parametrize("column_name", [None, pd.NA])
+def test_reformat_and_group_data_preserves_nullable_sensitive_feature_column_name(column_name):
+    sensitive_features = pd.DataFrame([["a"], ["b"]], columns=[column_name])
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1],
+        scores=[0.1, 0.2],
+    )
+
+    assert pd.isna(grouped_data.obj.columns[0])
+    assert grouped_data.obj.columns[1:].tolist() == [SCORE_KEY, LABEL_KEY]
+    assert sorted(grouped_data.groups.keys()) == ["a", "b"]
+
+
 def test_reformat_and_group_data_preserves_ndarray_sensitive_feature_columns():
     sensitive_features = np.array([["a", "x"], ["a", "y"], ["b", "x"], ["b", "y"]])
 
@@ -124,13 +139,42 @@ def test_reformat_and_group_data_rejects_multi_column_auxiliary_data(
         _reformat_and_group_data(**inputs)
 
 
-def test_reformat_and_group_data_rejects_singleton_score_length_mismatch():
-    with pytest.raises(ValueError, match="same length"):
+@pytest.mark.parametrize(
+    "scores",
+    [
+        [0.5],
+        np.array([0.5]),
+        np.array([[0.5]]),
+    ],
+)
+def test_reformat_and_group_data_rejects_singleton_score_length_mismatch(scores):
+    with pytest.raises(ValueError, match="(?i)length"):
         _reformat_and_group_data(
             sensitive_features=["a", "a", "b", "b"],
             labels=[0, 1, 0, 1],
-            scores=[0.5],
+            scores=scores,
         )
+
+
+@pytest.mark.parametrize(
+    "columnless_input",
+    [
+        np.array(1),
+        np.empty((2, 0)),
+        pd.DataFrame(index=range(2)),
+    ],
+)
+@pytest.mark.parametrize("input_name", ["sensitive_features", "labels", "scores"])
+def test_reformat_and_group_data_rejects_columnless_inputs(input_name, columnless_input):
+    inputs = {
+        "sensitive_features": ["a", "b"],
+        "labels": [0, 1],
+        "scores": [0.1, 0.2],
+    }
+    inputs[input_name] = columnless_input
+
+    with pytest.raises(ValueError, match=f"at least one column in {input_name.rstrip('s')}"):
+        _reformat_and_group_data(**inputs)
 
 
 @pytest.mark.parametrize(

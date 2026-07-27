@@ -47,6 +47,7 @@ NON_BINARY_LABELS_ERROR_MESSAGE = "Labels other than 0/1 were provided."
 MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE = (
     "Post processing currently only supports a single column in {}."
 )
+EMPTY_DATA_COLUMNS_ERROR_MESSAGE = "Post processing requires at least one column in {}."
 SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE = (
     "A sensitive feature named {} or {} "
     "was detected. Please rename your column and try again.".format(SCORE_KEY, LABEL_KEY)
@@ -675,7 +676,7 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
         the labels of the dataset
     scores : list, numpy.ndarray, pandas.DataFrame, or pandas.Series
         the scores produced by a predictor's prediction
-    sensitive_feature_names : list of strings
+    sensitive_feature_names : list of hashable values
         list of names for the sensitive features in case they were not
         implicitly provided (e.g. if `sensitive_features` is of type
         pandas.DataFrame); default None
@@ -697,9 +698,13 @@ def _reformat_and_group_data(sensitive_features, labels, scores, sensitive_featu
     _reformat_data_into_dict(SCORE_KEY, data_dict, scores)
     _reformat_data_into_dict(LABEL_KEY, data_dict, labels)
 
-    if len(sensitive_feature_names) == 1:
-        return pd.DataFrame(data_dict).groupby(sensitive_feature_names[0])
-    return pd.DataFrame(data_dict).groupby(sensitive_feature_names)
+    data = pd.DataFrame(data_dict)
+    sensitive_feature_columns = [
+        data.iloc[:, column_index] for column_index in range(len(sensitive_feature_names))
+    ]
+    if len(sensitive_feature_columns) == 1:
+        return data.groupby(sensitive_feature_columns[0])
+    return data.groupby(sensitive_feature_columns)
 
 
 def _reformat_data_into_dict(
@@ -725,25 +730,27 @@ def _reformat_data_into_dict(
         will be inserted at the key `key`.
     additional_data : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
         the data to be added to `data_dict` at the specified `key`
-    column_names : list of strings, default=None
+    column_names : list of hashable values, default=None
         the names to use for the columns in `additional_data`
     allow_multiple_columns : bool, default=False
         whether `additional_data` may contain more than one column
 
     Returns
     -------
-    list of strings
+    list of hashable values
         The columns added to `data_dict`
     """
 
     def _validate_column_names(names, column_count):
+        if column_count == 0:
+            raise ValueError(EMPTY_DATA_COLUMNS_ERROR_MESSAGE.format(key))
         if names is not None:
             if len(names) != column_count:
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE.format("column names"))
             if not pd.Index(names).is_unique:
                 raise ValueError(SENSITIVE_FEATURE_NAMES_NOT_UNIQUE_ERROR_MESSAGE)
             for name in names:
-                if name in [SCORE_KEY, LABEL_KEY]:
+                if name in {SCORE_KEY, LABEL_KEY}:
                     raise ValueError(SENSITIVE_FEATURE_NAME_CONFLICT_DETECTED_ERROR_MESSAGE)
             return names
 
@@ -760,6 +767,8 @@ def _reformat_data_into_dict(
         return names
 
     if isinstance(additional_data, np.ndarray):
+        if additional_data.ndim == 0:
+            raise ValueError(EMPTY_DATA_COLUMNS_ERROR_MESSAGE.format(key))
         if len(additional_data.shape) > 2:
             raise ValueError(MULTIPLE_DATA_COLUMNS_ERROR_MESSAGE.format(key))
 
