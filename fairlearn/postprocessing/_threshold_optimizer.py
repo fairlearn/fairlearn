@@ -747,7 +747,10 @@ def _reformat_data_into_dict(
         if names is not None:
             if len(names) != column_count:
                 raise ValueError(DIFFERENT_INPUT_LENGTH_ERROR_MESSAGE.format("column names"))
-            if not pd.Index(names).is_unique:
+            missing_name_count = sum(
+                pd.api.types.is_scalar(name) and bool(pd.isna(name)) for name in names
+            )
+            if not pd.Index(names).is_unique or missing_name_count > 1:
                 raise ValueError(SENSITIVE_FEATURE_NAMES_NOT_UNIQUE_ERROR_MESSAGE)
             for name in names:
                 if name in {SCORE_KEY, LABEL_KEY}:

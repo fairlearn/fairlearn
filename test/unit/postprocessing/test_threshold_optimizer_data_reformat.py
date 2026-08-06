@@ -109,6 +109,64 @@ def test_reformat_and_group_data_preserves_tuple_sensitive_feature_columns():
 
 
 @pytest.mark.parametrize(
+    "sensitive_features,labels,scores",
+    [
+        (["a", "b"], [0, 1], [0.1, 0.2]),
+        ([["a"], ["b"]], [[0], [1]], [[0.1], [0.2]]),
+        (np.array(["a", "b"]), np.array([0, 1]), np.array([0.1, 0.2])),
+        (
+            np.array([["a"], ["b"]]),
+            np.array([[0], [1]]),
+            np.array([[0.1], [0.2]]),
+        ),
+        (
+            pd.Series(["a", "b"], index=[20, 10]),
+            pd.Series([0, 1], index=[10, 20]),
+            pd.Series([0.1, 0.2], index=[40, 30]),
+        ),
+        (
+            pd.DataFrame({"group": ["a", "b"]}, index=[20, 10]),
+            pd.DataFrame({"target": [0, 1]}, index=[10, 20]),
+            pd.DataFrame({"prediction": [0.1, 0.2]}, index=[40, 30]),
+        ),
+    ],
+    ids=["list", "nested-list", "ndarray-1d", "ndarray-2d", "series", "dataframe"],
+)
+def test_reformat_and_group_data_accepts_single_column_representations(
+    sensitive_features,
+    labels,
+    scores,
+):
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=labels,
+        scores=scores,
+    )
+
+    assert sorted(grouped_data.groups.keys()) == ["a", "b"]
+    assert grouped_data.obj[SCORE_KEY].tolist() == [0.1, 0.2]
+    assert grouped_data.obj[LABEL_KEY].tolist() == [0, 1]
+
+
+def test_reformat_and_group_data_combines_pandas_inputs_positionally():
+    sensitive_features = pd.DataFrame(
+        {"first": ["a", "b"], "second": ["x", "y"]},
+        index=[20, 10],
+    )
+    labels = pd.Series([0, 1], index=[10, 20])
+    scores = pd.Series([0.1, 0.2], index=[40, 30])
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=labels,
+        scores=scores,
+    )
+
+    assert grouped_data.get_group(("a", "x"))[[SCORE_KEY, LABEL_KEY]].values.tolist() == [[0.1, 0]]
+    assert grouped_data.get_group(("b", "y"))[[SCORE_KEY, LABEL_KEY]].values.tolist() == [[0.2, 1]]
+
+
+@pytest.mark.parametrize(
     "input_name,input_value,error_match",
     [
         (
@@ -212,6 +270,16 @@ def test_reformat_and_group_data_rejects_malformed_nested_sensitive_features(
         (
             [["a", "x"], ["b", "y"]],
             ["group", "group"],
+            "column names need to be unique",
+        ),
+        (
+            pd.DataFrame([["a", "x"], ["b", "y"]], columns=[pd.NA, np.nan]),
+            None,
+            "column names need to be unique",
+        ),
+        (
+            [["a", "x"], ["b", "y"]],
+            [pd.NA, np.nan],
             "column names need to be unique",
         ),
     ],
