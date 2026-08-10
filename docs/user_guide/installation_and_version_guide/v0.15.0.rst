@@ -29,7 +29,7 @@ Bug fixes
   :attr:`~fairlearn.metrics.MetricFrame.by_group` while still counting towards
   :attr:`~fairlearn.metrics.MetricFrame.overall`, and a feature passed as a list
   instead of a :code:`pandas.Series` turned the missing value into a category
-  named :code:`'nan'`.
+  named :code:`'nan'`: :pr:`1698` by :user:`Edward Yi <aiedwardyi>`.
 * Fixed :code:`AssertionError: data can be loaded only once` raised when a
   :class:`~fairlearn.reductions.Moment` instance is passed as :code:`constraints`
   to more than one call of :code:`ExponentiatedGradient.fit` or
