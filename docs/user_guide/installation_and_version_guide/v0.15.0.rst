@@ -23,6 +23,13 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` now raises a :code:`ValueError` when a
+  sensitive or control feature contains missing values, naming the offending
+  feature. Previously a missing value was silently dropped from
+  :attr:`~fairlearn.metrics.MetricFrame.by_group` while still counting towards
+  :attr:`~fairlearn.metrics.MetricFrame.overall`, and a feature passed as a list
+  instead of a :code:`pandas.Series` turned the missing value into a category
+  named :code:`'nan'`.
 * Fixed :code:`AssertionError: data can be loaded only once` raised when a
   :class:`~fairlearn.reductions.Moment` instance is passed as :code:`constraints`
   to more than one call of :code:`ExponentiatedGradient.fit` or
