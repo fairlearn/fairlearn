@@ -41,6 +41,9 @@ Documentation
 Other improvements
 ------------------
 
+* Preserved multi-column sensitive feature data in
+  :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
+  :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
 * Replaced the PyTorch adversarial engine's hard-coded activation string checks with a lookup table and added support for :code:`Tanh`, :code:`GELU`, :code:`ELU`, and :code:`SELU` activation strings. Activation strings are now matched case-insensitively on both the PyTorch and TensorFlow backends (the TensorFlow backend previously failed on capitalized strings such as :code:`Sigmoid`): :pr:`1665` by :user:`Aryan <Aryankn29>`.
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
 * Bumped the minimum :code:`sphinx` version from 7.3.7 to 8.3.0 (and bumped :code:`sphinx-prompt` from 1.8.0 to 1.9.0 and :code:`sphinx-autodoc-typehints` from 2.0.1 to 3.5.2 in the minimum-version pins for compatibility) so the documentation build picks up newer sphinx theme and extension improvements.
