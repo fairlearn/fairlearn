@@ -27,6 +27,8 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
 
     Read more in the :ref:`User Guide <postprocessing>`.
 
+    .. versionadded:: 0.5.0
+
     Parameters
     ----------
     estimator :
