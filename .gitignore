@@ -120,6 +120,9 @@ docbuild/
 # IntelliJ
 /.idea
 
+# Impeccable (GitHub Copilot skill) cache
+.impeccable/
+
 # OSX directory info files
 .DS_Store
 
@@ -128,3 +131,6 @@ docs/api_reference/generated/
 
 # Doc build generated files
 *.pkl
+
+# impeccable (UI design tooling)
+.impeccable/

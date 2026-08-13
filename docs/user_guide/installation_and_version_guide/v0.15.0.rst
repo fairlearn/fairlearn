@@ -41,6 +41,9 @@ Documentation
 Other improvements
 ------------------
 
+* Preserved multi-column sensitive feature data in
+  :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
+  :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
 * Replaced the PyTorch adversarial engine's hard-coded activation string checks with a lookup table and added support for :code:`Tanh`, :code:`GELU`, :code:`ELU`, and :code:`SELU` activation strings. Activation strings are now matched case-insensitively on both the PyTorch and TensorFlow backends (the TensorFlow backend previously failed on capitalized strings such as :code:`Sigmoid`): :pr:`1665` by :user:`Aryan <Aryankn29>`.
 * Added support for Python 3.14: :pr:`1649` by :user:`Roman Lutz <romanlutz>`.
 * Bumped the minimum :code:`sphinx` version from 7.3.7 to 8.3.0 (and bumped :code:`sphinx-prompt` from 1.8.0 to 1.9.0 and :code:`sphinx-autodoc-typehints` from 2.0.1 to 3.5.2 in the minimum-version pins for compatibility) so the documentation build picks up newer sphinx theme and extension improvements.
@@ -53,3 +56,4 @@ Other improvements
 * Enabled the :code:`pydocstyle` (:code:`D`) ruff rule set with the numpy convention. Added docstrings where missing for public APIs and per-file ignores for tests, examples, and scripts.
 * Enabled the :code:`flake8-logging-format` (:code:`G`) ruff rule set and converted existing logging calls to use lazy :code:`%s` formatting.
 * Clarified the fitted-state check in :code:`_AdversarialFairness._validate_input` by replacing a :code:`try`/:code:`except NotFittedError` block used purely for control flow with a direct :code:`hasattr(self, "_is_setup")` probe against the class's canonical fitted flag, and removed the now-unused :code:`NotFittedError` import: :pr:`1673` by :user:`Dresden <DresdenGman>`.
+* Updated Ruff to :code:`0.15.20`, enabled the :code:`UP`, :code:`B`, :code:`SIM`, and :code:`C4` rule families, and applied the resulting lint cleanups across the codebase: :pr:`1675` by :user:`Roman Lutz <romanlutz>`.
