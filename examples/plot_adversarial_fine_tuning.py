@@ -92,7 +92,7 @@ import torch
 
 class PredictorModel(torch.nn.Module):
     def __init__(self):
-        super(PredictorModel, self).__init__()
+        super().__init__()
         self.layers = torch.nn.Sequential(
             # in_features is the number of features coming out of the above
             # ColumnTransformer
@@ -134,9 +134,7 @@ def validate(pipeline, X, y, z, pos_label):
     accuracy = mean(predictions == y)
     selection_rate = mean(predictions == pos_label)
     print(
-        "DP diff: {:.4f}, accuracy: {:.4f}, selection_rate: {:.4f}".format(
-            dp_diff, accuracy, selection_rate
-        )
+        f"DP diff: {dp_diff:.4f}, accuracy: {accuracy:.4f}, selection_rate: {selection_rate:.4f}"
     )
     return dp_diff, accuracy, selection_rate
 
