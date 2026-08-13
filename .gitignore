@@ -120,6 +120,9 @@ docbuild/
 # IntelliJ
 /.idea
 
+# Impeccable (GitHub Copilot skill) cache
+.impeccable/
+
 # OSX directory info files
 .DS_Store
 
