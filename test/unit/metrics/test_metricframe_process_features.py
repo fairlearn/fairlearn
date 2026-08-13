@@ -141,7 +141,7 @@ class TestTwoFeatures:
         cols = ["Col Alpha", "Col Num"]
         a, b, y_true = self._get_raw_data()
 
-        rf = pd.DataFrame(data=zip(a, b), columns=cols)
+        rf = pd.DataFrame(data=zip(a, b, strict=False), columns=cols)
 
         target = _get_raw_MetricFrame()
         result = target._process_features("Ignored", rf, y_true)
@@ -150,7 +150,7 @@ class TestTwoFeatures:
     def test_unnamed_dataframe(self):
         a, b, y_true = self._get_raw_data()
 
-        rf = pd.DataFrame(data=zip(a, b))
+        rf = pd.DataFrame(data=zip(a, b, strict=False))
 
         target = _get_raw_MetricFrame()
         msg = "DataFrame column names must be strings. Name '0' is of type <class 'int'>"

@@ -11,11 +11,7 @@ def ensure_list(X):
     assert X is not None
     if isinstance(X, list):
         return X
-    elif isinstance(X, np.ndarray):
-        return X.tolist()
-    elif isinstance(X, pd.Series):
-        return X.tolist()
-    elif isinstance(X, pd.DataFrame):
+    elif isinstance(X, (np.ndarray, pd.Series, pd.DataFrame)):
         return X.tolist()
     raise ValueError("Failed to convert to list")
 
@@ -26,9 +22,7 @@ def ensure_list_1d(X):
         return X
     elif isinstance(X, np.ndarray):
         return X.squeeze().tolist()
-    elif isinstance(X, pd.Series):
-        return X.tolist()
-    elif isinstance(X, pd.DataFrame):
+    elif isinstance(X, (pd.Series, pd.DataFrame)):
         return X.tolist()
     raise ValueError("Failed to convert to list")
 
@@ -39,9 +33,7 @@ def ensure_ndarray(X):
         return np.asarray(X)
     elif isinstance(X, np.ndarray):
         return X
-    elif isinstance(X, pd.Series):
-        return np.asarray(X)
-    elif isinstance(X, pd.DataFrame):
+    elif isinstance(X, (pd.Series, pd.DataFrame)):
         return np.asarray(X)
     raise ValueError("Failed to convert to ndarray")
 
@@ -76,11 +68,7 @@ def ensure_series(X):
 
 def ensure_dataframe(X):
     assert X is not None
-    if isinstance(X, list):
-        return pd.DataFrame(X)
-    elif isinstance(X, np.ndarray):
-        return pd.DataFrame(X)
-    elif isinstance(X, pd.Series):
+    if isinstance(X, (list, np.ndarray, pd.Series)):
         return pd.DataFrame(X)
     elif isinstance(X, pd.DataFrame):
         return X

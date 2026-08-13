@@ -207,7 +207,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             oracle_call_execution_time = time() - oracle_call_start_time
             logger.debug("Call to estimator complete")
 
-            def predict_fct(X):
+            def predict_fct(X, current_estimator=current_estimator):
                 return current_estimator.predict(X)
 
             self.predictors_.append(current_estimator)

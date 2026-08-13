@@ -140,7 +140,11 @@ notice-rgx = "# (?i)Copyright \\(C\\) (Microsoft Corporation and )?Fairlearn con
 # Enable flake8-logging-format (`G`) to enforce lazy %s logging.
 # Enable pydocstyle (`D`); the numpy convention is configured below to match
 # the project's use of numpydoc.
-select = ["E4", "E7", "E9", "F", "G", "NPY201", "D"]
+# Enable pyupgrade (`UP`) to modernize syntax for the minimum supported Python.
+# Enable flake8-bugbear (`B`) to catch likely bugs and design problems.
+# Enable flake8-simplify (`SIM`) to simplify verbose or redundant code.
+# Enable flake8-comprehensions (`C4`) for more idiomatic comprehensions.
+select = ["E4", "E7", "E9", "F", "G", "NPY201", "D", "UP", "B", "SIM", "C4"]
 ignore = []
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -183,8 +187,9 @@ docstring-code-line-length = "dynamic"
 [tool.ruff.lint.per-file-ignores]
 # It's fine not to put the import at the top of the file in the examples
 # folder. Docstrings (`D`) are not required for tests, examples, scripts,
-# or the docs build configuration.
-"examples/*" = ["E402", "D"]
+# or the docs build configuration. Bare expressions (`B018`) in the examples
+# are intentional: sphinx-gallery renders their repr as cell output.
+"examples/*" = ["E402", "D", "B018"]
 "test/**" = ["D"]
 "test_othermlpackages/**" = ["D"]
 "scripts/**" = ["D"]

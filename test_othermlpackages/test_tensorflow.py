@@ -14,8 +14,10 @@ from . import package_test_common as ptc
 tf = pytest.importorskip("tensorflow")
 
 
-def create_model(X, y, loss="binary_crossentropy", layers=[12, 8]):
+def create_model(X, y, loss="binary_crossentropy", layers=None):
     # create model
+    if layers is None:
+        layers = [12, 8]
     n_features_in = X.shape[1]
     inp = Input(shape=(n_features_in,))
 
