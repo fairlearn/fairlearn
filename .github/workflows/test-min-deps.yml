@@ -13,9 +13,6 @@ on:
         required: true
         type: string
 
-env:
-  DATA_HOME: "~/openml_data"
-
 jobs:
   all-deps-min:
     # This job installs all dependencies and runs most tests.
@@ -38,20 +35,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ inputs.python }}
-      - name: Cache openml datasets
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.DATA_HOME }}
-          key: ${{ runner.os }}-openml-datasets-v1
-          restore-keys: ${{ runner.os }}-openml-datasets-
-
       - run: python scripts/install_requirements.py --min
       - run: pip install .
       - run: pip install matplotlib
       - run: >
           pytest --mpl
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
-          --ignore=test/install --cov=fairlearn --cov-report=xml -vl test/
+          --ignore=test/install -m "not openml"
+          --cov=fairlearn --cov-report=xml -vl test/
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v4.2.0

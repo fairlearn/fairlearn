@@ -21,6 +21,7 @@ from fairlearn.metrics import (
 from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationLearner
 
 PreprocessingAlgorithm = Union[CorrelationRemover, PrototypeRepresentationLearner]
+pytestmark = pytest.mark.openml
 
 
 @dataclass(frozen=True)

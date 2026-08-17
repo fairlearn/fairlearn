@@ -12,6 +12,10 @@ on:
       mlpackage:
         required: true
         type: string
+      optional:
+        required: false
+        type: boolean
+        default: false
 
 env:
   DATA_HOME: "~/openml_data"
@@ -19,6 +23,7 @@ env:
 jobs:
   other-ml:
     runs-on: ${{ inputs.os }}
+    continue-on-error: ${{ inputs.optional }}
     env:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
@@ -65,7 +70,7 @@ jobs:
           echo
           # Override the filterwarnings set in the TOML file
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
-        name: Run ${{matrix.mlpackage}} tests
+        name: Run ${{ inputs.mlpackage }} tests
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v4.2.0
