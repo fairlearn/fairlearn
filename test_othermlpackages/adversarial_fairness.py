@@ -24,6 +24,7 @@ step = 1
 
 def test_examples():
     # EXAMPLE 1
+    # This dataset is bundled with scikit-learn and does not require network access.
     data = load_breast_cancer(as_frame=True)
     X, y = data.data, data.target
     pos_label = y.iloc[0]
