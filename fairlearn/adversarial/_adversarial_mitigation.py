@@ -980,6 +980,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
+
+    .. versionadded:: 0.8.0
     """
 
     def __init__(
@@ -1172,6 +1174,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
+
+    .. versionadded:: 0.8.0
     """
 
     def __init__(
