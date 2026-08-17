@@ -51,6 +51,20 @@ jobs:
       codeCovPython: "3.13"
 
 
+  other-ml:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.13"]
+        mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
+      fail-fast: false
+    uses: ./.github/workflows/test-other-ml.yml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+      mlpackage: ${{ matrix.mlpackage }}
+
+
   linting:
     strategy:
       matrix:

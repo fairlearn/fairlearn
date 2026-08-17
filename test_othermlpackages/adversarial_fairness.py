@@ -6,6 +6,7 @@
 import torch
 from numpy import mean, number
 from sklearn.compose import make_column_selector, make_column_transformer
+from sklearn.datasets import load_breast_cancer
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -14,9 +15,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 import fairlearn.utils._compatibility as compat
 from fairlearn.adversarial import AdversarialFairnessClassifier
-from fairlearn.datasets import fetch_adult
 from fairlearn.metrics import MetricFrame, demographic_parity_difference, selection_rate
-from test_othermlpackages.utils import DATA_HOME
 
 # Global variables of test_examples()
 schedulers = []
@@ -25,10 +24,10 @@ step = 1
 
 def test_examples():
     # EXAMPLE 1
-    X, y = fetch_adult(return_X_y=True, data_home=DATA_HOME)
-    pos_label = y[0]
-
-    z = X["sex"]  # In this example, we consider 'sex' the sensitive feature.
+    data = load_breast_cancer(as_frame=True)
+    X, y = data.data, data.target
+    pos_label = y.iloc[0]
+    z = (X["mean radius"] >= X["mean radius"].median()).map({False: "small", True: "large"})
 
     ct = make_column_transformer(
         (
