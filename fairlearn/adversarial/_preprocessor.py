@@ -5,6 +5,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
+from sklearn.utils.validation import check_is_fitted
 
 
 class FloatTransformer(TransformerMixin, BaseEstimator):
@@ -96,6 +97,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
 
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
+        check_is_fitted(self)
         if isinstance(self.transformer, str) or self.transformer is None:
             return (
                 self.transform_.transform(self._check(X)).astype(float)
