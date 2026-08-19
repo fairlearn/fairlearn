@@ -243,21 +243,21 @@ def test_threshold_optimization_demographic_parity(
     assert np.isclose(
         value_for_less_than_2_5, prob_pred([sensitive_feature_names_ex1[0]], [2.499])
     )
-    assert 0 == prob_pred([sensitive_feature_names_ex1[0]], [2.5])
-    assert 0 == prob_pred([sensitive_feature_names_ex1[0]], [100])
+    assert prob_pred([sensitive_feature_names_ex1[0]], [2.5]) == 0
+    assert prob_pred([sensitive_feature_names_ex1[0]], [100]) == 0
 
     # sensitive feature value B
     value_for_less_than_0_5 = 0.00133333333333
     assert np.isclose(value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0]))
     assert np.isclose(value_for_less_than_0_5, prob_pred([sensitive_feature_names_ex1[1]], [0.5]))
-    assert 1 == prob_pred([sensitive_feature_names_ex1[1]], [0.51])
-    assert 1 == prob_pred([sensitive_feature_names_ex1[1]], [1])
-    assert 1 == prob_pred([sensitive_feature_names_ex1[1]], [100])
+    assert prob_pred([sensitive_feature_names_ex1[1]], [0.51]) == 1
+    assert prob_pred([sensitive_feature_names_ex1[1]], [1]) == 1
+    assert prob_pred([sensitive_feature_names_ex1[1]], [100]) == 1
 
     # sensitive feature value C
     value_between_0_5_and_1_5 = 0.608
-    assert 0 == prob_pred([sensitive_feature_names_ex1[2]], [0])
-    assert 0 == prob_pred([sensitive_feature_names_ex1[2]], [0.5])
+    assert prob_pred([sensitive_feature_names_ex1[2]], [0]) == 0
+    assert prob_pred([sensitive_feature_names_ex1[2]], [0.5]) == 0
     assert np.isclose(
         value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [0.51])
     )
@@ -265,8 +265,8 @@ def test_threshold_optimization_demographic_parity(
     assert np.isclose(
         value_between_0_5_and_1_5, prob_pred([sensitive_feature_names_ex1[2]], [1.5])
     )
-    assert 1 == prob_pred([sensitive_feature_names_ex1[2]], [1.51])
-    assert 1 == prob_pred([sensitive_feature_names_ex1[2]], [100])
+    assert prob_pred([sensitive_feature_names_ex1[2]], [1.51]) == 1
+    assert prob_pred([sensitive_feature_names_ex1[2]], [100]) == 1
 
     # Assert Demographic Parity actually holds
     predictions_by_sensitive_feature = _get_predictions_by_sensitive_feature(

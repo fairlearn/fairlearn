@@ -20,6 +20,7 @@ from fairlearn.datasets import (
 
 
 class TestFairlearnDataset:
+    @pytest.mark.openml
     @pytest.mark.parametrize("as_frame", [True, False])
     @pytest.mark.parametrize(
         "fetch_function",
@@ -44,6 +45,7 @@ class TestFairlearnDataset:
         assert dataset["DESCR"] is not None
         assert isinstance(dataset["DESCR"], str)
 
+    @pytest.mark.openml
     @pytest.mark.parametrize("as_frame", [True, False])
     @pytest.mark.parametrize(
         "fetch_function",
@@ -63,6 +65,7 @@ class TestFairlearnDataset:
         assert y is not None
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
+    @pytest.mark.openml
     def test_fetch_acs_income_dataframe(self):
         dataset = fetch_acs_income(data_home=DATA_HOME)
         expected_columns = [

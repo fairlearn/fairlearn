@@ -74,4 +74,4 @@ _base_metrics = [
     "count",
 ]
 
-__all__ = _core + _fairness + _base_metrics + list(sorted(_generated_metric_dict.keys()))
+__all__ = _core + _fairness + _base_metrics + sorted(_generated_metric_dict.keys())

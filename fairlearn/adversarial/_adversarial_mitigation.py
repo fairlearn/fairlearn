@@ -14,7 +14,7 @@ from sklearn.base import (
     TransformerMixin,
     is_classifier,
 )
-from sklearn.exceptions import DataConversionWarning, NotFittedError
+from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_scalar
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
@@ -435,26 +435,22 @@ class _AdversarialFairness(BaseEstimator):
                 )
             )
 
-        if self.predictor_model is not None:
+        # Kept as if/else: the `[]` branch carries an F841 waiver and note that
+        # a one-line ternary would not preserve cleanly.
+        if self.predictor_model is not None:  # noqa: SIM108
             predictor_model = self.predictor_model
         else:
             predictor_model = []  # [] is a NN with no hidden layers # noqa: F841
 
-        if self.adversary_model is not None:
+        if self.adversary_model is not None:  # noqa: SIM108
             adversary_model = self.adversary_model
         else:
             adversary_model = []  # noqa: F841
 
-        if self.batch_size == -1:
-            batch_size = X.shape[0]
-        else:
-            batch_size = self.batch_size
+        batch_size = X.shape[0] if self.batch_size == -1 else self.batch_size
         batches = ceil(X.shape[0] / batch_size)
 
-        if self.epochs == -1:
-            epochs = ceil(self.max_iter / batches)
-        else:
-            epochs = self.epochs
+        epochs = ceil(self.max_iter / batches) if self.epochs == -1 else self.epochs
 
         start_time = time()
         last_update_time = start_time
@@ -467,32 +463,26 @@ class _AdversarialFairness(BaseEstimator):
             if self.shuffle:
                 X, y, A = self.backendEngine_.shuffle(X, y, A)
             for batch in range(batches):
-                if self.progress_updates:
-                    if (time() - last_update_time) > self.progress_updates:
-                        last_update_time = time()
-                        progress = (epoch / epochs) + (batch / (batches * epochs))
-                        if (
-                            progress > 0
-                            and len(predictor_losses) >= 1
-                            and len(adversary_losses) >= 1
-                        ):
-                            ETA = ((last_update_time - start_time + 1e-6) / (progress + 1e-6)) * (
-                                1 - progress
-                            )
-                            # + 1e-6 for numerical stability
-                            logger.info(
-                                _PROGRESS_UPDATE,
-                                "=" * round(20 * progress),
-                                " " * round(20 * (1 - progress)),
-                                epoch + 1,
-                                epochs,
-                                " " * (len(str(batch + 1)) - len(str(batches))),
-                                batch + 1,
-                                batches,
-                                ETA,
-                                predictor_losses[-1],
-                                adversary_losses[-1],
-                            )
+                if self.progress_updates and (time() - last_update_time) > self.progress_updates:
+                    last_update_time = time()
+                    progress = (epoch / epochs) + (batch / (batches * epochs))
+                    if progress > 0 and len(predictor_losses) >= 1 and len(adversary_losses) >= 1:
+                        ETA = ((last_update_time - start_time + 1e-6) / (progress + 1e-6)) * (
+                            1 - progress
+                        )  # + 1e-6 for numerical stability
+                        logger.info(
+                            _PROGRESS_UPDATE,
+                            "=" * round(20 * progress),
+                            " " * round(20 * (1 - progress)),
+                            epoch + 1,
+                            epochs,
+                            " " * (len(str(batch + 1)) - len(str(batches))),
+                            batch + 1,
+                            batches,
+                            ETA,
+                            predictor_losses[-1],
+                            adversary_losses[-1],
+                        )
                 batch_slice = slice(
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
@@ -561,12 +551,11 @@ class _AdversarialFairness(BaseEstimator):
 
         if first_call and classes is not None:
             self.classes_ = classes
-        if not first_call:
-            if self.n_features_in_ != X.shape[1]:
-                raise ValueError(
-                    "X has %d features, but %s is expecting %d features as input"
-                    % (X.shape[1], self.__class__.__name__, self.n_features_in_)
-                )
+        if not first_call and self.n_features_in_ != X.shape[1]:
+            raise ValueError(
+                f"X has {X.shape[1]} features, but {self.__class__.__name__} "
+                f"is expecting {self.n_features_in_} features as input"
+            )
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
         self.backendEngine_.train_step(X, y, A)
@@ -683,11 +672,10 @@ class _AdversarialFairness(BaseEstimator):
                     "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
                 )
 
-        try:  # TODO check this
-            check_is_fitted(self)
-            is_fitted = True
-        except NotFittedError:
-            is_fitted = False
+        # Probe whether the estimator has been fitted so _validate_input
+        # can decide whether to initialize the backend engine. `_is_setup`
+        # is the canonical fitted flag (see `__sklearn_is_fitted__`).
+        is_fitted = hasattr(self, "_is_setup")
 
         if A is None:
             logger.warning("No sensitive_features provided")
@@ -753,7 +741,7 @@ class _AdversarialFairness(BaseEstimator):
                     )
             except ImportError:
                 if self.backend == "torch":
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
+                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch")) from None
             if select:
                 self.backend_ = PytorchEngine
                 return
@@ -776,7 +764,7 @@ class _AdversarialFairness(BaseEstimator):
                     )
             except ImportError:
                 if self.backend == "tensorflow":
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
+                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow")) from None
             if select:
                 self.backend_ = TensorflowEngine
                 return
@@ -1015,7 +1003,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        super(AdversarialFairnessClassifier, self).__init__(
+        super().__init__(
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
@@ -1207,7 +1195,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        super(AdversarialFairnessRegressor, self).__init__(
+        super().__init__(
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
