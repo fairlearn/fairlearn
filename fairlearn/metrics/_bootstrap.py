@@ -168,5 +168,5 @@ def calculate_pandas_quantiles(
     elif isinstance(bootstrap_samples[0], pd.DataFrame):
         result = _calc_dataframe_quantiles(quantiles=quantiles, samples=bootstrap_samples)
     else:
-        assert False, "Should not be possible to get here"
+        raise AssertionError("Should not be possible to get here")
     return result

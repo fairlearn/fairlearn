@@ -97,7 +97,7 @@ class UtilityParity(ClassificationMoment):
         ratio_bound_slack: float = 0.0,
     ):
         """Initialize with the ratio value."""
-        super(UtilityParity, self).__init__()
+        super().__init__()
         if (difference_bound is None) and (ratio_bound is None):
             self.eps = _DEFAULT_DIFFERENCE_BOUND
             self.ratio = 1.0

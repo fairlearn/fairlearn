@@ -13,9 +13,6 @@ on:
         required: true
         type: string
 
-env:
-  DATA_HOME: "~/openml_data"
-
 jobs:
   other-ml:
     runs-on: ${{ inputs.os }}
@@ -36,13 +33,6 @@ jobs:
           AGE=$((CURRENT_DATE - COMMIT_DATE))
           echo "AGE=$AGE" >> $GITHUB_OUTPUT
           echo "AGE in seconds: $AGE"
-      - name: Cache openml datasets
-        uses: actions/cache@v6
-        with:
-          path: ${{ env.DATA_HOME }}
-          key: ${{ runner.os }}-openml-datasets-v1
-          restore-keys: ${{ runner.os }}-openml-datasets-
-
       - run: |
           conda update -n base -c defaults conda
         name: Update and initialise conda
@@ -74,7 +64,7 @@ jobs:
           echo
           # Override the filterwarnings set in the TOML file
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
-        name: Run ${{matrix.mlpackage}} tests
+        name: Run ${{ inputs.mlpackage }} tests
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ steps.get_date.outputs.AGE < 172800 }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v7
