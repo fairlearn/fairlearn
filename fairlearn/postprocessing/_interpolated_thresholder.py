@@ -27,6 +27,8 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
 
     Read more in the :ref:`User Guide <postprocessing>`.
 
+    .. versionadded:: 0.5.0
+
     Parameters
     ----------
     estimator :
@@ -71,9 +73,8 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             In previous versions only the ``predict`` method was used
             implicitly.
 
-        .. versionchanged:: 0.7
-            From version 0.7, 'predict' is deprecated as the default value and
-            the default changes to 'auto' from v0.10.
+        .. versionchanged:: 0.10
+            The default value changed from ``'predict'`` to ``'auto'``.
     """
 
     def __init__(self, estimator, interpolation_dict, prefit=False, predict_method="auto"):
@@ -99,7 +100,7 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             try:
                 check_is_fitted(self.estimator)
             except NotFittedError:
-                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__))
+                warn(BASE_ESTIMATOR_NOT_FITTED_WARNING.format(type(self).__name__), stacklevel=2)
             self.estimator_ = self.estimator
         return self
 

@@ -102,7 +102,7 @@ Key Terms
 Key Term Examples  - Unobservable theoretical constructs and Measurement models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- **Fairness** is an example of an unobservable theoretical construct. Several measurement models exist for measuring fairness, including demographic parity. These measurements may come together to form a measurement model, where several measurements are combined to ultimately measure fairness.See :code:`fairlearn.metrics` for more examples of measurement models for measuring fairness.
+- **Fairness** is an example of an unobservable theoretical construct. Several measurement models exist for measuring fairness, including demographic parity. These measurements may come together to form a measurement model, where several measurements are combined to ultimately measure fairness. See :code:`fairlearn.metrics` for more examples of measurement models for measuring fairness.
 
 - **Teacher effectiveness** is an example of an unobservable theoretical construct. Common measurement models include student performance on standardized exams and qualitative feedback for the teacher’s students.
 
@@ -121,11 +121,11 @@ What is construct validity?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Though :footcite:cts:`jacobs2021measurement` explore both construct reliability and construct validity, we focus our
-exploration below on construct Validity.
+exploration below on construct validity.
 We note that both play an important role in understanding fairness in sociotechnical contexts.
 With that said, :footcite:cts:`jacobs2021measurement` offers a fairness-oriented conceptualization of construct validity, that
 is helpful in thinking about fairness in sociotechnical contexts.
-We capture the idea in seven key parts that when combined  can serve as a framework for analyzing an AI task and attempting to establish construct validity:
+We capture the idea in seven key parts that when combined can serve as a framework for analyzing an AI task and attempting to establish construct validity:
 
 1. **Face validity** – On the surface, how plausible do the measurements produced by the measurement model look?
 

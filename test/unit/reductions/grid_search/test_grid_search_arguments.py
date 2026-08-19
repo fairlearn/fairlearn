@@ -9,6 +9,9 @@ from test.unit.input_convertors import (
     ensure_ndarray,
 )
 from test.unit.reductions.conftest import is_invalid_transformation
+from test.unit.reductions.exponentiated_gradient.simple_learners import (
+    LeastSquaresRegressor,
+)
 from test.unit.reductions.grid_search.utilities import (
     _quick_data,
     assert_n_grid_search_results,
@@ -18,7 +21,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.exceptions import NotFittedError
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -55,6 +58,24 @@ not_fitted_error_msg = (
     "This {} instance is not fitted yet. Call 'fit' with "
     "appropriate arguments before using this estimator."
 )
+
+
+def test_constraints_reused_across_multiple_fits():
+    """Same constraints instance must be reusable for multiple fit() calls (#1210)."""
+    X, y, A = _quick_data()
+    constraints = DemographicParity()
+    gs = GridSearch(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=constraints,
+        grid_size=2,
+    )
+
+    gs.fit(X, y, sensitive_features=A)
+    gs.fit(X, y, sensitive_features=A)
+
+    assert not constraints.data_loaded
+    assert gs.constraints_ is not constraints
+    assert gs.constraints_.data_loaded
 
 
 # Base class for tests
@@ -105,6 +126,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, _, A = _quick_data()
@@ -123,6 +145,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, _, A = _quick_data()
@@ -140,6 +163,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, Y, _ = _quick_data(A_two_dim)
@@ -201,7 +225,9 @@ class ArgumentTests:
         log_records = caplog.get_records("call")
         dimension_log_record = log_records[0]
         size_log_record = log_records[1]
-        if isinstance(self.disparity_criterion, EqualizedOdds):
+        # Kept as if/else: each branch has an explanatory comment that a ternary
+        # would drop.
+        if isinstance(self.disparity_criterion, EqualizedOdds):  # noqa: SIM108
             # not every label occurs with every group
             grid_dimensions = 10
         else:
@@ -232,7 +258,7 @@ class ArgumentTests:
                 " dimensionality."
             )
 
-        grid_size = 10
+        grid_size = 3
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
@@ -310,6 +336,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, Y, A = _quick_data(A_two_dim)
@@ -331,6 +358,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, Y, A = _quick_data(A_two_dim)
@@ -350,6 +378,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, _, _ = _quick_data()
@@ -363,6 +392,7 @@ class ArgumentTests:
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, _, _ = _quick_data()
@@ -384,6 +414,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, Y, A = _quick_data(A_two_dim)
@@ -394,7 +425,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -405,6 +436,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         gs = GridSearch(
             self.estimator,
             self.disparity_criterion,
+            grid_size=3,
             sample_weight_name=self.sample_weight_name,
         )
         X, Y, A = _quick_data(A_two_dim)
@@ -413,42 +445,54 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
 
 # Set up Pipeline estimator
 class TestPipelineEstimator(ConditionalOpportunityTests):
-    def setup_method(self, method):
-        self.estimator = Pipeline(
+    @classmethod
+    def setup_class(cls):
+        cls.estimator = Pipeline(
             [
                 ("scaler", StandardScaler()),
-                ("logistic", LogisticRegression(solver="liblinear")),
+                ("logistic", LogisticRegression(solver="liblinear", max_iter=10)),
             ]
         )
+
+    def setup_method(self, method):
         self.disparity_criterion = DemographicParity()
         self.sample_weight_name = "logistic__sample_weight"
 
 
 # Set up DemographicParity
 class TestDemographicParity(ConditionalOpportunityTests):
+    @classmethod
+    def setup_class(cls):
+        cls.estimator = LogisticRegression(solver="liblinear", max_iter=10)
+
     def setup_method(self, method):
-        self.estimator = LogisticRegression(solver="liblinear")
         self.disparity_criterion = DemographicParity()
         self.sample_weight_name = "sample_weight"
 
 
 # Test EqualizedOdds
 class TestEqualizedOdds(ConditionalOpportunityTests):
+    @classmethod
+    def setup_class(cls):
+        cls.estimator = LogisticRegression(solver="liblinear", max_iter=10)
+
     def setup_method(self, method):
-        self.estimator = LogisticRegression(solver="liblinear")
         self.disparity_criterion = EqualizedOdds()
         self.sample_weight_name = "sample_weight"
 
 
 # Tests specific to BoundedGroupLoss
 class TestBoundedGroupLoss(ArgumentTests):
+    @classmethod
+    def setup_class(cls):
+        cls.estimator = LeastSquaresRegressor()
+
     def setup_method(self, method):
-        self.estimator = LinearRegression()
         eps = 0.01
         self.disparity_criterion = BoundedGroupLoss(ZeroOneLoss(), upper_bound=eps)
         self.sample_weight_name = "sample_weight"

@@ -521,6 +521,8 @@ Intersectionality in Mental Health Care
 
 # %%
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 
 # Import relevant libraries
@@ -535,7 +537,8 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from fairlearn.metrics import MetricFrame, false_positive_rate
 
 # Read in dataset
-data_openml = fetch_openml(data_id=45040)
+data_home = Path().home() / ".fairlearn-data"
+data_openml = fetch_openml(data_id=45040, data_home=data_home)
 data = data_openml.data
 data["Diagnosis"] = data_openml.target
 
@@ -966,8 +969,8 @@ f(testy, predictions)
 # - We see that Hispanic individuals are also poorly affected by this model, with a relative FPR of
 #   1.3 (but you should note that this is not an effect that has been explicitly noted in the
 #   literature and is likely an artifact of our simulated data)
-# - The white population has a relative FPR of 1 - this makes since they are our reference
-#   population, and other other group is being compared against the FPR for whites.
+# - The white population has a relative FPR of 1 - this makes sense since they are our reference
+#   population, and every other group is being compared against the FPR for whites.
 #
 # Intersectional bias
 # ~~~~~~~~~~~~~~~~~~~
@@ -1093,7 +1096,7 @@ intersectionalf(testy, predictions)
 # fairness assessment - it can manifest in impactful and pervasive ways in the systems where it is
 # potentially deployed. A Black man misdiagnosed with schizophrenia with the help of a ML model may
 # become more distrustful towards healthcare in the future. At any future visits, this distrust
-# might manifest in certain types of behaviours (e.g., an increased sense of tension) that could be
+# might manifest in certain types of behaviors (e.g., an increased sense of tension) that could be
 # interpreted as further evidence of schizophrenia, ultimately contributing to further
 # misdiagnosis. This type of feedback is extremely detrimental, as **algorithms reinforce and
 # propagate the unfairness** encoded within the data that is representative of society's own

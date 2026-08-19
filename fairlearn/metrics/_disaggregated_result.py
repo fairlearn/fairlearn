@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 _VALID_ERROR_STRING = ["raise", "coerce"]
 _VALID_GROUPING_FUNCTION = ["min", "max"]
 
-_INVALID_ERRORS_VALUE_ERROR_MESSAGE = "Invalid error value specified. Valid values are {0}".format(
-    _VALID_ERROR_STRING
+_INVALID_ERRORS_VALUE_ERROR_MESSAGE = (
+    f"Invalid error value specified. Valid values are {_VALID_ERROR_STRING}"
 )
 _INVALID_GROUPING_FUNCTION_ERROR_MESSAGE = (
-    "Invalid grouping function specified. Valid values are {0}".format(_VALID_GROUPING_FUNCTION)
+    f"Invalid grouping function specified. Valid values are {_VALID_GROUPING_FUNCTION}"
 )
 _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
     "Metric frame contains non-scalar cells. Please remove non-scalar columns from your"
@@ -45,14 +45,11 @@ def apply_to_dataframe(
     We don't use this argument, and only include it so that we can be
     compatible with pandas<2.2
     """
-    values = dict()
+    values = {}
     for function_name, metric_function in metric_functions.items():
         values[function_name] = metric_function(data)
     # correctly handle zero provided metrics
-    if len(values) == 0:
-        result = pd.Series(dtype=float)
-    else:
-        result = pd.Series(values)
+    result = pd.Series(dtype=float) if len(values) == 0 else pd.Series(values)
     return result
 
 
@@ -104,11 +101,11 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        grouping_function: string {'min', 'max'}
-        control_feature_names: list[str] | None
+        grouping_function : string {'min', 'max'}
+        control_feature_names : list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        errors: string {'raise', 'coerce'}, default :code:`raise`
+        errors : string {'raise', 'coerce'}, default :code:`raise`
             How to deal with any errors. Either coerce to `np.nan` or wrap the
             exception and reraise
 
@@ -152,7 +149,7 @@ class DisaggregatedResult:
                 )
                 result = mf.groupby(level=control_feature_names).agg(grouping_function)
 
-        assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
+        assert isinstance(result, (pd.Series, pd.DataFrame))
 
         return result
 
@@ -179,12 +176,12 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        control_feature_names: list[str] | None
+        control_feature_names : list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        method : {'between_groups', 'overall'}, default :code:`between_groups`
+        method : {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -200,7 +197,7 @@ class DisaggregatedResult:
         elif method == "to_overall":
             subtrahend = self.overall
         else:
-            raise ValueError("Unrecognised method '{0}' in difference() call".format(method))
+            raise ValueError(f"Unrecognised method '{method}' in difference() call")
 
         # Can assume errors='coerce', else error would already have been raised in .group_min
         # Fill all non-scalar values with NaN
@@ -211,7 +208,7 @@ class DisaggregatedResult:
         else:
             result = (mf - subtrahend).abs().groupby(level=control_feature_names).max()
 
-        assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
+        assert isinstance(result, (pd.Series, pd.DataFrame))
 
         return result
 
@@ -240,12 +237,12 @@ class DisaggregatedResult:
 
         Parameters
         ----------
-        control_feature_names: list[str] | None
+        control_feature_names : list[str] | None
             Names of the control features. Must appear in the index of the `overall`
             and `by_group` properties
-        method : {'between_groups', 'overall'}, default :code:`between_groups`
+        method : {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -279,14 +276,11 @@ class DisaggregatedResult:
                 ratios = self.by_group / self.overall
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
-            if not control_feature_names:
-                result = ratios.min()
-            else:
-                result = ratios.min().unstack(0)
+            result = ratios.min() if not control_feature_names else ratios.min().unstack(0)
         else:
-            raise ValueError("Unrecognised method '{0}' in ratio() call".format(method))
+            raise ValueError(f"Unrecognised method '{method}' in ratio() call")
 
-        assert isinstance(result, pd.Series) or isinstance(result, pd.DataFrame)
+        assert isinstance(result, (pd.Series, pd.DataFrame))
 
         return result
 
@@ -297,7 +291,7 @@ class DisaggregatedResult:
         annotated_functions: dict[str, AnnotatedMetricFunction],
         sensitive_feature_names: list[str],
         control_feature_names: list[str] | None = None,
-    ) -> "DisaggregatedResult":
+    ) -> DisaggregatedResult:
         """Manufacture a DisaggregatedResult.
 
         This is essentially a more restricted version of the MetricFrame

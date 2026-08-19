@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -81,6 +82,12 @@ class MetricFrame:
     of 'controlling' for a variable.
 
     Read more in the :ref:`User Guide <assessment>`.
+
+    .. versionadded:: 0.5.0
+
+    .. versionchanged:: 0.7.0
+        The ``metric`` argument was renamed to ``metrics`` and constructor
+        arguments became keyword-only.
 
     Parameters
     ----------
@@ -176,9 +183,9 @@ class MetricFrame:
 
     Access the largest difference, smallest ratio, and worst case performance
 
-    >>> print(f"difference: {mf1.difference()[0]:.3}   "
-    ...      f"ratio: {mf1.ratio()[0]:.3}   "
-    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    >>> print(f"difference: {mf1.difference().iloc[0]:.3}   "
+    ...      f"ratio: {mf1.ratio().iloc[0]:.3}   "
+    ...      f"max across groups: {mf1.group_max().iloc[0]:.3}")
     difference: 0.4   ratio: 0.5   max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
@@ -259,10 +266,10 @@ class MetricFrame:
 
         # Add sensitive and conditional features to all_data
         for sf in sf_list:
-            all_data[sf.name_] = list(sf.raw_feature_)
+            all_data[sf.name_] = sf.raw_feature_
         if cf_list is not None:
             for cf in cf_list:
-                all_data[cf.name_] = list(cf.raw_feature_)
+                all_data[cf.name_] = cf.raw_feature_
 
         # Check for duplicate feature names
         nameset = set()
@@ -274,7 +281,7 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self._result_cache = dict()
+        self._result_cache = {}
 
         # Create the basic results
         result = DisaggregatedResult.create(
@@ -356,19 +363,19 @@ class MetricFrame:
         # Next up, group_min and group_max
         group_functions = {"group_min": "min", "group_max": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = dict()
+            self._result_cache[k] = {}
             for err_string in _VALID_ERROR_STRING:
                 try:
                     self._result_cache[k][err_string] = self._group(raw_result, v, err_string)
-                except Exception as e:  # noqa: B902
+                except Exception as e:
                     # Store any exception for later
                     self._result_cache[k][err_string] = e
 
         # Differences and ratios
         for c_t in ["difference", "ratio"]:
-            self._result_cache[c_t] = dict()
+            self._result_cache[c_t] = {}
             for c_m in _COMPARE_METHODS:
-                self._result_cache[c_t][c_m] = dict()
+                self._result_cache[c_t][c_m] = {}
                 for err_string in _VALID_ERROR_STRING:
                     try:
                         if c_t == "difference":
@@ -385,7 +392,7 @@ class MetricFrame:
                         self._result_cache[c_t][c_m][err_string] = self._extract_result(
                             result, no_control_levels=False
                         )
-                    except Exception as e:  # noqa: B902
+                    except Exception as e:
                         # Store any exception for later
                         self._result_cache[c_t][c_m][err_string] = e
 
@@ -420,7 +427,7 @@ class MetricFrame:
 
         # Differences and ratios
         for c_t in ["difference_ci", "ratio_ci"]:
-            self._result_cache[c_t] = dict()
+            self._result_cache[c_t] = {}
             for c_m in _COMPARE_METHODS:
                 if c_t == "difference_ci":
                     raw_samples = [
@@ -598,15 +605,15 @@ class MetricFrame:
 
         Parameters
         ----------
-        disagg_result: The DisaggregatedResult containing all the metrics
-        grouping_function: string {'min', 'max'}
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        disagg_result : The DisaggregatedResult containing all the metrics
+        grouping_function : string {'min', 'max'}
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
-        typing.Any pandas.Series or pandas.DataFrame
+        typing.Any or pandas.Series or pandas.DataFrame
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
@@ -650,7 +657,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -688,7 +695,7 @@ class MetricFrame:
     def group_min(
         self, errors: Literal["raise", "coerce"] = "raise"
     ) -> Any | pd.Series | pd.DataFrame:
-        """Return the maximum value of the metric over the sensitive features.
+        """Return the minimum value of the metric over the sensitive features.
 
         This method computes the minimum value over all combinations of
         sensitive features for each underlying metric function in the :attr:`.by_group`
@@ -701,14 +708,14 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
-            The maximum value over sensitive features. The exact type
+            The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
         """
         if errors not in _VALID_ERROR_STRING:
@@ -766,7 +773,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -846,7 +853,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -972,7 +979,7 @@ class MetricFrame:
 
         if isinstance(features, pd.Series):
             check_consistent_length(features, sample_array)
-            result.append(GroupFeature(base_name, features, 0, None))
+            result.append(GroupFeature(base_name, features, 0))
         elif isinstance(features, pd.DataFrame):
             for i in range(len(features.columns)):
                 col_name = features.columns[i]
@@ -981,13 +988,13 @@ class MetricFrame:
                     raise ValueError(msg)
                 column = features.iloc[:, i]
                 check_consistent_length(column, sample_array)
-                result.append(GroupFeature(base_name, column, i, None))
+                result.append(GroupFeature(base_name, column, i))
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
-                result.append(GroupFeature(base_name, f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0))
             else:
                 raise ValueError(_FEATURE_LIST_NONSCALAR)
         elif isinstance(features, dict):
@@ -1002,19 +1009,19 @@ class MetricFrame:
                     raise ValueError(msg)
                 column = df.iloc[:, i]
                 check_consistent_length(column, sample_array)
-                result.append(GroupFeature(base_name, column, i, None))
+                result.append(GroupFeature(base_name, column, i))
         else:
             # Need to specify dtype to avoid inadvertent type conversions
             f_arr = np.squeeze(np.asarray(features, dtype=object))
             if len(f_arr.shape) == 1:
                 check_consistent_length(f_arr, sample_array)
-                result.append(GroupFeature(base_name, f_arr, 0, None))
+                result.append(GroupFeature(base_name, f_arr, 0))
             elif len(f_arr.shape) == 2:
                 # Work similarly to pd.DataFrame(data=ndarray)
                 for i in range(f_arr.shape[1]):
                     col = f_arr[:, i]
                     check_consistent_length(col, sample_array)
-                    result.append(GroupFeature(base_name, col, i, None))
+                    result.append(GroupFeature(base_name, col, i))
             else:
                 raise ValueError(_TOO_MANY_FEATURE_DIMS)
 

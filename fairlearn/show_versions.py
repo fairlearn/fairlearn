@@ -4,7 +4,7 @@
 """Utility methods to print system info for debugging.
 
 Adapted from :py:func:`pandas.show_versions` and :py:func:`sklearn.show_versions`.
-"""  # noqa: RST304
+"""
 
 import platform
 import sys
@@ -77,8 +77,8 @@ def show_versions():
 
     print("\nSystem:")
     for k, stat in sys_info.items():
-        print("{k:>10}: {stat}".format(k=k, stat=stat))
+        print(f"{k:>10}: {stat}")
 
     print("\nPython dependencies:")
     for k, stat in deps_info.items():
-        print("{k:>13}: {stat}".format(k=k, stat=stat))
+        print(f"{k:>13}: {stat}")

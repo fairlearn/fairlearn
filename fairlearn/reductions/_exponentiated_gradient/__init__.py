@@ -3,7 +3,7 @@
 
 """Package for Exponentiated Gradient."""
 
-from .exponentiated_gradient import ExponentiatedGradient  # noqa: F401
+from .exponentiated_gradient import ExponentiatedGradient
 
 __all__ = [
     "ExponentiatedGradient",

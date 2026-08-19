@@ -6,6 +6,7 @@
 CorrelationRemover visualization
 ================================
 """
+
 # %%
 # This notebook demonstrates the use of the :func:`fairlearn.preprocessing.CorrelationRemover`
 # class. We will show this by looking at the correlation matrices

@@ -2,7 +2,8 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from typing import Callable, List, Literal
+from collections.abc import Callable
+from typing import Literal
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -91,7 +92,7 @@ class ErrorRate(ClassificationMoment):
         self._index = [_ALL]
 
     @property
-    def index(self) -> List[str]:
+    def index(self) -> list[str]:
         """Return the index listing the constraints."""
         return self._index
 

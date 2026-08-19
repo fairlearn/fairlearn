@@ -14,16 +14,15 @@ from sklearn.base import (
     TransformerMixin,
     is_classifier,
 )
-from sklearn.exceptions import DataConversionWarning, NotFittedError
+from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_scalar
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import (
     check_consistent_length,
     check_is_fitted,
     check_random_state,
+    validate_data,
 )
-
-from fairlearn.utils._fixes import validate_data
 
 from ._backend_engine import BackendEngine
 from ._constants import (
@@ -207,7 +206,7 @@ class _AdversarialFairness(BaseEstimator):
         Maximum number of training iterations to perform. If set to -1, the number
         of iterations is determined by epochs parameter. Either epochs or max_iter
         must be positive.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -271,10 +270,14 @@ class _AdversarialFairness(BaseEstimator):
         Infers appropriate losses and functions if not explicitly defined.
         Called from `fit` method, not `__init__`, following sklearn API.
 
-        Parameters:
-        X : array-like, input features
-        y : array-like, target values
-        A : array-like, sensitive features
+        Parameters
+        ----------
+        X : array-like
+            Input features.
+        y : array-like
+            Target values.
+        A : array-like
+            Sensitive features.
         """
         self._validate_backend()
 
@@ -432,26 +435,22 @@ class _AdversarialFairness(BaseEstimator):
                 )
             )
 
-        if self.predictor_model is not None:
+        # Kept as if/else: the `[]` branch carries an F841 waiver and note that
+        # a one-line ternary would not preserve cleanly.
+        if self.predictor_model is not None:  # noqa: SIM108
             predictor_model = self.predictor_model
         else:
             predictor_model = []  # [] is a NN with no hidden layers # noqa: F841
 
-        if self.adversary_model is not None:
+        if self.adversary_model is not None:  # noqa: SIM108
             adversary_model = self.adversary_model
         else:
             adversary_model = []  # noqa: F841
 
-        if self.batch_size == -1:
-            batch_size = X.shape[0]
-        else:
-            batch_size = self.batch_size
+        batch_size = X.shape[0] if self.batch_size == -1 else self.batch_size
         batches = ceil(X.shape[0] / batch_size)
 
-        if self.epochs == -1:
-            epochs = ceil(self.max_iter / batches)
-        else:
-            epochs = self.epochs
+        epochs = ceil(self.max_iter / batches) if self.epochs == -1 else self.epochs
 
         start_time = time()
         last_update_time = start_time
@@ -464,42 +463,31 @@ class _AdversarialFairness(BaseEstimator):
             if self.shuffle:
                 X, y, A = self.backendEngine_.shuffle(X, y, A)
             for batch in range(batches):
-                if self.progress_updates:
-                    if (time() - last_update_time) > self.progress_updates:
-                        last_update_time = time()
-                        progress = (epoch / epochs) + (batch / (batches * epochs))
-                        if (
-                            progress > 0
-                            and len(predictor_losses) >= 1
-                            and len(adversary_losses) >= 1
-                        ):
-                            ETA = ((last_update_time - start_time + 1e-6) / (progress + 1e-6)) * (
-                                1 - progress
-                            )
-                            # + 1e-6 for numerical stability
-                            logger.info(
-                                _PROGRESS_UPDATE.format(  # noqa : G001
-                                    "=" * round(20 * progress),
-                                    " " * round(20 * (1 - progress)),  # noqa : G003
-                                    epoch + 1,  # noqa : G003
-                                    epochs,
-                                    " "  # noqa : G003
-                                    * (
-                                        len(str(batch + 1))  # noqa : G003
-                                        - len(str(batches))  # noqa : G003
-                                    ),  # noqa : G003
-                                    batch + 1,  # noqa : G003
-                                    batches,
-                                    ETA,
-                                    predictor_losses[-1],
-                                    adversary_losses[-1],
-                                )
-                            )
+                if self.progress_updates and (time() - last_update_time) > self.progress_updates:
+                    last_update_time = time()
+                    progress = (epoch / epochs) + (batch / (batches * epochs))
+                    if progress > 0 and len(predictor_losses) >= 1 and len(adversary_losses) >= 1:
+                        ETA = ((last_update_time - start_time + 1e-6) / (progress + 1e-6)) * (
+                            1 - progress
+                        )  # + 1e-6 for numerical stability
+                        logger.info(
+                            _PROGRESS_UPDATE,
+                            "=" * round(20 * progress),
+                            " " * round(20 * (1 - progress)),
+                            epoch + 1,
+                            epochs,
+                            " " * (len(str(batch + 1)) - len(str(batches))),
+                            batch + 1,
+                            batches,
+                            ETA,
+                            predictor_losses[-1],
+                            adversary_losses[-1],
+                        )
                 batch_slice = slice(
                     batch * batch_size,
                     min((batch + 1) * batch_size, X.shape[0]),
                 )
-                (LP, LA) = self.backendEngine_.train_step(
+                LP, LA = self.backendEngine_.train_step(
                     X[batch_slice], y[batch_slice], A[batch_slice]
                 )
                 predictor_losses.append(LP)
@@ -514,8 +502,14 @@ class _AdversarialFairness(BaseEstimator):
                 if self.callbacks_:
                     stop = False
                     for cb in self.callbacks_:
+                        y_true = self._y_transform.inverse_transform(y)
                         result = cb(
-                            self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=1
+                            self,
+                            step=self.n_iter_,
+                            X=X,
+                            y=y_true,
+                            z=sensitive_features,
+                            pos_label=self.classes_[1],
                         )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
@@ -527,8 +521,7 @@ class _AdversarialFairness(BaseEstimator):
         return self
 
     def partial_fit(self, X, y, *, classes=None, sensitive_features=None):
-        """
-        Perform one training step on given samples and update model.
+        """Perform one training step on given samples and update model.
 
         This method allows for incremental fitting on batches of data.
 
@@ -554,17 +547,15 @@ class _AdversarialFairness(BaseEstimator):
         self : object
             Returns self.
         """
-
         first_call = not hasattr(self, "classes_")
 
         if first_call and classes is not None:
             self.classes_ = classes
-        if not first_call:
-            if self.n_features_in_ != X.shape[1]:
-                raise ValueError(
-                    "X has %d features, but %s is expecting %d features as input"
-                    % (X.shape[1], self.__class__.__name__, self.n_features_in_)
-                )
+        if not first_call and self.n_features_in_ != X.shape[1]:
+            raise ValueError(
+                f"X has {X.shape[1]} features, but {self.__class__.__name__} "
+                f"is expecting {self.n_features_in_} features as input"
+            )
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
         self.backendEngine_.train_step(X, y, A)
@@ -681,11 +672,10 @@ class _AdversarialFairness(BaseEstimator):
                     "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
                 )
 
-        try:  # TODO check this
-            check_is_fitted(self)
-            is_fitted = True
-        except NotFittedError:
-            is_fitted = False
+        # Probe whether the estimator has been fitted so _validate_input
+        # can decide whether to initialize the backend engine. `_is_setup`
+        # is the canonical fitted flag (see `__sklearn_is_fitted__`).
+        is_fitted = hasattr(self, "_is_setup")
 
         if A is None:
             logger.warning("No sensitive_features provided")
@@ -751,7 +741,7 @@ class _AdversarialFairness(BaseEstimator):
                     )
             except ImportError:
                 if self.backend == "torch":
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch"))
+                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch")) from None
             if select:
                 self.backend_ = PytorchEngine
                 return
@@ -774,7 +764,7 @@ class _AdversarialFairness(BaseEstimator):
                     )
             except ImportError:
                 if self.backend == "tensorflow":
-                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow"))
+                    raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow")) from None
             if select:
                 self.backend_ = TensorflowEngine
                 return
@@ -786,7 +776,7 @@ class _AdversarialFairness(BaseEstimator):
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
             raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
-        # Or all other cases, a mismatch between model model (and installation)
+        # Or all other cases, a mismatch between model (and installation)
         raise ValueError(
             _KWARG_ERROR_MESSAGE.format(
                 "predictor_model and adversary_model",
@@ -989,7 +979,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -1013,7 +1003,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        super(AdversarialFairnessClassifier, self).__init__(
+        super().__init__(
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
@@ -1181,7 +1171,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-    """  # noqa : E501
+    """
 
     def __init__(
         self,
@@ -1205,7 +1195,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
         random_state=None,
     ):
         """Initialize model by setting the predictor loss and function."""
-        super(AdversarialFairnessRegressor, self).__init__(
+        super().__init__(
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,

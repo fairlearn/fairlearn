@@ -54,8 +54,9 @@ def _get_soft_predictions(estimator, X, predict_method):
 
 
 def _filter_kwargs(func, kwargs):
-    """Helper function to filter kwargs that are accepted by `func` according to its
-    signature. Returns all `kwargs` if `func` accepts `**kwargs` (or similar).
+    """Filter kwargs to those accepted by ``func`` according to its signature.
+
+    Returns all `kwargs` if `func` accepts `**kwargs` (or similar).
 
     Parameters
     ----------
