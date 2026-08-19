@@ -94,6 +94,7 @@ In the next section, we build a classification model to accomplish the
 prediction task.
 
 .. doctest:: quickstart
+    :skipif: SKIP_OPENML
 
     >>> import numpy as np
     >>> import pandas as pd
@@ -131,6 +132,7 @@ we can evaluate metrics for subgroups within the data as below:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> from fairlearn.metrics import MetricFrame
     >>> from sklearn.metrics import accuracy_score, balanced_accuracy_score
@@ -170,6 +172,7 @@ the model does not predict that outcome.
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> from fairlearn.metrics import false_negative_rate
     >>> mf = MetricFrame(metrics=false_negative_rate, y_true=y_test, y_pred=y_pred, sensitive_features=A_test)
@@ -214,6 +217,7 @@ as the objective, leading to a vastly reduced difference in accuracy:
 
 .. doctest:: quickstart
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> from fairlearn.reductions import ErrorRate, EqualizedOdds, ExponentiatedGradient
     >>> objective = ErrorRate(costs={'fp': 0.1, 'fn': 0.9})

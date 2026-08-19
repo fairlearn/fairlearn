@@ -129,6 +129,7 @@ visit :mod:`fairlearn.datasets`.
 
 .. doctest:: datasets
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> import warnings
     >>> warnings.filterwarnings('ignore')
@@ -295,6 +296,7 @@ begin to be affected by the racism of others in the community.
 
 .. doctest:: datasets
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> import sklearn.metrics as skm
     >>> import fairlearn.metrics as fm

@@ -16,9 +16,12 @@ import inspect
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import re
 import sys
 from datetime import datetime
 
+from docutils import nodes
+from matplotlib.sphinxext.plot_directive import PlotDirective
 from packaging.version import parse
 from sphinx_gallery.notebook import add_code_cell, add_markdown_cell
 
@@ -66,6 +69,9 @@ extensions = [
     "jupyterlite_sphinx",
     "sphinx_issues",
 ]
+
+skip_openml = os.environ.get("FAIRLEARN_DOCS_SKIP_OPENML") == "1"
+doctest_global_setup = f"SKIP_OPENML = {skip_openml!r}"
 
 copybutton_prompt_text = r">>> |\.\.\. "
 copybutton_prompt_is_regexp = True
@@ -267,8 +273,20 @@ plot_html_show_source_link = False
 # ------------
 
 
+class _SkippedOpenMLPlotDirective(PlotDirective):
+    """Render an OpenML-backed plot's source without executing it."""
+
+    def run(self):
+        source = "\n".join(self.content)
+        literal = nodes.literal_block(source, source)
+        literal["language"] = "pycon" if self.options.get("format") == "doctest" else "python"
+        return [literal]
+
+
 def setup(app):
     app.add_css_file("css/hide_links.css")
+    if skip_openml:
+        app.add_directive("plot", _SkippedOpenMLPlotDirective, override=True)
 
 
 # The following is used by sphinx.ext.linkcode to provide links to github
@@ -415,6 +433,26 @@ sphinx_gallery_conf = {
     "show_memory": True,
     "compress_images": ("images", "thumbnails"),
 }
+
+if skip_openml:
+    openml_examples = (
+        "plot_adversarial_basics.py",
+        "plot_adversarial_fine_tuning.py",
+        "plot_correlationremover_before_after.py",
+        "plot_grid_search_census.py",
+        "plot_intersectional_bias.py",
+        "plot_make_derived_metric.py",
+        "plot_mitigation_pipeline.py",
+        "plot_new_metrics.py",
+        "plot_plotting_metrics_with_error.py",
+        "plot_quickstart.py",
+        "plot_quickstart_counts.py",
+        "plot_roc_auc.py",
+    )
+    openml_example_pattern = "|".join(re.escape(filename) for filename in openml_examples)
+    sphinx_gallery_conf["filename_pattern"] = (
+        rf"^(?!.*(?:{openml_example_pattern})$).*plot_"
+    )
 
 # Setup for sphinx-bibtex
 

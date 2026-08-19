@@ -75,6 +75,7 @@ The :code:`CorrelationRemover` will drop the sensitive features from the dataset
 
 .. doctest:: mitigation_preprocessing
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> from fairlearn.preprocessing import CorrelationRemover
     >>> import pandas as pd
@@ -126,6 +127,7 @@ We can also use the :code:`alpha` parameter with for instance :math:`\alpha=0.5`
 to control the level of filtering between the sensitive and non-sensitive features.
 
 .. doctest:: mitigation_preprocessing
+    :skipif: SKIP_OPENML
 
     >>> cr = CorrelationRemover(sensitive_feature_ids=['race_AfricanAmerican'], alpha=0.5)
     >>> cr.fit(X)
@@ -204,6 +206,7 @@ features have less influence on the predictions of a downstream model.
 
 .. doctest:: mitigation_preprocessing
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> from fairlearn.preprocessing import PrototypeRepresentationLearner
     >>> from fairlearn.datasets import fetch_adult
@@ -241,6 +244,7 @@ not provided, the classification error term will not be included in the loss fun
 
 .. doctest:: mitigation_preprocessing
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> prl = PrototypeRepresentationLearner(n_prototypes=4, max_iter=10)
     >>> prl.fit(X_train, sensitive_features=sf_train)

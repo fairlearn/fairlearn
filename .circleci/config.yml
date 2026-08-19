@@ -54,7 +54,11 @@ jobs:
 
       - run:
           name: "Build Documentation"
-          command: make doc
+          command: |
+            if [[ ! "${CIRCLE_BRANCH}" =~ ^main$|^release/v[0-9]+\.[0-9]+$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
+              export FAIRLEARN_DOCS_SKIP_OPENML=1
+            fi
+            make doc
           no_output_timeout: 30m
 
       - run:
@@ -129,7 +133,11 @@ jobs:
 
       - run:
           name: 'Build doctest'
-          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+          command: |
+            if [[ ! "${CIRCLE_BRANCH}" =~ ^main$|^release/v[0-9]+\.[0-9]+$|^release/v[0-9]+\.[0-9]+\.[0-9,X]+$ ]]; then
+              export FAIRLEARN_DOCS_SKIP_OPENML=1
+            fi
+            python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
 
       - save_cache:

@@ -682,6 +682,7 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
 
 .. doctest:: mitigation_reductions
     :options:  +NORMALIZE_WHITESPACE
+    :skipif: SKIP_OPENML
 
     >>> from fairlearn.datasets import fetch_adult
     >>> from fairlearn.metrics import plot_model_comparison, equal_opportunity_difference
