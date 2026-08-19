@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -118,7 +119,7 @@ def _validate_and_reformat_input(
             raise ValueError(f"{_MESSAGE_Y_NONE}, got {y=}.")
         if not (y.ndim == 1 or (y.ndim == 2 and y.shape[1] == 1)):
             raise ValueError(f"`y` must be of shape (n,) or (n,1), got y of shape=({y.shape}).")
-        if enforce_binary_labels and not set(np.unique(y)).issubset(set([0, 1])):
+        if enforce_binary_labels and not set(np.unique(y)).issubset({0, 1}):
             raise ValueError(_LABELS_NOT_0_1_ERROR_MESSAGE)
         y = check_array(y.reshape(-1), ensure_2d=False, dtype="numeric", ensure_all_finite=False)
 
