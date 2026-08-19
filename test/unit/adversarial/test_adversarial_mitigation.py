@@ -14,6 +14,7 @@ from fairlearn.adversarial import (
     AdversarialFairnessRegressor,
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
+from fairlearn.adversarial._constants import _X_NOT_2D
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from test._sklearn_compat import parametrize_with_checks
 
@@ -392,6 +393,41 @@ def test_backend_engine_rejects_non_2d_X(fake_backend_env):
     )
     with pytest.raises(ValueError, match="two-dimensional"):
         mitigator.fit(X, Y, sensitive_features=Z)
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+@pytest.mark.parametrize(
+    "method_name, skip_validation, backend_method",
+    [
+        ("predict", False, "evaluate"),
+        ("partial_fit", False, "train_step"),
+        ("partial_fit", True, "train_step"),
+    ],
+)
+def test_fitted_model_rejects_non_2d_X(
+    fake_backend_env, method_name, skip_validation, backend_method
+):
+    X, Y, Z = Bin2d, Bin1d, Bin1d
+    X_non_2d = np.repeat(X[:, :, np.newaxis], X.shape[1], axis=2)
+    mitigator = get_instance(fake_mixin=True)
+    mitigator.fit(X, Y, sensitive_features=Z)
+    mitigator.skip_validation = skip_validation
+
+    with (
+        patch.object(
+            mitigator.backendEngine_,
+            backend_method,
+            side_effect=AssertionError(f"{backend_method} should not be called"),
+        ) as backend_call,
+        pytest.raises(ValueError) as exc,
+    ):
+        if method_name == "predict":
+            mitigator.predict(X_non_2d)
+        else:
+            mitigator.partial_fit(X_non_2d, Y, sensitive_features=Z)
+
+    assert str(exc.value) == _X_NOT_2D.format(X_non_2d.ndim)
+    backend_call.assert_not_called()
 
 
 @pytest.mark.parametrize(

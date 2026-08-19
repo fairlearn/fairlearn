@@ -14,6 +14,11 @@ from ._constants import (
 )
 
 
+def _check_2d(X):
+    if X.ndim != 2:
+        raise ValueError(_X_NOT_2D.format(X.ndim))
+
+
 class BackendEngine:
     """The interface of a mixin class."""
 
@@ -34,8 +39,7 @@ class BackendEngine:
         """
         self.base = base
 
-        if X.ndim != 2:
-            raise ValueError(_X_NOT_2D.format(X.ndim))
+        _check_2d(X)
         n_X_features = X.shape[1]
         n_Y_features = base._y_transform.n_features_out_
         n_A_features = base._sf_transform.n_features_out_
