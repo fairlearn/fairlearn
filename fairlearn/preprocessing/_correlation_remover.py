@@ -111,8 +111,9 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : numpy.ndarray or pandas.DataFrame
-            The feature matrix. Sensitive feature columns identified by
+        X : array-like of shape (n_samples, n_features)
+            The feature matrix. pandas DataFrame, Polars DataFrame, and PyArrow
+            Table inputs are supported. Sensitive feature columns identified by
             ``sensitive_feature_ids`` must be present in ``X``.
         y : Ignored
             Not used; present for API compatibility with scikit-learn.
@@ -156,8 +157,9 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : numpy.ndarray or pandas.DataFrame
-            The feature matrix to transform. Must have the same number of
+        X : array-like of shape (n_samples, n_features)
+            The feature matrix to transform. pandas DataFrame, Polars DataFrame,
+            and PyArrow Table inputs are supported. Must have the same number of
             features as the ``X`` passed to ``fit``.
 
         Returns
