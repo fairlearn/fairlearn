@@ -106,6 +106,18 @@ class fake_torch:
         Sigmoid = lambda: type("Sigmoid", (), {"__call__": lambda x: x})  # noqa: E731
         Softmax = lambda: type("Softmax", (), {"__call__": lambda x: x})  # noqa: E731
 
+        def Tanh():
+            return type("Tanh", (), {"__call__": lambda x: x})
+
+        def GELU():
+            return type("GELU", (), {"__call__": lambda x: x})
+
+        def ELU():
+            return type("ELU", (), {"__call__": lambda x: x})
+
+        def SELU():
+            return type("SELU", (), {"__call__": lambda x: x})
+
         class ModuleList:  # noqa: D106
             def __init__(self, layers):
                 self.layers = layers
@@ -148,7 +160,24 @@ class fake_keras:
 
     class activations:  # noqa: D106
         def deserialize(item):
-            return type(item, (), {"__call__": lambda x: x})
+            # Mirror keras.activations.deserialize: recognized lowercase
+            # activation identifiers resolve to a callable, while
+            # unrecognized strings (such as capitalized names) are returned
+            # unchanged, exactly as real keras does. This ensures the engine
+            # must lower-case activation strings before deserializing them.
+            known = {
+                "sigmoid",
+                "softmax",
+                "relu",
+                "leaky_relu",
+                "tanh",
+                "gelu",
+                "elu",
+                "selu",
+            }
+            if item in known:
+                return type(item, (), {"__call__": lambda x: x})
+            return item
 
     class layers:  # noqa: D106
         class Dense:  # noqa: D106
@@ -197,7 +226,7 @@ cols = 5
 Bin2d = np.random.choice([0.0, 1.0], size=(rows, cols))
 Bin1d = np.random.choice([0.0, 1.0], size=(rows,))
 Cat = np.zeros((rows, cols), dtype=float)
-Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.0
+Cat[np.arange(rows), np.random.choice(list(range(cols)), size=(rows,))] = 1.0
 Cat1d = Cat[:, 0]
 Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(
@@ -233,7 +262,7 @@ def generate_data_combinations(n=10):
         Y = c % K
         c = (c - Y) // K
         Z = c % K
-        assert X + Y * K + Z * K * K == c_orig
+        assert c_orig == X + Y * K + Z * K * K
         X_type = dist_type[X]
         X = dataX[X]
         Y_type = dist_type[Y]
@@ -312,7 +341,7 @@ def get_instance(
     fake_backend : Literal["torch", "tensorflow"] | None
         which backend to use
     """
-    default_kwargs = dict()
+    default_kwargs = {}
 
     if fake_backend == "torch":
         default_kwargs["predictor_model"] = fake_torch.nn.Module()

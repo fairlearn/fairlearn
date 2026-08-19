@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import functools
 import inspect
-from typing import Callable, Union
+from collections.abc import Callable
 
 from ._metric_frame import MetricFrame
 
@@ -22,7 +22,7 @@ _METHOD_ARG_ERROR = (
     "Callables which accept a '{0}' argument "
     "may not be passed to make_derived_metric(). Please use functools.partial()"
 )
-_INVALID_TRANSFORM = "Transform must be one of {0}".format(transform_options)
+_INVALID_TRANSFORM = f"Transform must be one of {transform_options}"
 
 
 class _DerivedMetric:
@@ -50,10 +50,10 @@ class _DerivedMetric:
         if sample_param_names is not None:
             self._sample_param_names = sample_param_names
 
-    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params) -> Union[float, int]:
-        sample_params = dict()
-        params = dict()
-        transform_parameters = dict()
+    def __call__(self, y_true, y_pred, *, sensitive_features, **other_params) -> float | int:
+        sample_params = {}
+        params = {}
+        transform_parameters = {}
         for k, v in other_params.items():
             if k in self._sample_param_names:
                 sample_params[k] = v
@@ -96,7 +96,7 @@ def make_derived_metric(
     *,
     metric: Callable[..., float | int],
     transform: str,
-    sample_param_names: list[str] = ["sample_weight"],
+    sample_param_names: list[str] | None = None,
 ) -> Callable[..., float | int]:
     """Create a scalar returning metric function based on aggregation of a disaggregated metric.
 
@@ -155,5 +155,7 @@ def make_derived_metric(
         :code:`sensitive_features=` and :code:`method=` arguments, to enable the
         required computation
     """
+    if sample_param_names is None:
+        sample_param_names = ["sample_weight"]
     dm = _DerivedMetric(metric=metric, transform=transform, sample_param_names=sample_param_names)
     return dm

@@ -6,9 +6,7 @@ from collections.abc import Iterable
 import narwhals.stable.v1 as nw
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
-
-from fairlearn.utils._fixes import validate_data
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class CorrelationRemover(TransformerMixin, BaseEstimator):
@@ -109,20 +107,18 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         return X
 
     def fit(self, X, y=None):
-        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""  # noqa: E501
-
+        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""
         first_call = not hasattr(self, "_n_features_in_")
 
         self._check_sensitive_features_in_X(X)
         X = self._create_lookup(X)
         X = validate_data(self, X)
 
-        if not first_call:
-            if self._n_features_in_ != X.shape[1]:
-                raise ValueError(
-                    "X has %d features, but %s is expecting %d features as input"
-                    % (X.shape[1], self.__class__.__name__, self._n_features_in_)
-                )
+        if not first_call and self._n_features_in_ != X.shape[1]:
+            raise ValueError(
+                f"X has {X.shape[1]} features, but {self.__class__.__name__} "
+                f"is expecting {self._n_features_in_} features as input"
+            )
 
         X_use, X_sensitive = self._split_X(X)
 
@@ -146,8 +142,8 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         X = validate_data(self, X)
         if self._n_features_in_ != X.shape[1]:
             raise ValueError(
-                "X has %d features, but %s is expecting %d features as input"
-                % (X.shape[1], self.__class__.__name__, self._n_features_in_)
+                f"X has {X.shape[1]} features, but {self.__class__.__name__} "
+                f"is expecting {self._n_features_in_} features as input"
             )
 
         X_use, X_sensitive = self._split_X(X)
@@ -170,7 +166,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
         if len(missing_columns) > 0:
             raise ValueError(
-                "0 feature(s) (shape=(%d, 0)) while a minimum of %d is required. "
-                "Columns %s not found in the input data."
-                % (len(missing_columns), len(missing_columns), missing_columns)
+                f"0 feature(s) (shape=({len(missing_columns)}, 0)) while a minimum of "
+                f"{len(missing_columns)} is required. "
+                f"Columns {missing_columns} not found in the input data."
             )

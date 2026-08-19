@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -86,7 +87,7 @@ class MetricFrame:
 
     .. versionchanged:: 0.7.0
         The ``metric`` argument was renamed to ``metrics`` and constructor
-        arguments became keyword-only; the previous form is deprecated.
+        arguments became keyword-only.
 
     Parameters
     ----------
@@ -182,9 +183,9 @@ class MetricFrame:
 
     Access the largest difference, smallest ratio, and worst case performance
 
-    >>> print(f"difference: {mf1.difference()[0]:.3}   "
-    ...      f"ratio: {mf1.ratio()[0]:.3}   "
-    ...      f"max across groups: {mf1.group_max()[0]:.3}")
+    >>> print(f"difference: {mf1.difference().iloc[0]:.3}   "
+    ...      f"ratio: {mf1.ratio().iloc[0]:.3}   "
+    ...      f"max across groups: {mf1.group_max().iloc[0]:.3}")
     difference: 0.4   ratio: 0.5   max across groups: 0.8
 
     You can also evaluate multiple metrics by providing a dictionary
@@ -280,7 +281,7 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self._result_cache = dict()
+        self._result_cache = {}
 
         # Create the basic results
         result = DisaggregatedResult.create(
@@ -362,7 +363,7 @@ class MetricFrame:
         # Next up, group_min and group_max
         group_functions = {"group_min": "min", "group_max": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = dict()
+            self._result_cache[k] = {}
             for err_string in _VALID_ERROR_STRING:
                 try:
                     self._result_cache[k][err_string] = self._group(raw_result, v, err_string)
@@ -372,9 +373,9 @@ class MetricFrame:
 
         # Differences and ratios
         for c_t in ["difference", "ratio"]:
-            self._result_cache[c_t] = dict()
+            self._result_cache[c_t] = {}
             for c_m in _COMPARE_METHODS:
-                self._result_cache[c_t][c_m] = dict()
+                self._result_cache[c_t][c_m] = {}
                 for err_string in _VALID_ERROR_STRING:
                     try:
                         if c_t == "difference":
@@ -426,7 +427,7 @@ class MetricFrame:
 
         # Differences and ratios
         for c_t in ["difference_ci", "ratio_ci"]:
-            self._result_cache[c_t] = dict()
+            self._result_cache[c_t] = {}
             for c_m in _COMPARE_METHODS:
                 if c_t == "difference_ci":
                     raw_samples = [
@@ -604,9 +605,9 @@ class MetricFrame:
 
         Parameters
         ----------
-        disagg_result: The DisaggregatedResult containing all the metrics
-        grouping_function: string {'min', 'max'}
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        disagg_result : The DisaggregatedResult containing all the metrics
+        grouping_function : string {'min', 'max'}
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -656,7 +657,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -707,7 +708,7 @@ class MetricFrame:
 
         Parameters
         ----------
-        errors: {'raise', 'coerce'}, default :code:`raise`
+        errors : {'raise', 'coerce'}, default :code:`raise`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -772,7 +773,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 
@@ -852,7 +853,7 @@ class MetricFrame:
         ----------
         method : string {'between_groups', 'to_overall'}, default :code:`between_groups`
             How to compute the aggregate.
-        errors: {'raise', 'coerce'}, default :code:`coerce`
+        errors : {'raise', 'coerce'}, default :code:`coerce`
             if 'raise', then invalid parsing will raise an exception
             if 'coerce', then invalid parsing will be set as NaN
 

@@ -60,6 +60,24 @@ not_fitted_error_msg = (
 )
 
 
+def test_constraints_reused_across_multiple_fits():
+    """Same constraints instance must be reusable for multiple fit() calls (#1210)."""
+    X, y, A = _quick_data()
+    constraints = DemographicParity()
+    gs = GridSearch(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=constraints,
+        grid_size=2,
+    )
+
+    gs.fit(X, y, sensitive_features=A)
+    gs.fit(X, y, sensitive_features=A)
+
+    assert not constraints.data_loaded
+    assert gs.constraints_ is not constraints
+    assert gs.constraints_.data_loaded
+
+
 # Base class for tests
 # Tests which must be passed by all calls to the GridSearch
 # go here
@@ -207,7 +225,9 @@ class ArgumentTests:
         log_records = caplog.get_records("call")
         dimension_log_record = log_records[0]
         size_log_record = log_records[1]
-        if isinstance(self.disparity_criterion, EqualizedOdds):
+        # Kept as if/else: each branch has an explanatory comment that a ternary
+        # would drop.
+        if isinstance(self.disparity_criterion, EqualizedOdds):  # noqa: SIM108
             # not every label occurs with every group
             grid_dimensions = 10
         else:
@@ -405,7 +425,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -425,7 +445,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
 
 # Set up Pipeline estimator

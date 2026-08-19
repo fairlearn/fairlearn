@@ -6,7 +6,7 @@
 # Since that file does its own testing setup
 
 # Required for environment
-ruff==0.4.5
+ruff==0.15.20
 requirements-parser
 # Need to keep black version consistent in
 # requirements-dev.txt
@@ -31,7 +31,7 @@ pyarrow
 
 # Required for documentation
 pypandoc
-sphinx==7.3.7
+sphinx>=8.3.0
 sphinx-gallery==0.19.0
 numpydoc
 pydata-sphinx-theme>=0.14.4

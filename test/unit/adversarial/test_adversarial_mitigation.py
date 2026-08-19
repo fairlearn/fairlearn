@@ -15,7 +15,7 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._preprocessor import FloatTransformer
-from fairlearn.utils._fixes import parametrize_with_checks
+from test._sklearn_compat import parametrize_with_checks
 
 from .helper import (
     Bin1d,
@@ -53,7 +53,17 @@ def test_model_init(fake_backend_env):
         fake_backend=fake_backend_env,
         fake_mixin=False,
         fake_training=True,
-        predictor_model=[10, "Sigmoid", "Softmax", "ReLU", "Leaky_ReLU"],
+        predictor_model=[
+            10,
+            "Sigmoid",
+            "Softmax",
+            "ReLU",
+            "Leaky_ReLU",
+            "Tanh",
+            "GELU",
+            "ELU",
+            "SELU",
+        ],
     )
     mitigator.fit(X, Y, sensitive_features=Z)
     layers = mitigator.backendEngine_.predictor_model.layers_
@@ -61,14 +71,34 @@ def test_model_init(fake_backend_env):
         layers = layers.layers
     assert not hasattr(layers[0], "a") or layers[0].a == cols
     assert layers[0].b == 10
-    assert layers[1].__name__ == "Sigmoid"
-    assert layers[2].__name__ == "Softmax"
-    assert layers[3].__name__ == "ReLU"
-    assert layers[4].__name__.replace("_", "") == "LeakyReLU"
-    assert not hasattr(layers[0], "a") or layers[5].a == 10
-    assert layers[5].b == 1
-    assert layers[6].__name__.lower() == "sigmoid"
-    assert len(layers) == 7
+    assert layers[1].__name__.lower() == "sigmoid"
+    assert layers[2].__name__.lower() == "softmax"
+    assert layers[3].__name__.lower() == "relu"
+    assert layers[4].__name__.replace("_", "").lower() == "leakyrelu"
+    assert layers[5].__name__.lower() == "tanh"
+    assert layers[6].__name__.lower() == "gelu"
+    assert layers[7].__name__.lower() == "elu"
+    assert layers[8].__name__.lower() == "selu"
+    for activation in layers[1:9]:
+        assert callable(activation)
+    assert not hasattr(layers[0], "a") or layers[9].a == 10
+    assert layers[9].b == 1
+    assert layers[10].__name__.lower() == "sigmoid"
+    assert len(layers) == 11
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+def test_model_init_unknown_pytorch_activation(fake_backend_env):
+    """Test unknown activation string raises ValueError for PyTorch backend."""
+    X, Y, Z = Bin2d, Bin1d, Bin1d
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_mixin=False,
+        fake_training=True,
+        predictor_model=[10, "NotAnActivation"],
+    )
+    with pytest.raises(ValueError, match="NotAnActivation"):
+        mitigator.fit(X, Y, sensitive_features=Z)
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
@@ -325,7 +355,7 @@ def test_estimators_with_torch(estimator, check, fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_fake_models(fake_backend_env):
     """Test various data types and see if it is interpreted correctly."""
-    for (X, Y, Z), (X_type, Y_type, Z_type) in generate_data_combinations():
+    for (X, Y, Z), (_X_type, Y_type, Z_type) in generate_data_combinations():
         mitigator = get_instance(fake_training=True, fake_backend=fake_backend_env)
         mitigator.fit(X, Y, sensitive_features=Z)
         assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
@@ -335,7 +365,7 @@ def test_fake_models(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_fake_models_list_inputs(fake_backend_env):
     """Test model with lists as input."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
@@ -343,9 +373,25 @@ def test_fake_models_list_inputs(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_fake_models_df_inputs(fake_backend_env):
     """Test model with data frames as input."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         mitigator.fit(pd.DataFrame(X), pd.Series(Y), sensitive_features=pd.DataFrame(Z))
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_backend_engine_rejects_non_2d_X(fake_backend_env):
+    """BackendEngine should raise a clear error instead of silently mis-sizing layers."""
+    rng = np.random.default_rng(0)
+    X = rng.random((20, 3, 4))
+    Y = rng.integers(0, 2, size=20)
+    Z = rng.integers(0, 2, size=20)
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_training=True,
+        predictor_model=[10, "Sigmoid"],
+    )
+    with pytest.raises(ValueError, match="two-dimensional"):
+        mitigator.fit(X, Y, sensitive_features=Z)
 
 
 @pytest.mark.parametrize(
@@ -376,7 +422,7 @@ def check_2dnp(X):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data(fake_backend_env):
     """Test if validate_data properly preprocesses datasets to ndarray."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X, Y, Z)
         for x in (X, Y, Z):
@@ -386,7 +432,7 @@ def test_validate_data(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_list_inputs(fake_backend_env):
     """Test if validate_data properly preprocesses list datasets to ndarray."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
         for x in (X, Y, Z):
@@ -396,7 +442,7 @@ def test_validate_data_list_inputs(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_df_inputs(fake_backend_env):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(fake_mixin=True)
         X, Y, Z = mitigator._validate_input(pd.DataFrame(X), pd.Series(Y), pd.DataFrame(Z))
         for x in (X, Y, Z):
@@ -406,10 +452,7 @@ def test_validate_data_df_inputs(fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_not_correct_backend(fake_backend_env):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
-    if fake_backend_env == "torch":
-        backend = "tensorflow"
-    else:
-        backend = "torch"
+    backend = "tensorflow" if fake_backend_env == "torch" else "torch"
 
     mitigator = get_instance(
         fake_backend=fake_backend_env,
@@ -431,13 +474,12 @@ def test_no_backend(backend, fake_backend_env):
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_ambiguous_rows(fake_backend_env):
     """Test if an ambiguous number of rows are caught."""
-    for (X, Y, Z), types in generate_data_combinations():
+    for (X, Y, Z), _types in generate_data_combinations():
         X = X[:5, :]
         mitigator = get_instance(fake_mixin=True)
         with pytest.raises(ValueError) as exc:
             mitigator._validate_input(X.tolist(), Y.tolist(), Z.tolist())
-            assert str(
-                exc.value
-            ) == "Input data has an ambiguous number of rows: {}, {}, {}.".format(
-                X.shape[0], Y.shape[0], Z.shape[0]
+            assert (
+                str(exc.value)
+                == f"Input data has an ambiguous number of rows: {X.shape[0]}, {Y.shape[0]}, {Z.shape[0]}."
             )

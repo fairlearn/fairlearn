@@ -15,11 +15,10 @@ of `fairlearn`) exists in the repo. Otherwise, the links won't work.
 
 import argparse
 import logging
-import os
 import re
 import sys
 
-from _utils import _LogWrapper
+from _utils import _get_fairlearn_version, _LogWrapper
 
 _logger = logging.getLogger(__name__)
 
@@ -58,8 +57,8 @@ def _update_other_markdown_references(line, target_version):
     if match:
         _logger.info("Matched %s", match)
         for m in match.groups():
-            old_str = "./{0}".format(m)
-            new_str = "{0}/{1}".format(_get_base_path(target_version), m)
+            old_str = f"./{m}"
+            new_str = f"{_get_base_path(target_version)}/{m}"
             result = result.replace(old_str, new_str)
         _logger.info("Updated string: %s", result.rstrip())
 
@@ -75,7 +74,7 @@ def _update_same_page_references(line, target_version):
         _logger.info("Matched %s", match)
         for m in match.groups():
             old_str = m
-            new_str = "{0}{1}".format(_get_base_path(target_version), m)
+            new_str = f"{_get_base_path(target_version)}{m}"
             result = result.replace(old_str, new_str)
         _logger.info("Updated string: %s", result.rstrip())
 
@@ -92,22 +91,20 @@ def _process_line(line, target_version):
 
 
 def process_readme(input_file_name, output_file_name):
-    sys.path.append(os.getcwd())
-    import fairlearn
-
-    target_version = fairlearn.__version__
+    target_version = _get_fairlearn_version()
     _logger.info("fairlearn version: %s", target_version)
 
     text_lines = []
-    with _LogWrapper("reading file {}".format(input_file_name)):
-        with open(input_file_name, "r") as input_file:
-            text_lines = input_file.readlines()
+    with _LogWrapper(f"reading file {input_file_name}"), open(input_file_name) as input_file:
+        text_lines = input_file.readlines()
 
     result_lines = [_process_line(line, target_version) for line in text_lines]
 
-    with _LogWrapper("writing file {}".format(output_file_name)):
-        with open(output_file_name, "w") as output_file:
-            output_file.writelines(result_lines)
+    with (
+        _LogWrapper(f"writing file {output_file_name}"),
+        open(output_file_name, "w") as output_file,
+    ):
+        output_file.writelines(result_lines)
 
 
 def build_argument_parser():

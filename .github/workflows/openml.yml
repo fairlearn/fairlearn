@@ -26,8 +26,8 @@ jobs:
     env:
       MPLBACKEND: Agg
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - run: python scripts/install_requirements.py
@@ -37,7 +37,7 @@ jobs:
         run: python -c "import sklearn; print('version=' + sklearn.__version__)" >> "$GITHUB_OUTPUT"
       - name: Cache OpenML datasets
         id: openml-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ env.DATA_HOME }}
           key: ${{ runner.os }}-openml-datasets-v2-sklearn-${{ steps.sklearn-version.outputs.version }}-${{ hashFiles('fairlearn/datasets/_fetch_*.py', 'test/unit/datasets/test_datasets.py', 'test/unit/adversarial/test_preprocessing.py', 'test/unit/preprocessing/test_preprocessing_fairness.py', 'test/unit/test_random_state.py') }}
