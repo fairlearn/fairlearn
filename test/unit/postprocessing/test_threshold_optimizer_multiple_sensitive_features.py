@@ -163,16 +163,10 @@ def test_threshold_optimizer_multiple_sensitive_features():
         metricframe_combined.by_group.loc[a2 + a4] == metricframe_multi.by_group.loc[(a2, a4)]
     ).all()
 
-    # comparing string representations of interpolation dicts is sufficient
-    assert str(
-        postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a1 + a3]
-    ) == str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a13])
-    assert str(
-        postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a1 + a4]
-    ) == str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a14])
-    assert str(
-        postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a2 + a3]
-    ) == str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a23])
-    assert str(
-        postprocess_est_combined.interpolated_thresholder_.threshold_interpolation[a2 + a4]
-    ) == str(postprocess_est_multi.interpolated_thresholder_.threshold_interpolation[a24])
+    # comparing dict representations of interpolation rows is sufficient
+    combined = postprocess_est_combined.interpolated_thresholder_.threshold_interpolation
+    multi = postprocess_est_multi.interpolated_thresholder_.threshold_interpolation
+    assert str(combined.loc[a1 + a3].to_dict()) == str(multi.loc[a13].to_dict())
+    assert str(combined.loc[a1 + a4].to_dict()) == str(multi.loc[a14].to_dict())
+    assert str(combined.loc[a2 + a3].to_dict()) == str(multi.loc[a23].to_dict())
+    assert str(combined.loc[a2 + a4].to_dict()) == str(multi.loc[a24].to_dict())

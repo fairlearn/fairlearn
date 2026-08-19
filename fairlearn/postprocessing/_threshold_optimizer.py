@@ -19,7 +19,6 @@ import pandas as pd
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
-from sklearn.utils import Bunch
 from sklearn.utils.validation import check_is_fitted
 
 from ..utils._common import _get_soft_predictions
@@ -515,18 +514,22 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
 
         # Create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature value.
-        threshold_interpolation = {}
-
+        groups = []
+        records = []
         for sensitive_feature_value, idx_best in zip(
             self._tradeoff_curve, optimal_indices, strict=False
         ):
             best_interpolation = self._tradeoff_curve[sensitive_feature_value].iloc[idx_best]
-            threshold_interpolation[sensitive_feature_value] = Bunch(
-                p0=best_interpolation.p0,
-                operation0=best_interpolation.operation0,
-                p1=best_interpolation.p1,
-                operation1=best_interpolation.operation1,
+            groups.append(sensitive_feature_value)
+            records.append(
+                {
+                    "p0": best_interpolation.p0,
+                    "operation0": best_interpolation.operation0,
+                    "p1": best_interpolation.p1,
+                    "operation1": best_interpolation.operation1,
+                }
             )
+        threshold_interpolation = pd.DataFrame(records, index=groups)
 
         return InterpolatedThresholder(
             self.estimator_,
@@ -615,7 +618,8 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
 
         # create the solution as interpolation of multiple points with a separate
         # interpolation per sensitive feature
-        threshold_interpolation = {}
+        groups = []
+        records = []
         for sensitive_feature_value in self._tradeoff_curve:
             roc_result = self._tradeoff_curve[sensitive_feature_value].transpose()[i_best_EO]
             # p_ignore * x_best represent the diagonal of the ROC plot.
@@ -632,14 +636,18 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
                     / vertical_distance_from_diagonal
                 )
 
-            threshold_interpolation[sensitive_feature_value] = Bunch(
-                p_ignore=p_ignore,
-                prediction_constant=self._x_best,
-                p0=roc_result.p0,
-                operation0=roc_result.operation0,
-                p1=roc_result.p1,
-                operation1=roc_result.operation1,
+            groups.append(sensitive_feature_value)
+            records.append(
+                {
+                    "p0": roc_result.p0,
+                    "operation0": roc_result.operation0,
+                    "p1": roc_result.p1,
+                    "operation1": roc_result.operation1,
+                    "p_ignore": p_ignore,
+                    "prediction_constant": self._x_best,
+                }
             )
+        threshold_interpolation = pd.DataFrame(records, index=groups)
 
         logger.debug(OUTPUT_SEPARATOR)
         logger.debug("From ROC curves")

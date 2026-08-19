@@ -4,6 +4,7 @@
 from warnings import warn
 
 import numpy as np
+import pandas as pd
 from sklearn import clone
 from sklearn.base import BaseEstimator, MetaEstimatorMixin
 from sklearn.exceptions import NotFittedError
@@ -33,23 +34,30 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
     ----------
     estimator :
         base estimator
-    threshold_interpolation : dict
-        maps sensitive feature values to `Bunch` that describes the
-        interpolation transformation via the following fields:
+    threshold_interpolation : pandas.DataFrame
+        A table describing the per-group thresholding rules. The index holds
+        sensitive feature values, and each row describes the randomized
+        thresholding transformation via the following columns:
 
-        - p0, operation0: with probability p0, operation0 is executed
-        - p1, operation1: with probability p1, operation1 is executed
-        - p_ignore, prediction_constant: two optional fields; if present then the result of
-          the draw of operation0 or operation1 is kept with probability 1 - p_ignore, and gets
-          replaced by prediction_constant with probability p_ignore.
+        - ``p0``, ``operation0``: with probability ``p0``, ``operation0``
+          is executed
+        - ``p1``, ``operation1``: with probability ``p1``, ``operation1``
+          is executed
+        - ``p_ignore``, ``prediction_constant``: two optional columns; if
+          present then the result of the draw of ``operation0`` or
+          ``operation1`` is kept with probability ``1 - p_ignore``, and gets
+          replaced by ``prediction_constant`` with probability ``p_ignore``.
 
-        The numbers p0 and p1 must be non-negative and add up to 1, operation0 and
-        operation1 must be instances of :class:`ThresholdOperation`, and p_ignore must be
-        between 0 and 1.
+        Within each row, ``p0`` and ``p1`` must be non-negative and add up
+        to 1, ``operation0`` and ``operation1`` must be instances of
+        :class:`ThresholdOperation`, and ``p_ignore`` must be between 0 and
+        1.
 
         .. versionchanged:: 0.15
-            The :code:`interpolation_dict` argument was renamed to
-            :code:`threshold_interpolation`.
+            Previously an ``interpolation_dict`` argument that mapped each
+            sensitive feature value to a :class:`sklearn.utils.Bunch` with
+            the fields above. It is now a single :class:`pandas.DataFrame`
+            indexed by sensitive feature value, with one column per field.
 
     prefit : bool
         if `True` then the base estimator is not fitted in :meth:`fit`.
@@ -143,14 +151,15 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
         )
 
         positive_probs = 0.0 * base_predictions_vector
-        for a, interpolation in self.threshold_interpolation.items():
-            interpolated_predictions = interpolation.p0 * interpolation.operation0(
+        has_ignore = "p_ignore" in self.threshold_interpolation.columns
+        for a, row in self.threshold_interpolation.iterrows():
+            interpolated_predictions = row.p0 * row.operation0(
                 base_predictions_vector
-            ) + interpolation.p1 * interpolation.operation1(base_predictions_vector)
-            if "p_ignore" in interpolation:
+            ) + row.p1 * row.operation1(base_predictions_vector)
+            if has_ignore:
                 interpolated_predictions = (
-                    interpolation.p_ignore * interpolation.prediction_constant
-                    + (1 - interpolation.p_ignore) * interpolated_predictions
+                    row.p_ignore * row.prediction_constant
+                    + (1 - row.p_ignore) * interpolated_predictions
                 )
             positive_probs[sensitive_feature_vector == a] = interpolated_predictions[
                 sensitive_feature_vector == a

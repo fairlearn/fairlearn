@@ -889,19 +889,20 @@ def test_constraints_objective_pairs(constraints, objective):
         thr_optimizer.fit(X, y, sensitive_features=sf)
         res = thr_optimizer.interpolated_thresholder_.threshold_interpolation
         for key in [0, 1]:
-            assert res[key]["p0"] == pytest.approx(expected[key]["p0"], PREC)
-            assert res[key]["operation0"]._operator == expected[key]["op0"]
-            assert res[key]["operation0"]._threshold == pytest.approx(expected[key]["thr0"], PREC)
-            assert res[key]["p1"] == pytest.approx(expected[key]["p1"], PREC)
-            assert res[key]["operation1"]._operator == expected[key]["op1"]
-            assert res[key]["operation1"]._threshold == pytest.approx(expected[key]["thr1"], PREC)
+            row = res.loc[key]
+            assert row["p0"] == pytest.approx(expected[key]["p0"], PREC)
+            assert row["operation0"]._operator == expected[key]["op0"]
+            assert row["operation0"]._threshold == pytest.approx(expected[key]["thr0"], PREC)
+            assert row["p1"] == pytest.approx(expected[key]["p1"], PREC)
+            assert row["operation1"]._operator == expected[key]["op1"]
+            assert row["operation1"]._threshold == pytest.approx(expected[key]["thr1"], PREC)
             if "p_ignore" in expected[key]:
-                assert res[key]["p_ignore"] == pytest.approx(expected[key]["p_ignore"], PREC)
-                assert res[key]["prediction_constant"] == pytest.approx(
+                assert row["p_ignore"] == pytest.approx(expected[key]["p_ignore"], PREC)
+                assert row["prediction_constant"] == pytest.approx(
                     expected[key]["prediction_constant"], PREC
                 )
             else:
-                assert "p_ignore" not in res[key]
+                assert "p_ignore" not in res.columns
 
 
 @pytest.mark.parametrize(
