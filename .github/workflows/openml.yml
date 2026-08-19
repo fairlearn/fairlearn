@@ -48,4 +48,5 @@ jobs:
       - run: >
           pytest
           -W "default:A network error occurred while downloading:UserWarning"
+          -W "default:Invalid cache, redownloading file:RuntimeWarning"
           -m openml -vl test/
