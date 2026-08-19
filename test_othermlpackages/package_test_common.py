@@ -7,32 +7,27 @@ import copy
 import logging
 
 import pandas as pd
-from numpy import mean, number, random
-from sklearn.compose import make_column_selector, make_column_transformer
+from numpy import mean, random
+from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 
-import fairlearn.datasets as fld
 from fairlearn.metrics import demographic_parity_difference
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import ExponentiatedGradient, GridSearch
-from test_othermlpackages.utils import DATA_HOME
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_adult():
-    """Grab dataset for testing."""
-    data = fld.fetch_adult(data_home=DATA_HOME)
-    X = data.data.drop(labels=["sex"], axis=1)
-    X = pd.get_dummies(X)
-    Y = (data.target == ">50K") * 1
-    A = data.data["sex"]
-
-    le = LabelEncoder()
-    Y = le.fit_transform(Y)
-
-    le = LabelEncoder()
+def fetch_test_data():
+    """Load a bundled dataset for testing without external network access."""
+    data = load_breast_cancer(as_frame=True)
+    X = data.data
+    Y = data.target.to_numpy(copy=True)
+    group = Y.copy()
+    flip_group = random.default_rng(12345).random(len(Y)) < 0.2
+    group[flip_group] = 1 - group[flip_group]
+    A = pd.Series(group).map({0: "group0", 1: "group1"})
 
     sc = StandardScaler()
     X_scaled = sc.fit_transform(X)
@@ -53,7 +48,7 @@ def fetch_adult():
 
 def run_expgrad_classification(estimator, moment):
     """Run classification test with ExponentiatedGradient."""
-    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_adult()
+    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_test_data()
     verification_moment = copy.deepcopy(moment)
 
     unmitigated = copy.deepcopy(estimator)
@@ -75,7 +70,7 @@ def run_expgrad_classification(estimator, moment):
 
 def run_gridsearch_classification(estimator, moment):
     """Run classification test with GridSearch."""
-    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_adult()
+    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_test_data()
     verification_moment = copy.deepcopy(moment)
 
     unmitigated = copy.deepcopy(estimator)
@@ -97,7 +92,7 @@ def run_gridsearch_classification(estimator, moment):
 
 def run_thresholdoptimizer_classification(estimator):
     """Run classification test with ThresholdOptimizer."""
-    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_adult()
+    X_train, Y_train, A_train, X_test, Y_test, A_test = fetch_test_data()
 
     unmitigated = copy.deepcopy(estimator)
     unmitigated.fit(X_train, Y_train)
@@ -122,31 +117,11 @@ def run_AdversarialFairness_classification(estimator):
     """Run classification test with AdversarialFairness."""
     random.seed(123)
 
-    X, y = fld.fetch_adult(return_X_y=True, data_home=DATA_HOME)
-
-    non_NaN_rows = ~X.isna().any(axis=1)
-
-    X = X[non_NaN_rows]
-    y = y[non_NaN_rows]
-
-    sensitive_feature = X["sex"]
-
-    def preprocess(X):
-        if isinstance(X, pd.Series):
-            X = X.to_frame()
-        """Make the Transformer for a single dataframe."""
-        ct = make_column_transformer(
-            (StandardScaler(), make_column_selector(dtype_include=number)),
-            (
-                OneHotEncoder(drop="if_binary", sparse_output=False),
-                make_column_selector(dtype_include="category"),
-            ),
-        )
-        return ct.fit_transform(X)
-
-    X = preprocess(X)
-    y = preprocess(y).ravel()
-    sensitive_feature = preprocess(sensitive_feature)
+    data = load_breast_cancer(as_frame=True)
+    X = data.data
+    y = data.target.to_numpy()
+    sensitive_feature = (X["mean radius"] >= X["mean radius"].median()).to_numpy().reshape(-1, 1)
+    X = StandardScaler().fit_transform(X)
 
     X_train, X_test, Y_train, Y_test, A_train, A_test = train_test_split(
         X, y, sensitive_feature, test_size=0.2, random_state=12345, stratify=y

@@ -84,7 +84,8 @@ filterwarnings = [
 
 markers = [
     "narwhals: tests that involve dataframe logic backed by Narwhals (deselect with '-m \"not narwhals\"')",
-    "mpl_image_compare: tests that require 'pytest-mpl' to be installed"
+    "mpl_image_compare: tests that require 'pytest-mpl' to be installed",
+    "openml: tests that download datasets from OpenML (deselect with '-m \"not openml\"')",
 ]
 
 [tool.ruff]
