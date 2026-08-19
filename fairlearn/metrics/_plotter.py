@@ -253,7 +253,7 @@ def plot_metric_frame(
 
     df = metric_frame.by_group
 
-    # Normalise to DataFrame so column iteration works for single-metric
+    # Normalize to DataFrame so column iteration works for single-metric
     # frames where by_group is a Series.
     if isinstance(df, pd.Series):
         df = df.to_frame()

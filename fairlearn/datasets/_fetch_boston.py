@@ -38,7 +38,7 @@ def fetch_boston(*, cache=True, data_home=None, as_frame=True, return_X_y=False,
     to look out for and a column that is a derived from the proportion of
     people with a black skin color that live in a neighborhood (B)
     :footcite:`carlisle2019racist`.
-    See the references at the bottom for  more detailed information.
+    See the references at the bottom for more detailed information.
 
     Here's a table of all the variables in order:
 

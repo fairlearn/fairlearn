@@ -21,6 +21,7 @@ from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationL
 from test.utils import DATA_HOME
 
 PreprocessingAlgorithm = CorrelationRemover | PrototypeRepresentationLearner
+pytestmark = pytest.mark.openml
 
 
 @dataclass(frozen=True)

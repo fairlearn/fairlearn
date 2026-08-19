@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 import pandas as pd
+import pytest
 from sklearn.datasets import fetch_openml
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -9,6 +10,8 @@ from sklearn.model_selection import train_test_split
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.reductions import EqualizedOdds, ExponentiatedGradient
 from test.utils import DATA_HOME
+
+pytestmark = pytest.mark.openml
 
 
 def test_random_state_threshold_optimizer():
