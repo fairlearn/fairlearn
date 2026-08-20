@@ -315,9 +315,9 @@ def test_plot_metric_frame_auto_ci_reordered_metrics():
     # recall error bar should reflect recall CI, not accuracy CI
     rec_err = captured["df_all_errors"]["rec"]
     # recall should have non-zero errors (from bootstrapping)
-    assert not all(
-        e[0] == 0 and e[1] == 0 for e in rec_err
-    ), "recall CI should not be all-zero if bootstrapping produced variance"
+    assert not all(e[0] == 0 and e[1] == 0 for e in rec_err), (
+        "recall CI should not be all-zero if bootstrapping produced variance"
+    )
     monkeypatch.undo()
 
 

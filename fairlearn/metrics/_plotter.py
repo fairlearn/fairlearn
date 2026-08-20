@@ -138,7 +138,7 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
         import warnings
 
         warnings.warn(
-            f"ci_quantiles has {len(pairs)} entries; " "using the outermost pair for error bars.",
+            f"ci_quantiles has {len(pairs)} entries; using the outermost pair for error bars.",
             stacklevel=2,
         )
 
