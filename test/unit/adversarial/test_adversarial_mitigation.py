@@ -395,21 +395,24 @@ def test_backend_engine_rejects_non_2d_X(fake_backend_env):
         mitigator.fit(X, Y, sensitive_features=Z)
 
 
-@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 @pytest.mark.parametrize(
-    "method_name, skip_validation, backend_method",
+    "method_name, skip_validation, backend_method, as_list",
     [
-        ("predict", False, "evaluate"),
-        ("partial_fit", False, "train_step"),
-        ("partial_fit", True, "train_step"),
+        ("predict", False, "evaluate", False),
+        ("partial_fit", False, "train_step", False),
+        ("partial_fit", True, "train_step", False),
+        ("partial_fit", True, "train_step", True),
     ],
 )
 def test_fitted_model_rejects_non_2d_X(
-    fake_backend_env, method_name, skip_validation, backend_method
+    fake_backend_env, method_name, skip_validation, backend_method, as_list
 ):
     X, Y, Z = Bin2d, Bin1d, Bin1d
     X_non_2d = np.repeat(X[:, :, np.newaxis], X.shape[1], axis=2)
-    mitigator = get_instance(fake_mixin=True)
+    if as_list:
+        X_non_2d = X[:, 0].tolist()
+    mitigator = get_instance(fake_mixin=True, fake_backend=fake_backend_env)
     mitigator.fit(X, Y, sensitive_features=Z)
     mitigator.skip_validation = skip_validation
 
@@ -426,7 +429,7 @@ def test_fitted_model_rejects_non_2d_X(
         else:
             mitigator.partial_fit(X_non_2d, Y, sensitive_features=Z)
 
-    assert str(exc.value) == _X_NOT_2D.format(X_non_2d.ndim)
+    assert str(exc.value) == _X_NOT_2D.format(np.ndim(X_non_2d))
     backend_call.assert_not_called()
 
 

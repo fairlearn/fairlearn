@@ -551,6 +551,7 @@ class _AdversarialFairness(BaseEstimator):
 
         if first_call and classes is not None:
             self.classes_ = classes
+        _check_2d(X)
         if not first_call and self.n_features_in_ != X.shape[1]:
             raise ValueError(
                 f"X has {X.shape[1]} features, but {self.__class__.__name__} "
