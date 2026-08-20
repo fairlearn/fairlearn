@@ -107,7 +107,28 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         return X
 
     def fit(self, X, y=None):
-        """Learn the projection required to make the dataset uncorrelated with sensitive columns."""
+        """Learn the projection required to make the dataset uncorrelated with sensitive columns.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The feature matrix. pandas DataFrame, Polars DataFrame, and PyArrow
+            Table inputs are supported. Sensitive feature columns identified by
+            ``sensitive_feature_ids`` must be present in ``X``.
+        y : Ignored
+            Not used; present for API compatibility with scikit-learn.
+
+        Returns
+        -------
+        self : object
+            Fitted CorrelationRemover instance.
+
+        Raises
+        ------
+        ValueError
+            If the number of features in ``X`` differs from the number seen
+            during a previous call to ``fit``.
+        """
         first_call = not hasattr(self, "_n_features_in_")
 
         self._check_sensitive_features_in_X(X)
@@ -132,7 +153,31 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X):
-        """Transform X by applying the correlation remover."""
+        """Transform X by applying the correlation remover.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The feature matrix to transform. pandas DataFrame, Polars DataFrame,
+            and PyArrow Table inputs are supported. Must have the same number of
+            features as the ``X`` passed to ``fit``.
+
+        Returns
+        -------
+        numpy.ndarray
+            The transformed feature matrix with sensitive correlations removed.
+            The sensitive feature columns are dropped; non-sensitive columns
+            are replaced by their residuals after projecting out the sensitive
+            features, blended with the originals according to ``alpha``.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted yet.
+        ValueError
+            If the number of features in ``X`` differs from the number seen
+            during ``fit``.
+        """
         check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_", "sensitive_mean_"])
 
         X = nw.from_native(X, pass_through=True, eager_only=True)
