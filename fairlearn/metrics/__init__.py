@@ -25,19 +25,23 @@ for each combination of subgroups.
 
 import sys as _sys
 
-from ._base_metrics import count  # noqa: F401
-from ._base_metrics import false_negative_rate  # noqa: F401
-from ._base_metrics import false_positive_rate  # noqa: F401
-from ._base_metrics import mean_prediction  # noqa: F401
-from ._base_metrics import selection_rate  # noqa: F401
-from ._base_metrics import true_negative_rate  # noqa: F401
-from ._base_metrics import true_positive_rate  # noqa: F401
-from ._fairness_metrics import demographic_parity_difference  # noqa: F401
-from ._fairness_metrics import demographic_parity_ratio  # noqa: F401
-from ._fairness_metrics import equal_opportunity_difference  # noqa: F401
-from ._fairness_metrics import equal_opportunity_ratio  # noqa: F401
-from ._fairness_metrics import equalized_odds_difference  # noqa: F401
-from ._fairness_metrics import equalized_odds_ratio  # noqa: F401
+from ._base_metrics import (
+    count,  # noqa: F401
+    false_negative_rate,  # noqa: F401
+    false_positive_rate,  # noqa: F401
+    mean_prediction,  # noqa: F401
+    selection_rate,  # noqa: F401
+    true_negative_rate,  # noqa: F401
+    true_positive_rate,  # noqa: F401
+)
+from ._fairness_metrics import (
+    demographic_parity_difference,  # noqa: F401
+    demographic_parity_ratio,  # noqa: F401
+    equal_opportunity_difference,  # noqa: F401
+    equal_opportunity_ratio,  # noqa: F401
+    equalized_odds_difference,  # noqa: F401
+    equalized_odds_ratio,  # noqa: F401
+)
 from ._generated_metrics import _generated_metric_dict
 from ._make_derived_metric import make_derived_metric  # noqa: F401
 from ._metric_frame import MetricFrame  # noqa: F401

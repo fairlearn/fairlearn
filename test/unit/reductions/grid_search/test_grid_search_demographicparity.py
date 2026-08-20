@@ -2,7 +2,6 @@
 # Licensed under the MIT License.
 
 import copy
-from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 
 import numpy as np
 import pandas as pd
@@ -11,6 +10,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 
 from fairlearn.reductions import DemographicParity, GridSearch
+from test.unit.reductions.grid_search.utilities import assert_n_grid_search_results
 
 
 def _simple_threshold_data(
