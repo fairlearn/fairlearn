@@ -1,13 +1,12 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.utils import DATA_HOME
-
 import pytest
 from numpy import asarray, issubdtype, ndarray
 
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.datasets import fetch_adult
+from test.utils import DATA_HOME
 
 
 def data_generator():
