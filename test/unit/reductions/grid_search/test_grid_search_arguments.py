@@ -3,19 +3,6 @@
 
 import logging
 import re
-from test.unit.input_convertors import (
-    conversions_for_1d,
-    ensure_dataframe,
-    ensure_ndarray,
-)
-from test.unit.reductions.conftest import is_invalid_transformation
-from test.unit.reductions.exponentiated_gradient.simple_learners import (
-    LeastSquaresRegressor,
-)
-from test.unit.reductions.grid_search.utilities import (
-    _quick_data,
-    assert_n_grid_search_results,
-)
 
 import numpy as np
 import pandas as pd
@@ -42,6 +29,19 @@ from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
     _MESSAGE_X_Y_ROWS,
     _MESSAGE_Y_NONE,
+)
+from test.unit.input_convertors import (
+    conversions_for_1d,
+    ensure_dataframe,
+    ensure_ndarray,
+)
+from test.unit.reductions.conftest import is_invalid_transformation
+from test.unit.reductions.exponentiated_gradient.simple_learners import (
+    LeastSquaresRegressor,
+)
+from test.unit.reductions.grid_search.utilities import (
+    _quick_data,
+    assert_n_grid_search_results,
 )
 
 # ==============================================================

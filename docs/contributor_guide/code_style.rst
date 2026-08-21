@@ -29,11 +29,11 @@ Linting
 ^^^^^^^
 
 We recommend using a linter to check your code before you submit a PR.
-We use ``ruff`` to check for PEP8 compatibility issues. You can either follow
-the guidelines, or you can run ``black`` on your code. The generated
-formatting by ``black`` is compatible our with formatting requirements. You can
-configure your IDE to use ``black`` to format your code. Please refer to your
-IDE's instructions for further details.
+We use ``ruff`` for both linting (checking for PEP8 compatibility issues) and
+code formatting. You can check your code with ``ruff check`` and automatically
+format it with ``ruff format``; the two together satisfy our formatting
+requirements. You can also configure your IDE to run ``ruff`` on save. Please
+refer to your IDE's instructions for further details.
 Attaining the project compatible linting is also possible without changing your local setup.
 You can enable the pre-commit hooks, which will run the linters described above with the settings
 defined in the `pyproject.toml <https://github.com/fairlearn/fairlearn/blob/main/pyproject.toml>`_.

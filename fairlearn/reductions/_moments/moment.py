@@ -49,7 +49,8 @@ class Moment:
         sensitive_features : numpy.ndarray, Series object supported by narwhals, or list, default=None
             The sensitive feature vector.
         """
-        assert self.data_loaded is False, "data can be loaded only once"
+        if self.data_loaded:
+            raise ValueError("data can be loaded only once")
         self.X = X
         self._y = y
         # TODO (when dependency from pandas is being removed): Dynamically change
