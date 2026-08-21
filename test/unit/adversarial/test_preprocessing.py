@@ -1,13 +1,12 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.utils import DATA_HOME
-
 import pytest
 from numpy import asarray, issubdtype, ndarray
 
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.datasets import fetch_adult
+from test.utils import DATA_HOME
 
 
 def data_generator():
@@ -33,15 +32,6 @@ def data_generator():
     yield ["USA", "NL", "GB", "NL"], "category"
     yield [1, 2, 6, 2, 1.1], "continuous"
     yield [0.1, 2.0, 0.999999, 100000.1], "continuous"
-
-    # Larger examples.
-    X, y = fetch_adult(return_X_y=True, data_home=DATA_HOME)
-    yield y.tolist(), "binary"
-    non_NaN_rows = ~X.isna().any(axis=1)
-    X = X[non_NaN_rows]
-    yield X["native-country"].tolist(), "category"
-    yield X["sex"].tolist(), "binary"
-    # yield X['capital-loss'], 'continuous' # FIXME: what should this be?
 
 
 def checker(data):
@@ -70,5 +60,26 @@ def test_data_as_datatypes(data, data_type):
     if data_type:
         if len(other) > 0 and data_type in other[0]:
             return
+        data = data_type(data)
+    checker(data)
+
+
+@pytest.fixture(scope="module")
+def adult_data():
+    X, y = fetch_adult(return_X_y=True, data_home=DATA_HOME)
+    X = X[~X.isna().any(axis=1)]
+    return {
+        "target": y.tolist(),
+        "native-country": X["native-country"].tolist(),
+        "sex": X["sex"].tolist(),
+    }
+
+
+@pytest.mark.openml
+@pytest.mark.parametrize("column", ["target", "native-country", "sex"])
+@pytest.mark.parametrize("data_type", [None, asarray])
+def test_adult_data_as_datatypes(adult_data, column, data_type):
+    data = adult_data[column]
+    if data_type:
         data = data_type(data)
     checker(data)
