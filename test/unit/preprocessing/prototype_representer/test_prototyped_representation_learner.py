@@ -3,10 +3,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 import pytest
-from test._sklearn_compat import parametrize_with_checks
 
 from fairlearn.preprocessing import PrototypeRepresentationLearner
 from fairlearn.utils._input_validation import _merge_columns
+from test._sklearn_compat import parametrize_with_checks
 
 
 @parametrize_with_checks(

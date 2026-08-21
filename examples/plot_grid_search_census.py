@@ -205,7 +205,7 @@ for row in all_results.itertuples():
 
 predictions = {"unmitigated": unmitigated_predictor.predict(X_test)}
 for i, predictor in enumerate(non_dominated):
-    predictions["dominant_model_{0}".format(i)] = predictor.predict(X_test)
+    predictions[f"dominant_model_{i}"] = predictor.predict(X_test)
 
 plot_model_comparison(
     x_axis_metric=skm.accuracy_score,

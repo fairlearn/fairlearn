@@ -6,13 +6,8 @@
 # Since that file does its own testing setup
 
 # Required for environment
-ruff==0.4.5
+ruff==0.15.20
 requirements-parser
-# Need to keep black version consistent in
-# requirements-dev.txt
-# linting.yml
-# .pre-commit-config.yaml
-black==26.3.1
 
 # Required for building sdist and wheel
 build
