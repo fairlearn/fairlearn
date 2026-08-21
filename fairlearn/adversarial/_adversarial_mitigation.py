@@ -873,6 +873,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     :code:`y` as input. For multi-class classification, :code:`y` is
     transformed using one-hot encoding.
 
+    .. versionadded:: 0.8.0
+
     Parameters
     ----------
     backend : str, BackendEngine, default = 'auto'
@@ -980,8 +982,6 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-
-    .. versionadded:: 0.8.0
     """
 
     def __init__(
@@ -1072,6 +1072,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
 
     The adversarial model for equalized odds additionally takes
     :code:`y` as input.
+
+    .. versionadded:: 0.8.0
 
     Parameters
     ----------
@@ -1174,8 +1176,6 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     random_state : int, RandomState, default = None
         Controls the randomized aspects of this algorithm, such as shuffling.
         Useful to get reproducible output across multiple function calls.
-
-    .. versionadded:: 0.8.0
     """
 
     def __init__(
