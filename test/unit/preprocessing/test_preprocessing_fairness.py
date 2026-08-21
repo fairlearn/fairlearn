@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from test.utils import DATA_HOME
 
 import numpy as np
 import pandas as pd
@@ -19,8 +18,10 @@ from fairlearn.metrics import (
     equalized_odds_difference,
 )
 from fairlearn.preprocessing import CorrelationRemover, PrototypeRepresentationLearner
+from test.utils import DATA_HOME
 
 PreprocessingAlgorithm = CorrelationRemover | PrototypeRepresentationLearner
+pytestmark = pytest.mark.openml
 
 
 @dataclass(frozen=True)

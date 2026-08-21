@@ -138,7 +138,7 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
         import warnings
 
         warnings.warn(
-            f"ci_quantiles has {len(pairs)} entries; " "using the outermost pair for error bars.",
+            f"ci_quantiles has {len(pairs)} entries; using the outermost pair for error bars.",
             stacklevel=2,
         )
 
@@ -253,7 +253,7 @@ def plot_metric_frame(
 
     df = metric_frame.by_group
 
-    # Normalise to DataFrame so column iteration works for single-metric
+    # Normalize to DataFrame so column iteration works for single-metric
     # frames where by_group is a Series.
     if isinstance(df, pd.Series):
         df = df.to_frame()
