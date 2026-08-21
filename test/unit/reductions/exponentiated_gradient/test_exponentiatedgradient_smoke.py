@@ -858,7 +858,7 @@ class TestExponentiatedGradientSmoke:
         disparity_moment.load_data(X, y, sensitive_features=A)
         objective_moment.load_data(X, y, sensitive_features=A)
         disparity = disparity_moment.gamma(Q).max()
-        error = objective_moment.gamma(Q).iloc[0]
+        error = objective_moment.objective_value(Q)
         assert disparity == pytest.approx(data["disp"], abs=_PRECISION)
         assert error == pytest.approx(data["error"], abs=_PRECISION)
 
@@ -904,7 +904,7 @@ class TestExponentiatedGradientSmoke:
             default_objective = MeanLoss(data["loss"])
             default_objective.load_data(X, y, sensitive_features=A)
             disparity = disparity_moment.gamma(Q).max()
-            error = default_objective.gamma(Q).iloc[0]
+            error = default_objective.objective_value(Q)
             assert disparity == pytest.approx(data["disp"][i], abs=_PRECISION)
             assert error == pytest.approx(data["error"][i], abs=_PRECISION)
             assert expgrad.weights_[i] == pytest.approx(data["weights"][i], abs=_PRECISION)
@@ -1022,9 +1022,9 @@ class TestExponentiatedGradientSmoke:
 
             objective_eval = deepcopy(objective_moment)
             objective_eval.load_data(X, y, sensitive_features=A)
-            total_error = objective_eval.gamma(Q).iloc[0] * len(y)
+            total_error = objective_eval.objective_value(Q) * len(y)
             results[method] = {
-                "error": objective_eval.gamma(Q).iloc[0],
+                "error": objective_eval.objective_value(Q),
                 "total_error": total_error,
                 "disp": disparity,
                 "n_predictors": len(expgrad.predictors_),

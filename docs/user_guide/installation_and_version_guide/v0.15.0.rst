@@ -44,10 +44,9 @@ Other improvements
 
 * :class:`~fairlearn.reductions.ErrorRate` now supports :code:`X`, :code:`y`, and
   :code:`sensitive_features` from pandas, Polars, or PyArrow dataframe libraries.
-  :meth:`~fairlearn.reductions.ErrorRate.gamma` and
-  :meth:`~fairlearn.reductions.ErrorRate.signed_weights` preserve pandas return
-  types for NumPy and pandas inputs for backwards compatibility, and otherwise
-  return the input dataframe library's native type: :pr:`1526` by
+  :meth:`~fairlearn.reductions.ErrorRate.gamma` returns an
+  :class:`~fairlearn.reductions.ErrorRateResult` with the scalar weighted error,
+  without relying on dataframe index semantics: :pr:`1526` by
   :user:`Stefanie Senger <StefanieSenger>`.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:

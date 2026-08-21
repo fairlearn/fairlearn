@@ -7,7 +7,7 @@ import pytest
 from sklearn.datasets import make_classification
 from sklearn.ensemble import HistGradientBoostingClassifier
 
-from fairlearn.reductions import ErrorRate
+from fairlearn.reductions import ErrorRate, ErrorRateResult
 from fairlearn.reductions._moments.error_rate import _MESSAGE_BAD_COSTS
 
 BAD_COSTS_EXAMPLES = [
@@ -69,23 +69,21 @@ def test_error_rate_narwhals_compatible():
     errorrate_pl.load_data(X_pl, y_pl, sensitive_features=sensitive_features_pl)
     errorrate_pa.load_data(X_pa, y_pa, sensitive_features=sensitive_features_pa)
 
-    # check `ErrorRate.gamma()` returns similar returns for all input types
+    # check `ErrorRate.gamma()` returns similar results for all input types
     classifier = HistGradientBoostingClassifier().fit(X, y)
     error_np = errorrate_np.gamma(classifier.predict)
-    assert isinstance(error_np, pd.Series)
+    assert isinstance(error_np, ErrorRateResult)
 
     classifier = HistGradientBoostingClassifier().fit(X_pd, y_pd)
     error_pd = errorrate_pd.gamma(classifier.predict)
-    assert isinstance(error_pd, pd.Series)
+    assert isinstance(error_pd, ErrorRateResult)
 
     classifier = HistGradientBoostingClassifier().fit(X_pl, y_pl)
     error_pl = errorrate_pl.gamma(classifier.predict)
-    assert isinstance(error_pl, pl.Series)
+    assert isinstance(error_pl, ErrorRateResult)
 
     classifier = HistGradientBoostingClassifier().fit(X_pa, y_pa)
     error_pa = errorrate_pa.gamma(classifier.predict)
-    assert isinstance(error_pa, (pa.Array, pa.ChunkedArray))
+    assert isinstance(error_pa, ErrorRateResult)
 
-    assert np.array_equal(error_np.to_numpy(), error_pd.to_numpy())
-    assert np.array_equal(error_np.to_numpy(), error_pl.to_numpy())
-    assert np.array_equal(error_np.to_numpy(), error_pa.to_numpy())
+    assert error_np == error_pd == error_pl == error_pa

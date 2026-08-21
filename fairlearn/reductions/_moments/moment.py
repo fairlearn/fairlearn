@@ -83,6 +83,10 @@ class Moment:
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
+    def objective_value(self, predictor: Callable) -> float:
+        """Calculate the scalar objective value for the predictor."""
+        return float(self.gamma(predictor).iloc[0])
+
     def bound(self) -> pd.Series:
         """Return vector of fairness bound constraint the length of gamma."""
         raise NotImplementedError()
