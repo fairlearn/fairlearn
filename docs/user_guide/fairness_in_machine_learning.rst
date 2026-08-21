@@ -479,7 +479,7 @@ Defining terms
 
 Note: Some have identified that using the term *stakeholder* may perpetuate colonial harm in some contexts :footcite:`reed2024stakeholder`. It is important to pay attention to the context in which stakeholder identification occurs and adjust accordingly (e.g. opt for alternative terminology to avoid causing harm).
 
- $newSection 
+**Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
 .. topic:: References
 
