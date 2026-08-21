@@ -5,6 +5,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
+from sklearn.utils.validation import check_is_fitted
 
 
 class FloatTransformer(TransformerMixin, BaseEstimator):
@@ -96,6 +97,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
 
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
+        check_is_fitted(self)
         if isinstance(self.transformer, str) or self.transformer is None:
             return (
                 self.transform_.transform(self._check(X)).astype(float)
@@ -107,6 +109,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
+        check_is_fitted(self)
         if self.transformer is None or isinstance(self.transformer, str):
             if self.inferred_type_ == "continuous":
                 inverse = y
