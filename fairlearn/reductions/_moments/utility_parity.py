@@ -146,6 +146,8 @@ class UtilityParity(ClassificationMoment):
 
         """
         super().load_data(X, y, sensitive_features=sensitive_features)
+        # TODO: remove following line when UtilityParity is being narwhalified:
+        self.tags = self.tags.to_native()
         self.tags[_EVENT] = event
         if utilities is None:
             utilities = np.vstack(

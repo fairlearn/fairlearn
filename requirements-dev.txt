@@ -13,6 +13,8 @@ requirements-parser
 build
 
 # Required for test
+polars
+pyarrow
 pytest
 pytest-cov
 pytest-mock
