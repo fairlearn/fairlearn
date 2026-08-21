@@ -109,7 +109,7 @@ def plot_roc_curve_by_group(
     try:
         import matplotlib.pyplot as plt
     except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE) from None
 
     y_true = asarray(y_true)
     y_score = asarray(y_score)
