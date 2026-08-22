@@ -5,6 +5,20 @@ from __future__ import annotations
 import narwhals.stable.v1 as nw
 
 _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
+_FEATURE_HAS_MISSING_VALUES = (
+    "Feature '{0}' contains missing values. Remove or replace them before "
+    "constructing a MetricFrame"
+)
+
+
+def _is_missing(value) -> bool:
+    # pd.NA raises rather than returning a bool from the self-inequality check
+    if value is None:
+        return True
+    try:
+        return bool(value != value)
+    except (TypeError, ValueError):
+        return True
 
 
 class GroupFeature:
@@ -55,3 +69,6 @@ class GroupFeature:
             if not isinstance(name_, str):
                 raise ValueError(_SERIES_NAME_NOT_STRING.format(name_, type(name_)))
             self.name_ = name_
+
+        if any(_is_missing(x) for x in self.raw_feature_):
+            raise ValueError(_FEATURE_HAS_MISSING_VALUES.format(self.name_))
