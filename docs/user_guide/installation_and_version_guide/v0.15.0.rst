@@ -38,6 +38,11 @@ Bug fixes
   :code:`NotFittedError` instead of :code:`AttributeError` when called before
   :code:`fit`: :pr:`1709` by :user:`SpiliosDimakopoulos`.
 
+Narwhals integration
+--------------------
+
+* Made the :code:`fairlearn.utils` module dataframe agnostic through Narwhals: :pr:`1533` by :user:`Edoardo Abati <EdAbati>`.
+
 Documentation
 -------------
 
