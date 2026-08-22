@@ -31,6 +31,7 @@ from ._constants import (
     _KWARG_ERROR_MESSAGE,
     _PREDICTION_FUNCTION_AMBIGUOUS,
     _PROGRESS_UPDATE,
+    _X_NOT_2D,
 )
 from ._preprocessor import FloatTransformer
 from ._pytorch_engine import PytorchEngine
@@ -586,6 +587,8 @@ class _AdversarialFairness(BaseEstimator):
             allow_nd=True,
             reset=False,
         )
+        if X.ndim != 2:
+            raise ValueError(_X_NOT_2D.format(X.ndim))
         y_pred = self.backendEngine_.evaluate(X)
         return y_pred
 
@@ -651,6 +654,8 @@ class _AdversarialFairness(BaseEstimator):
                 allow_nd=True,
                 ensure_2d=True,
             )
+            if X.ndim != 2:
+                raise ValueError(_X_NOT_2D.format(X.ndim))
             if y is not None:
                 y = validate_data(self, y, dtype=None, ensure_2d=False)
                 if y.ndim != 1:
