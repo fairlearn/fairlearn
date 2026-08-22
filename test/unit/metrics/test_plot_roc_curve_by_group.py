@@ -215,3 +215,39 @@ class TestPlotRocCurveByGroup:
             mask = g_1 == group
             expected_auc = roc_auc_score((y_str[mask] == "yes").astype(int), y_score[mask])
             assert f"{group} (AUC = {expected_auc:0.2f})" in labels
+
+    def test_missing_sensitive_feature_value_is_skipped_not_raised(self):
+        """A NaN sensitive feature value should not crash the plot.
+
+        This mirrors how `MetricFrame.by_group` treats such rows: they are
+        excluded from any single subgroup's curve, but the overall curve
+        still uses every row.
+        """
+        sf = np.asarray(g_1, dtype=object).copy()
+        sf[0] = np.nan
+
+        ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=sf)
+
+        labels = [line.get_label() for line in ax.get_lines()]
+        assert not any("nan" in label.lower() for label in labels)
+
+        known_mask = np.array([not (isinstance(v, float) and np.isnan(v)) for v in sf])
+        for group in sorted(np.unique(sf[known_mask])):
+            mask = known_mask & (sf == group)
+            expected_auc = roc_auc_score(y_t[mask], y_score[mask])
+            assert f"{group} (AUC = {expected_auc:0.2f})" in labels
+
+        # The overall curve still reflects every row, including the one with
+        # the missing sensitive feature value.
+        expected_overall_auc = roc_auc_score(y_t, y_score)
+        assert f"Overall (AUC = {expected_overall_auc:0.2f})" in labels
+
+    def test_all_missing_sensitive_feature_values(self):
+        """No per-group curves are drawn if every value is missing."""
+        sf = np.full(len(y_t), np.nan, dtype=object)
+
+        ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=sf)
+
+        labels = [line.get_label() for line in ax.get_lines()]
+        assert not any("nan" in label.lower() for label in labels)
+        assert _expected_label("Overall", y_t, y_score) in labels

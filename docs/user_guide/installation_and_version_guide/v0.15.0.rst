@@ -37,6 +37,15 @@ Bug fixes
   :code:`FloatTransformer.inverse_transform` so that they raise
   :code:`NotFittedError` instead of :code:`AttributeError` when called before
   :code:`fit`: :pr:`1709` by :user:`SpiliosDimakopoulos`.
+* :func:`~fairlearn.metrics.plot_roc_curve_by_group` raised
+  :code:`ValueError: Input contains NaN` for any row with a missing sensitive
+  feature value, even though its docstring says it follows the same
+  convention as :class:`~fairlearn.metrics.MetricFrame`, whose
+  :code:`by_group` results simply omit such rows. It now matches that
+  convention: rows with a missing sensitive feature value are included in
+  the overall curve but skipped when drawing per-group curves, instead of
+  raising: :pr:`REPLACE_WITH_PR_NUMBER` by
+  :user:`REPLACE_WITH_YOUR_GITHUB_USERNAME`.
 
 Documentation
 -------------
