@@ -394,6 +394,49 @@ def test_backend_engine_rejects_non_2d_X(fake_backend_env):
         mitigator.fit(X, Y, sensitive_features=Z)
 
 
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_partial_fit_rejects_non_2d_X_on_second_call(fake_backend_env):
+    """partial_fit should reject non-2D X even after the backend engine exists.
+
+    The first call to partial_fit sets up the backend engine (which validates
+    ndim), but subsequent calls go straight to backendEngine_.train_step and
+    used to skip that check entirely.
+    """
+    rng = np.random.default_rng(0)
+    X = rng.random((20, 3))
+    Y = rng.integers(0, 2, size=20)
+    Z = rng.integers(0, 2, size=20)
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_training=True,
+        predictor_model=[10, "Sigmoid"],
+    )
+    mitigator.partial_fit(X, Y, classes=[0, 1], sensitive_features=Z)
+
+    bad_X = rng.random((20, 3, 4))
+    with pytest.raises(ValueError, match="two-dimensional"):
+        mitigator.partial_fit(bad_X, Y, sensitive_features=Z)
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_predict_rejects_non_2d_X(fake_backend_env):
+    """predict() should reject non-2D X instead of passing it to the backend."""
+    rng = np.random.default_rng(0)
+    X = rng.random((20, 3))
+    Y = rng.integers(0, 2, size=20)
+    Z = rng.integers(0, 2, size=20)
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_training=True,
+        predictor_model=[10, "Sigmoid"],
+    )
+    mitigator.fit(X, Y, sensitive_features=Z)
+
+    bad_X = rng.random((20, 3, 4))
+    with pytest.raises(ValueError, match="two-dimensional"):
+        mitigator.predict(bad_X)
+
+
 @pytest.mark.parametrize(
     "data, valid_choice",
     [

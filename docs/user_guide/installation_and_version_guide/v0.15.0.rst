@@ -37,6 +37,12 @@ Bug fixes
   :code:`FloatTransformer.inverse_transform` so that they raise
   :code:`NotFittedError` instead of :code:`AttributeError` when called before
   :code:`fit`: :pr:`1709` by :user:`SpiliosDimakopoulos`.
+* Extended the :code:`X` dimensionality check added in :pr:`1671` to
+  :code:`_AdversarialFairness.predict` and to repeated/:code:`partial_fit`
+  calls, which previously bypassed :code:`BackendEngine.__init__` (and
+  therefore the check) entirely and could silently mis-size predictions or
+  hand non-2D data straight to the backend model: :pr:`REPLACE_WITH_PR_NUMBER`
+  by :user:`REPLACE_WITH_YOUR_GITHUB_USERNAME`.
 
 Documentation
 -------------
