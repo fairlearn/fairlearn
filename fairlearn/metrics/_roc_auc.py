@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 import pandas as pd
-from numpy import asarray, zeros
+from numpy import asarray
 from sklearn.metrics import RocCurveDisplay
+from sklearn.utils import check_array, check_consistent_length
 
 from ..postprocessing._constants import _MATPLOTLIB_IMPORT_ERROR_MESSAGE
 from ..utils._input_validation import (
     _INCONSISTENT_ARRAY_LENGTH,
-    _validate_and_reformat_input,
+    _merge_columns,
 )
 
 _CHANCE_LEVEL_LABEL = "Chance level (AUC = 0.50)"
@@ -40,7 +41,11 @@ def plot_roc_curve_by_group(
 
     When more than one sensitive feature is provided, the unique combinations of
     their values define the subgroups (for example ``"Female,White"``), following
-    the same convention as :class:`~fairlearn.metrics.MetricFrame`.
+    the same convention as :class:`~fairlearn.metrics.MetricFrame`. Rows with a
+    missing (``NaN``) sensitive feature value are included in the overall curve
+    but are skipped when drawing per-group curves, since they cannot be assigned
+    to a subgroup -- again matching :class:`~fairlearn.metrics.MetricFrame`,
+    whose :code:`by_group` results omit such rows.
 
     .. versionadded:: 0.15.0
 
@@ -118,14 +123,20 @@ def plot_roc_curve_by_group(
 
     # Validate and merge the sensitive feature(s) into a single Series of group
     # names without coercing y_true, so that non-numeric class labels remain
-    # usable together with pos_label.
+    # usable together with pos_label. Unlike the shared
+    # `_validate_and_reformat_input` helper, this does not reject missing
+    # (NaN) values: a NaN sensitive feature value means "unknown group", not
+    # invalid input, and rows with such values are skipped below rather than
+    # raising -- matching how `MetricFrame.by_group` treats them.
     if isinstance(sensitive_features, dict):
         sensitive_features = pd.DataFrame(sensitive_features)
-    *_, sensitive_features, _ = _validate_and_reformat_input(
-        zeros((len(y_true), 1)),  # dummy X; only sensitive_features is needed
-        expect_y=False,
-        sensitive_features=sensitive_features,
+    check_consistent_length(y_true, sensitive_features)
+    sensitive_features = check_array(
+        sensitive_features, ensure_2d=False, dtype=None, ensure_all_finite=False
     )
+    if sensitive_features.ndim > 1 and sensitive_features.shape[1] > 1:
+        sensitive_features = _merge_columns(sensitive_features)
+    sensitive_features = pd.Series(sensitive_features.squeeze())
 
     if ax is None:
         _, ax = plt.subplots()
@@ -142,7 +153,7 @@ def plot_roc_curve_by_group(
             ax=ax,
         )
 
-    for group in sorted(sensitive_features.unique()):
+    for group in sorted(sensitive_features.dropna().unique()):
         mask = (sensitive_features == group).to_numpy()
         RocCurveDisplay.from_predictions(
             y_true[mask],
