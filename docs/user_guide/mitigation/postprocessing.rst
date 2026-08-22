@@ -136,8 +136,10 @@ true positive rate parity as the fairness constraint.
                        predict_method='predict_proba')
     >>> threshold_optimizer.predict(X_test, sensitive_features=A_test, random_state=12345)
     array([0, 0, 0, ..., 0, 1, 0], shape=(30529,))
-    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
-    >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
+    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.threshold_interpolation
+    >>> # `threshold_rules_by_group` is a pandas.DataFrame indexed by sensitive
+    >>> # feature value. Print via `.to_dict('index')` for stable formatting.
+    >>> print(json.dumps(threshold_rules_by_group.to_dict('index'), default=str, indent=4))
     {
         "Female": {
             "p0": 0.628...,
@@ -306,56 +308,56 @@ two groups.
                                                   LogisticRegression(solver='liblinear'))]),
                        objective='balanced_accuracy_score',
                        predict_method='predict_proba')
-    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.interpolation_dict
-    >>> print(json.dumps(threshold_rules_by_group, default=str, indent=4))
+    >>> threshold_rules_by_group = threshold_optimizer.interpolated_thresholder_.threshold_interpolation
+    >>> print(json.dumps(threshold_rules_by_group.to_dict('index'), default=str, indent=4))
     {
         "AfricanAmerican": {
-            "p_ignore": 0.107...,
-            "prediction_constant": 0.511,
             "p0": 0.987...,
             "operation0": "[>0.093...]",
             "p1": 0.012...,
-            "operation1": "[>0.081...]"
+            "operation1": "[>0.081...]",
+            "p_ignore": 0.107...,
+            "prediction_constant": 0.511
         },
         "Asian": {
-            "p_ignore": 0.445...,
-            "prediction_constant": 0.511,
             "p0": 0.921...,
             "operation0": "[>0.084...]",
             "p1": 0.078...,
-            "operation1": "[>0.066...]"
+            "operation1": "[>0.066...]",
+            "p_ignore": 0.445...,
+            "prediction_constant": 0.511
         },
         "Caucasian": {
-            "p_ignore": 0.071...,
-            "prediction_constant": 0.511,
             "p0": 0.708...,
             "operation0": "[>0.097...]",
             "p1": 0.291...,
-            "operation1": "[>0.088...]"
+            "operation1": "[>0.088...]",
+            "p_ignore": 0.071...,
+            "prediction_constant": 0.511
         },
         "Hispanic": {
-            "p_ignore": 0.311...,
-            "prediction_constant": 0.511,
             "p0": 0.864...,
             "operation0": "[>0.084...]",
             "p1": 0.135...,
-            "operation1": "[>0.080...]"
+            "operation1": "[>0.080...]",
+            "p_ignore": 0.311...,
+            "prediction_constant": 0.511
         },
         "Other": {
-            "p_ignore": 0.0,
-            "prediction_constant": 0.511,
             "p0": 0.373...,
             "operation0": "[>0.113...]",
             "p1": 0.626...,
-            "operation1": "[>0.069...]"
+            "operation1": "[>0.069...]",
+            "p_ignore": 0.0,
+            "prediction_constant": 0.511
         },
         "Unknown": {
-            "p_ignore": 0.000...,
-            "prediction_constant": 0.511,
             "p0": 0.183...,
             "operation0": "[>0.094...]",
             "p1": 0.816...,
-            "operation1": "[>0.065...]"
+            "operation1": "[>0.065...]",
+            "p_ignore": 0.000...,
+            "prediction_constant": 0.511
         }
     }
     >>> plot_threshold_optimizer(threshold_optimizer)

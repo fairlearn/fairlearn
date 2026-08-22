@@ -9,6 +9,12 @@ v0.15.0
 New features
 ------------
 
+* Exposed :class:`~fairlearn.postprocessing.InterpolatedThresholder` and
+  :class:`~fairlearn.postprocessing.ThresholdOperation` as public objects in
+  :mod:`fairlearn.postprocessing`. See the breaking-changes entry below for
+  the accompanying reshape of
+  :class:`~fairlearn.postprocessing.InterpolatedThresholder`'s per-group
+  interpolation data: :pr:`918` by :user:`Roman Lutz <romanlutz>`.
 * Added :func:`~fairlearn.metrics.plot_roc_curve_by_group` to plot ROC curves
   disaggregated by sensitive feature, together with the overall curve and a
   chance-level baseline. The corresponding AUC scores can be obtained with
@@ -19,6 +25,41 @@ New features
   now auto-detects them from :attr:`~fairlearn.metrics.MetricFrame.by_group_ci` when
   the *conf_intervals* argument is not supplied:
   :pr:`1674` by :user:`Dresden <DresdenGman>`.
+
+Breaking changes
+----------------
+
+* Reshaped :class:`~fairlearn.postprocessing.InterpolatedThresholder`'s
+  per-group interpolation data. The old :code:`interpolation_dict`
+  constructor argument and attribute (a mapping from sensitive feature
+  value to a :class:`sklearn.utils.Bunch`) has been replaced by
+  :code:`threshold_interpolation`, a single :class:`pandas.DataFrame`
+  indexed by sensitive feature value with columns :code:`p0`,
+  :code:`operation0`, :code:`p1`, :code:`operation1` (and additionally
+  :code:`p_ignore`, :code:`prediction_constant` when the equalized-odds
+  constraint is used). Users who construct
+  :class:`~fairlearn.postprocessing.InterpolatedThresholder` directly, or
+  who read the attribute off a fitted
+  :class:`~fairlearn.postprocessing.ThresholdOptimizer` via
+  :code:`interpolated_thresholder_`, need to update both the name and the
+  access pattern. For example:
+
+  .. code-block:: python
+
+     # Before (v0.14 and earlier)
+     it = threshold_optimizer.interpolated_thresholder_
+     p0 = it.interpolation_dict[group].p0
+     op0 = it.interpolation_dict[group].operation0
+
+     # After (v0.15)
+     it = threshold_optimizer.interpolated_thresholder_
+     p0 = it.threshold_interpolation.loc[group, "p0"]
+     op0 = it.threshold_interpolation.loc[group, "operation0"]
+
+     # To recover the old nested-dict view:
+     nested = it.threshold_interpolation.to_dict("index")
+
+  :pr:`918` by :user:`Roman Lutz <romanlutz>`.
 
 Bug fixes
 ---------
