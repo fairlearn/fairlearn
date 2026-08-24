@@ -8,10 +8,11 @@ from typing import Literal
 
 import narwhals.stable.v1 as nw
 import numpy as np
+import pandas as pd
 
 from fairlearn.utils._input_validation import _validate_and_reformat_input
 
-from .moment import _ALL, _LABEL, ClassificationMoment
+from .moment import _ALL, _LABEL, _PREDICTION, ClassificationMoment
 
 _MESSAGE_BAD_COSTS = (
     "costs needs to be a dictionary with keys "
@@ -118,13 +119,8 @@ class ErrorRate(ClassificationMoment):
         """
         # self.X passed into the predict function of an estimator needs not to be a
         # narwhals type, in case third party libraries don't depend on narwhals:
-        y_pred = predictor(self.X)
-        y_pred = nw.from_native(y_pred, pass_through=True, eager_only=True)
-        if isinstance(y_pred, np.ndarray):
-            # TensorFlow is returning an (n,1) array, which results
-            # in the subtraction in the 'error =' line generating an
-            # (n,n) array
-            y_pred = np.squeeze(y_pred)
+        y_pred = np.atleast_1d(np.squeeze(np.asarray(predictor(self.X))))
+        y_pred = nw.new_series(name=_PREDICTION, values=y_pred, native_namespace=pd)
         signed_errors = self.tags[_LABEL] - y_pred
         total_fn_cost = (signed_errors.filter(signed_errors > 0) * self.fn_cost).sum()
         total_fp_cost = (signed_errors.filter(signed_errors < 0) * self.fp_cost * -1).sum()
