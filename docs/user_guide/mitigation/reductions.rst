@@ -373,7 +373,7 @@ To measure the ErrorRate in respect to a trained estimator we use its :code:`gam
     >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
-    >>> sensitive_features = X[:, -1]
+    >>> sensitive_features = X[:, -1].astype(int)
     >>> classifier = LogisticRegression().fit(X, y)
     >>> costs = {"fp":0.1, "fn":0.9}
     >>> errorrate = ErrorRate(costs=costs)
@@ -395,7 +395,7 @@ to a cost-sensitive classification problem.
     >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
-    >>> sensitive_features = X[:, -1]
+    >>> sensitive_features = X[:, -1].astype(int)
     >>> objective = ErrorRate(costs={"fp":0.1, "fn":0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
     >>> classifier = LogisticRegression()
@@ -410,8 +410,8 @@ to a cost-sensitive classification problem.
     0.5151515151515151
     >>> mf_mitigated.by_group
     sensitive_feature_0
-    0.0    0.611111
-    1.0    0.400000
+    0    0.611111
+    1    0.400000
     Name: accuracy_score, dtype: float64
 
 
