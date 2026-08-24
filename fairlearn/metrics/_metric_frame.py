@@ -115,6 +115,7 @@ class MetricFrame:
         The sensitive features which should be used to create the subgroups.
         At least one sensitive feature must be provided.
         All names (whether on pandas objects or dictionary keys) must be strings.
+        All entries in these structures must be scalar non-float values (e.g., strings, integers).
         We also forbid DataFrames with column names of ``None``.
         For cases where no names are provided we generate names ``sensitive_feature_[n]``.
 
@@ -126,6 +127,7 @@ class MetricFrame:
         will have one value for each subgroup in the control feature(s),
         rather than a single value for the entire data set.
         Control features can be specified similarly to the sensitive features.
+        The same scalar non-float entry requirement applies.
         However, their default names (if none can be identified in the
         input values) are of the format ``control_feature_[n]``.
         See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
