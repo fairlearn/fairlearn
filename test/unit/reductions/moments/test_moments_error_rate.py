@@ -21,6 +21,10 @@ BAD_COSTS_EXAMPLES = [
 ]
 
 
+def test_error_rate_result_is_public():
+    assert ErrorRateResult.__module__ == "fairlearn.reductions"
+
+
 @pytest.mark.parametrize("bad_costs", BAD_COSTS_EXAMPLES)
 def test_bad_costs(bad_costs):
     with pytest.raises(ValueError) as execInfo:

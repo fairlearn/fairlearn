@@ -114,6 +114,7 @@ API Docs
    EqualizedOdds
    ErrorRate
    ErrorRateParity
+   ErrorRateResult
    ExponentiatedGradient
    TruePositiveRateParity
    FalsePositiveRateParity

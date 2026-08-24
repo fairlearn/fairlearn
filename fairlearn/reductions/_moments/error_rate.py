@@ -27,6 +27,9 @@ class ErrorRateResult:
     error: float
 
 
+ErrorRateResult.__module__ = "fairlearn.reductions"
+
+
 class ErrorRate(ClassificationMoment[ErrorRateResult]):
     r"""Misclassification error as a moment.
 
