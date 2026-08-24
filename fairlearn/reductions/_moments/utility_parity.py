@@ -35,7 +35,7 @@ def _merge_event_and_control_columns(event_col: pd.Series, control_col) -> pd.Se
     return event_col.combine(control_col, _combine_event_and_control)
 
 
-class UtilityParity(ClassificationMoment):
+class UtilityParity(ClassificationMoment[pd.Series]):
     r"""A generic moment for parity in utilities (or costs) under classification.
 
     This serves as the base class for :class:`DemographicParity`,

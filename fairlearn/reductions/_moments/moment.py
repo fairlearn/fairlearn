@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import Generic, TypeVar
 
 import narwhals.stable.v1 as nw
 import pandas as pd
+
+_GammaResultT = TypeVar("_GammaResultT")
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -16,7 +19,7 @@ _ALL = "all"
 _SIGN = "sign"
 
 
-class Moment:
+class Moment(Generic[_GammaResultT]):
     """Generic moment.
 
     Our implementations of the reductions approach to fairness
@@ -80,13 +83,18 @@ class Moment:
         """Return a pandas (multi-)index listing the constraints."""
         raise NotImplementedError()
 
-    def gamma(self, predictor: Callable) -> pd.Series:
-        """Calculate the degree to which constraints are currently violated by the predictor."""
+    def gamma(self, predictor: Callable) -> _GammaResultT:
+        """Calculate the moment-specific result for the predictor."""
         raise NotImplementedError()
 
     def objective_value(self, predictor: Callable) -> float:
-        """Calculate the scalar objective value for the predictor."""
-        return float(self.gamma(predictor).iloc[0])
+        """Calculate the scalar objective value from a Series-based gamma result."""
+        result = self.gamma(predictor)
+        if not isinstance(result, pd.Series):
+            raise TypeError(
+                "Moments with non-Series gamma results must implement objective_value()."
+            )
+        return float(result.iloc[0])
 
     def bound(self) -> pd.Series:
         """Return vector of fairness bound constraint the length of gamma."""
@@ -114,7 +122,7 @@ class Moment:
 Moment.__module__ = "fairlearn.reductions"
 
 
-class ClassificationMoment(Moment):
+class ClassificationMoment(Moment[_GammaResultT], Generic[_GammaResultT]):
     """Moment that can be expressed as weighted classification error."""
 
     def _moment_type(self):
@@ -126,7 +134,7 @@ class ClassificationMoment(Moment):
 ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
-class LossMoment(Moment):
+class LossMoment(Moment[pd.Series]):
     """Moment that can be expressed as weighted loss."""
 
     def __init__(self, loss):

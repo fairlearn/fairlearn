@@ -27,7 +27,7 @@ class ErrorRateResult:
     error: float
 
 
-class ErrorRate(ClassificationMoment):
+class ErrorRate(ClassificationMoment[ErrorRateResult]):
     r"""Misclassification error as a moment.
 
     A classifier :math:`h(X)` has the misclassification error equal to
