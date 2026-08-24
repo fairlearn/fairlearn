@@ -128,9 +128,7 @@ class ErrorRate(ClassificationMoment):
         signed_errors = self.tags[_LABEL] - y_pred
         total_fn_cost = (signed_errors.filter(signed_errors > 0) * self.fn_cost).sum()
         total_fp_cost = (signed_errors.filter(signed_errors < 0) * self.fp_cost * -1).sum()
-        result = ErrorRateResult(
-            error=float((total_fn_cost + total_fp_cost) / self.total_samples)
-        )
+        result = ErrorRateResult(error=float((total_fn_cost + total_fp_cost) / self.total_samples))
         self._gamma_descr = str(result)
         return result
 
