@@ -150,6 +150,26 @@ def test_project_lambda_smoke_positives():
     assert expected.equals(ls)
 
 
+def test_project_lambda_handles_unequal_group_probabilities_by_event():
+    eqo = EqualizedOdds()
+    y = pd.Series([False] * 6 + [True] * 6)
+    sensitive_features = pd.Series(
+        ["a", "a", "b", "c", "c", "c", "a", "b", "b", "b", "b", "b"]
+    )
+    eqo.load_data(np.zeros((12, 1)), y, sensitive_features=sensitive_features)
+
+    lambda_vec = pd.Series(
+        [4, 2, 30, 8, 1, 1, 8, 0, 3, 7],
+        index=eqo.index,
+        dtype=np.float64,
+    )
+    projected = eqo.project_lambda(lambda_vec)
+
+    assert np.allclose(eqo.signed_weights(projected), eqo.signed_weights(lambda_vec))
+    assert projected.sum() <= lambda_vec.sum()
+    assert np.allclose(eqo.project_lambda(projected), projected)
+
+
 def test_signed_weights():
     eqo = EqualizedOdds()
     assert eqo.short_name == "EqualizedOdds"
