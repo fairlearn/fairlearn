@@ -3,6 +3,7 @@
 
 import pytest
 from numpy import asarray, issubdtype, ndarray
+from sklearn.exceptions import NotFittedError
 
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from fairlearn.datasets import fetch_adult
@@ -51,6 +52,14 @@ def checker(data):
         or isinstance(is_equal, ndarray)
         and is_equal.all().all()
     )
+
+
+@pytest.mark.parametrize("method_name", ["transform", "inverse_transform"])
+def test_transform_before_fit_raises_not_fitted_error(method_name):
+    transformer = FloatTransformer()
+
+    with pytest.raises(NotFittedError):
+        getattr(transformer, method_name)([0, 1])
 
 
 @pytest.mark.parametrize("data", list(data_generator()))
