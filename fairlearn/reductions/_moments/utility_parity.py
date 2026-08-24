@@ -35,7 +35,7 @@ def _merge_event_and_control_columns(event_col: pd.Series, control_col) -> pd.Se
     return event_col.combine(control_col, _combine_event_and_control)
 
 
-class UtilityParity(ClassificationMoment):
+class UtilityParity(ClassificationMoment[pd.Series]):
     r"""A generic moment for parity in utilities (or costs) under classification.
 
     This serves as the base class for :class:`DemographicParity`,
@@ -146,6 +146,8 @@ class UtilityParity(ClassificationMoment):
 
         """
         super().load_data(X, y, sensitive_features=sensitive_features)
+        # TODO: remove following line when UtilityParity is being narwhalified:
+        self.tags = self.tags.to_native()
         self.tags[_EVENT] = event
         if utilities is None:
             utilities = np.vstack(

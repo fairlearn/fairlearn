@@ -138,7 +138,7 @@ class _Lagrangian:
             violations, and `error` is the empirical error
         """
         if callable(Q):
-            error = self.obj.gamma(Q).iloc[0]
+            error = self.obj.objective_value(Q)
             gamma = self.constraints.gamma(Q)
         else:
             error = self.errors[Q.index].dot(Q)
@@ -252,7 +252,7 @@ class _Lagrangian:
 
         h = _PredictorAsCallable(classifier)
 
-        h_error = self.obj.gamma(h).iloc[0]
+        h_error = self.obj.objective_value(h)
         h_gamma = self.constraints.gamma(h)
         h_value = h_error + h_gamma.dot(lambda_vec)
 

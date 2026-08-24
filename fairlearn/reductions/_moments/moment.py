@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import Generic, TypeVar
 
+import narwhals.stable.v1 as nw
 import pandas as pd
+
+_GammaResultT = TypeVar("_GammaResultT")
 
 _GROUP_ID = "group_id"
 _EVENT = "event"
@@ -15,7 +19,7 @@ _ALL = "all"
 _SIGN = "sign"
 
 
-class Moment:
+class Moment(Generic[_GammaResultT]):
     """Generic moment.
 
     Our implementations of the reductions approach to fairness
@@ -30,34 +34,44 @@ class Moment:
     def __init__(self):
         self.data_loaded = False
 
-    def load_data(self, X, y: pd.Series, *, sensitive_features: pd.Series | None = None) -> None:
+    def load_data(
+        self,
+        X: nw.typing.IntoDataFrame,
+        y: nw.typing.IntoSeries,
+        *,
+        sensitive_features: nw.typing.IntoSeries | None = None,
+    ) -> None:
         """Load a set of data for use by this object.
 
         Parameters
         ----------
-        X : array
-            The feature array
-        y : :class:`pandas.Series`
-            The label vector
-        sensitive_features : :class:`pandas.Series`
-            The sensitive feature vector (default None)
+        X : numpy.ndarray, DataFrame object supported by narwhals, or list of lists
+            The feature array.
+        y : numpy.ndarray, Series object supported by narwhals or list
+            The label vector.
+        sensitive_features : numpy.ndarray, Series object supported by narwhals, or list, default=None
+            The sensitive feature vector.
         """
         if self.data_loaded:
             raise ValueError("data can be loaded only once")
-        if sensitive_features is not None:
-            assert isinstance(sensitive_features, pd.Series)
         self.X = X
         self._y = y
-        self.tags = pd.DataFrame({_LABEL: y})
+        # TODO (when dependency from pandas is being removed): Dynamically change
+        # backends for y, sensitive_features and self.tags to user's backend:
+        y = nw.new_series(name="y", values=y, native_namespace=pd)
+        self.tags = nw.from_dict({_LABEL: y}, backend=pd)
         if sensitive_features is not None:
-            self.tags[_GROUP_ID] = sensitive_features
+            sensitive_features = nw.new_series(
+                name="sensitive_features", values=sensitive_features, native_namespace=pd
+            )
+            self.tags = self.tags.with_columns(**{_GROUP_ID: sensitive_features})
         self.data_loaded = True
         self._gamma_descr = None
 
     @property
     def total_samples(self) -> int:
         """Return the number of samples in the data."""
-        return self.X.shape[0]
+        return len(self.X)
 
     @property
     def _y_as_series(self) -> pd.Series:
@@ -69,9 +83,18 @@ class Moment:
         """Return a pandas (multi-)index listing the constraints."""
         raise NotImplementedError()
 
-    def gamma(self, predictor: Callable) -> pd.Series:
-        """Calculate the degree to which constraints are currently violated by the predictor."""
+    def gamma(self, predictor: Callable) -> _GammaResultT:
+        """Calculate the moment-specific result for the predictor."""
         raise NotImplementedError()
+
+    def objective_value(self, predictor: Callable) -> float:
+        """Calculate the scalar objective value from a Series-based gamma result."""
+        result = self.gamma(predictor)
+        if not isinstance(result, pd.Series):
+            raise TypeError(
+                "Moments with non-Series gamma results must implement objective_value()."
+            )
+        return float(result.iloc[0])
 
     def bound(self) -> pd.Series:
         """Return vector of fairness bound constraint the length of gamma."""
@@ -99,7 +122,7 @@ class Moment:
 Moment.__module__ = "fairlearn.reductions"
 
 
-class ClassificationMoment(Moment):
+class ClassificationMoment(Moment[_GammaResultT], Generic[_GammaResultT]):
     """Moment that can be expressed as weighted classification error."""
 
     def _moment_type(self):
@@ -111,7 +134,7 @@ class ClassificationMoment(Moment):
 ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
-class LossMoment(Moment):
+class LossMoment(Moment[pd.Series]):
     """Moment that can be expressed as weighted loss."""
 
     def __init__(self, loss):
