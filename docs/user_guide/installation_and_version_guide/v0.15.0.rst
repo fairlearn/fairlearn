@@ -37,6 +37,10 @@ Bug fixes
   :code:`FloatTransformer.inverse_transform` so that they raise
   :code:`NotFittedError` instead of :code:`AttributeError` when called before
   :code:`fit`: :pr:`1709` by :user:`SpiliosDimakopoulos`.
+* Fixed :func:`~fairlearn.metrics.plot_roc_curve_by_group` so that rows with
+  missing sensitive feature values are included in the overall curve but
+  omitted from per-group curves, instead of raising a :code:`ValueError`:
+  :pr:`1713` by :user:`SpiliosDimakopoulos`.
 
 Documentation
 -------------
