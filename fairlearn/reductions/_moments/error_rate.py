@@ -118,7 +118,7 @@ class ErrorRate(ClassificationMoment[ErrorRateResult]):
         Returns
         -------
         ErrorRateResult
-            The weighted error is available through the :attr:`error` attribute.
+            The weighted error is available through the ``error`` attribute.
         """
         # self.X passed into the predict function of an estimator needs not to be a
         # narwhals type, in case third party libraries don't depend on narwhals:
