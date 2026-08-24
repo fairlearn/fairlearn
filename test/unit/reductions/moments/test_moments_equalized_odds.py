@@ -153,9 +153,7 @@ def test_project_lambda_smoke_positives():
 def test_project_lambda_handles_unequal_group_probabilities_by_event():
     eqo = EqualizedOdds()
     y = pd.Series([False] * 6 + [True] * 6)
-    sensitive_features = pd.Series(
-        ["a", "a", "b", "c", "c", "c", "a", "b", "b", "b", "b", "b"]
-    )
+    sensitive_features = pd.Series(["a", "a", "b", "c", "c", "c", "a", "b", "b", "b", "b", "b"])
     eqo.load_data(np.zeros((12, 1)), y, sensitive_features=sensitive_features)
 
     lambda_vec = pd.Series(
