@@ -46,6 +46,9 @@ Documentation
 Other improvements
 ------------------
 
+* Tightened the internal projection of Lagrange multipliers for difference-based
+  reductions constraints by removing the redundant per-event group-membership
+  component while preserving the classifier-dependent Lagrangian term.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
   :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.

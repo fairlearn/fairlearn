@@ -102,6 +102,11 @@ def test_construct_and_load():
 
 def test_project_lambda_smoke_negatives():
     eqo = EqualizedOdds()
+    eqo.load_data(
+        np.zeros((4, 1)),
+        pd.Series([False, False, True, True]),
+        sensitive_features=pd.Series(["a", "b", "a", "b"]),
+    )
 
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
@@ -115,7 +120,7 @@ def test_project_lambda_smoke_negatives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx, dtype=np.float64)
+    expected = 0 + pd.Series([108, 0, 112, 0, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -123,6 +128,11 @@ def test_project_lambda_smoke_positives():
     # This is a repeat of the _negatives method but with
     # the '+' indices larger
     eqo = EqualizedOdds()
+    eqo.load_data(
+        np.zeros((4, 1)),
+        pd.Series([False, False, True, True]),
+        sensitive_features=pd.Series(["a", "b", "a", "b"]),
+    )
 
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
@@ -136,7 +146,7 @@ def test_project_lambda_smoke_positives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx, dtype=np.float64)
+    expected = 0 + pd.Series([0, 99, 0, 499, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
