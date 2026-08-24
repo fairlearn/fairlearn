@@ -46,6 +46,7 @@ API Docs
     make_derived_metric
     mean_prediction
     plot_model_comparison
+    plot_roc_curve_by_group
     selection_rate
     true_negative_rate
     true_positive_rate

@@ -6,6 +6,7 @@
 Value counts
 =============
 """
+
 import matplotlib.pyplot as plt
 
 from fairlearn.datasets import fetch_diabetes_hospital

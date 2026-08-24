@@ -15,7 +15,7 @@ _DIST_TYPE_NOT_IMPLEMENTED = (
     "BackendEngine {} has no loss function defined for the given " + "distribution type {}."
 )
 _PROGRESS_UPDATE = (
-    "|{}>{}| Epoch: {}/{}, Batch: {}{}/{}, ETA: {:.2f} sec. Loss " + "(pred/adv): {:.2f}/{:.2f}"
+    "|%s>%s| Epoch: %s/%s, Batch: %s%s/%s, ETA: %.2f sec. Loss (pred/adv): %.2f/%.2f"
 )
 _NOT_IMPLEMENTED = "Interface-class method has not been implemented"
 _NO_DATA = "Haven't seen data yet. Call fit or partial_fit first to set up."
@@ -41,3 +41,4 @@ _LIST_MODEL_UNSUPPORTED = (
     + "supported when the accompanying {}_loss is not a keyword."
 )
 _CALLBACK_RETURNS_ERROR = "Callback function returned a non-boolean value"
+_X_NOT_2D = "Expected 'X' to be a two-dimensional array, but got an array with {} dimension(s)."

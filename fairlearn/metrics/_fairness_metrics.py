@@ -26,6 +26,8 @@ def demographic_parity_difference(
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
 
+    .. versionadded:: 0.4.6
+
     Parameters
     ----------
     y_true : array-like
@@ -76,6 +78,8 @@ def demographic_parity_ratio(
     The demographic parity ratio of 1 means that all groups have the same selection rate.
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    .. versionadded:: 0.4.6
 
     Parameters
     ----------
@@ -137,6 +141,8 @@ def equalized_odds_difference(
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
 
+    .. versionadded:: 0.4.6
+
     Parameters
     ----------
     y_true : array-like
@@ -197,6 +203,8 @@ def equalized_odds_ratio(
     true positive, true negative, false positive, and false negative rates.
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    .. versionadded:: 0.4.6
 
     Parameters
     ----------
@@ -264,10 +272,12 @@ def equal_opportunity_difference(
 
     The equal opportunity difference is defined as the difference
     between the largest and the smallest group-level true positive rates,
-    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
+    :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a` of the sensitive feature(s).
     The equal opportunity difference of 0 means that all groups have the same true positive rate.
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    .. versionadded:: 0.11.0
 
     Parameters
     ----------
@@ -315,10 +325,12 @@ def equal_opportunity_ratio(
 
     The equal opportunity ratio is defined as the ratio
     between the smallest and the largest group-level true positive rate,
-    :math:`E[h(X) | A=a]`, across all values :math:`a` of the sensitive feature(s).
+    :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a` of the sensitive feature(s).
     The equal opportunity ratio of 1 means that all groups have the same true positive rate.
 
     Read more in the :ref:`User Guide <disparity_metrics>`.
+
+    .. versionadded:: 0.11.0
 
     Parameters
     ----------

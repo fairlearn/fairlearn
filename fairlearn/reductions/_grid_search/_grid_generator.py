@@ -64,10 +64,7 @@ class _GridGenerator:
             self.grid_offset = grid_offset
 
         # true dimensionality of the grid
-        if self.force_L1_norm:
-            true_dim = self.dim - 1
-        else:
-            true_dim = self.dim
+        true_dim = self.dim - 1 if self.force_L1_norm else self.dim
 
         if true_dim > GRID_DIMENSION_WARN_THRESHOLD:
             logger.warning(GRID_DIMENSION_WARN_TEMPLATE, true_dim, GRID_DIMENSION_WARN_THRESHOLD)
@@ -89,7 +86,7 @@ class _GridGenerator:
                 # re-scale the integer grid, separate into positive and negative parts
                 pos_coefs = pd.DataFrame(self.accumulator[:grid_size]).T * (
                     float(grid_limit) / n_units
-                )  # noqa: E501
+                )
                 neg_coefs = -pos_coefs.copy()
                 pos_coefs[pos_coefs < 0] = 0.0
                 neg_coefs[neg_coefs < 0] = 0.0
@@ -123,4 +120,4 @@ class _GridGenerator:
 
             for current_value in values:
                 self.entry[index] = current_value
-                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))  # noqa: E501
+                self.accumulate_integer_grid(index + 1, max_val - abs(current_value))

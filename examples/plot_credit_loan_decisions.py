@@ -993,7 +993,7 @@ performance_df_masked = performance_df.loc[mask, :]
 # %%
 # Now, let's plot the performance trade-offs between all of our models.
 
-for index, row in performance_df_masked.iterrows():
+for _index, row in performance_df_masked.iterrows():
     bal_error, eq_odds_diff = row["balanced_error"], row["equalized_odds"]
     epsilon_, index_ = row["epsilon"], row["index"]
     plt.scatter(bal_error, eq_odds_diff, color="green", label="ExponentiatedGradient")
@@ -1056,12 +1056,12 @@ def filter_models_by_unmitigiated_score(
 
     Parameters
     ----------
-    all_models: Dictionary (Epsilon, Index) mapping (epilson, index number) pairs to a Model object
-    models_frames: A DataFrame representing each model's performance and fairness score.
-    unmitigated_score: The performance score of the unmitigated model.
-    performance_metric: The model performance metric to threshold on.
-    fairness_metric: The fairness metric to optimize for
-    threshold: The threshold padding added to the :code:`unmitigated_score`.
+    all_models : Dictionary (Epsilon, Index) mapping (epilson, index number) pairs to a Model object
+    models_frames : A DataFrame representing each model's performance and fairness score.
+    unmitigated_score : The performance score of the unmitigated model.
+    performance_metric : The model performance metric to threshold on.
+    fairness_metric : The fairness metric to optimize for
+    threshold : The threshold padding added to the :code:`unmitigated_score`.
 
     """
     # Create threshold based on balanced_error of unmitigated model and filter

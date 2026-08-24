@@ -5,15 +5,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
-
-import fairlearn.utils._compatibility as compat
-
-# FIXME: memoize type_of_target. It is quite expensive and called repeatedly.
+from sklearn.utils.validation import check_is_fitted
 
 
-class FloatTransformer(BaseEstimator, TransformerMixin):
-    """
-    Transformer that converts input data to numpy arrays of floats.
+class FloatTransformer(TransformerMixin, BaseEstimator):
+    """Transformer that converts input data to numpy arrays of floats.
 
     This class acts as a wrapper around scikit-learn transformers, automatically
     inferring the data type and applying appropriate transformations. It serves
@@ -24,19 +20,20 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
     3. Passes numerical data through without modification.
     4. Ensures all output is in the form of floating-point numpy arrays.
 
-    Attributes:
-        transformer : str, sklearn.base.TransformerMixin, or None
-            Specifies the transformation method. Can be "auto", a specific transformer
-            name (e.g., "one_hot_encoder"), None for pass-through, or a custom transformer object.
+    Attributes
+    ----------
+    transformer : str, sklearn.base.TransformerMixin, or None
+        Specifies the transformation method. Can be "auto", a specific transformer
+        name (e.g., "one_hot_encoder"), None for pass-through, or a custom transformer object.
 
-    Note:
-        When using "auto", the class will attempt to choose the most appropriate
-        transformation based on the input data type.
+    Notes
+    -----
+    When using "auto", the class will attempt to choose the most appropriate
+    transformation based on the input data type.
     """
 
     def __init__(self, transformer="auto"):
-        """
-        Initialize empty transformers with the given distribution assumption.
+        """Initialize empty transformers with the given distribution assumption.
 
         Parameters
         ----------
@@ -90,7 +87,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
                 self.transform_ = OneHotEncoder(
                     drop="if_binary",
                     handle_unknown="error",
-                    **compat._SPARSE_OUTPUT_FALSE,
+                    sparse_output=False,
                 )
                 self.transform_.fit(X)
                 self.n_features_out_ = sum(
@@ -100,9 +97,8 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
+        check_is_fitted(self)
         if isinstance(self.transformer, str) or self.transformer is None:
-            if not type_of_target(X) == self.inferred_type_:
-                raise ValueError("Unknown label type")
             return (
                 self.transform_.transform(self._check(X)).astype(float)
                 if self.inferred_type_ in ["binary", "multiclass"]
@@ -113,6 +109,7 @@ class FloatTransformer(BaseEstimator, TransformerMixin):
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
+        check_is_fitted(self)
         if self.transformer is None or isinstance(self.transformer, str):
             if self.inferred_type_ == "continuous":
                 inverse = y

@@ -65,13 +65,11 @@ class ConditionalLossMoment(LossMoment):
         self.neg_basis = pd.DataFrame()
         self.neg_basis_present = pd.Series(dtype="float64")
         zero_vec = pd.Series(0.0, self.index)
-        i = 0
-        for attr in attr_vals:
+        for i, attr in enumerate(attr_vals):
             self.pos_basis[i] = 0 + zero_vec
             self.neg_basis[i] = 0 + zero_vec
             self.pos_basis.loc[attr, i] = 1
             self.neg_basis_present.at[i] = False
-            i += 1
 
     def gamma(self, predictor: Callable) -> pd.Series:
         """Calculate the degree to which constraints are currently violated by the predictor."""
@@ -148,7 +146,7 @@ class SquareLoss:
         self.min = 0
         self.max = (max_val - min_val) ** 2
 
-    def eval(self, y_true, y_pred):  # noqa: A003
+    def eval(self, y_true, y_pred):
         """Evaluate the square loss for the given set of true and predicted values."""
         return (
             np.clip(y_true, self.min_val, self.max_val)
@@ -168,7 +166,7 @@ class AbsoluteLoss:
         self.min = 0
         self.max = np.abs(max_val - min_val)
 
-    def eval(self, y_true, y_pred):  # noqa: A003
+    def eval(self, y_true, y_pred):
         """Evaluate the absolute loss for the given set of true and predicted values."""
         return np.abs(
             np.clip(y_true, self.min_val, self.max_val)

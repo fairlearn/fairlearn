@@ -5,6 +5,7 @@ This script generates an html table of contributors, with names and avatars.
 The list is generated from Fairlearn's teams on GitHub.
 It's originally copied from scikit-learn and adapted for Fairlearn.
 """
+
 from os import path
 from pathlib import Path
 
@@ -35,10 +36,10 @@ def generate_table(maintainers):
     for alias, name in maintainers.items():
         lines.append("    <div>")
         lines.append(
-            "    <a href='%s'><img src='%s' class='avatar' /></a> <br />"
-            % (f"https://github.com/{alias}", f"https://github.com/{alias}.png")
+            f"    <a href='https://github.com/{alias}'>"
+            f"<img src='https://github.com/{alias}.png' class='avatar' /></a> <br />"
         )
-        lines.append("    <p>%s</p>" % (name,))
+        lines.append(f"    <p>{name}</p>")
         lines.append("    </div>")
     lines.append("    </div>")
     lines.append("")  # add empty line for linting compliance

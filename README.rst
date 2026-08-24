@@ -125,7 +125,7 @@ Maintainers
 -----------
 
 A list of current maintainers is
-`on our website <https://fairlearn.org/main/about/index.html>`__.
+`on our website <https://fairlearn.org/main/about/index.html#maintainers>`__.
 
 Code of conduct
 ---------------

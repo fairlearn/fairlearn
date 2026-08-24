@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
-from typing import Iterable
+from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
@@ -14,12 +14,10 @@ def maximize_objective_with_tolerance(
     x_col: str = "x",
     y_col: str = "y",
 ) -> tuple[list[int], float]:
-    """
-    Finds the indices that maximize the sum of weighted `y` values across multiple DataFrames
-    under the constraint that the range of the associated `x` values is at most equal to `tol`.
+    """Find the indices that maximize the sum of weighted `y` values across multiple DataFrames under the constraint that the range of the associated `x` values is at most equal to `tol`.
 
     Parameters
-    -----------
+    ----------
     dataframes:  Iterable[pd.DataFrame]
         An Iterable of DataFrames. The DataFrames must have:
         - A common `x` column (sorted in ascending order).
@@ -52,7 +50,9 @@ def maximize_objective_with_tolerance(
     n = len(x_values)
 
     # Extract weighted `y` columns
-    y_columns = [df[y_col].values * weight for df, weight in zip(dataframes, weights)]
+    y_columns = [
+        df[y_col].values * weight for df, weight in zip(dataframes, weights, strict=False)
+    ]
     m = len(y_columns)
 
     # Initialize a deque for each DataFrame to store indices in descending order of y values.

@@ -6,6 +6,7 @@
 Plotting Metrics with Errors
 ============================
 """
+
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.compose import make_column_selector as selector
@@ -110,7 +111,7 @@ def general_wilson(p, n, digits=4, z=1.959964):
     """
     denominator = 1 + z**2 / n
     centre_adjusted_probability = p + z * z / (2 * n)
-    adjusted_standard_deviation = np.sqrt((p * (1 - p) + z * z / (4 * n))) / np.sqrt(n)
+    adjusted_standard_deviation = np.sqrt(p * (1 - p) + z * z / (4 * n)) / np.sqrt(n)
     lower_bound = (centre_adjusted_probability - z * adjusted_standard_deviation) / denominator
     upper_bound = (centre_adjusted_probability + z * adjusted_standard_deviation) / denominator
     return np.array([round(lower_bound, digits), round(upper_bound, digits)])

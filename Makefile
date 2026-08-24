@@ -11,7 +11,7 @@ clean:
 
 in: inplace # just a shortcut
 inplace:
-	$(PYTHON) setup.py build_ext -i
+	pip install -e .
 
 test-coverage:
 	$(PYTEST) test -m "not notebooks" --ignore=test/install --cov=fairlearn --cov-report=xml --cov-report=html

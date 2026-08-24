@@ -31,6 +31,8 @@ logger = logging.getLogger(__name__)
 class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     """An Estimator which implements the exponentiated gradient reduction.
 
+    .. versionadded:: 0.3.0
+
     The exponentiated gradient algorithm is described in detail by
     :footcite:t:`agarwal2018reductions`.
 
@@ -110,7 +112,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         eta0: float = 2.0,
         run_linprog_step: bool = True,
         sample_weight_name: str = "sample_weight",
-    ):  # noqa: D103
+    ):
         self.estimator = estimator
         self.constraints = constraints
         self.objective = objective
@@ -131,8 +133,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         y : numpy.ndarray, pandas.DataFrame, pandas.Series, or list
             Label vector
         """
-        self.lambda_vecs_EG_ = pd.DataFrame()
-        self.lambda_vecs_LP_ = pd.DataFrame()
+        lambda_vecs_EG_dict = {}
+        lambda_vecs_LP_dict = {}
 
         logger.debug("...Exponentiated Gradient STARTING")
 
@@ -165,13 +167,15 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         last_regret_checked = _REGRET_CHECK_START_T
         last_gap = np.inf
+        lambda_cumsum = pd.Series(0.0, dtype="float64", index=lagrangian.constraints.index)
         for t in range(0, self.max_iter):
             logger.debug("...iter=%03d", t)
 
             # set lambdas for every constraint
             lambda_vec = B * np.exp(theta) / (1 + np.exp(theta).sum())
-            self.lambda_vecs_EG_[t] = lambda_vec
-            lambda_EG = self.lambda_vecs_EG_.mean(axis=1)
+            lambda_vecs_EG_dict[t] = lambda_vec
+            lambda_cumsum += lambda_vec
+            lambda_EG = lambda_cumsum / (t + 1)
 
             # select classifier according to best_h method
             h, h_idx = lagrangian.best_h(lambda_vec)
@@ -180,8 +184,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 if self.nu is None:
                     self.nu = (
                         _ACCURACY_MUL
-                        * (h(X) - self.constraints._y_as_series).abs().std()
-                        / np.sqrt(self.constraints.total_samples)
+                        * (h(X) - lagrangian.constraints._y_as_series).abs().std()
+                        / np.sqrt(lagrangian.constraints.total_samples)
                     )
                 eta = self.eta0 / B
                 logger.debug(
@@ -206,7 +210,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, self.lambda_vecs_LP_[t], result_LP = lagrangian.solve_linprog(self.nu)
+                Q_LP, lambda_vec_LP, result_LP = lagrangian.solve_linprog(self.nu)
+                lambda_vecs_LP_dict[t] = lambda_vec_LP
                 gap_LP = result_LP.gap()
 
             # keep values from exponentiated gradient or linear programming
@@ -245,7 +250,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 last_gap = best_gap
 
             # update theta based on learning rate
-            theta += eta * (gamma - self.constraints.bound())
+            theta += eta * (gamma - lagrangian.constraints.bound())
 
         # retain relevant result data
         gaps_series = pd.Series(gaps)
@@ -260,10 +265,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         self.last_iter_ = len(Qs) - 1
         self.predictors_ = lagrangian.predictors
+        self.constraints_ = lagrangian.constraints
         self.n_oracle_calls_ = lagrangian.n_oracle_calls
         self.n_oracle_calls_dummy_returned_ = lagrangian.n_oracle_calls_dummy_returned
         self.oracle_execution_times_ = lagrangian.oracle_execution_times
-        self.lambda_vecs_ = lagrangian.lambdas
+        self.lambda_vecs_EG_ = pd.DataFrame(lambda_vecs_EG_dict)
+        self.lambda_vecs_LP_ = pd.DataFrame(lambda_vecs_LP_dict)
+        self.lambda_vecs_ = lagrangian.lambdas.copy()
 
         logger.debug(
             "...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
@@ -345,12 +353,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         """
         check_is_fitted(self)
 
-        pred = pd.DataFrame()
+        pred = {}
         for t in range(len(self._hs)):
             if self.weights_[t] == 0:
                 pred[t] = np.zeros(len(X))
             else:
                 pred[t] = self._hs[t](X)
+        pred = pd.DataFrame(pred)
 
         if isinstance(self.constraints, ClassificationMoment):
             positive_probs = pred[self.weights_.index].dot(self.weights_).to_frame()

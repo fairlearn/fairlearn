@@ -37,7 +37,7 @@ def test_construct_and_load():
     # Examine the tags DF
     assert eqo.tags["label"].equals(pd.Series(Y))
     assert eqo.tags["group_id"].equals(pd.Series(A))
-    expected_tags_event = ["label={0}".format(a) for a in Y]
+    expected_tags_event = [f"label={a}" for a in Y]
     assert np.array_equal(expected_tags_event, eqo.tags["event"])
 
     # Examine the index MultiIndex

@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import narwhals.stable.v1 as nw
 import numpy as np
-import pandas as pd
 import pytest
 
 from fairlearn.postprocessing._constants import (
@@ -26,11 +26,13 @@ from .conftest import (
     sensitive_features_ex1,
 )
 
+pytestmark = pytest.mark.narwhals
 
-def test_assert_interpolated_curve():
+
+def test_assert_interpolated_curve(constructor):
     # An easily interpretable test to make sure the assertion method works as expected
-    base_points = pd.DataFrame(
-        {"x": [0, 5, 10], "y": [0, 2.5, 5], "operation": ["a", "b", "c"]}  # irrelevant
+    base_points = constructor(
+        {"x": [0, 5, 10], "y": [0.0, 2.5, 5.0], "operation": ["a", "b", "c"]}  # irrelevant
     )
     x_grid = np.linspace(0, 10, 333)
     curve = _interpolate_curve(base_points, "x", "y", "operation", x_grid)
@@ -38,13 +40,13 @@ def test_assert_interpolated_curve():
     _assert_interpolated_points_are_between_base_points(base_points, curve)
 
 
-def test_interpolate_curve():
+def test_interpolate_curve(constructor):
     # The operation is irrelevant in this case since its semantics are not
     # used within _interpolate_curve.
-    base_points = pd.DataFrame(
+    base_points = constructor(
         {
             "x": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            "y": [-5, -2, -1.5, -1, 0, 0.5, 0.8, 1.0, 1.1, 1.15],
+            "y": [-5.0, -2.0, -1.5, -1.0, 0.0, 0.5, 0.8, 1.0, 1.1, 1.15],
             "operation": ["i", "r", "r", "e", "l", "e", "v", "a", "n", "t"],
         }
     )
@@ -55,58 +57,64 @@ def test_interpolate_curve():
 
 
 @pytest.mark.parametrize(
-    "base_points,expected_remaining_indices",
+    "data,expected_remaining_indices",
     [
-        (pd.DataFrame({"x": [0, 1], "y": [0, 1], "operation": ["i", "r"]}), [0, 1]),
+        ({"x": [0, 1], "y": [0, 1], "operation": ["i", "r"]}, [0, 1]),
         (
-            pd.DataFrame({"x": [0, 0.5, 1], "y": [0, 0.5, 1], "operation": ["i", "r", "e"]}),
+            {"x": [0.0, 0.5, 1.0], "y": [0.0, 0.5, 1.0], "operation": ["i", "r", "e"]},
             [0, 2],
         ),
         (
-            pd.DataFrame({"x": [0, 0.5, 1], "y": [0, 0.51, 1], "operation": ["i", "r", "e"]}),
+            {"x": [0.0, 0.5, 1.0], "y": [0.0, 0.51, 1.0], "operation": ["i", "r", "e"]},
             [0, 1, 2],
         ),
         (
-            pd.DataFrame(
-                {
-                    "x": [0, 0.2, 0.3, 0.5, 1],
-                    "y": [0, 0.3, 0.35, 0.7, 1],
-                    "operation": ["i", "r", "r", "e", "l"],
-                }
-            ),
+            {
+                "x": [0.0, 0.2, 0.3, 0.5, 1.0],
+                "y": [0.0, 0.3, 0.35, 0.7, 1.0],
+                "operation": ["i", "r", "r", "e", "l"],
+            },
             [0, 1, 3, 4],
         ),
         (
-            pd.DataFrame(
-                {
-                    "x": [0, 0.1, 0.2, 0.5, 1],
-                    "y": [0, 0.3, 0.5, 0.9, 1],
-                    "operation": ["i", "r", "r", "e", "l"],
-                }
-            ),
+            {
+                "x": [0.0, 0.1, 0.2, 0.5, 1.0],
+                "y": [0.0, 0.3, 0.5, 0.9, 1.0],
+                "operation": ["i", "r", "r", "e", "l"],
+            },
             [0, 1, 2, 3, 4],
         ),
         (
-            pd.DataFrame(
-                {
-                    "x": [0, 0.2, 0.3, 0.5, 1],
-                    "y": [0, 0.3, 0.8, 0.82, 1],
-                    "operation": ["i", "r", "r", "e", "l"],
-                }
-            ),
+            {
+                "x": [0.0, 0.2, 0.3, 0.5, 1.0],
+                "y": [0.0, 0.3, 0.8, 0.82, 1.0],
+                "operation": ["i", "r", "r", "e", "l"],
+            },
             [0, 2, 4],
         ),
     ],
 )
-def test_convex_hull(base_points, expected_remaining_indices):
+def test_convex_hull(constructor, data, expected_remaining_indices):
+    base_points = constructor(data)
     convex_hull = _filter_points_to_get_convex_hull(base_points)
-    pd.testing.assert_frame_equal(
-        base_points.iloc[expected_remaining_indices].reset_index(drop=True), convex_hull
-    )
+
+    expected = nw.maybe_reset_index(
+        nw.from_native(base_points, eager_only=True, pass_through=False)[
+            expected_remaining_indices
+        ]
+    ).to_native()
+    assert expected.equals(convex_hull)
 
 
-def test_calculate_tradeoff_points():
-    data = pd.DataFrame(
+def test_calculate_tradeoff_points(request, constructor):
+    if "pyarrow_table" in str(request):
+        reason = (
+            "pyarrow.lib.ArrowInvalid: Could not convert [>inf] with type ThresholdOperation: "
+            "did not recognize Python value type when inferring an Arrow data type"
+        )
+        request.applymarker(pytest.mark.xfail(reason=reason))
+
+    data = constructor(
         {
             SENSITIVE_FEATURE_KEY: sensitive_features_ex1.squeeze(),
             SCORE_KEY: scores_ex.squeeze(),
@@ -114,16 +122,17 @@ def test_calculate_tradeoff_points():
         }
     )
     grouped_data = (
-        data.groupby(SENSITIVE_FEATURE_KEY)
-        .get_group("A")
-        .sort_values(by=SCORE_KEY, ascending=False)
+        nw.from_native(data, eager_only=True, pass_through=False)
+        .filter(nw.col(SENSITIVE_FEATURE_KEY) == "A")
+        .sort(by=SCORE_KEY, descending=True)
+        .to_native()
     )
 
     roc_points = _calculate_tradeoff_points(grouped_data, "A", flip=True)
-    expected_roc_points = pd.DataFrame(
+    expected_roc_points = constructor(
         {
-            "x": [0, 0.0, 0.25, 0.5, 0.5, 0.5, 0.5, 0.75, 1.0, 1],
-            "y": [0, 0.0, 1 / 3, 0.0, 0.1 / 0.3, 2 / 3, 1, 0.2 / 0.3, 1.0, 1],
+            "x": [0.0, 0.0, 0.25, 0.5, 0.5, 0.5, 0.5, 0.75, 1.0, 1.0],
+            "y": [0.0, 0.0, 1 / 3, 0.0, 0.1 / 0.3, 2 / 3, 1, 0.2 / 0.3, 1.0, 1.0],
             "operation": [
                 ThresholdOperation(">", np.inf),
                 ThresholdOperation("<", -np.inf),
@@ -141,9 +150,9 @@ def test_calculate_tradeoff_points():
 
     _assert_equal_points(expected_roc_points, roc_points)
 
-    expected_roc_convex_hull = pd.DataFrame(
+    expected_roc_convex_hull = constructor(
         {
-            "x": [0, 0.5, 1],
+            "x": [0.0, 0.5, 1.0],
             "y": [0, 1, 1],
             "operation": [
                 ThresholdOperation(">", np.inf),
@@ -153,20 +162,27 @@ def test_calculate_tradeoff_points():
         }
     )
     # Try filtering to get the convex hull of the ROC points.
-    selected_points = pd.DataFrame(_filter_points_to_get_convex_hull(roc_points))[
+    selected_points = constructor(_filter_points_to_get_convex_hull(roc_points))[
         ["x", "y", "operation"]
     ]
     _assert_equal_points(expected_roc_convex_hull, selected_points)
 
 
-def test_tradeoff_curve():
+def test_tradeoff_curve(request, constructor):
+    if "pyarrow_table" in str(request):
+        reason = (
+            "pyarrow.lib.ArrowInvalid: Could not convert [>inf] with type ThresholdOperation: "
+            "did not recognize Python value type when inferring an Arrow data type"
+        )
+        request.applymarker(pytest.mark.xfail(reason=reason))
+
     for sensitive_feature_value in sensitive_feature_names_ex1:
         (
             grouped_data,
             base_points,
             ignore_for_base_points,
             x_grid,
-        ) = _get_grouped_data_and_base_points(sensitive_feature_value)
+        ) = _get_grouped_data_and_base_points(constructor, sensitive_feature_value)
 
         roc_convex_hull = _tradeoff_curve(grouped_data, x_grid, sensitive_feature_value)
         curve = _interpolate_curve(roc_convex_hull, "x", "y", "operation", x_grid)
@@ -179,8 +195,11 @@ def test_tradeoff_curve():
 def _assert_interpolated_points_are_between_base_points(
     base_points, curve, ignore_for_base_points=None
 ):
-    def _get_base_point_coordinates(i, data):
-        return data.x[i], data.y[i]
+    def _get_base_point_coordinates(i: int, data: nw.DataFrame):
+        return data.item(i, "x"), data.item(i, "y")
+
+    curve = nw.from_native(curve, eager_only=True)
+    base_points = nw.from_native(base_points, eager_only=True)
 
     if ignore_for_base_points is None:
         ignore_for_base_points = []
@@ -204,8 +223,8 @@ def _assert_interpolated_points_are_between_base_points(
     )
 
     for x_grid_index in range(len(curve)):
-        x = curve.x[x_grid_index]
-        y = curve.y[x_grid_index]
+        x = curve.item(x_grid_index, "x")
+        y = curve.item(x_grid_index, "y")
         if np.isclose(x, current_base_point_x):
             assert np.isclose(y, current_base_point_y)
             continue
@@ -240,12 +259,19 @@ def _assert_interpolated_points_are_between_base_points(
 
 
 def _assert_equal_points(expected_points, actual_points):
-    assert len(expected_points) == len(actual_points)
+    nw_expected_points = nw.from_native(expected_points, eager_only=True, pass_through=False)
+    nw_actual_points = nw.from_native(actual_points, eager_only=True, pass_through=False)
+
+    assert len(nw_expected_points) == len(nw_actual_points)
 
     for i in range(len(expected_points)):
-        assert np.isclose(actual_points.x[i], expected_points.x[i])
-        assert np.isclose(actual_points.y[i], expected_points.y[i])
-        assert actual_points.operation[i].operator == expected_points.operation[i].operator
+        assert np.isclose(nw_actual_points.item(i, "x"), nw_expected_points.item(i, "x"))
+        assert np.isclose(nw_actual_points.item(i, "y"), nw_expected_points.item(i, "y"))
+        assert (
+            nw_actual_points.item(i, "operation").operator
+            == nw_expected_points.item(i, "operation").operator
+        )
         assert np.isclose(
-            actual_points.operation[i].threshold, expected_points.operation[i].threshold
+            nw_actual_points.item(i, "operation").threshold,
+            nw_expected_points.item(i, "operation").threshold,
         )

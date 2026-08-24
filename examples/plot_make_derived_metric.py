@@ -6,6 +6,7 @@
 Making Derived Metrics
 ======================
 """
+
 # %%
 # This notebook demonstrates the use of the :func:`fairlearn.metrics.make_derived_metric`
 # function.
@@ -61,7 +62,7 @@ A = X_raw[["race", "sex"]]
 # `problem in machine learning <https://en.wikipedia.org/wiki/Leakage_(machine_learning)>`_).
 # So, first we split the data:
 
-(X_train, X_test, y_train, y_test, A_train, A_test) = train_test_split(
+X_train, X_test, y_train, y_test, A_train, A_test = train_test_split(
     X_raw, y, A, test_size=0.3, random_state=12345, stratify=y
 )
 

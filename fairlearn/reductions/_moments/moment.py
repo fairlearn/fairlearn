@@ -42,7 +42,8 @@ class Moment:
         sensitive_features : :class:`pandas.Series`
             The sensitive feature vector (default None)
         """
-        assert self.data_loaded is False, "data can be loaded only once"
+        if self.data_loaded:
+            raise ValueError("data can be loaded only once")
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)
         self.X = X
@@ -68,19 +69,19 @@ class Moment:
         """Return a pandas (multi-)index listing the constraints."""
         raise NotImplementedError()
 
-    def gamma(self, predictor: Callable) -> pd.Series:  # noqa: D102
+    def gamma(self, predictor: Callable) -> pd.Series:
         """Calculate the degree to which constraints are currently violated by the predictor."""
         raise NotImplementedError()
 
-    def bound(self) -> pd.Series:  # noqa: D102
+    def bound(self) -> pd.Series:
         """Return vector of fairness bound constraint the length of gamma."""
         raise NotImplementedError()
 
-    def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:  # noqa: D102
+    def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
         """Return the projected lambda values."""
         raise NotImplementedError()
 
-    def signed_weights(self, lambda_vec: pd.Series) -> pd.Series:  # noqa: D102
+    def signed_weights(self, lambda_vec: pd.Series) -> pd.Series:
         """Return the signed weights."""
         raise NotImplementedError()
 

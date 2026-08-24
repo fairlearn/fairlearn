@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 import warnings
-from typing import Callable, Generic, Tuple, TypeVar
+from collections.abc import Callable
+from typing import Generic, TypeVar
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -50,7 +51,7 @@ class AnnotatedMetricFunction(Generic[R]):
     def __init__(
         self,
         *,
-        func: Callable[[*Tuple[np.ndarray, ...]], R],
+        func: Callable[[*tuple[np.ndarray, ...]], R],
         name: str | None = None,
         positional_argument_names: list[str] | None = None,
         kw_argument_mapping: dict[str, str] | None = None,
@@ -65,7 +66,7 @@ class AnnotatedMetricFunction(Generic[R]):
             if hasattr(func, "__name__"):
                 self.name = func.__name__
             else:
-                warnings.warn("Supplied 'func' had no __name__ attribute")
+                warnings.warn("Supplied 'func' had no __name__ attribute", stacklevel=2)
                 self.name = _DEFAULT_NAME
         else:
             self.name = name
@@ -73,7 +74,7 @@ class AnnotatedMetricFunction(Generic[R]):
         self.postional_argument_names = ["y_true", "y_pred"]
         if positional_argument_names is not None:
             self.postional_argument_names = positional_argument_names
-        self.kw_argument_mapping = dict()
+        self.kw_argument_mapping = {}
         if kw_argument_mapping is not None:
             self.kw_argument_mapping = kw_argument_mapping
 

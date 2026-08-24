@@ -13,7 +13,6 @@ on:
         required: true
         type: string
 
-
 jobs:
   other-ml:
     runs-on: ${{ inputs.os }}
@@ -21,8 +20,8 @@ jobs:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ inputs.python }}
       - run: |
@@ -56,10 +55,10 @@ jobs:
           echo
           # Override the filterwarnings set in the TOML file
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
-        name: Run ${{matrix.mlpackage}} tests
+        name: Run ${{ inputs.mlpackage }} tests
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@v4.2.0
+        uses: codecov/codecov-action@v7
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true

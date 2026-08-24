@@ -1,13 +1,5 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
-from test.unit.input_convertors import (
-    _map_into_single_column,
-    conversions_for_1d,
-    ensure_dataframe,
-    ensure_ndarray,
-)
-from test.unit.reductions.conftest import is_invalid_transformation
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -17,6 +9,13 @@ from sklearn.preprocessing import StandardScaler
 
 from fairlearn.reductions import DemographicParity, ErrorRate, ExponentiatedGradient
 from fairlearn.utils._input_validation import _LABELS_NOT_0_1_ERROR_MESSAGE
+from test.unit.input_convertors import (
+    _map_into_single_column,
+    conversions_for_1d,
+    ensure_dataframe,
+    ensure_ndarray,
+)
+from test.unit.reductions.conftest import is_invalid_transformation
 
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data
@@ -31,6 +30,24 @@ candidate_A_transforms = conversions_for_1d
 # ================================================================
 
 _PRECISION = 1e-6
+
+
+def test_constraints_reused_across_multiple_fits():
+    """Same constraints instance must be reusable for multiple fit() calls (#1210)."""
+    X, y, A = _get_data()
+    constraints = DemographicParity()
+    expgrad = ExponentiatedGradient(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=constraints,
+        max_iter=5,
+    )
+
+    expgrad.fit(X, y, sensitive_features=A)
+    expgrad.fit(X, y, sensitive_features=A)
+
+    assert not constraints.data_loaded
+    assert expgrad.constraints_ is not constraints
+    assert expgrad.constraints_.data_loaded
 
 
 class TestExponentiatedGradientArguments:
@@ -145,7 +162,19 @@ class TestExponentiatedGradientArguments:
         estimator.fit = mocker.MagicMock()
         # restrict ExponentiatedGradient to a single iteration
         expgrad = ExponentiatedGradient(estimator, constraints=DemographicParity(), max_iter=1)
-        mocker.patch("copy.deepcopy", return_value=estimator)
+
+        from copy import deepcopy
+
+        original_deepcopy = deepcopy
+
+        def mock_deepcopy(obj, *args, **kwargs):
+            # Only intercept deepcopy of the estimator so the constraints copy follows
+            # the production path.
+            if obj is estimator:
+                return estimator
+            return original_deepcopy(obj, *args, **kwargs)
+
+        mocker.patch("copy.deepcopy", side_effect=mock_deepcopy)
         expgrad.fit(transformed_X, transformed_y, sensitive_features=transformed_A)
 
         # ensure that the input data wasn't changed by our mitigator before being passed to the
@@ -167,7 +196,7 @@ class TestExponentiatedGradientArguments:
         )
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
     def test_sample_weights_argument(self):
         estimator = Pipeline(

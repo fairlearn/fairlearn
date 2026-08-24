@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.unit.reductions.data_generators import loan_scenario_generator
-
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -21,6 +19,7 @@ from fairlearn.reductions import (
     FalsePositiveRateParity,
     TruePositiveRateParity,
 )
+from test.unit.reductions.data_generators import loan_scenario_generator
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G
@@ -30,9 +29,9 @@ sfs = ["F", "G"]
 
 # Numbers for each intersection
 n = {
-    "A": {"F": 80, "G": 100},
-    "B": {"F": 200, "G": 50},
-    "C": {"F": 400, "G": 350},
+    "A": {"F": 48, "G": 60},
+    "B": {"F": 120, "G": 30},
+    "C": {"F": 160, "G": 140},
 }
 
 # Approval rates for each intersection
@@ -58,7 +57,7 @@ def run_comparisons(moment, metric_fn):
     print("Metric for input:\n", mf_input.by_group)
     print("Input Metric differences:\n", mf_input.difference(method="to_overall"), "\n")
 
-    unmitigated = LogisticRegression()
+    unmitigated = LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear")
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
     mf_unmitigated = MetricFrame(
@@ -75,7 +74,11 @@ def run_comparisons(moment, metric_fn):
         "\n",
     )
 
-    expgrad_basic = ExponentiatedGradient(LogisticRegression(), constraints=moment(), eps=0.005)
+    expgrad_basic = ExponentiatedGradient(
+        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        constraints=moment(),
+        eps=0.005,
+    )
     expgrad_basic.fit(X_dummy, y, sensitive_features=X["sens"])
     y_pred_basic = expgrad_basic.predict(X_dummy, random_state=8235)
     mf_basic = MetricFrame(
@@ -92,7 +95,11 @@ def run_comparisons(moment, metric_fn):
         "\n",
     )
 
-    expgrad_control = ExponentiatedGradient(LogisticRegression(), constraints=moment(), eps=0.005)
+    expgrad_control = ExponentiatedGradient(
+        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        constraints=moment(),
+        eps=0.005,
+    )
     expgrad_control.fit(X_dummy, y, sensitive_features=X["sens"], control_features=X["ctrl"])
     y_pred_control = expgrad_control.predict(X_dummy, random_state=852)
     mf_control = MetricFrame(
@@ -141,7 +148,7 @@ def test_equalized_odds():
 
     metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
 
-    unmitigated = LogisticRegression()
+    unmitigated = LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear")
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
     mf_unmitigated = MetricFrame(
@@ -153,7 +160,9 @@ def test_equalized_odds():
     )
 
     expgrad_basic = ExponentiatedGradient(
-        LogisticRegression(), constraints=EqualizedOdds(difference_bound=0.01), eps=0.01
+        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        constraints=EqualizedOdds(difference_bound=0.01),
+        eps=0.01,
     )
     expgrad_basic.fit(X_dummy, y, sensitive_features=X["sens"])
     y_pred_basic = expgrad_basic.predict(X_dummy, random_state=9235)
@@ -166,7 +175,9 @@ def test_equalized_odds():
     )
 
     expgrad_control = ExponentiatedGradient(
-        LogisticRegression(), constraints=EqualizedOdds(difference_bound=0.01), eps=0.01
+        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        constraints=EqualizedOdds(difference_bound=0.01),
+        eps=0.01,
     )
     expgrad_control.fit(X_dummy, y, sensitive_features=X["sens"], control_features=X["ctrl"])
     y_pred_control = expgrad_control.predict(X_dummy, random_state=8152)

@@ -6,19 +6,18 @@
 # Since that file does its own testing setup
 
 # Required for environment
-ruff==0.4.5
+ruff==0.15.20
 requirements-parser
-# Need to keep black version consistent in
-# requirements-dev.txt
-# linting.yml
-# .pre-commit-config.yaml
-black==24.4.2
+
+# Required for building sdist and wheel
+build
 
 # Required for test
 pytest
 pytest-cov
 pytest-mock
 pytest-mpl
+matplotlib>=3.10.8
 wheel
 lightgbm
 xlrd
@@ -27,7 +26,7 @@ pyarrow
 
 # Required for documentation
 pypandoc
-sphinx==7.3.7
+sphinx>=8.3.0
 sphinx-gallery==0.19.0
 numpydoc
 pydata-sphinx-theme>=0.14.4

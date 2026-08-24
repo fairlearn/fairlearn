@@ -827,16 +827,13 @@ class TestExponentiatedGradientSmoke:
 
     def run_smoke_test_binary_classification(self, data, flipped=False):
         learner = LeastSquaresBinaryClassifierLearner()
-        if "ratio" in data.keys():
+        if "ratio" in data:
             disparity_moment = data["constraint_class"](
                 ratio_bound_slack=data["eps"], ratio_bound=data["ratio"]
             )
         else:
             disparity_moment = data["constraint_class"](difference_bound=data["eps"])
-        if "objective" in data.keys():
-            objective_moment = deepcopy(data["objective"])
-        else:
-            objective_moment = ErrorRate()
+        objective_moment = deepcopy(data["objective"]) if "objective" in data else ErrorRate()
 
         # Create Exponentiated Gradient object with a copy of the constraint.
         # The original disparity_moment object is used for validation, so the
@@ -901,7 +898,7 @@ class TestExponentiatedGradientSmoke:
         disparity_moment.load_data(X, y, sensitive_features=A)
         for i in range(len(expgrad.predictors_)):
 
-            def Q(X):
+            def Q(X, i=i):
                 return expgrad._pmf_predict(X)[i]
 
             default_objective = MeanLoss(data["loss"])
@@ -1016,7 +1013,7 @@ class TestExponentiatedGradientSmoke:
             expgrad.fit(X, y, sensitive_features=A)
 
             # select probability of predicting 1
-            def Q(X):
+            def Q(X, expgrad=expgrad):
                 return expgrad._pmf_predict(X)[:, 1]
 
             constraints_eval = deepcopy(constraints_moment)

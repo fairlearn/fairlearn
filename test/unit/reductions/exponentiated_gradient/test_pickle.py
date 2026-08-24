@@ -3,21 +3,23 @@
 
 import copy
 import pickle
+
 import pytest
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
 from fairlearn.reductions import (
+    AbsoluteLoss,
+    BoundedGroupLoss,
     DemographicParity,
-    TruePositiveRateParity,
-    FalsePositiveRateParity,
     ErrorRateParity,
+    ExponentiatedGradient,
+    FalsePositiveRateParity,
+    SquareLoss,
+    TruePositiveRateParity,
+    ZeroOneLoss,
 )
-from fairlearn.reductions import BoundedGroupLoss
-from fairlearn.reductions import AbsoluteLoss, SquareLoss, ZeroOneLoss
-from fairlearn.reductions import ExponentiatedGradient
 
 from .test_utilities import _get_data
-
 
 classification_moments = [
     DemographicParity,

@@ -3,23 +3,22 @@
 
 """Holds the various Moments."""
 
-from .bounded_group_loss import BoundedGroupLoss  # noqa: F401
-from .bounded_group_loss import (  # noqa: F401
+from .bounded_group_loss import (
     AbsoluteLoss,
+    BoundedGroupLoss,
     MeanLoss,
     SquareLoss,
     ZeroOneLoss,
 )
-from .error_rate import ErrorRate  # noqa: F401
-from .moment import Moment  # noqa: F401
-from .moment import ClassificationMoment, LossMoment  # noq: F401
-from .utility_parity import EqualizedOdds  # noqa: F401
-from .utility_parity import UtilityParity  # noqa: F401
+from .error_rate import ErrorRate
+from .moment import ClassificationMoment, LossMoment, Moment
 from .utility_parity import (
     DemographicParity,
+    EqualizedOdds,
     ErrorRateParity,
     FalsePositiveRateParity,
     TruePositiveRateParity,
+    UtilityParity,
 )
 
 __all__ = [

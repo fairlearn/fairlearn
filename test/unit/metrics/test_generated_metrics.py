@@ -70,10 +70,7 @@ def test_dict_sizes():
 def test_generated_metrics_smoke(func_name):
     func = getattr(metrics, func_name)
     assert callable(func)
-    if func_name.startswith("log_loss"):
-        y_pred_test = y_pred_log_loss
-    else:
-        y_pred_test = y_pred
+    y_pred_test = y_pred_log_loss if func_name.startswith("log_loss") else y_pred
     result = func(
         y_true,
         y_pred_test,

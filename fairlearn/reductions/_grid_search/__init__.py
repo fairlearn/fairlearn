@@ -3,6 +3,6 @@
 
 """Package for Grid Search."""
 
-from .grid_search import GridSearch  # noqa: F401
+from .grid_search import GridSearch
 
 __all__ = ["GridSearch"]

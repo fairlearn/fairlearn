@@ -169,6 +169,29 @@ For example:
     c    0.50
     Name: selection_rate, dtype: float64
 
+Another example of a metric that only uses :code:`y_pred` is
+:func:`mean_prediction`, which computes the average predicted value
+for each group. This is useful for detecting prediction bias —
+for instance, whether a model systematically assigns higher risk
+scores to one group over another.
+
+.. doctest:: advanced_metricframe_code
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> from fairlearn.metrics import mean_prediction
+    >>> mean_pred_frame = MetricFrame(metrics=mean_prediction,
+    ...                               y_true=dummy_y_true,
+    ...                               y_pred=y_pred,
+    ...                               sensitive_features=pd.Series(sf_data, name='SF 0'))
+    >>> mean_pred_frame.overall.item()
+    0.55555...
+    >>> mean_pred_frame.by_group
+    SF 0
+    a    0.75
+    b    0.50
+    c    0.50
+    Name: mean_prediction, dtype: float64
+
 
 .. _more_complex_metrics:
 

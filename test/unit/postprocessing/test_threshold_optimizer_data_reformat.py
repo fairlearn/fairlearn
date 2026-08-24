@@ -1,0 +1,309 @@
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
+# Licensed under the MIT License.
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from fairlearn.postprocessing._constants import LABEL_KEY, SCORE_KEY, SENSITIVE_FEATURE_KEY
+from fairlearn.postprocessing._threshold_optimizer import _reformat_and_group_data
+
+
+def test_reformat_and_group_data_preserves_dataframe_sensitive_feature_columns():
+    sensitive_features = pd.DataFrame({"SF1": ["a", "a", "b", "b"], "SF2": ["x", "y", "x", "y"]})
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1, 0, 1],
+        scores=[0.1, 0.2, 0.3, 0.4],
+    )
+
+    assert list(grouped_data.obj.columns) == ["SF1", "SF2", SCORE_KEY, LABEL_KEY]
+    assert sorted(grouped_data.groups.keys()) == [("a", "x"), ("a", "y"), ("b", "x"), ("b", "y")]
+    expected_group_data = {
+        ("a", "x"): (0.1, 0),
+        ("a", "y"): (0.2, 1),
+        ("b", "x"): (0.3, 0),
+        ("b", "y"): (0.4, 1),
+    }
+    for group_key, (score, label) in expected_group_data.items():
+        group = grouped_data.get_group(group_key)
+        assert group[SCORE_KEY].tolist() == [score]
+        assert group[LABEL_KEY].tolist() == [label]
+
+
+def test_reformat_and_group_data_preserves_dataframe_sensitive_feature_dtypes():
+    sensitive_features = pd.DataFrame({"SF1": [0.1, 0.1], "SF2": [2**53, 2**53 + 1]})
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1],
+        scores=[0.1, 0.2],
+    )
+
+    assert sorted(grouped_data.groups.keys()) == [
+        (0.1, 2**53),
+        (0.1, 2**53 + 1),
+    ]
+
+
+@pytest.mark.parametrize("column_name", [None, pd.NA])
+def test_reformat_and_group_data_preserves_nullable_sensitive_feature_column_name(column_name):
+    sensitive_features = pd.DataFrame([["a"], ["b"]], columns=[column_name])
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1],
+        scores=[0.1, 0.2],
+    )
+
+    assert pd.isna(grouped_data.obj.columns[0])
+    assert grouped_data.obj.columns[1:].tolist() == [SCORE_KEY, LABEL_KEY]
+    assert sorted(grouped_data.groups.keys()) == ["a", "b"]
+
+
+def test_reformat_and_group_data_preserves_ndarray_sensitive_feature_columns():
+    sensitive_features = np.array([["a", "x"], ["a", "y"], ["b", "x"], ["b", "y"]])
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1, 0, 1],
+        scores=[0.1, 0.2, 0.3, 0.4],
+    )
+
+    assert list(grouped_data.obj.columns) == [
+        f"{SENSITIVE_FEATURE_KEY}_0",
+        f"{SENSITIVE_FEATURE_KEY}_1",
+        SCORE_KEY,
+        LABEL_KEY,
+    ]
+    assert sorted(grouped_data.groups.keys()) == [("a", "x"), ("a", "y"), ("b", "x"), ("b", "y")]
+
+
+def test_reformat_and_group_data_preserves_list_sensitive_feature_columns():
+    sensitive_features = [["a", "x"], ["a", "y"], ["b", "x"], ["b", "y"]]
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1, 0, 1],
+        scores=[0.1, 0.2, 0.3, 0.4],
+        sensitive_feature_names=["first", "second"],
+    )
+
+    assert list(grouped_data.obj.columns) == ["first", "second", SCORE_KEY, LABEL_KEY]
+    assert sorted(grouped_data.groups.keys()) == [("a", "x"), ("a", "y"), ("b", "x"), ("b", "y")]
+
+
+def test_reformat_and_group_data_preserves_tuple_sensitive_feature_columns():
+    sensitive_features = [("a", "x"), ("b", "y")]
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=[0, 1],
+        scores=[0.1, 0.2],
+        sensitive_feature_names=["first", "second"],
+    )
+
+    assert list(grouped_data.obj.columns) == ["first", "second", SCORE_KEY, LABEL_KEY]
+    assert sorted(grouped_data.groups.keys()) == [("a", "x"), ("b", "y")]
+
+
+@pytest.mark.parametrize(
+    "sensitive_features,labels,scores",
+    [
+        (["a", "b"], [0, 1], [0.1, 0.2]),
+        ([["a"], ["b"]], [[0], [1]], [[0.1], [0.2]]),
+        (np.array(["a", "b"]), np.array([0, 1]), np.array([0.1, 0.2])),
+        (
+            np.array([["a"], ["b"]]),
+            np.array([[0], [1]]),
+            np.array([[0.1], [0.2]]),
+        ),
+        (
+            pd.Series(["a", "b"], index=[20, 10]),
+            pd.Series([0, 1], index=[10, 20]),
+            pd.Series([0.1, 0.2], index=[40, 30]),
+        ),
+        (
+            pd.DataFrame({"group": ["a", "b"]}, index=[20, 10]),
+            pd.DataFrame({"target": [0, 1]}, index=[10, 20]),
+            pd.DataFrame({"prediction": [0.1, 0.2]}, index=[40, 30]),
+        ),
+    ],
+    ids=["list", "nested-list", "ndarray-1d", "ndarray-2d", "series", "dataframe"],
+)
+def test_reformat_and_group_data_accepts_single_column_representations(
+    sensitive_features,
+    labels,
+    scores,
+):
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=labels,
+        scores=scores,
+    )
+
+    assert sorted(grouped_data.groups.keys()) == ["a", "b"]
+    assert grouped_data.obj[SCORE_KEY].tolist() == [0.1, 0.2]
+    assert grouped_data.obj[LABEL_KEY].tolist() == [0, 1]
+
+
+def test_reformat_and_group_data_combines_pandas_inputs_positionally():
+    sensitive_features = pd.DataFrame(
+        {"first": ["a", "b"], "second": ["x", "y"]},
+        index=[20, 10],
+    )
+    labels = pd.Series([0, 1], index=[10, 20])
+    scores = pd.Series([0.1, 0.2], index=[40, 30])
+
+    grouped_data = _reformat_and_group_data(
+        sensitive_features=sensitive_features,
+        labels=labels,
+        scores=scores,
+    )
+
+    assert grouped_data.get_group(("a", "x"))[[SCORE_KEY, LABEL_KEY]].values.tolist() == [[0.1, 0]]
+    assert grouped_data.get_group(("b", "y"))[[SCORE_KEY, LABEL_KEY]].values.tolist() == [[0.2, 1]]
+
+
+@pytest.mark.parametrize(
+    "input_name,input_value,error_match",
+    [
+        (
+            "scores",
+            pd.DataFrame({"score_1": [0.1, 0.2], "score_2": [0.3, 0.4]}),
+            "single column in score",
+        ),
+        (
+            "labels",
+            pd.DataFrame({"label_1": [0, 1], "label_2": [1, 0]}),
+            "single column in label",
+        ),
+    ],
+)
+def test_reformat_and_group_data_rejects_multi_column_auxiliary_data(
+    input_name,
+    input_value,
+    error_match,
+):
+    inputs = {
+        "sensitive_features": ["a", "b"],
+        "labels": [0, 1],
+        "scores": [0.1, 0.2],
+    }
+    inputs[input_name] = input_value
+
+    with pytest.raises(ValueError, match=error_match):
+        _reformat_and_group_data(**inputs)
+
+
+@pytest.mark.parametrize(
+    "scores",
+    [
+        [0.5],
+        np.array([0.5]),
+        np.array([[0.5]]),
+    ],
+)
+def test_reformat_and_group_data_rejects_singleton_score_length_mismatch(scores):
+    with pytest.raises(ValueError, match="(?i)length"):
+        _reformat_and_group_data(
+            sensitive_features=["a", "a", "b", "b"],
+            labels=[0, 1, 0, 1],
+            scores=scores,
+        )
+
+
+@pytest.mark.parametrize(
+    "columnless_input",
+    [
+        np.array(1),
+        np.empty((2, 0)),
+        pd.DataFrame(index=range(2)),
+    ],
+)
+@pytest.mark.parametrize("input_name", ["sensitive_features", "labels", "scores"])
+def test_reformat_and_group_data_rejects_columnless_inputs(input_name, columnless_input):
+    inputs = {
+        "sensitive_features": ["a", "b"],
+        "labels": [0, 1],
+        "scores": [0.1, 0.2],
+    }
+    inputs[input_name] = columnless_input
+
+    with pytest.raises(ValueError, match=f"at least one column in {input_name.rstrip('s')}"):
+        _reformat_and_group_data(**inputs)
+
+
+@pytest.mark.parametrize(
+    "sensitive_features",
+    [
+        [("a", "x"), ("b",)],
+        [[["a"]], [["b"]]],
+        np.array([[["a"]], [["b"]]]),
+    ],
+)
+def test_reformat_and_group_data_rejects_malformed_nested_sensitive_features(
+    sensitive_features,
+):
+    with pytest.raises(ValueError, match="single column in sensitive_feature"):
+        _reformat_and_group_data(
+            sensitive_features=sensitive_features,
+            labels=[0, 1],
+            scores=[0.1, 0.2],
+        )
+
+
+@pytest.mark.parametrize(
+    "sensitive_features,sensitive_feature_names,error_match",
+    [
+        (
+            [["a", "x"], ["b", "y"]],
+            ["first"],
+            "column names need to be of equal length",
+        ),
+        (
+            pd.DataFrame([["a", "x"], ["b", "y"]], columns=["group", "group"]),
+            None,
+            "column names need to be unique",
+        ),
+        (
+            [["a", "x"], ["b", "y"]],
+            ["group", "group"],
+            "column names need to be unique",
+        ),
+        (
+            pd.DataFrame([["a", "x"], ["b", "y"]], columns=[pd.NA, np.nan]),
+            None,
+            "column names need to be unique",
+        ),
+        (
+            [["a", "x"], ["b", "y"]],
+            [pd.NA, np.nan],
+            "column names need to be unique",
+        ),
+    ],
+)
+def test_reformat_and_group_data_rejects_invalid_sensitive_feature_names(
+    sensitive_features,
+    sensitive_feature_names,
+    error_match,
+):
+    with pytest.raises(ValueError, match=error_match):
+        _reformat_and_group_data(
+            sensitive_features=sensitive_features,
+            labels=[0, 1],
+            scores=[0.1, 0.2],
+            sensitive_feature_names=sensitive_feature_names,
+        )
+
+
+def test_reformat_and_group_data_rejects_reserved_sensitive_feature_names():
+    sensitive_features = pd.DataFrame({SCORE_KEY: ["a", "b"]})
+
+    with pytest.raises(ValueError, match="sensitive feature named"):
+        _reformat_and_group_data(
+            sensitive_features=sensitive_features,
+            labels=[0, 1],
+            scores=[0.1, 0.2],
+        )
