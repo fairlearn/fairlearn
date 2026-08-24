@@ -41,6 +41,9 @@ Bug fixes
   missing sensitive feature values are included in the overall curve but
   omitted from per-group curves, instead of raising a :code:`ValueError`:
   :pr:`1713` by :user:`SpiliosDimakopoulos`.
+* Fixed :code:`solve_linprog` so that failures reported by SciPy's linear
+  programming solver raise a :code:`RuntimeError` instead of allowing invalid
+  solver output to propagate: :pr:`1715` by :user:`Roman Lutz <romanlutz>`.
 
 Documentation
 -------------
