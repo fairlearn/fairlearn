@@ -120,7 +120,7 @@ class TestTwoFeatures:
 
     def test_nested_list(self):
         a, b, y_true = self._get_raw_data()
-        rf = [("a", 1), ("b", 2), ("a", 1), ("b", 2)]
+        rf = [a, b]
 
         target = _get_raw_MetricFrame()
         msg = "Feature lists must be of scalar types"
@@ -186,10 +186,35 @@ class TestTwoFeatures:
             _ = target._process_features("Ignored", raw_feature, y_true)
         assert msg in str(execInfo.value)
 
-    def test_float_entries(self):
+    @pytest.mark.parametrize(
+        "features",
+        [
+            pytest.param([1, 2.2, 3.3, 4.4], id="list"),
+            pytest.param(pd.Series([1, 2.2, 3.3, 4.4]), id="series"),
+            pytest.param(np.asarray([1, 2.2, 3.3, 4.4]), id="ndarray"),
+            pytest.param(
+                np.asarray([1, 2.2, 3.3, 4.4], dtype=np.float32),
+                id="ndarray-float32",
+            ),
+            pytest.param(
+                pd.DataFrame({"dimension1": [1, 2.2, 3.3, 4.4]}),
+                id="dataframe",
+            ),
+            pytest.param({"dimension1": [1, 2.2, 3.3, 4.4]}, id="dictionary"),
+            pytest.param(
+                pd.DataFrame(
+                    {
+                        "dimension1": [1, 2.2, 3.3, 4.4],
+                        "dimension2": [1.1, 2.2, 3.3, 4.4],
+                    }
+                ),
+                id="multi-column-dataframe",
+            ),
+        ],
+    )
+    def test_float_entries(self, features):
         y_true = [0, 1, 0, 1]
-        sensitive = [1.1, 2.2, 3.3, 4.4]  # float values should raise error
         target = _get_raw_MetricFrame()
 
-        with pytest.raises(ValueError, match=".*scalar non-float values.*"):
-            _ = target._process_features("unused", sensitive, y_true)
+        with pytest.raises(ValueError, match="scalar non-float values"):
+            _ = target._process_features("unused", features, y_true)

@@ -46,6 +46,9 @@ Documentation
 Other improvements
 ------------------
 
+* Added validation and documentation requiring scalar, non-floating entries for
+  :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
+  :pr:`1550` by :user:`MariamH <Mariamhaji>`.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
   :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.

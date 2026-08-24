@@ -127,6 +127,7 @@ class MetricFrame:
         will have one value for each subgroup in the control feature(s),
         rather than a single value for the entire data set.
         Control features can be specified similarly to the sensitive features.
+        The same scalar non-float entry requirement applies.
         However, their default names (if none can be identified in the
         input values) are of the format ``control_feature_[n]``.
         See the :ref:`section on intersecting groups <assessment_intersecting_groups>`
@@ -993,10 +994,6 @@ class MetricFrame:
         elif isinstance(features, list):
             if np.isscalar(features[0]):
                 f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
-                if not np.all([np.isscalar(x) and not isinstance(x, float) for x in f_arr]):
-                    raise ValueError(
-                        "Entries of sensitive_features must be scalar non-float values (e.g., strings or integers)"
-                    )
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0))

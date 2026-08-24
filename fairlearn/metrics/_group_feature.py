@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import narwhals.stable.v1 as nw
+import numpy as np
 
 _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
+_FEATURE_VALUE_NOT_SUPPORTED = (
+    "Feature entries must be scalar non-float values (e.g., strings or integers)"
+)
 
 
 class GroupFeature:
@@ -45,9 +49,14 @@ class GroupFeature:
         nw_feature_vector = nw.from_native(feature_vector, pass_through=True, allow_series=True)
         is_nw_series = isinstance(nw_feature_vector, nw.Series)
 
-        self.raw_feature_ = (
-            list(nw_feature_vector) if not is_nw_series else nw_feature_vector.to_list()
-        )
+        raw_feature = list(nw_feature_vector) if not is_nw_series else nw_feature_vector.to_list()
+        if not all(
+            np.isscalar(value) and not isinstance(value, (float, np.floating))
+            for value in raw_feature
+        ):
+            raise ValueError(_FEATURE_VALUE_NOT_SUPPORTED)
+
+        self.raw_feature_ = raw_feature
 
         self.name_ = f"{base_name}{index}"
 
