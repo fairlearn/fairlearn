@@ -15,6 +15,7 @@ def test_load_data_without_sensitive_features():
     moment.load_data(np.array([[0], [1]]), np.array([0, 1]))
 
     assert moment.tags.to_native().columns.tolist() == [_LABEL]
+    assert moment.total_samples == 2
 
 
 class _SeriesMoment(Moment[pd.Series]):

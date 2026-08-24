@@ -77,6 +77,17 @@ def test_error_rate_uses_prediction_values_not_pandas_index():
     assert result.error == 1.0
 
 
+def test_error_rate_supports_list_input_and_predictions():
+    error_rate = ErrorRate()
+    X = [[0], [1]]
+    error_rate.load_data(X, [0, 1], sensitive_features=[0, 1])
+
+    result = error_rate.gamma(lambda data: [1, 0])
+
+    assert error_rate.X is X
+    assert result.error == 1.0
+
+
 def test_error_rate_polars_compatible():
     """ErrorRate supports Polars input and Polars predictor output."""
     pl = pytest.importorskip("polars")

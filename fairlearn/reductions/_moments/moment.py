@@ -71,7 +71,7 @@ class Moment(Generic[_GammaResultT]):
     @property
     def total_samples(self) -> int:
         """Return the number of samples in the data."""
-        return self.X.shape[0]
+        return len(self.X)
 
     @property
     def _y_as_series(self) -> pd.Series:
