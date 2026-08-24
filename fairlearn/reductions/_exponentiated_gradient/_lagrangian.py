@@ -26,6 +26,23 @@ logger = logging.getLogger(__name__)
 _MESSAGE_BAD_OBJECTIVE = (
     "Objective needs to be of the same type as constraints. Objective is {}, constraints are {}."
 )
+_MESSAGE_LINPROG_FAILED = (
+    "Linear programming failed while solving the {} problem with method {}. "
+    "Status: {}. Message: {}"
+)
+_LINPROG_METHOD = "highs-ds"
+
+
+def _raise_if_linprog_failed(result, problem):
+    if not result.success:
+        raise RuntimeError(
+            _MESSAGE_LINPROG_FAILED.format(
+                problem,
+                _LINPROG_METHOD,
+                result.status,
+                result.message,
+            )
+        )
 
 
 class _PredictorAsCallable:
@@ -186,7 +203,15 @@ class _Lagrangian:
         b_ub = np.zeros(n_constraints)
         A_eq = np.concatenate((np.ones((1, n_hs)), np.zeros((1, 1))), axis=1)
         b_eq = np.ones(1)
-        result = opt.linprog(c, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, method="highs-ds")
+        result = opt.linprog(
+            c,
+            A_ub=A_ub,
+            b_ub=b_ub,
+            A_eq=A_eq,
+            b_eq=b_eq,
+            method=_LINPROG_METHOD,
+        )
+        _raise_if_linprog_failed(result, "primal")
         Q = pd.Series(result.x[:-1], self.hs.index)
         dual_c = np.concatenate((b_ub, -b_eq))
         dual_A_ub = np.concatenate((-A_ub.transpose(), A_eq.transpose()), axis=1)
@@ -199,8 +224,9 @@ class _Lagrangian:
             A_ub=dual_A_ub,
             b_ub=dual_b_ub,
             bounds=dual_bounds,
-            method="highs-ds",
+            method=_LINPROG_METHOD,
         )
+        _raise_if_linprog_failed(result_dual, "dual")
         lambda_vec = pd.Series(result_dual.x[:-1], self.constraints.index)
         self.last_linprog_n_hs = n_hs
         self.last_linprog_result = (
