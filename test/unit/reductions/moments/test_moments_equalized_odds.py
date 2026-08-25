@@ -37,7 +37,7 @@ def test_construct_and_load():
     # Examine the tags DF
     assert eqo.tags["label"].equals(pd.Series(Y))
     assert eqo.tags["group_id"].equals(pd.Series(A))
-    expected_tags_event = ["label={0}".format(a) for a in Y]
+    expected_tags_event = [f"label={a}" for a in Y]
     assert np.array_equal(expected_tags_event, eqo.tags["event"])
 
     # Examine the index MultiIndex
@@ -102,6 +102,11 @@ def test_construct_and_load():
 
 def test_project_lambda_smoke_negatives():
     eqo = EqualizedOdds()
+    eqo.load_data(
+        np.zeros((4, 1)),
+        pd.Series([False, False, True, True]),
+        sensitive_features=pd.Series(["a", "b", "a", "b"]),
+    )
 
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
@@ -115,7 +120,7 @@ def test_project_lambda_smoke_negatives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 0, 0, 1000, 1108, 1219, 1331], index=midx, dtype=np.float64)
+    expected = 0 + pd.Series([108, 0, 112, 0, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -123,6 +128,11 @@ def test_project_lambda_smoke_positives():
     # This is a repeat of the _negatives method but with
     # the '+' indices larger
     eqo = EqualizedOdds()
+    eqo.load_data(
+        np.zeros((4, 1)),
+        pd.Series([False, False, True, True]),
+        sensitive_features=pd.Series(["a", "b", "a", "b"]),
+    )
 
     events = ["label=False", "label=True"]
     signs = ["+", "-"]
@@ -136,8 +146,26 @@ def test_project_lambda_smoke_positives():
     ls = eqo.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([196, 295, 94, 593, 0, 0, 0, 0], index=midx, dtype=np.float64)
+    expected = 0 + pd.Series([0, 99, 0, 499, 0, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
+
+
+def test_project_lambda_handles_unequal_group_probabilities_by_event():
+    eqo = EqualizedOdds()
+    y = pd.Series([False] * 6 + [True] * 6)
+    sensitive_features = pd.Series(["a", "a", "b", "c", "c", "c", "a", "b", "b", "b", "b", "b"])
+    eqo.load_data(np.zeros((12, 1)), y, sensitive_features=sensitive_features)
+
+    lambda_vec = pd.Series(
+        [4, 2, 30, 8, 1, 1, 8, 0, 3, 7],
+        index=eqo.index,
+        dtype=np.float64,
+    )
+    projected = eqo.project_lambda(lambda_vec)
+
+    assert np.allclose(eqo.signed_weights(projected), eqo.signed_weights(lambda_vec))
+    assert projected.sum() <= lambda_vec.sum()
+    assert np.allclose(eqo.project_lambda(projected), projected)
 
 
 def test_signed_weights():

@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
-from test.unit.reductions.data_generators import loan_scenario_generator
-
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
@@ -21,6 +19,7 @@ from fairlearn.reductions import (
     FalsePositiveRateParity,
     TruePositiveRateParity,
 )
+from test.unit.reductions.data_generators import loan_scenario_generator
 
 # Set up a loan scenario, with three income bands A, B & C and
 # one sensitive attribute with values F & G

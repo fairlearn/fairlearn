@@ -1,0 +1,52 @@
+name: OpenML tests
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+      - "release/**"
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: openml-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  DATA_HOME: "~/openml_data"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: python scripts/install_requirements.py
+      - run: pip install .
+      - name: Get scikit-learn version
+        id: sklearn-version
+        run: python -c "import sklearn; print('version=' + sklearn.__version__)" >> "$GITHUB_OUTPUT"
+      - name: Cache OpenML datasets
+        id: openml-cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ env.DATA_HOME }}
+          key: ${{ runner.os }}-openml-datasets-v2-sklearn-${{ steps.sklearn-version.outputs.version }}-${{ hashFiles('fairlearn/datasets/_fetch_*.py', 'test/unit/datasets/test_datasets.py', 'test/unit/adversarial/test_preprocessing.py', 'test/unit/preprocessing/test_preprocessing_fairness.py', 'test/unit/test_random_state.py') }}
+          restore-keys: |
+            ${{ runner.os }}-openml-datasets-v2-sklearn-${{ steps.sklearn-version.outputs.version }}-
+      - name: Report OpenML cache result
+        run: echo "Exact cache hit ${{ steps.openml-cache.outputs.cache-hit }}"
+      - run: >
+          pytest
+          -W "default:A network error occurred while downloading:UserWarning"
+          -W "default:Invalid cache, redownloading file:RuntimeWarning"
+          -m openml -vl test/

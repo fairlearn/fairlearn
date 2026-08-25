@@ -18,12 +18,14 @@ from . import package_test_common as ptc  # noqa
 
 
 def create_model():
+    torch.manual_seed(12345)
+
     # create model
     class ClassificationModel(nn.Module):
         def __init__(self):
             super().__init__()
             self.model = nn.Sequential(
-                nn.Linear(103, 12),
+                nn.Linear(30, 12),
                 nn.ReLU(),
                 nn.Linear(12, 8),
                 nn.ReLU(),
@@ -44,9 +46,9 @@ def create_model():
             if isinstance(X, (pd.DataFrame, pd.Series)):
                 X = X.to_numpy().astype("float32")
             if isinstance(y, (pd.DataFrame, pd.Series)):
-                y = y.to_numpy()
+                y = y.to_numpy(copy=True)
             if sample_weight is not None and isinstance(sample_weight, (pd.DataFrame, pd.Series)):
-                sample_weight = sample_weight.to_numpy()
+                sample_weight = sample_weight.to_numpy(copy=True)
             y = y.reshape([-1, 1])
 
             sample_weight = sample_weight if sample_weight is not None else np.ones_like(y)
@@ -72,7 +74,7 @@ def create_model():
         ClassificationModel,
         max_epochs=10,
         optimizer=optim.Adam,
-        lr=0.001,
+        lr=0.01,
         batch_size=512,
         # No validation
         train_split=None,

@@ -33,10 +33,10 @@ METRICS_SPEC = [
     (skm.log_loss, ["group_max"]),
 ]
 
-_generated_metric_dict = dict()
+_generated_metric_dict = {}
 for base_metric, variants in METRICS_SPEC:
     for variant in variants:
-        name = "{0}_{1}".format(base_metric.__name__, variant)
+        name = f"{base_metric.__name__}_{variant}"
         fn = make_derived_metric(
             metric=base_metric, transform=variant, sample_param_names=["sample_weight"]
         )

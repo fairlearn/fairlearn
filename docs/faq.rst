@@ -23,7 +23,7 @@ Why not just ignore the sensitive features?
     Even if the model is not provided with race as a feature, the model will
     pick up on it implicitly via the ZIP code (and other features).
     Worse, without having the race available in the dataset, it is hard to
-    assess the  model's impact across different groups defined by race or by
+    assess the model's impact across different groups defined by race or by
     race intersected with other demographic features.
 
 The model is unfair because the data are biased. Isn't it better to get better data?
@@ -57,7 +57,7 @@ The model is unfair because the data are biased. Isn't it better to get better d
 
 Why am I seeing fairness issues, even though my data are reflective of the general population?
     Machine learning models often perform poorly for subgroups which are
-    poorly  represented.
+    poorly represented.
     What constitutes poor representation is context specific, and may well be
     affected by historical misrepresentation (consider the example above, of a
     company which had previously hired few women).

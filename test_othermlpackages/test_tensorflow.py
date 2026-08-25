@@ -4,6 +4,7 @@
 import pytest
 from keras.src.layers import Dense, Input
 from keras.src.models import Model
+from keras.utils import set_random_seed
 from keras.wrappers import SKLearnClassifier
 
 from fairlearn.adversarial import AdversarialFairnessClassifier
@@ -14,8 +15,10 @@ from . import package_test_common as ptc
 tf = pytest.importorskip("tensorflow")
 
 
-def create_model(X, y, loss="binary_crossentropy", layers=[12, 8]):
+def create_model(X, y, loss="binary_crossentropy", layers=None):
     # create model
+    if layers is None:
+        layers = [12, 8]
     n_features_in = X.shape[1]
     inp = Input(shape=(n_features_in,))
 
@@ -31,22 +34,34 @@ def create_model(X, y, loss="binary_crossentropy", layers=[12, 8]):
     return model
 
 
+@pytest.fixture(autouse=True)
+def reset_random_seed():
+    set_random_seed(12345)
+
+
+def create_estimator(*, epochs=1):
+    return SKLearnClassifier(
+        model=create_model,
+        fit_kwargs={"epochs": epochs, "verbose": 0},
+    )
+
+
 def test_expgrad_classification():
-    estimator = SKLearnClassifier(model=create_model)
+    estimator = create_estimator()
     disparity_moment = DemographicParity()
 
     ptc.run_expgrad_classification(estimator, disparity_moment)
 
 
 def test_gridsearch_classification():
-    estimator = SKLearnClassifier(model=create_model)
+    estimator = create_estimator(epochs=10)
     disparity_moment = DemographicParity()
 
     ptc.run_gridsearch_classification(estimator, disparity_moment)
 
 
 def test_thresholdoptimizer_classification():
-    estimator = SKLearnClassifier(model=create_model)
+    estimator = create_estimator()
 
     ptc.run_thresholdoptimizer_classification(estimator)
 

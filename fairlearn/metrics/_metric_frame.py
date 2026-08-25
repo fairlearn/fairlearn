@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from typing import Any, Literal
 
 import numpy as np
 import pandas as pd
@@ -280,7 +281,7 @@ class MetricFrame:
                 raise ValueError(_DUPLICATE_FEATURE_NAME.format(name))
             nameset.add(name)
 
-        self._result_cache = dict()
+        self._result_cache = {}
 
         # Create the basic results
         result = DisaggregatedResult.create(
@@ -362,7 +363,7 @@ class MetricFrame:
         # Next up, group_min and group_max
         group_functions = {"group_min": "min", "group_max": "max"}
         for k, v in group_functions.items():
-            self._result_cache[k] = dict()
+            self._result_cache[k] = {}
             for err_string in _VALID_ERROR_STRING:
                 try:
                     self._result_cache[k][err_string] = self._group(raw_result, v, err_string)
@@ -372,9 +373,9 @@ class MetricFrame:
 
         # Differences and ratios
         for c_t in ["difference", "ratio"]:
-            self._result_cache[c_t] = dict()
+            self._result_cache[c_t] = {}
             for c_m in _COMPARE_METHODS:
-                self._result_cache[c_t][c_m] = dict()
+                self._result_cache[c_t][c_m] = {}
                 for err_string in _VALID_ERROR_STRING:
                     try:
                         if c_t == "difference":
@@ -426,7 +427,7 @@ class MetricFrame:
 
         # Differences and ratios
         for c_t in ["difference_ci", "ratio_ci"]:
-            self._result_cache[c_t] = dict()
+            self._result_cache[c_t] = {}
             for c_m in _COMPARE_METHODS:
                 if c_t == "difference_ci":
                     raw_samples = [

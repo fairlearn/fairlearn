@@ -67,9 +67,8 @@ def _baseline_dir():
     # set of baselines. Pick the matching directory at import time.
     if not is_mpl_installed():
         return "../plot_snapshots"
-    from packaging.version import Version
-
     import matplotlib
+    from packaging.version import Version
 
     if Version(matplotlib.__version__) >= Version("3.11"):
         return "../plot_snapshots"

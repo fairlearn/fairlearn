@@ -64,10 +64,7 @@ class _GridGenerator:
             self.grid_offset = grid_offset
 
         # true dimensionality of the grid
-        if self.force_L1_norm:
-            true_dim = self.dim - 1
-        else:
-            true_dim = self.dim
+        true_dim = self.dim - 1 if self.force_L1_norm else self.dim
 
         if true_dim > GRID_DIMENSION_WARN_THRESHOLD:
             logger.warning(GRID_DIMENSION_WARN_TEMPLATE, true_dim, GRID_DIMENSION_WARN_THRESHOLD)

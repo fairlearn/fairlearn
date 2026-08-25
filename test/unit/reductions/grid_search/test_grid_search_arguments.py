@@ -3,19 +3,6 @@
 
 import logging
 import re
-from test.unit.input_convertors import (
-    conversions_for_1d,
-    ensure_dataframe,
-    ensure_ndarray,
-)
-from test.unit.reductions.conftest import is_invalid_transformation
-from test.unit.reductions.exponentiated_gradient.simple_learners import (
-    LeastSquaresRegressor,
-)
-from test.unit.reductions.grid_search.utilities import (
-    _quick_data,
-    assert_n_grid_search_results,
-)
 
 import numpy as np
 import pandas as pd
@@ -42,6 +29,19 @@ from fairlearn.utils._input_validation import (
     _LABELS_NOT_0_1_ERROR_MESSAGE,
     _MESSAGE_X_Y_ROWS,
     _MESSAGE_Y_NONE,
+)
+from test.unit.input_convertors import (
+    conversions_for_1d,
+    ensure_dataframe,
+    ensure_ndarray,
+)
+from test.unit.reductions.conftest import is_invalid_transformation
+from test.unit.reductions.exponentiated_gradient.simple_learners import (
+    LeastSquaresRegressor,
+)
+from test.unit.reductions.grid_search.utilities import (
+    _quick_data,
+    assert_n_grid_search_results,
 )
 
 # ==============================================================
@@ -225,7 +225,9 @@ class ArgumentTests:
         log_records = caplog.get_records("call")
         dimension_log_record = log_records[0]
         size_log_record = log_records[1]
-        if isinstance(self.disparity_criterion, EqualizedOdds):
+        # Kept as if/else: each branch has an explanatory comment that a ternary
+        # would drop.
+        if isinstance(self.disparity_criterion, EqualizedOdds):  # noqa: SIM108
             # not every label occurs with every group
             grid_dimensions = 10
         else:
@@ -423,7 +425,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
@@ -443,7 +445,7 @@ class ConditionalOpportunityTests(ArgumentTests):
         with pytest.raises(ValueError) as execInfo:
             gs.fit(transformX(X), transformY(Y), sensitive_features=transformA(A))
 
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
 
 # Set up Pipeline estimator
