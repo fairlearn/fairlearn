@@ -48,6 +48,8 @@ jobs:
           pip install --upgrade --pre --extra-index
           https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
           scikit-learn
+      - if: ${{ inputs.sklearnNightly }}
+        run: python -c "import sklearn; assert '.dev' in sklearn.__version__, sklearn.__version__"
       - run: pip install matplotlib
       - run: >
           pytest --mpl
