@@ -222,7 +222,7 @@ as the objective, leading to a vastly reduced difference in accuracy:
     >>> mitigator = ExponentiatedGradient(classifier, constraint, objective=objective)
     >>> mitigator.fit(X_train, y_train, sensitive_features=A_train)
     ExponentiatedGradient(...)
-    >>> y_pred_mitigated = mitigator.predict(X_test)
+    >>> y_pred_mitigated = mitigator.predict(X_test, random_state=42)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall.item()
     0.5251...
