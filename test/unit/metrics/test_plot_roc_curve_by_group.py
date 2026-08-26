@@ -251,3 +251,20 @@ class TestPlotRocCurveByGroup:
         labels = [line.get_label() for line in ax.get_lines()]
         assert not any("nan" in label.lower() for label in labels)
         assert _expected_label("Overall", y_t, y_score) in labels
+
+    def test_missing_value_in_multiple_sensitive_features_is_skipped(self, two_sensitive_features):
+        sf = two_sensitive_features.astype(object)
+        sf[0, 1] = np.nan
+
+        ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=sf)
+
+        labels = [line.get_label() for line in ax.get_lines()]
+        assert not any("nan" in label.lower() for label in labels)
+
+        missing_rows = np.zeros(len(sf), dtype=bool)
+        missing_rows[0] = True
+        expected_groups = {tuple(row) for row in sf[~missing_rows]}
+        for values in expected_groups:
+            group = ",".join(values)
+            mask = (~missing_rows) & np.all(sf == values, axis=1)
+            assert _expected_label(group, y_t[mask], y_score[mask]) in labels

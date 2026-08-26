@@ -135,8 +135,11 @@ def plot_roc_curve_by_group(
         sensitive_features, ensure_2d=False, dtype=None, ensure_all_finite=False
     )
     if sensitive_features.ndim > 1 and sensitive_features.shape[1] > 1:
-        sensitive_features = _merge_columns(sensitive_features)
-    sensitive_features = pd.Series(sensitive_features.squeeze())
+        missing_rows = pd.isna(sensitive_features).any(axis=1)
+        sensitive_features = pd.Series(_merge_columns(sensitive_features))
+        sensitive_features.loc[missing_rows] = pd.NA
+    else:
+        sensitive_features = pd.Series(sensitive_features.squeeze())
 
     if ax is None:
         _, ax = plt.subplots()

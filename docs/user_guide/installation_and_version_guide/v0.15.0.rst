@@ -37,15 +37,10 @@ Bug fixes
   :code:`FloatTransformer.inverse_transform` so that they raise
   :code:`NotFittedError` instead of :code:`AttributeError` when called before
   :code:`fit`: :pr:`1709` by :user:`SpiliosDimakopoulos`.
-* :func:`~fairlearn.metrics.plot_roc_curve_by_group` raised
-  :code:`ValueError: Input contains NaN` for any row with a missing sensitive
-  feature value, even though its docstring says it follows the same
-  convention as :class:`~fairlearn.metrics.MetricFrame`, whose
-  :code:`by_group` results simply omit such rows. It now matches that
-  convention: rows with a missing sensitive feature value are included in
-  the overall curve but skipped when drawing per-group curves, instead of
-  raising: :pr:`REPLACE_WITH_PR_NUMBER` by
-  :user:`REPLACE_WITH_YOUR_GITHUB_USERNAME`.
+* Fixed :func:`~fairlearn.metrics.plot_roc_curve_by_group` so that rows with
+  missing sensitive feature values are included in the overall curve but
+  omitted from per-group curves, instead of raising a :code:`ValueError`:
+  :pr:`1713` by :user:`SpiliosDimakopoulos`.
 
 Documentation
 -------------
@@ -55,6 +50,10 @@ Documentation
 Other improvements
 ------------------
 
+* Tightened the internal projection of Lagrange multipliers for difference-based
+  reductions constraints by removing the redundant per-event group-membership
+  component while preserving the classifier-dependent Lagrangian term: :pr:`1714`
+  by :user:`quinnarnold <quinnarnold>`.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
   :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
