@@ -25,7 +25,7 @@ def loan_scenario_generator(
             n_curr = class_sizes[ib][sf]
             f_curr = success_fractions[ib][sf]
 
-            for i in range(n_curr):
+            for _i in range(n_curr):
                 IB.append(ib)
                 SF.append(sf)
                 flip = random.random()

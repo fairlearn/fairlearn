@@ -97,7 +97,7 @@ class UtilityParity(ClassificationMoment):
         ratio_bound_slack: float = 0.0,
     ):
         """Initialize with the ratio value."""
-        super(UtilityParity, self).__init__()
+        super().__init__()
         if (difference_bound is None) and (ratio_bound is None):
             self.eps = _DEFAULT_DIFFERENCE_BOUND
             self.ratio = 1.0
@@ -242,7 +242,6 @@ class UtilityParity(ClassificationMoment):
         """
         return pd.Series(self.eps, index=self.index)
 
-    # TODO: this can be further improved using the overcompleteness in group membership
     def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
         """Return the projected lambda values.
 
@@ -250,10 +249,23 @@ class UtilityParity(ClassificationMoment):
         Lagrangian compared with lambda_vec for all possible choices of the classifier, h.
         """
         if self.ratio == 1.0:
-            lambda_pos = lambda_vec["+"] - lambda_vec["-"]
-            lambda_neg = -lambda_pos
-            lambda_pos[lambda_pos < 0.0] = 0.0
-            lambda_neg[lambda_neg < 0.0] = 0.0
+            lambda_signed = (lambda_vec["+"] - lambda_vec["-"]).astype(np.float64)
+            group_prob = self.prob_group_event.div(self.prob_event, level=_EVENT)
+
+            # Within each event, sum_g P(g|e) * gamma_(+,e,g) = 0. Thus shifting
+            # lambda_signed by a multiple of P(g|e) preserves its inner product with
+            # gamma. A weighted median minimizes the L1 norm over all such shifts.
+            for _, event_lambda in lambda_signed.groupby(level=_EVENT, sort=False):
+                event_prob = group_prob.loc[event_lambda.index]
+                normalized_lambda = event_lambda / event_prob
+                order = np.argsort(normalized_lambda.to_numpy(), kind="stable")
+                cumulative_prob = event_prob.iloc[order].cumsum()
+                median_position = np.searchsorted(cumulative_prob.to_numpy(), event_prob.sum() / 2)
+                shift = normalized_lambda.iloc[order[median_position]]
+                lambda_signed.loc[event_lambda.index] = event_lambda - event_prob * shift
+
+            lambda_pos = lambda_signed.clip(lower=0.0)
+            lambda_neg = (-lambda_signed).clip(lower=0.0)
             lambda_projected = pd.concat(
                 [lambda_pos, lambda_neg],
                 keys=["+", "-"],

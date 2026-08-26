@@ -118,7 +118,7 @@ def test_lagrangian_eval(eps, Constraints, use_Q_callable, opt_lambda):
         )
     ).all()
 
-    assert L == pytest.approx(L_expected, abs=_PRECISION)
+    assert pytest.approx(L_expected, abs=_PRECISION) == L
     assert L_high == pytest.approx(L_high_expected, abs=_PRECISION)
     assert error == 0.25
     assert (gamma == best_h_gamma).all()
@@ -225,10 +225,7 @@ def test_objective_constraints_compatibility(Constraints, Objective):
     else:
         constraints = Constraints()
 
-    if issubclass(Objective, LossMoment):
-        objective = Objective(ZeroOneLoss())
-    else:
-        objective = Objective()
+    objective = Objective(ZeroOneLoss()) if issubclass(Objective, LossMoment) else Objective()
 
     if objective._moment_type() != constraints._moment_type():
         with pytest.raises(ValueError) as execInfo:
@@ -274,10 +271,7 @@ def get_lambda_new_weights_and_labels(constraints, X, y, A):
     objective.load_data(X, y, sensitive_features=A)
     signed_weights = objective.signed_weights() + constraints.signed_weights(lambda_vec)
 
-    if isinstance(constraints, LossMoment):
-        redY = y
-    else:  # classification
-        redY = 1 * (signed_weights > 0)
+    redY = y if isinstance(constraints, LossMoment) else 1 * (signed_weights > 0)
     redW = signed_weights.abs()
     redW = y.shape[0] * redW / redW.sum()
     return lambda_vec, redW, redY

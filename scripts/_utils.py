@@ -17,9 +17,7 @@ def _ensure_cwd_is_fairlearn_root_dir():
         os.path.join(os.getcwd(), "README.rst")
     ):
         raise Exception(
-            "Please run this from the fairlearn root directory. Current directory: {}".format(
-                os.getcwd()
-            )
+            f"Please run this from the fairlearn root directory. Current directory: {os.getcwd()}"
         )
 
 
@@ -35,12 +33,14 @@ def _get_fairlearn_version():
     for node in tree.body:
         if isinstance(node, ast.Assign):
             for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "__version__":
-                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
-                        return node.value.value
-    raise RuntimeError(
-        "Could not find a string literal assignment to __version__ in {}".format(init_path)
-    )
+                if (
+                    isinstance(target, ast.Name)
+                    and target.id == "__version__"
+                    and isinstance(node.value, ast.Constant)
+                    and isinstance(node.value.value, str)
+                ):
+                    return node.value.value
+    raise RuntimeError(f"Could not find a string literal assignment to __version__ in {init_path}")
 
 
 class _LogWrapper:

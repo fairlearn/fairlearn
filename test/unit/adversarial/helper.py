@@ -226,7 +226,7 @@ cols = 5
 Bin2d = np.random.choice([0.0, 1.0], size=(rows, cols))
 Bin1d = np.random.choice([0.0, 1.0], size=(rows,))
 Cat = np.zeros((rows, cols), dtype=float)
-Cat[np.arange(rows), np.random.choice([i for i in range(cols)], size=(rows,))] = 1.0
+Cat[np.arange(rows), np.random.choice(list(range(cols)), size=(rows,))] = 1.0
 Cat1d = Cat[:, 0]
 Cont2d = np.random.rand(rows, cols)
 Cont1d = np.random.rand(
@@ -262,7 +262,7 @@ def generate_data_combinations(n=10):
         Y = c % K
         c = (c - Y) // K
         Z = c % K
-        assert X + Y * K + Z * K * K == c_orig
+        assert c_orig == X + Y * K + Z * K * K
         X_type = dist_type[X]
         X = dataX[X]
         Y_type = dist_type[Y]
@@ -341,7 +341,7 @@ def get_instance(
     fake_backend : Literal["torch", "tensorflow"] | None
         which backend to use
     """
-    default_kwargs = dict()
+    default_kwargs = {}
 
     if fake_backend == "torch":
         default_kwargs["predictor_model"] = fake_torch.nn.Module()

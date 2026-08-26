@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
-from typing import Iterable
+from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
@@ -50,7 +50,9 @@ def maximize_objective_with_tolerance(
     n = len(x_values)
 
     # Extract weighted `y` columns
-    y_columns = [df[y_col].values * weight for df, weight in zip(dataframes, weights)]
+    y_columns = [
+        df[y_col].values * weight for df, weight in zip(dataframes, weights, strict=False)
+    ]
     m = len(y_columns)
 
     # Initialize a deque for each DataFrame to store indices in descending order of y values.

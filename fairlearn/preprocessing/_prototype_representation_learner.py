@@ -17,7 +17,6 @@ from sklearn.calibration import LabelEncoder
 from sklearn.dummy import check_random_state
 from sklearn.metrics import log_loss
 from sklearn.utils.multiclass import type_of_target
-
 from sklearn.utils.validation import validate_data
 
 from fairlearn.utils._input_validation import _validate_and_reformat_input
@@ -32,6 +31,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     the classification error, and an approximation of the demographic parity difference.
 
     Read more in the :ref:`User Guide <preprocessing>`.
+
+    .. versionadded:: 0.13.0
 
     Parameters
     ----------

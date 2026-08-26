@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Callable
+from collections.abc import Callable
 
 from numpy import array, zeros
 from sklearn.utils.validation import check_array
@@ -115,7 +115,7 @@ def plot_model_comparison(
     try:
         import matplotlib.pyplot as plt
     except ImportError:
-        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE)
+        raise RuntimeError(_MATPLOTLIB_IMPORT_ERROR_MESSAGE) from None
 
     _, y_true, sensitive_features, _ = _validate_and_reformat_input(
         zeros((len(y_true), 1)),  # Dummy values for X
@@ -173,10 +173,7 @@ def plot_model_comparison(
         if not len(point_labels) == y_preds.shape[0]:
             raise ValueError(_INCONSISTENT_ARRAY_LENGTH.format("point_labels and y_preds"))
     elif isinstance(point_labels, bool):
-        if point_labels:
-            point_labels = inferred_point_labels
-        else:
-            point_labels = None
+        point_labels = inferred_point_labels if point_labels else None
     else:
         raise ValueError(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(

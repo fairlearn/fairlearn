@@ -1,13 +1,5 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
-from test.unit.input_convertors import (
-    _map_into_single_column,
-    conversions_for_1d,
-    ensure_dataframe,
-    ensure_ndarray,
-)
-from test.unit.reductions.conftest import is_invalid_transformation
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -17,6 +9,13 @@ from sklearn.preprocessing import StandardScaler
 
 from fairlearn.reductions import DemographicParity, ErrorRate, ExponentiatedGradient
 from fairlearn.utils._input_validation import _LABELS_NOT_0_1_ERROR_MESSAGE
+from test.unit.input_convertors import (
+    _map_into_single_column,
+    conversions_for_1d,
+    ensure_dataframe,
+    ensure_ndarray,
+)
+from test.unit.reductions.conftest import is_invalid_transformation
 
 from .simple_learners import LeastSquaresBinaryClassifierLearner
 from .test_utilities import _get_data
@@ -197,7 +196,7 @@ class TestExponentiatedGradientArguments:
         )
         with pytest.raises(ValueError) as execInfo:
             expgrad.fit(X, y, sensitive_features=(A))
-        assert _LABELS_NOT_0_1_ERROR_MESSAGE == execInfo.value.args[0]
+        assert execInfo.value.args[0] == _LABELS_NOT_0_1_ERROR_MESSAGE
 
     def test_sample_weights_argument(self):
         estimator = Pipeline(

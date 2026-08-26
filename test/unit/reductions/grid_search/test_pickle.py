@@ -3,18 +3,21 @@
 
 import copy
 import pickle
+
 import pytest
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
 from fairlearn.reductions import (
+    AbsoluteLoss,
+    BoundedGroupLoss,
     DemographicParity,
-    TruePositiveRateParity,
-    FalsePositiveRateParity,
     ErrorRateParity,
+    FalsePositiveRateParity,
+    GridSearch,
+    SquareLoss,
+    TruePositiveRateParity,
+    ZeroOneLoss,
 )
-from fairlearn.reductions import BoundedGroupLoss
-from fairlearn.reductions import AbsoluteLoss, SquareLoss, ZeroOneLoss
-from fairlearn.reductions import GridSearch
 
 from .utilities import _quick_data
 

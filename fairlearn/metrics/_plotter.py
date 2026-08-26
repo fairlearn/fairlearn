@@ -27,7 +27,7 @@ _CONF_INTERVALS_FLIPPED_BOUNDS_ERROR = (
 
 
 def _is_arraylike(input_):
-    return isinstance(input_, np.ndarray) or isinstance(input_, list)
+    return isinstance(input_, (np.ndarray, list))
 
 
 def _build_legend(ax, kind, legend_label):
@@ -132,13 +132,13 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
         return {}
 
     # Zip and sort by quantile value so lower < upper always
-    pairs = sorted(zip(ci_quantiles, ci_data), key=lambda x: x[0])
+    pairs = sorted(zip(ci_quantiles, ci_data, strict=True), key=lambda x: x[0])
 
     if len(pairs) > 2:
         import warnings
 
         warnings.warn(
-            f"ci_quantiles has {len(pairs)} entries; " "using the outermost pair for error bars.",
+            f"ci_quantiles has {len(pairs)} entries; using the outermost pair for error bars.",
             stacklevel=2,
         )
 
@@ -152,12 +152,12 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
             lower = lo_data[col].values
             upper = hi_data[col].values
             ci_col = f"__metricframe_ci_{col}"
-            mapping[col] = (ci_col, list(zip(lower, upper)))
+            mapping[col] = (ci_col, list(zip(lower, upper, strict=True)))
     else:
         # Single metric: by_group_ci returns Series
         col = lo_data.name or "metric"
         ci_col = f"__metricframe_ci_{col}"
-        mapping[col] = (ci_col, list(zip(lo_data.values, hi_data.values)))
+        mapping[col] = (ci_col, list(zip(lo_data.values, hi_data.values, strict=True)))
 
     return mapping
 
@@ -245,7 +245,7 @@ def plot_metric_frame(
     if not isinstance(metric_frame, MetricFrame):
         raise (ValueError(_METRIC_FRAME_INVALID_ERROR))
     # ensure metrics is either list, str, or None
-    if not (isinstance(metrics, list) or isinstance(metrics, str) or metrics is None):
+    if not (isinstance(metrics, (list, str)) or metrics is None):
         raise ValueError(_METRICS_NOT_LIST_OR_STR_ERROR.format(type(metrics)))
 
     metrics = [metrics] if isinstance(metrics, str) else metrics
@@ -253,7 +253,7 @@ def plot_metric_frame(
 
     df = metric_frame.by_group
 
-    # Normalise to DataFrame so column iteration works for single-metric
+    # Normalize to DataFrame so column iteration works for single-metric
     # frames where by_group is a Series.
     if isinstance(df, pd.Series):
         df = df.to_frame()
@@ -299,10 +299,12 @@ def plot_metric_frame(
     df_all_errors = pd.DataFrame([])
     df_all_bounds = pd.DataFrame([])
     # plotting with confidence intervals:
-    for metric, conf_interval in zip(metrics, conf_intervals):
+    for metric, conf_interval in zip(metrics, conf_intervals, strict=False):
         df_temp = pd.DataFrame([])
         df_temp[["lower", "upper"]] = pd.DataFrame(df[conf_interval].tolist(), index=df.index)
-        df_temp["error"] = list(zip(df[metric] - df_temp["lower"], df_temp["upper"] - df[metric]))
+        df_temp["error"] = list(
+            zip(df[metric] - df_temp["lower"], df_temp["upper"] - df[metric], strict=False)
+        )
         df_all_errors[metric] = df_temp["error"]
 
         if plot_ci_labels:

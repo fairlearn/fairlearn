@@ -12,7 +12,7 @@ Each record represents the hospital admission record for a patient diagnosed wit
 diabetes whose stay lasted between one to fourteen days. Also, laboratory tests were
 performed and medications were administered during the encounter. The features
 describing each encounter include demographics, diagnoses, diabetic medications, number
-of visits in the year preceding  the encounter, and payer information, as well as
+of visits in the year preceding the encounter, and payer information, as well as
 whether the patient was readmitted after release, and whether the readmission occurred
 within 30 days of the release.
 
