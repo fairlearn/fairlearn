@@ -672,6 +672,10 @@ The :class:`ExponentiatedGradient` algorithm in Fairlearn is used to produce mod
 satisfy fairness constraints without needing access to sensitive features at deployment time.
 This algorithm creates a sequence of re-weighted datasets and retrains the
 wrapped classifier on each of these datasets.
+Intuitively, each round increases the emphasis on constraints that the current predictors
+violate, so the base estimator focuses on examples that help reduce those violations. The
+result is a randomized mixture of predictors: :meth:`ExponentiatedGradient.predict` samples
+from this mixture, and repeated calls may therefore produce different predictions.
 To instantiate an :class:`ExponentiatedGradient` model, we need to pass in a base estimator
 and fairness constraints. The fairness constraints are typically specified by providing
 an upper bound on the difference (or the ratio) between the largest and the smallest
@@ -741,6 +745,23 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
 The performance-fairness trade-off learned by the ExponentiatedGradient model is
 sensitive to the chosen epsilon value, so epsilon can be treated as a hyperparameter
 and iterated over a range of potential values.
+
+Choosing epsilon
+~~~~~~~~~~~~~~~~
+
+In this example, epsilon refers to the bound supplied to the constraint
+(:code:`difference_bound`). Smaller values request stricter parity, which may reduce predictive
+performance or be difficult to satisfy when some groups or events contain few samples. A useful
+starting scale for a difference-based bound is the sampling uncertainty of the fairness metric;
+this is often on the order of :math:`1 / \sqrt{n}`, where :math:`n` is the number of samples in
+the smallest relevant group or event. This is only a starting point: domain requirements and the
+costs of different errors should determine which trade-offs are acceptable.
+
+Evaluate several plausible bounds on a validation set, plot predictive performance against the
+same fairness metric represented by the constraint, and select a model that meets the application
+requirements. Keep a separate test set for the final evaluation. The :code:`eps` argument of
+:class:`ExponentiatedGradient` is a distinct optimization parameter that controls the L1 norm
+bound; it is not the bound passed to the :class:`Moment`.
 
 
 .. topic:: References
