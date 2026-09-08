@@ -49,6 +49,11 @@ Bug fixes
   omitted from per-group curves, instead of raising a :code:`ValueError`:
   :pr:`1713` by :user:`SpiliosDimakopoulos`.
 
+Narwhals integration
+--------------------
+
+* Made the :code:`fairlearn.utils` module dataframe agnostic through Narwhals: :pr:`1533` by :user:`Edoardo Abati <EdAbati>`.
+
 Documentation
 -------------
 
