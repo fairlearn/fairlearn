@@ -990,8 +990,10 @@ class MetricFrame:
                 check_consistent_length(column, sample_array)
                 result.append(GroupFeature(base_name, column, i))
         elif isinstance(features, list):
-            if np.isscalar(features[0]):
-                f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
+            if all(pd.api.types.is_scalar(feature) for feature in features):
+                # dtype=object keeps a missing value from being cast to the
+                # string 'nan' and becoming a category of its own
+                f_arr = np.atleast_1d(np.squeeze(np.asarray(features, dtype=object)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0))

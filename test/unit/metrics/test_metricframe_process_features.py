@@ -30,6 +30,29 @@ class TestSingleFeature:
         result = target._process_features("SF", raw_feature, y_true)
         self._common_validations(result, "SF0")
 
+    @pytest.mark.parametrize("missing_index", [0, 2, 3])
+    def test_single_list_missing_value(self, missing_index):
+        _, y_true = self._get_raw_data()
+        raw_feature = ["a", "a", "b", "c"]
+        raw_feature[missing_index] = np.nan
+
+        target = _get_raw_MetricFrame()
+        msg = (
+            "Feature 'SF0' contains missing values. Remove or replace them "
+            "before constructing a MetricFrame"
+        )
+        with pytest.raises(ValueError) as execInfo:
+            _ = target._process_features("SF", raw_feature, y_true)
+        assert execInfo.value.args[0] == msg
+
+    def test_single_list_nonscalar_value(self):
+        _, y_true = self._get_raw_data()
+        raw_feature = ["a", ["b"], "c", "d"]
+
+        target = _get_raw_MetricFrame()
+        with pytest.raises(ValueError, match="Feature lists must be of scalar types"):
+            _ = target._process_features("SF", raw_feature, y_true)
+
     def test_single_series(self):
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.Series(data=r_f, name="Some Series")
@@ -44,6 +67,19 @@ class TestSingleFeature:
 
         target = _get_raw_MetricFrame()
         msg = "Series name must be a string. Value '0' was of type <class 'int'>"
+        with pytest.raises(ValueError) as execInfo:
+            _ = target._process_features("Ignored", raw_feature, y_true)
+        assert execInfo.value.args[0] == msg
+
+    def test_single_series_missing_value(self):
+        r_f, y_true = self._get_raw_data()
+        raw_feature = pd.Series(data=["a", "a", "b", np.nan], name="SF 0")
+
+        target = _get_raw_MetricFrame()
+        msg = (
+            "Feature 'SF 0' contains missing values. Remove or replace them "
+            "before constructing a MetricFrame"
+        )
         with pytest.raises(ValueError) as execInfo:
             _ = target._process_features("Ignored", raw_feature, y_true)
         assert execInfo.value.args[0] == msg
