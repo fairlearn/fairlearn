@@ -481,6 +481,62 @@ Note: Some have identified that using the term *stakeholder* may perpetuate colo
 
 **Factors and groups** include not only demographic factors (e.g. race, gender, age) but also sociocultural factors (e.g., head coverings, facial hair, glasses), behavioral factors (e.g., walking speed) and morphological (e.g., body shape, skin tone) :footcite:`barocas2021disagg` .
 
+Identifying stakeholders
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Involve data scientists and engineers, UX researchers, social scientists, and domain experts
+in identifying stakeholders, together with people who may be affected by the AI system.
+Community and civil society organizations can help identify people the project team has
+overlooked. Ask participants whose perspectives are missing and how to include them.
+Consider who can influence design decisions: consulting stakeholders does not necessarily
+give them power over the outcome :footcite:`delgado2023participatory`.
+For example, a platform operator may be able to change a fraud detection system, while a
+person whose transaction it blocks may have little opportunity to challenge that decision.
+Discuss these differences in power and any conflicting interests when planning participation.
+
+For each intended use, describe the system's purpose and deployment context, then identify
+who operates it, whose data or decisions it involves, and who could experience its effects
+without using it. Record these roles and possible benefits and harms, using prompts such as
+those in section 2.2 of the Responsible AI Impact Assessment Guide
+:footcite:`microsoft2022impact`. In :ref:`the fraud detection example <defining_terms>`,
+a team could begin by asking customers, platform operators, and auditors how transactions
+are reviewed today and who else is affected. During design, customers and customer-support
+staff could help identify difficulties in disputing a blocked transaction. During evaluation,
+they could help interpret errors and their consequences. After deployment, reviewing
+complaints with these stakeholders could reveal additional affected groups. Revisit the
+stakeholder list throughout the AI system's lifecycle, including when its use changes.
+
+Identifying factors and groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+People in the same stakeholder role can experience different harms. Use the
+:ref:`factors described above <defining_terms>` to identify groups for assessment; for
+example, language proficiency is a factor, and second language learners might be a relevant
+group when evaluating a translation system. Ask stakeholders which distinctions matter for
+the particular use case and deployment context, rather than relying only on demographic
+categories. Factors can also cut across roles: language proficiency may matter for both
+customers and support staff. Consider :ref:`intersecting groups <assessment_intersecting_groups>`
+because evaluating factors separately can obscure differences in people's experiences
+:footcite:`barocas2021disagg`.
+
+Consider historical disparities and cultural context when deciding whom to involve and which
+groups to assess. Ask domain experts and affected communities about past exclusion in the
+relevant setting and how it may shape the data or decisions used by the system. For example,
+the healthcare case discussed earlier shows how using healthcare costs as a proxy for need
+can reproduce disparities in access to care :footcite:`obermeyer2019dissecting`. Geographic
+and cultural differences also matter: object recognition systems have performed poorly on
+household items from lower-income countries, with differences in objects' appearance and
+surroundings contributing to errors :footcite:`devries2019object`. Involving people from the
+intended deployment settings can help teams identify relevant groups and evaluation examples.
+
+Check the :ref:`construct validity <construct_validity>` of the social categories used to
+define groups. Discuss with stakeholders what a category is intended to represent, how it
+is recorded, and whose experiences it may leave out. For example, nationality is not
+necessarily a valid measure of language proficiency for a translation system. Categories
+available in a dataset may not capture the distinctions relevant to a fairness assessment
+:footcite:`barocas2021disagg`. Reconsider group definitions when moving to a different
+setting rather than assuming that definitions from a previous project still apply.
+
 .. topic:: References
 
    .. footbibliography::
