@@ -211,6 +211,34 @@ Refer to the following examples for more details:
 - :ref:`sphx_glr_auto_examples_plot_adversarial_basics.py`
 - :ref:`sphx_glr_auto_examples_plot_adversarial_fine_tuning.py`
 
+Additional experiments
+----------------------
+
+Sean McCarren's `adversarial debiasing experiments
+<https://github.com/SeanMcCarren/adversarial-debiasing>`_ explore applications from
+:footcite:t:`zhang2018mitigating` beyond the Adult dataset:
+
+- The `toy classification example
+  <https://github.com/SeanMcCarren/adversarial-debiasing/blob/main/reproduce_toy.py>`_
+  generates a binary sensitive feature and correlated input features. It uses
+  :class:`AdversarialFairnessClassifier` and reports accuracy and selection rates
+  by group with :class:`fairlearn.metrics.MetricFrame`.
+- The `word embedding example
+  <https://github.com/SeanMcCarren/adversarial-debiasing/blob/main/reproduce_embeddings.py>`_
+  uses :class:`AdversarialFairnessRegressor` to predict a word embedding in an analogy
+  task. The sensitive feature is the embedding's projection onto a direction derived
+  from pairs of words associated with binary gender categories. This projection is a
+  continuous value, not a category. Both the embedding target and the sensitive feature
+  therefore use squared-error losses, rather than the cross-entropy losses used for
+  classification. See :ref:`adversarial_data_types` for how these losses are inferred.
+
+These external experiments were written for an earlier Fairlearn implementation and
+require adaptation to the current API. For example, their ``max_iter`` argument is no
+longer available; the current estimators use ``epochs`` to limit training.
+The word embedding experiment illustrates a modeling choice about gender associations
+in text; its binary framing does not represent the full range of gender identities or
+establish fairness in downstream uses.
+
 .. topic:: References
 
    .. footbibliography::
