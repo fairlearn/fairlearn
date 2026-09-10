@@ -61,6 +61,18 @@ Other improvements
   reductions constraints by removing the redundant per-event group-membership
   component while preserving the classifier-dependent Lagrangian term: :pr:`1714`
   by :user:`quinnarnold <quinnarnold>`.
+* **Behaviour change.** :func:`~fairlearn.datasets.fetch_bank_marketing` and
+  :func:`~fairlearn.datasets.fetch_credit_card` now report the authoritative UCI
+  column names (:code:`age`, :code:`job`, ... and :code:`LIMIT_BAL`, :code:`SEX`, ...)
+  instead of passing through the placeholder names carried by the underlying OpenML
+  records (:code:`V1` ... :code:`V16` and :code:`x1` ... :code:`x23`), so a sensitive
+  feature can be selected by its documented name. The names are applied consistently to
+  :code:`feature_names`, the :code:`data` and :code:`frame` DataFrame columns, and the
+  :code:`return_X_y=True` result; categorical metadata keys in non-frame Bunches are
+  remapped to match. Code that selects columns by the previous OpenML names will need
+  updating; positional access, OpenML data IDs, targets, arrays, and dtypes are
+  unchanged. The loaders now raise a :code:`ValueError` rather than relabelling if a
+  record's column count ever stops matching: by :user:`breken-ai`.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
   :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
