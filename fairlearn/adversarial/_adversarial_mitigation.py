@@ -24,7 +24,7 @@ from sklearn.utils.validation import (
     validate_data,
 )
 
-from ._backend_engine import BackendEngine
+from ._backend_engine import BackendEngine, _check_2d
 from ._constants import (
     _CALLBACK_RETURNS_ERROR,
     _IMPORT_ERROR_MESSAGE,
@@ -547,6 +547,7 @@ class _AdversarialFairness(BaseEstimator):
         self : object
             Returns self.
         """
+        _check_2d(X)
         first_call = not hasattr(self, "classes_")
 
         if first_call and classes is not None:
@@ -577,6 +578,7 @@ class _AdversarialFairness(BaseEstimator):
             Two-dimensional array containing the model's (soft-)predictions
         """
         check_is_fitted(self)
+        _check_2d(X)
         X = validate_data(
             self,
             X,
@@ -671,6 +673,8 @@ class _AdversarialFairness(BaseEstimator):
                 raise ValueError(
                     "Unknown label type: Regression targets have been passed to AdversarialFairnessClassifier."
                 )
+
+        _check_2d(X)
 
         # Probe whether the estimator has been fitted so _validate_input
         # can decide whether to initialize the backend engine. `_is_setup`

@@ -1,9 +1,10 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import re
 import sys
 from typing import Literal
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
@@ -14,6 +15,8 @@ from fairlearn.adversarial import (
     AdversarialFairnessRegressor,
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
+from fairlearn.adversarial._backend_engine import _check_2d
+from fairlearn.adversarial._constants import _X_NOT_2D
 from fairlearn.adversarial._preprocessor import FloatTransformer
 from test._sklearn_compat import parametrize_with_checks
 
@@ -32,6 +35,78 @@ from .helper import (
 )
 
 BackendType = Literal["torch", "tensorflow"]
+
+
+@pytest.mark.parametrize(
+    "X",
+    [[1, 2], np.array([1, 2]), np.zeros((1, 2, 3))],
+)
+def test_adversarial_non_2d_features_raise_shared_error_before_backend(X):
+    """The shared backend boundary rejects non-matrix features."""
+    ndim = np.asarray(X).ndim
+    with pytest.raises(ValueError, match=re.escape(_X_NOT_2D.format(ndim))):
+        _check_2d(X)
+
+
+def test_adversarial_check_2d_preserves_dataframe_identity_and_columns():
+    """The shared guard validates DataFrames without coercing their columns."""
+    X = pd.DataFrame([[1, 2]], columns=["first", "second"])
+    assert _check_2d(X) is None
+    assert X.columns.tolist() == ["first", "second"]
+
+
+def test_adversarial_check_2d_accepts_convertible_non_array_inputs():
+    """The guard avoids NumPy protocol dispatch when a shape is unavailable."""
+
+    class ConvertibleArray:
+        def __array__(self, dtype=None, copy=None):
+            return np.asarray([[1, 2]], dtype=dtype)
+
+        def __array_function__(self, func, types, args, kwargs):
+            raise TypeError(f"unsupported NumPy function: {func.__name__}")
+
+    assert _check_2d(ConvertibleArray()) is None
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+@pytest.mark.parametrize("method", ["predict", "partial_fit"])
+@pytest.mark.parametrize(
+    "bad_X",
+    [
+        # 3-D with a trailing-feature axis matching ``n_features_in_``. This is the
+        # shape that reached the backend before the guard: ``allow_nd=True`` lets it
+        # past ``validate_data`` and ``X.shape[1] == n_features_in_`` satisfies the
+        # pre-existing feature-count check in ``partial_fit``.
+        np.zeros((Bin2d.shape[0], cols, 3)),
+        # 3-D with a mismatched second axis, and the two 1-D forms. These were already
+        # rejected before this change, by the feature-count check and by
+        # ``validate_data(ensure_2d=True)`` respectively; they are kept so the new
+        # guard is what raises, with one shared message, on every non-2D input.
+        np.zeros((1, 2, 3)),
+        [1, 2],
+        np.array([1, 2]),
+    ],
+)
+@pytest.mark.parametrize("skip_validation", [False, True])
+def test_fitted_adversarial_methods_reject_non_2d_before_backend(
+    fake_backend_env, method, bad_X, skip_validation
+):
+    """Fitted predict and partial-fit never invoke a backend for non-2D input."""
+    mitigator = get_instance(fake_mixin=True, fake_backend=fake_backend_env)
+    mitigator.fit(Bin2d, Bin1d, sensitive_features=Bin1d)
+    mitigator.skip_validation = skip_validation
+    backend_method = "evaluate" if method == "predict" else "train_step"
+    setattr(
+        mitigator.backendEngine_,
+        backend_method,
+        Mock(side_effect=AssertionError("backend called")),
+    )
+    with pytest.raises(ValueError, match=re.escape(_X_NOT_2D.format(np.asarray(bad_X).ndim))):
+        if method == "predict":
+            mitigator.predict(bad_X)
+        else:
+            mitigator.partial_fit(bad_X, Bin1d, sensitive_features=Bin1d)
+    getattr(mitigator.backendEngine_, backend_method).assert_not_called()
 
 
 @pytest.fixture(scope="function")
