@@ -7,6 +7,25 @@ from sklearn.datasets import fetch_openml
 
 from ._constants import _DOWNLOAD_DIRECTORY_NAME
 
+_BANK_FEATURE_NAMES = [
+    "age",
+    "job",
+    "marital",
+    "education",
+    "default",
+    "balance",
+    "housing",
+    "loan",
+    "contact",
+    "day",
+    "month",
+    "duration",
+    "campaign",
+    "pdays",
+    "previous",
+    "poutcome",
+]
+
 
 def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_y=False):
     """Load the UCI bank marketing dataset (binary classification).
@@ -74,12 +93,23 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
             otherwise.
             If ``as_frame`` is True, ``target`` is a pandas object.
         feature_names : list of length 16
-            Array of ordered feature names used in the dataset.
+            The ordered UCI column names: ``age``, ``job``, ``marital``,
+            ``education``, ``default``, ``balance``, ``housing``, ``loan``,
+            ``contact``, ``day``, ``month``, ``duration``, ``campaign``,
+            ``pdays``, ``previous``, ``poutcome``. When ``as_frame`` is True the
+            same names are used for the ``data`` and ``frame`` columns, and for
+            the ``X`` returned by ``return_X_y=True``.
+
+            .. versionchanged:: 0.15.0
+                Previously these were whatever names the underlying OpenML
+                record carried, which are placeholders (``V1`` ... ``V16``)
+                rather than the UCI column names.
         DESCR : string
             Description of the UCI bank marketing dataset.
         categories : dict or None
             Maps each categorical feature name to a list of values, such that the
             value encoded as i is ith in the list. If ``as_frame`` is True, this is None.
+            The keys use the UCI names listed under ``feature_names``.
         frame : pandas DataFrame
             Only present when ``as_frame`` is True. DataFrame with ``data`` and ``target``.
 
@@ -94,7 +124,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
 
     # For data_home see
     # https://github.com/scikit-learn/scikit-learn/issues/27447
-    return fetch_openml(
+    result = fetch_openml(
         data_id=1461,
         data_home=str(data_home),
         cache=cache,
@@ -102,3 +132,35 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
         return_X_y=return_X_y,
         parser="auto",
     )
+    # The authoritative names are applied positionally, so refuse to relabel a record
+    # whose width does not match instead of silently mislabelling the columns.
+    if return_X_y:
+        X, y = result
+        original_feature_names = list(X.columns) if as_frame else []
+        observed_n_features = X.shape[1]
+    else:
+        original_feature_names = list(result.feature_names)
+        observed_n_features = len(original_feature_names)
+    if observed_n_features != len(_BANK_FEATURE_NAMES):
+        raise ValueError(
+            f"Expected the OpenML record with data_id=1461 backing the UCI bank marketing "
+            f"dataset to have {len(_BANK_FEATURE_NAMES)} features, but it has "
+            f"{observed_n_features}. The authoritative feature names are applied "
+            f"positionally and cannot be matched to this record."
+        )
+
+    if return_X_y:
+        if as_frame:
+            X = X.copy()
+            X.columns = _BANK_FEATURE_NAMES
+        return X, y
+    result.feature_names = _BANK_FEATURE_NAMES
+    if as_frame:
+        result.data.columns = _BANK_FEATURE_NAMES
+        result.frame.columns = _BANK_FEATURE_NAMES + [result.target.name]
+    elif isinstance(getattr(result, "categories", None), dict):
+        feature_name_map = dict(zip(original_feature_names, _BANK_FEATURE_NAMES, strict=True))
+        result.categories = {
+            feature_name_map.get(name, name): values for name, values in result.categories.items()
+        }
+    return result
