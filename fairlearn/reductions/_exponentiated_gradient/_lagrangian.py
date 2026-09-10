@@ -137,12 +137,17 @@ class _Lagrangian:
             response of the lambda player, `gamma` is the vector of constraint
             violations, and `error` is the empirical error
         """
+        if lambda_vec.empty and self.constraints.index.empty:
+            lambda_vec = pd.Series(dtype=float, index=self.constraints.index)
         if callable(Q):
             error = self.obj.gamma(Q).iloc[0]
             gamma = self.constraints.gamma(Q)
         else:
             error = self.errors[Q.index].dot(Q)
             gamma = self.gammas[Q.index].dot(Q)
+
+        if self.constraints.index.empty:
+            gamma = pd.Series(dtype=float, index=self.constraints.index)
 
         if self.opt_lambda:
             lambda_vec = self.constraints.project_lambda(lambda_vec)
@@ -174,6 +179,15 @@ class _Lagrangian:
         n_hs = len(self.hs)
         n_constraints = len(self.constraints.index)
         if self.last_linprog_n_hs == n_hs:
+            return self.last_linprog_result
+        if n_constraints == 0:
+            best_h_idx = self.errors.idxmin()
+            Q = pd.Series(0.0, index=self.hs.index)
+            Q.loc[best_h_idx] = 1.0
+            lambda_vec = pd.Series(dtype=float, index=self.constraints.index)
+            result = self.eval_gap(Q, lambda_vec, nu)
+            self.last_linprog_n_hs = n_hs
+            self.last_linprog_result = (Q, lambda_vec, result)
             return self.last_linprog_result
         c = np.concatenate((self.errors, [self.B]))
         A_ub = np.concatenate(

@@ -200,6 +200,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 Qsum.at[h_idx] = 0.0
             Qsum[h_idx] += 1.0
             gamma = lagrangian.gammas[h_idx]
+            if lagrangian.constraints.index.empty:
+                gamma = pd.Series(dtype=float, index=lagrangian.constraints.index)
             Q_EG = Qsum / Qsum.sum()
             result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, self.nu)
             gap_EG = result_EG.gap()
