@@ -23,6 +23,14 @@ New features
 Bug fixes
 ---------
 
+* Fixed :class:`~fairlearn.reductions.TruePositiveRateParity` and
+  :class:`~fairlearn.reductions.FalsePositiveRateParity` so that data in which the
+  conditioning event never occurs (all-negative labels for true positive rate parity,
+  all-positive labels for false positive rate parity) produces a vacuous, empty set of
+  constraints instead of raising from zero-dimensional intermediates.
+  :class:`~fairlearn.reductions.ExponentiatedGradient` and
+  :class:`~fairlearn.reductions.GridSearch` now fit and predict on such data,
+  returning the unconstrained best hypothesis: by :user:`breken-ai`.
 * :class:`~fairlearn.metrics.MetricFrame` now raises a :code:`ValueError` when a
   sensitive or control feature contains missing values, naming the offending
   feature. Previously a missing value was silently dropped from
