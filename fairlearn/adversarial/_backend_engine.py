@@ -1,6 +1,7 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import numpy as np
 from numpy import ndarray
 from sklearn.utils import shuffle
 
@@ -12,6 +13,15 @@ from ._constants import (
     _NOT_IMPLEMENTED,
     _X_NOT_2D,
 )
+
+
+def _check_2d(X):
+    """Validate matrix-shaped features without changing their representation."""
+    dimensions = getattr(X, "ndim", None)
+    if dimensions is None:
+        dimensions = np.asarray(X).ndim
+    if dimensions != 2:
+        raise ValueError(_X_NOT_2D.format(dimensions))
 
 
 class BackendEngine:
@@ -34,8 +44,7 @@ class BackendEngine:
         """
         self.base = base
 
-        if X.ndim != 2:
-            raise ValueError(_X_NOT_2D.format(X.ndim))
+        _check_2d(X)
         n_X_features = X.shape[1]
         n_Y_features = base._y_transform.n_features_out_
         n_A_features = base._sf_transform.n_features_out_
