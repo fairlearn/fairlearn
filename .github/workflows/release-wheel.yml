@@ -33,7 +33,7 @@ jobs:
     - name: Save wheels to artifact
       uses: actions/upload-artifact@v7
       with:
-        name: env.WHEEL_ARTIFACT
+        name: ${{ env.WHEEL_ARTIFACT }}
         path: dist/
 
   test-wheel:
@@ -56,7 +56,7 @@ jobs:
     - name: Download wheel artifact
       uses: actions/download-artifact@v8
       with:
-        name: env.WHEEL_ARTIFACT
+        name: ${{ env.WHEEL_ARTIFACT }}
     - name: Install Fairlearn from wheel
       # Do this in three steps to make sure that fairlearn wasn't pulled from PyPI
       run: |
@@ -80,7 +80,7 @@ jobs:
     - name: Download wheel artifact
       uses: actions/download-artifact@v8
       with:
-        name: env.WHEEL_ARTIFACT
+        name: ${{ env.WHEEL_ARTIFACT }}
         path: dist
     - name: DEBUG
       run: ls -R

@@ -23,6 +23,8 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
     predictive accuracy of probability of default of credit card clients", Expert Systems
     with Applications, 36(2), 2473-2480, 2009
 
+    .. versionadded:: 0.9.0
+
     Parameters
     ----------
     cache : boolean, default=True

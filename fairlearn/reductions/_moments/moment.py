@@ -42,7 +42,8 @@ class Moment:
         sensitive_features : :class:`pandas.Series`
             The sensitive feature vector (default None)
         """
-        assert self.data_loaded is False, "data can be loaded only once"
+        if self.data_loaded:
+            raise ValueError("data can be loaded only once")
         if sensitive_features is not None:
             assert isinstance(sensitive_features, pd.Series)
         self.X = X

@@ -85,6 +85,11 @@ def test_construct_and_load():
 
 def test_project_lambda_smoke_negatives():
     dp = DemographicParity()
+    dp.load_data(
+        np.zeros((4, 1)),
+        pd.Series([0, 0, 0, 0]),
+        sensitive_features=pd.Series(["a", "a", "b", "b"]),
+    )
 
     events = ["all"]
     signs = ["+", "-"]
@@ -99,7 +104,7 @@ def test_project_lambda_smoke_negatives():
     ls = dp.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([0, 0, 10, 17], index=midx, dtype=np.float64)
+    expected = 0 + pd.Series([7, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
 
 
@@ -107,6 +112,11 @@ def test_project_lambda_smoke_positives():
     # This is a repeat of the _negatives method but with
     # the '+' indices larger
     dp = DemographicParity()
+    dp.load_data(
+        np.zeros((4, 1)),
+        pd.Series([0, 0, 0, 0]),
+        sensitive_features=pd.Series(["a", "a", "b", "b"]),
+    )
 
     events = ["all"]
     signs = ["+", "-"]
@@ -121,8 +131,30 @@ def test_project_lambda_smoke_positives():
     ls = dp.project_lambda(df)
 
     expected = pd.DataFrame()
-    expected = 0 + pd.Series([18, 12, 0, 0], index=midx, dtype=np.float64)
+    expected = 0 + pd.Series([6, 0, 0, 0], index=midx, dtype=np.float64)
     assert expected.equals(ls)
+
+
+def test_project_lambda_uses_group_membership_redundancy():
+    eps = 0.1
+    dp = DemographicParity(difference_bound=eps)
+    X = np.zeros((10, 1))
+    y = pd.Series(np.zeros(10, dtype=int))
+    sensitive_features = pd.Series(["a"] * 2 + ["b"] * 2 + ["c"] * 6)
+    dp.load_data(X, y, sensitive_features=sensitive_features)
+
+    lambda_vec = pd.Series([4, 2, 30, 1, 8, 0], index=dp.index, dtype=np.float64)
+    projected = dp.project_lambda(lambda_vec)
+
+    expected = pd.Series([0, 0, 0, 7, 16, 0], index=dp.index, dtype=np.float64)
+    assert expected.equals(projected)
+    assert projected.sum() < lambda_vec.sum()
+    assert np.allclose(dp.signed_weights(projected), dp.signed_weights(lambda_vec))
+
+    for predictions in [np.zeros(10), np.ones(10), np.arange(10) % 2]:
+        gamma = dp.gamma(lambda _, predictions=predictions: predictions)
+        assert np.isclose(projected.dot(gamma), lambda_vec.dot(gamma))
+        assert projected.dot(gamma - dp.bound()) >= lambda_vec.dot(gamma - dp.bound())
 
 
 def test_signed_weights():

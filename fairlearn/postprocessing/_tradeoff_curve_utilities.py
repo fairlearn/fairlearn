@@ -296,7 +296,7 @@ def _calculate_tradeoff_points(
         The DataFrame containing scores and labels.
     sensitive_feature_value : str, int
         The sensitive feature value of the samples provided in `data`.
-    flip : bool, default = True
+    flip : bool, default=False
         If True `flip` points below the ROC diagonal into points above by
         applying negative weights; if False does not allow flipping.
     x_metric : str, default="false_positive_rate"
