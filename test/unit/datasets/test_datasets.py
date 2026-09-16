@@ -92,6 +92,58 @@ class TestFairlearnDataset:
         assert mocked.call_args.kwargs["data_id"] == data_id
 
     @pytest.mark.parametrize(
+        ("module", "loader", "n_features"),
+        [
+            ("fairlearn.datasets._fetch_bank_marketing", fetch_bank_marketing, 16),
+            ("fairlearn.datasets._fetch_credit_card", fetch_credit_card, 23),
+        ],
+    )
+    @pytest.mark.parametrize("as_frame", [True, False])
+    @pytest.mark.parametrize("return_X_y", [True, False])
+    def test_dataset_feature_names_are_independent(
+        self, module, loader, n_features, as_frame, return_X_y
+    ):
+        def fake_fetch_openml(*, as_frame, return_X_y, **kwargs):
+            data = pd.DataFrame(
+                np.zeros((2, n_features)), columns=[f"old{i}" for i in range(n_features)]
+            )
+            target = pd.Series([0, 1], name="target")
+            frame = pd.concat([data, target], axis=1) if as_frame else None
+            original_names = data.columns.tolist()
+            if not as_frame:
+                data, target = data.to_numpy(), target.to_numpy()
+            if return_X_y:
+                return data, target
+            return Bunch(data=data, target=target, frame=frame, feature_names=original_names)
+
+        with patch(f"{module}.fetch_openml", side_effect=fake_fetch_openml):
+            first = loader(as_frame=as_frame)
+            second = loader(as_frame=as_frame)
+            expected_names = first.feature_names.copy()
+            assert first.feature_names is not second.feature_names
+
+            first.feature_names[0] = "renamed"
+            first.feature_names.pop()
+            assert second.feature_names == expected_names
+            if as_frame:
+                assert first.data.columns.tolist() == expected_names
+                assert first.frame.columns.tolist() == expected_names + ["target"]
+
+            result = loader(as_frame=as_frame, return_X_y=return_X_y)
+
+        if return_X_y:
+            X, y = result
+        else:
+            assert result.feature_names == expected_names
+            X, y = result.data, result.target
+            if as_frame:
+                assert result.frame.columns.tolist() == expected_names + ["target"]
+        assert X.shape == (2, n_features)
+        assert y.tolist() == [0, 1]
+        if as_frame:
+            assert X.columns.tolist() == expected_names
+
+    @pytest.mark.parametrize(
         ("module", "loader", "data_id", "names"),
         [
             (

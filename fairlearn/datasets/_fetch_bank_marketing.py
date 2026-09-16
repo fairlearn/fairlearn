@@ -99,6 +99,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
             ``pdays``, ``previous``, ``poutcome``. When ``as_frame`` is True the
             same names are used for the ``data`` and ``frame`` columns, and for
             the ``X`` returned by ``return_X_y=True``.
+            Each returned Bunch has its own ``feature_names`` list.
 
             .. versionchanged:: 0.15.0
                 Previously these were whatever names the underlying OpenML
@@ -154,7 +155,7 @@ def fetch_bank_marketing(*, cache=True, data_home=None, as_frame=True, return_X_
             X = X.copy()
             X.columns = _BANK_FEATURE_NAMES
         return X, y
-    result.feature_names = _BANK_FEATURE_NAMES
+    result.feature_names = _BANK_FEATURE_NAMES.copy()
     if as_frame:
         result.data.columns = _BANK_FEATURE_NAMES
         result.frame.columns = _BANK_FEATURE_NAMES + [result.target.name]
