@@ -70,10 +70,12 @@ Other improvements
   feature can be selected by its documented name. The names are applied consistently to
   :code:`feature_names`, the :code:`data` and :code:`frame` DataFrame columns, and the
   :code:`return_X_y=True` result; categorical metadata keys in non-frame Bunches are
-  remapped to match. Code that selects columns by the previous OpenML names will need
+  remapped to match. Each returned Bunch has its own :code:`feature_names` list, so
+  modifying it does not affect other results or later loads. Code that selects
+  columns by the previous OpenML names will need
   updating; positional access, OpenML data IDs, targets, arrays, and dtypes are
   unchanged. The loaders now raise a :code:`ValueError` rather than relabelling if a
-  record's column count ever stops matching: by :user:`breken-ai`.
+  record's column count ever stops matching: :pr:`1728` by :user:`breken-ai`.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
   :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
