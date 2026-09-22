@@ -23,6 +23,13 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` now raises a :code:`ValueError` when a
+  sensitive or control feature contains missing values, naming the offending
+  feature. Previously a missing value was silently dropped from
+  :attr:`~fairlearn.metrics.MetricFrame.by_group` while still counting towards
+  :attr:`~fairlearn.metrics.MetricFrame.overall`, and a feature passed as a list
+  instead of a :code:`pandas.Series` turned the missing value into a category
+  named :code:`'nan'`: :pr:`1698` by :user:`Edward Yi <aiedwardyi>`.
 * Fixed :code:`AssertionError: data can be loaded only once` raised when a
   :class:`~fairlearn.reductions.Moment` instance is passed as :code:`constraints`
   to more than one call of :code:`ExponentiatedGradient.fit` or
@@ -41,6 +48,7 @@ Bug fixes
   missing sensitive feature values are included in the overall curve but
   omitted from per-group curves, instead of raising a :code:`ValueError`:
   :pr:`1713` by :user:`SpiliosDimakopoulos`.
+* Already-fitted adversarial estimators now enforce the same two-dimensional input requirement in :code:`predict` and :code:`partial_fit`, including when input validation is skipped: :pr:`1711` by :user:`Roman Lutz <romanlutz>`.
 
 Documentation
 -------------
@@ -54,6 +62,20 @@ Other improvements
   reductions constraints by removing the redundant per-event group-membership
   component while preserving the classifier-dependent Lagrangian term: :pr:`1714`
   by :user:`quinnarnold <quinnarnold>`.
+* **Behaviour change.** :func:`~fairlearn.datasets.fetch_bank_marketing` and
+  :func:`~fairlearn.datasets.fetch_credit_card` now report the authoritative UCI
+  column names (:code:`age`, :code:`job`, ... and :code:`LIMIT_BAL`, :code:`SEX`, ...)
+  instead of passing through the placeholder names carried by the underlying OpenML
+  records (:code:`V1` ... :code:`V16` and :code:`x1` ... :code:`x23`), so a sensitive
+  feature can be selected by its documented name. The names are applied consistently to
+  :code:`feature_names`, the :code:`data` and :code:`frame` DataFrame columns, and the
+  :code:`return_X_y=True` result; categorical metadata keys in non-frame Bunches are
+  remapped to match. Each returned Bunch has its own :code:`feature_names` list, so
+  modifying it does not affect other results or later loads. Code that selects
+  columns by the previous OpenML names will need
+  updating; positional access, OpenML data IDs, targets, arrays, and dtypes are
+  unchanged. The loaders now raise a :code:`ValueError` rather than relabelling if a
+  record's column count ever stops matching: :pr:`1728` by :user:`breken-ai`.
 * Preserved multi-column sensitive feature data in
   :class:`fairlearn.postprocessing.ThresholdOptimizer` data reformatting helpers:
   :pr:`1679` by :user:`BALOGUN-DAVID <BALOGUN-DAVID>`.
