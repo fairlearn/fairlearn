@@ -58,7 +58,7 @@ Documentation
   :func:`~fairlearn.datasets.fetch_credit_card`: the :code:`states` parameter of the former was
   not parsed as a parameter because of a missing space before the colon, and the latter now uses
   numpydoc type names (:code:`bool`, :code:`str`) and refers to the fairlearn data folder
-  instead of scikit-learn's.
+  instead of scikit-learn's: :pr:`1731` by :user:`rabiya43`.
 
 Other improvements
 ------------------
