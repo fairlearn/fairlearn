@@ -61,7 +61,7 @@ def fetch_acs_income(
         If True, returns ``(data.data, data.target)`` instead of a Bunch
         object.
 
-    states: list, default=None
+    states : list, default=None
         List containing two letter (capitalized) state abbreviations.
         If None, data from all 50 US states and Puerto Rico will be returned.
         Note that Puerto Rico is the only US territory included in this dataset.
