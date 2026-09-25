@@ -49,6 +49,13 @@ Bug fixes
   omitted from per-group curves, instead of raising a :code:`ValueError`:
   :pr:`1713` by :user:`SpiliosDimakopoulos`.
 * Already-fitted adversarial estimators now enforce the same two-dimensional input requirement in :code:`predict` and :code:`partial_fit`, including when input validation is skipped: :pr:`1711` by :user:`Roman Lutz <romanlutz>`.
+* Fixed :class:`~fairlearn.preprocessing.CorrelationRemover` so that each
+  sensitive feature is centered by its own mean. With more than one sensitive
+  feature, :code:`fit` used a single mean over all sensitive columns, so the
+  transformed features stayed correlated with the sensitive features whenever
+  those columns had different means (for example several one-hot encoded
+  groups). :code:`sensitive_mean_` now holds one mean per sensitive feature:
+  :pr:`1732` by :user:`breken-ai`.
 
 Documentation
 -------------
