@@ -50,6 +50,13 @@ Bug fixes
   :pr:`1713` by :user:`SpiliosDimakopoulos`.
 * Already-fitted adversarial estimators now enforce the same two-dimensional input requirement in :code:`predict` and :code:`partial_fit`, including when input validation is skipped: :pr:`1711` by :user:`Roman Lutz <romanlutz>`.
 
+* Fixed :func:`~fairlearn.metrics.selection_rate` returning a one-element array
+  instead of a scalar when :code:`sample_weight` is passed for a single sample. In a
+  weighted :class:`~fairlearn.metrics.MetricFrame` this happens for any group with one
+  member, and :func:`~fairlearn.metrics.demographic_parity_difference` and
+  :func:`~fairlearn.metrics.demographic_parity_ratio` then reported 0 and 1 (no disparity)
+  regardless of the actual selection rates: :pr:`TBD` by :user:`breken-ai`.
+
 Documentation
 -------------
 
