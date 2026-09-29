@@ -242,7 +242,30 @@ class MetricFrame:
         ci_quantiles: list[float] | None = None,
         random_state: int | np.random.RandomState | None = None,
     ):
-        """Read a placeholder comment."""
+        """Initialize the MetricFrame.
+
+        Parameters
+        ----------
+        metrics : callable or dict[str, callable]
+            The metric(s) to compute. Can be a single callable or a dictionary
+            mapping metric names to callables.
+        y_true : array-like
+            The ground-truth labels.
+        y_pred : array-like
+            The predicted labels.
+        sensitive_features : array-like
+            The sensitive features used to define groups.
+        control_features : array-like, optional
+            Control features used to stratify the analysis.
+        sample_params : dict or dict[str, dict], optional
+            Sample parameters to pass to the metric functions.
+        n_boot : int, optional
+            Number of bootstrap samples for confidence intervals.
+        ci_quantiles : list[float], optional
+            Quantiles for confidence intervals.
+        random_state : int or np.random.RandomState, optional
+            Random state for reproducibility.
+        """
         check_consistent_length(y_true, y_pred)
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -467,7 +490,7 @@ class MetricFrame:
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
-            The exact type varies based on whether control featuers were
+            The exact type varies based on whether control features were
             provided and how the metric functions were specified.
 
             ======== ================  =================================
