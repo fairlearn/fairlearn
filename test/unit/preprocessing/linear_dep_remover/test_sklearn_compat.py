@@ -129,3 +129,26 @@ def test__check_sensitive_features_in_X_array_dataframe(
 
     with expectation:
         remover._check_sensitive_features_in_X(X)
+
+
+def test_correlation_remover_centers_each_sensitive_feature_separately(constructor) -> None:
+    # Two sensitive features with very different means, e.g. a one-hot column
+    # and a numeric one. Each must be centered by its own mean, otherwise the
+    # filtered features stay correlated with the sensitive features.
+    rng = np.random.default_rng(0)
+    s1 = rng.integers(0, 2, 200).astype(float)
+    s2 = rng.normal(10, 1, 200)
+    z1 = 2 * s1 + 3 * s2 + rng.normal(0, 1, 200)
+    z2 = -s1 + 0.5 * s2 + rng.normal(0, 1, 200)
+    X = constructor({"s1": s1, "s2": s2, "z1": z1, "z2": z2})
+
+    remover = CorrelationRemover(sensitive_feature_ids=["s1", "s2"]).fit(X)
+    X_tfm = remover.transform(X)
+
+    for sensitive in (s1, s2):
+        for column in X_tfm.T:
+            assert abs(np.corrcoef(column, sensitive)[0, 1]) < 1e-8
+    # Only the part explained by the centered sensitive features is removed,
+    # so the means of the non-sensitive features are preserved.
+    np.testing.assert_array_almost_equal(X_tfm.mean(axis=0), [z1.mean(), z2.mean()])
+    np.testing.assert_array_almost_equal(remover.sensitive_mean_, [s1.mean(), s2.mean()])
