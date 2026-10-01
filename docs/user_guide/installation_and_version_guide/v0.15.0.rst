@@ -57,6 +57,13 @@ Bug fixes
   groups). :code:`sensitive_mean_` now holds one mean per sensitive feature:
   :pr:`1732` by :user:`breken-ai`.
 
+* Fixed :func:`~fairlearn.metrics.selection_rate` returning a one-element array
+  instead of a scalar when :code:`sample_weight` is passed for a single sample. In a
+  weighted :class:`~fairlearn.metrics.MetricFrame` this happens for any group with one
+  member, and :func:`~fairlearn.metrics.demographic_parity_difference` and
+  :func:`~fairlearn.metrics.demographic_parity_ratio` then reported 0 and 1 (no disparity)
+  regardless of the actual selection rates: :pr:`1734` by :user:`breken-ai`.
+
 Documentation
 -------------
 

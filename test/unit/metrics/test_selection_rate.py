@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import numpy as np
 import pytest
 
 import fairlearn.metrics as metrics
@@ -51,6 +52,37 @@ def test_selection_rate_weighted():
     result = metrics.selection_rate(y_true, y_pred, sample_weight=weight)
 
     assert result == 0.3125
+
+
+@pytest.mark.parametrize("y_pred", [[1], [0]])
+def test_selection_rate_weighted_single_element_is_scalar(y_pred):
+    result = metrics.selection_rate([1], y_pred, sample_weight=[2])
+
+    assert np.ndim(result) == 0
+    assert result == y_pred[0]
+
+
+def test_demographic_parity_difference_weighted_with_single_member_group():
+    # Group "b" has a single sample. Its selection rate must be a scalar, or
+    # the between-groups difference comes out wrong.
+    y_true = [0, 1, 1, 0]
+    y_pred = [1, 0, 1, 1]
+    sensitive_features = ["a", "a", "a", "b"]
+    weight = [1, 1, 2, 3]
+
+    mf = metrics.MetricFrame(
+        metrics=metrics.selection_rate,
+        y_true=y_true,
+        y_pred=y_pred,
+        sensitive_features=sensitive_features,
+        sample_params={"sample_weight": weight},
+    )
+    assert mf.by_group.to_dict() == {"a": 0.75, "b": 1.0}
+
+    result = metrics.demographic_parity_difference(
+        y_true, y_pred, sensitive_features=sensitive_features, sample_weight=weight
+    )
+    assert result == pytest.approx(0.25)
 
 
 def test_selection_rate_non_numeric():
