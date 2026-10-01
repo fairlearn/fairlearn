@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import numbers
 from collections.abc import Callable
 from typing import Any, Literal
 
@@ -321,7 +322,7 @@ class MetricFrame:
         self._n_boot = n_boot
 
         if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
-            if not isinstance(n_boot, int) or n_boot < 1:
+            if not isinstance(n_boot, numbers.Integral) or n_boot < 1:
                 raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
             for _ci in ci_quantiles:
                 if not isinstance(_ci, float) or _ci <= 0 or _ci >= 1:
