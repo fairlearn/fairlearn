@@ -11,6 +11,8 @@ class ThresholdOperation:
 
     Read more in the :ref:`User Guide <postprocessing>`.
 
+    .. versionadded:: 0.5.0
+
     Parameters
     ----------
     operator : str
