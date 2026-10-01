@@ -63,6 +63,10 @@ class _GridGenerator:
         else:
             self.grid_offset = grid_offset
 
+        if self.dim == 0:
+            self.grid = pd.DataFrame({0: self.grid_offset})
+            return
+
         # true dimensionality of the grid
         true_dim = self.dim - 1 if self.force_L1_norm else self.dim
 

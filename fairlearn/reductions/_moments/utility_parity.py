@@ -222,6 +222,8 @@ class UtilityParity(ClassificationMoment):
 
     def gamma(self, predictor: Callable) -> pd.Series:
         """Calculate the degree to which constraints are currently violated by the predictor."""
+        if self.index.empty:
+            return pd.Series(dtype=float, index=self.index)
         predictions = predictor(self.X)
         if isinstance(predictions, np.ndarray):
             # TensorFlow seems to return an (n,1) array instead of an (n) array
@@ -248,6 +250,8 @@ class UtilityParity(ClassificationMoment):
         i.e., returns lambda which is guaranteed to lead to the same or higher value of the
         Lagrangian compared with lambda_vec for all possible choices of the classifier, h.
         """
+        if lambda_vec.empty:
+            return lambda_vec
         if self.ratio == 1.0:
             lambda_signed = (lambda_vec["+"] - lambda_vec["-"]).astype(np.float64)
             group_prob = self.prob_group_event.div(self.prob_event, level=_EVENT)
