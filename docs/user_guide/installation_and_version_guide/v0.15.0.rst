@@ -23,6 +23,10 @@ New features
 Bug fixes
 ---------
 
+* Estimator-check test IDs no longer include process-specific object addresses,
+  and relaxed-constraint parameter sets have deterministic iteration order.
+  The unit suite can now be collected consistently by parallel pytest workers.
+
 * :class:`~fairlearn.metrics.MetricFrame` now raises a :code:`ValueError` when a
   sensitive or control feature contains missing values, naming the offending
   feature. Previously a missing value was silently dropped from
