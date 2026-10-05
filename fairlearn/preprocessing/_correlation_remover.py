@@ -97,7 +97,9 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         X = nw.from_native(X, pass_through=True, eager_only=True)
         if isinstance(X, nw.DataFrame):
             self.lookup_ = {c: i for i, c in enumerate(X.columns)}
+            self._columns_in_ = list(X.columns)
             return X.to_numpy()
+        self._columns_in_ = None
         # correctly handle a 1d input
         X = validate_data(self, X, ensure_2d=False, ensure_min_samples=0)
         if len(X.shape) == 1:
@@ -178,12 +180,14 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
             If the estimator has not been fitted yet.
         ValueError
             If the number of features in ``X`` differs from the number seen
-            during ``fit``.
+            during ``fit``, or named columns do not match the fitted column order.
         """
         check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_", "sensitive_mean_"])
 
         X = nw.from_native(X, pass_through=True, eager_only=True)
         if isinstance(X, nw.DataFrame):
+            if self._columns_in_ is not None and list(X.columns) != self._columns_in_:
+                raise ValueError("Named columns must match the columns and order seen during fit.")
             X = X.to_numpy()
 
         X = validate_data(self, X)
