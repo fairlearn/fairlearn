@@ -81,8 +81,8 @@ def test_maximize_objective_with_tolerance_returns_correct_values(
     assert expected_maximum == maximum
 
 
-@pytest.mark.parametrize("objective", OBJECTIVES_FOR_SIMPLE_CONSTRAINTS)
-@pytest.mark.parametrize("constraints", SIMPLE_CONSTRAINTS)
+@pytest.mark.parametrize("objective", sorted(OBJECTIVES_FOR_SIMPLE_CONSTRAINTS))
+@pytest.mark.parametrize("constraints", sorted(SIMPLE_CONSTRAINTS))
 def test_threshold_optimization_with_tolerance_increases_objective_and_respects_constraints(
     constraints: str, objective: str
 ) -> None:
