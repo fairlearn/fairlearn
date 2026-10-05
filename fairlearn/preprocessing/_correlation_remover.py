@@ -187,7 +187,10 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         X = nw.from_native(X, pass_through=True, eager_only=True)
         if isinstance(X, nw.DataFrame):
             if self._columns_in_ is not None and list(X.columns) != self._columns_in_:
-                raise ValueError("Named columns must match the columns and order seen during fit.")
+                raise ValueError(
+                    "Named columns must match the columns and order seen during fit. "
+                    f"Expected columns: {self._columns_in_}; got: {list(X.columns)}."
+                )
             X = X.to_numpy()
 
         X = validate_data(self, X)
