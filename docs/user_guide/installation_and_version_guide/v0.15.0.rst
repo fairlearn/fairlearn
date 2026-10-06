@@ -71,7 +71,7 @@ Bug fixes
 * :class:`~fairlearn.postprocessing.ThresholdOptimizer` now raises a
   :code:`ValueError` in :code:`predict` when a sensitive feature value was not seen
   during :code:`fit`. Previously every row of such a group was silently predicted as 0:
-  :issue:`1742` by :user:`Raashish Aggarwal <raashish1601>`.
+  :pr:`1743` by :user:`Raashish Aggarwal <raashish1601>`.
 
 Documentation
 -------------
