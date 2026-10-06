@@ -19,6 +19,10 @@ New features
   now auto-detects them from :attr:`~fairlearn.metrics.MetricFrame.by_group_ci` when
   the *conf_intervals* argument is not supplied:
   :pr:`1674` by :user:`Dresden <DresdenGman>`.
+* Added :code:`get_feature_names_out` to
+  :class:`~fairlearn.preprocessing.CorrelationRemover`, so it can be used with
+  :code:`set_output` and reports its output feature names in pipelines and
+  :code:`ColumnTransformer`: :issue:`1744` by :user:`Raashish Aggarwal <raashish1601>`.
 
 Bug fixes
 ---------
