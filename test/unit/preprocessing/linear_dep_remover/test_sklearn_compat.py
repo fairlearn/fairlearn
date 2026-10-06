@@ -152,3 +152,29 @@ def test_correlation_remover_centers_each_sensitive_feature_separately(construct
     # so the means of the non-sensitive features are preserved.
     np.testing.assert_array_almost_equal(X_tfm.mean(axis=0), [z1.mean(), z2.mean()])
     np.testing.assert_array_almost_equal(remover.sensitive_mean_, [s1.mean(), s2.mean()])
+
+
+@pytest.mark.parametrize(
+    "columns",
+    [
+        {"feature": [10.0, 20.0, 30.0, 40.0], "sensitive": [0.0, 1.0, 0.0, 1.0]},
+        {"sensitive": [0.0, 1.0, 0.0, 1.0], "renamed": [10.0, 20.0, 30.0, 40.0]},
+        {"sensitive": [0.0, 1.0, 0.0, 1.0]},
+        {
+            "sensitive": [0.0, 1.0, 0.0, 1.0],
+            "feature": [10.0, 20.0, 30.0, 40.0],
+            "extra": [1.0, 2.0, 3.0, 4.0],
+        },
+    ],
+)
+def test_transform_rejects_mismatched_named_columns(constructor, columns):
+    X = constructor({"sensitive": [0.0, 1.0, 0.0, 1.0], "feature": [10.0, 20.0, 30.0, 40.0]})
+    remover = CorrelationRemover(sensitive_feature_ids=["sensitive"]).fit(X)
+    expected = remover.transform(X)
+
+    with pytest.raises(ValueError, match="columns and order seen during fit") as exc:
+        remover.transform(constructor(columns))
+
+    assert "Expected columns: ['sensitive', 'feature']" in str(exc.value)
+    assert f"got: {list(columns)}" in str(exc.value)
+    np.testing.assert_array_equal(remover.transform(X), expected)
