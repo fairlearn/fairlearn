@@ -180,14 +180,21 @@ def test_transform_rejects_mismatched_named_columns(constructor, columns):
     np.testing.assert_array_equal(remover.transform(X), expected)
 
 
-def test_get_feature_names_out_array():
+@pytest.mark.parametrize(
+    "input_features, expected",
+    [(None, ["x0", "x2", "x3"]), (["a", "s", "b", "c"], ["a", "b", "c"])],
+)
+def test_get_feature_names_out_array(input_features, expected):
     X = np.arange(12, dtype=float).reshape(3, 4)
     remover = CorrelationRemover(sensitive_feature_ids=[1]).fit(X)
 
-    np.testing.assert_array_equal(remover.get_feature_names_out(), ["x0", "x2", "x3"])
-    np.testing.assert_array_equal(
-        remover.get_feature_names_out(["a", "s", "b", "c"]), ["a", "b", "c"]
-    )
+    np.testing.assert_array_equal(remover.get_feature_names_out(input_features), expected)
+
+
+def test_get_feature_names_out_rejects_wrong_length():
+    X = np.arange(12, dtype=float).reshape(3, 4)
+    remover = CorrelationRemover(sensitive_feature_ids=[1]).fit(X)
+
     with pytest.raises(ValueError, match="input_features should have length equal"):
         remover.get_feature_names_out(["a", "s"])
 
