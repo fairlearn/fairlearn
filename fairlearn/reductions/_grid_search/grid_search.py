@@ -245,6 +245,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         ----------
         X : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`
             Feature data.
+
+        Returns
+        -------
+        Scalar or array-like
+            The prediction returned by the best estimator's :code:`predict` method.
+            The exact type depends on the underlying estimator.
         """
         check_is_fitted(self)
         return self.predictors_[self.best_idx_].predict(X)
@@ -259,6 +265,12 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
         ----------
         X : :class:`numpy.ndarray`, :class:`pandas:pandas.DataFrame`
             Feature data.
+
+        Returns
+        -------
+        array-like of shape (n_samples, n_classes)
+            The probability estimates returned by the best estimator's
+            :code:`predict_proba` method.
         """
         check_is_fitted(self)
         return self.predictors_[self.best_idx_].predict_proba(X)
