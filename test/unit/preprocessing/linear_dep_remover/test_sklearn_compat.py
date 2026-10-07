@@ -178,3 +178,45 @@ def test_transform_rejects_mismatched_named_columns(constructor, columns):
     assert "Expected columns: ['sensitive', 'feature']" in str(exc.value)
     assert f"got: {list(columns)}" in str(exc.value)
     np.testing.assert_array_equal(remover.transform(X), expected)
+
+
+@pytest.mark.parametrize(
+    "input_features, expected",
+    [(None, ["x0", "x2", "x3"]), (["a", "s", "b", "c"], ["a", "b", "c"])],
+)
+def test_get_feature_names_out_array(input_features, expected):
+    X = np.arange(12, dtype=float).reshape(3, 4)
+    remover = CorrelationRemover(sensitive_feature_ids=[1]).fit(X)
+
+    np.testing.assert_array_equal(remover.get_feature_names_out(input_features), expected)
+
+
+def test_get_feature_names_out_rejects_wrong_length():
+    X = np.arange(12, dtype=float).reshape(3, 4)
+    remover = CorrelationRemover(sensitive_feature_ids=[1]).fit(X)
+
+    with pytest.raises(ValueError, match="input_features should have length equal"):
+        remover.get_feature_names_out(["a", "s"])
+
+
+def test_get_feature_names_out_dataframe(constructor):
+    X = constructor({"a": [1.0, 2.0, 4.0], "s": [0.0, 1.0, 1.0], "b": [3.0, 1.0, 0.0]})
+    remover = CorrelationRemover(sensitive_feature_ids=["s"]).fit(X)
+
+    names = remover.get_feature_names_out()
+    np.testing.assert_array_equal(names, ["a", "b"])
+    assert len(names) == remover.transform(X).shape[1]
+    with pytest.raises(ValueError, match="not equal to the column names seen during fit"):
+        remover.get_feature_names_out(["x", "s", "b"])
+
+
+def test_set_output_pandas():
+    pd = pytest.importorskip("pandas")
+    X = pd.DataFrame({"a": [1.0, 2.0, 4.0], "s": [0.0, 1.0, 1.0], "b": [3.0, 1.0, 0.0]})
+    remover = CorrelationRemover(sensitive_feature_ids=["s"]).set_output(transform="pandas")
+
+    X_tfm = remover.fit_transform(X)
+
+    assert isinstance(X_tfm, pd.DataFrame)
+    assert list(X_tfm.columns) == ["a", "b"]
+    np.testing.assert_array_equal(X_tfm.to_numpy(), remover.transform(X.to_numpy()))
