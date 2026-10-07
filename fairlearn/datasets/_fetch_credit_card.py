@@ -45,14 +45,14 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
 
     Parameters
     ----------
-    cache : boolean, default=True
-        Whether to cache downloaded datasets using joblib
+    cache : bool, default=True
+        Whether to cache downloaded datasets using joblib.
 
-    data_home : optional, default: None
+    data_home : str, default=None
         Specify another download and cache folder for the datasets. By default,
-        all scikit-learn data is stored in '~/.fairlearn-data' subfolders.
+        all fairlearn data is stored in '~/.fairlearn-data' subfolders.
 
-    as_frame : boolean, default=True
+    as_frame : bool, default=True
         If True,
             Returns the data as Pandas DataFrame, and the target
             is returned as a Pandas Series.
@@ -63,7 +63,7 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
         .. versionchanged:: 0.9.0
             Default value changed to True.
 
-    return_X_y : boolean, default=False.
+    return_X_y : bool, default=False
         If True,
             returns ``(data.data, data.target)``
         Else,

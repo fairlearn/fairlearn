@@ -77,6 +77,11 @@ Documentation
 -------------
 
 * Removed stale deprecation notices in docstrings for changes that completed in v0.10 (:code:`ThresholdOptimizer.predict_method` default, :code:`InterpolatedThresholder.predict_method` default, and :code:`MetricFrame` constructor positional-argument deprecation).
+* Fixed the parameter documentation of :func:`~fairlearn.datasets.fetch_acs_income` and
+  :func:`~fairlearn.datasets.fetch_credit_card`: the :code:`states` parameter of the former was
+  not parsed as a parameter because of a missing space before the colon, and the latter now uses
+  numpydoc type names (:code:`bool`, :code:`str`) and refers to the fairlearn data folder
+  instead of scikit-learn's: :pr:`1731` by :user:`rabiya43`.
 
 Other improvements
 ------------------
