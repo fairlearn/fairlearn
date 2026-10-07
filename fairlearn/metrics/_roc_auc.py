@@ -13,9 +13,13 @@ from ..utils._input_validation import (
     _INCONSISTENT_ARRAY_LENGTH,
     _merge_columns,
 )
+from ._group_feature import _is_missing
 
 _CHANCE_LEVEL_LABEL = "Chance level (AUC = 0.50)"
 _OVERALL_LABEL = "Overall"
+_FEATURE_HAS_MISSING_VALUES = (
+    "Feature '{0}' contains missing values. Remove or replace them before plotting"
+)
 
 
 def plot_roc_curve_by_group(
@@ -41,11 +45,9 @@ def plot_roc_curve_by_group(
 
     When more than one sensitive feature is provided, the unique combinations of
     their values define the subgroups (for example ``"Female,White"``), following
-    the same convention as :class:`~fairlearn.metrics.MetricFrame`. Rows with a
-    missing (``NaN``) sensitive feature value are included in the overall curve
-    but are skipped when drawing per-group curves, since they cannot be assigned
-    to a subgroup -- again matching :class:`~fairlearn.metrics.MetricFrame`,
-    whose :code:`by_group` results omit such rows.
+    the same convention as :class:`~fairlearn.metrics.MetricFrame`. Sensitive
+    features containing missing values are rejected with a :class:`ValueError`,
+    consistent with :class:`~fairlearn.metrics.MetricFrame`.
 
     .. versionadded:: 0.15.0
 
@@ -123,21 +125,16 @@ def plot_roc_curve_by_group(
 
     # Validate and merge the sensitive feature(s) into a single Series of group
     # names without coercing y_true, so that non-numeric class labels remain
-    # usable together with pos_label. Unlike the shared
-    # `_validate_and_reformat_input` helper, this does not reject missing
-    # (NaN) values: a NaN sensitive feature value means "unknown group", not
-    # invalid input, and rows with such values are skipped below rather than
-    # raising -- matching how `MetricFrame.by_group` treats them.
+    # usable together with pos_label.
     if isinstance(sensitive_features, dict):
         sensitive_features = pd.DataFrame(sensitive_features)
     check_consistent_length(y_true, sensitive_features)
+    _raise_on_missing_values(sensitive_features)
     sensitive_features = check_array(
         sensitive_features, ensure_2d=False, dtype=None, ensure_all_finite=False
     )
     if sensitive_features.ndim > 1 and sensitive_features.shape[1] > 1:
-        missing_rows = pd.isna(sensitive_features).any(axis=1)
         sensitive_features = pd.Series(_merge_columns(sensitive_features))
-        sensitive_features.loc[missing_rows] = pd.NA
     else:
         sensitive_features = pd.Series(sensitive_features.squeeze())
 
@@ -156,7 +153,7 @@ def plot_roc_curve_by_group(
             ax=ax,
         )
 
-    for group in sorted(sensitive_features.dropna().unique()):
+    for group in sorted(sensitive_features.unique()):
         mask = (sensitive_features == group).to_numpy()
         RocCurveDisplay.from_predictions(
             y_true[mask],
@@ -170,3 +167,24 @@ def plot_roc_curve_by_group(
         ax.set_title(title)
 
     return ax
+
+
+def _raise_on_missing_values(sensitive_features):
+    if isinstance(sensitive_features, pd.DataFrame):
+        columns = [sensitive_features.iloc[:, i] for i in range(sensitive_features.shape[1])]
+    elif isinstance(sensitive_features, pd.Series):
+        columns = [sensitive_features]
+    else:
+        # dtype=object keeps a missing value from being cast to the string 'nan'
+        f_arr = asarray(sensitive_features, dtype=object)
+        if f_arr.ndim > 2:
+            # check_array reports the dimension error
+            return
+        columns = list(f_arr.T) if f_arr.ndim == 2 else [f_arr]
+
+    for i, column in enumerate(columns):
+        if any(_is_missing(value) for value in column):
+            name = getattr(column, "name", None)
+            if not isinstance(name, str):
+                name = f"sensitive_feature_{i}"
+            raise ValueError(_FEATURE_HAS_MISSING_VALUES.format(name))

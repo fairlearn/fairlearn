@@ -53,10 +53,11 @@ Bug fixes
   :code:`FloatTransformer.inverse_transform` so that they raise
   :code:`NotFittedError` instead of :code:`AttributeError` when called before
   :code:`fit`: :pr:`1709` by :user:`SpiliosDimakopoulos`.
-* Fixed :func:`~fairlearn.metrics.plot_roc_curve_by_group` so that rows with
-  missing sensitive feature values are included in the overall curve but
-  omitted from per-group curves, instead of raising a :code:`ValueError`:
-  :pr:`1713` by :user:`SpiliosDimakopoulos`.
+* :func:`~fairlearn.metrics.plot_roc_curve_by_group` now raises a
+  :code:`ValueError` naming the offending feature when a sensitive feature
+  contains missing values, consistent with
+  :class:`~fairlearn.metrics.MetricFrame`: :pr:`1713` by
+  :user:`SpiliosDimakopoulos` and :pr:`1729` by :user:`Edward Yi <aiedwardyi>`.
 * Already-fitted adversarial estimators now enforce the same two-dimensional input requirement in :code:`predict` and :code:`partial_fit`, including when input validation is skipped: :pr:`1711` by :user:`Roman Lutz <romanlutz>`.
 * Fixed :class:`~fairlearn.preprocessing.CorrelationRemover` so that each
   sensitive feature is centered by its own mean. With more than one sensitive
