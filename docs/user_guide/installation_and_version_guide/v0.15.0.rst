@@ -73,6 +73,13 @@ Bug fixes
   :func:`~fairlearn.metrics.demographic_parity_ratio` then reported 0 and 1 (no disparity)
   regardless of the actual selection rates: :pr:`1734` by :user:`breken-ai`.
 
+* Fixed :class:`~fairlearn.reductions.TruePositiveRateParity` and
+  :class:`~fairlearn.reductions.FalsePositiveRateParity` with :code:`control_features`.
+  Rows with the other label (:code:`Y=0` and :code:`Y=1` respectively) were turned into
+  events named :code:`control=<value>,nan`, so the moments also constrained the rate
+  among those rows, and passing a control feature added a false (or true) positive rate
+  parity constraint that the user did not ask for: :pr:`1747` by :user:`breken-ai`.
+
 Documentation
 -------------
 

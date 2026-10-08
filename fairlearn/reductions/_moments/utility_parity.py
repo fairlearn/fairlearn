@@ -24,7 +24,10 @@ _CTRL_EVENT_FORMAT = "control={0},{1}"
 
 
 def _combine_event_and_control(event: str, control: str) -> str:
-    if pd.notnull(control):
+    # A missing event marks a row outside every constraint (e.g. Y=0 for
+    # TruePositiveRateParity); keep it missing rather than turning it into
+    # an event of its own.
+    if pd.notnull(event) and pd.notnull(control):
         return _CTRL_EVENT_FORMAT.format(control, event)
     return event
 

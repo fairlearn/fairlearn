@@ -1,10 +1,12 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 
 from fairlearn.metrics import (
     MetricFrame,
@@ -16,6 +18,7 @@ from fairlearn.reductions import (
     DemographicParity,
     EqualizedOdds,
     ErrorRateParity,
+    ExponentiatedGradient,
     FalsePositiveRateParity,
     TruePositiveRateParity,
 )
@@ -164,3 +167,54 @@ def test_equalized_odds():
     metric = false_positive_rate
     selected_label = 0
     _selected_label_compare(moment, metric, selected_label)
+
+
+@pytest.mark.parametrize(
+    ("moment", "selected_label"),
+    [(TruePositiveRateParity, 1), (FalsePositiveRateParity, 0)],
+)
+def test_control_features_do_not_constrain_the_other_label(moment, selected_label):
+    X, y = loan_scenario_generator(n, f, sfs, ibs, seed=7132752)
+    X_dummy = pd.get_dummies(X)
+
+    target = moment()
+    target.load_data(
+        X_dummy,
+        y,
+        sensitive_features=X["sens"],
+        control_features=X["ctrl"],
+    )
+
+    # Only rows with the selected label take part in the constraints, exactly
+    # as without control features; the other rows must not form an event.
+    events = set(target.index.get_level_values("event"))
+    assert events == {f"control={ib},label={selected_label}" for ib in ibs}
+    other_label = np.asarray(y) != selected_label
+    assert pd.isna(target.tags["event"].to_numpy()[other_label]).all()
+
+
+def test_true_positive_rate_parity_with_control_features_ignores_negatives():
+    # Every positive has x=1, so the classifier "x=1" has TPR 1 in both groups
+    # and meets TruePositiveRateParity. Its false positive rates differ a lot
+    # between groups, which the constraint does not care about.
+    rng = np.random.default_rng(0)
+    n_samples = 2000
+    sensitive = rng.choice(["a", "b"], n_samples)
+    control = rng.choice(["c", "d"], n_samples)
+    y_true = rng.integers(0, 2, n_samples)
+    x = np.where(
+        y_true == 1, 1, np.where((sensitive == "b") & (rng.random(n_samples) < 0.5), 1, 0)
+    )
+    X_data = pd.DataFrame({"x": x})
+
+    mitigator = ExponentiatedGradient(
+        DecisionTreeClassifier(max_depth=1),
+        constraints=TruePositiveRateParity(difference_bound=0.01),
+    )
+    mitigator.fit(X_data, y_true, sensitive_features=sensitive, control_features=control)
+    y_pred = mitigator.predict(X_data, random_state=0)
+
+    tpr = MetricFrame(
+        metrics=true_positive_rate, y_true=y_true, y_pred=y_pred, sensitive_features=sensitive
+    ).by_group
+    assert tpr.to_dict() == {"a": 1.0, "b": 1.0}
