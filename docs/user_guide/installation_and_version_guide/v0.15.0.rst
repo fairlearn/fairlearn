@@ -80,7 +80,7 @@ Documentation
 * Added :code:`versionadded`/:code:`versionchanged` directives to the
   :class:`~fairlearn.preprocessing.CorrelationRemover` API reference, documenting
   when the estimator was introduced (v0.6.0) and subsequently changed (v0.8.0,
-  v0.12.0): :pr:`PRNUM` by :user:`Peace Amhanesi <amhanesipeace>`.
+  v0.12.0): :pr:`1748` by :user:`Peace Amhanesi <amhanesipeace>`.
 
 Other improvements
 ------------------
