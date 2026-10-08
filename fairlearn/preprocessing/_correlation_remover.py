@@ -86,8 +86,6 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
     Therefore, we expect this to be most appropriate as a preprocessing step for
     (generalized) linear models.
 
-    .. versionadded:: 0.6
-
     """
 
     def __init__(self, *, sensitive_feature_ids: Iterable = (), alpha: float = 1):
