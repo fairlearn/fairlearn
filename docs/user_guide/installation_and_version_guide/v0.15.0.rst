@@ -78,7 +78,7 @@ Bug fixes
   Rows with the other label (:code:`Y=0` and :code:`Y=1` respectively) were turned into
   events named :code:`control=<value>,nan`, so the moments also constrained the rate
   among those rows, and passing a control feature added a false (or true) positive rate
-  parity constraint that the user did not ask for: :pr:`TBD` by :user:`breken-ai`.
+  parity constraint that the user did not ask for: :pr:`1747` by :user:`breken-ai`.
 
 Documentation
 -------------
