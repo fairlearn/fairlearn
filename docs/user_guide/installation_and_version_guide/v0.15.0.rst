@@ -77,6 +77,10 @@ Documentation
 -------------
 
 * Removed stale deprecation notices in docstrings for changes that completed in v0.10 (:code:`ThresholdOptimizer.predict_method` default, :code:`InterpolatedThresholder.predict_method` default, and :code:`MetricFrame` constructor positional-argument deprecation).
+* Added :code:`versionadded`/:code:`versionchanged` directives to the
+  :class:`~fairlearn.preprocessing.CorrelationRemover` API reference, documenting
+  when the estimator was introduced (v0.6.0) and subsequently changed (v0.8.0,
+  v0.12.0): :pr:`PRNUM` by :user:`Peace Amhanesi <amhanesipeace>`.
 
 Other improvements
 ------------------
