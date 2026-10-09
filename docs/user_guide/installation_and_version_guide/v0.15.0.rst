@@ -73,6 +73,11 @@ Bug fixes
   :func:`~fairlearn.metrics.demographic_parity_ratio` then reported 0 and 1 (no disparity)
   regardless of the actual selection rates: :pr:`1734` by :user:`breken-ai`.
 
+Narwhals integration
+--------------------
+
+* Made the :code:`fairlearn.utils` module dataframe agnostic through Narwhals: :pr:`1533` by :user:`Edoardo Abati <EdAbati>`.
+
 Documentation
 -------------
 
