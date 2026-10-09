@@ -98,6 +98,7 @@ Documentation
 -------------
 
 * Removed stale deprecation notices in docstrings for changes that completed in v0.10 (:code:`ThresholdOptimizer.predict_method` default, :code:`InterpolatedThresholder.predict_method` default, and :code:`MetricFrame` constructor positional-argument deprecation).
+* Documented the parameters and return values of :code:`gamma`, :code:`bound`, :code:`project_lambda`, and :code:`signed_weights` on :class:`~fairlearn.reductions.Moment`.
 
 Other improvements
 ------------------
