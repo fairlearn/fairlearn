@@ -65,6 +65,9 @@ Bug fixes
   those columns had different means (for example several one-hot encoded
   groups). :code:`sensitive_mean_` now holds one mean per sensitive feature:
   :pr:`1732` by :user:`breken-ai`.
+* :class:`~fairlearn.metrics.MetricFrame` now accepts NumPy integers (for example
+  :code:`np.int64`) for :code:`n_boot` and :code:`random_state`. Previously they
+  raised a :code:`ValueError`: :pr:`1737` by :user:`Arthur031221`.
 
 * Fixed :func:`~fairlearn.metrics.selection_rate` returning a one-element array
   instead of a scalar when :code:`sample_weight` is passed for a single sample. In a

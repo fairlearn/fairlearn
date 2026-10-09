@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import numbers
 from functools import reduce
 
 import numpy as np
@@ -69,8 +70,8 @@ def generate_bootstrap_samples(
         rs = random_state.randint(
             low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype=np.uint32
         )
-    elif isinstance(random_state, int):
-        generator = np.random.default_rng(seed=random_state)
+    elif isinstance(random_state, numbers.Integral):
+        generator = np.random.default_rng(seed=int(random_state))
         rs = generator.integers(
             low=0, high=np.iinfo(np.uint32).max, size=n_samples, dtype=np.uint32
         )
