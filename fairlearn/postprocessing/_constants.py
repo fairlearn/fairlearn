@@ -11,6 +11,10 @@ _MATPLOTLIB_IMPORT_ERROR_MESSAGE = (
     "Please make sure to install fairlearn[customplots] to use the postprocessing plots."
 )
 BASE_ESTIMATOR_NONE_ERROR_MESSAGE = "The base estimator cannot be `None`."
+UNSEEN_SENSITIVE_FEATURES_ERROR_MESSAGE = (
+    "No threshold is available for the sensitive feature values {}. Predictions can only"
+    " be made for the groups seen during fit."
+)
 BASE_ESTIMATOR_NOT_FITTED_WARNING = (
     "The value of `prefit` is `True`, but `check_is_fitted` raised `NotFittedError` on"
     " the base estimator.\n\nIf the provided base estimator has been fitted, this could"
