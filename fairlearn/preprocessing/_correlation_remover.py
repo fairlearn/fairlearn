@@ -97,7 +97,9 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         X = nw.from_native(X, pass_through=True, eager_only=True)
         if isinstance(X, nw.DataFrame):
             self.lookup_ = {c: i for i, c in enumerate(X.columns)}
+            self._columns_in_ = list(X.columns)
             return X.to_numpy()
+        self._columns_in_ = None
         # correctly handle a 1d input
         X = validate_data(self, X, ensure_2d=False, ensure_min_samples=0)
         if len(X.shape) == 1:
@@ -178,12 +180,17 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
             If the estimator has not been fitted yet.
         ValueError
             If the number of features in ``X`` differs from the number seen
-            during ``fit``.
+            during ``fit``, or named columns do not match the fitted column order.
         """
         check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_", "sensitive_mean_"])
 
         X = nw.from_native(X, pass_through=True, eager_only=True)
         if isinstance(X, nw.DataFrame):
+            if self._columns_in_ is not None and list(X.columns) != self._columns_in_:
+                raise ValueError(
+                    "Named columns must match the columns and order seen during fit. "
+                    f"Expected columns: {self._columns_in_}; got: {list(X.columns)}."
+                )
             X = X.to_numpy()
 
         X = validate_data(self, X)
@@ -199,6 +206,51 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         X_use = np.atleast_2d(X_use)
         X_filtered = np.atleast_2d(X_filtered)
         return self.alpha * X_filtered + (1 - self.alpha) * X_use
+
+    def get_feature_names_out(self, input_features=None):
+        """Get output feature names for transformation.
+
+        The sensitive feature columns are dropped, so the output contains the
+        non-sensitive features in their input order.
+
+        Parameters
+        ----------
+        input_features : array-like of str or None, default=None
+            Input feature names. If ``None``, the column names seen during
+            ``fit`` are used, or ``["x0", "x1", ...]`` if ``X`` had no column
+            names. If given, it must match the column names seen during ``fit``.
+
+        Returns
+        -------
+        numpy.ndarray of str
+            The names of the transformed features.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted yet.
+        ValueError
+            If ``input_features`` does not match the features seen during ``fit``.
+        """
+        check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_"])
+
+        if input_features is None:
+            if self._columns_in_ is not None:
+                input_features = self._columns_in_
+            else:
+                input_features = [f"x{i}" for i in range(self._n_features_in_)]
+        elif len(input_features) != self._n_features_in_:
+            raise ValueError(
+                f"input_features should have length equal to number of features "
+                f"({self._n_features_in_}), got {len(input_features)}"
+            )
+        elif self._columns_in_ is not None and list(input_features) != self._columns_in_:
+            raise ValueError("input_features is not equal to the column names seen during fit")
+
+        sensitive = {self.lookup_[i] for i in self.sensitive_feature_ids}
+        return np.asarray(
+            [name for i, name in enumerate(input_features) if i not in sensitive], dtype=object
+        )
 
     def _check_sensitive_features_in_X(self, X) -> None:
         """Check if the sensitive features are in X."""
