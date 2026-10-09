@@ -70,19 +70,67 @@ class Moment:
         raise NotImplementedError()
 
     def gamma(self, predictor: Callable) -> pd.Series:
-        """Calculate the degree to which constraints are currently violated by the predictor."""
+        """Calculate the degree to which constraints are currently violated by the predictor.
+
+        Parameters
+        ----------
+        predictor : Callable
+            A function that maps the feature matrix to predictions.
+
+        Returns
+        -------
+        pandas.Series
+            The value of each constraint for the predictor, indexed by :attr:`index`.
+            The constraints are satisfied when these values do not exceed the values
+            returned by :meth:`bound`.
+        """
         raise NotImplementedError()
 
     def bound(self) -> pd.Series:
-        """Return vector of fairness bound constraint the length of gamma."""
+        """Return vector of fairness bound constraint the length of gamma.
+
+        Returns
+        -------
+        pandas.Series
+            The upper bound for each constraint, indexed by :attr:`index`. The
+            entries of :meth:`gamma` are compared against these values.
+        """
         raise NotImplementedError()
 
     def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
-        """Return the projected lambda values."""
+        """Return the projected lambda values.
+
+        Parameters
+        ----------
+        lambda_vec : pandas.Series
+            The vector of Lagrange multipliers, indexed by :attr:`index`.
+
+        Returns
+        -------
+        pandas.Series
+            Lagrange multipliers that are equivalent to `lambda_vec` for the
+            Lagrangian but can have a smaller norm. They are used by the
+            :class:`~fairlearn.reductions.ExponentiatedGradient` algorithm when
+            evaluating the Lagrangian.
+        """
         raise NotImplementedError()
 
     def signed_weights(self, lambda_vec: pd.Series) -> pd.Series:
-        """Return the signed weights."""
+        """Return the signed weights.
+
+        Parameters
+        ----------
+        lambda_vec : pandas.Series
+            The vector of Lagrange multipliers, indexed by :attr:`index`.
+
+        Returns
+        -------
+        pandas.Series
+            One weight per sample. The reductions algorithms add the weights of the
+            objective and the constraints, use the sign of the sum to choose the label
+            for a cost-sensitive learning problem, and the absolute value as the
+            sample weight when calling the underlying estimator.
+        """
         raise NotImplementedError()
 
     def _moment_type(self) -> type[Moment]:
