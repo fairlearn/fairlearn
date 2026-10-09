@@ -22,7 +22,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
     .. versionadded:: 0.6.0
 
     .. versionchanged:: 0.8.0
-        Added the :code:`n_features_in_` and :code:`feature_names_in_` attributes.
+        Added the :attr:`n_features_in_` and :attr:`feature_names_in_` attributes.
 
     .. versionchanged:: 0.12.0
         The estimator became fully :code:`scikit-learn` compatible.
