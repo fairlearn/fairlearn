@@ -50,7 +50,13 @@ The following steps assume git remote's :code:`origin` points to
 #. Run the `Release Wheel workflow on GitHub <https://github.com/fairlearn/fairlearn/actions/workflows/release-wheel.yml>`_
 
 .. note::
-    Ensure that you have selected the correct release branch
+    Ensure that you have selected the correct release branch.
+    The workflow tests the exact wheel built from that branch with stable
+    dependencies only. Before publishing, it verifies the installed wheel's
+    origin, package contents, and version, and runs the tests including OpenML
+    dataset downloads. If an OpenML test reports an invalid-cache warning, inspect the
+    preceding exception in the full job log: a dataset parser error can also
+    trigger scikit-learn's cache retry warning.
 
 #. On the release branch, place an annotated tag:
 
