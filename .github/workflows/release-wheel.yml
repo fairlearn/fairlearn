@@ -49,6 +49,8 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.0
     - name: Remove Fairlearn source directory
       uses: JesseTG/rm@v1.0.3
       with:
@@ -58,15 +60,39 @@ jobs:
       with:
         name: ${{ env.WHEEL_ARTIFACT }}
     - name: Install Fairlearn from wheel
-      # Do this in three steps to make sure that fairlearn wasn't pulled from PyPI
+      shell: bash
       run: |
-        pip install --pre --find-links . "fairlearn"
-        pip uninstall fairlearn --yes
-        pip install --no-index --find-links . "fairlearn"
+        uv pip install --system --python python --prerelease disallow ./fairlearn-*.whl
     - name: Install testing requirements
       run: |
-        echo "Using pip to install test requirements subject to constraints in requirements-dev.txt"
-        pip install pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
+        uv pip install --system --python python --prerelease disallow pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
+    - name: Verify wheel installation and stable dependencies
+      shell: bash
+      run: |
+        python - <<'PY'
+        import json
+        from importlib.metadata import distribution, distributions
+        from pathlib import Path
+        from zipfile import ZipFile
+
+        import fairlearn
+        from packaging.version import Version
+
+        wheel, = Path.cwd().glob("fairlearn-*.whl")
+        installed = distribution("fairlearn")
+        direct_url = json.loads(installed.read_text("direct_url.json"))
+        assert direct_url["url"] == wheel.as_uri(), direct_url
+        with ZipFile(wheel) as archive:
+            for name in archive.namelist():
+                if name.startswith("fairlearn/") and not name.endswith("/"):
+                    assert archive.read(name) == installed.locate_file(name).read_bytes(), name
+        assert Path(fairlearn.__file__).resolve() == Path(installed.locate_file("fairlearn/__init__.py")).resolve()
+        assert fairlearn.__version__ == Path("version.txt").read_text().strip()
+        for dependency in distributions():
+            version = Version(dependency.version)
+            assert not version.is_prerelease, (dependency.metadata["Name"], dependency.version)
+        print(f"Testing {wheel.name} from {fairlearn.__file__} with stable dependencies")
+        PY
     - name: Run tests
       run: >
         pytest --mpl
