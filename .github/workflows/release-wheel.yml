@@ -18,6 +18,8 @@ env:
 jobs:
   build-wheel:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python
@@ -29,7 +31,19 @@ jobs:
         pip install --upgrade pip
         pip install --upgrade build
     - name: Build wheels
-      run: python ./scripts/build_wheels.py --version-filename $VERSION_FILE_NAME
+      run: python ./scripts/build_wheels.py --version-filename "$VERSION_FILE_NAME"
+    - name: Export expected wheel version
+      id: version
+      shell: bash
+      run: |
+        python - <<'PY'
+        import os
+        from pathlib import Path
+
+        version = Path(os.environ["VERSION_FILE_NAME"]).read_text(encoding="utf-8").strip()
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+            output.write(f"version={version}\n")
+        PY
     - name: Save wheels to artifact
       uses: actions/upload-artifact@v7
       with:
@@ -68,9 +82,12 @@ jobs:
         uv pip install --system --python python --prerelease disallow pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
     - name: Verify wheel installation and stable dependencies
       shell: bash
+      env:
+        EXPECTED_VERSION: ${{ needs.build-wheel.outputs.version }}
       run: |
         python - <<'PY'
         import json
+        import os
         from importlib.metadata import distribution, distributions
         from pathlib import Path
         from zipfile import ZipFile
@@ -87,7 +104,9 @@ jobs:
                 if name.startswith("fairlearn/") and not name.endswith("/"):
                     assert archive.read(name) == installed.locate_file(name).read_bytes(), name
         assert Path(fairlearn.__file__).resolve() == Path(installed.locate_file("fairlearn/__init__.py")).resolve()
-        assert fairlearn.__version__ == Path("version.txt").read_text().strip()
+        assert fairlearn.__version__ == os.environ["EXPECTED_VERSION"], (
+            fairlearn.__version__, os.environ["EXPECTED_VERSION"]
+        )
         for dependency in distributions():
             version = Version(dependency.version)
             assert not version.is_prerelease, (dependency.metadata["Name"], dependency.version)
