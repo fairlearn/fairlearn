@@ -34,6 +34,10 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
     .. versionadded:: 0.13.0
 
+    .. versionchanged:: 0.14.0
+        :code:`fit` now handles single-group (degenerate) sensitive features,
+        which previously failed during the fairness-error computation.
+
     Parameters
     ----------
     n_prototypes : int, default=2
