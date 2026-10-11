@@ -101,7 +101,7 @@ Documentation
 * Added a :code:`versionchanged` directive to the
   :class:`~fairlearn.preprocessing.PrototypeRepresentationLearner` API reference,
   documenting the v0.14.0 fix to single-group (degenerate) sensitive-feature
-  handling in :code:`fit`: :pr:`1750` by :user:`Peace Amhanesi <amhanesipeace>`.
+  handling in :code:`fit`: :pr:`1755` by :user:`Peace Amhanesi <amhanesipeace>`.
 
 Other improvements
 ------------------
