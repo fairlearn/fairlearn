@@ -54,7 +54,9 @@ The following steps assume git remote's :code:`origin` points to
     The workflow tests the exact wheel built from that branch with stable
     dependencies only. Before publishing, it verifies the installed wheel's
     origin, package contents, and version, and runs the tests including OpenML
-    dataset downloads. If an OpenML test reports an invalid-cache warning, inspect the
+    dataset downloads. The expected source version is passed from the build job
+    as a job output, keeping version metadata out of the publishing artifact.
+    If an OpenML test reports an invalid-cache warning, inspect the
     preceding exception in the full job log: a dataset parser error can also
     trigger scikit-learn's cache retry warning.
 
