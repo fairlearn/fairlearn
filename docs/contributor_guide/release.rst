@@ -51,6 +51,9 @@ The following steps assume git remote's :code:`origin` points to
 
 .. note::
     Ensure that you have selected the correct release branch.
+    Immediately after building, the workflow runs :code:`twine check --strict`
+    on both the wheel and source distribution to catch metadata and README
+    rendering errors before starting the test matrix.
     The workflow tests the exact wheel built from that branch with stable
     dependencies only. Before publishing, it verifies the installed wheel's
     origin, package contents, and version, and runs the tests including OpenML
