@@ -16,11 +16,12 @@ run periodically. When adding new code paths or features, tests are a
 requirement to complete a pull request. They should be added in the
 :code:`test` directory.
 
-The alternative-ML GitHub Actions jobs explicitly use :code:`ubuntu-24.04`
-because they rely on the runner's preinstalled Miniconda. Ubuntu 26.04 does not
-include Miniconda. Keep these jobs pinned until their setup no longer depends
-on the runner image providing it; other Linux jobs continue to use
-:code:`ubuntu-latest`.
+The alternative-ML GitHub Actions jobs use :code:`ubuntu-latest` and explicitly
+install Miniconda with :code:`conda-incubator/setup-miniconda`. The action creates
+the environment from :code:`test_othermlpackages/conda-<package>.yaml`, preserving
+each package's Python constraints. These jobs use login Bash shells so the
+environment is activated for every test step, without depending on the runner
+image's preinstalled software or a fixed Miniconda installation path.
 
 Documentation should be provided with pull requests that add or change
 functionality. This includes comments in the code itself, docstrings, and user

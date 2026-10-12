@@ -64,7 +64,7 @@ jobs:
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
     uses: ./.github/workflows/test-other-ml.yml
     with:
-      os: ubuntu-24.04
+      os: ubuntu-latest
       python: "3.13"
       mlpackage: ${{ matrix.mlpackage }}
 
