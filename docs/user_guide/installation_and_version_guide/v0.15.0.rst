@@ -100,7 +100,7 @@ Documentation
 * Corrected the default :code:`pos_label` descriptions for
   :func:`~fairlearn.metrics.true_positive_rate`, :func:`~fairlearn.metrics.true_negative_rate`,
   :func:`~fairlearn.metrics.false_positive_rate`, and :func:`~fairlearn.metrics.false_negative_rate`:
-  :issue:`1762` by :user:`Ganesh1729-ui`.
+  :pr:`1763` by :user:`Ganesh1729-ui`.
 
 * Removed stale deprecation notices in docstrings for changes that completed in v0.10 (:code:`ThresholdOptimizer.predict_method` default, :code:`InterpolatedThresholder.predict_method` default, and :code:`MetricFrame` constructor positional-argument deprecation).
 
