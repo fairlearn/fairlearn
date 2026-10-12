@@ -26,12 +26,12 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: "3.11"
-    - name: Update pip and build
-      run: |
-        pip install --upgrade pip
-        pip install --upgrade build
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.0
     - name: Build wheels
-      run: python ./scripts/build_wheels.py --version-filename "$VERSION_FILE_NAME"
+      run: uv run --no-project --with build python ./scripts/build_wheels.py --version-filename "$VERSION_FILE_NAME"
+    - name: Check distribution metadata
+      run: uv run --no-project --with twine twine check --strict dist/*
     - name: Read expected version
       id: version
       shell: bash
