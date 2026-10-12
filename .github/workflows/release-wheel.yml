@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: "3.11"
     - name: Set up uv
@@ -60,15 +60,17 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Set up uv
       uses: astral-sh/setup-uv@v10.3.0
     - name: Remove Fairlearn source directory
-      uses: JesseTG/rm@v1.0.3
-      with:
-        path: fairlearn
+      shell: python
+      run: |
+        import shutil
+
+        shutil.rmtree("fairlearn")
     - name: Download wheel artifact
       uses: actions/download-artifact@v8
       with:
@@ -136,8 +138,11 @@ jobs:
     #  uses: pypa/gh-action-pypi-publish@release/v1
     #  with:
     #    password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-    #    repository_url: https://test.pypi.org/legacy/
+    #    attestations: false
+    #    repository-url: https://test.pypi.org/legacy/
     - name: Release to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
+        # Attestations require Trusted Publishing instead of API-token authentication.
+        attestations: false

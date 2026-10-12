@@ -54,7 +54,7 @@ jobs:
   other-ml:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         python: ["3.13"]
         mlpackage: [lightgbm, xgboost, tensorflow, pytorch]
       fail-fast: false

@@ -16,6 +16,12 @@ run periodically. When adding new code paths or features, tests are a
 requirement to complete a pull request. They should be added in the
 :code:`test` directory.
 
+The alternative-ML GitHub Actions jobs explicitly use :code:`ubuntu-24.04`
+because they rely on the runner's preinstalled Miniconda. Ubuntu 26.04 does not
+include Miniconda. Keep these jobs pinned until their setup no longer depends
+on the runner image providing it; other Linux jobs continue to use
+:code:`ubuntu-latest`.
+
 Documentation should be provided with pull requests that add or change
 functionality. This includes comments in the code itself, docstrings, and user
 guides. For exceptions to this rule the pull request author should coordinate
