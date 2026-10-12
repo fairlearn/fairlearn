@@ -4,7 +4,7 @@
 # without download. Azure Pipelines and GitHub Actions currently don't
 # support certain actions on PRs from forks so we can't use them for this.
 
-version: 2.0
+version: 2.1
 
 jobs:
   build-doc:
