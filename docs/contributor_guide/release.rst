@@ -51,6 +51,12 @@ The following steps assume git remote's :code:`origin` points to
 
 .. note::
     Ensure that you have selected the correct release branch.
+    Immediately after building, the workflow runs
+    :code:`uv run --no-project --with twine twine check --strict dist/*`
+    on both the wheel and source distribution. This metadata preflight rejects
+    invalid README reStructuredText and missing metadata before the test matrix
+    starts or the publishing artifact is uploaded. Fix any reported errors or
+    warnings rather than changing the README content type or bypassing validation.
     The workflow tests the exact wheel built from that branch with stable
     dependencies only. Before publishing, it verifies the installed wheel's
     origin, package contents, and version, and runs the tests including OpenML
