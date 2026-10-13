@@ -193,7 +193,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
                 )
             X = X.to_numpy()
 
-        X = validate_data(self, X)
+        X = validate_data(self, X, reset=False)
         if self._n_features_in_ != X.shape[1]:
             raise ValueError(
                 f"X has {X.shape[1]} features, but {self.__class__.__name__} "
