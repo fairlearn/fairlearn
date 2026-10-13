@@ -44,7 +44,8 @@ Bug fixes
 
 * :class:`~fairlearn.preprocessing.CorrelationRemover` preserves its fitted
   feature count when :code:`transform` rejects an input with the wrong number
-  of features.
+  of features: :pr:`1765` by
+  :user:`J Ganesh Kumar Reddy <Ganesh1729-ui>`.
 
 * :class:`~fairlearn.preprocessing.CorrelationRemover` rejects reordered or
   renamed columns in named transform inputs instead of silently applying the
