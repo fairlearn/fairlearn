@@ -51,6 +51,11 @@ def plot_roc_curve_by_group(
 
     .. versionadded:: 0.15.0
 
+    .. versionchanged:: 0.16.0
+        Missing sensitive feature values now raise a :class:`ValueError`
+        instead of being included in the overall curve but skipped in
+        per-group curves.
+
     Parameters
     ----------
     y_true : array-like
