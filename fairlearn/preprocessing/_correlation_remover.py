@@ -19,6 +19,14 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
     Read more in the :ref:`User Guide <preprocessing>`.
 
+    .. versionadded:: 0.6.0
+
+    .. versionchanged:: 0.8.0
+        Added the :attr:`n_features_in_` and :attr:`feature_names_in_` attributes.
+
+    .. versionchanged:: 0.12.0
+        The estimator became fully :code:`scikit-learn` compatible.
+
     Parameters
     ----------
         sensitive_feature_ids : list
@@ -77,8 +85,6 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
     Note that the lack of correlation does not imply anything about statistical dependence.
     Therefore, we expect this to be most appropriate as a preprocessing step for
     (generalized) linear models.
-
-    .. versionadded:: 0.6
 
     """
 

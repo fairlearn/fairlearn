@@ -1,0 +1,27 @@
+v0.16.0
+=======
+
+.. note::
+
+   v0.16.0 is not yet released. This page reflects changes on the current
+   :code:`main` branch that will eventually be a part of v0.16.0.
+
+New features
+------------
+
+Bug fixes
+---------
+
+* :func:`~fairlearn.metrics.plot_roc_curve_by_group` now raises a
+  :code:`ValueError` naming the offending feature when a sensitive feature
+  contains missing values, consistent with
+  :class:`~fairlearn.metrics.MetricFrame`. Previously, rows with missing
+  sensitive feature values were included in the overall curve but omitted
+  from per-group curves. Remove or replace missing values before plotting:
+  :pr:`1729` by :user:`Edward Yi <aiedwardyi>`.
+
+Documentation
+-------------
+
+Other improvements
+------------------
