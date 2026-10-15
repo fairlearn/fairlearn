@@ -7,10 +7,12 @@ import copy
 import logging
 from collections.abc import Callable
 from time import time
+from typing import Literal
 
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
+from scipy.optimize import OptimizeResult
 from sklearn import clone
 from sklearn.dummy import DummyClassifier
 
@@ -33,7 +35,9 @@ _MESSAGE_LINPROG_FAILED = (
 _LINPROG_METHOD = "highs-ds"
 
 
-def _raise_if_linprog_failed(result, problem):
+def _raise_if_linprog_failed(
+    result: OptimizeResult, problem: Literal["primal", "dual"]
+) -> None:
     if not result.success:
         raise RuntimeError(
             _MESSAGE_LINPROG_FAILED.format(
