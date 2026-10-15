@@ -3,8 +3,12 @@
 from __future__ import annotations
 
 import narwhals.stable.v1 as nw
+import numpy as np
 
 _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type {1}"
+_FEATURE_VALUE_NOT_SUPPORTED = (
+    "Feature entries must be scalar non-float values (e.g., strings or integers)"
+)
 _FEATURE_HAS_MISSING_VALUES = (
     "Feature '{0}' contains missing values. Remove or replace them before "
     "constructing a MetricFrame"
@@ -72,3 +76,9 @@ class GroupFeature:
 
         if any(_is_missing(x) for x in self.raw_feature_):
             raise ValueError(_FEATURE_HAS_MISSING_VALUES.format(self.name_))
+
+        if not all(
+            np.isscalar(value) and not isinstance(value, (float, np.floating))
+            for value in self.raw_feature_
+        ):
+            raise ValueError(_FEATURE_VALUE_NOT_SUPPORTED)

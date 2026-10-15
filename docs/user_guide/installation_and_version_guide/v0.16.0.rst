@@ -33,3 +33,7 @@ Documentation
 
 Other improvements
 ------------------
+
+* Added validation and documentation requiring scalar, non-floating entries for
+  :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
+  :pr:`1550` by :user:`MariamH <Mariamhaji>`.
