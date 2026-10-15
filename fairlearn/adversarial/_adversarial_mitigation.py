@@ -878,6 +878,11 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
 
     .. versionadded:: 0.8.0
 
+    .. versionchanged:: 0.11.0
+        Greatly improved :code:`scikit-learn` compatibility (the estimator now
+        passes nearly all scikit-learn estimator checks) and gained a
+        :code:`classes_` attribute.
+
     Parameters
     ----------
     backend : str, BackendEngine, default = 'auto'
@@ -1077,6 +1082,11 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     :code:`y` as input.
 
     .. versionadded:: 0.8.0
+
+    .. versionchanged:: 0.11.0
+        Greatly improved :code:`scikit-learn` compatibility (the estimator now
+        passes nearly all scikit-learn estimator checks) and gained a
+        :code:`classes_` attribute.
 
     Parameters
     ----------
