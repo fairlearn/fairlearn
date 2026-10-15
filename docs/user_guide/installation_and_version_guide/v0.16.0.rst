@@ -38,7 +38,7 @@ Documentation
   :class:`~fairlearn.reductions.ErrorRateParity`, :class:`~fairlearn.reductions.ErrorRate`,
   :class:`~fairlearn.reductions.BoundedGroupLoss`, and the loss helpers), documenting
   when each entered the public API (v0.3.0, v0.5.0, and v0.13.0 for
-  :class:`~fairlearn.reductions.MeanLoss`): :pr:`1766` by
+  :class:`~fairlearn.reductions.MeanLoss`): :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
 
 Other improvements
