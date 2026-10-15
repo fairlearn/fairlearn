@@ -33,6 +33,14 @@ jobs:
       python: ${{ matrix.python }}
       codeCovPython: "3.13"
 
+  sklearn-nightly:
+    uses: ./.github/workflows/test-all-deps.yml
+    with:
+      os: ubuntu-latest
+      python: "3.14"
+      codeCovPython: "3.13"
+      sklearnNightly: true
+
   minimal-deps:
     strategy:
       # Keep running remaining matrix jobs even if one fails

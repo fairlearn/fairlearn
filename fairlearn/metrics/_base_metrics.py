@@ -331,6 +331,6 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
 
     s_w = np.ones(len(selected))
     if sample_weight is not None:
-        s_w = np.squeeze(np.asarray(sample_weight))
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight)
 
     return np.dot(selected, s_w) / s_w.sum()

@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 import pytest
 from sklearn.metrics import roc_auc_score
 
-from fairlearn.metrics import plot_roc_curve_by_group
+from fairlearn.metrics import MetricFrame, plot_roc_curve_by_group
 
 from .data_for_test import g_1, g_2, y_score, y_t
 
@@ -24,6 +25,12 @@ def is_mpl_installed():
 def _expected_label(name, y_true, y_score):
     # Mirrors the legend label produced by sklearn's RocCurveDisplay.
     return f"{name} (AUC = {roc_auc_score(y_true, y_score):0.2f})"
+
+
+def _with_first_missing(values, missing_val):
+    values = list(values)
+    values[0] = missing_val
+    return values
 
 
 @pytest.fixture()
@@ -215,3 +222,39 @@ class TestPlotRocCurveByGroup:
             mask = g_1 == group
             expected_auc = roc_auc_score((y_str[mask] == "yes").astype(int), y_score[mask])
             assert f"{group} (AUC = {expected_auc:0.2f})" in labels
+
+    @pytest.mark.parametrize("missing_val", [np.nan, None])
+    @pytest.mark.parametrize(
+        "make_sf,expected_name",
+        [
+            (lambda m: _with_first_missing(g_1, m), "sensitive_feature_0"),
+            (lambda m: np.array(_with_first_missing(g_1, m), dtype=object), "sensitive_feature_0"),
+            (lambda m: pd.Series(_with_first_missing(g_1, m)), "sensitive_feature_0"),
+            (lambda m: pd.Series(_with_first_missing(g_1, m), name="sf"), "sf"),
+            (lambda m: pd.DataFrame({"sf": _with_first_missing(g_1, m)}), "sf"),
+            (
+                lambda m: np.array([g_1, _with_first_missing(g_2, m)], dtype=object).T,
+                "sensitive_feature_1",
+            ),
+            (lambda m: pd.DataFrame({"a": g_1, "b": _with_first_missing(g_2, m)}), "b"),
+            (lambda m: {"a": list(g_1), "b": _with_first_missing(g_2, m)}, "b"),
+        ],
+    )
+    def test_missing_sensitive_feature_raises_like_metricframe(
+        self, missing_val, make_sf, expected_name
+    ):
+        message = f"Feature '{expected_name}' contains missing values"
+        with pytest.raises(ValueError, match=message):
+            plot_roc_curve_by_group(y_t, y_score, sensitive_features=make_sf(missing_val))
+        with pytest.raises(ValueError, match=message):
+            MetricFrame(
+                metrics=roc_auc_score,
+                y_true=y_t,
+                y_pred=y_score,
+                sensitive_features=make_sf(missing_val),
+            )
+
+    @pytest.mark.parametrize("missing_val", [np.nan, None])
+    def test_all_missing_sensitive_feature_values_raise(self, missing_val):
+        with pytest.raises(ValueError, match="Feature 'sensitive_feature_0' contains missing"):
+            plot_roc_curve_by_group(y_t, y_score, sensitive_features=[missing_val] * len(y_t))

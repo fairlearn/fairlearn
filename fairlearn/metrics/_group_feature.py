@@ -9,6 +9,20 @@ _SERIES_NAME_NOT_STRING = "Series name must be a string. Value '{0}' was of type
 _FEATURE_VALUE_NOT_SUPPORTED = (
     "Feature entries must be scalar non-float values (e.g., strings or integers)"
 )
+_FEATURE_HAS_MISSING_VALUES = (
+    "Feature '{0}' contains missing values. Remove or replace them before "
+    "constructing a MetricFrame"
+)
+
+
+def _is_missing(value) -> bool:
+    # pd.NA raises rather than returning a bool from the self-inequality check
+    if value is None:
+        return True
+    try:
+        return bool(value != value)
+    except (TypeError, ValueError):
+        return True
 
 
 class GroupFeature:
@@ -49,14 +63,9 @@ class GroupFeature:
         nw_feature_vector = nw.from_native(feature_vector, pass_through=True, allow_series=True)
         is_nw_series = isinstance(nw_feature_vector, nw.Series)
 
-        raw_feature = list(nw_feature_vector) if not is_nw_series else nw_feature_vector.to_list()
-        if not all(
-            np.isscalar(value) and not isinstance(value, (float, np.floating))
-            for value in raw_feature
-        ):
-            raise ValueError(_FEATURE_VALUE_NOT_SUPPORTED)
-
-        self.raw_feature_ = raw_feature
+        self.raw_feature_ = (
+            list(nw_feature_vector) if not is_nw_series else nw_feature_vector.to_list()
+        )
 
         self.name_ = f"{base_name}{index}"
 
@@ -64,3 +73,12 @@ class GroupFeature:
             if not isinstance(name_, str):
                 raise ValueError(_SERIES_NAME_NOT_STRING.format(name_, type(name_)))
             self.name_ = name_
+
+        if any(_is_missing(x) for x in self.raw_feature_):
+            raise ValueError(_FEATURE_HAS_MISSING_VALUES.format(self.name_))
+
+        if not all(
+            np.isscalar(value) and not isinstance(value, (float, np.floating))
+            for value in self.raw_feature_
+        ):
+            raise ValueError(_FEATURE_VALUE_NOT_SUPPORTED)
