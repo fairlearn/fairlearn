@@ -35,9 +35,7 @@ _MESSAGE_LINPROG_FAILED = (
 _LINPROG_METHOD = "highs-ds"
 
 
-def _raise_if_linprog_failed(
-    result: OptimizeResult, problem: Literal["primal", "dual"]
-) -> None:
+def _raise_if_linprog_failed(result: OptimizeResult, problem: Literal["primal", "dual"]) -> None:
     if not result.success:
         raise RuntimeError(
             _MESSAGE_LINPROG_FAILED.format(
