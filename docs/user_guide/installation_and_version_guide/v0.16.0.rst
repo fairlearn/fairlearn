@@ -12,6 +12,9 @@ New features
 Bug fixes
 ---------
 
+* Fixed :code:`solve_linprog` so that failures reported by SciPy's linear
+  programming solver raise a :code:`RuntimeError` instead of allowing invalid
+  solver output to propagate: :pr:`1715` by :user:`Roman Lutz <romanlutz>`.
 * :func:`~fairlearn.metrics.plot_roc_curve_by_group` now raises a
   :code:`ValueError` naming the offending feature when a sensitive feature
   contains missing values, consistent with
