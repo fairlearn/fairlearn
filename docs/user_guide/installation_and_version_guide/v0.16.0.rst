@@ -26,5 +26,10 @@ Bug fixes
 Documentation
 -------------
 
+* Corrected the default :code:`pos_label` descriptions for
+  :func:`~fairlearn.metrics.true_positive_rate`, :func:`~fairlearn.metrics.true_negative_rate`,
+  :func:`~fairlearn.metrics.false_positive_rate`, and :func:`~fairlearn.metrics.false_negative_rate`:
+  :pr:`1763` by :user:`Ganesh1729-ui`.
+
 Other improvements
 ------------------
