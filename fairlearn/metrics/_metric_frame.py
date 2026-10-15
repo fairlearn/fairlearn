@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import numbers
 from collections.abc import Callable
 from typing import Any, Literal
 
@@ -242,7 +243,30 @@ class MetricFrame:
         ci_quantiles: list[float] | None = None,
         random_state: int | np.random.RandomState | None = None,
     ):
-        """Read a placeholder comment."""
+        """Initialize the MetricFrame.
+
+        Parameters
+        ----------
+        metrics : callable or dict[str, callable]
+            The metric(s) to compute. Can be a single callable or a dictionary
+            mapping metric names to callables.
+        y_true : array-like
+            The ground-truth labels.
+        y_pred : array-like
+            The predicted labels.
+        sensitive_features : array-like
+            The sensitive features used to define groups.
+        control_features : array-like, optional
+            Control features used to stratify the analysis.
+        sample_params : dict or dict[str, dict], optional
+            Sample parameters to pass to the metric functions.
+        n_boot : int, optional
+            Number of bootstrap samples for confidence intervals.
+        ci_quantiles : list[float], optional
+            Quantiles for confidence intervals.
+        random_state : int or np.random.RandomState, optional
+            Random state for reproducibility.
+        """
         check_consistent_length(y_true, y_pred)
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
@@ -298,7 +322,7 @@ class MetricFrame:
         self._n_boot = n_boot
 
         if n_boot is not None and ci_quantiles is not None and len(ci_quantiles) > 0:
-            if not isinstance(n_boot, int) or n_boot < 1:
+            if not isinstance(n_boot, numbers.Integral) or n_boot < 1:
                 raise ValueError(_BOOTSTRAP_N_BOOT_INT_GT_ZERO)
             for _ci in ci_quantiles:
                 if not isinstance(_ci, float) or _ci <= 0 or _ci >= 1:
@@ -467,7 +491,7 @@ class MetricFrame:
         Returns
         -------
         typing.Any or pandas.Series or pandas.DataFrame
-            The exact type varies based on whether control featuers were
+            The exact type varies based on whether control features were
             provided and how the metric functions were specified.
 
             ======== ================  =================================
@@ -990,8 +1014,10 @@ class MetricFrame:
                 check_consistent_length(column, sample_array)
                 result.append(GroupFeature(base_name, column, i))
         elif isinstance(features, list):
-            if np.isscalar(features[0]):
-                f_arr = np.atleast_1d(np.squeeze(np.asarray(features)))
+            if all(pd.api.types.is_scalar(feature) for feature in features):
+                # dtype=object keeps a missing value from being cast to the
+                # string 'nan' and becoming a category of its own
+                f_arr = np.atleast_1d(np.squeeze(np.asarray(features, dtype=object)))
                 assert len(f_arr.shape) == 1  # Sanity check
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0))

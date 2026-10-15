@@ -138,7 +138,7 @@ def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
 
     Parameters
     ----------
-    feature_column : numpy.ndarray
+    feature_columns : numpy.ndarray
         Multi-dimensional array of columns to be merged
 
     Returns
