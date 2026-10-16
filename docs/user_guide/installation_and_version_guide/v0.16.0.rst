@@ -35,6 +35,21 @@ Documentation
   :func:`~fairlearn.metrics.true_positive_rate`, :func:`~fairlearn.metrics.true_negative_rate`,
   :func:`~fairlearn.metrics.false_positive_rate`, and :func:`~fairlearn.metrics.false_negative_rate`:
   :pr:`1763` by :user:`Ganesh1729-ui`.
+* Added :code:`versionadded` directives to the reductions moment classes
+  (:class:`~fairlearn.reductions.Moment`, :class:`~fairlearn.reductions.DemographicParity`,
+  :class:`~fairlearn.reductions.EqualizedOdds`, :class:`~fairlearn.reductions.UtilityParity`,
+  :class:`~fairlearn.reductions.TruePositiveRateParity`,
+  :class:`~fairlearn.reductions.FalsePositiveRateParity`,
+  :class:`~fairlearn.reductions.ErrorRateParity`, :class:`~fairlearn.reductions.ErrorRate`,
+  :class:`~fairlearn.reductions.BoundedGroupLoss`, and the loss helpers), documenting
+  when each entered the public API (v0.3.0, v0.5.0, and v0.13.0 for
+  :class:`~fairlearn.reductions.MeanLoss`): :pr:`1767` by
+  :user:`Peace Amhanesi <amhanesipeace>`.
+* Added a :code:`versionchanged` directive to the
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` API reference,
+  documenting the v0.11.0 :code:`scikit-learn` compatibility overhaul and the
+  new :code:`classes_` attribute: :pr:`1767` by
+  :user:`Peace Amhanesi <amhanesipeace>`.
 
 Other improvements
 ------------------
