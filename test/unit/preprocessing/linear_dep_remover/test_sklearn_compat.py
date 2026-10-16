@@ -3,6 +3,7 @@
 
 import re
 from contextlib import nullcontext as does_not_raise
+from copy import deepcopy
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -177,6 +178,25 @@ def test_transform_rejects_mismatched_named_columns(constructor, columns):
 
     assert "Expected columns: ['sensitive', 'feature']" in str(exc.value)
     assert f"got: {list(columns)}" in str(exc.value)
+    np.testing.assert_array_equal(remover.transform(X), expected)
+
+
+@pytest.mark.parametrize("n_features", [1, 3])
+@pytest.mark.parametrize("sensitive_feature_ids", [[], [0]])
+@pytest.mark.parametrize("as_list", [False, True])
+def test_rejected_transform_preserves_fitted_state(n_features, sensitive_feature_ids, as_list):
+    X = np.array([[0.0, 1.0], [1.0, 2.0], [0.0, 3.0], [1.0, 4.0]])
+    X = X.tolist() if as_list else X
+    remover = CorrelationRemover(sensitive_feature_ids=sensitive_feature_ids).fit(X)
+    expected = remover.transform(X)
+    fitted_state = deepcopy(remover.__dict__)
+    invalid = np.ones((4, n_features))
+    invalid = invalid.tolist() if as_list else invalid
+
+    with pytest.raises(ValueError, match=f"X has {n_features} features"):
+        remover.transform(invalid)
+
+    np.testing.assert_equal(remover.__dict__, fitted_state)
     np.testing.assert_array_equal(remover.transform(X), expected)
 
 
