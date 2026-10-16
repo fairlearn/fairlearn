@@ -41,8 +41,7 @@ Documentation
   :class:`~fairlearn.reductions.MeanLoss`): :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
 * Added a :code:`versionchanged` directive to the
-  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` and
-  :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` API references,
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` API reference,
   documenting the v0.11.0 :code:`scikit-learn` compatibility overhaul and the
   new :code:`classes_` attribute: :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
