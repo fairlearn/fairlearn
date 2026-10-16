@@ -1,0 +1,39 @@
+v0.16.0
+=======
+
+.. note::
+
+   v0.16.0 is not yet released. This page reflects changes on the current
+   :code:`main` branch that will eventually be a part of v0.16.0.
+
+New features
+------------
+
+Bug fixes
+---------
+
+* Fixed :code:`solve_linprog` so that failures reported by SciPy's linear
+  programming solver raise a :code:`RuntimeError` instead of allowing invalid
+  solver output to propagate: :pr:`1715` by :user:`Roman Lutz <romanlutz>`.
+* :func:`~fairlearn.metrics.plot_roc_curve_by_group` now raises a
+  :code:`ValueError` naming the offending feature when a sensitive feature
+  contains missing values, consistent with
+  :class:`~fairlearn.metrics.MetricFrame`. Previously, rows with missing
+  sensitive feature values were included in the overall curve but omitted
+  from per-group curves. Remove or replace missing values before plotting:
+  :pr:`1729` by :user:`Edward Yi <aiedwardyi>`.
+
+Documentation
+-------------
+
+* Corrected the default :code:`pos_label` descriptions for
+  :func:`~fairlearn.metrics.true_positive_rate`, :func:`~fairlearn.metrics.true_negative_rate`,
+  :func:`~fairlearn.metrics.false_positive_rate`, and :func:`~fairlearn.metrics.false_negative_rate`:
+  :pr:`1763` by :user:`Ganesh1729-ui`.
+
+Other improvements
+------------------
+
+* Added validation and documentation requiring scalar, non-floating entries for
+  :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
+  :pr:`1550` by :user:`MariamH <Mariamhaji>`.

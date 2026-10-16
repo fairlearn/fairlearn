@@ -6,9 +6,11 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import pytest
+from scipy.optimize import OptimizeResult
 from sklearn.base import BaseEstimator
 from sklearn.dummy import DummyClassifier
 
+import fairlearn.reductions._exponentiated_gradient._lagrangian as lagrangian_module
 from fairlearn.reductions import (
     BoundedGroupLoss,
     DemographicParity,
@@ -44,6 +46,40 @@ REGRESSION_CONSTRAINTS = [BoundedGroupLoss]
 ALL_CONSTRAINTS = CLASSIFICATION_CONSTRAINTS + REGRESSION_CONSTRAINTS
 
 ALL_OBJECTIVES = [ErrorRate, MeanLoss]
+
+
+def test_solve_linprog_raises_on_primal_failure(monkeypatch):
+    lagrangian = _get_lagrangian_for_linprog()
+
+    def mock_linprog(*args, **kwargs):
+        return OptimizeResult(success=False, status=2, message="primal failed")
+
+    monkeypatch.setattr(lagrangian_module.opt, "linprog", mock_linprog)
+
+    with pytest.raises(RuntimeError, match="primal.*highs-ds.*Status: 2.*primal failed"):
+        lagrangian.solve_linprog(nu=0.01)
+
+
+def test_solve_linprog_raises_on_dual_failure(monkeypatch):
+    lagrangian = _get_lagrangian_for_linprog()
+    n_constraints = len(lagrangian.constraints.index)
+    linprog_results = [
+        OptimizeResult(success=True, status=0, message="success", x=np.array([1.0, 0.0])),
+        OptimizeResult(
+            success=False,
+            status=4,
+            message="dual failed",
+            x=np.zeros(n_constraints + 1),
+        ),
+    ]
+
+    def mock_linprog(*args, **kwargs):
+        return linprog_results.pop(0)
+
+    monkeypatch.setattr(lagrangian_module.opt, "linprog", mock_linprog)
+
+    with pytest.raises(RuntimeError, match="dual.*highs-ds.*Status: 4.*dual failed"):
+        lagrangian.solve_linprog(nu=0.01)
 
 
 @pytest.mark.parametrize("eps", [0.001, 0.01, 0.1])
@@ -263,6 +299,23 @@ def get_lambda_vec(constraints, X, y, A):
     theta = pd.Series(0, constraints.index)
     lambda_vec = np.exp(theta) / (1 + np.exp(theta).sum())
     return lambda_vec
+
+
+def _get_lagrangian_for_linprog():
+    X, y, A = _get_data(A_two_dim=False)
+    constraints = DemographicParity(difference_bound=0.01)
+    lagrangian = _Lagrangian(
+        X=X,
+        y=y,
+        estimator=LeastSquaresBinaryClassifierLearner(),
+        constraints=constraints,
+        B=100.0,
+        sensitive_features=A,
+    )
+    lagrangian.hs.at[0] = lambda X: np.zeros(len(X))
+    lagrangian.errors.at[0] = 0.25
+    lagrangian.gammas[0] = pd.Series(0.0, index=lagrangian.constraints.index)
+    return lagrangian
 
 
 def get_lambda_new_weights_and_labels(constraints, X, y, A):
