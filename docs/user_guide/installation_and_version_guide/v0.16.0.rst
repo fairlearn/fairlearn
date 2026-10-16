@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.preprocessing.CorrelationRemover` preserves its fitted
+  feature count when :code:`transform` rejects an input with the wrong number
+  of features: :pr:`1765` by
+  :user:`J Ganesh Kumar Reddy <Ganesh1729-ui>`.
+
 * Fixed :code:`solve_linprog` so that failures reported by SciPy's linear
   programming solver raise a :code:`RuntimeError` instead of allowing invalid
   solver output to propagate: :pr:`1715` by :user:`Roman Lutz <romanlutz>`.
