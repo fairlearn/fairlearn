@@ -1,12 +1,16 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
 import warnings
+from collections.abc import Callable
 from math import ceil
 from time import time
+from typing import TYPE_CHECKING, Literal
 
 from numpy import arange, argmax, unique, zeros
+from numpy.random import RandomState
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
@@ -37,6 +41,11 @@ from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
 
 logger = logging.getLogger(__name__)
+
+
+if TYPE_CHECKING:
+    import keras
+    import torch
 
 
 class _AdversarialFairness(BaseEstimator):
@@ -211,30 +220,35 @@ class _AdversarialFairness(BaseEstimator):
     def __init__(
         self,
         *,
-        backend="auto",
-        predictor_model=None,
-        adversary_model=None,
-        predictor_loss="auto",
-        adversary_loss="auto",
-        predictor_function="auto",
-        threshold_value=0.5,
-        predictor_optimizer="Adam",
-        adversary_optimizer="Adam",
-        constraints="demographic_parity",
-        y_transform="auto",
-        sf_transform="auto",
-        learning_rate=0.001,
-        alpha=1.0,
-        epochs=1,
-        batch_size=32,
-        max_iter=-1,
-        shuffle=False,
-        progress_updates=None,
-        skip_validation=False,
-        callbacks=None,
-        cuda=None,
-        warm_start=False,
-        random_state=None,
+        backend: Literal["auto", "torch", "tensorflow"] | BackendEngine = "auto",
+        predictor_model: torch.nn.Module | keras.Model | list | None = None,
+        adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
+        adversary_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
+        predictor_function: Literal["binary", "multiclass", "continuous", "auto"]
+        | Callable = "auto",
+        threshold_value: float = 0.5,
+        predictor_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        adversary_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        constraints: Literal["demographic_parity", "equalized_odds"] = "demographic_parity",
+        y_transform: str | TransformerMixin | None = "auto",
+        sf_transform: str | TransformerMixin | None = "auto",
+        learning_rate: float = 0.001,
+        alpha: float = 1.0,
+        epochs: int = 1,
+        batch_size: int = 32,
+        max_iter: int = -1,
+        shuffle: bool = False,
+        progress_updates: float | None = None,
+        skip_validation: bool = False,
+        callbacks: Callable | list[Callable] | None = None,
+        cuda: str | None = None,
+        warm_start: bool = False,
+        random_state: int | RandomState | None = None,
     ):
         """Initialize class by only storing (kw)args, as per sklearn API."""
         self.backend = backend
@@ -349,8 +363,15 @@ class _AdversarialFairness(BaseEstimator):
             else:
                 self.callbacks_ = [self.callbacks]
 
-        self.predictor_loss_ = self.predictor_function_ = type_of_target(y)
-        self.adversary_loss_ = type_of_target(A)
+        self.predictor_function_ = (
+            type_of_target(y) if self.predictor_function == "auto" else self.predictor_function
+        )
+        self.predictor_loss_ = (
+            type_of_target(y) if self.predictor_loss == "auto" else self.predictor_loss
+        )
+        self.adversary_loss_ = (
+            type_of_target(A) if self.adversary_loss == "auto" else self.adversary_loss
+        )
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
@@ -797,7 +818,7 @@ class _AdversarialFairness(BaseEstimator):
         Infer prediction function.
 
         The :code:`predictor_function` should be either the string
-        :code:`'auto'`, :code:`'binary'`, :code:`'category'`,
+        :code:`'auto'`, :code:`'binary'`, :code:`'multiclass'`,
         :code:`'continuous'`, or a callable. The string
         :code:`'auto'` indicates to infer the predictor function
         from the distribution type of :code:`y`
@@ -1018,9 +1039,9 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
-            predictor_loss="classification",
+            predictor_loss="auto",
             adversary_loss="auto",
-            predictor_function="classification",
+            predictor_function="auto",
             threshold_value=0.5,
             predictor_optimizer=predictor_optimizer,
             adversary_optimizer=adversary_optimizer,
@@ -1214,7 +1235,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
             adversary_model=adversary_model,
             predictor_loss="continuous",
             adversary_loss="auto",
-            predictor_function=None,
+            predictor_function="continuous",
             predictor_optimizer=predictor_optimizer,
             adversary_optimizer=adversary_optimizer,
             y_transform=None,
