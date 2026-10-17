@@ -13,6 +13,7 @@ from sklearn.base import (
     RegressorMixin,
     TransformerMixin,
     is_classifier,
+    is_regressor,
 )
 from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_scalar
@@ -419,7 +420,7 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        first_call = not hasattr(self, "classes_")
+        first_call = not hasattr(self, "_is_setup")
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
 
@@ -547,7 +548,7 @@ class _AdversarialFairness(BaseEstimator):
         self : object
             Returns self.
         """
-        first_call = not hasattr(self, "classes_")
+        first_call = not hasattr(self, "_is_setup")
 
         if first_call and classes is not None:
             self.classes_ = classes
@@ -692,7 +693,7 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        if not hasattr(self, "classes_"):
+        if not is_regressor(self) and not hasattr(self, "classes_"):
             self.classes_ = unique(y)
 
         y = self._y_transform.transform(y)

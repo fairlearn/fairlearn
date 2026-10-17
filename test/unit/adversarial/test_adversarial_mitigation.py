@@ -46,6 +46,21 @@ def fake_backend_env(request: pytest.FixtureRequest):
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_regressor_fit_does_not_expose_classes(fake_backend_env):
+    mitigator = get_instance(cls=AdversarialFairnessRegressor, fake_mixin=True)
+    mitigator.fit(Bin2d, Cont2d[:, 0], sensitive_features=Bin1d)
+    assert not hasattr(mitigator, "classes_")
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_regressor_partial_fit_validates_feature_count(fake_backend_env):
+    mitigator = get_instance(cls=AdversarialFairnessRegressor, fake_mixin=True)
+    mitigator.fit(Bin2d, Cont2d[:, 0], sensitive_features=Bin1d)
+    with pytest.raises(ValueError, match="features"):
+        mitigator.partial_fit(Bin2d[:, :1], Cont2d[:, 0], sensitive_features=Bin1d)
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_model_init(fake_backend_env):
     """Test model init from list."""
 
