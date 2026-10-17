@@ -15,6 +15,7 @@ from ..utils._input_validation import _validate_and_reformat_input
 from ._constants import (
     BASE_ESTIMATOR_NONE_ERROR_MESSAGE,
     BASE_ESTIMATOR_NOT_FITTED_WARNING,
+    UNSEEN_SENSITIVE_FEATURES_ERROR_MESSAGE,
 )
 
 
@@ -138,6 +139,7 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
         )
 
         positive_probs = 0.0 * base_predictions_vector
+        seen = np.zeros(len(sensitive_feature_vector), dtype=bool)
         for a, interpolation in self.interpolation_dict.items():
             interpolated_predictions = interpolation.p0 * interpolation.operation0(
                 base_predictions_vector
@@ -150,6 +152,11 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             positive_probs[sensitive_feature_vector == a] = interpolated_predictions[
                 sensitive_feature_vector == a
             ]
+            seen |= np.asarray(sensitive_feature_vector == a)
+
+        if not seen.all():
+            unseen = list(dict.fromkeys(sensitive_feature_vector[~seen].astype(str)))
+            raise ValueError(UNSEEN_SENSITIVE_FEATURES_ERROR_MESSAGE.format(unseen))
         return np.array([1.0 - positive_probs, positive_probs]).transpose()
 
     def predict(self, X, *, sensitive_features, random_state=None):
