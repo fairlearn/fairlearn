@@ -522,3 +522,27 @@ def test_validate_data_ambiguous_rows(fake_backend_env):
                 str(exc.value)
                 == f"Input data has an ambiguous number of rows: {X.shape[0]}, {Y.shape[0]}, {Z.shape[0]}."
             )
+
+
+def test_backend_engine_is_abstract():
+    """BackendEngine cannot be instantiated and a subclass must implement the
+    methods that have no generic implementation."""
+    from fairlearn.adversarial._backend_engine import BackendEngine
+
+    abstract = {"evaluate", "train_step", "get_optimizer", "get_model"}
+    assert BackendEngine.__abstractmethods__ == abstract
+    with pytest.raises(TypeError, match="abstract"):
+        BackendEngine(None, None, None, None)
+
+    class MissingModel(BackendEngine):
+        def evaluate(self, X):
+            pass
+
+        def train_step(self, X, Y, A):
+            pass
+
+        def get_optimizer(self, optim_param, model):
+            pass
+
+    with pytest.raises(TypeError, match="get_model"):
+        MissingModel(None, None, None, None)
