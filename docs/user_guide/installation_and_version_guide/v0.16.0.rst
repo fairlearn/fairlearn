@@ -57,3 +57,8 @@ Other improvements
 * Added validation and documentation requiring scalar, non-floating entries for
   :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
   :pr:`1550` by :user:`MariamH <Mariamhaji>`.
+
+* Made :code:`BackendEngine` in the adversarial module an abstract base class
+  with abstract :code:`evaluate`, :code:`train_step`, :code:`get_optimizer` and
+  :code:`get_model` methods: :pr:`1775` by
+  :user:`Venius24 <Venius24>`.
