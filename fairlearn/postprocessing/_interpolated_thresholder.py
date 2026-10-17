@@ -137,6 +137,18 @@ class InterpolatedThresholder(MetaEstimatorMixin, BaseEstimator):
             enforce_binary_labels=False,
         )
 
+        is_known = np.zeros(len(sensitive_feature_vector), dtype=bool)
+        for a in self.interpolation_dict:
+            is_known |= np.asarray(sensitive_feature_vector == a)
+        if not is_known.all():
+            unseen_groups = list(
+                dict.fromkeys(str(v) for v in sensitive_feature_vector[~is_known])
+            )
+            raise ValueError(
+                "Found sensitive feature values that were not seen during fit: "
+                f"{unseen_groups}. Known values are {[str(k) for k in self.interpolation_dict]}."
+            )
+
         positive_probs = 0.0 * base_predictions_vector
         for a, interpolation in self.interpolation_dict.items():
             interpolated_predictions = interpolation.p0 * interpolation.operation0(

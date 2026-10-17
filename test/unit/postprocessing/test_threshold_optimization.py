@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
 
 from fairlearn.postprocessing import ThresholdOptimizer
 from fairlearn.postprocessing._threshold_optimizer import (
@@ -952,6 +953,21 @@ def test_ThresholdOptimize_handles_X_with_ndims_greater_than_2() -> None:
     with does_not_raise():
         threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
         threshold_optimizer.predict(X, sensitive_features=sensitive_features)
+
+
+@pytest.mark.parametrize("method", ["predict", "_pmf_predict"])
+def test_predict_raises_for_unseen_sensitive_feature_values(method):
+    X, y = make_classification(n_samples=200, n_features=5, random_state=0)
+    sensitive_features = np.random.default_rng(0).choice(["g1", "g2"], len(y))
+
+    clf = ThresholdOptimizer(
+        estimator=LogisticRegression(),
+        predict_method="predict_proba",
+    )
+    clf.fit(X, y, sensitive_features=sensitive_features)
+
+    with pytest.raises(ValueError, match="not seen during fit.*g3"):
+        getattr(clf, method)(X[:4], sensitive_features=["g3"] * 4)
 
 
 # -------------------------------------------------------------------------
