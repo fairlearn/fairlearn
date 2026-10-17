@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+import narwhals.stable.v1 as nw
 import numpy as np
 import pandas as pd
 
@@ -340,6 +341,8 @@ class DemographicParity(UtilityParity):
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
             control_features=control_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         base_event = pd.Series(data=_ALL, index=y_train.index)
@@ -397,6 +400,8 @@ class TruePositiveRateParity(UtilityParity):
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
             control_features=control_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         # The `where` clause is used to put `pd.nan` on all values where `Y!=1`.
@@ -449,6 +454,8 @@ class FalsePositiveRateParity(UtilityParity):
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
             control_features=control_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         # The `where` clause is used to put `pd.nan` on all values where `Y!=0`.
@@ -500,6 +507,8 @@ class EqualizedOdds(UtilityParity):
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
             control_features=control_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
 
         base_event = y_train.apply(lambda v: _LABEL + "=" + str(v))
@@ -546,6 +555,8 @@ class ErrorRateParity(UtilityParity):
             enforce_binary_labels=True,
             sensitive_features=sensitive_features,
             control_features=control_features,
+            # TODO: remove this once we supports all narwhals inputs in this module
+            default_backend=nw.Implementation.PANDAS,
         )
         utilities = np.vstack([y_train, 1 - y_train]).T
         base_event = pd.Series(data=_ALL, index=y_train.index)
