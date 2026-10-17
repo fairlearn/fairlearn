@@ -1,7 +1,9 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from numpy import ndarray, ndim
 from sklearn.utils import shuffle
@@ -14,6 +16,9 @@ from ._constants import (
     _NOT_IMPLEMENTED,
     _X_NOT_2D,
 )
+
+if TYPE_CHECKING:
+    from ._adversarial_mitigation import _AdversarialFairness
 
 
 def _check_2d(X):
@@ -35,7 +40,7 @@ class BackendEngine(ABC):
     model_class = None
     optim_class = None
 
-    def __init__(self, base, X, Y, A):
+    def __init__(self, base: _AdversarialFairness, X, Y, A):
         """
         Initialize the generic parts of the backend engine.
 
@@ -113,7 +118,7 @@ class BackendEngine(ABC):
             predictor_list_nodes = [X_features] + model_param + [y_features]
             if loss_param == "binary":
                 predictor_list_nodes.append("sigmoid")
-            elif loss_param == "category":
+            elif loss_param == "multiclass":
                 predictor_list_nodes.append("softmax")
 
             return self.get_model(list_nodes=predictor_list_nodes)
