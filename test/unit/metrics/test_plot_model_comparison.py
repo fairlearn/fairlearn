@@ -123,7 +123,7 @@ def test_kw_error_point_labels1():
 
 
 def test_kw_error_point_labels2():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"point_labels.*of type str"):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),

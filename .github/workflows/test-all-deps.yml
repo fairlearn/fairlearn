@@ -12,7 +12,6 @@ on:
       codeCovPython:
         required: true
         type: string
-        default: "3.13"
       sklearnNightly:
         required: false
         type: boolean
@@ -37,7 +36,7 @@ jobs:
           AGE=$((CURRENT_DATE - COMMIT_DATE))
           echo "AGE=$AGE" >> $GITHUB_OUTPUT
           echo "AGE in seconds: $AGE"
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
       - run: python scripts/install_requirements.py

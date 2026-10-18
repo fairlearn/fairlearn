@@ -18,18 +18,32 @@ env:
 jobs:
   build-wheel:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: "3.11"
-    - name: Update pip and build
-      run: |
-        pip install --upgrade pip
-        pip install --upgrade build
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.0
     - name: Build wheels
-      run: python ./scripts/build_wheels.py --version-filename $VERSION_FILE_NAME
+      run: uv run --no-project --with build python ./scripts/build_wheels.py --version-filename "$VERSION_FILE_NAME"
+    - name: Check distribution metadata
+      run: uv run --no-project --with twine twine check --strict dist/*
+    - name: Export expected wheel version
+      id: version
+      shell: bash
+      run: |
+        python - <<'PY'
+        import os
+        from pathlib import Path
+
+        version = Path(os.environ["VERSION_FILE_NAME"]).read_text(encoding="utf-8").strip()
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+            output.write(f"version={version}\n")
+        PY
     - name: Save wheels to artifact
       uses: actions/upload-artifact@v7
       with:
@@ -46,27 +60,60 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v10.3.0
     - name: Remove Fairlearn source directory
-      uses: JesseTG/rm@v1.0.3
-      with:
-        path: fairlearn
+      shell: python
+      run: |
+        import shutil
+
+        shutil.rmtree("fairlearn")
     - name: Download wheel artifact
       uses: actions/download-artifact@v8
       with:
         name: ${{ env.WHEEL_ARTIFACT }}
     - name: Install Fairlearn from wheel
-      # Do this in three steps to make sure that fairlearn wasn't pulled from PyPI
+      shell: bash
       run: |
-        pip install --pre --find-links . "fairlearn"
-        pip uninstall fairlearn --yes
-        pip install --no-index --find-links . "fairlearn"
+        uv pip install --system --python python --prerelease disallow ./fairlearn-*.whl
     - name: Install testing requirements
       run: |
-        echo "Using pip to install test requirements subject to constraints in requirements-dev.txt"
-        pip install pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
+        uv pip install --system --python python --prerelease disallow pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
+    - name: Verify wheel installation and stable dependencies
+      shell: bash
+      env:
+        EXPECTED_VERSION: ${{ needs.build-wheel.outputs.version }}
+      run: |
+        python - <<'PY'
+        import json
+        import os
+        from importlib.metadata import distribution, distributions
+        from pathlib import Path
+        from zipfile import ZipFile
+
+        import fairlearn
+        from packaging.version import Version
+
+        wheel, = Path.cwd().glob("fairlearn-*.whl")
+        installed = distribution("fairlearn")
+        direct_url = json.loads(installed.read_text("direct_url.json"))
+        assert direct_url["url"] == wheel.as_uri(), direct_url
+        with ZipFile(wheel) as archive:
+            for name in archive.namelist():
+                if name.startswith("fairlearn/") and not name.endswith("/"):
+                    assert archive.read(name) == installed.locate_file(name).read_bytes(), name
+        assert Path(fairlearn.__file__).resolve() == Path(installed.locate_file("fairlearn/__init__.py")).resolve()
+        assert fairlearn.__version__ == os.environ["EXPECTED_VERSION"], (
+            fairlearn.__version__, os.environ["EXPECTED_VERSION"]
+        )
+        for dependency in distributions():
+            version = Version(dependency.version)
+            assert not version.is_prerelease, (dependency.metadata["Name"], dependency.version)
+        print(f"Testing {wheel.name} from {fairlearn.__file__} with stable dependencies")
+        PY
     - name: Run tests
       run: >
         pytest --mpl
@@ -91,8 +138,11 @@ jobs:
     #  uses: pypa/gh-action-pypi-publish@release/v1
     #  with:
     #    password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-    #    repository_url: https://test.pypi.org/legacy/
+    #    attestations: false
+    #    repository-url: https://test.pypi.org/legacy/
     - name: Release to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
+        # Attestations require Trusted Publishing instead of API-token authentication.
+        attestations: false
