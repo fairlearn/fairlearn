@@ -14,7 +14,8 @@ Bug fixes
 
 * Bootstrap confidence intervals in :func:`fairlearn.metrics.plot_metric_frame`
   are aligned with the plotted groups when a group is absent from all bootstrap
-  samples. Such groups retain their metric values with unavailable intervals.
+  samples. Such groups retain their metric values with unavailable intervals:
+  :pr:`1787` by :user:`Zhe Chen <zhechen-cs>`.
 
 * :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
   the classification-only :code:`classes_` attribute. Regression callbacks
