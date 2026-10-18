@@ -719,23 +719,28 @@ class _AdversarialFairness(BaseEstimator):
         we try the same for tensorflow, and if that also fails then we give an
         appropriate error message.
         """
-        # Discover which backends are available
-        torch_installed = False
-        tensorflow_installed = False
-
         if isinstance(self.backend, type) and issubclass(self.backend, BackendEngine):
             self.backend_ = self.backend
             return
+
+        if self.backend not in ["torch", "tensorflow", "auto"]:
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format("backend", "one of ['auto', 'torch','tensorflow']")
+            )
+
+        # Discover which backends are available
+        torch_installed = False
+        tensorflow_installed = False
         if self.backend == "torch" or self.backend == "auto":
-            select = False
             try:
-                from torch.nn import Module as model
+                from torch import nn
 
                 torch_installed = True
-                if isinstance(self.predictor_model, (list, model)) and isinstance(
-                    self.adversary_model, (list, model)
+                if isinstance(self.predictor_model, list | nn.Module) and isinstance(
+                    self.adversary_model, list | nn.Module
                 ):
-                    select = True
+                    self.backend_ = PytorchEngine
+                    return
                 elif self.backend == "torch":
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
@@ -746,19 +751,17 @@ class _AdversarialFairness(BaseEstimator):
             except ImportError:
                 if self.backend == "torch":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch")) from None
-            if select:
-                self.backend_ = PytorchEngine
-                return
+
         if self.backend == "tensorflow" or self.backend == "auto":
-            select = False
             try:
-                from keras import Model as model
+                from keras import Model
 
                 tensorflow_installed = True
-                if isinstance(self.predictor_model, (list, model)) and isinstance(
-                    self.adversary_model, (list, model)
+                if isinstance(self.predictor_model, list | Model) and isinstance(
+                    self.adversary_model, list | Model
                 ):
-                    select = True
+                    self.backend_ = TensorflowEngine
+                    return
                 elif self.backend == "tensorflow":
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
@@ -769,14 +772,7 @@ class _AdversarialFairness(BaseEstimator):
             except ImportError:
                 if self.backend == "tensorflow":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow")) from None
-            if select:
-                self.backend_ = TensorflowEngine
-                return
-        # The keyword self.backend was weird
-        if self.backend not in ["torch", "tensorflow", "auto"]:
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format("backend", "one of ['auto', 'torch','tensorflow']")
-            )
+
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
             raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
