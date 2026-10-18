@@ -12,6 +12,10 @@ New features
 Bug fixes
 ---------
 
+* :func:`~fairlearn.metrics.plot_model_comparison` accepts omitted
+  :code:`sensitive_features` when both metrics can be evaluated without them.
+  Fairness metrics that require sensitive features still reject missing values.
+
 * :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
   the classification-only :code:`classes_` attribute. Regression callbacks
   receive :code:`pos_label=None`, and incremental fitting preserves fitted
