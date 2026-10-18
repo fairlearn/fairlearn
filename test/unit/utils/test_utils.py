@@ -4,52 +4,53 @@
 import numpy as np
 import pandas as pd
 import pytest
+from narwhals.dependencies import is_into_dataframe, is_into_series
 
 import fairlearn.utils._input_validation as iv
 
 
 class TestValidateAndReformatInput:
-    def test_smoke(self):
+    def test_smoke(self, constructor):
         # Regression test for Issue #898
-        X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
+        X = constructor({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
         sf = np.asarray(["C", "D", "C"])
         y = np.asarray([0, 0, 1])
 
         X_update, y_update, sf_update, cf_update = iv._validate_and_reformat_input(
             X=X, y=y, sensitive_features=sf
         )
-        assert isinstance(y_update, pd.Series)
-        assert isinstance(sf_update, pd.Series)
+        is_into_series(y_update)
+        is_into_series(sf_update)
         assert cf_update is None
 
-        assert isinstance(X_update, pd.DataFrame)
+        assert is_into_dataframe(X_update)
         assert np.array_equal(X, X_update)
         assert np.array_equal(y, y_update)
         assert np.array_equal(sf, sf_update)
 
-    def test_only_X(self):
+    def test_only_X(self, constructor):
         # Regression test for Issue #898
-        X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
+        X = constructor({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
 
         X_update, _, _, _ = iv._validate_and_reformat_input(
             X=X, expect_y=False, expect_sensitive_features=False
         )
-        assert isinstance(X_update, pd.DataFrame)
+        assert is_into_dataframe(X_update)
 
-    def test_cf(self):
+    def test_cf(self, constructor):
         # Regression test for Issue #898
-        X = pd.DataFrame.from_dict({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
+        X = constructor({"alpha": ["a", "a", "b"], "beta": [1, 2, 1]})
         sf = np.asarray(["C", "D", "C"])
         y = np.asarray([0, 0, 1])
-        cf = pd.DataFrame.from_dict({"gamma": ["c", "d", "d"], "delta": [0, 0, 0]})
+        cf = constructor({"gamma": ["c", "d", "d"], "delta": [0, 0, 0]})
 
         X_update, y_update, sf_update, cf_update = iv._validate_and_reformat_input(
             X=X, y=y, sensitive_features=sf, control_features=cf
         )
-        assert isinstance(y_update, pd.Series)
-        assert isinstance(cf_update, pd.Series)
+        assert is_into_series(y_update)
+        assert is_into_series(cf_update)
 
-        assert isinstance(X_update, pd.DataFrame)
+        assert is_into_dataframe(X_update)
         assert np.array_equal(X, X_update)
         assert np.array_equal(y, y_update)
         assert np.array_equal(sf, sf_update)
