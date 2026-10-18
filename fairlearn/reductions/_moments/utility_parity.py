@@ -67,6 +67,8 @@ class UtilityParity(ClassificationMoment):
 
     Read more in the :ref:`User Guide <constraints_binary_classification>`.
 
+    .. versionadded:: 0.5.0
+
     Parameters
     ----------
     difference_bound : float | None
@@ -325,6 +327,7 @@ class DemographicParity(UtilityParity):
 
     Read more in the :ref:`User Guide <demographic_parity>`.
 
+    .. versionadded:: 0.3.0
     """
 
     short_name = "DemographicParity"
@@ -381,6 +384,7 @@ class TruePositiveRateParity(UtilityParity):
 
     Read more in the :ref:`User Guide <true_positive_rate_parity>`.
 
+    .. versionadded:: 0.5.0
     """
 
     short_name = "TruePositiveRateParity"
@@ -432,6 +436,7 @@ class FalsePositiveRateParity(UtilityParity):
 
     Read more in the :ref:`User Guide <false_positive_rate_parity>`.
 
+    .. versionadded:: 0.5.0
     """
 
     short_name = "FalsePositiveRateParity"
@@ -482,6 +487,7 @@ class EqualizedOdds(UtilityParity):
 
     Read more in the :ref:`User Guide <equalized_odds>`.
 
+    .. versionadded:: 0.3.0
     """
 
     short_name = "EqualizedOdds"
@@ -527,6 +533,7 @@ class ErrorRateParity(UtilityParity):
 
     Read more in the :ref:`User Guide <error_rate_parity>`.
 
+    .. versionadded:: 0.5.0
     """
 
     short_name = "ErrorRateParity"
