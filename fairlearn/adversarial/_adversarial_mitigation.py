@@ -13,7 +13,6 @@ from sklearn.base import (
     RegressorMixin,
     TransformerMixin,
     is_classifier,
-    is_regressor,
 )
 from sklearn.exceptions import DataConversionWarning
 from sklearn.utils import check_scalar
@@ -510,7 +509,7 @@ class _AdversarialFairness(BaseEstimator):
                             X=X,
                             y=y_true,
                             z=sensitive_features,
-                            pos_label=self.classes_[1],
+                            pos_label=self.classes_[1] if is_classifier(self) else None,
                         )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
@@ -537,7 +536,7 @@ class _AdversarialFairness(BaseEstimator):
         classes : array-like of shape (n_classes,), default=None
             List of all the classes that can possibly appear in the y vector.
             Must be provided at the first call to partial_fit, can be omitted
-            in subsequent calls.
+            in subsequent calls. Ignored for regressors.
 
         sensitive_features : array-like of shape (n_samples,), default=None
             The sensitive features for each sample. If None, a vector of zeros
@@ -550,7 +549,7 @@ class _AdversarialFairness(BaseEstimator):
         """
         first_call = not hasattr(self, "_is_setup")
 
-        if first_call and classes is not None:
+        if first_call and is_classifier(self) and classes is not None:
             self.classes_ = classes
         _check_2d(X)
         if not first_call and self.n_features_in_ != X.shape[1]:
@@ -693,7 +692,7 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        if not is_regressor(self) and not hasattr(self, "classes_"):
+        if is_classifier(self) and not hasattr(self, "classes_"):
             self.classes_ = unique(y)
 
         y = self._y_transform.transform(y)
@@ -1165,9 +1164,14 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     callbacks : callable
         Callback function, called after every batch. For instance useable when
         wanting to validate. A list of callback functions can also be provided.
-        Each callback function is passed two arguments :code:`self` (the
-        estimator instance) and :code:`step` (the completed iteration), and
-        may return a Boolean value. If the returned value is `True`, the
+        Each callback function is called as::
+
+            callback(self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=None)
+
+        The arguments are the estimator, completed iteration, input features,
+        targets, sensitive features, and positive label. For regression,
+        :code:`pos_label` is always :code:`None`.
+        The callback may return a Boolean value. If the returned value is `True`, the
         optimization algorithm terminates. This can be used to implement
         *early stopping*.
 
