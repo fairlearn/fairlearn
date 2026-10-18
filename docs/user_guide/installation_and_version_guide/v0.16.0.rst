@@ -12,6 +12,13 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and 
+  :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` correctly passthrough
+  target :code:`y`, respec., sensitive features :code:`A` passed to :code:`.fit` if
+  :attr:`y_transform`, respec. :attr:`sf_transform`, is :code:`None`. They also
+  correctly apply the custom scikit learn transformers the user passes in.
+  :pr:`1783` by :user:`Tahar Allouche <taharallouche>`.
+
 * Fixed :class:`~fairlearn.reductions.TruePositiveRateParity` and
   :class:`~fairlearn.reductions.FalsePositiveRateParity` with :code:`control_features`.
   Rows with the other label (:code:`Y=0` and :code:`Y=1` respectively) were turned into
