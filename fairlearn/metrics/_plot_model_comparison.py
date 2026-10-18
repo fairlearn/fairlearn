@@ -99,6 +99,15 @@ def plot_model_comparison(
     ax : matplotlib.axes.Axes
         The Axes object that was drawn on.
 
+    Raises
+    ------
+    ValueError
+        If the lengths of `y_true`, `y_preds` or `point_labels` are inconsistent,
+        or if `axis_labels`, `legend`, `show_plot`, `point_labels` or
+        `point_labels_position` have an unsupported type or format.
+    RuntimeError
+        If matplotlib is not installed.
+
     Notes
     -----
     To offer flexibility in stylistic features besides the aforementioned
@@ -177,7 +186,7 @@ def plot_model_comparison(
     else:
         raise ValueError(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                name, "boolean or list of labels", type(kwarg).__name__
+                "point_labels", "boolean or list of labels", type(point_labels).__name__
             )
         )
 
