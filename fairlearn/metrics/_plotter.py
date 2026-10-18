@@ -240,6 +240,14 @@ def plot_metric_frame(
     Returns
     -------
     :class:`matplotlib.axes.Axes` or :class:`numpy.ndarray` of them
+
+    Raises
+    ------
+    ValueError
+        If `metric_frame` is not a :class:`.MetricFrame`, if `metrics` is not a
+        string, a list or `None`, if there are no metrics to plot, if `metrics` and
+        `conf_intervals` have different lengths, or if the confidence intervals are
+        not pairs of values with the lower bound not exceeding the upper bound.
     """
     # ensure metric_frame is a MetricFrame
     if not isinstance(metric_frame, MetricFrame):
