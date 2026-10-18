@@ -672,3 +672,21 @@ def test_callable_losses_and_predictor_functions_are_not_overridden(
     assert mitigator.predictor_loss_ is dummy_predictor_loss
     assert mitigator.adversary_loss_ is dummy_adversary_loss
     assert mitigator.predictor_function is dummy_predictor_function
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_predictor_model_set_to_empty_list_if_None(fake_backend_env):
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_training=True,
+        fake_mixin=True,
+        predictor_model=None,
+        adversary_model=None,
+    )
+
+    X = np.random.default_rng().random(size=(3, 2))
+    y = np.array([1.0, 2.0, 3.0])
+    mitigator.fit(X, y)
+
+    assert mitigator.predictor_model == []
+    assert mitigator.adversary_model == []
