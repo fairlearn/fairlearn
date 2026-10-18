@@ -14,7 +14,8 @@ Bug fixes
 
 * :func:`~fairlearn.metrics.plot_model_comparison` accepts omitted
   :code:`sensitive_features` when both metrics can be evaluated without them.
-  Fairness metrics that require sensitive features still reject missing values.
+  Fairness metrics that require sensitive features still reject missing values:
+  :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
 
 * :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
   the classification-only :code:`classes_` attribute. Regression callbacks
