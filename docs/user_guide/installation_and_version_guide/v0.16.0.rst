@@ -14,7 +14,7 @@ Bug fixes
 
 * :func:`~fairlearn.metrics.plot_model_comparison` respects
   :code:`axis_labels=False`, preserving existing axis labels instead of replacing
-  them with inferred metric names.
+  them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
 
 * :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
   the classification-only :code:`classes_` attribute. Regression callbacks
