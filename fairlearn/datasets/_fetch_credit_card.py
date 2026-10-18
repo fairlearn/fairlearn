@@ -48,7 +48,7 @@ def fetch_credit_card(*, cache=True, data_home=None, as_frame=True, return_X_y=F
     cache : bool, default=True
         Whether to cache downloaded datasets using joblib.
 
-    data_home : str, default=None
+    data_home : str, optional, default=None
         Specify another download and cache folder for the datasets. By default,
         all fairlearn data is stored in '~/.fairlearn-data' subfolders.
 
