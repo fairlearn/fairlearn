@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
+  the classification-only :code:`classes_` attribute. Regression callbacks
+  receive :code:`pos_label=None`, and incremental fitting preserves fitted
+  state and validates feature counts: :pr:`1769` by :user:`Emre K. <kocaemre>`.
+
 * :class:`~fairlearn.preprocessing.CorrelationRemover` preserves its fitted
   feature count when :code:`transform` rejects an input with the wrong number
   of features: :pr:`1765` by
