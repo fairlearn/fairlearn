@@ -77,12 +77,13 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
     def fit(self, X, y=None) -> Self:
         self.inferred_type_ = type_of_target(X)
         X = self._check(X, init=True)
-        self.n_features_in_, self.n_features_out_ = X.shape[0], X.shape[1]
+        self.n_features_in_ = X.shape[1]
 
         passthrough_transformer = FunctionTransformer(func=None)
         if self.transformer is None:
             self.transform_ = passthrough_transformer
             self.transform_.fit(X)
+            self.n_features_out_ = X.shape[1]
             return self
 
         if self.transformer == "auto":
@@ -95,16 +96,16 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
                     sparse_output=False,
                 )
                 self.transform_.fit(X)
-                self.n_features_out_ = sum(
-                    len(cat) if len(cat) != 2 else 1 for cat in self.transform_.categories_
-                )
+                self.n_features_out_ = len(self.transform_.get_feature_names_out())
             else:
                 self.transform_ = passthrough_transformer
                 self.transform_.fit(X)
+                self.n_features_out_ = X.shape[1]
             return self
 
         self.transform_ = self.transformer
         self.transform_.fit(X)
+        self.n_features_out_ = len(self.transform_.get_feature_names_out())
         return self
 
     def transform(self, X):

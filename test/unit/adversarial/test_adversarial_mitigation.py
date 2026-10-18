@@ -491,14 +491,35 @@ def test_fitted_model_rejects_non_2d_X(
     backend_call.assert_not_called()
 
 
-@pytest.mark.parametrize("transformer", ["auto", None, FunctionTransformer(None)])
+@pytest.mark.parametrize(
+    "transformer", ["auto", None, FunctionTransformer(None, feature_names_out="one-to-one")]
+)
 @pytest.mark.parametrize("data", [Bin2d, Cat, Cont2d, MultiClass2d])
 def test_valid_input_data_types(data, transformer):
     """Test if the model processes the right data types"""
     prep = FloatTransformer(transformer=transformer)
     prep.fit(data)
-    assert prep.n_features_in_ == data.shape[0]
+    assert prep.n_features_in_ == data.shape[1]
     assert prep.n_features_out_ == data.shape[1]
+
+
+@pytest.mark.parametrize(
+    ["data", "expected_n_features_in_", "expected_n_features_out_"],
+    [
+        (np.array([0, 1, 1]), 1, 1),
+        (np.array([[0], [1], [1]]), 1, 1),
+        (np.array([[0], [1], [2]]), 1, 3),
+        (np.array([[0.5], [1.1], [2]]), 1, 1),
+    ],
+)
+def test_FloatTransformer_auto_n_features_attributes(
+    data, expected_n_features_in_: int, expected_n_features_out_: int
+):
+    transformer = FloatTransformer("auto")
+    transformer.fit(data)
+
+    assert expected_n_features_in_ == transformer.n_features_in_
+    assert expected_n_features_out_ == transformer.n_features_out_
 
 
 def test_FloatTransformer_passes_through_on_None():
@@ -529,7 +550,9 @@ def test_FloatTransformer_multiclass_auto():
 
 def test_FloatTransformer_custom_transformer():
     input_ = np.array([0, 1, 2, 0])
-    custom_transformer = FunctionTransformer(func=lambda x: 2 * x, inverse_func=lambda x: x / 2)
+    custom_transformer = FunctionTransformer(
+        func=lambda x: 2 * x, inverse_func=lambda x: x / 2, feature_names_out="one-to-one"
+    )
 
     transformer = FloatTransformer(custom_transformer)
 
