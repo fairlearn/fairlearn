@@ -144,6 +144,8 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
 
     lo_q, lo_data = pairs[0]
     hi_q, hi_data = pairs[-1]
+    lo_data = lo_data.reindex(metric_frame.by_group.index)
+    hi_data = hi_data.reindex(metric_frame.by_group.index)
 
     mapping = {}
     if isinstance(lo_data, pd.DataFrame):
