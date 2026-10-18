@@ -186,7 +186,7 @@ def plot_model_comparison(
     else:
         raise ValueError(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                name, "boolean or list of labels", type(kwarg).__name__
+                "point_labels", "boolean or list of labels", type(point_labels).__name__
             )
         )
 
