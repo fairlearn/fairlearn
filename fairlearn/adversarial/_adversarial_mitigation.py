@@ -733,11 +733,11 @@ class _AdversarialFairness(BaseEstimator):
         tensorflow_installed = False
         if self.backend == "torch" or self.backend == "auto":
             try:
-                from torch import nn
+                import torch
 
                 torch_installed = True
-                if isinstance(self.predictor_model, list | nn.Module) and isinstance(
-                    self.adversary_model, list | nn.Module
+                if isinstance(self.predictor_model, list | torch.nn.Module) and isinstance(
+                    self.adversary_model, list | torch.nn.Module
                 ):
                     self.backend_ = PytorchEngine
                     return
@@ -754,11 +754,11 @@ class _AdversarialFairness(BaseEstimator):
 
         if self.backend == "tensorflow" or self.backend == "auto":
             try:
-                from keras import Model
+                import keras
 
                 tensorflow_installed = True
-                if isinstance(self.predictor_model, list | Model) and isinstance(
-                    self.adversary_model, list | Model
+                if isinstance(self.predictor_model, list | keras.Model) and isinstance(
+                    self.adversary_model, list | keras.Model
                 ):
                     self.backend_ = TensorflowEngine
                     return
