@@ -572,8 +572,7 @@ def test_invalid_backend():
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Key-word argument 'backend' should be set to one of"
-            " ['auto', 'torch','tensorflow']."
+            "Key-word argument 'backend' should be set to one of ['auto', 'torch','tensorflow']."
         ),
     ):
         mitigator._validate_backend()
@@ -600,7 +599,8 @@ def test_tensorflow_backend_wrong_predictor_class(fake_backend_env):
     with pytest.raises(
         ValueError,
         match=re.escape(
-            "Key-word argument 'backend' should be set to one of ['auto', 'torch','tensorflow']."
+            "Key-word argument 'predictor_model and adversary_model'"
+            " should be set to a list or keras.Model."
         ),
     ):
         mitigator._validate_backend()
