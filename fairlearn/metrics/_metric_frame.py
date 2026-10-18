@@ -692,6 +692,13 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The maximum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
+
+        Raises
+        ------
+        ValueError
+            If `errors` is not one of ``"raise"`` or ``"coerce"``, or if
+            `errors` is ``"raise"`` and any of the metric functions returned
+            a non-scalar value.
         """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
@@ -743,6 +750,13 @@ class MetricFrame:
         typing.Any or pandas.Series or pandas.DataFrame
             The minimum value over sensitive features. The exact type
             follows the table in :attr:`.MetricFrame.overall`.
+
+        Raises
+        ------
+        ValueError
+            If `errors` is not one of ``"raise"`` or ``"coerce"``, or if
+            `errors` is ``"raise"`` and any of the metric functions returned
+            a non-scalar value.
         """
         if errors not in _VALID_ERROR_STRING:
             raise ValueError(_INVALID_ERRORS_VALUE_ERROR_MESSAGE)
