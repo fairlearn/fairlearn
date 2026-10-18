@@ -95,6 +95,14 @@ def plot_roc_curve_by_group(
     matplotlib.axes.Axes
         The axes on which the curves were drawn.
 
+    Raises
+    ------
+    ValueError
+        If ``y_true``, ``y_score`` and ``sensitive_features`` do not have the
+        same length, or if ``sensitive_features`` contains missing values.
+    RuntimeError
+        If matplotlib is not installed.
+
     Notes
     -----
     This function only produces the plot. To obtain the AUC scores
