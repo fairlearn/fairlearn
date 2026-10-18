@@ -146,9 +146,7 @@ class DisaggregatedResult:
 
             elif errors == "coerce":
                 # Fill in the possible min/max values, else np.nan
-                mf = self.by_group.apply(
-                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
-                )
+                mf = _coerce_non_scalar(self.by_group, errors)
                 result = mf.agg(grouping_function, axis=0)
         else:
             if errors == "raise":
@@ -161,9 +159,7 @@ class DisaggregatedResult:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self.by_group.apply(
-                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
-                )
+                mf = _coerce_non_scalar(self.by_group, errors)
                 result = mf.groupby(level=control_feature_names).agg(grouping_function)
 
         assert isinstance(result, (pd.Series, pd.DataFrame))
@@ -216,9 +212,8 @@ class DisaggregatedResult:
         else:
             raise ValueError(f"Unrecognised method '{method}' in difference() call")
 
-        # Can assume errors='coerce', else error would already have been raised in .group_min
         # Fill all non-scalar values with NaN
-        mf = self.by_group.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
+        mf = _coerce_non_scalar(self.by_group, errors)
 
         if control_feature_names is None:
             result = (mf - subtrahend).abs().max()
