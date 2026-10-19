@@ -289,11 +289,15 @@ def test_without_sensitive_features(as_dict):
         plt.close(ax.figure)
 
 
-def test_fairness_metric_still_requires_sensitive_features():
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize("metric_axis", ["x_axis_metric", "y_axis_metric"])
+def test_fairness_metric_without_sensitive_features_has_clear_error(metric_axis):
+    derived_metric = make_derived_metric(metric=selection_rate, transform="difference")
+    metrics = {"x_axis_metric": accuracy_score, "y_axis_metric": accuracy_score}
+    metrics[metric_axis] = derived_metric
+
+    with pytest.raises(ValueError, match="sensitive_features must be provided"):
         plot_model_comparison(
-            x_axis_metric=accuracy_score,
-            y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
+            **metrics,
             y_true=y_t,
             y_preds=[y_t, y_p],
         )
