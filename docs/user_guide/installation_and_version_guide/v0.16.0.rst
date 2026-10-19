@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* Bootstrap confidence intervals in :func:`~fairlearn.metrics._plotter.plot_metric_frame`
+  are aligned with the plotted groups when a group is absent from all bootstrap
+  samples. Such groups retain their metric values with unavailable intervals:
+  :pr:`1787` by :user:`Zhe Chen <zhechen-cs>`.
+
 * :func:`~fairlearn.metrics.plot_model_comparison` respects
   :code:`axis_labels=False`, preserving existing axis labels instead of replacing
   them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
