@@ -234,7 +234,7 @@ def plot_model_comparison(
         ax = plt.axes()
 
     # Add axis labels
-    if isinstance(axis_labels, bool):
+    if axis_labels is True:
         for f, m in (
             (ax.set_xlabel, x_axis_metric),
             (ax.set_ylabel, y_axis_metric),
