@@ -12,6 +12,12 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.postprocessing.ThresholdOptimizer` with :code:`tol` no
+  longer excludes thresholds whose constraint values are exactly :code:`tol`
+  apart because of floating point error, and now raises a :code:`ValueError`
+  if :code:`tol` is not :code:`None` or a non-negative number: :pr:`1794` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * :func:`~fairlearn.metrics.plot_model_comparison` respects
   :code:`axis_labels=False`, preserving existing axis labels instead of replacing
   them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
