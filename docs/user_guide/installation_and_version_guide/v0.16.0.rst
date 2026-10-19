@@ -12,6 +12,10 @@ New features
 Bug fixes
 ---------
 
+* :func:`~fairlearn.metrics.plot_model_comparison` accepts omitted
+  :code:`sensitive_features` when both metrics can be evaluated without them.
+  Fairness metrics that require sensitive features still reject missing values:
+  :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
 * :meth:`~fairlearn.metrics.MetricFrame.difference` and
   :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
   now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the

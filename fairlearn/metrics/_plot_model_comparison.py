@@ -130,9 +130,11 @@ def plot_model_comparison(
         zeros((len(y_true), 1)),  # Dummy values for X
         y=y_true,
         sensitive_features=sensitive_features,
+        expect_sensitive_features=False,
     )
     y_true = y_true.values
-    sensitive_features = sensitive_features.values
+    if sensitive_features is not None:
+        sensitive_features = sensitive_features.values
 
     # --- VALIDATE INPUT ---
     if isinstance(y_preds, dict):
