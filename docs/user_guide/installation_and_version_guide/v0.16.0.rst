@@ -16,6 +16,9 @@ Bug fixes
   :code:`sensitive_features` when both metrics can be evaluated without them.
   Fairness metrics that require sensitive features still reject missing values:
   :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
+* `plot_model_comparison` now raises a clear `:class:`ValueError`` directing
+  users to provide `:code:`sensitive_features`` when a derived fairness metric
+  needs group data.
 * :meth:`~fairlearn.metrics.MetricFrame.difference` and
   :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
   now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the
