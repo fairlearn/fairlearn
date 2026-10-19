@@ -19,14 +19,22 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
     Read more in the :ref:`User Guide <preprocessing>`.
 
+    .. versionadded:: 0.6.0
+
+    .. versionchanged:: 0.8.0
+        Added the :attr:`n_features_in_` and :attr:`feature_names_in_` attributes.
+
+    .. versionchanged:: 0.12.0
+        The estimator became fully :code:`scikit-learn` compatible.
+
     Parameters
     ----------
-        sensitive_feature_ids : list
-            list of columns to filter out this can be a sequence of
-            either int, in the case of numpy, or string, in the case of pandas.
-        alpha : float
-            parameter to control how much to filter, for alpha=1.0 we filter out
-            all information while for alpha=0.0 we don't apply any.
+    sensitive_feature_ids : list, default=()
+        List of columns to filter out. This can be a sequence of
+        either int, in the case of numpy, or string, in the case of pandas.
+    alpha : float, default=1
+        Parameter to control how much to filter. For alpha=1.0 we filter out
+        all information, while for alpha=0.0 we don't apply any.
 
     Notes
     -----
@@ -77,8 +85,6 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
     Note that the lack of correlation does not imply anything about statistical dependence.
     Therefore, we expect this to be most appropriate as a preprocessing step for
     (generalized) linear models.
-
-    .. versionadded:: 0.6
 
     """
 
@@ -193,7 +199,7 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
                 )
             X = X.to_numpy()
 
-        X = validate_data(self, X)
+        X = validate_data(self, X, reset=False)
         if self._n_features_in_ != X.shape[1]:
             raise ValueError(
                 f"X has {X.shape[1]} features, but {self.__class__.__name__} "

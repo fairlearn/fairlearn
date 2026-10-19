@@ -26,6 +26,10 @@ def maximize_objective_with_tolerance(
         An Iterable of weights for each DataFrame.
     tol: float
         The maximum allowed tolerance.
+    x_col: str, default='x'
+        Name of the column holding the `x` values in each DataFrame.
+    y_col: str, default='y'
+        Name of the column holding the `y` values in each DataFrame.
 
     Returns
     -------

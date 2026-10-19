@@ -123,7 +123,7 @@ def test_kw_error_point_labels1():
 
 
 def test_kw_error_point_labels2():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"point_labels.*of type str"):
         plot_model_comparison(
             x_axis_metric=accuracy_score,
             y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
@@ -264,3 +264,60 @@ def test_multiple_calls():
     assert ax.get_xlabel() == "accuracy score"
     assert ax.get_ylabel() == "selection rate, difference"
     assert ax.get_legend_handles_labels()[1] == ["True", "Pred"]
+
+
+@pytest.mark.parametrize("labels", [("", ""), ("custom x", "custom y")])
+def test_axis_labels_false_preserves_existing_labels(labels):
+    import matplotlib.pyplot as plt
+
+    _, ax = plt.subplots()
+    ax.set_xlabel(labels[0])
+    ax.set_ylabel(labels[1])
+    try:
+        plot_model_comparison(
+            x_axis_metric=accuracy_score,
+            y_axis_metric=selection_rate,
+            y_true=y_t,
+            y_preds=[y_t, y_p],
+            sensitive_features=g_1,
+            axis_labels=False,
+            ax=ax,
+        )
+        assert ax.get_xlabel() == labels[0]
+        assert ax.get_ylabel() == labels[1]
+        assert len(ax.collections[0].get_offsets()) == 2
+    finally:
+        plt.close(ax.figure)
+
+
+@pytest.mark.parametrize("as_dict", [False, True])
+def test_without_sensitive_features(as_dict):
+    import matplotlib.pyplot as plt
+
+    predictions = {"first": y_t, "second": y_p} if as_dict else [y_t, y_p]
+    _, ax = plt.subplots()
+    try:
+        result = plot_model_comparison(
+            x_axis_metric=accuracy_score,
+            y_axis_metric=selection_rate,
+            y_true=y_t,
+            y_preds=predictions,
+            ax=ax,
+        )
+        assert result is ax
+        np.testing.assert_allclose(
+            ax.collections[0].get_offsets(),
+            [[accuracy_score(y_t, pred), selection_rate(y_t, pred)] for pred in [y_t, y_p]],
+        )
+    finally:
+        plt.close(ax.figure)
+
+
+def test_fairness_metric_still_requires_sensitive_features():
+    with pytest.raises(ValueError):
+        plot_model_comparison(
+            x_axis_metric=accuracy_score,
+            y_axis_metric=make_derived_metric(metric=selection_rate, transform="difference"),
+            y_true=y_t,
+            y_preds=[y_t, y_p],
+        )

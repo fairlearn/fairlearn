@@ -1,6 +1,7 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import re
 import sys
 from typing import Literal
 from unittest.mock import patch
@@ -43,6 +44,62 @@ def fake_backend_env(request: pytest.FixtureRequest):
 
     with patch.dict(sys.modules, get_backend_patches(backend)):
         yield backend
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_regressor_fit_does_not_expose_classes(fake_backend_env):
+    mitigator = get_instance(cls=AdversarialFairnessRegressor, fake_mixin=True)
+    mitigator.fit(Bin2d, Cont2d[:, 0], sensitive_features=Bin1d)
+    assert not hasattr(mitigator, "classes_")
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+@pytest.mark.parametrize("classes", [None, [0, 1]])
+def test_regressor_partial_fit_does_not_expose_classes(fake_backend_env, classes):
+    mitigator = get_instance(cls=AdversarialFairnessRegressor, fake_mixin=True)
+    for _ in range(2):
+        mitigator.partial_fit(Bin2d, Cont2d[:, 0], classes=classes, sensitive_features=Bin1d)
+        assert not hasattr(mitigator, "classes_")
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+@pytest.mark.parametrize("cls", [AdversarialFairnessClassifier, AdversarialFairnessRegressor])
+@pytest.mark.parametrize("early_stop", [False, True])
+def test_callback_positive_label(fake_backend_env, cls, early_stop):
+    y = Bin1d if cls is AdversarialFairnessClassifier else Cont2d[:, 0]
+    expected_pos_label = np.unique(y)[1] if cls is AdversarialFairnessClassifier else None
+    steps = []
+
+    def callback(estimator, step, X, y, z, pos_label):
+        assert estimator is mitigator
+        np.testing.assert_array_equal(X, Bin2d)
+        np.testing.assert_array_equal(y, targets)
+        np.testing.assert_array_equal(z, Bin1d)
+        assert pos_label == expected_pos_label
+        steps.append(step)
+        return early_stop
+
+    targets = y
+    mitigator = get_instance(
+        cls=cls,
+        fake_backend=fake_backend_env,
+        fake_mixin=True,
+        callbacks=callback,
+        epochs=3,
+        batch_size=-1,
+    )
+    mitigator.fit(Bin2d, y, sensitive_features=Bin1d)
+    assert steps == ([1] if early_stop else [1, 2, 3])
+    assert mitigator.n_iter_ == len(steps)
+    assert hasattr(mitigator, "classes_") == (cls is AdversarialFairnessClassifier)
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_regressor_partial_fit_validates_feature_count(fake_backend_env):
+    mitigator = get_instance(cls=AdversarialFairnessRegressor, fake_mixin=True)
+    mitigator.fit(Bin2d, Cont2d[:, 0], sensitive_features=Bin1d)
+    with pytest.raises(ValueError, match="features"):
+        mitigator.partial_fit(Bin2d[:, :1], Cont2d[:, 0], sensitive_features=Bin1d)
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
@@ -510,6 +567,45 @@ def test_no_backend(backend, fake_backend_env):
         mitigator._validate_backend()
 
 
+def test_invalid_backend():
+    mitigator = get_instance(fake_backend=None, backend="invalid-backend")
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Key-word argument 'backend' should be set to one of ['auto', 'torch','tensorflow']."
+        ),
+    ):
+        mitigator._validate_backend()
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+def test_torch_backend_wrong_predictor_class(fake_backend_env):
+    mitigator = get_instance(fake_backend=None, backend="torch", predictor_model="other class")
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Key-word argument 'predictor_model and adversary_model'"
+            " should be set to a list or torch.nn.Module."
+        ),
+    ):
+        mitigator._validate_backend()
+
+
+@pytest.mark.parametrize("fake_backend_env", ["tensorflow"], indirect=True)
+def test_tensorflow_backend_wrong_predictor_class(fake_backend_env):
+    mitigator = get_instance(
+        fake_backend=None, backend="tensorflow", predictor_model="other class"
+    )
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Key-word argument 'predictor_model and adversary_model'"
+            " should be set to a list or keras.Model."
+        ),
+    ):
+        mitigator._validate_backend()
+
+
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
 def test_validate_data_ambiguous_rows(fake_backend_env):
     """Test if an ambiguous number of rows are caught."""
@@ -522,3 +618,27 @@ def test_validate_data_ambiguous_rows(fake_backend_env):
                 str(exc.value)
                 == f"Input data has an ambiguous number of rows: {X.shape[0]}, {Y.shape[0]}, {Z.shape[0]}."
             )
+
+
+def test_backend_engine_is_abstract():
+    """BackendEngine cannot be instantiated and a subclass must implement the
+    methods that have no generic implementation."""
+    from fairlearn.adversarial._backend_engine import BackendEngine
+
+    abstract = {"evaluate", "train_step", "get_optimizer", "get_model"}
+    assert BackendEngine.__abstractmethods__ == abstract
+    with pytest.raises(TypeError, match="abstract"):
+        BackendEngine(None, None, None, None)
+
+    class MissingModel(BackendEngine):
+        def evaluate(self, X):
+            pass
+
+        def train_step(self, X, Y, A):
+            pass
+
+        def get_optimizer(self, optim_param, model):
+            pass
+
+    with pytest.raises(TypeError, match="get_model"):
+        MissingModel(None, None, None, None)
