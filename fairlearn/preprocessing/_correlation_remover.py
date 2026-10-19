@@ -29,12 +29,12 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
 
     Parameters
     ----------
-        sensitive_feature_ids : list
-            list of columns to filter out this can be a sequence of
-            either int, in the case of numpy, or string, in the case of pandas.
-        alpha : float
-            parameter to control how much to filter, for alpha=1.0 we filter out
-            all information while for alpha=0.0 we don't apply any.
+    sensitive_feature_ids : list, default=()
+        List of columns to filter out. This can be a sequence of
+        either int, in the case of numpy, or string, in the case of pandas.
+    alpha : float, default=1
+        Parameter to control how much to filter. For alpha=1.0 we filter out
+        all information, while for alpha=0.0 we don't apply any.
 
     Notes
     -----

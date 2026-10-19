@@ -27,6 +27,23 @@ _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE = (
 )
 
 
+def _coerce_non_scalar(
+    data: pd.Series | pd.DataFrame, errors: Literal["raise", "coerce"]
+) -> pd.Series | pd.DataFrame:
+    """Replace non-scalar cells with NaN, or raise if errors is 'raise'."""
+
+    def coerce(y):
+        if np.isscalar(y):
+            return y
+        if errors == "raise":
+            raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE)
+        return np.nan
+
+    if isinstance(data, pd.DataFrame):
+        return data.apply(lambda x: x.apply(coerce))
+    return data.apply(coerce)
+
+
 def apply_to_dataframe(
     data: pd.DataFrame,
     metric_functions: dict[str, AnnotatedMetricFunction],
@@ -129,9 +146,7 @@ class DisaggregatedResult:
 
             elif errors == "coerce":
                 # Fill in the possible min/max values, else np.nan
-                mf = self.by_group.apply(
-                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
-                )
+                mf = _coerce_non_scalar(self.by_group, errors)
                 result = mf.agg(grouping_function, axis=0)
         else:
             if errors == "raise":
@@ -144,9 +159,7 @@ class DisaggregatedResult:
                     raise ValueError(_MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE) from ve
             elif errors == "coerce":
                 # Fill all impossible columns with NaN before grouping metric frame
-                mf = self.by_group.apply(
-                    lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan)
-                )
+                mf = _coerce_non_scalar(self.by_group, errors)
                 result = mf.groupby(level=control_feature_names).agg(grouping_function)
 
         assert isinstance(result, (pd.Series, pd.DataFrame))
@@ -195,13 +208,12 @@ class DisaggregatedResult:
         if method == "between_groups":
             subtrahend = self.apply_grouping("min", control_feature_names, errors=errors)
         elif method == "to_overall":
-            subtrahend = self.overall
+            subtrahend = _coerce_non_scalar(self.overall, errors)
         else:
             raise ValueError(f"Unrecognised method '{method}' in difference() call")
 
-        # Can assume errors='coerce', else error would already have been raised in .group_min
         # Fill all non-scalar values with NaN
-        mf = self.by_group.apply(lambda x: x.apply(lambda y: y if np.isscalar(y) else np.nan))
+        mf = _coerce_non_scalar(self.by_group, errors)
 
         if control_feature_names is None:
             result = (mf - subtrahend).abs().max()
@@ -266,14 +278,16 @@ class DisaggregatedResult:
             ) / self.apply_grouping("max", control_feature_names, errors=errors)
         elif method == "to_overall":
             ratios = None
+            by_group = _coerce_non_scalar(self.by_group, errors)
+            overall = _coerce_non_scalar(self.overall, errors)
 
             if control_feature_names is not None:
                 # It's easiest to give in to the DataFrame columns preference
-                ratios = self.by_group.unstack(level=control_feature_names) / self.overall.unstack(
+                ratios = by_group.unstack(level=control_feature_names) / overall.unstack(
                     level=control_feature_names
                 )
             else:
-                ratios = self.by_group / self.overall
+                ratios = by_group / overall
 
             ratios = ratios.apply(lambda x: x.transform(ratio_sub_one))
             result = ratios.min() if not control_feature_names else ratios.min().unstack(0)
