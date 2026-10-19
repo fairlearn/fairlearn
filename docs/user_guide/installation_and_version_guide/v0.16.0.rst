@@ -17,6 +17,21 @@ Bug fixes
   samples. Such groups retain their metric values with unavailable intervals:
   :pr:`1787` by :user:`Zhe Chen <zhechen-cs>`.
 
+* :func:`~fairlearn.metrics.plot_model_comparison` respects
+  :code:`axis_labels=False`, preserving existing axis labels instead of replacing
+  them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
+
+* :func:`~fairlearn.metrics.plot_model_comparison` accepts omitted
+  :code:`sensitive_features` when both metrics can be evaluated without them.
+  Fairness metrics that require sensitive features still reject missing values:
+  :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
+* :meth:`~fairlearn.metrics.MetricFrame.difference` and
+  :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
+  now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the
+  non-scalar error when :code:`errors="raise"`, as with
+  :code:`method="between_groups"`: :pr:`1786` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
   the classification-only :code:`classes_` attribute. Regression callbacks
   receive :code:`pos_label=None`, and incremental fitting preserves fitted

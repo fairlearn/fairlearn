@@ -1,6 +1,7 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import re
 import sys
 from typing import Literal
 from unittest.mock import patch
@@ -563,6 +564,45 @@ def test_no_backend(backend, fake_backend_env):
     """Test if validate_data properly preprocesses dataframes to ndarray."""
     mitigator = get_instance(fake_backend=fake_backend_env, backend=backend)
     with pytest.raises(RuntimeError):
+        mitigator._validate_backend()
+
+
+def test_invalid_backend():
+    mitigator = get_instance(fake_backend=None, backend="invalid-backend")
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Key-word argument 'backend' should be set to one of ['auto', 'torch','tensorflow']."
+        ),
+    ):
+        mitigator._validate_backend()
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+def test_torch_backend_wrong_predictor_class(fake_backend_env):
+    mitigator = get_instance(fake_backend=None, backend="torch", predictor_model="other class")
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Key-word argument 'predictor_model and adversary_model'"
+            " should be set to a list or torch.nn.Module."
+        ),
+    ):
+        mitigator._validate_backend()
+
+
+@pytest.mark.parametrize("fake_backend_env", ["tensorflow"], indirect=True)
+def test_tensorflow_backend_wrong_predictor_class(fake_backend_env):
+    mitigator = get_instance(
+        fake_backend=None, backend="tensorflow", predictor_model="other class"
+    )
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Key-word argument 'predictor_model and adversary_model'"
+            " should be set to a list or keras.Model."
+        ),
+    ):
         mitigator._validate_backend()
 
 
