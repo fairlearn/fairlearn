@@ -103,8 +103,8 @@ def plot_model_comparison(
     ------
     ValueError
         If the lengths of `y_true`, `y_preds` or `point_labels` are inconsistent,
-        or if `axis_labels`, `legend`, `show_plot`, `point_labels` or
-        `point_labels_position` have an unsupported type or format.
+        if an input has an unsupported type or format, or if `sensitive_features`
+        is omitted while a derived fairness metric is used.
     RuntimeError
         If matplotlib is not installed.
 
@@ -201,6 +201,13 @@ def plot_model_comparison(
                 )
     else:
         raise ValueError("Key word argument point_labels_position is not a two-tuple.")
+
+    if sensitive_features is None and any(
+        isinstance(metric, _DerivedMetric) for metric in (x_axis_metric, y_axis_metric)
+    ):
+        raise ValueError(
+            "sensitive_features must be provided when using a derived fairness metric."
+        )
 
     # --- COMPUTE METRICS ---
     # try-except structure because we expect: metric(y_true, y_pred, sensitive_attribute)
