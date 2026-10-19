@@ -492,7 +492,10 @@ Consider who can influence design decisions: consulting stakeholders does not ne
 give them power over the outcome :footcite:`delgado2023participatory`.
 For example, a platform operator may be able to change a fraud detection system, while a
 person whose transaction it blocks may have little opportunity to challenge that decision.
-Discuss these differences in power and any conflicting interests when planning participation.
+When planning participation, discuss differences in power and conflicting interests.
+Make clear which decisions participants can influence and who will make the final decisions.
+Record unresolved disagreements and explain to participants how their input shaped the outcome,
+including the reasons for not adopting particular suggestions.
 
 For each intended use, describe the system's purpose and deployment context, then identify
 who operates it, whose data or decisions it involves, and who could experience its effects
