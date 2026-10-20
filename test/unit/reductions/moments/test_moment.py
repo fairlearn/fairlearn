@@ -1,12 +1,20 @@
 # Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
+from typing import get_type_hints
+
 import numpy as np
 import pandas as pd
 import pytest
 
 from fairlearn.reductions import Moment
 from fairlearn.reductions._moments.moment import _LABEL
+
+
+def test_load_data_type_hints_resolve():
+    type_hints = get_type_hints(Moment.load_data)
+
+    assert set(type_hints) == {"X", "y", "sensitive_features", "return"}
 
 
 def test_load_data_without_sensitive_features():

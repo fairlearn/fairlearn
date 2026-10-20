@@ -2,11 +2,18 @@
 # Licensed under the MIT License.
 from __future__ import annotations
 
-from collections.abc import Callable
-from typing import Generic, TypeVar
+from collections.abc import Callable, Sequence
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import narwhals.stable.v1 as nw
+import numpy as np
 import pandas as pd
+
+if TYPE_CHECKING:
+    from narwhals.typing import IntoDataFrame, IntoSeries
+else:
+    IntoDataFrame = Any
+    IntoSeries = Any
 
 _GammaResultT = TypeVar("_GammaResultT")
 
@@ -38,10 +45,10 @@ class Moment(Generic[_GammaResultT]):
 
     def load_data(
         self,
-        X: nw.typing.IntoDataFrame,
-        y: nw.typing.IntoSeries,
+        X: IntoDataFrame | np.ndarray | Sequence[Sequence[Any]],
+        y: IntoSeries | np.ndarray | Sequence[Any],
         *,
-        sensitive_features: nw.typing.IntoSeries | None = None,
+        sensitive_features: IntoSeries | np.ndarray | Sequence[Any] | None = None,
     ) -> None:
         """Load a set of data for use by this object.
 
