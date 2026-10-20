@@ -983,6 +983,32 @@ def test_all_sensitive_features_one_group():
     assert set(preds).issubset({0, 1})
 
 
+@pytest.mark.parametrize("constraints", ["demographic_parity", "equalized_odds"])
+def test_predict_unseen_sensitive_feature_value(constraints):
+    """Groups that were not seen during fit have no threshold, so predict raises."""
+    X = pd.DataFrame(np.arange(8).reshape(-1, 1))
+    y = pd.Series([0, 1] * 4)
+    sf = pd.Series(["a", "a", "b", "b"] * 2)
+
+    thr_optimizer = ThresholdOptimizer(
+        estimator=PassThroughPredictor(),
+        constraints=constraints,
+        grid_size=5,
+    )
+    thr_optimizer.fit(X, y, sensitive_features=sf)
+
+    sf_new = pd.Series(["a", "c", "b", "c"])
+    msg = "No threshold is available for the sensitive feature values ['c']."
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        thr_optimizer.predict(X.iloc[:4], sensitive_features=sf_new)
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        thr_optimizer._pmf_predict(X.iloc[:4], sensitive_features=sf_new)
+
+    # groups seen during fit still work
+    preds = thr_optimizer.predict(X.iloc[:4], sensitive_features=sf.iloc[:4])
+    assert set(preds).issubset({0, 1})
+
+
 def test_prefit_estimator_small_grid():
     """Check that prefit=True path works and supports small grid sizes."""
     X = pd.DataFrame(np.arange(6).reshape(-1, 1))

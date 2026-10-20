@@ -1,0 +1,108 @@
+v0.16.0
+=======
+
+.. note::
+
+   v0.16.0 is not yet released. This page reflects changes on the current
+   :code:`main` branch that will eventually be a part of v0.16.0.
+
+New features
+------------
+
+Bug fixes
+---------
+
+* Fixed :class:`~fairlearn.reductions.TruePositiveRateParity` and
+  :class:`~fairlearn.reductions.FalsePositiveRateParity` with :code:`control_features`.
+  Rows with the other label (:code:`Y=0` and :code:`Y=1` respectively) were turned into
+  events named :code:`control=<value>,nan`, so the moments also constrained the rate
+  among those rows, and passing a control feature added a false (or true) positive rate
+  parity constraint that the user did not ask for: :pr:`1747` by :user:`breken-ai`.
+
+* Bootstrap confidence intervals in :func:`~fairlearn.metrics._plotter.plot_metric_frame`
+  are aligned with the plotted groups when a group is absent from all bootstrap
+  samples. Such groups retain their metric values with unavailable intervals:
+  :pr:`1787` by :user:`Zhe Chen <zhechen-cs>`.
+
+* :func:`~fairlearn.metrics.plot_model_comparison` respects
+  :code:`axis_labels=False`, preserving existing axis labels instead of replacing
+  them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
+
+* :func:`~fairlearn.metrics.plot_model_comparison` accepts omitted
+  :code:`sensitive_features` when both metrics can be evaluated without them.
+  Fairness metrics that require sensitive features still reject missing values:
+  :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
+* :meth:`~fairlearn.metrics.MetricFrame.difference` and
+  :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
+  now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the
+  non-scalar error when :code:`errors="raise"`, as with
+  :code:`method="between_groups"`: :pr:`1786` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
+  the classification-only :code:`classes_` attribute. Regression callbacks
+  receive :code:`pos_label=None`, and incremental fitting preserves fitted
+  state and validates feature counts: :pr:`1769` by :user:`Emre K. <kocaemre>`.
+
+* :class:`~fairlearn.preprocessing.CorrelationRemover` preserves its fitted
+  feature count when :code:`transform` rejects an input with the wrong number
+  of features: :pr:`1765` by
+  :user:`J Ganesh Kumar Reddy <Ganesh1729-ui>`.
+
+* Fixed :code:`solve_linprog` so that failures reported by SciPy's linear
+  programming solver raise a :code:`RuntimeError` instead of allowing invalid
+  solver output to propagate: :pr:`1715` by :user:`Roman Lutz <romanlutz>`.
+* :func:`~fairlearn.metrics.plot_roc_curve_by_group` now raises a
+  :code:`ValueError` naming the offending feature when a sensitive feature
+  contains missing values, consistent with
+  :class:`~fairlearn.metrics.MetricFrame`. Previously, rows with missing
+  sensitive feature values were included in the overall curve but omitted
+  from per-group curves. Remove or replace missing values before plotting:
+  :pr:`1729` by :user:`Edward Yi <aiedwardyi>`.
+
+* :class:`~fairlearn.postprocessing.ThresholdOptimizer` now raises a
+  :code:`ValueError` in :code:`predict` when a sensitive feature value was not seen
+  during :code:`fit`. Previously every row of such a group was silently predicted as 0:
+  :pr:`1743` by :user:`Raashish Aggarwal <raashish1601>`.
+
+Documentation
+-------------
+
+* Corrected the default :code:`pos_label` descriptions for
+  :func:`~fairlearn.metrics.true_positive_rate`, :func:`~fairlearn.metrics.true_negative_rate`,
+  :func:`~fairlearn.metrics.false_positive_rate`, and :func:`~fairlearn.metrics.false_negative_rate`:
+  :pr:`1763` by :user:`Ganesh1729-ui`.
+* Added :code:`versionadded` directives to the reductions moment classes
+  (:class:`~fairlearn.reductions.Moment`, :class:`~fairlearn.reductions.DemographicParity`,
+  :class:`~fairlearn.reductions.EqualizedOdds`, :class:`~fairlearn.reductions.UtilityParity`,
+  :class:`~fairlearn.reductions.TruePositiveRateParity`,
+  :class:`~fairlearn.reductions.FalsePositiveRateParity`,
+  :class:`~fairlearn.reductions.ErrorRateParity`, :class:`~fairlearn.reductions.ErrorRate`,
+  :class:`~fairlearn.reductions.BoundedGroupLoss`, and the loss helpers), documenting
+  when each entered the public API (v0.3.0, v0.5.0, and v0.13.0 for
+  :class:`~fairlearn.reductions.MeanLoss`): :pr:`1767` by
+  :user:`Peace Amhanesi <amhanesipeace>`.
+* Added a :code:`versionchanged` directive to the
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` API reference,
+  documenting the v0.11.0 :code:`scikit-learn` compatibility overhaul and the
+  new :code:`classes_` attribute: :pr:`1767` by
+  :user:`Peace Amhanesi <amhanesipeace>`.
+
+Other improvements
+------------------
+
+* :class:`~fairlearn.reductions.ErrorRate` now supports :code:`X`, :code:`y`, and
+  :code:`sensitive_features` from pandas, Polars, or PyArrow dataframe libraries.
+  :meth:`~fairlearn.reductions.ErrorRate.gamma` returns an
+  :class:`~fairlearn.reductions.ErrorRateResult` with the scalar weighted error,
+  without relying on dataframe index semantics: :pr:`1526` by
+  :user:`Stefanie Senger <StefanieSenger>`.
+
+* Added validation and documentation requiring scalar, non-floating entries for
+  :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
+  :pr:`1550` by :user:`MariamH <Mariamhaji>`.
+
+* Made :code:`BackendEngine` in the adversarial module an abstract base class
+  with abstract :code:`evaluate`, :code:`train_step`, :code:`get_optimizer` and
+  :code:`get_model` methods: :pr:`1775` by
+  :user:`Venius24 <Venius24>`.
