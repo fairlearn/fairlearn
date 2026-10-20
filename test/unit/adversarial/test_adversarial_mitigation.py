@@ -9,7 +9,6 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.preprocessing import FunctionTransformer
 
 from fairlearn.adversarial import (
     AdversarialFairnessClassifier,
@@ -17,16 +16,13 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._constants import _X_NOT_2D
-from fairlearn.adversarial._preprocessor import FloatTransformer
 from test._sklearn_compat import parametrize_with_checks
 
 from .helper import (
     Bin1d,
     Bin2d,
-    Cat,
     Cont2d,
     KeywordToClass,
-    MultiClass2d,
     cols,
     generate_data_combinations,
     get_backend_patches,
@@ -489,80 +485,6 @@ def test_fitted_model_rejects_non_2d_X(
 
     assert str(exc.value) == _X_NOT_2D.format(np.ndim(X_non_2d))
     backend_call.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "transformer", ["auto", None, FunctionTransformer(None, feature_names_out="one-to-one")]
-)
-@pytest.mark.parametrize("data", [Bin2d, Cat, Cont2d, MultiClass2d])
-def test_valid_input_data_types(data, transformer):
-    """Test if the model processes the right data types"""
-    prep = FloatTransformer(transformer=transformer)
-    prep.fit(data)
-    assert prep.n_features_in_ == data.shape[1]
-    assert prep.n_features_out_ == data.shape[1]
-
-
-@pytest.mark.parametrize(
-    ["data", "expected_n_features_in_", "expected_n_features_out_"],
-    [
-        (np.array([0, 1, 1]), 1, 1),
-        (np.array([[0], [1], [1]]), 1, 1),
-        (np.array([[0], [1], [2]]), 1, 3),
-        (np.array([[0.5], [1.1], [2]]), 1, 1),
-    ],
-)
-def test_FloatTransformer_auto_n_features_attributes(
-    data, expected_n_features_in_: int, expected_n_features_out_: int
-):
-    transformer = FloatTransformer("auto")
-    transformer.fit(data)
-
-    assert expected_n_features_in_ == transformer.n_features_in_
-    assert expected_n_features_out_ == transformer.n_features_out_
-
-
-def test_FloatTransformer_passes_through_on_None():
-    input_ = np.array([0, 1, 2, 0])
-    transformer = FloatTransformer(None)
-
-    output = transformer.fit_transform(input_)
-    inverse = transformer.inverse_transform(output)
-
-    np.testing.assert_array_equal(input_.astype(float).reshape(-1, 1), output)
-    np.testing.assert_array_equal(input_.astype(float), inverse)
-
-
-def test_FloatTransformer_multiclass_auto():
-    input_ = np.array([0, 1, 2, 0])
-    transformer = FloatTransformer("auto")
-
-    expected_output = np.array(
-        [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
-    )
-
-    output = transformer.fit_transform(input_)
-    inverse = transformer.inverse_transform(output)
-
-    np.testing.assert_array_equal(expected_output, output)
-    np.testing.assert_array_equal(input_.astype(float), inverse)
-
-
-def test_FloatTransformer_custom_transformer():
-    input_ = np.array([0, 1, 2, 0])
-    custom_transformer = FunctionTransformer(
-        func=lambda x: 2 * x, inverse_func=lambda x: x / 2, feature_names_out="one-to-one"
-    )
-
-    transformer = FloatTransformer(custom_transformer)
-
-    expected_output = np.array([[0.0], [2.0], [4.0], [0.0]])
-
-    output = transformer.fit_transform(input_)
-    inverse = transformer.inverse_transform(output)
-
-    np.testing.assert_array_equal(expected_output, output)
-    np.testing.assert_array_equal(input_.astype(float), inverse)
 
 
 def check_2dnp(X):

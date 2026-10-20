@@ -105,7 +105,8 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
 
         self.transform_ = self.transformer
         self.transform_.fit(X)
-        self.n_features_out_ = len(self.transform_.get_feature_names_out())
+        if hasattr(self.transform_, "get_feature_names_out"):
+            self.n_features_out_ = len(self.transform_.get_feature_names_out())
         return self
 
     def transform(self, X):
@@ -119,7 +120,7 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
                 else self._check(X, dtype=float)
             )
 
-        return self.transform_.transform(self._check(X, dtype=float))
+        return self.transform_.transform(self._check(X)).astype(float)
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
