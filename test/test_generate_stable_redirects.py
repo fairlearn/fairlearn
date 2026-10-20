@@ -41,9 +41,7 @@ class TestStableRedirects(unittest.TestCase):
                 b"# Project: Fairlearn\n"
                 + f"# Version: {version}\n".encode()
                 + b"# The remainder of this file is compressed using zlib.\n"
-                + zlib.compress(
-                    b"example py:class 1 api_reference/generated/example.html -\n"
-                )
+                + zlib.compress(b"example py:class 1 api_reference/generated/example.html -\n")
             )
 
         subprocess.run(

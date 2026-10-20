@@ -109,9 +109,7 @@ def generate(site_repo: Path, versions_file: Path) -> tuple[str, int]:
             capture_output=True,
         ).stdout
     except subprocess.CalledProcessError as exc:
-        raise ValueError(
-            f"Published documentation {version_dir}/objects.inv not found"
-        ) from exc
+        raise ValueError(f"Published documentation {version_dir}/objects.inv not found") from exc
 
     (stable_dir / "objects.inv").write_bytes(inventory)
 
