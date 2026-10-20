@@ -22,7 +22,10 @@ _MESSAGE_BAD_COSTS = (
 
 @dataclass(frozen=True)
 class ErrorRateResult:
-    """Result returned by :meth:`ErrorRate.gamma`."""
+    """Result returned by :meth:`ErrorRate.gamma`.
+
+    .. versionadded:: 0.16.0
+    """
 
     error: float
 
@@ -111,6 +114,10 @@ class ErrorRate(ClassificationMoment[ErrorRateResult]):
 
     def gamma(self, predictor: Callable) -> ErrorRateResult:
         """Calculate the weighted error for a predictor.
+
+        .. versionchanged:: 0.16.0
+            The return type changed from a one-element :class:`pandas.Series`
+            to :class:`ErrorRateResult`.
 
         Parameters
         ----------
