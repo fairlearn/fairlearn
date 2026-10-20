@@ -4,6 +4,7 @@ import json
 import subprocess
 import tempfile
 import unittest
+import zlib
 from pathlib import Path
 
 from scripts.generate_stable_redirects import generate, stable_directory
@@ -32,6 +33,18 @@ class TestStableRedirects(unittest.TestCase):
             path = self.site / page
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("Documentation", encoding="utf-8")
+
+        for version in ("v0.14", "v0.15"):
+            inventory = self.site / version / "objects.inv"
+            inventory.write_bytes(
+                b"# Sphinx inventory version 2\n"
+                b"# Project: Fairlearn\n"
+                + f"# Version: {version}\n".encode()
+                + b"# The remainder of this file is compressed using zlib.\n"
+                + zlib.compress(
+                    b"example py:class 1 api_reference/generated/example.html -\n"
+                )
+            )
 
         subprocess.run(
             ["git", "-C", str(self.site), "add", "."],
@@ -94,6 +107,28 @@ class TestStableRedirects(unittest.TestCase):
         self.assertIn(
             "window.location.search + window.location.hash",
             content,
+        )
+
+    def test_copies_inventory_from_published_git_tree(self):
+        """The inventory is available even with a sparse checkout."""
+        source = self.site / "v0.15/objects.inv"
+        expected = source.read_bytes()
+
+        # Simulate the inventory being excluded by sparse checkout.
+        source.unlink()
+
+        generate(self.site, self.versions)
+
+        stable_inventory = self.site / "stable/objects.inv"
+        self.assertTrue(stable_inventory.is_file())
+        self.assertEqual(stable_inventory.read_bytes(), expected)
+
+        parts = stable_inventory.read_bytes().split(b"\n", 4)
+        self.assertEqual(parts[0], b"# Sphinx inventory version 2")
+        self.assertEqual(len(parts), 5)
+        self.assertIn(
+            b"example py:class",
+            zlib.decompress(parts[4]),
         )
 
     def test_new_release_replaces_old_redirects(self):

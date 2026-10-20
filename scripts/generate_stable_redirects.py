@@ -94,6 +94,27 @@ def generate(site_repo: Path, versions_file: Path) -> tuple[str, int]:
         url = f"https://fairlearn.org/{version_dir}/{relative}"
         target.write_text(redirect_page(url), encoding="utf-8")
 
+    # Sphinx needs the actual inventory, not an HTML redirect.
+    # Read from Git because sparse checkout may exclude this file.
+    try:
+        inventory = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(site_repo),
+                "show",
+                f"HEAD:{version_dir}/objects.inv",
+            ],
+            check=True,
+            capture_output=True,
+        ).stdout
+    except subprocess.CalledProcessError as exc:
+        raise ValueError(
+            f"Published documentation {version_dir}/objects.inv not found"
+        ) from exc
+
+    (stable_dir / "objects.inv").write_bytes(inventory)
+
     return version_dir, len(pages)
 
 

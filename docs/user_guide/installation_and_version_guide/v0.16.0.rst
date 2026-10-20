@@ -51,11 +51,6 @@ Documentation
   new :code:`classes_` attribute: :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
 
-* Added a stable documentation alias at :code:`https://fairlearn.org/stable/`,
-  providing version-independent links to the latest stable release,
-  including individual API reference pages: :pr:`1770` by
-  :user:`BALOGUN-DAVID`.
-
 Other improvements
 ------------------
 
