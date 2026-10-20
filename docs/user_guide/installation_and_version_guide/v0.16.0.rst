@@ -18,7 +18,7 @@ Bug fixes
   :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
 * :func:`~fairlearn.metrics.plot_model_comparison` raises a clear
   :class:`ValueError` directing users to provide :code:`sensitive_features`
-  when a derived fairness metric needs group data.
+  when a derived fairness metric needs group data: :pr:`1793`.
 * :meth:`~fairlearn.metrics.MetricFrame.difference` and
   :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
   now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the
