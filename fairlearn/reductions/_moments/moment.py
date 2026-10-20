@@ -61,7 +61,7 @@ class Moment(Generic[_GammaResultT]):
         # TODO (when dependency from pandas is being removed): Dynamically change
         # backends for y, sensitive_features and self.tags to user's backend:
         y = nw.new_series(name="y", values=y, native_namespace=pd)
-        self.tags = nw.from_dict({_LABEL: y}, backend=pd)
+        self.tags = nw.from_dict({_LABEL: y}, native_namespace=pd)
         if sensitive_features is not None:
             sensitive_features = nw.new_series(
                 name="sensitive_features", values=sensitive_features, native_namespace=pd
