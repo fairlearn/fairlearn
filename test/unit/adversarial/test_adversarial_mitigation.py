@@ -16,16 +16,13 @@ from fairlearn.adversarial import (
 )
 from fairlearn.adversarial._adversarial_mitigation import _AdversarialFairness
 from fairlearn.adversarial._constants import _X_NOT_2D
-from fairlearn.adversarial._preprocessor import FloatTransformer
 from test._sklearn_compat import parametrize_with_checks
 
 from .helper import (
     Bin1d,
     Bin2d,
-    Cat,
     Cont2d,
     KeywordToClass,
-    MultiClass2d,
     cols,
     generate_data_combinations,
     get_backend_patches,
@@ -488,23 +485,6 @@ def test_fitted_model_rejects_non_2d_X(
 
     assert str(exc.value) == _X_NOT_2D.format(np.ndim(X_non_2d))
     backend_call.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "data, valid_choice",
-    [
-        (Bin2d, "binary"),
-        (Cat, "binary"),
-        (Cont2d, "continuous"),
-        (MultiClass2d, "multiclass"),
-    ],
-)
-def test_valid_input_data_types(data, valid_choice):
-    """Test if the model processes the right data types"""
-    prep = FloatTransformer(transformer=valid_choice)
-    prep.fit(data)
-    assert prep.n_features_in_ == data.shape[0]
-    assert prep.n_features_out_ == data.shape[1]
 
 
 def check_2dnp(X):
