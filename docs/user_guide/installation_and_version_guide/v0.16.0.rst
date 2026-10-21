@@ -12,6 +12,14 @@ New features
 Bug fixes
 ---------
 
+* The mitigation techniques in :mod:`fairlearn.reductions`,
+  :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
+  a :code:`ValueError` when :code:`sensitive_features` or
+  :code:`control_features` contain missing values. Previously, a :code:`None`
+  value was silently left out of the groups used by the reductions
+  constraints: :pr:`1792` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and 
   :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` correctly passthrough
   target :code:`y`, respec., sensitive features :code:`A` passed to :code:`.fit` if
