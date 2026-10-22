@@ -970,7 +970,7 @@ class TestExponentiatedGradientSmoke:
     def _assert_expgrad_state(self, expgrad, data):
         n_predictors = len(expgrad.predictors_)
         assert expgrad.best_gap_ == pytest.approx(data["best_gap"], abs=_PRECISION)
-        assert expgrad.best_gap_ < expgrad.nu
+        assert expgrad.best_gap_ < expgrad.nu_
         assert expgrad.last_iter_ == data["last_iter"]
         assert expgrad.best_iter_ == data["best_iter"]
         assert expgrad.last_iter_ >= _MIN_ITER

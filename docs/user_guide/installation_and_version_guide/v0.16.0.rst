@@ -12,6 +12,13 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.reductions.ExponentiatedGradient` no longer overwrites its
+  :code:`nu` parameter in :code:`fit`. When :code:`nu=None`, the threshold is
+  now computed from the data of every call to :code:`fit` and stored in the
+  new :code:`nu_` attribute, instead of being reused when refitting or
+  cloning a fitted estimator: :pr:`1802` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
