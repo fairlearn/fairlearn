@@ -88,7 +88,7 @@ class fake_torch:
             def apply(self, weights):
                 self.w = weights
 
-        BCELoss = type("BCELoss", (BCE,), {})
+        BCEWithLogitsLoss = type("BCEWithLogitsLoss", (BCE,), {})
         CrossEntropyLoss = type("CrossEntropyLoss", (CCE,), {})
         MSELoss = type("MSELoss", (MSE,), {})
 

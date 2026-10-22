@@ -116,11 +116,6 @@ class BackendEngine(ABC):
                 # Can not parse model as list when loss is undefined
                 raise ValueError(_LIST_MODEL_UNSUPPORTED.format(name, name))
             predictor_list_nodes = [X_features] + model_param + [y_features]
-            if loss_param == "binary":
-                predictor_list_nodes.append("sigmoid")
-            elif loss_param == "multiclass":
-                predictor_list_nodes.append("softmax")
-
             return self.get_model(list_nodes=predictor_list_nodes)
         elif issubclass(type(model_param), self.model_class):
             return model_param
