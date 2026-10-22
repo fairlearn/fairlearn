@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from fractions import Fraction
 from functools import partial
 
 import numpy as np
@@ -110,3 +111,50 @@ def test_threshold_optimization_with_tolerance_increases_objective_and_respects_
 
     assert relaxed_predictor._y_best >= strict_predictor._y_best
     assert relaxed_predictor._between_groups <= tol
+
+
+def test_maximize_objective_with_tolerance_keeps_grid_points_exactly_tol_apart() -> None:
+    # On np.linspace(0, 1, 1001), x[551] - x[501] is slightly larger than 0.05
+    # because of floating point error, but the two points are exactly tol apart.
+    x = np.linspace(0, 1, 1001)
+    start, end = 501, 551
+    assert x[end] - x[start] > 0.05
+    y0 = np.zeros_like(x)
+    y0[start] = 1.0
+    y1 = np.zeros_like(x)
+    y1[end] = 1.0
+    dataframes = [pd.DataFrame({"x": x, "y": y}) for y in (y0, y1)]
+
+    optimal_indices, maximum = maximize_objective_with_tolerance(
+        dataframes=dataframes, weights=[0.5, 0.5], tol=0.05
+    )
+
+    assert optimal_indices == [start, end]
+    assert maximum == 1.0
+
+
+def _fit_threshold_optimizer_with_tol(tol) -> ThresholdOptimizer:
+    X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+    y = np.array([1, 0, 1, 1, 0])
+    sensitive_features = np.array(["a", "b", "a", "b", "a"])
+    threshold_optimizer = ThresholdOptimizer(
+        estimator=ExamplePredictor([0.1, 0.2, 0.3, 0.4, 0.5]),
+        predict_method="predict",
+        tol=tol,
+    )
+    return threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
+
+
+@pytest.mark.parametrize("tol", [-0.1, -1, Fraction(-1, 10), "0.1", True, np.nan, np.inf, -np.inf])
+def test_threshold_optimizer_rejects_invalid_tol(tol) -> None:
+    with pytest.raises(ValueError, match="tol must be None or a non-negative number"):
+        _fit_threshold_optimizer_with_tol(tol)
+
+
+@pytest.mark.parametrize(
+    "tol", [0, 0.0, 0.1, 1, np.float32(0.1), np.int64(1), Fraction(1, 10), 10**30]
+)
+def test_threshold_optimizer_accepts_finite_non_negative_tol(tol) -> None:
+    threshold_optimizer = _fit_threshold_optimizer_with_tol(tol)
+
+    assert threshold_optimizer._between_groups <= tol + 1e-12
