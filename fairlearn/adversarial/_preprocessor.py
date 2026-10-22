@@ -1,8 +1,10 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+from typing import Literal, Self
+
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import FunctionTransformer, OneHotEncoder
 from sklearn.utils import check_array
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import check_is_fitted
@@ -23,8 +25,8 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
     Attributes
     ----------
     transformer : str, sklearn.base.TransformerMixin, or None
-        Specifies the transformation method. Can be "auto", a specific transformer
-        name (e.g., "one_hot_encoder"), None for pass-through, or a custom transformer object.
+        Specifies the transformation method. Can be "auto", None for pass-through, or a
+        custom transformer object.
 
     Notes
     -----
@@ -32,15 +34,14 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
     transformation based on the input data type.
     """
 
-    def __init__(self, transformer="auto"):
+    def __init__(self, transformer: Literal["auto"] | TransformerMixin | None = "auto"):
         """Initialize empty transformers with the given distribution assumption.
 
         Parameters
         ----------
         transformer : str, sklearn.base.TransformerMixin, optional, default = "auto"
-            This is a string that indicates the transformer, such as
-            :code:`"auto"`, :code:`"one_hot_encoder"`, :code:`"binarizer"`.
-            Or, None, for pass-through. Or, a transformer object.
+            If a string is passed it has to be :code:`"auto"`.
+            Use :code:`None` for pass-through.
         """
         self.transformer = transformer
 
@@ -73,14 +74,19 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
             X = X.reshape(-1, 1)
         return X
 
-    def fit(self, X, y=None):
-        """Fit the three transformers."""
-        # Sci-kit learn parameter
-        if isinstance(self.transformer, str) or self.transformer is None:
-            self.inferred_type_ = type_of_target(X)
-            X = self._check(X, init=True)
-            self.n_features_in_, self.n_features_out_ = X.shape[0], X.shape[1]
+    def fit(self, X, y=None) -> Self:
+        self.inferred_type_ = type_of_target(X)
+        X = self._check(X, init=True)
+        self.n_features_in_ = X.shape[1]
 
+        passthrough_transformer = FunctionTransformer(func=None)
+        if self.transformer is None:
+            self.transform_ = passthrough_transformer
+            self.transform_.fit(X)
+            self.n_features_out_ = X.shape[1]
+            return self
+
+        if self.transformer == "auto":
             if self.inferred_type_ in ["binary", "multiclass"]:
                 # NOTE: if 'binary' then it could be possible it is already 0/1
                 # encoded. So may want to skip redundant OHE in that case...
@@ -90,30 +96,34 @@ class FloatTransformer(TransformerMixin, BaseEstimator):
                     sparse_output=False,
                 )
                 self.transform_.fit(X)
-                self.n_features_out_ = sum(
-                    len(cat) if len(cat) != 2 else 1 for cat in self.transform_.categories_
-                )
+                self.n_features_out_ = len(self.transform_.get_feature_names_out())
+            else:
+                self.transform_ = passthrough_transformer
+                self.transform_.fit(X)
+                self.n_features_out_ = X.shape[1]
+            return self
+
+        self.transform_ = self.transformer
+        self.transform_.fit(X)
+        if hasattr(self.transform_, "get_feature_names_out"):
+            self.n_features_out_ = len(self.transform_.get_feature_names_out())
         return self
 
     def transform(self, X):
         """Transform X using the fitted encoder or passthrough."""
         check_is_fitted(self)
-        if isinstance(self.transformer, str) or self.transformer is None:
+
+        if self.transformer == "auto" or self.transformer is None:
             return (
                 self.transform_.transform(self._check(X)).astype(float)
                 if self.inferred_type_ in ["binary", "multiclass"]
                 else self._check(X, dtype=float)
             )
-        else:
-            return self.transform_.transform(X)
+
+        return self.transform_.transform(self._check(X)).astype(float)
 
     def inverse_transform(self, y):
         """Transform y back to X using the inverse transform of the encoder."""
         check_is_fitted(self)
-        if self.transformer is None or isinstance(self.transformer, str):
-            if self.inferred_type_ == "continuous":
-                inverse = y
-            else:
-                inverse = self.transform_.inverse_transform(y)
-
+        inverse = self.transform_.inverse_transform(self._check(y, dtype=float))
         return inverse.reshape(-1) if self.input_dim_ == 1 else inverse

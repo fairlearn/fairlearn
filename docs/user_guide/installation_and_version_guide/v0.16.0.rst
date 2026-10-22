@@ -18,6 +18,33 @@ Bug fixes
   if :code:`tol` is not :code:`None` or a non-negative number: :pr:`1794` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
+* The mitigation techniques in :mod:`fairlearn.reductions`,
+  :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
+  a :code:`ValueError` when :code:`sensitive_features` or
+  :code:`control_features` contain missing values. Previously, a :code:`None`
+  value was silently left out of the groups used by the reductions
+  constraints: :pr:`1792` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and 
+  :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` correctly passthrough
+  target :code:`y`, respec., sensitive features :code:`A` passed to :code:`.fit` if
+  :attr:`y_transform`, respec. :attr:`sf_transform`, is :code:`None`. They also
+  correctly apply the custom scikit learn transformers the user passes in.
+  :pr:`1783` by :user:`Tahar Allouche <taharallouche>`.
+
+* Fixed :class:`~fairlearn.reductions.TruePositiveRateParity` and
+  :class:`~fairlearn.reductions.FalsePositiveRateParity` with :code:`control_features`.
+  Rows with the other label (:code:`Y=0` and :code:`Y=1` respectively) were turned into
+  events named :code:`control=<value>,nan`, so the moments also constrained the rate
+  among those rows, and passing a control feature added a false (or true) positive rate
+  parity constraint that the user did not ask for: :pr:`1747` by :user:`breken-ai`.
+
+* Bootstrap confidence intervals in :func:`~fairlearn.metrics._plotter.plot_metric_frame`
+  are aligned with the plotted groups when a group is absent from all bootstrap
+  samples. Such groups retain their metric values with unavailable intervals:
+  :pr:`1787` by :user:`Zhe Chen <zhechen-cs>`.
+
 * :func:`~fairlearn.metrics.plot_model_comparison` respects
   :code:`axis_labels=False`, preserving existing axis labels instead of replacing
   them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
@@ -26,6 +53,9 @@ Bug fixes
   :code:`sensitive_features` when both metrics can be evaluated without them.
   Fairness metrics that require sensitive features still reject missing values:
   :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
+* :func:`~fairlearn.metrics.plot_model_comparison` raises a clear
+  :class:`ValueError` directing users to provide :code:`sensitive_features`
+  when a derived fairness metric needs group data: :pr:`1793`.
 * :meth:`~fairlearn.metrics.MetricFrame.difference` and
   :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
   now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the
