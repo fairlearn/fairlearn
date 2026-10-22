@@ -12,6 +12,13 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.preprocessing.CorrelationRemover` now raises a
+  :code:`ValueError` if :code:`alpha` is not a number between 0 and 1.
+  Previously, values outside this range were accepted and extrapolated
+  instead of blending, so that e.g. :code:`alpha=-1` increased the
+  correlation with the sensitive features: :pr:`1805` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
