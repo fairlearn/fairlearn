@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
+  use :code:`Series.loc` when adding new entries instead of scalar-only
+  :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
+  This avoids pandas 3.1 deprecation warnings without suppressing warnings.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
