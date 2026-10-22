@@ -12,6 +12,14 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.reductions.GridSearch` now uses a :code:`constraint_weight`
+  set with :code:`set_params`, e.g. by
+  :class:`~sklearn.model_selection.GridSearchCV`, for both terms of the
+  trade-off. Previously the weight of the error term kept the value computed
+  in the constructor. The parameters are now validated in :code:`fit` instead
+  of the constructor: :pr:`1803` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
