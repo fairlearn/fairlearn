@@ -12,6 +12,10 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` accepts sensitive and control feature
+  names that coincide with internal metric input columns, such as :code:`y_true`,
+  :code:`y_pred`, or a sample-weight column, without overwriting those inputs.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
