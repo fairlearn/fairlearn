@@ -138,8 +138,7 @@ def test_model_init(fake_backend_env):
         assert callable(activation)
     assert not hasattr(layers[0], "a") or layers[9].a == 10
     assert layers[9].b == 1
-    assert layers[10].__name__.lower() == "sigmoid"
-    assert len(layers) == 11
+    assert len(layers) == 10
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
@@ -622,26 +621,6 @@ def test_backend_engine_is_abstract():
 
     with pytest.raises(TypeError, match="get_model"):
         MissingModel(None, None, None, None)
-
-
-@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
-def test_softmax_layer_is_added_to_multiclass_models_passed_as_list(
-    fake_backend_env: Literal["torch", "tensorflow"],
-) -> None:
-    mitigator = get_instance(fake_training=True, fake_backend=fake_backend_env, predictor_model=[])
-
-    X = np.random.default_rng().random(size=(3, 2))
-    y = np.array([1.0, 2.0, 3.0])
-    mitigator.fit(X, y)
-
-    constructed_layers = mitigator.backendEngine_.predictor_model.layers_
-
-    if isinstance(constructed_layers, list):  # tensorflow
-        last_layer = constructed_layers[-1]
-    else:  # pytorch
-        last_layer = constructed_layers.layers[-1]
-
-    assert last_layer.__name__.lower() == "softmax"
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)

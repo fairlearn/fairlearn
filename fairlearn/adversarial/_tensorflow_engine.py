@@ -104,11 +104,9 @@ class TensorflowEngine(BackendEngine):
     def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""
         if dist_type == "binary":
-            # Use sigmoid as final layer
-            return keras.losses.BinaryCrossentropy(from_logits=False)
+            return keras.losses.BinaryCrossentropy(from_logits=True)
         elif dist_type in ["multiclass", "multilabel-indicator"]:
-            # User softmax as final layer
-            return keras.losses.CategoricalCrossentropy(from_logits=False)
+            return keras.losses.CategoricalCrossentropy(from_logits=True)
         elif dist_type in ["continuous", "continuous-multioutput"]:
             return keras.losses.MeanSquaredError()
         super().get_loss(dist_type)
