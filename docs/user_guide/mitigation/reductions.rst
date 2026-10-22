@@ -373,7 +373,7 @@ To measure the ErrorRate in respect to a trained estimator we use its :code:`gam
     >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
-    >>> sensitive_features = X[:, -1]
+    >>> sensitive_features = X[:, -1].astype(int)
     >>> classifier = LogisticRegression().fit(X, y)
     >>> costs = {"fp":0.1, "fn":0.9}
     >>> errorrate = ErrorRate(costs=costs)
@@ -395,7 +395,7 @@ to a cost-sensitive classification problem.
     >>> rng = np.random.default_rng(42)
     >>> X, y = make_classification(n_features=10, class_sep=0.1, random_state=42)
     >>> X[:, -1] = rng.integers(0, 2, size=(X.shape[0],)) # defining the sensitive feature
-    >>> sensitive_features = X[:, -1]
+    >>> sensitive_features = X[:, -1].astype(int)
     >>> objective = ErrorRate(costs={"fp":0.1, "fn":0.9})
     >>> constraint = EqualizedOdds(difference_bound=0.01)
     >>> classifier = LogisticRegression()
@@ -404,14 +404,14 @@ to a cost-sensitive classification problem.
     ... X, y, sensitive_features, test_size=0.33, random_state=42)
     >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +ELLIPSIS
     ExponentiatedGradient(...)
-    >>> y_pred = mitigator.predict(X_test)
+    >>> y_pred = mitigator.predict(X_test, random_state=42)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=sensitive_test)
     >>> mf_mitigated.overall.item()
     0.5151515151515151
     >>> mf_mitigated.by_group
     sensitive_feature_0
-    0.0    0.611111
-    1.0    0.400000
+    0    0.611111
+    1    0.400000
     Name: accuracy_score, dtype: float64
 
 
@@ -672,6 +672,18 @@ The :class:`ExponentiatedGradient` algorithm in Fairlearn is used to produce mod
 satisfy fairness constraints without needing access to sensitive features at deployment time.
 This algorithm creates a sequence of re-weighted datasets and retrains the
 wrapped classifier on each of these datasets.
+The learned solution is a probability distribution over these predictors,
+represented by the :attr:`ExponentiatedGradient.predictors_` and
+:attr:`ExponentiatedGradient.weights_` attributes. Consequently,
+:meth:`ExponentiatedGradient.predict` is randomized, and repeated calls may
+return different labels. Pass ``random_state`` to ``predict``, as shown below,
+to make evaluation and examples reproducible.
+
+:class:`ExponentiatedGradient` does not expose a ``predict_proba`` method.
+Averaging the wrapped estimators' ``predict_proba`` outputs is not a supported
+equivalent to the learned randomized solution, which samples hard predictor
+outputs according to ``weights_``.
+
 To instantiate an :class:`ExponentiatedGradient` model, we need to pass in a base estimator
 and fairness constraints. The fairness constraints are typically specified by providing
 an upper bound on the difference (or the ratio) between the largest and the smallest
@@ -724,7 +736,8 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     ...         constraints=EqualizedOdds(difference_bound=eps),
     ...         sample_weight_name="classifier__sample_weight")
     ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train)
-    ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(X_test)
+    ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(
+    ...         X_test, random_state=42)
     >>> # Add the base model predictions
     >>> exp_grad_models["Base Model"] = y_pred_base
     >>> # Plot the comparison

@@ -132,21 +132,15 @@ class _AdversarialFairness(BaseEstimator):
         The fairness constraint. Must be either 'demographic_parity'
         or 'equalized_odds'.
 
-    y_transform : str, sklearn.base.TransformerMixin, default = "auto"
-        The preprocessor to use on the predictions :code:`y`.
-        Either a keyword such as :code:`"auto"` or :code:`"one_hot_encoder",
-        None, or a preprocessor. None indicates to pass-through data directly
-        without preprocessing.
-        The given transformer *must* map data
-        to a 2d ndarray containing only floats.
+    y_transform : str, sklearn.base.TransformerMixin, or None
+        The preprocessor to use on the predictions :code:`y`. Can be "auto", None for
+        pass-through, or a custom transformer object.
+        The given transformer *must* map data to a 2d ndarray containing only floats.
 
-    sf_transform : str, sklearn.base.TransformerMixin, default = "auto"
-        The preprocessor to use on the :code:`sensitive_features`.
-        Either a keyword such as :code:`"auto"` or :code:`"one_hot_encoder",
-        None, or a preprocessor. None indicates to pass-through data directly
-        without preprocessing.
-        The given transformer *must* map data
-        to a 2d ndarray containing only floats.
+    sf_transform : str, sklearn.base.TransformerMixin, or None
+        The preprocessor to use on the :code:`sensitive_features`. Can be "auto", None
+        for pass-through, or a custom transformer object.
+        The given transformer *must* map data to a 2d ndarray containing only floats.
 
     learning_rate : float, default = 0.001
         A small number greater than zero to set as a learning rate.
@@ -419,7 +413,7 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        first_call = not hasattr(self, "classes_")
+        first_call = not hasattr(self, "_is_setup")
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
 
@@ -509,7 +503,7 @@ class _AdversarialFairness(BaseEstimator):
                             X=X,
                             y=y_true,
                             z=sensitive_features,
-                            pos_label=self.classes_[1],
+                            pos_label=self.classes_[1] if is_classifier(self) else None,
                         )
                         if result and not isinstance(result, bool):
                             raise RuntimeError(_CALLBACK_RETURNS_ERROR)
@@ -536,7 +530,7 @@ class _AdversarialFairness(BaseEstimator):
         classes : array-like of shape (n_classes,), default=None
             List of all the classes that can possibly appear in the y vector.
             Must be provided at the first call to partial_fit, can be omitted
-            in subsequent calls.
+            in subsequent calls. Ignored for regressors.
 
         sensitive_features : array-like of shape (n_samples,), default=None
             The sensitive features for each sample. If None, a vector of zeros
@@ -547,9 +541,9 @@ class _AdversarialFairness(BaseEstimator):
         self : object
             Returns self.
         """
-        first_call = not hasattr(self, "classes_")
+        first_call = not hasattr(self, "_is_setup")
 
-        if first_call and classes is not None:
+        if first_call and is_classifier(self) and classes is not None:
             self.classes_ = classes
         _check_2d(X)
         if not first_call and self.n_features_in_ != X.shape[1]:
@@ -692,7 +686,7 @@ class _AdversarialFairness(BaseEstimator):
         if (not is_fitted) or (reinitialize):
             self.__setup(X, y, A)
 
-        if not hasattr(self, "classes_"):
+        if is_classifier(self) and not hasattr(self, "classes_"):
             self.classes_ = unique(y)
 
         y = self._y_transform.transform(y)
@@ -719,23 +713,28 @@ class _AdversarialFairness(BaseEstimator):
         we try the same for tensorflow, and if that also fails then we give an
         appropriate error message.
         """
-        # Discover which backends are available
-        torch_installed = False
-        tensorflow_installed = False
-
         if isinstance(self.backend, type) and issubclass(self.backend, BackendEngine):
             self.backend_ = self.backend
             return
+
+        if self.backend not in ["torch", "tensorflow", "auto"]:
+            raise ValueError(
+                _KWARG_ERROR_MESSAGE.format("backend", "one of ['auto', 'torch','tensorflow']")
+            )
+
+        # Discover which backends are available
+        torch_installed = False
+        tensorflow_installed = False
         if self.backend == "torch" or self.backend == "auto":
-            select = False
             try:
-                from torch.nn import Module as model
+                import torch
 
                 torch_installed = True
-                if isinstance(self.predictor_model, (list, model)) and isinstance(
-                    self.adversary_model, (list, model)
+                if isinstance(self.predictor_model, list | torch.nn.Module) and isinstance(
+                    self.adversary_model, list | torch.nn.Module
                 ):
-                    select = True
+                    self.backend_ = PytorchEngine
+                    return
                 elif self.backend == "torch":
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
@@ -746,19 +745,17 @@ class _AdversarialFairness(BaseEstimator):
             except ImportError:
                 if self.backend == "torch":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch")) from None
-            if select:
-                self.backend_ = PytorchEngine
-                return
+
         if self.backend == "tensorflow" or self.backend == "auto":
-            select = False
             try:
-                from keras import Model as model
+                import keras
 
                 tensorflow_installed = True
-                if isinstance(self.predictor_model, (list, model)) and isinstance(
-                    self.adversary_model, (list, model)
+                if isinstance(self.predictor_model, list | keras.Model) and isinstance(
+                    self.adversary_model, list | keras.Model
                 ):
-                    select = True
+                    self.backend_ = TensorflowEngine
+                    return
                 elif self.backend == "tensorflow":
                     raise ValueError(
                         _KWARG_ERROR_MESSAGE.format(
@@ -769,14 +766,7 @@ class _AdversarialFairness(BaseEstimator):
             except ImportError:
                 if self.backend == "tensorflow":
                     raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("tensorflow")) from None
-            if select:
-                self.backend_ = TensorflowEngine
-                return
-        # The keyword self.backend was weird
-        if self.backend not in ["torch", "tensorflow", "auto"]:
-            raise ValueError(
-                _KWARG_ERROR_MESSAGE.format("backend", "one of ['auto', 'torch','tensorflow']")
-            )
+
         # Or no backend is installed
         if not (torch_installed or tensorflow_installed):
             raise RuntimeError(_IMPORT_ERROR_MESSAGE.format("torch or tensorflow"))
@@ -877,6 +867,11 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     transformed using one-hot encoding.
 
     .. versionadded:: 0.8.0
+
+    .. versionchanged:: 0.11.0
+        Greatly improved :code:`scikit-learn` compatibility (the estimator now
+        passes nearly all scikit-learn estimator checks) and gained a
+        :code:`classes_` attribute.
 
     Parameters
     ----------
@@ -1159,9 +1154,14 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     callbacks : callable
         Callback function, called after every batch. For instance useable when
         wanting to validate. A list of callback functions can also be provided.
-        Each callback function is passed two arguments :code:`self` (the
-        estimator instance) and :code:`step` (the completed iteration), and
-        may return a Boolean value. If the returned value is `True`, the
+        Each callback function is called as::
+
+            callback(self, step=self.n_iter_, X=X, y=y, z=sensitive_features, pos_label=None)
+
+        The arguments are the estimator, completed iteration, input features,
+        targets, sensitive features, and positive label. For regression,
+        :code:`pos_label` is always :code:`None`.
+        The callback may return a Boolean value. If the returned value is `True`, the
         optimization algorithm terminates. This can be used to implement
         *early stopping*.
 

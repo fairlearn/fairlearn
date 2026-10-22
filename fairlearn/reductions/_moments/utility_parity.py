@@ -24,7 +24,10 @@ _CTRL_EVENT_FORMAT = "control={0},{1}"
 
 
 def _combine_event_and_control(event: str, control: str) -> str:
-    if pd.notnull(control):
+    # A missing event marks a row outside every constraint (e.g. Y=0 for
+    # TruePositiveRateParity); keep it missing rather than turning it into
+    # an event of its own.
+    if pd.notnull(event) and pd.notnull(control):
         return _CTRL_EVENT_FORMAT.format(control, event)
     return event
 
@@ -66,6 +69,8 @@ class UtilityParity(ClassificationMoment):
       for positive and negative violations of the constraint
 
     Read more in the :ref:`User Guide <constraints_binary_classification>`.
+
+    .. versionadded:: 0.5.0
 
     Parameters
     ----------
@@ -325,6 +330,7 @@ class DemographicParity(UtilityParity):
 
     Read more in the :ref:`User Guide <demographic_parity>`.
 
+    .. versionadded:: 0.3.0
     """
 
     short_name = "DemographicParity"
@@ -381,6 +387,7 @@ class TruePositiveRateParity(UtilityParity):
 
     Read more in the :ref:`User Guide <true_positive_rate_parity>`.
 
+    .. versionadded:: 0.5.0
     """
 
     short_name = "TruePositiveRateParity"
@@ -432,6 +439,7 @@ class FalsePositiveRateParity(UtilityParity):
 
     Read more in the :ref:`User Guide <false_positive_rate_parity>`.
 
+    .. versionadded:: 0.5.0
     """
 
     short_name = "FalsePositiveRateParity"
@@ -482,6 +490,7 @@ class EqualizedOdds(UtilityParity):
 
     Read more in the :ref:`User Guide <equalized_odds>`.
 
+    .. versionadded:: 0.3.0
     """
 
     short_name = "EqualizedOdds"
@@ -527,6 +536,7 @@ class ErrorRateParity(UtilityParity):
 
     Read more in the :ref:`User Guide <error_rate_parity>`.
 
+    .. versionadded:: 0.5.0
     """
 
     short_name = "ErrorRateParity"
