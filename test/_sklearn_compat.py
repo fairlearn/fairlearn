@@ -15,6 +15,8 @@ the import. It consumes the generator upfront and re-emits the same
 ``pytest.mark.parametrize`` with a materialized list.
 """
 
+import re
+
 import pytest
 from sklearn.utils.estimator_checks import (
     parametrize_with_checks as _sk_parametrize_with_checks,
@@ -41,4 +43,15 @@ def parametrize_with_checks(estimators, **kwargs):
     decorator = _sk_parametrize_with_checks(estimators, **kwargs)
     mark = decorator.mark
     argnames, argvalues = mark.args
-    return pytest.mark.parametrize(argnames, list(argvalues), **mark.kwargs)
+    kwargs = dict(mark.kwargs)
+    original_ids = kwargs["ids"]
+
+    def stable_ids(value):
+        result = original_ids(value)
+        if isinstance(result, str):
+            # sklearn removes whitespace from repr, including "object at 0x...".
+            return re.sub(r"at0x[0-9a-fA-F]+(?=>)", "atADDRESS", result)
+        return result
+
+    kwargs["ids"] = stable_ids
+    return pytest.mark.parametrize(argnames, list(argvalues), **kwargs)

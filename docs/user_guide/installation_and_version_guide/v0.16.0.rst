@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* Estimator-check test IDs no longer include process-specific object addresses,
+  and relaxed-constraint parameter sets have deterministic iteration order.
+  The unit suite can now be collected consistently by parallel pytest workers:
+  :pr:`1741` by :user:`nawaaaaaAaar`.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
