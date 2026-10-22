@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from fractions import Fraction
 from functools import partial
 
 import numpy as np
@@ -132,8 +133,7 @@ def test_maximize_objective_with_tolerance_keeps_grid_points_exactly_tol_apart()
     assert maximum == 1.0
 
 
-@pytest.mark.parametrize("tol", [-0.1, "0.1", True, np.nan, np.inf])
-def test_threshold_optimizer_rejects_invalid_tol(tol) -> None:
+def _fit_threshold_optimizer_with_tol(tol) -> ThresholdOptimizer:
     X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
     y = np.array([1, 0, 1, 1, 0])
     sensitive_features = np.array(["a", "b", "a", "b", "a"])
@@ -142,6 +142,19 @@ def test_threshold_optimizer_rejects_invalid_tol(tol) -> None:
         predict_method="predict",
         tol=tol,
     )
+    return threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
 
+
+@pytest.mark.parametrize("tol", [-0.1, -1, Fraction(-1, 10), "0.1", True, np.nan, np.inf, -np.inf])
+def test_threshold_optimizer_rejects_invalid_tol(tol) -> None:
     with pytest.raises(ValueError, match="tol must be None or a non-negative number"):
-        threshold_optimizer.fit(X, y, sensitive_features=sensitive_features)
+        _fit_threshold_optimizer_with_tol(tol)
+
+
+@pytest.mark.parametrize(
+    "tol", [0, 0.0, 0.1, 1, np.float32(0.1), np.int64(1), Fraction(1, 10), 10**30]
+)
+def test_threshold_optimizer_accepts_finite_non_negative_tol(tol) -> None:
+    threshold_optimizer = _fit_threshold_optimizer_with_tol(tol)
+
+    assert threshold_optimizer._between_groups <= tol + 1e-12

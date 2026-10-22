@@ -11,7 +11,8 @@ for binary classification with one categorical sensitive feature.
 from __future__ import annotations
 
 import logging
-from numbers import Real
+import math
+from numbers import Integral, Real
 from typing import Literal
 from warnings import warn
 
@@ -301,7 +302,8 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         if self.tol is not None and (
             isinstance(self.tol, bool)
             or not isinstance(self.tol, Real)
-            or not np.isfinite(self.tol)
+            # integers are always finite, and math.isfinite overflows on very large ones
+            or (not isinstance(self.tol, Integral) and not math.isfinite(self.tol))
             or self.tol < 0
         ):
             raise ValueError(f"tol must be None or a non-negative number, got {self.tol!r}.")
