@@ -416,11 +416,13 @@ def test_fake_models(fake_backend_env):
         assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
 
 
-@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_fake_models_list_inputs(fake_backend_env):
     """Test model with lists as input."""
     for (X, Y, Z), _types in generate_data_combinations():
-        mitigator = get_instance(fake_mixin=True)
+        mitigator = get_instance(
+            fake_backend=fake_backend_env, fake_mixin=False, fake_training=True
+        )
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
 
@@ -658,7 +660,7 @@ def test_predictor_model_set_to_empty_list_if_None(fake_backend_env):
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_training=True,
-        fake_mixin=True,
+        fake_mixin=False,
         predictor_model=None,
         adversary_model=None,
     )

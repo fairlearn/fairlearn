@@ -460,6 +460,11 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
+        if self.predictor_model is None:
+            self.predictor_model = []  # [] is a NN with no hidden layers
+
+        if self.adversary_model is None:
+            self.adversary_model = []
         first_call = not hasattr(self, "_is_setup")
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
@@ -475,18 +480,6 @@ class _AdversarialFairness(BaseEstimator):
                     ),
                 )
             )
-
-        # Kept as if/else: the `[]` branch carries an F841 waiver and note that
-        # a one-line ternary would not preserve cleanly.
-        if self.predictor_model is not None:  # noqa: SIM108
-            self.predictor_model = self.predictor_model
-        else:
-            self.predictor_model = []  # [] is a NN with no hidden layers # noqa: F841
-
-        if self.adversary_model is not None:  # noqa: SIM108
-            self.adversary_model = self.adversary_model
-        else:
-            self.adversary_model = []  # noqa: F841
 
         batch_size = X.shape[0] if self.batch_size == -1 else self.batch_size
         batches = ceil(X.shape[0] / batch_size)
