@@ -168,12 +168,12 @@ class TestBoundedGroupLoss:
         del X_train["gender"]
         del X_test["gender"]
 
-        X_train.reset_index(inplace=True, drop=True)
-        X_test.reset_index(inplace=True, drop=True)
-        A_train.reset_index(inplace=True, drop=True)
-        A_test.reset_index(inplace=True, drop=True)
-        y_train.reset_index(inplace=True, drop=True)
-        y_test.reset_index(inplace=True, drop=True)
+        X_train = X_train.reset_index(drop=True)
+        X_test = X_test.reset_index(drop=True)
+        A_train = A_train.reset_index(drop=True)
+        A_test = A_test.reset_index(drop=True)
+        y_train = y_train.reset_index(drop=True)
+        y_test = y_test.reset_index(drop=True)
 
         estimator = LinearRegression().fit(X, Y)
 

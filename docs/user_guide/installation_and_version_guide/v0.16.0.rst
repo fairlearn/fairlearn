@@ -16,6 +16,12 @@ Bug fixes
   names that coincide with internal metric input columns, such as :code:`y_true`,
   :code:`y_pred`, or a sample-weight column, without overwriting those inputs.
 
+* Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
+  use :code:`Series.loc` when adding new entries instead of scalar-only
+  :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
+  This avoids pandas 3.1 deprecation warnings without suppressing warnings:
+  :pr:`1801` by :user:`nawaaaaaAaar`.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
