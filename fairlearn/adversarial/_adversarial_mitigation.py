@@ -95,12 +95,12 @@ class _AdversarialFairness(BaseEstimator):
 
     Parameters
     ----------
-    backend : str, BackendEngine, default = 'auto'
+    backend : str, type[BackendEngine], default = 'auto'
         The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
         or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
         automatically infer
         the backend from the :code:`predictor_model`.
-        You can also pass in a BackendEngine class.
+        You can also pass in a BackendEngine subclass.
 
     predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
@@ -240,7 +240,7 @@ class _AdversarialFairness(BaseEstimator):
     def __init__(
         self,
         *,
-        backend: Literal["auto", "torch", "tensorflow"] | BackendEngine = "auto",
+        backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
         predictor_model: torch.nn.Module | keras.Model | list | None = None,
         adversary_model: torch.nn.Module | keras.Model | list | None = None,
         predictor_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
@@ -1025,7 +1025,7 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     def __init__(
         self,
         *,
-        backend: Literal["auto", "torch", "tensorflow"] | BackendEngine = "auto",
+        backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
         predictor_model: torch.nn.Module | keras.Model | list | None = None,
         adversary_model: torch.nn.Module | keras.Model | list | None = None,
         predictor_optimizer: Literal["Adam", "SGD"]
@@ -1228,7 +1228,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     def __init__(
         self,
         *,
-        backend: Literal["auto", "torch", "tensorflow"] | BackendEngine = "auto",
+        backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
         predictor_model: torch.nn.Module | keras.Model | list | None = None,
         adversary_model: torch.nn.Module | keras.Model | list | None = None,
         predictor_optimizer: Literal["Adam", "SGD"]
