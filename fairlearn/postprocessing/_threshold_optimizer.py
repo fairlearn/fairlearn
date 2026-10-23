@@ -57,6 +57,7 @@ SENSITIVE_FEATURE_NAMES_NOT_UNIQUE_ERROR_MESSAGE = (
 )
 SCORES_DATA_TOO_MANY_COLUMNS_ERROR_MESSAGE = "The provided scores data contains multiple columns."
 UNEXPECTED_DATA_TYPE_ERROR_MESSAGE = "Unexpected data type {} encountered."
+_PREDICT_METHODS = ("auto", "predict_proba", "decision_function", "predict")
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +160,7 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         grid of the specified size over the interval [0,1] and the optimization
         is performed with respect to the constraints achieving those values. In
         case of 'equalized_odds' the constraint metric is the false positive
-        rate.
+        rate. Must be a positive integer.
 
     flip : bool, default=False
         If True, then allow flipping the decision if it improves the resulting
@@ -311,6 +312,20 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
                 raise ValueError("Relaxed constraints are not supported for equalized odds.")
         else:
             raise ValueError(NOT_SUPPORTED_CONSTRAINTS_ERROR_MESSAGE)
+
+        if (
+            isinstance(self.grid_size, bool)
+            or not isinstance(self.grid_size, (int, np.integer))
+            or self.grid_size < 1
+        ):
+            # grid_size=0 used to silently produce a grid with only the point 0
+            raise ValueError(f"grid_size must be a positive integer, got {self.grid_size!r}.")
+
+        if self.predict_method not in _PREDICT_METHODS:
+            raise ValueError(
+                f"predict_method must be one of {list(_PREDICT_METHODS)}, "
+                f"got {self.predict_method!r}."
+            )
 
         self._predict_method = self.predict_method
 
