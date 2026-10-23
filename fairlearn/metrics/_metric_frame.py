@@ -290,6 +290,28 @@ class MetricFrame:
             cf_list = self._process_features("control_feature_", control_features, y_t)
             self._cf_names = [x.name_ for x in cf_list]
 
+        # Keep metric inputs separate from user-provided feature names.
+        feature_names = self._sf_names + (self._cf_names or [])
+        used_names = set(all_data.columns) | set(feature_names)
+        renamed_columns = {}
+        for column in all_data.columns:
+            if column in feature_names:
+                new_column = column
+                while new_column in used_names:
+                    new_column += "_"
+                renamed_columns[column] = new_column
+                used_names.add(new_column)
+        if renamed_columns:
+            all_data = all_data.rename(columns=renamed_columns)
+            for func in annotated_funcs.values():
+                func.postional_argument_names = [
+                    renamed_columns.get(name, name) for name in func.postional_argument_names
+                ]
+                func.kw_argument_mapping = {
+                    arg: renamed_columns.get(name, name)
+                    for arg, name in func.kw_argument_mapping.items()
+                }
+
         # Add sensitive and conditional features to all_data
         for sf in sf_list:
             all_data[sf.name_] = sf.raw_feature_
