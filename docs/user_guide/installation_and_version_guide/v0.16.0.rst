@@ -12,6 +12,13 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.postprocessing.ThresholdOptimizer` now raises a
+  :code:`ValueError` if :code:`grid_size` is not a positive integer or
+  :code:`predict_method` is not one of the supported values. Previously,
+  :code:`grid_size=0` silently produced a model that predicts the negative
+  class for everyone: :pr:`1806` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
   a :code:`ValueError` when :code:`sensitive_features` or
