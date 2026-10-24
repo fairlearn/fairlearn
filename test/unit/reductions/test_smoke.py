@@ -7,8 +7,6 @@ from functools import partial
 import numpy as np
 import pandas as pd
 import pytest
-import sklearn
-from packaging.version import Version
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -20,8 +18,11 @@ from fairlearn.reductions import (
     GridSearch,
 )
 
-_SOLVER = "newton-cd" if Version(sklearn.__version__) >= Version("1.10.dev0") else "liblinear"
-_ESTIMATORS = [LogisticRegression(solver=_SOLVER), SVC(), DecisionTreeClassifier()]
+_ESTIMATORS = [
+    LogisticRegression(solver="lbfgs"),
+    SVC(),
+    DecisionTreeClassifier(),
+]
 
 if platform.system() != "Darwin":
     # MacOS requires extra steps to install lightgbm properly, skipping for now

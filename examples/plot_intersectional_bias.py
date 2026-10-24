@@ -710,7 +710,11 @@ testx = testx.drop(categories, axis=1)
 
 # Defining a logistic regression model
 
-model = LogisticRegression(penalty="elasticnet", max_iter=1000, solver="saga", l1_ratio=1)
+model = LogisticRegression(
+    max_iter=1000,
+    solver="saga",
+    l1_ratio=1,
+)
 
 # %%
 # We train the model and apply it to generate predictions on our test set.
@@ -1056,7 +1060,7 @@ testx_norace = testx.drop(race_cat, axis=1)
 # %%
 
 # Define and train a second model
-model2 = LogisticRegression(penalty="elasticnet", max_iter=1000, solver="saga", l1_ratio=1)
+model2 = LogisticRegression(max_iter=1000, solver="saga", l1_ratio=1)
 model2 = model2.fit(trainx_norace, trainy)
 
 train_predictions = model2.predict(trainx_norace)
