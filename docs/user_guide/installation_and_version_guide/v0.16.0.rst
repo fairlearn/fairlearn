@@ -12,6 +12,16 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` no longer silently
+  override custom callable user inputs for :attr:`predictor_loss`, :attr:`adversary_loss` 
+  and :attr:`predictor_function`. :pr:`1776` by :user:`Tahar Allouche <taharallouche>`.
+
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier` no longer add a redundant
+  final softmax/sigmoid layer to :attr:`predictor_model` and :attr:`adversary_model` when passed
+  as list at construction.
+  :pr:`1776` by :user:`Tahar Allouche <taharallouche>`.
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.

@@ -27,7 +27,7 @@ from fairlearn.adversarial._tensorflow_engine import TensorflowEngine
 model_class = type("Model", (object,), {})
 
 Keyword_BINARY = "binary"
-Keyword_CATEGORY = "category"
+Keyword_CATEGORY = "multiclass"
 Keyword_CONTINUOUS = "continuous"
 Keyword_AUTO = "auto"
 Keyword_CLASSIFICATION = "classification"
@@ -88,7 +88,7 @@ class fake_torch:
             def apply(self, weights):
                 self.w = weights
 
-        BCELoss = type("BCELoss", (BCE,), {})
+        BCEWithLogitsLoss = type("BCEWithLogitsLoss", (BCE,), {})
         CrossEntropyLoss = type("CrossEntropyLoss", (CCE,), {})
         MSELoss = type("MSELoss", (MSE,), {})
 

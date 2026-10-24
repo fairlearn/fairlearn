@@ -128,10 +128,8 @@ class PytorchEngine(BackendEngine):
     def get_loss(self, dist_type):
         """Get loss function corresponding to the keyword."""
         if dist_type == "binary":
-            # Use sigmoid as last layer
-            return torch.nn.BCELoss(reduction="mean")
+            return torch.nn.BCEWithLogitsLoss(reduction="mean")
         elif dist_type in ["multiclass", "multilabel-indicator"]:
-            # Use logsoftmax as last layer
             return torch.nn.CrossEntropyLoss(reduction="mean")
         elif dist_type in ["continuous", "continuous-multioutput"]:
             return torch.nn.MSELoss(reduction="mean")

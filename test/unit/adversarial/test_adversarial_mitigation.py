@@ -138,8 +138,7 @@ def test_model_init(fake_backend_env):
         assert callable(activation)
     assert not hasattr(layers[0], "a") or layers[9].a == 10
     assert layers[9].b == 1
-    assert layers[10].__name__.lower() == "sigmoid"
-    assert len(layers) == 11
+    assert len(layers) == 10
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
@@ -417,11 +416,13 @@ def test_fake_models(fake_backend_env):
         assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
 
 
-@pytest.mark.parametrize("fake_backend_env", ["torch"], indirect=True)
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 def test_fake_models_list_inputs(fake_backend_env):
     """Test model with lists as input."""
     for (X, Y, Z), _types in generate_data_combinations():
-        mitigator = get_instance(fake_mixin=True)
+        mitigator = get_instance(
+            fake_backend=fake_backend_env, fake_mixin=False, fake_training=True
+        )
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
 
@@ -622,3 +623,51 @@ def test_backend_engine_is_abstract():
 
     with pytest.raises(TypeError, match="get_model"):
         MissingModel(None, None, None, None)
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_callable_losses_and_predictor_functions_are_not_overridden(
+    fake_backend_env: Literal["torch", "tensorflow"],
+) -> None:
+    def dummy_predictor_loss(x):
+        return x
+
+    def dummy_adversary_loss(x):
+        return x
+
+    def dummy_predictor_function(x):
+        return x
+
+    mitigator = get_instance(
+        fake_training=True,
+        fake_backend=fake_backend_env,
+        predictor_loss=dummy_predictor_loss,
+        adversary_loss=dummy_adversary_loss,
+        predictor_function=dummy_predictor_function,
+    )
+
+    X = np.random.default_rng().random(size=(3, 2))
+    y = np.array([1.0, 2.0, 3.0])
+    mitigator.fit(X, y)
+
+    assert mitigator.predictor_loss_ is dummy_predictor_loss
+    assert mitigator.adversary_loss_ is dummy_adversary_loss
+    assert mitigator.predictor_function is dummy_predictor_function
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_predictor_model_set_to_empty_list_if_None(fake_backend_env):
+    mitigator = get_instance(
+        fake_backend=fake_backend_env,
+        fake_training=True,
+        fake_mixin=False,
+        predictor_model=None,
+        adversary_model=None,
+    )
+
+    X = np.random.default_rng().random(size=(3, 2))
+    y = np.array([1.0, 2.0, 3.0])
+    mitigator.fit(X, y)
+
+    assert mitigator.predictor_model == []
+    assert mitigator.adversary_model == []

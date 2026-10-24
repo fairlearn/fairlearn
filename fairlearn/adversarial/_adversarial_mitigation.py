@@ -1,12 +1,16 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
+from __future__ import annotations
 
 import logging
 import warnings
+from collections.abc import Callable
 from math import ceil
 from time import time
+from typing import TYPE_CHECKING, Literal, Self
 
 from numpy import arange, argmax, unique, zeros
+from numpy.random import RandomState
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
@@ -37,6 +41,11 @@ from ._pytorch_engine import PytorchEngine
 from ._tensorflow_engine import TensorflowEngine
 
 logger = logging.getLogger(__name__)
+
+
+if TYPE_CHECKING:
+    import keras
+    import torch
 
 
 class _AdversarialFairness(BaseEstimator):
@@ -86,12 +95,12 @@ class _AdversarialFairness(BaseEstimator):
 
     Parameters
     ----------
-    backend : str, BackendEngine, default = 'auto'
+    backend : str, type[BackendEngine], default = 'auto'
         The backend to use. Must be one of :code:`'torch'`, :code:`'tensorflow'`,
         or :code:`'auto'` which indicates PyTorch, TensorFlow, or to
         automatically infer
         the backend from the :code:`predictor_model`.
-        You can also pass in a BackendEngine class.
+        You can also pass in a BackendEngine subclass.
 
     predictor_model : list, torch.nn.Module, keras.Model
         The predictor model to train.
@@ -113,6 +122,32 @@ class _AdversarialFairness(BaseEstimator):
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
+
+    predictor_loss : str, callable, default = 'auto'
+        If a string is passed, it must be one of :code:`'auto'`, :code:`'binary'`,
+        :code:`'multiclass'`, :code:`'continuous'`.
+        Determines the loss function for the adversary model (i.e. cross entropy for
+        'binary' and 'multiclass' and MSE for 'continuous').
+        The loss is automatically infered from the type of target :code:`y` if set to
+        :code:`'auto'`.
+        If a callable is passed, it will be used.
+
+    adversary_loss : str, callable, default = 'auto'
+        If a string is passed, it must be one of :code:`'auto'`, :code:`'binary'`,
+        :code:`'multiclass'`, :code:`'continuous'`.
+        Determines the loss function for the adversary model (i.e. cross entropy for
+        'binary' and 'multiclass' and MSE for 'continuous').
+        The loss is automatically infered from the type of sensitive feature :code:`A`
+        if set to 'auto'.
+        If a callable is passed, it will be used.
+
+    predictor_function : str, callable, default = 'auto'
+        Should be either the string :code:`'auto'`, :code:`'binary'`, :code:`'multiclass'`,
+        :code:`'continuous'`, or a callable. The string
+        :code:`'auto'` indicates to infer the predictor function
+        from the distribution type of :code:`y`
+        A callable should be a function that maps the continuous output of the predictor
+        model to a discrete prediction.
 
     predictor_optimizer : str, torch.optim, keras.optimizers, callable, default = 'Adam'
         The optimizer class to use. If a string is passed instead, this must be
@@ -205,30 +240,35 @@ class _AdversarialFairness(BaseEstimator):
     def __init__(
         self,
         *,
-        backend="auto",
-        predictor_model=None,
-        adversary_model=None,
-        predictor_loss="auto",
-        adversary_loss="auto",
-        predictor_function="auto",
-        threshold_value=0.5,
-        predictor_optimizer="Adam",
-        adversary_optimizer="Adam",
-        constraints="demographic_parity",
-        y_transform="auto",
-        sf_transform="auto",
-        learning_rate=0.001,
-        alpha=1.0,
-        epochs=1,
-        batch_size=32,
-        max_iter=-1,
-        shuffle=False,
-        progress_updates=None,
-        skip_validation=False,
-        callbacks=None,
-        cuda=None,
-        warm_start=False,
-        random_state=None,
+        backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
+        predictor_model: torch.nn.Module | keras.Model | list | None = None,
+        adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
+        adversary_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
+        predictor_function: Literal["binary", "multiclass", "continuous", "auto"]
+        | Callable = "auto",
+        threshold_value: float = 0.5,
+        predictor_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        adversary_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        constraints: Literal["demographic_parity", "equalized_odds"] = "demographic_parity",
+        y_transform: str | TransformerMixin | None = "auto",
+        sf_transform: str | TransformerMixin | None = "auto",
+        learning_rate: float = 0.001,
+        alpha: float = 1.0,
+        epochs: int = 1,
+        batch_size: int = 32,
+        max_iter: int = -1,
+        shuffle: bool = False,
+        progress_updates: float | None = None,
+        skip_validation: bool = False,
+        callbacks: Callable | list[Callable] | None = None,
+        cuda: str | None = None,
+        warm_start: bool = False,
+        random_state: int | RandomState | None = None,
     ):
         """Initialize class by only storing (kw)args, as per sklearn API."""
         self.backend = backend
@@ -256,7 +296,7 @@ class _AdversarialFairness(BaseEstimator):
         self.warm_start = warm_start
         self.random_state = random_state
 
-    def __setup(self, X, y, A):
+    def __setup(self, X, y, A) -> None:
         """
         Initialize model from parameters and data.
 
@@ -343,8 +383,15 @@ class _AdversarialFairness(BaseEstimator):
             else:
                 self.callbacks_ = [self.callbacks]
 
-        self.predictor_loss_ = self.predictor_function_ = type_of_target(y)
-        self.adversary_loss_ = type_of_target(A)
+        self.predictor_function_ = (
+            type_of_target(y) if self.predictor_function == "auto" else self.predictor_function
+        )
+        self.predictor_loss_ = (
+            type_of_target(y) if self.predictor_loss == "auto" else self.predictor_loss
+        )
+        self.adversary_loss_ = (
+            type_of_target(A) if self.adversary_loss == "auto" else self.adversary_loss
+        )
 
         for kw, kwname in (
             (self.y_transform, "y_transform"),
@@ -393,7 +440,7 @@ class _AdversarialFairness(BaseEstimator):
 
         self._is_setup = True
 
-    def fit(self, X, y, *, sensitive_features=None):
+    def fit(self, X, y, *, sensitive_features=None) -> Self:
         """
         Fit the model based on the given training data and sensitive features.
 
@@ -413,6 +460,11 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
+        if self.predictor_model is None:
+            self.predictor_model = []  # [] is a NN with no hidden layers
+
+        if self.adversary_model is None:
+            self.adversary_model = []
         first_call = not hasattr(self, "_is_setup")
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
@@ -428,18 +480,6 @@ class _AdversarialFairness(BaseEstimator):
                     ),
                 )
             )
-
-        # Kept as if/else: the `[]` branch carries an F841 waiver and note that
-        # a one-line ternary would not preserve cleanly.
-        if self.predictor_model is not None:  # noqa: SIM108
-            predictor_model = self.predictor_model
-        else:
-            predictor_model = []  # [] is a NN with no hidden layers # noqa: F841
-
-        if self.adversary_model is not None:  # noqa: SIM108
-            adversary_model = self.adversary_model
-        else:
-            adversary_model = []  # noqa: F841
 
         batch_size = X.shape[0] if self.batch_size == -1 else self.batch_size
         batches = ceil(X.shape[0] / batch_size)
@@ -514,7 +554,7 @@ class _AdversarialFairness(BaseEstimator):
 
         return self
 
-    def partial_fit(self, X, y, *, classes=None, sensitive_features=None):
+    def partial_fit(self, X, y, *, classes=None, sensitive_features=None) -> Self:
         """Perform one training step on given samples and update model.
 
         This method allows for incremental fitting on batches of data.
@@ -608,7 +648,7 @@ class _AdversarialFairness(BaseEstimator):
         y_pred = self._y_transform.inverse_transform(y_pred)
         return y_pred
 
-    def _validate_input(self, X, y, A, reinitialize=False):
+    def _validate_input(self, X, y, A, reinitialize: bool = False):
         """
         Validate input data and optionally set up the estimator.
 
@@ -701,7 +741,7 @@ class _AdversarialFairness(BaseEstimator):
 
         return X, y, A
 
-    def _validate_backend(self):
+    def _validate_backend(self) -> None:
         """
         Import either PyTorch or TensorFlow, depending on predictor.
 
@@ -782,12 +822,12 @@ class _AdversarialFairness(BaseEstimator):
     def _binary_predictor_function(self, pred):
         return (pred >= self.threshold_value).astype(float)
 
-    def _set_predictor_function(self):
+    def _set_predictor_function(self) -> None:
         """
         Infer prediction function.
 
         The :code:`predictor_function` should be either the string
-        :code:`'auto'`, :code:`'binary'`, :code:`'category'`,
+        :code:`'auto'`, :code:`'binary'`, :code:`'multiclass'`,
         :code:`'continuous'`, or a callable. The string
         :code:`'auto'` indicates to infer the predictor function
         from the distribution type of :code:`y`
@@ -819,7 +859,7 @@ class _AdversarialFairness(BaseEstimator):
         else:
             raise ValueError(_PREDICTION_FUNCTION_AMBIGUOUS)
 
-    def __sklearn_is_fitted__(self):
+    def __sklearn_is_fitted__(self) -> bool:
         """Speed up check_is_fitted."""
         return hasattr(self, "_is_setup")
 
@@ -985,32 +1025,36 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
     def __init__(
         self,
         *,
-        backend="auto",
-        predictor_model=None,
-        adversary_model=None,
-        predictor_optimizer="Adam",
-        adversary_optimizer="Adam",
-        constraints="demographic_parity",
-        learning_rate=0.001,
-        alpha=1.0,
-        epochs=1,
-        batch_size=32,
-        shuffle=False,
-        progress_updates=None,
-        skip_validation=False,
-        callbacks=None,
-        cuda=None,
-        warm_start=False,
-        random_state=None,
+        backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
+        predictor_model: torch.nn.Module | keras.Model | list | None = None,
+        adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        adversary_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        constraints: Literal["demographic_parity", "equalized_odds"] = "demographic_parity",
+        learning_rate: float = 0.001,
+        alpha: float = 1.0,
+        epochs: int = 1,
+        batch_size: int = 32,
+        shuffle: bool = False,
+        progress_updates: float | None = None,
+        skip_validation: bool = False,
+        callbacks: Callable | list[Callable] | None = None,
+        cuda: str | None = None,
+        warm_start: bool = False,
+        random_state: int | RandomState | None = None,
     ):
         """Initialize model by setting the predictor loss and function."""
         super().__init__(
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
-            predictor_loss="classification",
+            predictor_loss="auto",
             adversary_loss="auto",
-            predictor_function="classification",
+            predictor_function="auto",
             threshold_value=0.5,
             predictor_optimizer=predictor_optimizer,
             adversary_optimizer=adversary_optimizer,
@@ -1184,23 +1228,27 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
     def __init__(
         self,
         *,
-        backend="auto",
-        predictor_model=None,
-        adversary_model=None,
-        predictor_optimizer="Adam",
-        adversary_optimizer="Adam",
-        constraints="demographic_parity",
-        learning_rate=0.001,
-        alpha=1.0,
-        epochs=1,
-        batch_size=32,
-        shuffle=False,
-        progress_updates=None,
-        skip_validation=False,
-        callbacks=None,
-        cuda=None,
-        warm_start=False,
-        random_state=None,
+        backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
+        predictor_model: torch.nn.Module | keras.Model | list | None = None,
+        adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        adversary_optimizer: Literal["Adam", "SGD"]
+        | torch.optim.Optimizer
+        | keras.optimizers.Optimizer = "Adam",
+        constraints: Literal["demographic_parity", "equalized_odds"] = "demographic_parity",
+        learning_rate: float = 0.001,
+        alpha: float = 1.0,
+        epochs: int = 1,
+        batch_size: int = 32,
+        shuffle: bool = False,
+        progress_updates: float | None = None,
+        skip_validation: bool = False,
+        callbacks: Callable | list[Callable] | None = None,
+        cuda: str | None = None,
+        warm_start: bool = False,
+        random_state: int | RandomState | None = None,
     ):
         """Initialize model by setting the predictor loss and function."""
         super().__init__(
@@ -1209,7 +1257,7 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
             adversary_model=adversary_model,
             predictor_loss="continuous",
             adversary_loss="auto",
-            predictor_function=None,
+            predictor_function="continuous",
             predictor_optimizer=predictor_optimizer,
             adversary_optimizer=adversary_optimizer,
             y_transform=None,
