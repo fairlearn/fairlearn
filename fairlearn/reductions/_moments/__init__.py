@@ -10,7 +10,7 @@ from .bounded_group_loss import (
     SquareLoss,
     ZeroOneLoss,
 )
-from .error_rate import ErrorRate
+from .error_rate import ErrorRate, ErrorRateResult
 from .moment import ClassificationMoment, LossMoment, Moment
 from .utility_parity import (
     DemographicParity,
@@ -32,6 +32,7 @@ __all__ = [
     "FalsePositiveRateParity",
     "ErrorRateParity",
     "ErrorRate",
+    "ErrorRateResult",
     "BoundedGroupLoss",
     "LossMoment",
     "SquareLoss",

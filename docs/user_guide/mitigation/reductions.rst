@@ -357,9 +357,9 @@ and false positive rate.
 Error Rate
 ~~~~~~~~~~
 
-We can use the :class:`ErrorRate` either to measure performance of a trained model that does or
-does not take sensitive features into account, or as an
-objective function during the training of a fairness aware model.
+We can use the :class:`ErrorRate` either to measure performance of a trained model that
+does or does not take sensitive features into account, or as an objective function
+during the training of a fairness aware model.
 
 To measure the ErrorRate in respect to a trained estimator we use its :code:`gamma` method:
 
@@ -379,8 +379,7 @@ To measure the ErrorRate in respect to a trained estimator we use its :code:`gam
     >>> errorrate = ErrorRate(costs=costs)
     >>> errorrate.load_data(X, y, sensitive_features=sensitive_features)
     >>> errorrate.gamma(classifier.predict)
-    all    0.139
-    dtype: float64
+    ErrorRateResult(error=0.139)
 
 
 Using :class:`ErrorRate` as part of a reductions approach for fairness mitigation is equivalent
