@@ -99,8 +99,8 @@ def fairness_comparison_data(
     X_train_transformed = mitigator.transform(dataset.X_train)
     X_test_transformed = mitigator.transform(dataset.X_test)
 
-    estimator_with_mitigation = LogisticRegression(solver="liblinear")
-    estimator_without_mitigation = LogisticRegression(solver="liblinear")
+    estimator_with_mitigation = LogisticRegression(solver="lbfgs", max_iter=300)
+    estimator_without_mitigation = LogisticRegression(solver="lbfgs", max_iter=300)
     estimator_with_mitigation.fit(X_train_transformed, dataset.y_train)
     estimator_without_mitigation.fit(dataset.X_train, dataset.y_train)
 

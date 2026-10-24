@@ -116,7 +116,7 @@ unmitigated_predictor = Pipeline(
         ("preprocessor", preprocessor),
         (
             "classifier",
-            LogisticRegression(solver="liblinear", fit_intercept=True),
+            LogisticRegression(solver="lbfgs", fit_intercept=True),
         ),
     ]
 )

@@ -97,7 +97,7 @@ A_test = A_test.reset_index(drop=True)
 # that does not incorporate fairness. For speed of demonstration, we use the
 # simple :class:`sklearn.linear_model.LogisticRegression` class:
 
-unmitigated_predictor = LogisticRegression(solver="liblinear", fit_intercept=True)
+unmitigated_predictor = LogisticRegression(solver="lbfgs", fit_intercept=True)
 
 unmitigated_predictor.fit(X_train, Y_train)
 
@@ -154,7 +154,7 @@ plt.show()
 # simplicity; in general, the appropriate fairness metric will not be obvious.
 
 sweep = GridSearch(
-    LogisticRegression(solver="liblinear", fit_intercept=True),
+    LogisticRegression(solver="lbfgs", fit_intercept=True),
     constraints=DemographicParity(),
     grid_size=31,
 )

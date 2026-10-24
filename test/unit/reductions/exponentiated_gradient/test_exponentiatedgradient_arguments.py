@@ -37,7 +37,7 @@ def test_constraints_reused_across_multiple_fits():
     X, y, A = _get_data()
     constraints = DemographicParity()
     expgrad = ExponentiatedGradient(
-        LogisticRegression(solver="liblinear", random_state=42),
+        LogisticRegression(solver="lbfgs", random_state=42),
         constraints=constraints,
         max_iter=5,
     )
@@ -202,7 +202,7 @@ class TestExponentiatedGradientArguments:
         estimator = Pipeline(
             [
                 ("scaler", StandardScaler()),
-                ("logistic", LogisticRegression(solver="liblinear")),
+                ("logistic", LogisticRegression(solver="lbfgs")),
             ]
         )
 
