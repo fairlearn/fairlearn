@@ -68,18 +68,18 @@ The Fairlearn Python package has two components:
    along a variety of fairness definitions.
 
 Fairlearn metrics
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 Check out our in-depth `guide on the Fairlearn metrics <https://fairlearn.org/main/user_guide/assessment>`__.
 
 Fairlearn algorithms
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 For an overview of our algorithms please refer to our
 `website <https://fairlearn.org/main/user_guide/mitigation/index.html>`__.
 
 Getting Started with Fairlearn
------------------------------
+------------------------------
 
 First steps
 ~~~~~~~~~~~
@@ -96,10 +96,10 @@ First steps
 
 
 For Users & Practitioners
-~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__. 
-Please note that notebooks downloaded from `main` may not be compatible with pip-installed versions.
+- Browse the `example gallery <https://fairlearn.org/main/auto_examples/index.html>`__.
+  Please note that notebooks downloaded from `main` may not be compatible with pip-installed versions.
 
 - Check the `API reference <https://fairlearn.org/main/api_reference/index.html>`__.
 
@@ -110,7 +110,7 @@ Please note that notebooks downloaded from `main` may not be compatible with pip
   - Join the `Discord community <https://discord.gg/R22yCfgsRn>`__ for discussions.
 
 For Contributors
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 - Read the `contributor guide <https://fairlearn.org/main/contributor_guide/index.html>`__.
 

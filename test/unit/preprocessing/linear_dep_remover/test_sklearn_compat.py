@@ -3,6 +3,7 @@
 
 import re
 from contextlib import nullcontext as does_not_raise
+from copy import deepcopy
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -129,3 +130,113 @@ def test__check_sensitive_features_in_X_array_dataframe(
 
     with expectation:
         remover._check_sensitive_features_in_X(X)
+
+
+def test_correlation_remover_centers_each_sensitive_feature_separately(constructor) -> None:
+    # Two sensitive features with very different means, e.g. a one-hot column
+    # and a numeric one. Each must be centered by its own mean, otherwise the
+    # filtered features stay correlated with the sensitive features.
+    rng = np.random.default_rng(0)
+    s1 = rng.integers(0, 2, 200).astype(float)
+    s2 = rng.normal(10, 1, 200)
+    z1 = 2 * s1 + 3 * s2 + rng.normal(0, 1, 200)
+    z2 = -s1 + 0.5 * s2 + rng.normal(0, 1, 200)
+    X = constructor({"s1": s1, "s2": s2, "z1": z1, "z2": z2})
+
+    remover = CorrelationRemover(sensitive_feature_ids=["s1", "s2"]).fit(X)
+    X_tfm = remover.transform(X)
+
+    for sensitive in (s1, s2):
+        for column in X_tfm.T:
+            assert abs(np.corrcoef(column, sensitive)[0, 1]) < 1e-8
+    # Only the part explained by the centered sensitive features is removed,
+    # so the means of the non-sensitive features are preserved.
+    np.testing.assert_array_almost_equal(X_tfm.mean(axis=0), [z1.mean(), z2.mean()])
+    np.testing.assert_array_almost_equal(remover.sensitive_mean_, [s1.mean(), s2.mean()])
+
+
+@pytest.mark.parametrize(
+    "columns",
+    [
+        {"feature": [10.0, 20.0, 30.0, 40.0], "sensitive": [0.0, 1.0, 0.0, 1.0]},
+        {"sensitive": [0.0, 1.0, 0.0, 1.0], "renamed": [10.0, 20.0, 30.0, 40.0]},
+        {"sensitive": [0.0, 1.0, 0.0, 1.0]},
+        {
+            "sensitive": [0.0, 1.0, 0.0, 1.0],
+            "feature": [10.0, 20.0, 30.0, 40.0],
+            "extra": [1.0, 2.0, 3.0, 4.0],
+        },
+    ],
+)
+def test_transform_rejects_mismatched_named_columns(constructor, columns):
+    X = constructor({"sensitive": [0.0, 1.0, 0.0, 1.0], "feature": [10.0, 20.0, 30.0, 40.0]})
+    remover = CorrelationRemover(sensitive_feature_ids=["sensitive"]).fit(X)
+    expected = remover.transform(X)
+
+    with pytest.raises(ValueError, match="columns and order seen during fit") as exc:
+        remover.transform(constructor(columns))
+
+    assert "Expected columns: ['sensitive', 'feature']" in str(exc.value)
+    assert f"got: {list(columns)}" in str(exc.value)
+    np.testing.assert_array_equal(remover.transform(X), expected)
+
+
+@pytest.mark.parametrize("n_features", [1, 3])
+@pytest.mark.parametrize("sensitive_feature_ids", [[], [0]])
+@pytest.mark.parametrize("as_list", [False, True])
+def test_rejected_transform_preserves_fitted_state(n_features, sensitive_feature_ids, as_list):
+    X = np.array([[0.0, 1.0], [1.0, 2.0], [0.0, 3.0], [1.0, 4.0]])
+    X = X.tolist() if as_list else X
+    remover = CorrelationRemover(sensitive_feature_ids=sensitive_feature_ids).fit(X)
+    expected = remover.transform(X)
+    fitted_state = deepcopy(remover.__dict__)
+    invalid = np.ones((4, n_features))
+    invalid = invalid.tolist() if as_list else invalid
+
+    with pytest.raises(ValueError, match=f"X has {n_features} features"):
+        remover.transform(invalid)
+
+    np.testing.assert_equal(remover.__dict__, fitted_state)
+    np.testing.assert_array_equal(remover.transform(X), expected)
+
+
+@pytest.mark.parametrize(
+    "input_features, expected",
+    [(None, ["x0", "x2", "x3"]), (["a", "s", "b", "c"], ["a", "b", "c"])],
+)
+def test_get_feature_names_out_array(input_features, expected):
+    X = np.arange(12, dtype=float).reshape(3, 4)
+    remover = CorrelationRemover(sensitive_feature_ids=[1]).fit(X)
+
+    np.testing.assert_array_equal(remover.get_feature_names_out(input_features), expected)
+
+
+def test_get_feature_names_out_rejects_wrong_length():
+    X = np.arange(12, dtype=float).reshape(3, 4)
+    remover = CorrelationRemover(sensitive_feature_ids=[1]).fit(X)
+
+    with pytest.raises(ValueError, match="input_features should have length equal"):
+        remover.get_feature_names_out(["a", "s"])
+
+
+def test_get_feature_names_out_dataframe(constructor):
+    X = constructor({"a": [1.0, 2.0, 4.0], "s": [0.0, 1.0, 1.0], "b": [3.0, 1.0, 0.0]})
+    remover = CorrelationRemover(sensitive_feature_ids=["s"]).fit(X)
+
+    names = remover.get_feature_names_out()
+    np.testing.assert_array_equal(names, ["a", "b"])
+    assert len(names) == remover.transform(X).shape[1]
+    with pytest.raises(ValueError, match="not equal to the column names seen during fit"):
+        remover.get_feature_names_out(["x", "s", "b"])
+
+
+def test_set_output_pandas():
+    pd = pytest.importorskip("pandas")
+    X = pd.DataFrame({"a": [1.0, 2.0, 4.0], "s": [0.0, 1.0, 1.0], "b": [3.0, 1.0, 0.0]})
+    remover = CorrelationRemover(sensitive_feature_ids=["s"]).set_output(transform="pandas")
+
+    X_tfm = remover.fit_transform(X)
+
+    assert isinstance(X_tfm, pd.DataFrame)
+    assert list(X_tfm.columns) == ["a", "b"]
+    np.testing.assert_array_equal(X_tfm.to_numpy(), remover.transform(X.to_numpy()))

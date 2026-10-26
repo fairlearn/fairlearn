@@ -25,6 +25,8 @@ class Moment:
     imposed on the solution. This is an abstract class for all such objects.
 
     Read more in the :ref:`User Guide <reductions>`.
+
+    .. versionadded:: 0.3.0
     """
 
     def __init__(self):
@@ -100,7 +102,10 @@ Moment.__module__ = "fairlearn.reductions"
 
 
 class ClassificationMoment(Moment):
-    """Moment that can be expressed as weighted classification error."""
+    """Moment that can be expressed as weighted classification error.
+
+    .. versionadded:: 0.3.0
+    """
 
     def _moment_type(self):
         return ClassificationMoment
@@ -112,7 +117,10 @@ ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
 class LossMoment(Moment):
-    """Moment that can be expressed as weighted loss."""
+    """Moment that can be expressed as weighted loss.
+
+    .. versionadded:: 0.3.0
+    """
 
     def __init__(self, loss):
         super().__init__()

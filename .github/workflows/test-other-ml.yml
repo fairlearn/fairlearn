@@ -16,20 +16,34 @@ on:
 jobs:
   other-ml:
     runs-on: ${{ inputs.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
     env:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
-      - run: |
-          conda update -n base -c defaults conda
-        name: Update and initialise conda
-      - run: |
-          conda env create --name $condaEnv --file=$baseDir/conda-${{inputs.mlpackage}}.yaml
-        name: Create conda environment
+      - name: Get commit date
+        id: get_date
+        shell: bash
+        run: |
+          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
+          CURRENT_DATE=$(date +%s)
+          AGE=$((CURRENT_DATE - COMMIT_DATE))
+          echo "AGE=$AGE" >> $GITHUB_OUTPUT
+          echo "AGE in seconds: $AGE"
+      - name: Set up Conda environment
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          miniconda-version: latest
+          activate-environment: ${{ env.condaEnv }}
+          # Let each environment file choose its compatible Python version.
+          environment-file: ${{ env.baseDir }}/conda-${{ inputs.mlpackage }}.yaml
+          auto-activate: false
       - run: |
           if [[ ${{ inputs.mlpackage }} == "tensorflow" ]]; then
             export NUMPY_DEP="numpy<2"
@@ -41,15 +55,9 @@ jobs:
           else
             export NUMPY_DEP="numpy"
           fi
-          # For some reason, 'conda init bash' doesn't stick so
-          # We have to keep doing the following
-          source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate $condaEnv
           pip install . $NUMPY_DEP
         name: Install Fairlearn
       - run: |
-          source /usr/share/miniconda/etc/profile.d/conda.sh
-          conda activate $condaEnv
           echo
           conda list
           echo
@@ -57,7 +65,7 @@ jobs:
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
         name: Run ${{ inputs.mlpackage }} tests
       - name: Upload coverage reports to Codecov with GitHub Action
-        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
+        if: ${{ steps.get_date.outputs.AGE < 172800 }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v7
         with:
           env_vars: OS,PYTHON

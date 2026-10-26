@@ -171,6 +171,11 @@ def equalized_odds_difference(
     -------
     float
         The equalized odds difference
+
+    Raises
+    ------
+    ValueError
+        If `agg` is not one of ``'worst_case'`` or ``'mean'``.
     """
     if agg not in ["worst_case", "mean"]:
         raise ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")
@@ -234,6 +239,11 @@ def equalized_odds_ratio(
     -------
     float
         The equalized odds ratio
+
+    Raises
+    ------
+    ValueError
+        If `agg` is not one of ``'worst_case'`` or ``'mean'``.
     """
     if agg not in ["worst_case", "mean"]:
         raise ValueError(f"agg must be one of 'worst_case' or 'mean', got {agg}")

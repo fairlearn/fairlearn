@@ -1,7 +1,9 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
-from numpy import ndarray
+from abc import ABC, abstractmethod
+
+from numpy import ndarray, ndim
 from sklearn.utils import shuffle
 
 from ._constants import (
@@ -14,7 +16,18 @@ from ._constants import (
 )
 
 
-class BackendEngine:
+def _check_2d(X):
+    """Raise a clear error if ``X`` is not two-dimensional.
+
+    This check is independent of scikit-learn's ``ensure_2d`` and ``allow_nd``
+    flags so that all validation paths enforce the same requirement.
+    """
+    X_ndim = ndim(X)
+    if X_ndim != 2:
+        raise ValueError(_X_NOT_2D.format(X_ndim))
+
+
+class BackendEngine(ABC):
     """The interface of a mixin class."""
 
     # NOTE: to validate objects passed.
@@ -34,8 +47,7 @@ class BackendEngine:
         """
         self.base = base
 
-        if X.ndim != 2:
-            raise ValueError(_X_NOT_2D.format(X.ndim))
+        _check_2d(X)
         n_X_features = X.shape[1]
         n_Y_features = base._y_transform.n_features_out_
         n_A_features = base._sf_transform.n_features_out_
@@ -195,6 +207,7 @@ class BackendEngine:
         X, Y, A = shuffle(X, Y, A, random_state=self.base.random_state_)
         return X, Y, A
 
+    @abstractmethod
     def evaluate(self, X: ndarray) -> ndarray:
         """
         Evaluate the model given input `X`.
@@ -204,6 +217,7 @@ class BackendEngine:
         """
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
+    @abstractmethod
     def train_step(self, X: ndarray, Y: ndarray, A: ndarray):
         """
         Perform one training step over data.
@@ -215,6 +229,7 @@ class BackendEngine:
         """
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
+    @abstractmethod
     def get_optimizer(self, optim_param, model):
         """Create the predictor_optimizer and adversary_optimizer here."""
         raise NotImplementedError(_NOT_IMPLEMENTED)
@@ -228,6 +243,7 @@ class BackendEngine:
         """
         raise ValueError(_DIST_TYPE_NOT_IMPLEMENTED.format(self.__class__.__name__, dist_type))
 
+    @abstractmethod
     def get_model(self, list_nodes):
         """
         Build a model from a list of keywords.

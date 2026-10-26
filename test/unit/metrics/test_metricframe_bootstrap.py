@@ -308,6 +308,32 @@ class TestGroupComparisons:
                 assert result[1][m][cf] == pytest.approx(nominal[m][cf], abs=tol)
 
 
+class TestIntegerTypes:
+    @pytest.mark.parametrize("seed", [13489623, np.int64(13489623)])
+    @pytest.mark.parametrize("n_boot", [N_BOOTSTRAP, np.int64(N_BOOTSTRAP)])
+    def test_numpy_integers_accepted(self, seed, n_boot):
+        mf = MetricFrame(
+            metrics=skm.mean_squared_error,
+            y_true=y_t,
+            y_pred=y_p,
+            sensitive_features=g_1,
+            n_boot=n_boot,
+            ci_quantiles=QUANTILES,
+            random_state=seed,
+        )
+        reference = MetricFrame(
+            metrics=skm.mean_squared_error,
+            y_true=y_t,
+            y_pred=y_p,
+            sensitive_features=g_1,
+            n_boot=N_BOOTSTRAP,
+            ci_quantiles=QUANTILES,
+            random_state=13489623,
+        )
+        for actual, expected in zip(mf.overall_ci, reference.overall_ci, strict=True):
+            assert actual == expected
+
+
 class TestErrors:
     def test_n_boot_none(self):
         msg = "Must specify both n_boot and ci_quantiles"

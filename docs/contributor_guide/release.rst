@@ -50,7 +50,31 @@ The following steps assume git remote's :code:`origin` points to
 #. Run the `Release Wheel workflow on GitHub <https://github.com/fairlearn/fairlearn/actions/workflows/release-wheel.yml>`_
 
 .. note::
-    Ensure that you have selected the correct release branch
+    Ensure that you have selected the correct release branch.
+    Immediately after building, the workflow runs
+    :code:`uv run --no-project --with twine twine check --strict dist/*`
+    on both the wheel and source distribution. This metadata preflight rejects
+    invalid README reStructuredText and missing metadata before the test matrix
+    starts or the publishing artifact is uploaded. Fix any reported errors or
+    warnings rather than changing the README content type or bypassing validation.
+    The workflow tests the exact wheel built from that branch with stable
+    dependencies only. It removes the checked-out Fairlearn package directory
+    before installing the wheel so tests cannot accidentally import the source
+    tree instead. Before publishing, it verifies the installed wheel's
+    origin, package contents, and version, and runs the tests including OpenML
+    dataset downloads. The expected source version is passed from the build job
+    to the test jobs as a job output, separate from the publishing artifact.
+    If an OpenML test reports an invalid-cache warning, inspect the
+    preceding exception in the full job log: a dataset parser error can also
+    trigger scikit-learn's cache retry warning.
+
+    Publishing currently authenticates with :code:`PYPI_API_TOKEN`, so provenance
+    attestations are disabled. To switch to
+    `PyPI Trusted Publishing <https://docs.pypi.org/trusted-publishers/adding-a-publisher/>`_,
+    first register :code:`fairlearn/fairlearn` and :code:`release-wheel.yml` as a
+    trusted publisher on PyPI. Then grant :code:`id-token: write` to the
+    :code:`release-wheel` job and remove its :code:`password` input and
+    :code:`attestations: false` override.
 
 #. On the release branch, place an annotated tag:
 

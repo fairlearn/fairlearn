@@ -102,6 +102,15 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
         A custom `matplotlib.axes.Axes` object to use for the plots.
     show_plot : bool, default = True
         Whether or not the generated plot should be shown, default True
+
+    Raises
+    ------
+    ValueError
+        If `threshold_optimizer` is not a :class:`.ThresholdOptimizer`.
+    sklearn.exceptions.NotFittedError
+        If `threshold_optimizer` has not been fitted.
+    RuntimeError
+        If matplotlib is not installed.
     """
     try:
         import matplotlib.pyplot as plt

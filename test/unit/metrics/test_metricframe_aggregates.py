@@ -1438,6 +1438,19 @@ class Test2m1sf1cfErrorHandlingCM:
         expected_ratio["confusion_matrix"] = np.nan
         assert target_ratio.equals(expected_ratio)
 
+    @pytest.mark.parametrize("compare", ["difference", "ratio"])
+    def test_to_overall_raise(self, compare):
+        with pytest.raises(ValueError) as exc:
+            getattr(self.target, compare)(method="to_overall", errors="raise")
+        assert exc.value.args[0] == _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
+
+    @pytest.mark.parametrize("compare", ["difference", "ratio"])
+    def test_to_overall_coerce(self, compare):
+        target_result = getattr(self.target, compare)(method="to_overall", errors="coerce")
+        expected_result = getattr(self.expected, compare)(method="to_overall")
+        expected_result["confusion_matrix"] = np.nan
+        assert target_result.equals(expected_result)
+
 
 class Test1m1sf1cfErrorHandlingCM:
     # Metricframe containing a confusion matrix raises ValueErrors, since cells are non-scalar
@@ -1654,6 +1667,19 @@ class Test2m1sf0cfErrorHandlingCM:
         expected_ratio = self.expected.ratio()
         expected_ratio["confusion_matrix"] = np.nan
         assert target_ratio.equals(expected_ratio)
+
+    @pytest.mark.parametrize("compare", ["difference", "ratio"])
+    def test_to_overall_raise(self, compare):
+        with pytest.raises(ValueError) as exc:
+            getattr(self.target, compare)(method="to_overall", errors="raise")
+        assert exc.value.args[0] == _MF_CONTAINS_NON_SCALAR_ERROR_MESSAGE
+
+    @pytest.mark.parametrize("compare", ["difference", "ratio"])
+    def test_to_overall_coerce(self, compare):
+        target_result = getattr(self.target, compare)(method="to_overall", errors="coerce")
+        expected_result = getattr(self.expected, compare)(method="to_overall")
+        expected_result["confusion_matrix"] = np.nan
+        assert target_result.equals(expected_result)
 
 
 class Test1m1sf0cfErrorHandlingCM:

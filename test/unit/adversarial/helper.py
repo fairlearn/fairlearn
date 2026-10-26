@@ -298,6 +298,9 @@ class RemoveAll(BackendEngine):
     def get_loss(self, Y, choice, data_name):  # noqa: D102
         pass
 
+    def get_model(self, list_nodes):  # noqa: D102
+        pass
+
 
 class RemoveTrainStepPytorch(PytorchEngine):
     """Mock train_step only, then we can still perform Backend inits."""

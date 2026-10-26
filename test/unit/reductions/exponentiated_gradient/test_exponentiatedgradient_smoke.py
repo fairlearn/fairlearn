@@ -952,7 +952,7 @@ class TestExponentiatedGradientSmoke:
         y = [1, 1, 1]
         A = ["a", "b", "b"]
 
-        estimator = LogisticRegression(solver="liblinear", fit_intercept=True, random_state=97)
+        estimator = LogisticRegression(solver="lbfgs", fit_intercept=True, random_state=97)
         expgrad = ExponentiatedGradient(estimator, DemographicParity())
 
         # Following line should not throw an exception

@@ -18,7 +18,11 @@ from fairlearn.reductions import (
     GridSearch,
 )
 
-_ESTIMATORS = [LogisticRegression(solver="liblinear"), SVC(), DecisionTreeClassifier()]
+_ESTIMATORS = [
+    LogisticRegression(solver="lbfgs"),
+    SVC(),
+    DecisionTreeClassifier(),
+]
 
 if platform.system() != "Darwin":
     # MacOS requires extra steps to install lightgbm properly, skipping for now

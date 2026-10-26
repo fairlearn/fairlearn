@@ -435,3 +435,28 @@ def test_explicit_conf_intervals_not_overridden_by_auto(monkeypatch):
     with suppress(KeyError, AttributeError):
         plot_metric_frame(mf, metrics=["accuracy_score"], conf_intervals=["custom_ci"])
     assert len(calls) == 0, "auto-detect must not fire when conf_intervals is explicitly passed"
+
+
+@pytest.mark.parametrize("as_dict", [False, True])
+@pytest.mark.parametrize("with_control", [False, True])
+def test_auto_ci_missing_bootstrap_group(as_dict, with_control):
+    mf = MetricFrame(
+        metrics={"accuracy_score": accuracy_score} if as_dict else accuracy_score,
+        y_true=[0, 0, 1],
+        y_pred=[0, 0, 1],
+        sensitive_features=["a", "a", "b"],
+        control_features=["control"] * 3 if with_control else None,
+        n_boot=1,
+        ci_quantiles=[0.025, 0.975],
+        random_state=1,
+    )
+    assert len(mf.by_group) == 2
+    assert len(mf.by_group_ci[0]) == 1
+
+    _, bounds = _get_conf_intervals_from_metric_frame(mf)["accuracy_score"]
+    np.testing.assert_allclose(bounds, [[1.0, 1.0], [np.nan, np.nan]])
+    for kind in ["point", "bar"]:
+        axs = plot_metric_frame(mf, kind=kind)
+        ax = np.asarray(axs).ravel()[0]
+        assert isinstance(ax, matplotlib.axes.Axes)
+        plt.close(ax.figure)

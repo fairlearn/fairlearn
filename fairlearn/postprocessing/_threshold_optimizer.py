@@ -285,6 +285,13 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
             The label vector. This must only contain binary labels (0 and 1).
         sensitive_features : numpy.ndarray, list, pandas.DataFrame, or pandas.Series
             sensitive features to identify groups by
+
+        Raises
+        ------
+        ValueError
+            If `estimator` is `None`, if `constraints` or `objective` is not
+            supported, if `tol` is set together with ``constraints="equalized_odds"``,
+            or if `control_features` is passed in `kwargs`.
         """
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)

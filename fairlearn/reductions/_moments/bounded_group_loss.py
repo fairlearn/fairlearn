@@ -63,13 +63,13 @@ class ConditionalLossMoment(LossMoment):
         attr_vals = self.tags[_GROUP_ID].unique()
         self.pos_basis = pd.DataFrame()
         self.neg_basis = pd.DataFrame()
-        self.neg_basis_present = pd.Series(dtype="float64")
+        self.neg_basis_present = pd.Series(dtype="bool")
         zero_vec = pd.Series(0.0, self.index)
         for i, attr in enumerate(attr_vals):
             self.pos_basis[i] = 0 + zero_vec
             self.neg_basis[i] = 0 + zero_vec
             self.pos_basis.loc[attr, i] = 1
-            self.neg_basis_present.at[i] = False
+            self.neg_basis_present.loc[i] = False
 
     def gamma(self, predictor: Callable) -> pd.Series:
         """Calculate the degree to which constraints are currently violated by the predictor."""
@@ -113,6 +113,8 @@ class MeanLoss(ConditionalLossMoment):
     """Moment for evaluating the mean loss.
 
     Read more in the :ref:`User Guide <constraints_regression>`.
+
+    .. versionadded:: 0.13.0
     """
 
     def __init__(self, loss):
@@ -128,6 +130,8 @@ class BoundedGroupLoss(ConditionalLossMoment):
     """Moment for constraining the worst-case loss by a group.
 
     For more information refer to the :ref:`user guide <bounded_group_loss>`.
+
+    .. versionadded:: 0.5.0
     """
 
     def __init__(self, loss, *, upper_bound=None):
@@ -138,6 +142,8 @@ class SquareLoss:
     """Class to evaluate the square loss.
 
     Read more in the :ref:`User Guide <constraints_regression>`.
+
+    .. versionadded:: 0.3.0
     """
 
     def __init__(self, min_val, max_val):
@@ -158,6 +164,8 @@ class AbsoluteLoss:
     """Class to evaluate absolute loss.
 
     Read more in the :ref:`User Guide <constraints_regression>`.
+
+    .. versionadded:: 0.3.0
     """
 
     def __init__(self, min_val, max_val):
@@ -183,6 +191,8 @@ class ZeroOneLoss(AbsoluteLoss):
     """Class to evaluate a zero-one loss.
 
     Read more in the :ref:`User Guide <constraints_regression>`.
+
+    .. versionadded:: 0.3.0
     """
 
     def __init__(self):

@@ -16,6 +16,13 @@ run periodically. When adding new code paths or features, tests are a
 requirement to complete a pull request. They should be added in the
 :code:`test` directory.
 
+The alternative-ML GitHub Actions jobs use :code:`ubuntu-latest` and explicitly
+install Miniconda with :code:`conda-incubator/setup-miniconda`. The action creates
+the environment from :code:`test_othermlpackages/conda-<package>.yaml`, preserving
+each package's Python constraints. These jobs use login Bash shells so the
+environment is activated for every test step, without depending on the runner
+image's preinstalled software or a fixed Miniconda installation path.
+
 Documentation should be provided with pull requests that add or change
 functionality. This includes comments in the code itself, docstrings, and user
 guides. For exceptions to this rule the pull request author should coordinate

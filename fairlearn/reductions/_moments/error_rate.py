@@ -38,6 +38,8 @@ class ErrorRate(ClassificationMoment):
 
     Read more in the :ref:`User Guide <error_rate>`.
 
+    .. versionadded:: 0.3.0
+
     Parameters
     ----------
     costs : dict
