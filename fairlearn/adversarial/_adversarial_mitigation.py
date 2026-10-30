@@ -9,8 +9,9 @@ from math import ceil
 from time import time
 from typing import TYPE_CHECKING, Literal, Self
 
-from numpy import arange, argmax, unique, zeros
+import numpy as np
 from numpy.random import RandomState
+from scipy.special import expit
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
@@ -122,6 +123,17 @@ class _AdversarialFairness(BaseEstimator):
         The adversary model to train. Defined similarly as :code:`predictor_model`.
         Must be the same type as the
         :code:`predictor_model`.
+
+    predictor_model_output : {'auto', 'logits', 'probabilities', 'continuous'}, default='auto'
+        Declare whether the predictor returns logits or probabilities. The
+        :code:`'continuous'` option is for regression outputs.
+
+    adversary_model_output : {'auto', 'logits', 'probabilities'}, default='auto'
+        Declare whether the corresponding model returns logits or probabilities.
+        With :code:`'auto'`, list-built models and default models are treated as
+        logits, while user-supplied models are treated as probabilities. If a
+        model list includes a final sigmoid or softmax activation, set its output
+        parameter to :code:`'probabilities'`.
 
     predictor_loss : str, callable, default = 'auto'
         If a string is passed, it must be one of :code:`'auto'`, :code:`'binary'`,
@@ -243,6 +255,8 @@ class _AdversarialFairness(BaseEstimator):
         backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
         predictor_model: torch.nn.Module | keras.Model | list | None = None,
         adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_model_output: Literal["auto", "logits", "probabilities", "continuous"] = "auto",
+        adversary_model_output: Literal["auto", "logits", "probabilities"] = "auto",
         predictor_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
         adversary_loss: Literal["binary", "multiclass", "continuous", "auto"] | Callable = "auto",
         predictor_function: Literal["binary", "multiclass", "continuous", "auto"]
@@ -274,6 +288,8 @@ class _AdversarialFairness(BaseEstimator):
         self.backend = backend
         self.predictor_model = predictor_model
         self.adversary_model = adversary_model
+        self.predictor_model_output = predictor_model_output
+        self.adversary_model_output = adversary_model_output
         self.predictor_loss = predictor_loss
         self.adversary_loss = adversary_loss
         self.predictor_function = predictor_function
@@ -430,6 +446,18 @@ class _AdversarialFairness(BaseEstimator):
 
         self._set_predictor_function()
 
+        if self.predictor_model_output == "continuous" and self.predictor_loss_ not in (
+            "continuous",
+            "continuous-multioutput",
+        ):
+            raise ValueError("predictor_model_output='continuous' is only valid for regression.")
+        self.predictor_outputs_logits_ = self._resolve_model_output(
+            self.predictor_model_output, self.predictor_model, "predictor_model_output"
+        )
+        self.adversary_outputs_logits_ = self._resolve_model_output(
+            self.adversary_model_output, self.adversary_model, "adversary_model_output"
+        )
+
         # Initialize backend
         # here, losses and optimizers are also set up.
         self.backendEngine_ = self.backend_(self, X, y, A)
@@ -439,6 +467,21 @@ class _AdversarialFairness(BaseEstimator):
         self.n_features_out_ = self._y_transform.n_features_in_
 
         self._is_setup = True
+
+    @staticmethod
+    def _resolve_model_output(
+        output: Literal["auto", "logits", "probabilities", "continuous"],
+        model: torch.nn.Module | keras.Model | list | None,
+        parameter_name: str,
+    ) -> bool:
+        if output not in ("auto", "logits", "probabilities", "continuous"):
+            raise ValueError(
+                f"{parameter_name} must be 'auto', 'logits', 'probabilities', or 'continuous'; "
+                f"got {output!r}."
+            )
+        if output == "auto":
+            return model is None or isinstance(model, list)
+        return output == "logits"
 
     def fit(self, X, y, *, sensitive_features=None) -> Self:
         """
@@ -460,11 +503,6 @@ class _AdversarialFairness(BaseEstimator):
             Array-like containing the sensitive features of the
             training data.
         """
-        if self.predictor_model is None:
-            self.predictor_model = []  # [] is a NN with no hidden layers
-
-        if self.adversary_model is None:
-            self.adversary_model = []
         first_call = not hasattr(self, "_is_setup")
 
         X, y, A = self._validate_input(X, y, sensitive_features, first_call)
@@ -718,7 +756,7 @@ class _AdversarialFairness(BaseEstimator):
         if A is None:
             logger.warning("No sensitive_features provided")
             logger.warning("Setting sensitive_features to zeros")
-            A = zeros(len(X))
+            A = np.zeros(len(X))
 
         if not self.skip_validation:
             check_consistent_length(X, A)
@@ -727,7 +765,7 @@ class _AdversarialFairness(BaseEstimator):
             self.__setup(X, y, A)
 
         if is_classifier(self) and not hasattr(self, "classes_"):
-            self.classes_ = unique(y)
+            self.classes_ = np.unique(y)
 
         y = self._y_transform.transform(y)
         A = self._sf_transform.transform(A)
@@ -763,6 +801,8 @@ class _AdversarialFairness(BaseEstimator):
             )
 
         # Discover which backends are available
+        predictor_model = [] if self.predictor_model is None else self.predictor_model
+        adversary_model = [] if self.adversary_model is None else self.adversary_model
         torch_installed = False
         tensorflow_installed = False
         if self.backend == "torch" or self.backend == "auto":
@@ -770,8 +810,8 @@ class _AdversarialFairness(BaseEstimator):
                 import torch
 
                 torch_installed = True
-                if isinstance(self.predictor_model, list | torch.nn.Module) and isinstance(
-                    self.adversary_model, list | torch.nn.Module
+                if isinstance(predictor_model, list | torch.nn.Module) and isinstance(
+                    adversary_model, list | torch.nn.Module
                 ):
                     self.backend_ = PytorchEngine
                     return
@@ -791,8 +831,8 @@ class _AdversarialFairness(BaseEstimator):
                 import keras
 
                 tensorflow_installed = True
-                if isinstance(self.predictor_model, list | keras.Model) and isinstance(
-                    self.adversary_model, list | keras.Model
+                if isinstance(predictor_model, list | keras.Model) and isinstance(
+                    adversary_model, list | keras.Model
                 ):
                     self.backend_ = TensorflowEngine
                     return
@@ -820,6 +860,8 @@ class _AdversarialFairness(BaseEstimator):
         )
 
     def _binary_predictor_function(self, pred):
+        if getattr(self, "predictor_outputs_logits_", False):
+            pred = expit(pred)
         return (pred >= self.threshold_value).astype(float)
 
     def _set_predictor_function(self) -> None:
@@ -845,9 +887,9 @@ class _AdversarialFairness(BaseEstimator):
 
                 def loss(pred):
                     shape = pred.shape
-                    c = argmax(pred, axis=1)
-                    b = zeros(shape, dtype=float)
-                    a = arange(shape[0])
+                    c = np.argmax(pred, axis=1)
+                    b = np.zeros(shape, dtype=float)
+                    a = np.arange(shape[0])
                     b[a, c] = 1
                     return b
 
@@ -1028,6 +1070,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
         backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
         predictor_model: torch.nn.Module | keras.Model | list | None = None,
         adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_model_output: Literal["auto", "logits", "probabilities", "continuous"] = "auto",
+        adversary_model_output: Literal["auto", "logits", "probabilities"] = "auto",
         predictor_optimizer: Literal["Adam", "SGD"]
         | torch.optim.Optimizer
         | keras.optimizers.Optimizer = "Adam",
@@ -1052,6 +1096,8 @@ class AdversarialFairnessClassifier(ClassifierMixin, _AdversarialFairness):
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
+            predictor_model_output=predictor_model_output,
+            adversary_model_output=adversary_model_output,
             predictor_loss="auto",
             adversary_loss="auto",
             predictor_function="auto",
@@ -1231,6 +1277,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
         backend: Literal["auto", "torch", "tensorflow"] | type[BackendEngine] = "auto",
         predictor_model: torch.nn.Module | keras.Model | list | None = None,
         adversary_model: torch.nn.Module | keras.Model | list | None = None,
+        predictor_model_output: Literal["auto", "logits", "probabilities", "continuous"] = "auto",
+        adversary_model_output: Literal["auto", "logits", "probabilities"] = "auto",
         predictor_optimizer: Literal["Adam", "SGD"]
         | torch.optim.Optimizer
         | keras.optimizers.Optimizer = "Adam",
@@ -1255,6 +1303,8 @@ class AdversarialFairnessRegressor(RegressorMixin, _AdversarialFairness):
             backend=backend,
             predictor_model=predictor_model,
             adversary_model=adversary_model,
+            predictor_model_output=predictor_model_output,
+            adversary_model_output=adversary_model_output,
             predictor_loss="continuous",
             adversary_loss="auto",
             predictor_function="continuous",

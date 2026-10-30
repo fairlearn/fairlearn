@@ -51,6 +51,17 @@ def test_regressor_fit_does_not_expose_classes(fake_backend_env):
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
+def test_regressor_accepts_continuous_predictor_output(fake_backend_env):
+    mitigator = get_instance(
+        cls=AdversarialFairnessRegressor,
+        fake_mixin=True,
+        predictor_model_output="continuous",
+    )
+    mitigator.fit(Bin2d, Cont2d[:, 0], sensitive_features=Bin1d)
+    assert mitigator.predictor_outputs_logits_ is False
+
+
+@pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
 @pytest.mark.parametrize("classes", [None, [0, 1]])
 def test_regressor_partial_fit_does_not_expose_classes(fake_backend_env, classes):
     mitigator = get_instance(cls=AdversarialFairnessRegressor, fake_mixin=True)
@@ -119,6 +130,7 @@ def test_model_init(fake_backend_env):
             "ELU",
             "SELU",
         ],
+        adversary_model=[],
     )
     mitigator.fit(X, Y, sensitive_features=Z)
     layers = mitigator.backendEngine_.predictor_model.layers_
@@ -410,7 +422,12 @@ def test_estimators_with_torch(estimator, check, fake_backend_env):
 def test_fake_models(fake_backend_env):
     """Test various data types and see if it is interpreted correctly."""
     for (X, Y, Z), (_X_type, Y_type, Z_type) in generate_data_combinations():
-        mitigator = get_instance(fake_training=True, fake_backend=fake_backend_env)
+        mitigator = get_instance(
+            fake_training=True,
+            fake_backend=fake_backend_env,
+            predictor_model_output="logits",
+            adversary_model_output="logits",
+        )
         mitigator.fit(X, Y, sensitive_features=Z)
         assert isinstance(mitigator.backendEngine_.predictor_loss, KeywordToClass(Y_type))
         assert isinstance(mitigator.backendEngine_.adversary_loss, KeywordToClass(Z_type))
@@ -421,7 +438,11 @@ def test_fake_models_list_inputs(fake_backend_env):
     """Test model with lists as input."""
     for (X, Y, Z), _types in generate_data_combinations():
         mitigator = get_instance(
-            fake_backend=fake_backend_env, fake_mixin=False, fake_training=True
+            fake_backend=fake_backend_env,
+            fake_mixin=False,
+            fake_training=True,
+            predictor_model_output="logits",
+            adversary_model_output="logits",
         )
         mitigator.fit(X.tolist(), Y.tolist(), sensitive_features=Z.tolist())
 
@@ -656,7 +677,7 @@ def test_callable_losses_and_predictor_functions_are_not_overridden(
 
 
 @pytest.mark.parametrize("fake_backend_env", ["torch", "tensorflow"], indirect=True)
-def test_predictor_model_set_to_empty_list_if_None(fake_backend_env):
+def test_default_model_parameters_are_unchanged_after_fit(fake_backend_env):
     mitigator = get_instance(
         fake_backend=fake_backend_env,
         fake_training=True,
@@ -669,5 +690,19 @@ def test_predictor_model_set_to_empty_list_if_None(fake_backend_env):
     y = np.array([1.0, 2.0, 3.0])
     mitigator.fit(X, y)
 
-    assert mitigator.predictor_model == []
-    assert mitigator.adversary_model == []
+    assert mitigator.predictor_model is None
+    assert mitigator.adversary_model is None
+    assert mitigator.get_params()["predictor_model"] is None
+    assert mitigator.get_params()["adversary_model"] is None
+    assert mitigator.get_params()["predictor_model_output"] == "auto"
+    assert mitigator.get_params()["adversary_model_output"] == "auto"
+    assert hasattr(mitigator.backendEngine_, "predictor_model")
+
+
+def test_binary_prediction_applies_sigmoid_to_logits():
+    mitigator = get_instance(fake_training=True, fake_backend="torch")
+    mitigator.predictor_outputs_logits_ = True
+    np.testing.assert_array_equal(
+        mitigator._binary_predictor_function(np.array([[-0.2], [0.2]])),
+        np.array([[0.0], [1.0]]),
+    )

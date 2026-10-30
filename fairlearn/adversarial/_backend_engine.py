@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from numpy import ndarray, ndim
@@ -81,8 +82,12 @@ class BackendEngine(ABC):
             self.__move_model__()
 
         # Set up losses
-        self.predictor_loss = self.__init_loss__(base.predictor_loss_, "predictor")
-        self.adversary_loss = self.__init_loss__(base.adversary_loss_, "adversary")
+        self.predictor_loss = self.__init_loss__(
+            base.predictor_loss_, base.predictor_outputs_logits_
+        )
+        self.adversary_loss = self.__init_loss__(
+            base.adversary_loss_, base.adversary_outputs_logits_
+        )
 
         # Set up optimizers
         self.predictor_optimizer = self.__init_optimizers__(
@@ -117,6 +122,8 @@ class BackendEngine(ABC):
                 raise ValueError(_LIST_MODEL_UNSUPPORTED.format(name, name))
             predictor_list_nodes = [X_features] + model_param + [y_features]
             return self.get_model(list_nodes=predictor_list_nodes)
+        elif model_param is None:
+            return self.get_model(list_nodes=[X_features, y_features])
         elif issubclass(type(model_param), self.model_class):
             return model_param
         else:
@@ -124,7 +131,7 @@ class BackendEngine(ABC):
                 _KWARG_ERROR_MESSAGE.format(f"{name}_model", f"a list or a '{name}_model'")
             )
 
-    def __init_loss__(self, loss_param, name):
+    def __init_loss__(self, loss_param: str | Callable, from_logits: bool) -> Callable:
         """
         Get an initialized loss.
 
@@ -133,15 +140,15 @@ class BackendEngine(ABC):
         loss_param
             given loss. If auto-inferred, apply get_loss. Otherwise, use
             loss_param as loss function directly
-        name : str
-            name of model, either "predictor" or "adversary"
+        from_logits : bool
+            Whether the model output is logits rather than probabilities.
         """
         if callable(loss_param):
             return loss_param
         elif isinstance(loss_param, str):
-            return self.get_loss(loss_param)
+            return self.get_loss(loss_param, from_logits=from_logits)
         else:
-            raise ValueError(_NO_LOSS.format(f"{name}_loss"))
+            raise ValueError(_NO_LOSS.format("predictor or adversary loss"))
 
     def __init_optimizers__(self, optim_param, model, name):
         """
@@ -234,7 +241,7 @@ class BackendEngine(ABC):
         """Create the predictor_optimizer and adversary_optimizer here."""
         raise NotImplementedError(_NOT_IMPLEMENTED)
 
-    def get_loss(self, dist_type):
+    def get_loss(self, dist_type: str, from_logits: bool = True):
         """
         Infer loss from keyword or callable.
 

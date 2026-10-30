@@ -101,12 +101,12 @@ class TensorflowEngine(BackendEngine):
         if optim is not None:
             return optim(learning_rate=self.base.learning_rate)
 
-    def get_loss(self, dist_type):
+    def get_loss(self, dist_type: str, from_logits: bool = True):
         """Get loss function corresponding to the keyword."""
         if dist_type == "binary":
-            return keras.losses.BinaryCrossentropy(from_logits=True)
+            return keras.losses.BinaryCrossentropy(from_logits=from_logits)
         elif dist_type in ["multiclass", "multilabel-indicator"]:
-            return keras.losses.CategoricalCrossentropy(from_logits=True)
+            return keras.losses.CategoricalCrossentropy(from_logits=from_logits)
         elif dist_type in ["continuous", "continuous-multioutput"]:
             return keras.losses.MeanSquaredError()
         super().get_loss(dist_type)

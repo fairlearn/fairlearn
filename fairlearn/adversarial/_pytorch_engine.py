@@ -125,10 +125,19 @@ class PytorchEngine(BackendEngine):
         if optim is not None:
             return optim(model.parameters(), lr=self.base.learning_rate)
 
-    def get_loss(self, dist_type):
+    def get_loss(self, dist_type: str, from_logits: bool = True):
         """Get loss function corresponding to the keyword."""
-        if dist_type == "binary":
+        if dist_type == "binary" and from_logits:
             return torch.nn.BCEWithLogitsLoss(reduction="mean")
+        elif dist_type == "binary":
+            return torch.nn.BCELoss(reduction="mean")
+        elif dist_type == "multiclass" and not from_logits:
+
+            def categorical_cross_entropy(pred, target):
+                clipped_pred = torch.clamp(pred, min=torch.finfo(pred.dtype).tiny)
+                return -torch.sum(target * torch.log(clipped_pred), dim=1).mean()
+
+            return categorical_cross_entropy
         elif dist_type in ["multiclass", "multilabel-indicator"]:
             return torch.nn.CrossEntropyLoss(reduction="mean")
         elif dist_type in ["continuous", "continuous-multioutput"]:
