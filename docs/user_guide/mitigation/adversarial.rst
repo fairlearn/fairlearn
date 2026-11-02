@@ -211,8 +211,11 @@ Refer to the following examples for more details:
 - :ref:`sphx_glr_auto_examples_plot_adversarial_basics.py`
 - :ref:`sphx_glr_auto_examples_plot_adversarial_fine_tuning.py`
 
-Additional experiments
-----------------------
+Historical background
+---------------------
+
+The following external experiments are historical background, not maintained examples
+of the current Fairlearn API. For runnable examples, use the gallery links above.
 
 Sean McCarren's `adversarial debiasing experiments
 <https://github.com/SeanMcCarren/adversarial-debiasing>`_ explore applications from
@@ -232,9 +235,8 @@ Sean McCarren's `adversarial debiasing experiments
   therefore use squared-error losses, rather than the cross-entropy losses used for
   classification. See :ref:`adversarial_data_types` for how these losses are inferred.
 
-These external experiments were written for an earlier Fairlearn implementation and
-require adaptation to the current API. For example, their ``max_iter`` argument is no
-longer available; the current estimators use ``epochs`` to limit training.
+These scripts were written for an earlier Fairlearn implementation and do not run
+with the current API. For example, they use the removed ``max_iter`` argument.
 The word embedding experiment illustrates a modeling choice about gender associations
 in text; its binary framing does not represent the full range of gender identities or
 establish fairness in downstream uses.
