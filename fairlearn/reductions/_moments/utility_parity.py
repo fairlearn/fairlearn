@@ -207,7 +207,7 @@ class UtilityParity(ClassificationMoment):
         # constraints, which is achieved by removing some redundant constraints.
         # Considering fewer constraints is not required for correctness, but it can dramatically
         # speed up GridSearch.
-        self.neg_basis_present = pd.Series(dtype="float64")
+        self.neg_basis_present = pd.Series(dtype="bool")
         col_count = len(event_vals) * (len(group_vals) - 1)
         self.pos_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
         self.neg_basis = pd.DataFrame(0.0, index=self.index, columns=range(col_count)).sort_index()
@@ -222,7 +222,7 @@ class UtilityParity(ClassificationMoment):
                     self.pos_basis.loc[("+", e, g), i] = 1
                 if ("-", e, g) in self.index:
                     self.neg_basis.loc[("-", e, g), i] = 1
-                self.neg_basis_present.at[i] = True
+                self.neg_basis_present.loc[i] = True
                 i += 1
 
     def gamma(self, predictor: Callable) -> pd.Series:

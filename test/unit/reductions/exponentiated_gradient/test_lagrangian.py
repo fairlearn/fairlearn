@@ -312,8 +312,8 @@ def _get_lagrangian_for_linprog():
         B=100.0,
         sensitive_features=A,
     )
-    lagrangian.hs.at[0] = lambda X: np.zeros(len(X))
-    lagrangian.errors.at[0] = 0.25
+    lagrangian.hs.loc[0] = lambda X: np.zeros(len(X))
+    lagrangian.errors.loc[0] = 0.25
     lagrangian.gammas[0] = pd.Series(0.0, index=lagrangian.constraints.index)
     return lagrangian
 
