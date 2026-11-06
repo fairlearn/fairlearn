@@ -32,6 +32,10 @@ _INCONSISTENT_ARRAY_LENGTH = "Arrays {} have an inconsistent number of items"
 _FEATURE_HAS_MISSING_VALUES_ERROR_MESSAGE = (
     "{} contains missing values. Remove or replace them before passing them to Fairlearn."
 )
+_FEATURE_VALUE_NOT_SCALAR_ERROR_MESSAGE = (
+    "{} entries must be scalar values (e.g., strings or integers), got an entry of type {}."
+)
+_NON_SCALAR_TYPES = (list, tuple, set, frozenset, dict, np.ndarray, pd.Series, pd.DataFrame)
 
 _ALLOWED_INPUT_TYPES_X = [np.ndarray, pd.DataFrame]
 _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES = [np.ndarray, pd.DataFrame, pd.Series, list]
@@ -102,6 +106,7 @@ def _validate_and_reformat_input(
     if sensitive_features is not None:
         check_consistent_length(X, sensitive_features)
         _check_no_missing_values(sensitive_features, _KW_SENSITIVE_FEATURES)
+        _check_scalar_entries(sensitive_features, _KW_SENSITIVE_FEATURES)
         sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
 
         # compress multiple sensitive features into a single column
@@ -117,6 +122,7 @@ def _validate_and_reformat_input(
     if control_features is not None:
         check_consistent_length(X, control_features)
         _check_no_missing_values(control_features, _KW_CONTROL_FEATURES)
+        _check_scalar_entries(control_features, _KW_CONTROL_FEATURES)
         control_features = check_array(control_features, ensure_2d=False, dtype=None)
 
         # compress multiple control features into a single column
@@ -140,6 +146,21 @@ def _check_no_missing_values(features, name: str) -> None:
     """
     if pd.isna(np.asarray(features, dtype=object)).any():
         raise ValueError(_FEATURE_HAS_MISSING_VALUES_ERROR_MESSAGE.format(name))
+
+
+def _check_scalar_entries(features, name: str) -> None:
+    """Raise a ValueError if `features` contains entries that are not scalars.
+
+    Entries such as lists, sets or dictionaries cannot be used as group labels and
+    would otherwise fail later with an unrelated error (e.g., ``unhashable type``).
+    Equal-length rows (a list of tuples, a 2D array or a DataFrame) are still treated
+    as multiple feature columns.
+    """
+    for value in np.asarray(features, dtype=object).ravel():
+        if isinstance(value, _NON_SCALAR_TYPES):
+            raise ValueError(
+                _FEATURE_VALUE_NOT_SCALAR_ERROR_MESSAGE.format(name, type(value).__name__)
+            )
 
 
 def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:
