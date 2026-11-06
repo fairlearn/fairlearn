@@ -123,3 +123,12 @@ Other improvements
   with abstract :code:`evaluate`, :code:`train_step`, :code:`get_optimizer` and
   :code:`get_model` methods: :pr:`1775` by
   :user:`Venius24 <Venius24>`.
+
+* The mitigation techniques in :mod:`fairlearn.reductions` and
+  :mod:`fairlearn.postprocessing`, and
+  :class:`~fairlearn.preprocessing.PrototypeRepresentationLearner`, now raise
+  a :code:`ValueError` with a clear message when :code:`sensitive_features` or
+  :code:`control_features` contain non-scalar entries such as lists, sets or
+  dictionaries. Previously, these failed later with errors like
+  :code:`TypeError: unhashable type`: :pr:`TODO` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.

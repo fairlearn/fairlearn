@@ -165,3 +165,66 @@ def test_mitigation_rejects_missing_sensitive_feature_values(fit):
 
     with pytest.raises(ValueError, match="sensitive_features contains missing values"):
         fit(X, y, sf)
+
+
+_NON_SCALAR_FEATURES = {
+    "dict": ([{"a": 1}, {"a": 2}] * 4, "dict"),
+    "set": ([{1}, {2}] * 4, "set"),
+    "ragged list": ([[1], [1, 2]] * 4, "list"),
+    "series of lists": (pd.Series([[1], [2]] * 4), "list"),
+    "series of tuples": (pd.Series([(1, 2), (3, 4)] * 4), "tuple"),
+}
+
+
+@pytest.mark.parametrize(
+    "features, type_name", _NON_SCALAR_FEATURES.values(), ids=_NON_SCALAR_FEATURES.keys()
+)
+@pytest.mark.parametrize("feature_name", ["sensitive_features", "control_features"])
+def test_validate_and_reformat_input_non_scalar_feature_values(features, type_name, feature_name):
+    X = pd.DataFrame({"alpha": np.arange(8)})
+    y = np.asarray([0, 1] * 4)
+    kwargs = {"sensitive_features": ["a", "b"] * 4}
+    kwargs[feature_name] = features
+
+    msg = iv._FEATURE_VALUE_NOT_SCALAR_ERROR_MESSAGE.format(feature_name, type_name)
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        iv._validate_and_reformat_input(X=X, y=y, **kwargs)
+
+
+@pytest.mark.parametrize(
+    "features",
+    [
+        [(1, "a"), (2, "b")] * 4,
+        np.asarray([[1, 2], [3, 4]] * 4),
+        pd.DataFrame({"f1": [1, 2] * 4, "f2": ["a", "b"] * 4}),
+        [0.5, 1.5] * 4,
+    ],
+    ids=["list of tuples", "2d ndarray", "dataframe", "floats"],
+)
+def test_validate_and_reformat_input_accepts_scalar_feature_values(features):
+    X = pd.DataFrame({"alpha": np.arange(8)})
+    y = np.asarray([0, 1] * 4)
+
+    _, _, sf, _ = iv._validate_and_reformat_input(X=X, y=y, sensitive_features=features)
+    assert sf.nunique() == 2
+
+
+@pytest.mark.parametrize(
+    "fit",
+    [
+        lambda X, y, sf: DemographicParity().load_data(X, y, sensitive_features=sf),
+        lambda X, y, sf: BoundedGroupLoss(ZeroOneLoss(), upper_bound=0.1).load_data(
+            X, y, sensitive_features=sf
+        ),
+        lambda X, y, sf: ThresholdOptimizer(
+            estimator=LogisticRegression(), predict_method="predict_proba"
+        ).fit(X, y, sensitive_features=sf),
+    ],
+)
+def test_mitigation_rejects_non_scalar_sensitive_feature_values(fit):
+    # Used to fail with "TypeError: unhashable type: 'dict'"
+    X = pd.DataFrame({"alpha": np.arange(8)})
+    y = np.asarray([0, 1] * 4)
+
+    with pytest.raises(ValueError, match="sensitive_features entries must be scalar values"):
+        fit(X, y, [{"a": 1}, {"a": 2}] * 4)
