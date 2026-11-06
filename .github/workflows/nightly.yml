@@ -41,6 +41,12 @@ jobs:
       codeCovPython: "3.13"
       sklearnNightly: true
 
+  latest-release:
+    uses: ./.github/workflows/test-latest-release.yml
+    with:
+      os: ubuntu-latest
+      python: "3.13"
+
   minimal-deps:
     strategy:
       # Keep running remaining matrix jobs even if one fails

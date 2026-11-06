@@ -1,0 +1,59 @@
+name: test-latest-release
+
+# Runs the test suite of the latest Fairlearn release on PyPI against the
+# newest versions of its dependencies, so that breakages in the released
+# version show up before users report them.
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      os:
+        required: false
+        type: string
+        default: ubuntu-latest
+      python:
+        required: false
+        type: string
+        default: "3.13"
+
+jobs:
+  latest-release:
+    runs-on: ${{ inputs.os }}
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ inputs.python }}
+      - name: Get the latest released version from PyPI
+        id: release
+        shell: bash
+        run: |
+          VERSION=$(curl -sSf https://pypi.org/pypi/fairlearn/json \
+            | python -c "import json, sys; print(json.load(sys.stdin)['info']['version'])")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Latest release: $VERSION"
+      - uses: actions/checkout@v7
+        with:
+          ref: v${{ steps.release.outputs.version }}
+      - run: python scripts/install_requirements.py
+      - run: pip install .
+      - run: pip install matplotlib
+      - name: Check the installed version
+        shell: bash
+        run: >
+          python -c "import fairlearn;
+          assert fairlearn.__version__ == '${{ steps.release.outputs.version }}',
+          fairlearn.__version__"
+      - run: >
+          pytest --mpl
+          --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
+          --ignore=test/install -m "not openml" -vl test/
