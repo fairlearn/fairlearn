@@ -126,5 +126,5 @@ Other improvements
 
 * Added a nightly workflow that runs the test suite of the latest release on
   PyPI against the newest versions of its dependencies, so that breakages in
-  the released version are caught early: :pr:`TODO` by
+  the released version are caught early: :pr:`1809` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
