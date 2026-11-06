@@ -130,5 +130,5 @@ Other improvements
   a :code:`ValueError` with a clear message when :code:`sensitive_features` or
   :code:`control_features` contain non-scalar entries such as lists, sets or
   dictionaries. Previously, these failed later with errors like
-  :code:`TypeError: unhashable type`: :pr:`TODO` by
+  :code:`TypeError: unhashable type`: :pr:`1810` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
