@@ -123,3 +123,8 @@ Other improvements
   with abstract :code:`evaluate`, :code:`train_step`, :code:`get_optimizer` and
   :code:`get_model` methods: :pr:`1775` by
   :user:`Venius24 <Venius24>`.
+
+* Added a nightly workflow that runs the test suite of the latest release on
+  PyPI against the newest versions of its dependencies, so that breakages in
+  the released version are caught early: :pr:`TODO` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
