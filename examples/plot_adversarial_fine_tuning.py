@@ -99,7 +99,6 @@ class PredictorModel(torch.nn.Module):
             torch.nn.Linear(in_features=104, out_features=200),
             torch.nn.LeakyReLU(),
             torch.nn.Linear(in_features=200, out_features=1),
-            torch.nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -188,6 +187,7 @@ from fairlearn.adversarial import AdversarialFairnessClassifier
 
 mitigator = AdversarialFairnessClassifier(
     predictor_model=predictor_model,
+    predictor_model_output="logits",
     adversary_model=[3, "leaky_relu"],
     predictor_optimizer=optimizer_constructor,
     adversary_optimizer=optimizer_constructor,
