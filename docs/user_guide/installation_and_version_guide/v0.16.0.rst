@@ -125,5 +125,5 @@ Other improvements
   :user:`Venius24 <Venius24>`.
 
 * Moved the macOS jobs in the GitHub workflows from the retired :code:`macOS-14`
-  runner to :code:`macos-15`: :pr:`TODO` by
+  runner to :code:`macos-15`: :pr:`1811` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
