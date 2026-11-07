@@ -23,6 +23,13 @@ fi
 # Absolute path needed because we use cd further down in this script
 GENERATED_DOC_DIR=$(readlink -f $GENERATED_DOC_DIR)
 
+# Save these paths before changing into the website repository.
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    STABLE_REDIRECT_SCRIPT=$(readlink -f scripts/generate_stable_redirects.py)
+    VERSIONS_FILE=$(readlink -f docs/_static/versions.json)
+fi
+
 if [ "$CIRCLE_BRANCH" = "main" ]
 then
     dir=main
@@ -41,7 +48,12 @@ cd $DOC_REPO
 
 # check if it's a new branch
 
-echo $dir > .git/info/sparse-checkout
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    printf '%s\n' "$dir" stable > .git/info/sparse-checkout
+else
+    printf '%s\n' "$dir" > .git/info/sparse-checkout
+fi
 if ! git show HEAD:$dir >/dev/null
 then
 	# directory does not exist. Need to make it so sparse checkout works
@@ -56,6 +68,13 @@ then
 	git rm -rf $dir/ && rm -rf $dir/
 fi
 cp -R $GENERATED_DOC_DIR $dir
+
+# Update stable redirects only from main, after the release version list
+# has been updated. Older release rebuilds must not change stable/.
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    python "$STABLE_REDIRECT_SCRIPT" "$PWD" "$VERSIONS_FILE"
+fi
 touch .nojekyll
 
 # If we're working with main, we should also update the link from the
@@ -81,7 +100,13 @@ git config user.email "ci-build@fairlearn.org"
 git config user.name $USERNAME
 git config push.default matching
 git add -f $dir/
-git commit -m "$MSG" $dir
+if [ "$CIRCLE_BRANCH" = "main" ]
+then
+    git add -f stable/
+    git commit -m "$MSG" $dir stable
+else
+    git commit -m "$MSG" $dir
+fi
 if [ "$CIRCLE_BRANCH" = "main" ]
 then
     git add -f js/
