@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* Estimator-check test IDs no longer include process-specific object addresses,
+  and relaxed-constraint parameter sets have deterministic iteration order.
+  The unit suite can now be collected consistently by parallel pytest workers:
+  :pr:`1741` by :user:`nawaaaaaAaar`.
+
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
