@@ -12,6 +12,10 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` accepts sensitive and control feature
+  names that coincide with internal metric input columns, such as :code:`y_true`,
+  :code:`y_pred`, or a sample-weight column, without overwriting those inputs.
+
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
