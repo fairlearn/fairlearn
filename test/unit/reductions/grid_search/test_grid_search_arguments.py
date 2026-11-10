@@ -78,6 +78,50 @@ def test_constraints_reused_across_multiple_fits():
     assert gs.constraints_.data_loaded
 
 
+def _tradeoff_data():
+    rng = np.random.default_rng(1)
+    n = 600
+    A = rng.choice(["a", "b"], n)
+    X = pd.DataFrame({"x0": rng.normal(size=n) + (A == "a") * 1.5, "x1": rng.normal(size=n)})
+    y = (X["x0"] + rng.normal(size=n) > 0.7).astype(int)
+    return X, y, A
+
+
+@pytest.mark.parametrize("constraint_weight", [0.2, 0.3])
+def test_constraint_weight_set_with_set_params_is_used(constraint_weight):
+    """constraint_weight set via set_params must be used like one passed to __init__."""
+    X, y, A = _tradeoff_data()
+
+    def make(**kwargs):
+        return GridSearch(
+            LogisticRegression(), constraints=DemographicParity(), grid_size=31, **kwargs
+        )
+
+    expected = make(constraint_weight=constraint_weight).fit(X, y, sensitive_features=A)
+    gs = make().set_params(constraint_weight=constraint_weight)
+    gs.fit(X, y, sensitive_features=A)
+
+    assert gs.best_idx_ == expected.best_idx_
+
+
+@pytest.mark.parametrize(
+    "params, msg",
+    [
+        ({"constraint_weight": 1.5}, "Must specify constraint_weight between 0.0 and 1.0"),
+        ({"constraint_weight": -0.1}, "Must specify constraint_weight between 0.0 and 1.0"),
+        ({"selection_rule": "unknown"}, "Unsupported selection rule"),
+        ({"constraints": "demographic_parity"}, "Unsupported disparity metric"),
+    ],
+)
+def test_invalid_parameters_set_with_set_params_raise_in_fit(params, msg):
+    X, y, A = _quick_data()
+    gs = GridSearch(LogisticRegression(), constraints=DemographicParity(), grid_size=2)
+    gs.set_params(**params)
+
+    with pytest.raises(RuntimeError, match=msg):
+        gs.fit(X, y, sensitive_features=A)
+
+
 # Base class for tests
 # Tests which must be passed by all calls to the GridSearch
 # go here

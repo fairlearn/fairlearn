@@ -89,21 +89,11 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
     ):
         """Construct a GridSearch object."""
         self.estimator = estimator
-        if not isinstance(constraints, Moment):
-            raise RuntimeError("Unsupported disparity metric")
         self.constraints = constraints
-
-        if selection_rule == TRADEOFF_OPTIMIZATION:
-            if not (0.0 <= constraint_weight <= 1.0):
-                raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
-        else:
-            raise RuntimeError("Unsupported selection rule")
         self.selection_rule = selection_rule
-        self.constraint_weight = float(constraint_weight)
-        self.objective_weight = 1.0 - constraint_weight
-
+        self.constraint_weight = constraint_weight
         self.grid_size = grid_size
-        self.grid_limit = float(grid_limit)
+        self.grid_limit = grid_limit
         self.grid_offset = grid_offset
         self.grid = grid
         self.sample_weight_name = sample_weight_name
@@ -128,7 +118,25 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             :class:`pandas.Series`, list
             A (currently) required keyword argument listing the
             feature used by the constraints object.
+
+        Raises
+        ------
+        RuntimeError
+            If `constraints` is not a :class:`~fairlearn.reductions.Moment`, if
+            `selection_rule` is not supported, or if `constraint_weight` is not
+            between 0.0 and 1.0.
         """
+        # Validate the parameters here rather than in __init__, so that values set
+        # through set_params (e.g. by sklearn.model_selection.GridSearchCV) are used
+        if not isinstance(self.constraints, Moment):
+            raise RuntimeError("Unsupported disparity metric")
+        if self.selection_rule != TRADEOFF_OPTIMIZATION:
+            raise RuntimeError("Unsupported selection rule")
+        if not (0.0 <= self.constraint_weight <= 1.0):
+            raise RuntimeError("Must specify constraint_weight between 0.0 and 1.0")
+        constraint_weight = float(self.constraint_weight)
+        objective_weight = 1.0 - constraint_weight
+
         self.predictors_ = []
         lambda_vecs_dict = {}
         self.objectives_ = []
@@ -165,7 +173,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
             logger.debug("Creating grid of size %i", self.grid_size)
             grid = _GridGenerator(
                 self.grid_size,
-                self.grid_limit,
+                float(self.grid_limit),
                 pos_basis,
                 neg_basis,
                 neg_allowed,
@@ -224,8 +232,8 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
             def loss_fct(i):
                 return (
-                    self.objective_weight * self.objectives_[i]
-                    + self.constraint_weight * self.gammas_[grid.columns[i]].max()
+                    objective_weight * self.objectives_[i]
+                    + constraint_weight * self.gammas_[grid.columns[i]].max()
                 )
 
             losses = [loss_fct(i) for i in range(len(self.objectives_))]
