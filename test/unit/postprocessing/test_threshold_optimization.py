@@ -80,6 +80,36 @@ def test_constraints_not_supported():
         ).fit(X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
 
 
+@pytest.mark.parametrize("constraints", ["demographic_parity", "equalized_odds"])
+@pytest.mark.parametrize("grid_size", [0, -5, 2.5, "10", True, None])
+def test_invalid_grid_size(constraints, grid_size):
+    with pytest.raises(ValueError, match="grid_size must be a positive integer"):
+        ThresholdOptimizer(
+            estimator=ExamplePredictor(scores_ex),
+            constraints=constraints,
+            predict_method="predict",
+            grid_size=grid_size,
+        ).fit(X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
+
+
+@pytest.mark.parametrize("grid_size", [1, 10, np.int64(10)])
+def test_valid_grid_size(grid_size):
+    ThresholdOptimizer(
+        estimator=ExamplePredictor(scores_ex),
+        predict_method="predict",
+        grid_size=grid_size,
+    ).fit(X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
+
+
+@pytest.mark.parametrize("predict_method", ["predict_probability", "", None])
+def test_invalid_predict_method(predict_method):
+    with pytest.raises(ValueError, match="predict_method must be one of"):
+        ThresholdOptimizer(
+            estimator=ExamplePredictor(scores_ex),
+            predict_method=predict_method,
+        ).fit(X_ex, labels_ex, sensitive_features=sensitive_features_ex1)
+
+
 @pytest.mark.parametrize("X", [None, X_ex])
 @pytest.mark.parametrize("y", [None, labels_ex])
 @pytest.mark.parametrize("sensitive_features", [None, sensitive_features_ex1])
