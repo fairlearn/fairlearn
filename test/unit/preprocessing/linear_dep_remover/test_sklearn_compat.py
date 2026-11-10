@@ -71,6 +71,23 @@ def test_correlation_remover_handles_alpha(alpha, expected_result) -> None:
     np.testing.assert_array_almost_equal(expected_result, X_tfm)
 
 
+@pytest.mark.parametrize("alpha", [-0.5, 1.5, np.nan, "1", None, True])
+def test_correlation_remover_rejects_invalid_alpha(alpha) -> None:
+    X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+    with pytest.raises(ValueError, match="alpha must be a number between 0 and 1"):
+        CorrelationRemover(sensitive_feature_ids=[0], alpha=alpha).fit(X)
+
+
+def test_correlation_remover_validates_alpha_set_after_fit() -> None:
+    X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    cr = CorrelationRemover(sensitive_feature_ids=[0]).fit(X)
+    cr.set_params(alpha=-1)
+
+    with pytest.raises(ValueError, match="alpha must be a number between 0 and 1"):
+        cr.transform(X)
+
+
 @pytest.mark.parametrize("X", [np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])])
 def test_correlation_remover_handles_default_sensitive_features(X) -> None:
     X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])

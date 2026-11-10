@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 from collections.abc import Iterable
+from numbers import Real
 
 import narwhals.stable.v1 as nw
 import numpy as np
@@ -33,8 +34,9 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         List of columns to filter out. This can be a sequence of
         either int, in the case of numpy, or string, in the case of pandas.
     alpha : float, default=1
-        Parameter to control how much to filter. For alpha=1.0 we filter out
-        all information, while for alpha=0.0 we don't apply any.
+        Parameter to control how much to filter. Must be between 0.0 and 1.0.
+        For alpha=1.0 we filter out all information, while for alpha=0.0 we
+        don't apply any.
 
     Notes
     -----
@@ -114,6 +116,14 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         self.lookup_ = {i: i for i in range(X.shape[1])}
         return X
 
+    def _validate_alpha(self):
+        # Values outside [0, 1] extrapolate instead of blending, e.g. alpha=-1
+        # strengthens the correlation with the sensitive features
+        if isinstance(self.alpha, bool) or not isinstance(self.alpha, Real):
+            raise ValueError(f"alpha must be a number between 0 and 1, got {self.alpha!r}.")
+        if not 0 <= self.alpha <= 1:
+            raise ValueError(f"alpha must be a number between 0 and 1, got {self.alpha!r}.")
+
     def fit(self, X, y=None):
         """Learn the projection required to make the dataset uncorrelated with sensitive columns.
 
@@ -134,9 +144,11 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         Raises
         ------
         ValueError
-            If the number of features in ``X`` differs from the number seen
-            during a previous call to ``fit``.
+            If ``alpha`` is not a number between 0 and 1, or if the number of
+            features in ``X`` differs from the number seen during a previous
+            call to ``fit``.
         """
+        self._validate_alpha()
         first_call = not hasattr(self, "_n_features_in_")
 
         self._check_sensitive_features_in_X(X)
@@ -185,10 +197,12 @@ class CorrelationRemover(TransformerMixin, BaseEstimator):
         NotFittedError
             If the estimator has not been fitted yet.
         ValueError
-            If the number of features in ``X`` differs from the number seen
-            during ``fit``, or named columns do not match the fitted column order.
+            If ``alpha`` is not a number between 0 and 1, if the number of
+            features in ``X`` differs from the number seen during ``fit``, or
+            named columns do not match the fitted column order.
         """
         check_is_fitted(self, ["beta_", "_n_features_in_", "lookup_", "sensitive_mean_"])
+        self._validate_alpha()
 
         X = nw.from_native(X, pass_through=True, eager_only=True)
         if isinstance(X, nw.DataFrame):
