@@ -17,6 +17,12 @@ Bug fixes
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
   This avoids pandas 3.1 deprecation warnings without suppressing warnings:
   :pr:`1801` by :user:`nawaaaaaAaar`.
+* :class:`~fairlearn.reductions.ExponentiatedGradient` no longer overwrites its
+  :code:`nu` parameter in :code:`fit`. When :code:`nu=None`, the threshold is
+  now computed from the data of every call to :code:`fit` and stored in the
+  new :code:`nu_` attribute, instead of being reused when refitting or
+  cloning a fitted estimator: :pr:`1802` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise

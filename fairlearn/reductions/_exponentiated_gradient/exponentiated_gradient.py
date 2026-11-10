@@ -78,7 +78,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
     nu : float | None
         Convergence threshold for the duality gap, corresponding to a
         conservative automatic setting based on the statistical uncertainty
-        in measuring classification error
+        in measuring classification error. If `None`, it is computed from the
+        training data in :meth:`fit`. The value used is stored in `nu_`.
 
     eta0 : float
         Initial setting of the learning rate
@@ -152,6 +153,9 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
 
         theta = pd.Series(0, lagrangian.constraints.index)
 
+        # Don't overwrite the `nu` parameter, so that refitting computes it from the new data
+        nu = self.nu
+
         # Stores the weights of the best-response estimators without LP and before averaging
         Qsum = pd.Series(dtype="float64")
 
@@ -181,8 +185,8 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             h, h_idx = lagrangian.best_h(lambda_vec)
 
             if t == 0:
-                if self.nu is None:
-                    self.nu = (
+                if nu is None:
+                    nu = (
                         _ACCURACY_MUL
                         * (h(X) - lagrangian.constraints._y_as_series).abs().std()
                         / np.sqrt(lagrangian.constraints.total_samples)
@@ -192,7 +196,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                     "...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
                     self.eps,
                     B,
-                    self.nu,
+                    nu,
                     self.max_iter,
                 )
 
@@ -201,7 +205,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             Qsum[h_idx] += 1.0
             gamma = lagrangian.gammas[h_idx]
             Q_EG = Qsum / Qsum.sum()
-            result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, self.nu)
+            result_EG = lagrangian.eval_gap(Q_EG, lambda_EG, nu)
             gap_EG = result_EG.gap()
             gaps_EG.append(gap_EG)
 
@@ -210,7 +214,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             else:
                 # saddle point optimization over the convex hull of
                 # classifiers returned so far
-                Q_LP, lambda_vec_LP, result_LP = lagrangian.solve_linprog(self.nu)
+                Q_LP, lambda_vec_LP, result_LP = lagrangian.solve_linprog(nu)
                 lambda_vecs_LP_dict[t] = lambda_vec_LP
                 gap_LP = result_LP.gap()
 
@@ -236,7 +240,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 gap_LP,
             )
 
-            if (gaps[t] < self.nu) and (t >= _MIN_ITER):
+            if (gaps[t] < nu) and (t >= _MIN_ITER):
                 # solution found
                 break
 
@@ -272,12 +276,13 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self.lambda_vecs_EG_ = pd.DataFrame(lambda_vecs_EG_dict)
         self.lambda_vecs_LP_ = pd.DataFrame(lambda_vecs_LP_dict)
         self.lambda_vecs_ = lagrangian.lambdas.copy()
+        self.nu_ = nu
 
         logger.debug(
             "...eps=%.3f, B=%.1f, nu=%.6f, max_iter=%d",
             self.eps,
             B,
-            self.nu,
+            nu,
             self.max_iter,
         )
         logger.debug(
