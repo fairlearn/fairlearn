@@ -127,3 +127,10 @@ Other improvements
 * Moved the macOS jobs in the GitHub workflows from the retired :code:`macOS-14`
   runner to :code:`macos-15`: :pr:`1811` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* Sped up :class:`~fairlearn.reductions.BoundedGroupLoss` and
+  :class:`~fairlearn.reductions.MeanLoss` in
+  :class:`~fairlearn.reductions.ExponentiatedGradient` and
+  :class:`~fairlearn.reductions.GridSearch` by computing the signed weights
+  with :code:`Series.map` instead of a row-wise :code:`DataFrame.apply`:
+  :pr:`XXXX` by :user:`Furqan Khan <furqan-khan07>`.
