@@ -133,4 +133,4 @@ Other improvements
   :class:`~fairlearn.reductions.ExponentiatedGradient` and
   :class:`~fairlearn.reductions.GridSearch` by computing the signed weights
   with :code:`Series.map` instead of a row-wise :code:`DataFrame.apply`:
-  :pr:`XXXX` by :user:`Furqan Khan <furqan-khan07>`.
+  :pr:`1814` by :user:`Furqan Khan <furqan-khan07>`.
