@@ -24,6 +24,13 @@ coordinates and inherits the fairness of the representation.
 reproduces that number, so I keep all rows (the rows the old cleaning dropped carry
 "?" only in native-country, a column standard UCI setups drop anyway).
 
+This branch tracks `german.data` and `compas-scores-two-years.csv`. The Adult files are
+not tracked here: the upstream fairlearn `.gitignore` ignores `*.data` and `*.test`,
+because this repo is a Python library and not a study repo, and I did not want to change
+the library's ignore rules for an assignment. Download `adult.data` and `adult.test` from
+the UCI Adult dataset into `a4_study/data/` before running Adult; the loader prints the
+path it expects. German and COMPAS need nothing.
+
 ### 1.2 Measures
 
 | measure | definition |
