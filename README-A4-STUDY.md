@@ -7,8 +7,8 @@ which follows Zemel et al. (2013), *Learning Fair Representations*, ICML 2013.
 
 I did not touch the library. The `a4_study/` folder holds my own study of it: the data
 loaders, the fairness metrics, the sweep over the `fairness_weight` knob, the final
-comparison on Adult / German Credit / COMPAS, and the README that explains the setup, the
-results and what I think they mean.
+comparison on Adult / German Credit / COMPAS, and the README with the setup, the
+parameters and the results tables.
 
 Start at [`a4_study/README.md`](a4_study/README.md).
 
