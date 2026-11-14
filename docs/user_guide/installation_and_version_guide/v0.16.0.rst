@@ -14,7 +14,7 @@ New features
   (2015). Every group of a sensitive feature keeps the ordering of its values,
   but the values are read back off the median distribution of all groups, so
   the repaired column no longer carries information about the sensitive
-  feature. :pr:`PR_NUMBER` by
+  feature. :pr:`1815` by
   :user:`Anurag <shaktimaan00>`.
 
 Bug fixes
