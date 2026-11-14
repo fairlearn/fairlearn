@@ -1,8 +1,9 @@
 """Download the three datasets into data/.
 
-The files live in the repository, so you do not need this script to run the
-experiments. It exists so the data can be re-fetched from the original sources,
-and so the loaders can be checked against a fresh download.
+The files are committed, so you don't need this to run the experiments. It's
+here so the committed copies can be checked against the original sources.
+
+  python src/fetch_data.py
 """
 
 import pathlib
@@ -12,12 +13,12 @@ URLS = {
     "adult.data": "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
     "adult.test": "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.test",
     "german.data": "https://archive.ics.uci.edu/ml/machine-learning-databases/statlog/german/german.data",
+    "compas-two-years.csv": "https://raw.githubusercontent.com/compas-dev/compas/main/compas-two-years.csv",
 }
 
 
 def main():
-    here = pathlib.Path(__file__).resolve().parents[1]
-    out = here / "data"
+    out = pathlib.Path(__file__).resolve().parents[1] / "data"
     out.mkdir(exist_ok=True)
     for name, url in URLS.items():
         path = out / name
@@ -26,15 +27,8 @@ def main():
             continue
         print(f"{name}: downloading")
         with urllib.request.urlopen(url, timeout=120) as r:
-            data = r.read()
-        path.write_bytes(data)
-        print(f"{name}: {len(data)} bytes")
-
-    compas = out / "compas-scores-two-years.csv"
-    if compas.exists():
-        print("compas-scores-two-years.csv: already there")
-    else:
-        print("compas-scores-two-years.csv: not in the repo checkout, see data/README.md")
+            path.write_bytes(r.read())
+        print(f"{name}: {path.stat().st_size} bytes")
 
 
 if __name__ == "__main__":
