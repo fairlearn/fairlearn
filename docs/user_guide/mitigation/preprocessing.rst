@@ -141,6 +141,95 @@ we would expect with :math:`\alpha=0.5`.
     :target: ../../auto_examples/plot_correlationremover_before_after.html
 
 
+.. _percentile_repairer:
+
+Percentile Repairer
+-------------------
+
+:class:`~fairlearn.preprocessing.PercentileRepairer` implements the percentile repair
+procedure of Feldman et al. (2015) :footcite:`feldman2015certifying`. Its idea is to keep
+the ordering of the values inside each group but to change the values themselves, so that
+every group follows the same, *median* distribution.
+
+In mathematical terms, let :math:`S` be the sensitive feature and let :math:`g` index its
+groups. For a column to repair, write :math:`F_g` for the empirical cumulative distribution
+function of that column inside group :math:`g`, and :math:`Q_g` for its quantile function.
+The **median distribution** of the column is the pointwise median of the group quantile
+functions:
+
+.. math::
+
+    \bar{Q}(p) = \operatorname{median}_g Q_g(p) \quad \text{for } p \in [0, 1]
+
+A value :math:`v` in group :math:`g` is then repaired to
+
+.. math::
+
+    v' = (1 - \lambda) v + \lambda \bar{Q}(F_g(v))
+
+where :math:`\lambda` is the :code:`repair_level` of the transformer. With
+:math:`\lambda = 0` the data is returned unchanged, with :math:`\lambda = 1` the column is
+fully repaired, and values in between interpolate between the two. Because :math:`F_g` is
+non-decreasing, the repair is monotone inside each group: values that are ordered stay
+ordered and values that are equal stay equal.
+
+In the example below, the two groups hold scores on disjoint ranges. After the repair both
+groups share the same three scores, while the order of the rows, and of the scores inside
+each group, is unchanged.
+
+.. doctest:: mitigation_preprocessing
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> import pandas as pd
+    >>> from fairlearn.preprocessing import PercentileRepairer
+    >>> data = pd.DataFrame({
+    ...     "group": [0, 0, 0, 1, 1, 1],
+    ...     "score": [1000, 1100, 1200, 1300, 1400, 1500],
+    ... })
+    >>> repairer = PercentileRepairer(sensitive_feature_ids=["group"])
+    >>> repaired = repairer.fit_transform(data)
+    >>> [round(float(score), 1) for score in repaired[:, 1]]
+    [1150.0, 1250.0, 1350.0, 1150.0, 1250.0, 1350.0]
+    >>> for group in (0, 1):
+    ...     print(sorted(round(float(score), 1) for score in repaired[data["group"] == group, 1]))
+    [1150.0, 1250.0, 1350.0]
+    [1150.0, 1250.0, 1350.0]
+
+The :code:`repair_level` parameter controls how much of the repair is applied. With
+:code:`repair_level=0.5` every value is halfway between the original score and the
+repaired one.
+
+.. doctest:: mitigation_preprocessing
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> repairer = PercentileRepairer(sensitive_feature_ids=["group"], repair_level=0.5)
+    >>> repaired = repairer.fit_transform(data)
+    >>> [round(float(score), 1) for score in repaired[:, 1]]
+    [1075.0, 1175.0, 1275.0, 1225.0, 1325.0, 1425.0]
+
+Every column of :code:`X` other than the sensitive one is repaired, and the sensitive
+column is passed through unchanged. A target column is repaired the same way, by passing it
+as one of the columns of :code:`X`. A discrete target becomes fractional, since its values
+are read back off the median distribution:
+
+.. doctest:: mitigation_preprocessing
+    :options:  +NORMALIZE_WHITESPACE
+
+    >>> labeled = data.assign(y=[0, 0, 1, 0, 1, 1])
+    >>> repaired = PercentileRepairer(sensitive_feature_ids=["group"]).fit_transform(labeled)
+    >>> [round(float(label), 1) for label in repaired[:, 2]]
+    [0.0, 0.0, 1.0, 0.0, 0.5, 0.5]
+
+A :code:`repair_level` below 1 keeps the repaired values closer to the originals, and
+rounding them recovers hard labels where a classifier needs them.
+
+The repair only makes sense for values that have an order, so every column, including the
+sensitive one, must be numeric: encode categorical columns first, for example with
+:code:`pandas.get_dummies` or an ordinal encoding. A group that was not seen during
+:code:`fit` has no percentile mapping, and :code:`transform` raises a :class:`ValueError`
+for it, as it does for a column holding missing values.
+
+
 .. _prototype_representation_learner:
 
 Prototype Representation Learner
