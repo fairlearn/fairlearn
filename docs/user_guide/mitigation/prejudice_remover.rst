@@ -93,7 +93,7 @@ data.
 >>> with_regularizer = demographic_parity_difference(
 ...     y, large.predict(X, sensitive_features=sensitive), sensitive_features=sensitive
 ... )
->>> with_regularizer < without_regularizer
+>>> bool(with_regularizer < without_regularizer)
 True
 
 The fitted model exposes the regularizer's value as

@@ -68,17 +68,20 @@ class PrejudiceRemover(ClassifierMixin, BaseEstimator):
     classes_ : numpy.ndarray
         The two class labels, sorted.
 
-    coef_ : numpy.ndarray of shape (n_groups_, n_features)
-        The coefficients of each group, ordered as in
+    coef_ : numpy.ndarray
+        The coefficients of the model, with one row per group and one column
+        per feature. The rows are ordered as in
         :attr:`sensitive_feature_values_`.
 
-    intercept_ : numpy.ndarray of shape (n_groups_,)
-        The intercept of each group. It is :code:`0.0` for every group when
+    intercept_ : numpy.ndarray
+        The intercept of each group, ordered as in
+        :attr:`sensitive_feature_values_`. Every entry is :code:`0.0` when
         :code:`fit_intercept=False`.
 
-    sensitive_feature_values_ : numpy.ndarray of shape (n_groups_,)
+    sensitive_feature_values_ : numpy.ndarray
         The distinct values the sensitive feature takes in the training data,
-        sorted. A group is one such value.
+        sorted. A group is one such value, so the number of groups is the length
+        of this array.
 
     prejudice_index_ : float
         The value of the prejudice remover regularizer at the solution, as
@@ -89,9 +92,9 @@ class PrejudiceRemover(ClassifierMixin, BaseEstimator):
     n_features_in_ : int
         Number of features seen during fit.
 
-    feature_names_in_ : numpy.ndarray of shape (n_features_in_,)
-        Names of features seen during fit. Only defined when :code:`X` has
-        string feature names.
+    feature_names_in_ : numpy.ndarray
+        Names of the features seen during fit, one per feature. Only defined
+        when :code:`X` has string feature names.
 
     n_iter_ : int
         Number of iterations run by the optimizer.
@@ -267,8 +270,8 @@ class PrejudiceRemover(ClassifierMixin, BaseEstimator):
 
         Returns
         -------
-        numpy.ndarray of shape (n_samples,)
-            The predicted labels.
+        numpy.ndarray
+            One predicted label per sample.
         """
         probabilities = self.predict_proba(X, sensitive_features=sensitive_features)
         return self.classes_[np.argmax(probabilities, axis=1)]
@@ -287,8 +290,9 @@ class PrejudiceRemover(ClassifierMixin, BaseEstimator):
 
         Returns
         -------
-        numpy.ndarray of shape (n_samples, 2)
-            The probability of each class, ordered as in :attr:`classes_`.
+        numpy.ndarray
+            The probability of each class, as an array with one row per sample
+            and two columns ordered as in :attr:`classes_`.
         """
         check_is_fitted(self)
         X = validate_data(self, X, reset=False, accept_sparse=False, dtype=np.float64)
