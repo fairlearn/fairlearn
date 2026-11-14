@@ -92,7 +92,7 @@ All numbers on the same held-out test split. Best fairness value per dataset in 
 **LFR closes the group gap on all three datasets.** DP_Diff moves from −0.19 to +0.02
 on Adult, −0.12 to +0.05 on German and −0.12 to −0.06 on COMPAS, and DIR crosses the
 conventional 0.8 "four-fifths" threshold on German and COMPAS. Consistency improves on
-every dataset, most dramatically on German (0.173 → 0.021, an 8× reduction), which
+every dataset, most dramatically on German (0.173 → 0.021, more than an 8× reduction), which
 matches the paper's claim that the reconstruction term makes the code treat similar
 people alike.
 
@@ -132,8 +132,8 @@ table regenerates.
 ## 4. How to reproduce
 
 ```bash
-git clone -b a4-fair-representations-study https://github.com/RendelGadaffi/fairlearn.git
-cd fairlearn/a4_study
+git clone <repo-url>
+cd <repo>
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python src/run_experiment.py     # results/results.json
