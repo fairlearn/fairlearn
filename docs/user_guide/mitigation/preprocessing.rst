@@ -184,6 +184,12 @@ where:
 
     L_y = -\frac{1}{N} \sum_{n=1}^{N} y_n \log(\hat{y}_n) + (1-y_n) \log(1-\hat{y}_n)
 
+For multiclass targets with :math:`C` classes, each prototype :math:`k` carries a weight vector
+:math:`\mathbf{w}_k \in \mathbb{R}^{C}`, and :math:`L_y` becomes the cross-entropy between the
+one-hot encoded targets and the class probabilities resulting from a softmax over the logits
+:math:`\mathbf{M} \mathbf{W}`, where the columns of :math:`\mathbf{W} \in \mathbb{R}^{K \times C}`
+are the vectors :math:`\mathbf{w}_k`.
+
 :math:`L_z` is the demographic parity difference's approximation term that is defined as:
 
 .. math::

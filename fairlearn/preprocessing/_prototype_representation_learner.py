@@ -16,7 +16,7 @@ from sklearn.base import (
 from sklearn.calibration import LabelEncoder
 from sklearn.dummy import check_random_state
 from sklearn.metrics import log_loss
-from sklearn.utils.multiclass import type_of_target
+from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.validation import validate_data
 
 from fairlearn.utils._input_validation import _validate_and_reformat_input
@@ -33,6 +33,9 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     Read more in the :ref:`User Guide <preprocessing>`.
 
     .. versionadded:: 0.13.0
+
+    .. versionchanged:: 0.16.0
+        Support for multiclass classification targets.
 
     Parameters
     ----------
@@ -81,7 +84,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         Maximum number of iterations for the optimization algorithm.
 
     coef_ : np.ndarray
-        Coefficients of the learned model.
+        Coefficients of the learned model. Of shape `(n_prototypes,)` for binary targets, and
+        of shape `(n_prototypes, n_classes)` for multiclass targets.
 
     n_iter_ : int
         Number of iterations run by the optimization algorithm.
@@ -135,6 +139,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
     n_features_in_: int
     classes_: np.ndarray | None
     _has_target: bool
+    _n_classes: int
     _label_encoder: LabelEncoder | None
     _groups: pd.Series | None
     _prototypes_: np.ndarray
@@ -238,8 +243,12 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
         # Dimension of each v_k prototype vector
         self._prototype_dim = X.shape[1]
-        # Dimension of the prototype predictions vector w
-        self._prototype_predictions_size = self.n_prototypes
+        # Dimension of the prototype predictions vector w. Multiclass targets hold one
+        # weight per prototype and class, while binary targets keep a single prediction
+        # per prototype.
+        self._prototype_predictions_size = (
+            self.n_prototypes * self._n_classes if self._n_classes > 2 else self.n_prototypes
+        )
         # Total size of the prototype vectors
         self._prototype_vectors_size = self.n_prototypes * self._prototype_dim
 
@@ -253,7 +262,10 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         V0 = random_state.rand(self.n_prototypes, self._prototype_dim)
 
         # Initialize the prototype predictions w_k
-        w0 = random_state.rand(self.n_prototypes)
+        if self._n_classes > 2:
+            w0 = random_state.rand(self.n_prototypes, self._n_classes).flatten()
+        else:
+            w0 = random_state.rand(self.n_prototypes)
 
         # Initialize the dimension weights alpha
         alpha0 = np.ones(self._prototype_dim)
@@ -278,6 +290,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         )
 
         self.coef_ = result.x[self._prototype_vectors_size : -self._prototype_dim]
+        if self._n_classes > 2:
+            self.coef_ = self.coef_.reshape((self.n_prototypes, self._n_classes))
         self._prototypes_ = result.x[: self._prototype_vectors_size].reshape(
             (self.n_prototypes, self._prototype_dim)
         )
@@ -322,9 +336,19 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         classification_error = 0.0
         if self._has_target:
             w = x[self._prototype_vectors_size : -self._prototype_dim]
-            y_hat = M @ w
-            y_hat = np.clip(y_hat, 0, 1)  # To deal with precision errors
-            classification_error = log_loss(y, y_hat)
+            if self._n_classes > 2:
+                # Multiclass: W holds a weight vector per class, and the class
+                # probabilities result from a softmax over the logits M @ W. The
+                # log loss is then the cross-entropy against the one-hot targets.
+                W = w.reshape((self.n_prototypes, self._n_classes))
+                probabilities = softmax(M @ W, axis=1)
+                classification_error = log_loss(
+                    y, probabilities, labels=np.arange(self._n_classes)
+                )
+            else:
+                y_hat = M @ w
+                y_hat = np.clip(y_hat, 0, 1)  # To deal with precision errors
+                classification_error = log_loss(y, y_hat)
 
         fairness_error = 0.0
         if sensitive_features is not None and len(self._groups) > 1:
@@ -384,10 +408,11 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
         Returns
         -------
-        np.ndarray of shape (n_samples, 2)
-            The class probabilities of the input samples. The first column
-            represents the probability of the negative class, and the second
-            column represents the probability of the positive class.
+        np.ndarray of shape (n_samples, n_classes)
+            The class probabilities of the input samples, with columns ordered as in
+            :code:`classes_` and rows normalized to sum to 1. For binary targets, the first
+            column represents the probability of the negative class, and the second column
+            represents the probability of the positive class.
 
         Raises
         ------
@@ -407,6 +432,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
             )
 
         M = self._get_latent_mapping(X, self._prototypes_, dimension_weights=self.alpha_)
+        if self._n_classes > 2:
+            return softmax(M @ self.coef_, axis=1)
         positive_proba = M @ self.coef_
         return np.c_[1 - positive_proba, positive_proba]
 
@@ -436,9 +463,7 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
         X = validate_data(self, X, reset=False)
 
-        binary_predictions = (self.predict_proba(X)[:, 1] > 0.5).astype(int)
-
-        return self._label_encoder.inverse_transform(binary_predictions)
+        return self.classes_[np.argmax(self.predict_proba(X), axis=1)]
 
     @property
     def prototypes_(self) -> np.ndarray:
@@ -497,11 +522,13 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         Raises
         ------
         ValueError
-            If the target labels are not binary.
+            If the target labels are not a valid classification target, or if only one
+            class is present.
         """
         if y is None:
             X = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
             self._has_target = False
+            self._n_classes = 0
             self._label_encoder = None
             self.classes_ = None
 
@@ -509,14 +536,11 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
         X, y = validate_data(self, X, y=y, allow_nd=True, ensure_2d=False, ensure_all_finite=True)
         self._has_target = True
-        y_type = type_of_target(y, input_name="y")
-        if y_type != "binary":
-            raise ValueError(
-                f"Unknown label type: {y_type}. Only binary classification is supported."
-            )
+        check_classification_targets(y)
         self.classes_ = np.unique(y)
         if len(self.classes_) == 1:
             raise ValueError("Classifier can't train when only one class is present.")
+        self._n_classes = len(self.classes_)
         self._label_encoder = LabelEncoder().fit(y)
         y = self._label_encoder.transform(y)
 
@@ -524,9 +548,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
     def __sklearn_tags__(self):
         tags = super().__sklearn_tags__()
-        tags.classifier_tags.multi_class = False
         tags.target_tags.required = False
         return tags
 
     def _more_tags(self):
-        return {"binary_only": True, "requires_y": False}
+        return {"requires_y": False}
