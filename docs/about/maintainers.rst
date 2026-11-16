@@ -41,4 +41,8 @@
     <a href='https://github.com/taharallouche'><img src='https://github.com/taharallouche.png' class='avatar' /></a> <br />
     <p>Tahar Allouche</p>
     </div>
+    <div>
+    <a href='https://github.com/parulgupta1004'><img src='https://github.com/parulgupta1004.png' class='avatar' /></a> <br />
+    <p>Parul Gupta</p>
+    </div>
     </div>
