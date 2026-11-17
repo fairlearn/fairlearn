@@ -212,7 +212,7 @@ class GridSearch(BaseEstimator, MetaEstimatorMixin):
 
             self.predictors_.append(current_estimator)
             lambda_vecs_dict[i] = lambda_vec
-            self.objectives_.append(objective.gamma(predict_fct).iloc[0])
+            self.objectives_.append(objective.objective_value(predict_fct))
             gammas_dict[i] = constraints.gamma(predict_fct)
             self.oracle_execution_times_.append(oracle_call_execution_time)
 

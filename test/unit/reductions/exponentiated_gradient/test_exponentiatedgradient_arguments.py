@@ -85,7 +85,7 @@ class TestExponentiatedGradientArguments:
         disparity = disparity_moment.gamma(Q).max()
         disp = disparity_moment.gamma(Q)
         disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
-        error = error.gamma(Q).iloc[0]
+        error = error.objective_value(Q)
 
         assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
         assert expgrad.last_iter_ == 5
@@ -131,7 +131,7 @@ class TestExponentiatedGradientArguments:
         disparity = disparity_moment.gamma(Q).max()
         disp = disparity_moment.gamma(Q)
         disp_eps = disparity_moment.gamma(Q) - disparity_moment.bound()
-        error = error.gamma(Q).iloc[0]
+        error = error.objective_value(Q)
 
         assert expgrad.best_gap_ == pytest.approx(0.0000, abs=_PRECISION)
         assert expgrad.last_iter_ == 5

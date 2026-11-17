@@ -6,6 +6,17 @@ v0.16.0
    v0.16.0 is not yet released. This page reflects changes on the current
    :code:`main` branch that will eventually be a part of v0.16.0.
 
+Compatibility changes
+---------------------
+
+* :meth:`fairlearn.reductions.ErrorRate.gamma` now returns an
+  :class:`~fairlearn.reductions.ErrorRateResult` instead of a one-element
+  :class:`pandas.Series`. Access the scalar weighted error through the
+  :attr:`~fairlearn.reductions.ErrorRateResult.error` attribute instead of
+  :code:`.iloc[0]`. The new result type avoids relying on dataframe index
+  semantics across pandas, Polars, and PyArrow inputs: :pr:`1526` by
+  :user:`Stefanie Senger <StefanieSenger>`.
+
 New features
 ------------
 
