@@ -1945,3 +1945,14 @@ class Test1m1sf0cfErrorHandlingSeries:
         # default is 'coerce'
         target_ratio = self.target.ratio()
         assert np.isnan(target_ratio)
+
+
+def test_empty_input_raises_clear_error():
+    """An empty dataset raises a fairlearn error instead of a numpy one."""
+    with pytest.raises(ValueError, match="at least one sample"):
+        metrics.MetricFrame(
+            metrics=skm.accuracy_score,
+            y_true=np.asarray([]),
+            y_pred=np.asarray([]),
+            sensitive_features=np.asarray([]),
+        )

@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` raises a clear :code:`ValueError`
+  for an empty dataset instead of a numpy
+  :code:`need at least one array to stack` error.
+  :pr:`1822` by :user:`Dongze Li <lidongze1002>`.
+
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
