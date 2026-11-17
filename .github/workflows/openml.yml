@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: python scripts/install_requirements.py
-      - run: pip install .
+      - run: pip install . 'pandas<3.0'
       - name: Get scikit-learn version
         id: sklearn-version
         run: python -c "import sklearn; print('version=' + sklearn.__version__)" >> "$GITHUB_OUTPUT"
