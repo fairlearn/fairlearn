@@ -18,7 +18,9 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-build-doc-datasets-{{ .Branch }}
+          keys:
+            - v2-doc-datasets-{{ .Branch }}-
+            - v2-doc-datasets-main-
 
       - restore_cache:
           keys:
@@ -49,8 +51,48 @@ jobs:
           name: 'Install required packages'
           command: |
             python scripts/install_requirements.py
-            pip install .
+            # OpenML's pandas parser fails on nominal boolean columns with pandas 3.
+            pip install . 'pandas<3.0'
             pip install matplotlib>=3.2.1
+
+      - run:
+          name: "Cache documentation datasets"
+          command: |
+            python - <<'PY'
+            import time
+            from http.client import RemoteDisconnected
+            from pathlib import Path
+            from urllib.error import HTTPError, URLError
+
+            from sklearn.datasets import fetch_openml
+            from fairlearn.datasets import fetch_adult, fetch_diabetes_hospital
+
+            def cache_dataset(fetch):
+                for attempt in range(5):
+                    try:
+                        fetch()
+                        return
+                    except (URLError, RemoteDisconnected, TimeoutError) as error:
+                        if isinstance(error, HTTPError) and error.code not in {429, 500, 502, 503, 504}:
+                            raise
+                        if attempt == 4:
+                            raise
+                        delay = 5 * 2**attempt
+                        print(f"Dataset download failed ({error}); retrying in {delay}s", flush=True)
+                        time.sleep(delay)
+
+            for fetch in (fetch_adult, fetch_diabetes_hospital):
+                print(f"Caching {fetch.__name__}", flush=True)
+                cache_dataset(fetch)
+            print("Caching OpenML dataset 45040", flush=True)
+            cache_dataset(lambda: fetch_openml(data_id=45040, data_home=Path.home() / ".fairlearn-data"))
+            PY
+          no_output_timeout: 30m
+
+      - save_cache:
+          key: v2-doc-datasets-{{ .Branch }}-{{ .BuildNum }}
+          paths:
+            - ~/.fairlearn-data
 
       - run:
           name: "Build Documentation"
@@ -66,11 +108,6 @@ jobs:
           paths:
             - ~/.ccache
             - ~/.cache/pip
-
-      - save_cache:
-          key: v1-build-doc-datasets-{{ .Branch }}
-          paths:
-            - ~/.fairlearn-data
 
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
