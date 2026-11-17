@@ -182,7 +182,7 @@ preprocessor = ColumnTransformer(
 unmitigated_predictor = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
-        ("classifier", LogisticRegression(solver="liblinear", fit_intercept=True)),
+        ("classifier", LogisticRegression(solver="lbfgs", fit_intercept=True)),
     ]
 )
 

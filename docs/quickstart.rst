@@ -225,15 +225,15 @@ as the objective, leading to a vastly reduced difference in accuracy:
     >>> y_pred_mitigated = mitigator.predict(X_test, random_state=42)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred_mitigated, sensitive_features=A_test)
     >>> mf_mitigated.overall.item()
-    0.5251...
+    0.5257448313811808
     >>> mf_mitigated.by_group
     race
-    AfricanAmerican    0.524358
-    Asian              0.562874
-    Caucasian          0.525588
-    Hispanic           0.549902
-    Other              0.478873
-    Unknown            0.511864
+    AfricanAmerican    0.522508
+    Asian              0.532934
+    Caucasian          0.526116
+    Hispanic           0.581213
+    Other              0.526761
+    Unknown            0.489831
     Name: accuracy_score, dtype: float64
 
 Note that :class:`.ExponentiatedGradient` does not have a `predict_proba`

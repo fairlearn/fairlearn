@@ -33,6 +33,7 @@ _FEATURE_LIST_NONSCALAR = "Feature lists must be of scalar types"
 _FEATURE_DF_COLUMN_BAD_NAME = "DataFrame column names must be strings. Name '{0}' is of type {1}"
 _DUPLICATE_FEATURE_NAME = "Detected duplicate feature name: '{0}'"
 _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
+_EMPTY_INPUT_MESSAGE = "MetricFrame requires at least one sample"
 _SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = "Keys in 'sample_params' do not match those in 'metric'"
 
@@ -273,6 +274,9 @@ class MetricFrame:
 
         y_t = _convert_to_ndarray_and_squeeze(y_true)
         y_p = _convert_to_ndarray_and_squeeze(y_pred)
+
+        if len(y_t) == 0:
+            raise ValueError(_EMPTY_INPUT_MESSAGE)
 
         all_data = pd.DataFrame.from_dict({"y_true": list(y_t), "y_pred": list(y_p)})
 
