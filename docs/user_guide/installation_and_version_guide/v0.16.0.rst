@@ -12,6 +12,10 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` accepts sensitive and control feature
+  names that coincide with internal metric input columns, such as :code:`y_true`,
+  :code:`y_pred`, or a sample-weight column, without overwriting those inputs.
+
 * :class:`~fairlearn.metrics.MetricFrame` raises a clear :code:`ValueError`
   for an empty dataset instead of a numpy
   :code:`need at least one array to stack` error.
