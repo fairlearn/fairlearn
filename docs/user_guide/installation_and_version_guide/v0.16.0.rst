@@ -9,6 +9,12 @@ v0.16.0
 New features
 ------------
 
+* Added :class:`~fairlearn.linear_model.PrejudiceRemover`, an in-processing
+  technique based on *Fairness-Aware Classifier with Prejudice Remover
+  Regularizer* by Kamishima et al. It fits a logistic regression whose
+  objective penalizes the dependence between the predictions and the
+  sensitive feature: :pr:`1816` by :user:`shaktimaan00`.
+
 Bug fixes
 ---------
 

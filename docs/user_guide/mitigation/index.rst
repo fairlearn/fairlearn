@@ -70,6 +70,14 @@ Fairlearn contains the following algorithms for mitigating unfairness:
       - ✘
       - ✔
       - DP, EO
+   *  - :class:`~fairlearn.linear_model.PrejudiceRemover`
+      - An in-processing technique based on the paper *Fairness-Aware Classifier with Prejudice
+        Remover Regularizer* :footcite:`kamishima2012prejudice`. It fits a logistic regression
+        whose objective includes a penalty on the dependence between the predictions and the
+        sensitive feature.
+      - ✔
+      - ✘
+      - DP
 
 DP refers to *demographic parity*, EO to *equalized odds*, TPRP to *true positive
 rate parity*, FPRP to *false positive rate parity*, ERP to *error rate parity*, and
@@ -100,3 +108,4 @@ fairness definitions, please open a
    postprocessing
    reductions
    adversarial
+   prejudice_remover
