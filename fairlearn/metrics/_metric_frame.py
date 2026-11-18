@@ -1057,8 +1057,10 @@ class MetricFrame:
                 check_consistent_length(column, sample_array)
                 result.append(GroupFeature(base_name, column, i))
         else:
-            # Need to specify dtype to avoid inadvertent type conversions
-            f_arr = np.squeeze(np.asarray(features, dtype=object))
+            # Need to specify dtype to avoid inadvertent type conversions.
+            # Do not squeeze here: a one-element feature array would collapse to
+            # zero dimensions and be rejected as "too many dimensions".
+            f_arr = np.asarray(features, dtype=object)
             if len(f_arr.shape) == 1:
                 check_consistent_length(f_arr, sample_array)
                 result.append(GroupFeature(base_name, f_arr, 0))

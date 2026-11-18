@@ -17,6 +17,11 @@ Bug fixes
   :code:`need at least one array to stack` error.
   :pr:`1822` by :user:`Dongze Li <lidongze1002>`.
 
+* :class:`~fairlearn.metrics.MetricFrame` now accepts datasets with a single
+  sample, and feature arrays with a single row, instead of raising
+  :code:`ValueError: Feature array has too many dimensions`.
+  :pr:`1820` by :user:`Dongze Li <lidongze1002>`.
+
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
