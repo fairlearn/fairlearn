@@ -9,6 +9,14 @@ v0.16.0
 New features
 ------------
 
+* Added :class:`~fairlearn.preprocessing.PercentileRepairer`, a preprocessing
+  algorithm that implements the percentile repair procedure of Feldman et al.
+  (2015). Every group of a sensitive feature keeps the ordering of its values,
+  but the values are read back off the median distribution of all groups, so
+  the repaired column no longer carries information about the sensitive
+  feature. :pr:`1815` by
+  :user:`Anurag <shaktimaan00>`.
+
 Bug fixes
 ---------
 
