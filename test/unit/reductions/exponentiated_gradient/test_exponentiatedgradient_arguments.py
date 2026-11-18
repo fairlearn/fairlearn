@@ -50,6 +50,40 @@ def test_constraints_reused_across_multiple_fits():
     assert expgrad.constraints_.data_loaded
 
 
+def _make_expgrad(**kwargs):
+    return ExponentiatedGradient(
+        LogisticRegression(solver="liblinear", random_state=42),
+        constraints=DemographicParity(),
+        max_iter=5,
+        **kwargs,
+    )
+
+
+def test_fit_does_not_overwrite_nu():
+    """fit() must compute nu from the data it is given, also when refitting."""
+    X, y, A = _get_data()
+    X_large, y_large, A_large = (pd.concat([data] * 4, ignore_index=True) for data in (X, y, A))
+
+    expgrad = _make_expgrad()
+    expgrad.fit(X, y, sensitive_features=A)
+    nu_small = expgrad.nu_
+    expgrad.fit(X_large, y_large, sensitive_features=A_large)
+
+    expected = _make_expgrad().fit(X_large, y_large, sensitive_features=A_large)
+    assert expgrad.nu is None
+    assert expgrad.nu_ == expected.nu_
+    assert expgrad.nu_ != pytest.approx(nu_small)
+
+
+def test_nu_is_used_when_provided():
+    X, y, A = _get_data()
+
+    expgrad = _make_expgrad(nu=0.1).fit(X, y, sensitive_features=A)
+
+    assert expgrad.nu == 0.1
+    assert expgrad.nu_ == 0.1
+
+
 class TestExponentiatedGradientArguments:
     @pytest.mark.parametrize("transformA", candidate_A_transforms)
     @pytest.mark.parametrize("transformY", candidate_Y_transforms)
