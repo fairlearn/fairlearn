@@ -121,6 +121,9 @@ def test_classification_multiclass(y: np.array, sensitive_features: np.array | N
     probabilities = prl.predict_proba(X)
     assert probabilities.shape == (len(X), 3)
     np.testing.assert_allclose(probabilities.sum(axis=1), 1.0, atol=1e-6)
+    # Perfectly separable clusters must yield confident predictions; bounding the
+    # multiclass class weights as logits would cap them at e / (e + n_classes - 1).
+    assert (probabilities.max(axis=1) > 0.9).all()
 
     y_pred = prl.predict(X)
     assert set(y_pred).issubset(set(prl.classes_))

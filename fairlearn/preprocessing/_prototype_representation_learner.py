@@ -213,8 +213,8 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
         This method sets up and executes the optimization algorithm by:
         - Initializing the optimization variables: the prototype vectors and their predictions are
           randomly drawn, and the dimension weights are initialized to one.
-        - Defining the constraints: prototype predictions are constrained to [0,1], and
-          dimension weights must be non-negative.
+        - Defining the constraints: binary prototype predictions are constrained to [0,1], the
+          multiclass class weights are unbounded, and dimension weights must be non-negative.
         - Executing the "L-BFGS-B" optimizer, extracting and reshaping the resulting optimal
           values.
 
@@ -272,10 +272,13 @@ class PrototypeRepresentationLearner(ClassifierMixin, TransformerMixin, BaseEsti
 
         x0 = np.concatenate([V0.flatten(), w0, alpha0])
 
+        # Binary prototype predictions are probabilities in [0, 1], while the multiclass
+        # class weights feed a softmax as logits and must stay unbounded, since bounded
+        # logits would cap the probabilities at e / (e + n_classes - 1).
+        prediction_bounds = (0, 1) if self._n_classes <= 2 else (None, None)
         bounds = (
             [(None, None)] * self._prototype_vectors_size  # The prototype vectors are unbounded
-            + [(0, 1)]
-            * self._prototype_predictions_size  # The prototype predictions are in [0, 1]
+            + [prediction_bounds] * self._prototype_predictions_size
             + [(0, None)] * self._prototype_dim  # The dimension weights are non-negative
         )
 
