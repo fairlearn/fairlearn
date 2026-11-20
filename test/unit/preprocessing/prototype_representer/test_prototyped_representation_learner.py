@@ -11,7 +11,7 @@ from test._sklearn_compat import parametrize_with_checks
 
 @parametrize_with_checks(
     [
-        PrototypeRepresentationLearner(max_iter=3, random_state=42),
+        PrototypeRepresentationLearner(n_prototypes=10, max_iter=10, random_state=42),
     ],
 )
 def test_sklearn_compatible_estimator(estimator, check):
@@ -97,6 +97,36 @@ def test_classification(y: np.array, sensitive_features: np.array | None):
         n_prototypes=4, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42, tol=1e-4
     )
     prl.fit(X, y, sensitive_features=sensitive_features)
+
+    classification_error = prl.score(X, y)
+
+    np.testing.assert_allclose(classification_error, 1.0, atol=1e-4)
+
+
+@pytest.mark.parametrize("sensitive_features", [np.array([0, 1, 0, 1, 0, 1]), None])
+@pytest.mark.parametrize(
+    ["y"],
+    [(np.array([0, 0, 1, 1, 2, 2]),), (pd.Series(["a", "a", "b", "b", "c", "c"]),)],
+)
+def test_classification_multiclass(y: np.array, sensitive_features: np.array | None):
+    X = np.array([[0.0, 0.0], [0.0, 0.0], [4.0, 0.0], [4.0, 0.0], [0.0, 4.0], [0.0, 4.0]])
+    prl = PrototypeRepresentationLearner(
+        n_prototypes=6, reconstruct_weight=0.0, fairness_weight=0.0, random_state=42, tol=1e-4
+    )
+    prl.fit(X, y, sensitive_features=sensitive_features)
+
+    np.testing.assert_array_equal(prl.classes_, np.unique(np.asarray(y)))
+    assert prl.coef_.shape == (6, 3)
+
+    probabilities = prl.predict_proba(X)
+    assert probabilities.shape == (len(X), 3)
+    np.testing.assert_allclose(probabilities.sum(axis=1), 1.0, atol=1e-6)
+    # Perfectly separable clusters must yield confident predictions; bounding the
+    # multiclass class weights as logits would cap them at e / (e + n_classes - 1).
+    assert (probabilities.max(axis=1) > 0.9).all()
+
+    y_pred = prl.predict(X)
+    assert set(y_pred).issubset(set(prl.classes_))
 
     classification_error = prl.score(X, y)
 
