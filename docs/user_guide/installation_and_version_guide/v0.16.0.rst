@@ -12,6 +12,15 @@ New features
 Bug fixes
 ---------
 
+* :func:`~fairlearn.metrics.equalized_odds_difference`,
+  :func:`~fairlearn.metrics.equalized_odds_ratio`,
+  :func:`~fairlearn.metrics.equal_opportunity_difference` and
+  :func:`~fairlearn.metrics.equal_opportunity_ratio` leave out a group whose
+  true positive rate (no positive labels) or false positive rate (no negative
+  labels) is undefined, and warn naming it. Previously such a group counted as
+  a rate of 0, so a classifier with every prediction correct could score an
+  equalized odds difference of 1: :pr:`1827` by :user:`WatchTree-19`.
+
 * :class:`~fairlearn.metrics.MetricFrame` raises a clear :code:`ValueError`
   for an empty dataset instead of a numpy
   :code:`need at least one array to stack` error.

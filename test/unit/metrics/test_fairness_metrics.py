@@ -232,3 +232,109 @@ def test_equal_opportunity_ratio_weighted(agg_method):
     )
 
     assert actual == gm.ratio(method=agg_method)
+
+
+# Group "a" has no positive labels and group "c" has no negative labels, and every
+# prediction is correct, so every defined rate is equal across groups.
+_y_true_missing_class = [0, 0, 0, 1, 1, 0, 1, 1]
+_sf_missing_class = ["a", "a", "b", "b", "b", "b", "c", "c"]
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+@pytest.mark.parametrize("agg", _agg_options)
+def test_equalized_odds_leaves_out_groups_with_an_undefined_rate(agg_method, agg):
+    with pytest.warns(UserWarning) as record:
+        difference = equalized_odds_difference(
+            _y_true_missing_class,
+            _y_true_missing_class,
+            sensitive_features=_sf_missing_class,
+            method=agg_method,
+            agg=agg,
+        )
+        ratio = equalized_odds_ratio(
+            _y_true_missing_class,
+            _y_true_missing_class,
+            sensitive_features=_sf_missing_class,
+            method=agg_method,
+            agg=agg,
+        )
+
+    assert difference == 0
+    assert ratio == 1
+    messages = [str(warning.message) for warning in record]
+    assert any("true positive rate" in m and "['a']" in m for m in messages)
+    assert any("false positive rate" in m and "['c']" in m for m in messages)
+
+
+@pytest.mark.parametrize("agg_method", _aggregate_methods)
+def test_equal_opportunity_leaves_out_groups_with_no_positive_labels(agg_method):
+    with pytest.warns(UserWarning, match=r"true positive rate .* \['a'\]"):
+        difference = equal_opportunity_difference(
+            _y_true_missing_class,
+            _y_true_missing_class,
+            sensitive_features=_sf_missing_class,
+            method=agg_method,
+        )
+    with pytest.warns(UserWarning, match=r"true positive rate .* \['a'\]"):
+        ratio = equal_opportunity_ratio(
+            _y_true_missing_class,
+            _y_true_missing_class,
+            sensitive_features=_sf_missing_class,
+            method=agg_method,
+        )
+
+    assert difference == 0
+    assert ratio == 1
+
+
+def test_equalized_odds_still_measures_the_groups_whose_rates_are_defined():
+    # Group "b" misses one of its two positives and flags one of its two negatives.
+    y_pred = [0, 0, 1, 1, 0, 0, 1, 1]
+    with pytest.warns(UserWarning):
+        difference = equalized_odds_difference(
+            _y_true_missing_class, y_pred, sensitive_features=_sf_missing_class
+        )
+    # TPR: b 0.5, c 1.0. FPR: a 0.0, b 0.5. The worst case is 0.5.
+    assert difference == pytest.approx(0.5)
+
+
+def test_equalized_odds_treats_zero_weight_labels_as_absent():
+    y_true = [0, 1, 0, 1]
+    y_pred = [0, 0, 0, 1]
+    with pytest.warns(UserWarning, match=r"true positive rate .* \['a'\]"):
+        difference = equalized_odds_difference(
+            y_true, y_pred, sensitive_features=["a", "a", "b", "b"], sample_weight=[1, 0, 1, 1]
+        )
+
+    assert difference == 0
+
+
+@pytest.mark.parametrize("y_true", [[1, 1], [0, 0]])
+def test_equalized_odds_uses_the_rate_that_is_defined(y_true):
+    with pytest.warns(UserWarning):
+        difference = equalized_odds_difference(y_true, [1, 0], sensitive_features=["a", "b"])
+    with pytest.warns(UserWarning):
+        ratio = equalized_odds_ratio(y_true, [1, 0], sensitive_features=["a", "b"])
+
+    assert difference == 1
+    assert ratio == 0
+
+
+def test_equal_opportunity_is_nan_when_no_group_has_a_defined_rate():
+    with pytest.warns(UserWarning):
+        ratio = equal_opportunity_ratio([0, 0], [1, 0], sensitive_features=["a", "b"])
+
+    assert ratio != ratio  # NaN
+
+
+def test_equalized_odds_does_not_warn_when_every_rate_is_defined():
+    difference = equalized_odds_difference(y_t, y_p, sensitive_features=g_1)
+
+    assert difference == max(
+        MetricFrame(
+            metrics={"tpr": true_positive_rate, "fpr": false_positive_rate},
+            y_true=y_t,
+            y_pred=y_p,
+            sensitive_features=g_1,
+        ).difference()
+    )
