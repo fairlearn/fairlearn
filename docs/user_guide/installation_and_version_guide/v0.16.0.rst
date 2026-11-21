@@ -100,6 +100,15 @@ Bug fixes
   during :code:`fit`. Previously every row of such a group was silently predicted as 0:
   :pr:`1743` by :user:`Raashish Aggarwal <raashish1601>`.
 
+* :meth:`~fairlearn.metrics.MetricFrame.group_min`,
+  :meth:`~fairlearn.metrics.MetricFrame.group_max`,
+  :meth:`~fairlearn.metrics.MetricFrame.difference` and
+  :meth:`~fairlearn.metrics.MetricFrame.ratio` warn, naming the groups, when
+  they leave out a group whose metric value is NaN or None. Previously such a
+  group was dropped silently, so the result could rest on fewer groups than
+  :attr:`~fairlearn.metrics.MetricFrame.by_group` shows: :pr:`1828` by
+  :user:`WatchTree-19`.
+
 Documentation
 -------------
 
