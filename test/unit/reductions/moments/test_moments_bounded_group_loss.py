@@ -168,12 +168,12 @@ class TestBoundedGroupLoss:
         del X_train["gender"]
         del X_test["gender"]
 
-        X_train.reset_index(inplace=True, drop=True)
-        X_test.reset_index(inplace=True, drop=True)
-        A_train.reset_index(inplace=True, drop=True)
-        A_test.reset_index(inplace=True, drop=True)
-        y_train.reset_index(inplace=True, drop=True)
-        y_test.reset_index(inplace=True, drop=True)
+        X_train = X_train.reset_index(drop=True)
+        X_test = X_test.reset_index(drop=True)
+        A_train = A_train.reset_index(drop=True)
+        A_test = A_test.reset_index(drop=True)
+        y_train = y_train.reset_index(drop=True)
+        y_test = y_test.reset_index(drop=True)
 
         estimator = LinearRegression().fit(X, Y)
 
@@ -190,3 +190,20 @@ class TestBoundedGroupLoss:
 
         assert not np.any(loss - loss_eps)
         assert bnd.shape == loss.shape
+
+    def test_signed_weights(self):
+        X = pd.DataFrame({"x": [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]})
+        y = pd.Series([0.1, 0.4, 0.2, 0.9, 0.5, 0.3])
+        A = pd.Series(["b", "a", "b", "c", "b", "a"])
+
+        bgl = BoundedGroupLoss(SquareLoss(0, 1), upper_bound=0.1)
+        bgl.load_data(X, y, sensitive_features=A)
+        # gamma adds the prediction and loss columns to tags, as during fit
+        bgl.gamma(lambda x: x["x"].to_numpy() / 5)
+
+        # prob_attr is a: 2/6, b: 3/6, c: 1/6
+        lambda_vec = pd.Series([0.2, 0.6, 0.3], index=bgl.index)
+        expected = pd.Series([1.2, 0.6, 1.2, 1.8, 1.2, 0.6])
+        pd.testing.assert_series_equal(bgl.signed_weights(lambda_vec), expected)
+
+        pd.testing.assert_series_equal(bgl.signed_weights(), pd.Series([1.0] * 6))

@@ -1,11 +1,16 @@
 # Copyright (c) Fairlearn contributors.
 # Licensed under the MIT License.
 
+import re
+
 import numpy as np
 import pandas as pd
 import pytest
+from sklearn.linear_model import LogisticRegression
 
 import fairlearn.utils._input_validation as iv
+from fairlearn.postprocessing import ThresholdOptimizer
+from fairlearn.reductions import BoundedGroupLoss, DemographicParity, EqualizedOdds, ZeroOneLoss
 
 
 class TestValidateAndReformatInput:
@@ -110,3 +115,53 @@ def test_validate_and_reformat_input_empty_y(y):
         X, y, _, _ = iv._validate_and_reformat_input(
             X=X, y=y, expect_y=True, expect_sensitive_features=False
         )
+
+
+def _feature_with_missing_value(kind, missing):
+    values = ["a", "b", missing, "a"]
+    if kind == "list":
+        return values
+    if kind == "ndarray":
+        return np.asarray(values, dtype=object)
+    if kind == "series":
+        return pd.Series(values)
+    # two columns, which would otherwise be merged into a single string column
+    return pd.DataFrame({"f0": values, "f1": ["c", "d", "c", "d"]})
+
+
+@pytest.mark.parametrize("kind", ["list", "ndarray", "series", "dataframe"])
+@pytest.mark.parametrize("missing", [None, np.nan, pd.NA])
+@pytest.mark.parametrize("feature_name", ["sensitive_features", "control_features"])
+def test_validate_and_reformat_input_missing_feature_values(kind, missing, feature_name):
+    X = pd.DataFrame({"alpha": [1, 2, 3, 4]})
+    y = np.asarray([0, 1, 0, 1])
+    features = {"sensitive_features": ["a", "b", "a", "b"]}
+    features[feature_name] = _feature_with_missing_value(kind, missing)
+
+    msg = iv._FEATURE_HAS_MISSING_VALUES_ERROR_MESSAGE.format(feature_name)
+    with pytest.raises(ValueError, match=re.escape(msg)):
+        iv._validate_and_reformat_input(X=X, y=y, **features)
+
+
+@pytest.mark.parametrize(
+    "fit",
+    [
+        lambda X, y, sf: DemographicParity().load_data(X, y, sensitive_features=sf),
+        lambda X, y, sf: EqualizedOdds().load_data(X, y, sensitive_features=sf),
+        lambda X, y, sf: BoundedGroupLoss(ZeroOneLoss(), upper_bound=0.1).load_data(
+            X, y, sensitive_features=sf
+        ),
+        lambda X, y, sf: ThresholdOptimizer(
+            estimator=LogisticRegression(), predict_method="predict_proba"
+        ).fit(X, y, sensitive_features=sf),
+    ],
+)
+def test_mitigation_rejects_missing_sensitive_feature_values(fit):
+    # None used to be dropped silently from the groups in the reductions moments
+    X = pd.DataFrame({"alpha": np.arange(8)})
+    y = np.asarray([0, 1] * 4)
+    sf = np.asarray(["a", "b"] * 4, dtype=object)
+    sf[0] = None
+
+    with pytest.raises(ValueError, match="sensitive_features contains missing values"):
+        fit(X, y, sf)

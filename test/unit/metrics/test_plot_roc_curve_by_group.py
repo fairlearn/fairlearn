@@ -2,10 +2,11 @@
 # Licensed under the MIT License.
 
 import numpy as np
+import pandas as pd
 import pytest
 from sklearn.metrics import roc_auc_score
 
-from fairlearn.metrics import plot_roc_curve_by_group
+from fairlearn.metrics import MetricFrame, plot_roc_curve_by_group
 
 from .data_for_test import g_1, g_2, y_score, y_t
 
@@ -24,6 +25,12 @@ def is_mpl_installed():
 def _expected_label(name, y_true, y_score):
     # Mirrors the legend label produced by sklearn's RocCurveDisplay.
     return f"{name} (AUC = {roc_auc_score(y_true, y_score):0.2f})"
+
+
+def _with_first_missing(values, missing_val):
+    values = list(values)
+    values[0] = missing_val
+    return values
 
 
 @pytest.fixture()
@@ -216,55 +223,38 @@ class TestPlotRocCurveByGroup:
             expected_auc = roc_auc_score((y_str[mask] == "yes").astype(int), y_score[mask])
             assert f"{group} (AUC = {expected_auc:0.2f})" in labels
 
-    def test_missing_sensitive_feature_value_is_skipped_not_raised(self):
-        """A NaN sensitive feature value should not crash the plot.
+    @pytest.mark.parametrize("missing_val", [np.nan, None])
+    @pytest.mark.parametrize(
+        "make_sf,expected_name",
+        [
+            (lambda m: _with_first_missing(g_1, m), "sensitive_feature_0"),
+            (lambda m: np.array(_with_first_missing(g_1, m), dtype=object), "sensitive_feature_0"),
+            (lambda m: pd.Series(_with_first_missing(g_1, m)), "sensitive_feature_0"),
+            (lambda m: pd.Series(_with_first_missing(g_1, m), name="sf"), "sf"),
+            (lambda m: pd.DataFrame({"sf": _with_first_missing(g_1, m)}), "sf"),
+            (
+                lambda m: np.array([g_1, _with_first_missing(g_2, m)], dtype=object).T,
+                "sensitive_feature_1",
+            ),
+            (lambda m: pd.DataFrame({"a": g_1, "b": _with_first_missing(g_2, m)}), "b"),
+            (lambda m: {"a": list(g_1), "b": _with_first_missing(g_2, m)}, "b"),
+        ],
+    )
+    def test_missing_sensitive_feature_raises_like_metricframe(
+        self, missing_val, make_sf, expected_name
+    ):
+        message = f"Feature '{expected_name}' contains missing values"
+        with pytest.raises(ValueError, match=message):
+            plot_roc_curve_by_group(y_t, y_score, sensitive_features=make_sf(missing_val))
+        with pytest.raises(ValueError, match=message):
+            MetricFrame(
+                metrics=roc_auc_score,
+                y_true=y_t,
+                y_pred=y_score,
+                sensitive_features=make_sf(missing_val),
+            )
 
-        This mirrors how `MetricFrame.by_group` treats such rows: they are
-        excluded from any single subgroup's curve, but the overall curve
-        still uses every row.
-        """
-        sf = np.asarray(g_1, dtype=object).copy()
-        sf[0] = np.nan
-
-        ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=sf)
-
-        labels = [line.get_label() for line in ax.get_lines()]
-        assert not any("nan" in label.lower() for label in labels)
-
-        known_mask = np.array([not (isinstance(v, float) and np.isnan(v)) for v in sf])
-        for group in sorted(np.unique(sf[known_mask])):
-            mask = known_mask & (sf == group)
-            expected_auc = roc_auc_score(y_t[mask], y_score[mask])
-            assert f"{group} (AUC = {expected_auc:0.2f})" in labels
-
-        # The overall curve still reflects every row, including the one with
-        # the missing sensitive feature value.
-        expected_overall_auc = roc_auc_score(y_t, y_score)
-        assert f"Overall (AUC = {expected_overall_auc:0.2f})" in labels
-
-    def test_all_missing_sensitive_feature_values(self):
-        """No per-group curves are drawn if every value is missing."""
-        sf = np.full(len(y_t), np.nan, dtype=object)
-
-        ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=sf)
-
-        labels = [line.get_label() for line in ax.get_lines()]
-        assert not any("nan" in label.lower() for label in labels)
-        assert _expected_label("Overall", y_t, y_score) in labels
-
-    def test_missing_value_in_multiple_sensitive_features_is_skipped(self, two_sensitive_features):
-        sf = two_sensitive_features.astype(object)
-        sf[0, 1] = np.nan
-
-        ax = plot_roc_curve_by_group(y_t, y_score, sensitive_features=sf)
-
-        labels = [line.get_label() for line in ax.get_lines()]
-        assert not any("nan" in label.lower() for label in labels)
-
-        missing_rows = np.zeros(len(sf), dtype=bool)
-        missing_rows[0] = True
-        expected_groups = {tuple(row) for row in sf[~missing_rows]}
-        for values in expected_groups:
-            group = ",".join(values)
-            mask = (~missing_rows) & np.all(sf == values, axis=1)
-            assert _expected_label(group, y_t[mask], y_score[mask]) in labels
+    @pytest.mark.parametrize("missing_val", [np.nan, None])
+    def test_all_missing_sensitive_feature_values_raise(self, missing_val):
+        with pytest.raises(ValueError, match="Feature 'sensitive_feature_0' contains missing"):
+            plot_roc_curve_by_group(y_t, y_score, sensitive_features=[missing_val] * len(y_t))

@@ -101,13 +101,27 @@ def true_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. If `None` (the default)
-        then the largest unique value of the y arrays will be used.
+        The value to treat as the 'positive' label in the samples. If ``None`` (the default),
+        the labels must be drawn from ``{0, 1}`` or ``{-1, 1}``, and ``1`` is used as the
+        positive label. For other binary labels, specify ``pos_label`` explicitly.
 
     Returns
     -------
     float
         The true positive rate for the data
+
+    Examples
+    --------
+    The default positive label remains ``1`` for an all-zero group:
+
+    >>> from fairlearn.metrics import true_positive_rate
+    >>> float(true_positive_rate([0, 0], [0, 0]))
+    0.0
+
+    Other binary labels need an explicit positive label:
+
+    >>> float(true_positive_rate(["no", "yes"], ["no", "yes"], pos_label="yes"))
+    1.0
     """
     unique_labels = _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), pos_label)
     tnr, fpr, fnr, tpr = skm.confusion_matrix(
@@ -140,8 +154,9 @@ def true_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> fl
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. If `None` (the default)
-        then the largest unique value of the y arrays will be used.
+        The value to treat as the 'positive' label in the samples. If ``None`` (the default),
+        the labels must be drawn from ``{0, 1}`` or ``{-1, 1}``, and ``1`` is used as the
+        positive label. For other binary labels, specify ``pos_label`` explicitly.
 
     Returns
     -------
@@ -179,8 +194,9 @@ def false_positive_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. If `None` (the default)
-        then the largest unique value of the y arrays will be used.
+        The value to treat as the 'positive' label in the samples. If ``None`` (the default),
+        the labels must be drawn from ``{0, 1}`` or ``{-1, 1}``, and ``1`` is used as the
+        positive label. For other binary labels, specify ``pos_label`` explicitly.
 
     Returns
     -------
@@ -218,8 +234,9 @@ def false_negative_rate(y_true, y_pred, sample_weight=None, pos_label=None) -> f
         equally
 
     pos_label : scalar, optional
-        The value to treat as the 'positive' label in the samples. If `None` (the default)
-        then the largest unique value of the y arrays will be used.
+        The value to treat as the 'positive' label in the samples. If ``None`` (the default),
+        the labels must be drawn from ``{0, 1}`` or ``{-1, 1}``, and ``1`` is used as the
+        positive label. For other binary labels, specify ``pos_label`` explicitly.
 
     Returns
     -------
@@ -324,6 +341,11 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
     -------
     float
         The selection rate
+
+    Raises
+    ------
+    ValueError
+        If `y_pred` is empty.
     """
     selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
     if len(selected) == 0:
@@ -331,6 +353,6 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
 
     s_w = np.ones(len(selected))
     if sample_weight is not None:
-        s_w = np.squeeze(np.asarray(sample_weight))
+        s_w = _convert_to_ndarray_and_squeeze(sample_weight)
 
     return np.dot(selected, s_w) / s_w.sum()

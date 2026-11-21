@@ -25,6 +25,8 @@ class Moment:
     imposed on the solution. This is an abstract class for all such objects.
 
     Read more in the :ref:`User Guide <reductions>`.
+
+    .. versionadded:: 0.3.0
     """
 
     def __init__(self):
@@ -70,19 +72,72 @@ class Moment:
         raise NotImplementedError()
 
     def gamma(self, predictor: Callable) -> pd.Series:
-        """Calculate the degree to which constraints are currently violated by the predictor."""
+        """Calculate the degree to which constraints are currently violated by the predictor.
+
+        Parameters
+        ----------
+        predictor : Callable
+            A function that maps the feature matrix to predictions.
+
+        Returns
+        -------
+        pandas.Series
+            The value of each constraint for the predictor, indexed by :attr:`index`.
+            The constraints are satisfied when these values do not exceed the values
+            returned by :meth:`bound`.
+        """
         raise NotImplementedError()
 
     def bound(self) -> pd.Series:
-        """Return vector of fairness bound constraint the length of gamma."""
+        """Return vector of fairness bound constraint the length of gamma.
+
+        Returns
+        -------
+        pandas.Series
+            The upper bound for each constraint, indexed by :attr:`index`. The
+            entries of :meth:`gamma` are compared against these values.
+        """
         raise NotImplementedError()
 
     def project_lambda(self, lambda_vec: pd.Series) -> pd.Series:
-        """Return the projected lambda values."""
+        """Return the projected lambda values.
+
+        Parameters
+        ----------
+        lambda_vec : pandas.Series
+            The vector of Lagrange multipliers, indexed by :attr:`index`.
+
+        Returns
+        -------
+        pandas.Series
+            Lagrange multipliers that give the same or a higher Lagrangian value
+            than `lambda_vec` for every predictor and may have a smaller L1 norm.
+            They are used by the
+            :class:`~fairlearn.reductions.ExponentiatedGradient` algorithm when
+            evaluating the Lagrangian.
+        """
         raise NotImplementedError()
 
     def signed_weights(self, lambda_vec: pd.Series) -> pd.Series:
-        """Return the signed weights."""
+        """Return the signed weights.
+
+        Parameters
+        ----------
+        lambda_vec : pandas.Series
+            The vector of Lagrange multipliers, indexed by :attr:`index`.
+
+        Returns
+        -------
+        pandas.Series
+            One weight per sample. For classification, reductions add the objective
+            and constraint weights, use the sign of the sum to choose a binary label
+            for the cost-sensitive learning problem, and use its absolute value as
+            the sample weight for the underlying estimator. For regression, the
+            original target values are kept and the weights are used to reweight
+            samples. :class:`~fairlearn.reductions.GridSearch` omits separate
+            objective weights when the objective is already in the span of the
+            constraints.
+        """
         raise NotImplementedError()
 
     def _moment_type(self) -> type[Moment]:
@@ -100,7 +155,10 @@ Moment.__module__ = "fairlearn.reductions"
 
 
 class ClassificationMoment(Moment):
-    """Moment that can be expressed as weighted classification error."""
+    """Moment that can be expressed as weighted classification error.
+
+    .. versionadded:: 0.3.0
+    """
 
     def _moment_type(self):
         return ClassificationMoment
@@ -112,7 +170,10 @@ ClassificationMoment.__module__ = "fairlearn.reductions"
 
 
 class LossMoment(Moment):
-    """Moment that can be expressed as weighted loss."""
+    """Moment that can be expressed as weighted loss.
+
+    .. versionadded:: 0.3.0
+    """
 
     def __init__(self, loss):
         super().__init__()

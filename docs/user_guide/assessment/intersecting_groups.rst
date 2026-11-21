@@ -33,6 +33,27 @@ is constructed.
 The :attr:`MetricFrame.by_group` property then holds the intersections
 of these groups:
 
+Each entry must be a scalar, non-floating value rather than a list or array.
+If a data source stores multiple dimensions in one list-valued column, split
+that column so each dimension has one scalar value per row:
+
+.. code-block:: python
+
+    import pandas as pd
+
+    # Invalid: each entry in "dimensions" is a list.
+    invalid_sensitive_features = pd.DataFrame(
+        {"dimensions": [["a", 8], ["b", 6]]}
+    )
+
+    # Valid: each entry in "dimension1" and "dimension2" is a scalar.
+    valid_sensitive_features = pd.DataFrame(
+        {
+            "dimension1": ["a", "b"],
+            "dimension2": [8, 6],
+        }
+    )
+
 .. doctest:: intersecting_groups_code
     :options:  +NORMALIZE_WHITESPACE
 

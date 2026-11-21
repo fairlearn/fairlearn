@@ -144,6 +144,8 @@ def _get_conf_intervals_from_metric_frame(metric_frame):
 
     lo_q, lo_data = pairs[0]
     hi_q, hi_data = pairs[-1]
+    lo_data = lo_data.reindex(metric_frame.by_group.index)
+    hi_data = hi_data.reindex(metric_frame.by_group.index)
 
     mapping = {}
     if isinstance(lo_data, pd.DataFrame):
@@ -240,6 +242,14 @@ def plot_metric_frame(
     Returns
     -------
     :class:`matplotlib.axes.Axes` or :class:`numpy.ndarray` of them
+
+    Raises
+    ------
+    ValueError
+        If `metric_frame` is not a :class:`.MetricFrame`, if `metrics` is not a
+        string, a list or `None`, if there are no metrics to plot, if `metrics` and
+        `conf_intervals` have different lengths, or if the confidence intervals are
+        not pairs of values with the lower bound not exceeding the upper bound.
     """
     # ensure metric_frame is a MetricFrame
     if not isinstance(metric_frame, MetricFrame):

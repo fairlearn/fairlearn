@@ -91,6 +91,10 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
     objects that have their constraint set to :code:`equalized_odds` this will
     result in a ROC curve plot.
 
+    For relaxed constraints, the legend is placed below the plotting area to
+    keep the tradeoff curves visible. Tight layout is enabled if the figure
+    does not already have a layout engine.
+
     .. versionadded:: 0.4.5
 
     Parameters
@@ -102,6 +106,15 @@ def plot_threshold_optimizer(threshold_optimizer: ThresholdOptimizer, ax=None, s
         A custom `matplotlib.axes.Axes` object to use for the plots.
     show_plot : bool, default = True
         Whether or not the generated plot should be shown, default True
+
+    Raises
+    ------
+    ValueError
+        If `threshold_optimizer` is not a :class:`.ThresholdOptimizer`.
+    sklearn.exceptions.NotFittedError
+        If `threshold_optimizer` has not been fitted.
+    RuntimeError
+        If matplotlib is not installed.
     """
     try:
         import matplotlib.pyplot as plt
@@ -161,6 +174,10 @@ def _plot_solution_with_tol(threshold_optimizer: ThresholdOptimizer, ax):
             ls="--",
             c=color,
         )
-        ax.legend()
-        ax.set_xlabel(threshold_optimizer.x_metric_)
-        ax.set_ylabel(threshold_optimizer.y_metric_)
+
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncols=2)
+    ax.set_xlabel(threshold_optimizer.x_metric_)
+    ax.set_ylabel(threshold_optimizer.y_metric_)
+    figure = ax.get_figure(root=True)
+    if figure.get_layout_engine() is None:
+        figure.set_layout_engine("tight")

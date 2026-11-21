@@ -6,6 +6,8 @@ from collections.abc import Iterable
 import numpy as np
 import pandas as pd
 
+_FLOAT_MARGIN = 1e-12
+
 
 def maximize_objective_with_tolerance(
     dataframes: Iterable[pd.DataFrame],
@@ -26,6 +28,10 @@ def maximize_objective_with_tolerance(
         An Iterable of weights for each DataFrame.
     tol: float
         The maximum allowed tolerance.
+    x_col: str, default='x'
+        Name of the column holding the `x` values in each DataFrame.
+    y_col: str, default='y'
+        Name of the column holding the `y` values in each DataFrame.
 
     Returns
     -------
@@ -82,8 +88,10 @@ def maximize_objective_with_tolerance(
                 deques[k].pop()
             deques[k].append(end)
 
-        # Adjust the window to ensure the tolerance constraint is satisfied
-        while x_values[end] - x_values[start] > tol:
+        # Adjust the window to ensure the tolerance constraint is satisfied. The small
+        # margin keeps x values that are exactly `tol` apart, such as points on an evenly
+        # spaced grid, inside the window despite floating point error in their difference.
+        while x_values[end] - x_values[start] > tol + _FLOAT_MARGIN:
             for k in range(m):
                 if deques[k] and (deques[k][0] == start):
                     deques[k].popleft()
