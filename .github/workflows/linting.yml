@@ -34,9 +34,8 @@ jobs:
       uses: actions/setup-python@v7
       with:
         python-version: "3.11"
-    - name: Install build
-      run: |
-        pip install --upgrade pip
-        pip install --upgrade build
+    - uses: astral-sh/setup-uv@v10.3.0
+    - name: Install build tooling
+      run: uv sync --locked --python python --no-default-groups --group tooling
     - name: Build sdist and wheel
-      run: python -m build
+      run: uv run --locked --python python --no-default-groups --group tooling python -m build

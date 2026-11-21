@@ -39,6 +39,50 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/fairlearn/fairlearn"
 
+[dependency-groups]
+dev = [
+    { include-group = "tests" },
+    { include-group = "docs" },
+    { include-group = "tooling" },
+]
+tests = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-mpl",
+    "matplotlib>=3.10.8",
+    "wheel",
+    "lightgbm",
+    "xlrd",
+    "polars",
+    "pyarrow",
+]
+docs = [
+    { include-group = "tests" },
+    "pandas<3.0",
+    "pypandoc",
+    "sphinx>=8.3.0",
+    "sphinx-gallery==0.19.0",
+    "numpydoc",
+    "pydata-sphinx-theme>=0.14.4",
+    "sphinx-autodoc-typehints",
+    "sphinxcontrib-bibtex",
+    "sphinx-prompt",
+    "sphinx-copybutton",
+    "jupyterlite_sphinx",
+    "jupyterlite-pyodide-kernel",
+    "packaging",
+    "seaborn",
+    "torch",
+    "sphinx-issues",
+    "memory_profiler",
+]
+tooling = [
+    "ruff==0.15.20",
+    "build",
+    "pre-commit",
+]
+
 [tool.setuptools.dynamic]
 version = { attr = "fairlearn.__version__" }
 

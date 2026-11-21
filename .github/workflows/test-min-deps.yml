@@ -35,11 +35,42 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
-      - run: python scripts/install_requirements.py --min
-      - run: pip install .
-      - run: pip install matplotlib
+      - uses: astral-sh/setup-uv@v10.3.0
+      - run: uv venv --python python .venv-compat
+      - run: uv pip install --python .venv-compat . --group tests -r requirements-min.txt
+      - name: Verify exact minimum runtime versions
+        shell: python
+        run: |
+          import subprocess
+
+          subprocess.run([
+              "uv", "run", "--no-project", "--python", ".venv-compat", "python",
+              "-c", """
+          import tomllib
+          from importlib.metadata import version
+          from pathlib import Path
+          from packaging.requirements import Requirement
+
+          pins = {
+              requirement.name.lower().replace("_", "-"): requirement
+              for raw in Path("requirements-min.txt").read_text().splitlines()
+              for line in [raw.strip()]
+              if line and not line.startswith("#")
+              for requirement in [Requirement(line)]
+          }
+          project = tomllib.loads(Path("pyproject.toml").read_text())
+          for entry in project["project"]["dependencies"]:
+              requirement = Requirement(entry)
+              pin = pins[requirement.name.lower().replace("_", "-")]
+              assert str(pin.specifier).startswith("=="), pin
+              installed = version(requirement.name)
+              assert installed in pin.specifier, (pin, installed)
+              assert installed in requirement.specifier, (requirement, installed)
+              print(f"{requirement.name}=={installed}")
+          """
+          ], check=True)
       - run: >
-          pytest --mpl
+          uv run --no-project --python .venv-compat python -m pytest --mpl
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install -m "not openml"
           --cov=fairlearn --cov-report=xml -vl test/

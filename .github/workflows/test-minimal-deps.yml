@@ -35,9 +35,12 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
-      - run: pip install .
-      - run: pip install pytest pytest-cov
-      - run: pytest --cov=fairlearn --cov-report=xml test/install
+      - uses: astral-sh/setup-uv@v10.3.0
+      - run: uv venv --python python .venv-compat
+      - run: uv pip install --python .venv-compat . pytest pytest-cov --prerelease disallow
+      - name: Verify optional plotting dependencies are absent
+        run: uv run --no-project --python .venv-compat python -c "from importlib.util import find_spec; assert find_spec('matplotlib') is None"
+      - run: uv run --no-project --python .venv-compat python -m pytest --cov=fairlearn --cov-report=xml test/install
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
         uses: codecov/codecov-action@v7
