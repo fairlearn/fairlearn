@@ -227,7 +227,7 @@ def _interpolate_curve(
             "p1": p1,
             content_col_1: content_values[interpolation_indices + 1],
         },
-        backend=nw.get_native_namespace(data),
+        native_namespace=nw.get_native_namespace(nw_data),
     ).to_native()
 
 
@@ -313,7 +313,8 @@ def _calculate_tradeoff_points(
     result : :class:`pandas:pandas.DataFrame`, :class:`polars:polars.DataFrame` or :class:`pyarrow:pyarrow.Table`
         The ROC curve points with their corresponding threshold operations.
     """
-    scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(data)
+    nw_data = nw.from_native(data, eager_only=True, pass_through=False)
+    scores, labels, n, n_positive, n_negative = _get_scores_labels_and_counts(nw_data)
 
     if n_positive == 0 or n_negative == 0:
         raise ValueError(DEGENERATE_LABELS_ERROR_MESSAGE.format(sensitive_feature_value))
@@ -370,7 +371,7 @@ def _calculate_tradeoff_points(
     return nw.maybe_reset_index(
         nw.from_dict(
             {"x": x_list, "y": y_list, "operation": operation_list},
-            backend=nw.get_native_namespace(data),
+            native_namespace=nw.get_native_namespace(nw_data),
         ).sort(by=["x", "y"])
     ).to_native()
 

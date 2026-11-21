@@ -8,6 +8,8 @@ version: 2.1
 
 jobs:
   build-doc:
+    environment:
+      UV_PYTHON: python
     docker:
       - image: cimg/python:3.12
 
@@ -25,6 +27,9 @@ jobs:
             - build-doc-ccache-{{ .Branch }}
             - build-doc-ccache
 
+      - restore_cache:
+          key: v1-uv-py312-{{ arch }}-{{ checksum "uv.lock" }}
+
       - run:
           name: Show Python version
           command: python --version
@@ -42,15 +47,15 @@ jobs:
           command: sudo apt-get install pandoc pandoc-citeproc optipng
 
       - run:
-          name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: python -m pip install --upgrade pip setuptools wheel
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/0.13.9/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
 
       - run:
           name: 'Install required packages'
           command: |
-            python scripts/install_requirements.py
-            pip install . 'pandas<3.0'
-            pip install matplotlib>=3.2.1
+            uv sync --locked --python python --no-default-groups --group docs
 
       - run:
           name: "Build Documentation"
@@ -65,7 +70,11 @@ jobs:
           key: build-doc-ccache-{{ .Branch }}-{{ .BuildNum }}
           paths:
             - ~/.ccache
-            - ~/.cache/pip
+
+      - save_cache:
+          key: v1-uv-py312-{{ arch }}-{{ checksum "uv.lock" }}
+          paths:
+            - ~/.cache/uv
 
       - save_cache:
           key: v1-build-doc-datasets-{{ .Branch }}
@@ -83,6 +92,8 @@ jobs:
             - static_landing_page
 
   build-doctest:
+    environment:
+      UV_PYTHON: python
     docker:
       - image: cimg/python:3.12
 
@@ -99,6 +110,9 @@ jobs:
           keys:
             - build-doctest-ccache-{{ .Branch }}
             - build-doctest-ccache
+
+      - restore_cache:
+          key: v1-uv-py312-{{ arch }}-{{ checksum "uv.lock" }}
 
       - run:
           name: Show Python version
@@ -117,26 +131,30 @@ jobs:
           command: sudo apt-get install pandoc pandoc-citeproc optipng
 
       - run:
-          name: Upgrade pip, setuptools, and wheel before installing other dependencies
-          command: python -m pip install --upgrade pip setuptools wheel
+          name: Install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/0.13.9/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
 
       - run:
           name: 'Install required packages'
           command: |
-            python scripts/install_requirements.py
-            pip install . 'pandas<3.0'
-            pip install matplotlib>=3.2.1
+            uv sync --locked --python python --no-default-groups --group docs
 
       - run:
           name: 'Build doctest'
-          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
+          command: uv run --locked --no-default-groups --group docs python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
           no_output_timeout: 30m
 
       - save_cache:
           key: build-doctest-ccache-{{ .Branch }}-{{ .BuildNum }}
           paths:
             - ~/.ccache
-            - ~/.cache/pip
+
+      - save_cache:
+          key: v1-uv-py312-{{ arch }}-{{ checksum "uv.lock" }}
+          paths:
+            - ~/.cache/uv
 
       - save_cache:
           key: v1-build-doctest-datasets-{{ .Branch }}

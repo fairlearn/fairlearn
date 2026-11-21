@@ -12,6 +12,9 @@ New features
 Bug fixes
 ---------
 
+* Restored postprocessing compatibility with the declared Narwhals 1.14.0
+  minimum by using its stable dataframe-construction API.
+
 * :class:`~fairlearn.metrics.MetricFrame` raises a clear :code:`ValueError`
   for an empty dataset instead of a numpy
   :code:`need at least one array to stack` error.
@@ -129,6 +132,11 @@ Documentation
 
 Other improvements
 ------------------
+
+* Standardized development environments on :code:`uv sync` and :code:`uv run`,
+  with tests, docs, and tooling dependency groups and a committed development
+  lockfile. Minimum, latest, minimal-installation, and nightly compatibility
+  tests continue to resolve dependencies independently.
 
 * Added validation and documentation requiring scalar, non-floating entries for
   :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
