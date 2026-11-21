@@ -3,10 +3,75 @@
 
 """Metrics for measuring fairness."""
 
+import warnings
 from typing import Literal
 
-from ._base_metrics import false_positive_rate, selection_rate, true_positive_rate
+import numpy as np
+
+from ._base_metrics import (
+    _get_labels_for_confusion_matrix,
+    false_positive_rate,
+    selection_rate,
+    true_positive_rate,
+)
 from ._metric_frame import MetricFrame
+
+_UNDEFINED_RATE_WARNING = (
+    "{rate} is undefined for groups with no {labels} labels, "
+    "so these groups are left out: {groups}"
+)
+
+
+def _has_weight(y_true, y_pred, *, positive: bool, sample_weight) -> bool:
+    """Report whether the positive (or negative) true labels carry any weight."""
+    y_true = np.asarray(y_true)
+    _get_labels_for_confusion_matrix(np.vstack((y_true, y_pred)), None)
+    mask = (y_true == 1) if positive else (y_true != 1)
+    weights = np.ones(len(y_true)) if sample_weight is None else np.asarray(sample_weight)
+    return bool(weights[mask].sum() > 0)
+
+
+def _true_positive_rate_or_nan(y_true, y_pred, sample_weight=None) -> float:
+    """Return the true positive rate, or NaN where there are no positive labels."""
+    if not _has_weight(y_true, y_pred, positive=True, sample_weight=sample_weight):
+        return np.nan
+    return true_positive_rate(y_true, y_pred, sample_weight=sample_weight)
+
+
+def _false_positive_rate_or_nan(y_true, y_pred, sample_weight=None) -> float:
+    """Return the false positive rate, or NaN where there are no negative labels."""
+    if not _has_weight(y_true, y_pred, positive=False, sample_weight=sample_weight):
+        return np.nan
+    return false_positive_rate(y_true, y_pred, sample_weight=sample_weight)
+
+
+def _quietly(aggregate):
+    """Run a MetricFrame aggregate without its warning about NaN groups.
+
+    ``_warn_on_undefined_rates`` has already named those groups and said why their rate
+    is undefined, so the aggregate's own NaN-group warning (#1828) would repeat it.
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore", message=r"MetricFrame\.\w+ left out these groups", category=UserWarning
+        )
+        return aggregate()
+
+
+def _warn_on_undefined_rates(frame: MetricFrame, *, stacklevel: int) -> None:
+    """Warn about the groups whose rate is undefined, which the aggregates leave out."""
+    by_group = frame.by_group.to_frame() if frame.by_group.ndim == 1 else frame.by_group
+    for column, rate, labels in (
+        ("tpr", "The true positive rate", "positive"),
+        ("fpr", "The false positive rate", "negative"),
+    ):
+        if column in by_group and by_group[column].isna().any():
+            groups = list(by_group.index[by_group[column].isna()])
+            warnings.warn(
+                _UNDEFINED_RATE_WARNING.format(rate=rate, labels=labels, groups=groups),
+                UserWarning,
+                stacklevel=stacklevel + 1,
+            )
 
 
 def demographic_parity_difference(
@@ -139,9 +204,16 @@ def equalized_odds_difference(
     The equalized odds difference of 0 means that all groups have the same
     true positive, true negative, false positive, and false negative rates.
 
+    A group with no positive labels has no true positive rate, and a group with
+    no negative labels has no false positive rate. Such a group is left out of
+    that rate's comparison, with a warning, rather than counted as a rate of 0.
+
     Read more in the :ref:`User Guide <disparity_metrics>`.
 
     .. versionadded:: 0.4.6
+
+    .. versionchanged:: 0.16.0
+        A group whose rate is undefined is left out instead of counted as 0.
 
     Parameters
     ----------
@@ -183,9 +255,9 @@ def equalized_odds_difference(
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
     if agg == "worst_case":
-        return max(eo.difference(method=method))
+        return _quietly(lambda: eo.difference(method=method)).max()
     else:
-        return eo.difference(method=method).mean()
+        return _quietly(lambda: eo.difference(method=method)).mean()
 
 
 def equalized_odds_ratio(
@@ -207,9 +279,16 @@ def equalized_odds_ratio(
     The equalized odds ratio of 1 means that all groups have the same
     true positive, true negative, false positive, and false negative rates.
 
+    A group with no positive labels has no true positive rate, and a group with
+    no negative labels has no false positive rate. Such a group is left out of
+    that rate's comparison, with a warning, rather than counted as a rate of 0.
+
     Read more in the :ref:`User Guide <disparity_metrics>`.
 
     .. versionadded:: 0.4.6
+
+    .. versionchanged:: 0.16.0
+        A group whose rate is undefined is left out instead of counted as 0.
 
     Parameters
     ----------
@@ -251,13 +330,13 @@ def equalized_odds_ratio(
     eo = _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight)
 
     if agg == "worst_case":
-        return min(eo.ratio(method=method))
+        return _quietly(lambda: eo.ratio(method=method)).min()
     else:
-        return eo.ratio(method=method).mean()
+        return _quietly(lambda: eo.ratio(method=method)).mean()
 
 
 def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFrame:
-    fns = {"tpr": true_positive_rate, "fpr": false_positive_rate}
+    fns = {"tpr": _true_positive_rate_or_nan, "fpr": _false_positive_rate_or_nan}
     sw_dict = {"sample_weight": sample_weight}
     sp = {"tpr": sw_dict, "fpr": sw_dict}
     eo = MetricFrame(
@@ -267,6 +346,7 @@ def _get_eo_frame(y_true, y_pred, sensitive_features, sample_weight) -> MetricFr
         sensitive_features=sensitive_features,
         sample_params=sp,
     )
+    _warn_on_undefined_rates(eo, stacklevel=3)
     return eo
 
 
@@ -285,9 +365,15 @@ def equal_opportunity_difference(
     :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a` of the sensitive feature(s).
     The equal opportunity difference of 0 means that all groups have the same true positive rate.
 
+    A group with no positive labels has no true positive rate, so it is left out
+    of the comparison, with a warning, rather than counted as a rate of 0.
+
     Read more in the :ref:`User Guide <disparity_metrics>`.
 
     .. versionadded:: 0.11.0
+
+    .. versionchanged:: 0.16.0
+        A group whose rate is undefined is left out instead of counted as 0.
 
     Parameters
     ----------
@@ -313,13 +399,14 @@ def equal_opportunity_difference(
         The equal opportunity difference
     """
     tpr = MetricFrame(
-        metrics=true_positive_rate,
+        metrics={"tpr": _true_positive_rate_or_nan},
         y_true=y_true,
         y_pred=y_pred,
         sensitive_features=sensitive_features,
-        sample_params={"sample_weight": sample_weight},
+        sample_params={"tpr": {"sample_weight": sample_weight}},
     )
-    result = tpr.difference(method=method)
+    _warn_on_undefined_rates(tpr, stacklevel=2)
+    result = _quietly(lambda: tpr.difference(method=method))["tpr"]
     return result
 
 
@@ -338,9 +425,15 @@ def equal_opportunity_ratio(
     :math:`P[h(X)=1 | A=a, Y=1]`, across all values :math:`a` of the sensitive feature(s).
     The equal opportunity ratio of 1 means that all groups have the same true positive rate.
 
+    A group with no positive labels has no true positive rate, so it is left out
+    of the comparison, with a warning, rather than counted as a rate of 0.
+
     Read more in the :ref:`User Guide <disparity_metrics>`.
 
     .. versionadded:: 0.11.0
+
+    .. versionchanged:: 0.16.0
+        A group whose rate is undefined is left out instead of counted as 0.
 
     Parameters
     ----------
@@ -366,11 +459,12 @@ def equal_opportunity_ratio(
         The equal opportunity ratio
     """
     tpr = MetricFrame(
-        metrics=true_positive_rate,
+        metrics={"tpr": _true_positive_rate_or_nan},
         y_true=y_true,
         y_pred=y_pred,
         sensitive_features=sensitive_features,
-        sample_params={"sample_weight": sample_weight},
+        sample_params={"tpr": {"sample_weight": sample_weight}},
     )
-    result = tpr.ratio(method=method)
+    _warn_on_undefined_rates(tpr, stacklevel=2)
+    result = _quietly(lambda: tpr.ratio(method=method))["tpr"]
     return result
