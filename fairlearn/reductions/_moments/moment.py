@@ -110,8 +110,9 @@ class Moment:
         Returns
         -------
         pandas.Series
-            Lagrange multipliers that are equivalent to `lambda_vec` for the
-            Lagrangian but can have a smaller norm. They are used by the
+            Lagrange multipliers that give the same or a higher Lagrangian value
+            than `lambda_vec` for every predictor and may have a smaller L1 norm.
+            They are used by the
             :class:`~fairlearn.reductions.ExponentiatedGradient` algorithm when
             evaluating the Lagrangian.
         """
@@ -128,10 +129,14 @@ class Moment:
         Returns
         -------
         pandas.Series
-            One weight per sample. The reductions algorithms add the weights of the
-            objective and the constraints, use the sign of the sum to choose the label
-            for a cost-sensitive learning problem, and the absolute value as the
-            sample weight when calling the underlying estimator.
+            One weight per sample. For classification, reductions add the objective
+            and constraint weights, use the sign of the sum to choose a binary label
+            for the cost-sensitive learning problem, and use its absolute value as
+            the sample weight for the underlying estimator. For regression, the
+            original target values are kept and the weights are used to reweight
+            samples. :class:`~fairlearn.reductions.GridSearch` omits separate
+            objective weights when the objective is already in the span of the
+            constraints.
         """
         raise NotImplementedError()
 
