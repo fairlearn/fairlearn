@@ -53,19 +53,20 @@ provide :code:`signed_weights` that are used to relabel and reweight samples.
 
 .. note::
 
-    The constraints described below (:class:`DemographicParity`,
-    :class:`TruePositiveRateParity`, :class:`FalsePositiveRateParity`,
-    :class:`EqualizedOdds`, and :class:`ErrorRateParity`) are all
-    :class:`Moment` objects, and are introduced here as *fairness
-    constraints*. However, "constraint" versus "objective" is a matter of
-    how a :class:`Moment` is used, not an inherent property of the class
-    itself: any of them can equally be passed as the :code:`objective`
-    argument of a reduction technique such as :class:`ExponentiatedGradient`,
-    in the same way :class:`ErrorRate` is used as an objective in
-    :ref:`error_rate`. Conversely, :class:`ErrorRate` can be used as a
-    fairness constraint (see :class:`ErrorRateParity`, which pairs
-    :class:`ErrorRate`-style utility with the parity constraint machinery
-    from :class:`UtilityParity`).
+    Both optimization objectives and fairness constraints inherit from
+    :class:`Moment`, but not every subclass supports both roles.
+    :class:`DemographicParity`, :class:`TruePositiveRateParity`,
+    :class:`FalsePositiveRateParity`, :class:`EqualizedOdds`, and
+    :class:`ErrorRateParity` are supported as classification constraints,
+    not as objectives. For :class:`ExponentiatedGradient`, use
+    :class:`ErrorRate` as a classification objective; see :ref:`error_rate`
+    for an example.
+
+    The :class:`ErrorRate` objective measures overall classification error,
+    with optional costs for false positives and false negatives. It is not
+    a supported fairness constraint. To constrain differences or ratios
+    between group error rates and the overall error rate, use
+    :class:`ErrorRateParity` instead; see :ref:`error_rate_parity`.
 
 .. _constraints_binary_classification:
 
