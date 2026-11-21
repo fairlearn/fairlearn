@@ -116,6 +116,10 @@ Documentation
   documenting the v0.11.0 :code:`scikit-learn` compatibility overhaul and the
   new :code:`classes_` attribute: :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
+* Documented the parameters and return values of :code:`gamma`, :code:`bound`,
+  :code:`project_lambda`, and :code:`signed_weights` on
+  :class:`~fairlearn.reductions.Moment`: :pr:`1751` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
 Other improvements
 ------------------
