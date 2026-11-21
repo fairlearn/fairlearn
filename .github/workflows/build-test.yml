@@ -9,6 +9,11 @@ on:
       - "main"
       - "release/**"
   workflow_dispatch:
+    inputs:
+      branch_coverage:
+        description: Collect a separate, non-gating branch coverage baseline
+        type: boolean
+        default: false
 
 
 concurrency:
@@ -63,6 +68,55 @@ jobs:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
       mlpackage: ${{ matrix.mlpackage }}
+
+  coverage:
+    needs: [all-deps-min, all-deps, minimal-deps, other-ml]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.0
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: coverage-line-*
+          path: coverage-data
+      - name: Combine complete line coverage
+        run: >
+          uv run --no-project --with coverage python scripts/combine_coverage.py
+          --reports coverage-data
+          --os ubuntu-latest windows-latest macos-15
+          --python 3.13 --min-python 3.11
+          --other-ml lightgbm xgboost tensorflow pytorch
+      - uses: actions/upload-artifact@v7
+        with:
+          name: coverage-combined-line
+          path: |
+            .coverage
+            coverage.xml
+            coverage.json
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
+      - name: Upload complete line coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          files: ./coverage.xml
+          disable_search: true
+          fail_ci_if_error: true
+          flags: unittests
+          name: build-test-${{ github.run_id }}-${{ github.run_attempt }}
+
+  branch-coverage:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_coverage }}
+    uses: ./.github/workflows/test-all-deps.yml
+    with:
+      os: ubuntu-latest
+      python: "3.13"
+      codeCovPython: "3.13"
+      coverageBranch: true
 
 
   linting:
