@@ -29,6 +29,9 @@ _NOT_ALLOWED_TYPE_ERROR_MESSAGE = "{} is not an ndarray, Series or DataFrame"
 _NDARRAY_NOT_TWO_DIMENSIONAL_ERROR_MESSAGE = "{} is an ndarray which is not 2D"
 _NOT_ALLOWED_MATRIX_TYPE_ERROR_MESSAGE = "{} is not an ndarray or DataFrame"
 _INCONSISTENT_ARRAY_LENGTH = "Arrays {} have an inconsistent number of items"
+_FEATURE_HAS_MISSING_VALUES_ERROR_MESSAGE = (
+    "{} contains missing values. Remove or replace them before passing them to Fairlearn."
+)
 
 _ALLOWED_INPUT_TYPES_X = [np.ndarray, pd.DataFrame]
 _ALLOWED_INPUT_TYPES_SENSITIVE_FEATURES = [np.ndarray, pd.DataFrame, pd.Series, list]
@@ -98,6 +101,7 @@ def _validate_and_reformat_input(
     sensitive_features = kwargs.get(_KW_SENSITIVE_FEATURES)
     if sensitive_features is not None:
         check_consistent_length(X, sensitive_features)
+        _check_no_missing_values(sensitive_features, _KW_SENSITIVE_FEATURES)
         sensitive_features = check_array(sensitive_features, ensure_2d=False, dtype=None)
 
         # compress multiple sensitive features into a single column
@@ -112,6 +116,7 @@ def _validate_and_reformat_input(
     control_features = kwargs.get(_KW_CONTROL_FEATURES)
     if control_features is not None:
         check_consistent_length(X, control_features)
+        _check_no_missing_values(control_features, _KW_CONTROL_FEATURES)
         control_features = check_array(control_features, ensure_2d=False, dtype=None)
 
         # compress multiple control features into a single column
@@ -125,6 +130,16 @@ def _validate_and_reformat_input(
     result_y = pd.Series(y) if y is not None else pd.Series(dtype="float64")
 
     return (result_X, result_y, sensitive_features, control_features)
+
+
+def _check_no_missing_values(features, name: str) -> None:
+    """Raise a ValueError if `features` contains missing values.
+
+    Missing values (``None``, ``np.nan``, ``pd.NA``, ...) would otherwise be
+    dropped silently when grouping, or end up as a group of their own.
+    """
+    if pd.isna(np.asarray(features, dtype=object)).any():
+        raise ValueError(_FEATURE_HAS_MISSING_VALUES_ERROR_MESSAGE.format(name))
 
 
 def _merge_columns(feature_columns: np.ndarray) -> np.ndarray:

@@ -295,9 +295,9 @@ class _Lagrangian:
         if h_value < best_value - _PRECISION:
             logger.debug("%sbest_h: val improvement %f", _LINE, best_value - h_value)
             h_idx = len(self.hs)
-            self.hs.at[h_idx] = h
-            self.predictors.at[h_idx] = classifier
-            self.errors.at[h_idx] = h_error
+            self.hs.loc[h_idx] = h
+            self.predictors.loc[h_idx] = classifier
+            self.errors.loc[h_idx] = h_error
             self.gammas[h_idx] = h_gamma
             self.lambdas[h_idx] = lambda_vec.copy()
             best_idx = h_idx

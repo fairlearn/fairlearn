@@ -57,7 +57,7 @@ def run_comparisons(moment, metric_fn):
     print("Metric for input:\n", mf_input.by_group)
     print("Input Metric differences:\n", mf_input.difference(method="to_overall"), "\n")
 
-    unmitigated = LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear")
+    unmitigated = LogisticRegression(max_iter=20, tol=1e-3, solver="lbfgs")
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
     mf_unmitigated = MetricFrame(
@@ -75,7 +75,7 @@ def run_comparisons(moment, metric_fn):
     )
 
     expgrad_basic = ExponentiatedGradient(
-        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        LogisticRegression(max_iter=20, tol=1e-3, solver="lbfgs"),
         constraints=moment(),
         eps=0.005,
     )
@@ -96,7 +96,7 @@ def run_comparisons(moment, metric_fn):
     )
 
     expgrad_control = ExponentiatedGradient(
-        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        LogisticRegression(max_iter=20, tol=1e-3, solver="lbfgs"),
         constraints=moment(),
         eps=0.005,
     )
@@ -148,7 +148,7 @@ def test_equalized_odds():
 
     metrics = {"tpr": true_positive_rate, "fpr": false_positive_rate}
 
-    unmitigated = LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear")
+    unmitigated = LogisticRegression(max_iter=20, tol=1e-3, solver="lbfgs")
     unmitigated.fit(X_dummy, y)
     y_pred = unmitigated.predict(X_dummy)
     mf_unmitigated = MetricFrame(
@@ -160,7 +160,7 @@ def test_equalized_odds():
     )
 
     expgrad_basic = ExponentiatedGradient(
-        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        LogisticRegression(max_iter=20, tol=1e-3, solver="lbfgs"),
         constraints=EqualizedOdds(difference_bound=0.01),
         eps=0.01,
     )
@@ -175,7 +175,7 @@ def test_equalized_odds():
     )
 
     expgrad_control = ExponentiatedGradient(
-        LogisticRegression(max_iter=20, tol=1e-3, solver="liblinear"),
+        LogisticRegression(max_iter=20, tol=1e-3, solver="lbfgs"),
         constraints=EqualizedOdds(difference_bound=0.01),
         eps=0.01,
     )

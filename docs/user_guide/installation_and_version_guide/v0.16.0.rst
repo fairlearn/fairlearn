@@ -12,6 +12,73 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` raises a clear :code:`ValueError`
+  for an empty dataset instead of a numpy
+  :code:`need at least one array to stack` error.
+  :pr:`1822` by :user:`Dongze Li <lidongze1002>`.
+
+* Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
+  use :code:`Series.loc` when adding new entries instead of scalar-only
+  :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
+  This avoids pandas 3.1 deprecation warnings without suppressing warnings:
+  :pr:`1801` by :user:`nawaaaaaAaar`.
+* :class:`~fairlearn.postprocessing.ThresholdOptimizer` with :code:`tol` no
+  longer excludes thresholds whose constraint values are exactly :code:`tol`
+  apart because of floating point error, and now raises a :code:`ValueError`
+  if :code:`tol` is not :code:`None` or a non-negative number. Relaxed-constraint
+  plots place the legend below the axes instead of covering the curves: :pr:`1794` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* The mitigation techniques in :mod:`fairlearn.reductions`,
+  :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
+  a :code:`ValueError` when :code:`sensitive_features` or
+  :code:`control_features` contain missing values. Previously, a :code:`None`
+  value was silently left out of the groups used by the reductions
+  constraints: :pr:`1792` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and 
+  :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` correctly passthrough
+  target :code:`y`, respec., sensitive features :code:`A` passed to :code:`.fit` if
+  :attr:`y_transform`, respec. :attr:`sf_transform`, is :code:`None`. They also
+  correctly apply the custom scikit learn transformers the user passes in.
+  :pr:`1783` by :user:`Tahar Allouche <taharallouche>`.
+
+* Fixed :class:`~fairlearn.reductions.TruePositiveRateParity` and
+  :class:`~fairlearn.reductions.FalsePositiveRateParity` with :code:`control_features`.
+  Rows with the other label (:code:`Y=0` and :code:`Y=1` respectively) were turned into
+  events named :code:`control=<value>,nan`, so the moments also constrained the rate
+  among those rows, and passing a control feature added a false (or true) positive rate
+  parity constraint that the user did not ask for: :pr:`1747` by :user:`breken-ai`.
+
+* Bootstrap confidence intervals in :func:`~fairlearn.metrics._plotter.plot_metric_frame`
+  are aligned with the plotted groups when a group is absent from all bootstrap
+  samples. Such groups retain their metric values with unavailable intervals:
+  :pr:`1787` by :user:`Zhe Chen <zhechen-cs>`.
+
+* :func:`~fairlearn.metrics.plot_model_comparison` respects
+  :code:`axis_labels=False`, preserving existing axis labels instead of replacing
+  them with inferred metric names: :pr:`1789` by :user:`Zhe Chen <zhechen-cs>`.
+
+* :func:`~fairlearn.metrics.plot_model_comparison` accepts omitted
+  :code:`sensitive_features` when both metrics can be evaluated without them.
+  Fairness metrics that require sensitive features still reject missing values:
+  :pr:`1788` by :user:`Zhe Chen <zhechen-cs>`.
+* :func:`~fairlearn.metrics.plot_model_comparison` raises a clear
+  :class:`ValueError` directing users to provide :code:`sensitive_features`
+  when a derived fairness metric needs group data: :pr:`1793`.
+* :meth:`~fairlearn.metrics.MetricFrame.difference` and
+  :meth:`~fairlearn.metrics.MetricFrame.ratio` with :code:`method="to_overall"`
+  now set non-scalar metrics to NaN when :code:`errors="coerce"`, and raise the
+  non-scalar error when :code:`errors="raise"`, as with
+  :code:`method="between_groups"`: :pr:`1786` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` no longer exposes
+  the classification-only :code:`classes_` attribute. Regression callbacks
+  receive :code:`pos_label=None`, and incremental fitting preserves fitted
+  state and validates feature counts: :pr:`1769` by :user:`Emre K. <kocaemre>`.
+
 * :class:`~fairlearn.preprocessing.CorrelationRemover` preserves its fitted
   feature count when :code:`transform` rejects an input with the wrong number
   of features: :pr:`1765` by
@@ -27,6 +94,11 @@ Bug fixes
   sensitive feature values were included in the overall curve but omitted
   from per-group curves. Remove or replace missing values before plotting:
   :pr:`1729` by :user:`Edward Yi <aiedwardyi>`.
+
+* :class:`~fairlearn.postprocessing.ThresholdOptimizer` now raises a
+  :code:`ValueError` in :code:`predict` when a sensitive feature value was not seen
+  during :code:`fit`. Previously every row of such a group was silently predicted as 0:
+  :pr:`1743` by :user:`Raashish Aggarwal <raashish1601>`.
 
 Documentation
 -------------
@@ -50,6 +122,10 @@ Documentation
   documenting the v0.11.0 :code:`scikit-learn` compatibility overhaul and the
   new :code:`classes_` attribute: :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
+* Documented the parameters and return values of :code:`gamma`, :code:`bound`,
+  :code:`project_lambda`, and :code:`signed_weights` on
+  :class:`~fairlearn.reductions.Moment`: :pr:`1751` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
 Other improvements
 ------------------
@@ -57,3 +133,19 @@ Other improvements
 * Added validation and documentation requiring scalar, non-floating entries for
   :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
   :pr:`1550` by :user:`MariamH <Mariamhaji>`.
+
+* Made :code:`BackendEngine` in the adversarial module an abstract base class
+  with abstract :code:`evaluate`, :code:`train_step`, :code:`get_optimizer` and
+  :code:`get_model` methods: :pr:`1775` by
+  :user:`Venius24 <Venius24>`.
+
+* Moved the macOS jobs in the GitHub workflows from the retired :code:`macOS-14`
+  runner to :code:`macos-15`: :pr:`1811` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* Sped up :class:`~fairlearn.reductions.BoundedGroupLoss` and
+  :class:`~fairlearn.reductions.MeanLoss` in
+  :class:`~fairlearn.reductions.ExponentiatedGradient` and
+  :class:`~fairlearn.reductions.GridSearch` by computing the signed weights
+  with :code:`Series.map` instead of a row-wise :code:`DataFrame.apply`:
+  :pr:`1814` by :user:`Furqan Khan <furqan-khan07>`.

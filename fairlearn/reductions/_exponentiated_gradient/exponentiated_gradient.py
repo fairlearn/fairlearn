@@ -197,7 +197,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
                 )
 
             if h_idx not in Qsum.index:
-                Qsum.at[h_idx] = 0.0
+                Qsum.loc[h_idx] = 0.0
             Qsum[h_idx] += 1.0
             gamma = lagrangian.gammas[h_idx]
             Q_EG = Qsum / Qsum.sum()
@@ -261,7 +261,7 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
         self._hs = lagrangian.hs
         for h_idx in self._hs.index:
             if h_idx not in self.weights_.index:
-                self.weights_.at[h_idx] = 0.0
+                self.weights_.loc[h_idx] = 0.0
 
         self.last_iter_ = len(Qs) - 1
         self.predictors_ = lagrangian.predictors

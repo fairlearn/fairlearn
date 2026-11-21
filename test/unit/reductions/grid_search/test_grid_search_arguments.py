@@ -65,7 +65,7 @@ def test_constraints_reused_across_multiple_fits():
     X, y, A = _quick_data()
     constraints = DemographicParity()
     gs = GridSearch(
-        LogisticRegression(solver="liblinear", random_state=42),
+        LogisticRegression(solver="lbfgs", random_state=42),
         constraints=constraints,
         grid_size=2,
     )
@@ -315,7 +315,7 @@ class ArgumentTests:
         grid = grid.iloc[:, indices]
 
         gs = GridSearch(
-            estimator=LogisticRegression(solver="liblinear"),
+            estimator=LogisticRegression(solver="lbfgs"),
             constraints=EqualizedOdds(),
             grid=grid,
         )
@@ -455,7 +455,7 @@ class TestPipelineEstimator(ConditionalOpportunityTests):
         cls.estimator = Pipeline(
             [
                 ("scaler", StandardScaler()),
-                ("logistic", LogisticRegression(solver="liblinear", max_iter=10)),
+                ("logistic", LogisticRegression(solver="lbfgs", max_iter=100)),
             ]
         )
 
@@ -468,7 +468,7 @@ class TestPipelineEstimator(ConditionalOpportunityTests):
 class TestDemographicParity(ConditionalOpportunityTests):
     @classmethod
     def setup_class(cls):
-        cls.estimator = LogisticRegression(solver="liblinear", max_iter=10)
+        cls.estimator = LogisticRegression(solver="lbfgs", max_iter=100)
 
     def setup_method(self, method):
         self.disparity_criterion = DemographicParity()
@@ -479,7 +479,7 @@ class TestDemographicParity(ConditionalOpportunityTests):
 class TestEqualizedOdds(ConditionalOpportunityTests):
     @classmethod
     def setup_class(cls):
-        cls.estimator = LogisticRegression(solver="liblinear", max_iter=10)
+        cls.estimator = LogisticRegression(solver="lbfgs", max_iter=100)
 
     def setup_method(self, method):
         self.disparity_criterion = EqualizedOdds()

@@ -341,6 +341,11 @@ def selection_rate(y_true, y_pred, *, pos_label: Any = 1, sample_weight=None) ->
     -------
     float
         The selection rate
+
+    Raises
+    ------
+    ValueError
+        If `y_pred` is empty.
     """
     selected = _convert_to_ndarray_and_squeeze(y_pred) == pos_label
     if len(selected) == 0:

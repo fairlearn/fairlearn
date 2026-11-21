@@ -51,6 +51,23 @@ are expressed as objects inheriting from the base class :code:`Moment`.
 current set of predictions through its :code:`gamma` function as well as to
 provide :code:`signed_weights` that are used to relabel and reweight samples.
 
+.. note::
+
+    Both optimization objectives and fairness constraints inherit from
+    :class:`Moment`, but not every subclass supports both roles.
+    :class:`DemographicParity`, :class:`TruePositiveRateParity`,
+    :class:`FalsePositiveRateParity`, :class:`EqualizedOdds`, and
+    :class:`ErrorRateParity` are supported as classification constraints,
+    not as objectives. For :class:`ExponentiatedGradient`, use
+    :class:`ErrorRate` as a classification objective; see :ref:`error_rate`
+    for an example.
+
+    The :class:`ErrorRate` objective measures overall classification error,
+    with optional costs for false positives and false negatives. It is not
+    a supported fairness constraint. To constrain differences or ratios
+    between group error rates and the overall error rate, use
+    :class:`ErrorRateParity` instead; see :ref:`error_rate_parity`.
+
 .. _constraints_binary_classification:
 
 Fairness constraints for binary classification
@@ -404,7 +421,7 @@ to a cost-sensitive classification problem.
     ... X, y, sensitive_features, test_size=0.33, random_state=42)
     >>> mitigator.fit(X_train, y_train, sensitive_features=sensitive_train) # doctest: +ELLIPSIS
     ExponentiatedGradient(...)
-    >>> y_pred = mitigator.predict(X_test)
+    >>> y_pred = mitigator.predict(X_test, random_state=42)
     >>> mf_mitigated = MetricFrame(metrics=accuracy_score, y_true=y_test, y_pred=y_pred, sensitive_features=sensitive_test)
     >>> mf_mitigated.overall.item()
     0.5151515151515151
@@ -672,6 +689,18 @@ The :class:`ExponentiatedGradient` algorithm in Fairlearn is used to produce mod
 satisfy fairness constraints without needing access to sensitive features at deployment time.
 This algorithm creates a sequence of re-weighted datasets and retrains the
 wrapped classifier on each of these datasets.
+The learned solution is a probability distribution over these predictors,
+represented by the :attr:`ExponentiatedGradient.predictors_` and
+:attr:`ExponentiatedGradient.weights_` attributes. Consequently,
+:meth:`ExponentiatedGradient.predict` is randomized, and repeated calls may
+return different labels. Pass ``random_state`` to ``predict``, as shown below,
+to make evaluation and examples reproducible.
+
+:class:`ExponentiatedGradient` does not expose a ``predict_proba`` method.
+Averaging the wrapped estimators' ``predict_proba`` outputs is not a supported
+equivalent to the learned randomized solution, which samples hard predictor
+outputs according to ``weights_``.
+
 To instantiate an :class:`ExponentiatedGradient` model, we need to pass in a base estimator
 and fairness constraints. The fairness constraints are typically specified by providing
 an upper bound on the difference (or the ratio) between the largest and the smallest
@@ -724,7 +753,8 @@ Here is an example of how to instantiate an :class:`ExponentiatedGradient` model
     ...         constraints=EqualizedOdds(difference_bound=eps),
     ...         sample_weight_name="classifier__sample_weight")
     ...     _ = exp_grad_est.fit(X_train, y_train, sensitive_features=A_train)
-    ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(X_test)
+    ...     exp_grad_models[f"ExpGrad (ε={eps})"] = exp_grad_est.predict(
+    ...         X_test, random_state=42)
     >>> # Add the base model predictions
     >>> exp_grad_models["Base Model"] = y_pred_base
     >>> # Plot the comparison

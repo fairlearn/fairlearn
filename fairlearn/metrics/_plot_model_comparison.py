@@ -99,6 +99,15 @@ def plot_model_comparison(
     ax : matplotlib.axes.Axes
         The Axes object that was drawn on.
 
+    Raises
+    ------
+    ValueError
+        If the lengths of `y_true`, `y_preds` or `point_labels` are inconsistent,
+        if an input has an unsupported type or format, or if `sensitive_features`
+        is omitted while a derived fairness metric is used.
+    RuntimeError
+        If matplotlib is not installed.
+
     Notes
     -----
     To offer flexibility in stylistic features besides the aforementioned
@@ -121,9 +130,11 @@ def plot_model_comparison(
         zeros((len(y_true), 1)),  # Dummy values for X
         y=y_true,
         sensitive_features=sensitive_features,
+        expect_sensitive_features=False,
     )
     y_true = y_true.values
-    sensitive_features = sensitive_features.values
+    if sensitive_features is not None:
+        sensitive_features = sensitive_features.values
 
     # --- VALIDATE INPUT ---
     if isinstance(y_preds, dict):
@@ -177,7 +188,7 @@ def plot_model_comparison(
     else:
         raise ValueError(
             _INPUT_DATA_FORMAT_ERROR_MESSAGE.format(
-                name, "boolean or list of labels", type(kwarg).__name__
+                "point_labels", "boolean or list of labels", type(point_labels).__name__
             )
         )
 
@@ -190,6 +201,13 @@ def plot_model_comparison(
                 )
     else:
         raise ValueError("Key word argument point_labels_position is not a two-tuple.")
+
+    if sensitive_features is None and any(
+        isinstance(metric, _DerivedMetric) for metric in (x_axis_metric, y_axis_metric)
+    ):
+        raise ValueError(
+            "sensitive_features must be provided when using a derived fairness metric."
+        )
 
     # --- COMPUTE METRICS ---
     # try-except structure because we expect: metric(y_true, y_pred, sensitive_attribute)
@@ -223,7 +241,7 @@ def plot_model_comparison(
         ax = plt.axes()
 
     # Add axis labels
-    if isinstance(axis_labels, bool):
+    if axis_labels is True:
         for f, m in (
             (ax.set_xlabel, x_axis_metric),
             (ax.set_ylabel, y_axis_metric),
