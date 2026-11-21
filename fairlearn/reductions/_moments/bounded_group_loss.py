@@ -101,7 +101,7 @@ class ConditionalLossMoment(LossMoment):
             adjust = pd.Series(1.0, index=self.index)
         else:
             adjust = lambda_vec / self.prob_attr
-        return self.tags.apply(lambda row: adjust[row[_GROUP_ID]], axis=1)
+        return self.tags[_GROUP_ID].map(adjust).rename(None)
 
 
 # Ensure that ConditionalLossMoment shows up in correct place in documentation
