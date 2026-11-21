@@ -20,7 +20,8 @@ Bug fixes
 * :class:`~fairlearn.postprocessing.ThresholdOptimizer` with :code:`tol` no
   longer excludes thresholds whose constraint values are exactly :code:`tol`
   apart because of floating point error, and now raises a :code:`ValueError`
-  if :code:`tol` is not :code:`None` or a non-negative number: :pr:`1794` by
+  if :code:`tol` is not :code:`None` or a non-negative number. Relaxed-constraint
+  plots place the legend below the axes instead of covering the curves: :pr:`1794` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
 * The mitigation techniques in :mod:`fairlearn.reductions`,

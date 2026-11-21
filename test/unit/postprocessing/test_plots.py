@@ -122,3 +122,26 @@ class TestPlots:
     )
     def test_plot_demographic_parity_tol(self):
         return _fit_and_plot("demographic_parity", _data_ex1, tol=0.1)
+
+    @pytest.mark.parametrize("constrained_layout", [False, True])
+    @pytest.mark.parametrize(
+        "plotting_data", [_data_ex1, _data_ex3], ids=["three-groups", "five-groups"]
+    )
+    def test_plot_demographic_parity_tol_legend_is_outside_axes(
+        self, plotting_data, constrained_layout
+    ):
+        import matplotlib.pyplot as plt
+
+        with plt.rc_context({"figure.constrained_layout.use": constrained_layout}):
+            fig = _fit_and_plot("demographic_parity", plotting_data, tol=0.1)
+            fig.canvas.draw()
+
+        ax = fig.axes[0]
+        renderer = fig.canvas.get_renderer()
+        legend_bounds = ax.get_legend().get_window_extent(renderer)
+        axes_bounds = ax.get_window_extent(renderer)
+
+        assert legend_bounds.y1 < axes_bounds.y0
+        assert fig.bbox.contains(legend_bounds.x0, legend_bounds.y0)
+        assert fig.bbox.contains(legend_bounds.x1, legend_bounds.y1)
+        assert fig.get_constrained_layout() == constrained_layout
