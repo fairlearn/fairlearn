@@ -6,7 +6,7 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.dummy import DummyClassifier
+from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.linear_model import LogisticRegression
 
 from fairlearn.reductions import (
@@ -942,6 +942,30 @@ class TestExponentiatedGradientSmoke:
         expgrad = ExponentiatedGradient(estimator, constraints)
         expgrad.fit(X, y, sensitive_features=sensitive_features)
         expgrad.predict(X)
+
+    def test_regression_prediction_uses_weights_of_the_matching_predictor(self):
+        # A BoundedGroupLoss fit can leave weights_ in a different order than
+        # _hs/predictors_. Regression predict sampled the columns positionally,
+        # giving zero-weight (always-zero) predictors positive probability.
+        X = np.ones((10, 1))
+        y = np.array([0.0] * 3 + [1.0] * 7)
+        sensitive_features = np.array([0] * 3 + [1] * 7)
+        expgrad = ExponentiatedGradient(
+            DummyRegressor(),
+            BoundedGroupLoss(SquareLoss(0, 1), upper_bound=0.3),
+            run_linprog_step=False,
+            nu=1e-6,
+            max_iter=20,
+        ).fit(X, y, sensitive_features=sensitive_features)
+
+        component_predictions = np.array(
+            [predictor.predict(X)[0] for predictor in expgrad.predictors_]
+        )
+        predictions = expgrad.predict(X, random_state=0)
+
+        assert list(expgrad.weights_.index) != list(expgrad._hs.index)
+        assert predictions.min() >= component_predictions.min()
+        assert predictions.max() <= component_predictions.max()
 
     def test_single_y_value(self):
         # Setup with data designed to result in "all single class"
