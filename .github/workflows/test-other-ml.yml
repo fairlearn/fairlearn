@@ -56,7 +56,7 @@ jobs:
           else
             export NUMPY_DEP="numpy"
           fi
-          uv pip install --python python . $NUMPY_DEP
+          uv pip install --system --python "$CONDA_PREFIX/bin/python" . $NUMPY_DEP
         name: Install Fairlearn
       - run: |
           echo

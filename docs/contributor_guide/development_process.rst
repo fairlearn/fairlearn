@@ -88,8 +88,7 @@ The same file declares development-only dependency groups:
 
 * :code:`tests` contains pytest, plotting, and dataframe-backend test dependencies.
 * :code:`docs` contains the documentation toolchain and includes the test dependencies
-  needed by examples. It retains the documentation environment's :code:`pandas<3`
-  constraint without changing the published runtime requirement.
+  needed by examples.
 * :code:`tooling` contains Ruff, the build frontend, and pre-commit.
 * The default :code:`dev` group includes all three.
 
@@ -136,9 +135,6 @@ wheels may require newer dependencies. Optional-backend compatibility bounds in 
 file are not claims about the oldest supported backend versions. Latest tests omit
 :code:`-r requirements-min.txt`; minimal-installation tests install only Fairlearn,
 pytest, and pytest-cov, without the :code:`tests` group.
-
-The old :code:`requirements-dev.txt` and :code:`scripts/install_requirements.py` have
-been replaced by these group-based commands.
 
 .. _contributing_pull_requests:
 

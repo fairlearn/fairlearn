@@ -59,6 +59,7 @@ tests = [
 ]
 docs = [
     { include-group = "tests" },
+    # Remove this cap when https://github.com/scikit-learn/scikit-learn/pull/34902 is released.
     "pandas<3.0",
     "pypandoc",
     "sphinx>=8.3.0",

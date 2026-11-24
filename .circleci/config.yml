@@ -9,7 +9,7 @@ version: 2.1
 jobs:
   build-doc:
     environment:
-      UV_PYTHON: python
+      UV_PYTHON: "3.12"
     docker:
       - image: cimg/python:3.12
 
@@ -55,7 +55,7 @@ jobs:
       - run:
           name: 'Install required packages'
           command: |
-            uv sync --locked --python python --no-default-groups --group docs
+            uv sync --locked --no-default-groups --group docs
 
       - run:
           name: "Build Documentation"
@@ -93,7 +93,7 @@ jobs:
 
   build-doctest:
     environment:
-      UV_PYTHON: python
+      UV_PYTHON: "3.12"
     docker:
       - image: cimg/python:3.12
 
@@ -139,7 +139,7 @@ jobs:
       - run:
           name: 'Install required packages'
           command: |
-            uv sync --locked --python python --no-default-groups --group docs
+            uv sync --locked --no-default-groups --group docs
 
       - run:
           name: 'Build doctest'
