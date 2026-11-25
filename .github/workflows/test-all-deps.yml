@@ -39,19 +39,20 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
-      - run: python scripts/install_requirements.py
-      - run: pip install .
+      - uses: astral-sh/setup-uv@v10.3.0
+      - run: uv venv --python python .venv-compat
+      - run: uv pip install --python .venv-compat . --group tests --prerelease disallow
       - name: Install scikit-learn nightly build
         if: ${{ inputs.sklearnNightly }}
         run: >
-          pip install --upgrade --pre --extra-index
+          uv pip install --python .venv-compat --upgrade --prerelease allow --index
           https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
+          --index-strategy unsafe-best-match
           scikit-learn
       - if: ${{ inputs.sklearnNightly }}
-        run: python -c "import sklearn; assert '.dev' in sklearn.__version__, sklearn.__version__"
-      - run: pip install matplotlib
+        run: uv run --no-project --python .venv-compat python -c "import sklearn; assert '.dev' in sklearn.__version__, sklearn.__version__"
       - run: >
-          pytest --mpl
+          uv run --no-project --python .venv-compat python -m pytest --mpl
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install -m "not openml"
           --cov=fairlearn --cov-report=xml -vl test/

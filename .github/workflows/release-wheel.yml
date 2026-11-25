@@ -81,7 +81,7 @@ jobs:
         uv pip install --system --python python --prerelease disallow ./fairlearn-*.whl
     - name: Install testing requirements
       run: |
-        uv pip install --system --python python --prerelease disallow pytest pytest-mock pytest-mpl lightgbm -c requirements-dev.txt
+        uv pip install --system --python python --prerelease disallow --group tests
     - name: Verify wheel installation and stable dependencies
       shell: bash
       env:

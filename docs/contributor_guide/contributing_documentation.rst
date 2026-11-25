@@ -53,11 +53,12 @@ instructions on that page, and return to follow the further
 documentation specific guidelines.
 
 You may also need to install `pandoc <https://pandoc.org/installing.html>`_,
-`optipng <https://optipng.sourceforge.net>`_, and :code:`matplotlib`.
+`optipng <https://optipng.sourceforge.net>`_. Python dependencies, including
+:code:`matplotlib`, are provided by the :code:`docs` development group:
 
 .. prompt:: bash
 
-    pip install matplotlib>=3.2.1
+    uv sync --locked --no-default-groups --group docs
 
 You can contribute updates to existing documentation by navigating to the
 relevant part of the repository (typically in the `docs` directory), and
@@ -68,7 +69,8 @@ directory:
 
 .. prompt:: bash
 
-    python -m sphinx -v -b html -n -j auto docs docs/_build/html
+    uv run --locked --no-default-groups --group docs python -m sphinx \
+        -v -b html -n -j auto docs docs/_build/html
 
 or use the shortcut:
 
