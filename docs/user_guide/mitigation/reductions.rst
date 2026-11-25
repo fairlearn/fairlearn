@@ -51,6 +51,23 @@ are expressed as objects inheriting from the base class :code:`Moment`.
 current set of predictions through its :code:`gamma` function as well as to
 provide :code:`signed_weights` that are used to relabel and reweight samples.
 
+.. note::
+
+    Both optimization objectives and fairness constraints inherit from
+    :class:`Moment`, but not every subclass supports both roles.
+    :class:`DemographicParity`, :class:`TruePositiveRateParity`,
+    :class:`FalsePositiveRateParity`, :class:`EqualizedOdds`, and
+    :class:`ErrorRateParity` are supported as classification constraints,
+    not as objectives. For :class:`ExponentiatedGradient`, use
+    :class:`ErrorRate` as a classification objective; see :ref:`error_rate`
+    for an example.
+
+    The :class:`ErrorRate` objective measures overall classification error,
+    with optional costs for false positives and false negatives. It is not
+    a supported fairness constraint. To constrain differences or ratios
+    between group error rates and the overall error rate, use
+    :class:`ErrorRateParity` instead; see :ref:`error_rate_parity`.
+
 .. _constraints_binary_classification:
 
 Fairness constraints for binary classification
