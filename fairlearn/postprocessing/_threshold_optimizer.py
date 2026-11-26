@@ -11,6 +11,8 @@ for binary classification with one categorical sensitive feature.
 from __future__ import annotations
 
 import logging
+import math
+from numbers import Integral, Real
 from typing import Literal
 from warnings import warn
 
@@ -290,11 +292,21 @@ class ThresholdOptimizer(MetaEstimatorMixin, BaseEstimator):
         ------
         ValueError
             If `estimator` is `None`, if `constraints` or `objective` is not
-            supported, if `tol` is set together with ``constraints="equalized_odds"``,
-            or if `control_features` is passed in `kwargs`.
+            supported, if `tol` is not `None` or a non-negative number, if `tol` is
+            set together with ``constraints="equalized_odds"``, or if
+            `control_features` is passed in `kwargs`.
         """
         if self.estimator is None:
             raise ValueError(BASE_ESTIMATOR_NONE_ERROR_MESSAGE)
+
+        if self.tol is not None and (
+            isinstance(self.tol, bool)
+            or not isinstance(self.tol, Real)
+            # integers are always finite, and math.isfinite overflows on very large ones
+            or (not isinstance(self.tol, Integral) and not math.isfinite(self.tol))
+            or self.tol < 0
+        ):
+            raise ValueError(f"tol must be None or a non-negative number, got {self.tol!r}.")
 
         if self.constraints in SIMPLE_CONSTRAINTS:
             if self.objective not in OBJECTIVES_FOR_SIMPLE_CONSTRAINTS:
