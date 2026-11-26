@@ -106,6 +106,10 @@ def fetch_diabetes_hospital(*, as_frame=True, cache=True, data_home=None, return
         as_frame=True,
         return_X_y=False,
         parser="auto",
+        # Values with spaces are single-quoted in the ARFF file, e.g. '30-60 years'.
+        # The pandas parser strips these quotes only from nominal columns, and
+        # these columns are STRING, so parse them with ' as the quote character.
+        read_csv_kwargs={"quotechar": "'"},
     )
 
     if as_frame:
