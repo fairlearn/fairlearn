@@ -26,7 +26,7 @@ def _get_fairlearn_version():
 
     This avoids requiring fairlearn (and its runtime dependencies) to be installed
     before the version can be read, which is useful in packaging/release scripts
-    that run before ``pip install``.
+    that run before installing the project.
     """
     init_path = Path(os.getcwd()) / "fairlearn" / "__init__.py"
     tree = ast.parse(init_path.read_text(encoding="utf-8"))
