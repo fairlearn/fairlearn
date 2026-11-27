@@ -93,6 +93,7 @@ API Docs
    :template: class.rst
 
    CorrelationRemover
+   PercentileRepairer
    PrototypeRepresentationLearner
 
 :py:mod:`fairlearn.reductions`
