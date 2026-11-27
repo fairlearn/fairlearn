@@ -12,6 +12,10 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.metrics.MetricFrame` accepts sensitive and control feature
+  names that coincide with internal metric input columns, such as :code:`y_true`,
+  :code:`y_pred`, or a sample-weight column, without overwriting those inputs.
+
 * Restored postprocessing compatibility with the declared Narwhals 1.14.0
   minimum by using its stable dataframe-construction API.
 
