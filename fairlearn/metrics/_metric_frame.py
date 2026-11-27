@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import numbers
+import warnings
 from collections.abc import Callable
 from typing import Any, Literal
 
@@ -36,6 +37,10 @@ _TOO_MANY_FEATURE_DIMS = "Feature array has too many dimensions"
 _EMPTY_INPUT_MESSAGE = "MetricFrame requires at least one sample"
 _SAMPLE_PARAMS_NOT_DICT = "Sample parameters must be a dictionary"
 _SAMPLE_PARAM_KEYS_NOT_IN_FUNC_DICT = "Keys in 'sample_params' do not match those in 'metric'"
+
+_NAN_GROUPS_LEFT_OUT = (
+    "MetricFrame.{method} left out these groups, whose metric value is NaN: {groups}"
+)
 
 _COMPARE_METHODS = ["between_groups", "to_overall"]
 _INVALID_COMPARE_METHOD = "Unrecognised comparison method: {0}"
@@ -322,6 +327,7 @@ class MetricFrame:
         )
         # Build into cache
         self._populate_results(result)
+        self._nan_groups = self._find_nan_groups(result.by_group, all_data)
 
         # Handle bootstrapping
         self._ci_quantiles = ci_quantiles
@@ -362,6 +368,36 @@ class MetricFrame:
                 return underlying_result.iloc[0]
         else:
             return underlying_result
+
+    @staticmethod
+    def _find_nan_groups(by_group: pd.DataFrame, data: pd.DataFrame) -> dict[str, list]:
+        """Find the groups with data whose metric value is NaN (or None), for each metric.
+
+        Combinations of features that never occur are NaN by construction and are not
+        included. Non-scalar values are not NaN, and are handled by the ``errors`` argument.
+        """
+        names = list(by_group.index.names)
+        present = data.groupby(names).size().index
+        nan_groups = {}
+        for metric in by_group.columns:
+            values = by_group[metric].loc[by_group.index.isin(present)]
+            missing = [
+                group
+                for group, value in values.items()
+                if (value is None or np.isscalar(value)) and pd.isna(value)
+            ]
+            if missing:
+                nan_groups[metric] = missing
+        return nan_groups
+
+    def _warn_on_nan_groups(self, method: str) -> None:
+        """Warn that an aggregate left out the groups whose metric value is NaN."""
+        if self._nan_groups:
+            warnings.warn(
+                _NAN_GROUPS_LEFT_OUT.format(method=method, groups=self._nan_groups),
+                UserWarning,
+                stacklevel=3,
+            )
 
     def _none_to_nan(self, target: pd.Series | pd.DataFrame) -> pd.Series | pd.DataFrame:
         """Convert Nones to NaNs."""
@@ -683,7 +719,13 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        A group whose metric value is NaN (or None) is left out, with a warning
+        naming it. Combinations of features that never occur are left out silently.
+
         Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
+        .. versionchanged:: 0.16.0
+            Warns when a group whose metric value is NaN is left out.
 
         Parameters
         ----------
@@ -711,6 +753,7 @@ class MetricFrame:
         if isinstance(value, Exception):
             raise value
         else:
+            self._warn_on_nan_groups("group_max")
             return value
 
     def group_max_ci(self) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
@@ -741,7 +784,13 @@ class MetricFrame:
         whether control features are present, and whether the metric functions
         were specified as a single callable or a dictionary.
 
+        A group whose metric value is NaN (or None) is left out, with a warning
+        naming it. Combinations of features that never occur are left out silently.
+
         Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
+        .. versionchanged:: 0.16.0
+            Warns when a group whose metric value is NaN is left out.
 
         Parameters
         ----------
@@ -769,6 +818,7 @@ class MetricFrame:
         if isinstance(value, Exception):
             raise value
         else:
+            self._warn_on_nan_groups("group_min")
             return value
 
     def group_min_ci(self) -> list[Any] | list[pd.Series] | list[pd.DataFrame]:
@@ -811,7 +861,13 @@ class MetricFrame:
         features, then :attr:`.overall` is multivalued for each metric).
         The result is the absolute maximum of these values.
 
+        A group whose metric value is NaN (or None) is left out, with a warning
+        naming it. Combinations of features that never occur are left out silently.
+
         Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
+        .. versionchanged:: 0.16.0
+            Warns when a group whose metric value is NaN is left out.
 
         Parameters
         ----------
@@ -836,6 +892,7 @@ class MetricFrame:
         if isinstance(value, Exception):
             raise value
         else:
+            self._warn_on_nan_groups("difference")
             return value
 
     def difference_ci(
@@ -891,7 +948,13 @@ class MetricFrame:
         expressing the ratio as a number less than 1.
         The result is the minimum of these values.
 
+        A group whose metric value is NaN (or None) is left out, with a warning
+        naming it. Combinations of features that never occur are left out silently.
+
         Read more in the :ref:`User Guide <assessment_compare_harms>`.
+
+        .. versionchanged:: 0.16.0
+            Warns when a group whose metric value is NaN is left out.
 
         Parameters
         ----------
@@ -916,6 +979,7 @@ class MetricFrame:
         if isinstance(value, Exception):
             raise value
         else:
+            self._warn_on_nan_groups("ratio")
             return value
 
     def ratio_ci(
