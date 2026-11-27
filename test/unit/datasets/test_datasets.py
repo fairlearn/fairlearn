@@ -355,6 +355,14 @@ class TestFairlearnDataset:
         assert isinstance(y, pd.Series if as_frame else np.ndarray)
 
     @pytest.mark.openml
+    def test_fetch_diabetes_hospital_strips_arff_quotes(self):
+        X, _ = fetch_diabetes_hospital(return_X_y=True, data_home=DATA_HOME)
+        assert set(X["age"]) == {"30 years or younger", "30-60 years", "Over 60 years"}
+        assert set(X["discharge_disposition_id"]) == {"Discharged to Home", "Other"}
+        string_columns = X.select_dtypes(include=["object", "string"]).columns
+        assert not any(X[col].str.startswith("'").any() for col in string_columns)
+
+    @pytest.mark.openml
     def test_fetch_acs_income_dataframe(self):
         dataset = fetch_acs_income(data_home=DATA_HOME)
         expected_columns = [

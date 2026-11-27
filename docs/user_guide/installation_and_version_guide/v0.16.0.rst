@@ -20,6 +20,11 @@ Bug fixes
   :code:`need at least one array to stack` error.
   :pr:`1822` by :user:`Dongze Li <lidongze1002>`.
 
+* :func:`~fairlearn.datasets.fetch_diabetes_hospital` no longer keeps the ARFF
+  single quotes around values that contain spaces, such as :code:`'30-60 years'`
+  in :code:`age`, :code:`discharge_disposition_id` and :code:`primary_diagnosis`:
+  :pr:`1832` by :user:`Chen-Yang Su <chenyangsu>`.
+
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
