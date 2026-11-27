@@ -27,6 +27,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
+      - uses: astral-sh/setup-uv@v10.3.0
       - name: Set up Conda environment
         uses: conda-incubator/setup-miniconda@v4
         with:
@@ -46,7 +47,7 @@ jobs:
           else
             export NUMPY_DEP="numpy"
           fi
-          pip install . $NUMPY_DEP
+          uv pip install --system --python "$CONDA_PREFIX/bin/python" . $NUMPY_DEP
         name: Install Fairlearn
       - run: |
           echo

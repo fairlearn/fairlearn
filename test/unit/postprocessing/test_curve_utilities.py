@@ -196,7 +196,7 @@ def _assert_interpolated_points_are_between_base_points(
     base_points, curve, ignore_for_base_points=None
 ):
     def _get_base_point_coordinates(i: int, data: nw.DataFrame):
-        return data.item(i, "x"), data.item(i, "y")
+        return float(data.item(i, "x")), float(data.item(i, "y"))
 
     curve = nw.from_native(curve, eager_only=True)
     base_points = nw.from_native(base_points, eager_only=True)
@@ -223,8 +223,8 @@ def _assert_interpolated_points_are_between_base_points(
     )
 
     for x_grid_index in range(len(curve)):
-        x = curve.item(x_grid_index, "x")
-        y = curve.item(x_grid_index, "y")
+        x = float(curve.item(x_grid_index, "x"))
+        y = float(curve.item(x_grid_index, "y"))
         if np.isclose(x, current_base_point_x):
             assert np.isclose(y, current_base_point_y)
             continue
