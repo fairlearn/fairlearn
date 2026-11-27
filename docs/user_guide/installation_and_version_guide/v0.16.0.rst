@@ -9,6 +9,12 @@ v0.16.0
 New features
 ------------
 
+* :class:`~fairlearn.preprocessing.PrototypeRepresentationLearner` now supports multiclass
+  classification targets. The classification error becomes a cross-entropy over softmax
+  class probabilities, and :code:`predict_proba` returns probabilities of shape
+  :code:`(n_samples, n_classes)` ordered as :code:`classes_`, matching scikit-learn
+  conventions: :pr:`1818` by :user:`laasyapriya2007`.
+
 Bug fixes
 ---------
 
