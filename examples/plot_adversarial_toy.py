@@ -107,7 +107,7 @@ evaluate(baseline.predict(X_test))
 # ``adversary_loss`` you can pass your own.
 #
 # ``alpha`` sets how hard the predictor works against the adversary. A small
-# weight decay keeps the weights from drifting, as in the original experiment.
+# weight decay keeps the weights from drifting.
 # Two passes over the training data are enough here.
 
 import torch
