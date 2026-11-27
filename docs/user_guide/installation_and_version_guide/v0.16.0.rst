@@ -40,7 +40,7 @@ Bug fixes
   constraints: :pr:`1792` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
-* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and 
+* :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` and
   :class:`~fairlearn.adversarial.AdversarialFairnessRegressor` correctly passthrough
   target :code:`y`, respec., sensitive features :code:`A` passed to :code:`.fit` if
   :attr:`y_transform`, respec. :attr:`sf_transform`, is :code:`None`. They also
@@ -106,6 +106,10 @@ Bug fixes
 Documentation
 -------------
 
+* Added a gallery example that reproduces the toy experiment from
+  Zhang et al. (2018) with
+  :class:`~fairlearn.adversarial.AdversarialFairnessClassifier`: :pr:`1833` by
+  :user:`quinnarnold <quinnarnold>`.
 * Corrected the default :code:`pos_label` descriptions for
   :func:`~fairlearn.metrics.true_positive_rate`, :func:`~fairlearn.metrics.true_negative_rate`,
   :func:`~fairlearn.metrics.false_positive_rate`, and :func:`~fairlearn.metrics.false_negative_rate`:
