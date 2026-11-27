@@ -126,6 +126,20 @@ API Docs
    ZeroOneLoss
    MeanLoss
 
+:py:mod:`fairlearn.linear_model`
+================================
+
+.. automodule:: fairlearn.linear_model
+    :no-members:
+    :no-inherited-members:
+
+.. autosummary::
+   :nosignatures:
+   :toctree: generated/
+   :template: class.rst
+
+   PrejudiceRemover
+
 :py:mod:`fairlearn.adversarial`
 ===============================
 
