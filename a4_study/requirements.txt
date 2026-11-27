@@ -1,0 +1,4 @@
+fairlearn==0.15.0
+numpy>=1.26
+pandas>=2.0
+scikit-learn>=1.4

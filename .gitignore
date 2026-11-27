@@ -132,3 +132,5 @@ docs/api_reference/generated/
 
 # impeccable (UI design tooling)
 .impeccable/
+a4_study/data/adult.data
+a4_study/data/adult.test
