@@ -330,9 +330,16 @@ class ExponentiatedGradient(BaseEstimator, MetaEstimatorMixin):
             return (positive_probs >= random_state.rand(len(positive_probs))) * 1
         else:
             pred = self._pmf_predict(X)
+            # ``_pmf_predict``'s columns follow ``_hs`` order, while
+            # ``weights_`` may have been reordered by the last linprog step.
+            # numpy's choice matches p positionally, so align the columns with
+            # the weights before sampling; otherwise zero-weight predictors
+            # can be sampled and their (zero) output returned.
+            pred = pred.reindex(columns=self.weights_.index)
+            probabilities = self.weights_.to_numpy()
             randomized_pred = np.zeros(pred.shape[0])
             for i in range(pred.shape[0]):
-                randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=self.weights_)
+                randomized_pred[i] = random_state.choice(pred.iloc[i, :], p=probabilities)
             return randomized_pred
 
     def _pmf_predict(self, X):

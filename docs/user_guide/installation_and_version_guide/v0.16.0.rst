@@ -12,6 +12,11 @@ New features
 Bug fixes
 ---------
 
+* :class:`~fairlearn.reductions.ExponentiatedGradient` samples regression
+  predictors with weights aligned to their fitted order, so a reordered
+  :code:`weights_` cannot give zero-weight predictors positive probability.
+  :pr:`1829` by :user:`Aniruddha Adak <aniruddhaadak80>`.
+
 * Restored postprocessing compatibility with the declared Narwhals 1.14.0
   minimum by using its stable dataframe-construction API.
 
