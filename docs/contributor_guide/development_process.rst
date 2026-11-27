@@ -51,80 +51,90 @@ First, clone the repository locally via:
    git clone git@github.com:fairlearn/fairlearn.git
 
 
-(Optional) Set up a virtual environment:
-
-   While you can use :code:`pip` to install the fairlearn package globally, we strongly
-   recommend developing using a virtual environment. Virtual environments are a great way
-   to isolate project dependencies, especially if you're working on multiple issues that
-   require different versions of the package.
-
-   To create a Python virtual environment using :code:`conda`, make your virtual environment
-   inside the fairlearn project directory. This will create a new :code:`fairlearn` folder
-   and seed it with a :code:`python=3.12` environment. Then activate the virtual environment:
-
-   .. prompt:: bash
-
-      conda create --name fairlearn python=3.12  # creates virtual env
-      conda activate fairlearn # activates virtual env
-      (fairlearn) $ # notice the shell prompt includes name of active virtual env
-
-   If you see the name of the environment in the shell prompt,
-   then the virtual environment is activated. To deactivate it, run: :code:`conda deactivate`.
-
-To install in editable mode, from the repository root path run:
+Install `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, then run
+from the repository root:
 
 .. prompt:: bash
 
-   pip install -e .
+   uv sync --locked
 
-To verify that the code works as expected run:
+This creates a project-local :code:`.venv`, installs Fairlearn in editable mode, and
+installs all development dependencies, including documentation dependencies. The
+checked-in :code:`.python-version` selects Python 3.13 by default; use
+:code:`--python 3.11` (or another supported version) on both :code:`uv sync` and
+:code:`uv run` to override it. Alternatively, set :code:`UV_PYTHON=3.11` for both commands.
+Each checkout or worktree has its own environment. No manual activation is required:
+:code:`uv run` executes commands in that checkout's environment.
 
-.. prompt:: bash
-
-   python ./scripts/install_requirements.py
-   python -m pytest -s ./test/unit
-
-.. note::
-
-   If there is a :code:`torch` related error during the installation,
-   please downgrade keep your :code:`python` version between 3.11-3.14.
-
-Fairlearn currently includes plotting functionality provided by
-:code:`matplotlib`. This is for a niche use case, so it isn't a default requirement. To install run:
+To verify that the code works as expected, run:
 
 .. prompt:: bash
 
-   pip install -e .
-   pip install matplotlib
+   uv run --locked python -m pytest -s ./test/unit
 
-The Requirements Files
-""""""""""""""""""""""
+Matplotlib and the adversarial ML backends remain optional for end users. Development
+groups install Matplotlib and Torch for tests and examples; they are not added to
+Fairlearn's published runtime requirements.
+
+Dependencies and the development lockfile
+""""""""""""""""""""""""""""""""""""""""""""
 
 Fairlearn's runtime dependencies (the packages required to actually use Fairlearn)
 are declared in the ``[project] dependencies`` table of
 `pyproject.toml <https://github.com/fairlearn/fairlearn/blob/main/pyproject.toml>`_ and
-are installed automatically when you run ``pip install .`` (or ``pip install -e .``).
+are installed automatically by :code:`uv sync` or a regular package installation.
 
-Development dependencies are tracked in two additional files:
+The same file declares development-only dependency groups:
 
-* `requirements-dev.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-dev.txt>`_
-  contains the prerequisites for Fairlearn development (such as :code:`ruff`, :code:`pytest`,
-  and the Sphinx documentation toolchain).
+* :code:`tests` contains pytest, plotting, and dataframe-backend test dependencies.
+* :code:`docs` contains the documentation toolchain and includes the test dependencies
+  needed by examples.
+* :code:`tooling` contains Ruff, the build frontend, and pre-commit.
+* The default :code:`dev` group includes all three.
 
-* `requirements-min.txt <https://github.com/fairlearn/fairlearn/blob/main/requirements-min.txt>`_
-  pins both runtime and development dependencies to the minimum supported versions
-  and is used in CI to test against the oldest combination of dependencies we claim to support.
-
-To install the unpinned development dependencies, run the
-`install_requirements.py <https://github.com/fairlearn/fairlearn/blob/main/scripts/install_requirements.py>`_
-helper script:
+For a smaller environment, select the groups explicitly in both installation and
+execution commands. For example:
 
 .. prompt:: bash
 
-   python ./scripts/install_requirements.py
+   uv sync --locked --no-default-groups --group tests
+   uv run --locked --no-default-groups --group tests python -m pytest ./test/unit
 
-Pass :code:`--min` to install the pinned minimum-version set from :code:`requirements-min.txt`
-instead.
+Omitting the group-selection flags from :code:`uv run` restores the default development
+groups. The committed :code:`uv.lock` resolves all groups together, even when only some
+are installed. :code:`--locked` fails if the manifest and lockfile disagree instead of
+silently changing the lock.
+
+When changing dependencies, edit the appropriate group in :code:`pyproject.toml`, run
+:code:`uv lock`, and commit both files. To intentionally update locked dependencies:
+
+.. prompt:: bash
+
+   uv lock --upgrade
+   uv lock --upgrade-package PACKAGE_NAME
+
+Use the second command for a targeted update, rather than running both. The development
+lockfile is not a runtime constraint for package users or compatibility tests.
+
+Compatibility environments
+""""""""""""""""""""""""""
+
+Latest, minimum, minimal-installation, and scikit-learn nightly CI environments resolve
+independently of :code:`uv.lock`. Use a separate environment and :code:`uv pip` to reproduce
+them; do not use project-mode :code:`uv run`, which can restore locked dependencies.
+
+.. prompt:: bash
+
+   uv venv --python 3.11 .venv-compat
+   uv pip install --python .venv-compat . --group tests -r requirements-min.txt
+   uv run --no-project --python .venv-compat python -m pytest -m narwhals ./test/unit
+
+:code:`requirements-min.txt` pins all runtime requirements and selected development
+requirements. The minimum matrix uses Python 3.11, not newer Python versions whose
+wheels may require newer dependencies. Optional-backend compatibility bounds in that
+file are not claims about the oldest supported backend versions. Latest tests omit
+:code:`-r requirements-min.txt`; minimal-installation tests install only Fairlearn,
+pytest, and pytest-cov, without the :code:`tests` group.
 
 .. _contributing_pull_requests:
 
@@ -202,8 +212,7 @@ Follow the steps below to create a pull request.
 
    .. prompt:: bash
 
-      pip install pre-commit
-      pre-commit install
+      uv run --locked pre-commit install
 
    Pre-commit checks can be disabled for a particular commit with :code:`git commit -n`.
 

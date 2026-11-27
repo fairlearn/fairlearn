@@ -18,11 +18,25 @@ New features
 Bug fixes
 ---------
 
+* Restored postprocessing compatibility with the declared Narwhals 1.14.0
+  minimum by using its stable dataframe-construction API.
+
+* :class:`~fairlearn.metrics.MetricFrame` raises a clear :code:`ValueError`
+  for an empty dataset instead of a numpy
+  :code:`need at least one array to stack` error.
+  :pr:`1822` by :user:`Dongze Li <lidongze1002>`.
+
 * Reduction constraint bases and :class:`~fairlearn.reductions.ExponentiatedGradient`
   use :code:`Series.loc` when adding new entries instead of scalar-only
   :code:`Series.at`, and boolean basis flags are initialized with boolean dtype.
   This avoids pandas 3.1 deprecation warnings without suppressing warnings:
   :pr:`1801` by :user:`nawaaaaaAaar`.
+* :class:`~fairlearn.postprocessing.ThresholdOptimizer` with :code:`tol` no
+  longer excludes thresholds whose constraint values are exactly :code:`tol`
+  apart because of floating point error, and now raises a :code:`ValueError`
+  if :code:`tol` is not :code:`None` or a non-negative number. Relaxed-constraint
+  plots place the legend below the axes instead of covering the curves: :pr:`1794` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
 * The mitigation techniques in :mod:`fairlearn.reductions`,
   :mod:`fairlearn.postprocessing` and :mod:`fairlearn.preprocessing` now raise
@@ -117,9 +131,18 @@ Documentation
   documenting the v0.11.0 :code:`scikit-learn` compatibility overhaul and the
   new :code:`classes_` attribute: :pr:`1767` by
   :user:`Peace Amhanesi <amhanesipeace>`.
+* Documented the parameters and return values of :code:`gamma`, :code:`bound`,
+  :code:`project_lambda`, and :code:`signed_weights` on
+  :class:`~fairlearn.reductions.Moment`: :pr:`1751` by
+  :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
 
 Other improvements
 ------------------
+
+* Standardized development environments on :code:`uv sync` and :code:`uv run`,
+  with tests, docs, and tooling dependency groups and a committed development
+  lockfile. Minimum, latest, minimal-installation, and nightly compatibility
+  tests continue to resolve dependencies independently.
 
 * Added validation and documentation requiring scalar, non-floating entries for
   :class:`~fairlearn.metrics.MetricFrame` sensitive and control features:
@@ -133,3 +156,10 @@ Other improvements
 * Moved the macOS jobs in the GitHub workflows from the retired :code:`macOS-14`
   runner to :code:`macos-15`: :pr:`1811` by
   :user:`Spilios Dimakopoulos <SpiliosDimakopoulos>`.
+
+* Sped up :class:`~fairlearn.reductions.BoundedGroupLoss` and
+  :class:`~fairlearn.reductions.MeanLoss` in
+  :class:`~fairlearn.reductions.ExponentiatedGradient` and
+  :class:`~fairlearn.reductions.GridSearch` by computing the signed weights
+  with :code:`Series.map` instead of a row-wise :code:`DataFrame.apply`:
+  :pr:`1814` by :user:`Furqan Khan <furqan-khan07>`.

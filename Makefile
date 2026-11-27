@@ -1,8 +1,9 @@
 # simple makefile to simplify repetitive build env management tasks
 
-PYTHON ?= python
-PYTEST ?= pytest
-SPHINX ?= python -m sphinx
+UV ?= uv
+PYTHON ?= $(UV) run --locked python
+PYTEST ?= $(PYTHON) -m pytest
+SPHINX ?= $(UV) run --locked --no-default-groups --group docs python -m sphinx
 
 all: clean inplace test-unit
 
@@ -11,7 +12,7 @@ clean:
 
 in: inplace # just a shortcut
 inplace:
-	pip install -e .
+	$(UV) sync --locked
 
 test-coverage:
 	$(PYTEST) test -m "not notebooks" --ignore=test/install --cov=fairlearn --cov-report=xml --cov-report=html
@@ -23,4 +24,4 @@ test-deprecation:
 	$(PYTEST) -Werror::DeprecationWarning -Werror::FutureWarning ./test/unit
 
 doc:
-	python -m sphinx -v -b html -n -j auto docs docs/_build/html
+	$(SPHINX) -v -b html -n -j auto docs docs/_build/html

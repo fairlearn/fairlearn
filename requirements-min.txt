@@ -1,12 +1,16 @@
 #requirements
+narwhals==1.14.0
 numpy==1.24.4
 pandas==2.0.3
 scikit-learn==1.6.0
 scipy==1.9.3
 
+# Optional backend compatibility with the pinned runtime, not claimed minimum versions.
+# PyArrow 26 requires NumPy 2 at import time.
+pyarrow<26
+
 #requirements-dev
 ruff==0.15.20
-requirements_parser==0.11.0
 pytest==9.0.3
 pytest_cov==6.1.1
 pytest-mock==3.14.0

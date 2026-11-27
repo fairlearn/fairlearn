@@ -16,40 +16,61 @@ on:
 jobs:
   all-deps-min:
     # This job installs all dependencies and runs most tests.
-    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
-    # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     env:
       MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v7
-      - name: Get commit date
-        id: get_date
-        shell: bash
-        run: |
-          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
-          CURRENT_DATE=$(date +%s)
-          AGE=$((CURRENT_DATE - COMMIT_DATE))
-          echo "AGE=$AGE" >> $GITHUB_OUTPUT
-          echo "AGE in seconds: $AGE"
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
-      - run: python scripts/install_requirements.py --min
-      - run: pip install .
-      - run: pip install matplotlib
+      - uses: astral-sh/setup-uv@v10.3.0
+      - run: uv venv --python python .venv-compat
+      - run: uv pip install --python .venv-compat . --group tests -r requirements-min.txt
+      - name: Verify exact minimum runtime versions
+        shell: python
+        run: |
+          import subprocess
+
+          subprocess.run([
+              "uv", "run", "--no-project", "--python", ".venv-compat", "python",
+              "-c", """
+          import tomllib
+          from importlib.metadata import version
+          from pathlib import Path
+          from packaging.requirements import Requirement
+
+          pins = {
+              requirement.name.lower().replace("_", "-"): requirement
+              for raw in Path("requirements-min.txt").read_text().splitlines()
+              for line in [raw.strip()]
+              if line and not line.startswith("#")
+              for requirement in [Requirement(line)]
+          }
+          project = tomllib.loads(Path("pyproject.toml").read_text())
+          for entry in project["project"]["dependencies"]:
+              requirement = Requirement(entry)
+              pin = pins[requirement.name.lower().replace("_", "-")]
+              assert str(pin.specifier).startswith("=="), pin
+              installed = version(requirement.name)
+              assert installed in pin.specifier, (pin, installed)
+              assert installed in requirement.specifier, (requirement, installed)
+              print(f"{requirement.name}=={installed}")
+          """
+          ], check=True)
       - run: >
-          pytest --mpl
+          uv run --no-project --python .venv-compat python -m pytest --mpl
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install -m "not openml"
           --cov=fairlearn --cov-report=xml -vl test/
-      - name: Upload coverage reports to Codecov with GitHub Action
-        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@v7
+      - name: Retain coverage report
+        if: ${{ inputs.codeCovPython == inputs.python }}
+        uses: actions/upload-artifact@v7
         with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
+          name: coverage-line-min-${{ inputs.os }}-${{ inputs.python }}
+          path: |
+            .coverage
+            coverage.xml
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
