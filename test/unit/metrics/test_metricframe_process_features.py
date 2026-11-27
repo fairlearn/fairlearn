@@ -92,6 +92,12 @@ class TestSingleFeature:
         result = target._process_features("CF", raw_feature, y_true)
         self._common_validations(result, "CF0")
 
+    def test_1d_array_single_sample(self):
+        # A one-element array must not be squeezed down to zero dimensions
+        target = _get_raw_MetricFrame()
+        result = target._process_features("SF", np.asarray(["a"]), np.asarray([0]))
+        self._common_validations(result, "SF0")
+
     def test_single_column_dataframe(self):
         r_f, y_true = self._get_raw_data()
         raw_feature = pd.DataFrame(data=r_f, columns=["My Feature"])
@@ -171,6 +177,14 @@ class TestTwoFeatures:
 
         target = _get_raw_MetricFrame()
         result = target._process_features("CF", rf, y_true)
+        self._common_validations(result, ["CF0", "CF1"])
+
+    def test_2d_array_single_row(self):
+        # One row with two feature columns must keep both features
+        rf = np.asarray([["a", "b"]], dtype=object)
+
+        target = _get_raw_MetricFrame()
+        result = target._process_features("CF", rf, np.asarray([0]))
         self._common_validations(result, ["CF0", "CF1"])
 
     def test_named_dataframe(self):

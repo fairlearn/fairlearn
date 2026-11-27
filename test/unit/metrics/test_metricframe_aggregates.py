@@ -1956,3 +1956,15 @@ def test_empty_input_raises_clear_error():
             y_pred=np.asarray([]),
             sensitive_features=np.asarray([]),
         )
+
+
+def test_single_sample():
+    """A MetricFrame built from a single sample must not raise."""
+    mf = metrics.MetricFrame(
+        metrics=skm.accuracy_score,
+        y_true=np.asarray([1]),
+        y_pred=np.asarray([1]),
+        sensitive_features=np.asarray(["a"]),
+    )
+    assert mf.overall == 1.0
+    assert mf.by_group.iloc[0] == 1.0
