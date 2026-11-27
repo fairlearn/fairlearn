@@ -116,6 +116,13 @@ markers = [
     "openml: tests that download datasets from OpenML (deselect with '-m \"not openml\"')",
 ]
 
+[tool.coverage.run]
+source = ["fairlearn"]
+relative_files = true
+
+[tool.coverage.paths]
+fairlearn = ["fairlearn", "*/fairlearn"]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [

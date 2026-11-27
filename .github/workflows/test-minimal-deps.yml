@@ -18,20 +18,9 @@ jobs:
     # This job installs minimal dependencies and runs tests for the minimal
     # dependency cases. This also covers the case where matplotlib is not
     # installed, i.e., fairlearn without extras.
-    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
-    # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     steps:
       - uses: actions/checkout@v7
-      - name: Get commit date
-        id: get_date
-        shell: bash
-        run: |
-          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
-          CURRENT_DATE=$(date +%s)
-          AGE=$((CURRENT_DATE - COMMIT_DATE))
-          echo "AGE=$AGE" >> $GITHUB_OUTPUT
-          echo "AGE in seconds: $AGE"
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ inputs.python }}
@@ -41,13 +30,14 @@ jobs:
       - name: Verify optional plotting dependencies are absent
         run: uv run --no-project --python .venv-compat python -c "from importlib.util import find_spec; assert find_spec('matplotlib') is None"
       - run: uv run --no-project --python .venv-compat python -m pytest --cov=fairlearn --cov-report=xml test/install
-      - name: Upload coverage reports to Codecov with GitHub Action
-        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@v7
+      - name: Retain coverage report
+        if: ${{ inputs.codeCovPython == inputs.python }}
+        uses: actions/upload-artifact@v7
         with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
+          name: coverage-line-install-${{ inputs.os }}-${{ inputs.python }}
+          path: |
+            .coverage
+            coverage.xml
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true

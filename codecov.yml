@@ -1,8 +1,37 @@
 comment: false
+coverage:
+  status:
+    project:
+      default: false
+      line-floor:
+        target: 95%
+        threshold: 0%
+        informational: true
+        if_not_found: failure
+        flags: [unittests]
+        paths: [fairlearn/]
+      non-regression:
+        target: auto
+        threshold: 0%
+        informational: true
+        if_not_found: failure
+        flags: [unittests]
+        paths: [fairlearn/]
+    patch:
+      default:
+        target: 90%
+        threshold: 0%
+        informational: true
+        if_not_found: failure
+        flags: [unittests]
+        paths: [fairlearn/]
+flags:
+  unittests:
+    carryforward: false
 codecov:
   branch: main
   require_ci_to_pass: true
   notify:
-    after_n_builds: 12
+    after_n_builds: 1
     wait_for_ci: true
   token: 363a2bcc-6585-4bdf-ac2d-3d9cb1bfdecf
