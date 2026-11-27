@@ -93,10 +93,11 @@ evaluate(baseline.predict(X_test))
 # Adversarial mitigation
 # ----------------------
 #
-# Now we train the same kind of model with an adversary. Passing an empty list
-# as ``predictor_model`` gives a network with no hidden layers, which is a
-# logistic regression. The adversary is also a single linear layer: it gets the
-# predictor's output and tries to recover :math:`r` from it.
+# Now we train the same kind of model with an adversary. We build both networks
+# ourselves in PyTorch so we can look at them afterwards. The predictor is a
+# single linear layer followed by a sigmoid, which is a logistic regression. The
+# adversary has the same shape: it gets the predictor's output and tries to
+# recover :math:`r` from it.
 #
 # We use ``constraints="demographic_parity"``. With the default ``"auto"``
 # losses, a binary label and a binary sensitive feature both use binary
@@ -118,10 +119,14 @@ def optimizer(model):
     return torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=0.01)
 
 
+torch.manual_seed(123)
+predictor = torch.nn.Sequential(torch.nn.Linear(2, 1), torch.nn.Sigmoid())
+adversary = torch.nn.Sequential(torch.nn.Linear(1, 1), torch.nn.Sigmoid())
+
 mitigator = AdversarialFairnessClassifier(
     backend="torch",
-    predictor_model=[],
-    adversary_model=[],
+    predictor_model=predictor,
+    adversary_model=adversary,
     predictor_optimizer=optimizer,
     adversary_optimizer=optimizer,
     constraints="demographic_parity",
@@ -133,11 +138,10 @@ mitigator = AdversarialFairnessClassifier(
 mitigator.fit(X_train, y_train, sensitive_features=r_train)
 
 # %%
-# The predictor network is a single ``torch.nn.Linear`` layer, so we can read
-# its weights the same way as before.
+# The mitigator trains the ``predictor`` we passed in, so we can read the
+# weights of its linear layer the same way as before.
 
-linear = mitigator.backendEngine_.predictor_model.layers_[0]
-print("weights (r, u):", linear.weight.detach().numpy().ravel().round(2))
+print("weights (r, u):", predictor[0].weight.detach().numpy().ravel().round(2))
 evaluate(mitigator.predict(X_test))
 
 # %%
@@ -155,6 +159,12 @@ evaluate(mitigator.predict(X_test))
 # the learning rate, or the number of steps, check the metrics again;
 # :ref:`adversarial_Example_2` shows how to adjust them during training with
 # callbacks.
+#
+# Keep in mind that this is a toy problem. It shows how the method works, not
+# when to use it. Whether demographic parity is the right goal, and whether
+# using the sensitive feature this way is acceptable, depends on the real
+# deployment context and the harms involved. Synthetic data can't answer
+# those questions.
 #
 # References
 # ----------
